@@ -148,7 +148,10 @@ def build() -> Path:
                 <ul class="scores">{score_rows}</ul>
               </section>
               <section>
-                <h4>Real listings</h4>
+                <div class="section-title">
+                  <h4>3 representative real listings</h4>
+                  <p>Sample live-market references to show the local range, ticket size, and property types.</p>
+                </div>
                 <div class="listings">{listing_cards}</div>
               </section>
             </details>
@@ -221,6 +224,8 @@ def build() -> Path:
     section {{ padding: 18px; border-top: 1px solid rgba(23,32,27,.08); }}
     h4 {{ margin: 0 0 8px; font-size: 15px; }}
     p {{ line-height: 1.6; }}
+    .section-title {{ margin-bottom: 12px; }}
+    .section-title p {{ margin: 0; color: #667168; font-size: 13px; }}
     .analysis, .pros-cons {{ display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }}
     .pros-cons {{ grid-template-columns: 1fr 1fr; }}
     .analysis p, .pros-cons li, .listing p {{ color: #536258; font-size: 14px; }}
@@ -252,7 +257,7 @@ def build() -> Path:
     <header>
       <p class="eyebrow">Investor-grade destination property research</p>
       <h1>Holiday & retirement property destination dashboard</h1>
-      <p class="lede">A mobile-first comparison of 25 global destinations, with scoring, ownership notes, yield caveats, USD/m² benchmarks, and representative real listings embedded per destination.</p>
+      <p class="lede">A mobile-first comparison of 25 global destinations, with scoring, ownership notes, yield caveats, USD/m² benchmarks, and 3 representative real listings embedded for every destination.</p>
     </header>
     <form class="toolbar" id="toolbar">
       <input id="search" type="search" placeholder="Search destination or country" aria-label="Search destination or country">
