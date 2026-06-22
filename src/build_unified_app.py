@@ -90,6 +90,159 @@ DIMENSIONS = [
     },
 ]
 
+SEO_PAGES = [
+    {
+        "slug": "best-places-to-buy-property-abroad-for-retirement",
+        "title": "Best Places to Buy Property Abroad for Retirement | Global Home Atlas",
+        "description": "Compare the best places to buy property abroad for retirement using ownership clarity, healthcare, lifestyle, value, rental resilience, and exit liquidity.",
+        "h1": "Best Places to Buy Property Abroad for Retirement",
+        "keyword": "best places to buy property abroad for retirement",
+        "theme": "retirement planning",
+        "intent": "buyers who want one property to support retirement optionality, seasonal living, and defensible resale value",
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "lake-como", "hakone-izu", "m-laga-costa-del-sol"],
+        "faqs": [
+            ("What matters most when buying abroad for retirement?", "Ownership clarity, healthcare access, daily convenience, tax and visa planning, and resale liquidity should be weighted before lifestyle appeal."),
+            ("Should retirement buyers prioritize rental yield?", "Yield helps offset ownership costs, but retirement buyers should avoid assets where income depends on fragile short-term-rental rules."),
+            ("Is a lower purchase price always safer?", "No. A cheap property can be expensive if title, maintenance, healthcare access, or resale demand are weak."),
+        ],
+    },
+    {
+        "slug": "best-places-to-buy-vacation-home-abroad",
+        "title": "Best Places to Buy a Vacation Home Abroad | Global Home Atlas",
+        "description": "Rank global vacation-home destinations by lifestyle pull, rental durability, foreign ownership, value discipline, and long-term exit liquidity.",
+        "h1": "Best Places to Buy a Vacation Home Abroad",
+        "keyword": "best places to buy a vacation home abroad",
+        "theme": "vacation-home acquisition",
+        "intent": "buyers who want personal use, repeatable travel demand, and a realistic path to offset carrying costs",
+        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "madeira", "costa-brava-girona", "lake-como", "crete", "phuket-koh-samui", "mallorca"],
+        "faqs": [
+            ("What makes a strong overseas vacation-home market?", "Look for repeat visitation, airport access, year-round demand, clear local rental rules, and a resale market beyond foreign buyers."),
+            ("Are island homes better investments?", "Not automatically. Islands can have scarcity and appeal, but also seasonality, maintenance friction, and regulatory limits."),
+            ("How should I use rental estimates?", "Treat rental estimates as underwriting context, then verify permits, net operating costs, occupancy, and local manager quality."),
+        ],
+    },
+    {
+        "slug": "best-countries-for-expats-to-buy-property",
+        "title": "Best Countries for Expats to Buy Property | Global Home Atlas",
+        "description": "A global expat property buying guide comparing ownership rules, foreign-buyer practicality, lifestyle quality, value, and resale depth.",
+        "h1": "Best Countries for Expats to Buy Property",
+        "keyword": "best countries for expats to buy property",
+        "theme": "expat ownership",
+        "intent": "globally mobile buyers who need clear foreign ownership, usable infrastructure, and a livable long-term base",
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "da-nang-hoi-an", "phuket-koh-samui"],
+        "faqs": [
+            ("Which countries are easiest for expats to buy in?", "Ease depends on title structure, local counsel quality, banking, taxes, and residency rules, not only whether foreign ownership is technically allowed."),
+            ("Should expats buy before moving?", "Usually only after validating healthcare, transport, language friction, taxes, and the specific neighborhood through extended stays."),
+            ("How should foreign buyers manage legal risk?", "Use independent local counsel, verify title and permits, model taxes, and avoid structures you cannot explain clearly."),
+        ],
+    },
+    {
+        "slug": "buy-property-abroad",
+        "title": "Buy Property Abroad: Global Buyer Checklist | Global Home Atlas",
+        "description": "Use a structured framework to buy property abroad: shortlist countries, compare ownership risk, underwrite income, and plan exit liquidity.",
+        "h1": "Buy Property Abroad",
+        "keyword": "buy property abroad",
+        "theme": "global purchase process",
+        "intent": "buyers moving from inspiration to a disciplined international property shortlist",
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "lake-como", "madeira", "costa-brava-girona", "crete"],
+        "faqs": [
+            ("What is the first step to buy property abroad?", "Define the job of the property: retirement base, vacation home, income asset, capital preservation, or a blend."),
+            ("How many markets should I compare?", "Start with five to eight markets, then reduce to two or three after legal, tax, visa, and neighborhood checks."),
+            ("What should I verify before an offer?", "Verify title, permits, taxes, financing, insurance, building condition, rental rules, and resale comparables."),
+        ],
+    },
+    {
+        "slug": "overseas-property-investment",
+        "title": "Overseas Property Investment: Markets to Compare | Global Home Atlas",
+        "description": "Compare overseas property investment destinations by net yield, capital upside, regulatory safety, entry price, and liquidity.",
+        "h1": "Overseas Property Investment",
+        "keyword": "overseas property investment",
+        "theme": "investment underwriting",
+        "intent": "investors comparing income, appreciation, governance, and the ability to exit cleanly",
+        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "m-laga-costa-del-sol", "da-nang-hoi-an", "phuket-koh-samui", "bali", "croatia-istria-dalmatia", "costa-brava-girona"],
+        "faqs": [
+            ("What is a good overseas property investment?", "A good investment combines realistic net income, legal clarity, demand durability, price discipline, and a broad future buyer pool."),
+            ("Should I chase the highest yield?", "No. High yield can signal regulatory, seasonality, management, title, or liquidity risk."),
+            ("How should I compare markets?", "Normalize by net yield, USD per square meter, ownership rules, exit depth, and the lifestyle demand that supports resale."),
+        ],
+    },
+    {
+        "slug": "portugal-vs-spain-retirement-property",
+        "title": "Portugal vs Spain Retirement Property | Global Home Atlas",
+        "description": "Compare Portugal and Spain retirement property markets across lifestyle, ownership clarity, value, healthcare practicality, rentals, and resale.",
+        "h1": "Portugal vs Spain Retirement Property",
+        "keyword": "Portugal vs Spain retirement property",
+        "theme": "country comparison",
+        "intent": "retirement buyers choosing between Iberian lifestyle, value, and legal-market depth",
+        "destination_ids": ["algarve-cascais", "madeira", "valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
+        "faqs": [
+            ("Is Portugal or Spain better for retirement property?", "The better choice depends on tax, residency, healthcare access, local price discipline, and whether you prefer smaller resort markets or deeper city-region liquidity."),
+            ("Which has stronger resale liquidity?", "Spain generally offers deeper regional buyer pools in major coastal and city markets, while Portugal can offer focused demand in established expat corridors."),
+            ("How should buyers compare Portugal and Spain?", "Compare specific regions, not just countries: Algarve versus Malaga is a more useful decision than Portugal versus Spain in the abstract."),
+        ],
+    },
+    {
+        "slug": "greece-vs-portugal-retirement-property",
+        "title": "Greece vs Portugal Retirement Property | Global Home Atlas",
+        "description": "Compare Greece and Portugal retirement property options for foreign buyers focused on lifestyle, value, ownership, rentals, and long-term livability.",
+        "h1": "Greece vs Portugal Retirement Property",
+        "keyword": "Greece vs Portugal retirement property",
+        "theme": "country comparison",
+        "intent": "buyers weighing Mediterranean value, island lifestyle, legal clarity, and retirement resilience",
+        "destination_ids": ["crete", "algarve-cascais", "madeira", "croatia-istria-dalmatia", "lake-como", "valencia"],
+        "faqs": [
+            ("Is Greece cheaper than Portugal for retirement property?", "Some Greek markets can offer attractive entry values, but buyers must compare micro-location, maintenance, flights, seasonality, and resale depth."),
+            ("Which is better for year-round living?", "Portugal often screens well for year-round expat infrastructure, while Greece can be compelling where healthcare, access, and local services are strong."),
+            ("What is the main risk in island retirement property?", "Seasonality, healthcare distance, maintenance logistics, and narrower resale pools can matter more than the purchase price."),
+        ],
+    },
+    {
+        "slug": "japan-retirement-property-foreign-buyers",
+        "title": "Japan Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Assess Japan retirement property for foreign buyers, including ownership clarity, lifestyle quality, value, income limits, and resale considerations.",
+        "h1": "Japan Retirement Property for Foreign Buyers",
+        "keyword": "Japan retirement property foreign buyers",
+        "theme": "Japan buyer guide",
+        "intent": "foreign buyers considering Japan for lifestyle, retirement optionality, and clean ownership rather than pure yield",
+        "destination_ids": ["fukuoka-itoshima", "hakone-izu", "hakuba", "niseko", "valencia", "algarve-cascais"],
+        "faqs": [
+            ("Can foreigners buy property in Japan?", "Foreign buyers can generally buy freehold property in Japan, but financing, taxes, management, and local rules still require careful advice."),
+            ("Is Japan good for retirement property?", "Japan can be strong for safety, healthcare, food, transport, and ownership clarity, but visa status and income expectations need separate planning."),
+            ("Where should foreign buyers compare in Japan?", "Compare city-adjacent lifestyle markets such as Fukuoka and Itoshima with resort markets such as Hakone, Hakuba, and Niseko."),
+        ],
+    },
+    {
+        "slug": "thailand-villa-ownership-foreigners",
+        "title": "Thailand Villa Ownership for Foreigners | Global Home Atlas",
+        "description": "Understand Thailand villa ownership for foreigners and compare Phuket and Koh Samui against other Asia lifestyle property alternatives.",
+        "h1": "Thailand Villa Ownership for Foreigners",
+        "keyword": "Thailand villa ownership foreigners",
+        "theme": "Thailand ownership",
+        "intent": "buyers attracted to Thai villas who need to understand structure, rental appeal, and legal friction",
+        "destination_ids": ["phuket-koh-samui", "bali", "da-nang-hoi-an", "fukuoka-itoshima", "algarve-cascais", "madeira"],
+        "faqs": [
+            ("Can foreigners own villas in Thailand?", "Foreigners need specialist advice because land ownership, leasehold structures, companies, and condominium rules differ materially."),
+            ("Are Phuket and Koh Samui good investment markets?", "They can offer strong lifestyle demand, but buyers must underwrite seasonality, management quality, legal structure, and resale buyer depth."),
+            ("What should foreign villa buyers avoid?", "Avoid opaque land structures, unrealistic rental guarantees, weak maintenance reserves, and assets dependent on one demand channel."),
+        ],
+    },
+    {
+        "slug": "best-places-to-buy-property-in-europe",
+        "title": "Best Places to Buy Property in Europe | Global Home Atlas",
+        "description": "Compare the best places to buy property in Europe for lifestyle, retirement, rental resilience, value discipline, and long-term resale liquidity.",
+        "h1": "Best Places to Buy Property in Europe",
+        "keyword": "best places to buy property in Europe",
+        "theme": "Europe shortlist",
+        "intent": "buyers comparing European lifestyle markets with a global investor's discipline",
+        "destination_ids": ["valencia", "algarve-cascais", "madeira", "lake-como", "costa-brava-girona", "crete", "annecy", "dolomites-south-tyrol", "mallorca", "croatia-istria-dalmatia"],
+        "faqs": [
+            ("Where should foreign buyers start in Europe?", "Start with regions that combine livability, transport, healthcare, clear ownership, and a resale market broader than one nationality."),
+            ("Is Europe better for lifestyle or yield?", "Europe is often strongest as a lifestyle and capital-preservation decision, while yield depends heavily on local rules and asset selection."),
+            ("How should I compare European property markets?", "Compare city access, healthcare, taxation, rental rules, seasonality, entry price, and resale depth at the regional level."),
+        ],
+    },
+]
+
 
 def money(value: float | int | None) -> str:
     if value is None:
@@ -379,6 +532,399 @@ def build_spotlight(destinations: list[dict]) -> str:
     return "\n".join(cards)
 
 
+def page_url(slug: str | None = None) -> str:
+    if not slug:
+        return SITE_URL
+    return f"{SITE_URL}{slug}/"
+
+
+def json_ld(data: dict | list[dict]) -> str:
+    return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+
+
+def head_html(title: str, description: str, canonical: str, schema: list[dict]) -> str:
+    return f"""
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2310241f'/%3E%3Cpath d='M17 37 32 18l15 19v11H36V36h-8v12H17Z' fill='%23fffdf8'/%3E%3C/svg%3E">
+  <title>{escape(title)}</title>
+  <meta name="description" content="{escape(description)}">
+  <link rel="canonical" href="{escape(canonical)}">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="{SITE_NAME}">
+  <meta property="og:title" content="{escape(title)}">
+  <meta property="og:description" content="{escape(description)}">
+  <meta property="og:url" content="{escape(canonical)}">
+  <meta name="twitter:card" content="summary_large_image">
+  <script type="application/ld+json">{json_ld(schema)}</script>
+"""
+
+
+def destination_lookup(destinations: list[dict]) -> dict[str, dict]:
+    return {item["id"]: item for item in destinations}
+
+
+def destinations_for_page(page: dict, destinations: list[dict]) -> list[dict]:
+    by_id = destination_lookup(destinations)
+    picked = [by_id[item] for item in page["destination_ids"] if item in by_id]
+    return picked or destinations[:8]
+
+
+def seo_guide_links(pages: list[dict], current_slug: str | None = None, limit: int | None = None) -> str:
+    links = [
+        f'<a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a>'
+        for page in pages
+        if page["slug"] != current_slug
+    ]
+    if limit:
+        links = links[:limit]
+    return "\n".join(links)
+
+
+def build_home_guide_section(pages: list[dict]) -> str:
+    cards = []
+    for page in pages[:6]:
+        cards.append(
+            f"""
+            <article>
+              <span>{escape(page["theme"])}</span>
+              <h3><a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a></h3>
+              <p>{escape(page["description"])}</p>
+            </article>
+            """
+        )
+    return "\n".join(cards)
+
+
+def metric_value(dest: dict, dimension_key: str) -> float:
+    for item in dest.get("decision_dimensions", []):
+        if item.get("key") == dimension_key:
+            return float(item.get("score", 0) or 0)
+    return 0
+
+
+def build_seo_destination_table(destinations: list[dict]) -> str:
+    rows = []
+    for dest in destinations:
+        rows.append(
+            f"""
+            <tr>
+              <td><strong>{escape(dest["name"])}</strong><br><span>{escape(dest.get("country") or "")}</span></td>
+              <td>{dest.get("decision_score", 0):.2f}</td>
+              <td>{money(dest.get("usd_per_m2"))}/m2</td>
+              <td>{escape(dest.get("net_yield_estimate") or "n/a")}</td>
+              <td>{metric_value(dest, "ownership_clarity"):.1f}/5</td>
+              <td>{metric_value(dest, "retirement_fit"):.1f}/5</td>
+              <td>{escape(dest.get("panel_verdict") or "")}</td>
+            </tr>
+            """
+        )
+    return f"""
+      <div class="seo-table-wrap">
+        <table class="seo-table">
+          <thead>
+            <tr>
+              <th>Destination</th>
+              <th>Score</th>
+              <th>Entry</th>
+              <th>Yield</th>
+              <th>Ownership</th>
+              <th>Retirement</th>
+              <th>Committee read</th>
+            </tr>
+          </thead>
+          <tbody>{"".join(rows)}</tbody>
+        </table>
+      </div>
+    """
+
+
+def build_seo_destination_cards(destinations: list[dict]) -> str:
+    cards = []
+    for dest in destinations[:6]:
+        cards.append(
+            f"""
+            <article class="seo-destination-card">
+              <div>
+                <span>#{dest["rank"]} global scorecard</span>
+                <h3>{escape(dest["name"])}</h3>
+                <p>{escape(dest.get("panel_summary") or "")}</p>
+              </div>
+              <dl>
+                <div><dt>Decision score</dt><dd>{dest.get("decision_score", 0):.2f}/5</dd></div>
+                <div><dt>Entry benchmark</dt><dd>{money(dest.get("usd_per_m2"))}/m2</dd></div>
+                <div><dt>Ownership</dt><dd>{metric_value(dest, "ownership_clarity"):.1f}/5</dd></div>
+                <div><dt>Exit liquidity</dt><dd>{metric_value(dest, "exit_liquidity"):.1f}/5</dd></div>
+              </dl>
+            </article>
+            """
+        )
+    return "\n".join(cards)
+
+
+def build_faq_html(faqs: list[tuple[str, str]]) -> str:
+    return "\n".join(
+        f"""
+        <details class="faq-item">
+          <summary>{escape(question)}</summary>
+          <p>{escape(answer)}</p>
+        </details>
+        """
+        for question, answer in faqs
+    )
+
+
+def schema_for_page(page: dict, canonical: str) -> list[dict]:
+    breadcrumb = {
+        "@context": "https://schema.org",
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+            {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
+            {"@type": "ListItem", "position": 2, "name": page["h1"], "item": canonical},
+        ],
+    }
+    webpage = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": page["h1"],
+        "url": canonical,
+        "description": page["description"],
+        "dateModified": date.today().isoformat(),
+        "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
+    }
+    faq = {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        "mainEntity": [
+            {
+                "@type": "Question",
+                "name": question,
+                "acceptedAnswer": {"@type": "Answer", "text": answer},
+            }
+            for question, answer in page.get("faqs", [])
+        ],
+    }
+    return [webpage, breadcrumb, faq]
+
+
+def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> str:
+    selected = destinations_for_page(page, destinations)
+    canonical = page_url(page["slug"])
+    top = selected[0]
+    runner_up = selected[1] if len(selected) > 1 else selected[0]
+    related_links = seo_guide_links(pages, page["slug"], limit=5)
+    title = page["title"]
+    description = page["description"]
+    updated = date.today().isoformat()
+    country_count = len({item.get("country") for item in selected if item.get("country")})
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(title, description, canonical, schema_for_page(page, canonical))}
+  <style>
+    :root {{
+      color: #16231f;
+      background: #f7f4ee;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --ink: #16231f;
+      --muted: #65736d;
+      --line: rgba(22, 35, 31, .14);
+      --paper: #fffdf8;
+      --deep: #10241f;
+      --teal: #176b62;
+      --gold: #a77a35;
+      --clay: #b85f3f;
+    }}
+    * {{ box-sizing: border-box; }}
+    body {{ margin: 0; min-width: 320px; }}
+    a {{ color: var(--teal); text-underline-offset: 3px; overflow-wrap: anywhere; }}
+    p, li {{ line-height: 1.65; }}
+    .seo-shell {{ width: min(1120px, calc(100% - 32px)); margin: 0 auto; }}
+    .seo-hero {{
+      color: #fffdf8;
+      background:
+        linear-gradient(135deg, rgba(16, 36, 31, .97), rgba(23, 107, 98, .74), rgba(184, 95, 63, .42)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'%3E%3Crect width='1500' height='900' fill='%2310241f'/%3E%3Cpath d='M0 560c150-62 304-58 462 12 163 72 300 79 465-18 177-104 371-133 573-25v371H0Z' fill='%23fffdf8' fill-opacity='.12'/%3E%3Cpath d='M110 128h1280M110 270h1280M110 412h1280M110 554h1280M110 696h1280M278 70v760M536 70v760M794 70v760M1052 70v760M1310 70v760' stroke='%23fffdf8' stroke-opacity='.11'/%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+      padding: 18px 0 64px;
+    }}
+    .seo-nav {{ display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 78px; }}
+    .seo-brand {{ color: #fffdf8; font-weight: 900; text-decoration: none; }}
+    .seo-nav-links {{ display: flex; gap: 18px; flex-wrap: wrap; }}
+    .seo-nav-links a {{ color: rgba(255, 253, 248, .86); text-decoration: none; font-size: 13px; font-weight: 800; }}
+    .seo-hero-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }}
+    .seo-eyebrow {{ margin: 0 0 12px; color: #e1c17e; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }}
+    h1 {{ margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }}
+    .seo-lede {{ max-width: 760px; margin: 22px 0 0; color: rgba(255, 253, 248, .84); font-size: clamp(16px, 2vw, 20px); }}
+    .seo-hero-card {{ padding: 16px; border: 1px solid rgba(255, 253, 248, .26); border-radius: 8px; background: rgba(255, 253, 248, .1); backdrop-filter: blur(16px); }}
+    .seo-hero-card span {{ display: block; color: rgba(255, 253, 248, .68); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .seo-hero-card strong {{ display: block; margin: 6px 0 14px; font-size: 24px; }}
+    .seo-actions {{ display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }}
+    .seo-button {{ display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 15px; border-radius: 6px; background: #fffdf8; color: var(--deep); font-weight: 850; text-decoration: none; }}
+    .seo-button.secondary {{ background: transparent; color: #fffdf8; border: 1px solid rgba(255, 253, 248, .34); }}
+    main {{ margin-top: -32px; }}
+    .seo-panel {{ border: 1px solid var(--line); border-radius: 8px; background: var(--paper); overflow: hidden; box-shadow: 0 18px 50px rgba(16, 36, 31, .08); }}
+    .seo-stats {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); }}
+    .seo-stats div {{ min-width: 0; padding: 16px; background: var(--paper); }}
+    .seo-stats span, dt {{ display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }}
+    .seo-stats strong, dd {{ display: block; margin: 5px 0 0; font-weight: 900; overflow-wrap: anywhere; }}
+    .seo-content {{ display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }}
+    .seo-article {{ display: grid; gap: 28px; min-width: 0; }}
+    .seo-section {{ min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }}
+    .seo-section h2 {{ margin: 0 0 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 4vw, 38px); line-height: 1.04; }}
+    .seo-section h3 {{ margin: 18px 0 8px; font-size: 18px; }}
+    .seo-section p {{ color: #3f4d48; }}
+    .seo-table-wrap {{ width: 100%; max-width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }}
+    .seo-table {{ width: 100%; min-width: 820px; border-collapse: collapse; background: #fff; }}
+    .seo-table th, .seo-table td {{ padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }}
+    .seo-table th {{ color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }}
+    .seo-table span {{ color: var(--muted); }}
+    .seo-card-grid {{ display: grid; gap: 12px; }}
+    .seo-destination-card {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .54fr); gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }}
+    .seo-destination-card span {{ color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .seo-destination-card h3 {{ margin: 7px 0; }}
+    .seo-destination-card dl {{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 0; }}
+    .seo-destination-card dl div {{ padding: 10px; border-radius: 6px; background: #f2f5f1; }}
+    .seo-aside {{ position: sticky; top: 16px; display: grid; gap: 14px; }}
+    .seo-aside-card {{ padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }}
+    .seo-aside-card h2, .seo-aside-card h3 {{ margin: 0 0 10px; font-size: 16px; }}
+    .seo-aside-card nav {{ display: grid; gap: 10px; }}
+    .seo-aside-card p, .seo-aside-card a {{ font-size: 14px; }}
+    .faq-item {{ border-top: 1px solid var(--line); padding: 14px 0; }}
+    .faq-item summary {{ cursor: pointer; font-weight: 850; }}
+    .faq-item p {{ margin-bottom: 0; }}
+    .seo-footer {{ padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--muted); }}
+    .seo-footer nav {{ display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }}
+    @media (max-width: 860px) {{
+      .seo-nav {{ margin-bottom: 48px; }}
+      .seo-hero-grid, .seo-content {{ grid-template-columns: 1fr; }}
+      .seo-aside {{ position: static; }}
+      .seo-stats {{ grid-template-columns: repeat(2, 1fr); }}
+    }}
+    @media (max-width: 560px) {{
+      .seo-shell {{ width: min(100% - 28px, 1120px); }}
+      .seo-nav {{ align-items: flex-start; }}
+      .seo-nav-links {{ display: none; }}
+      .seo-hero {{ padding-bottom: 48px; }}
+      .seo-stats, .seo-destination-card, .seo-destination-card dl {{ grid-template-columns: 1fr; }}
+      .seo-section {{ padding: 18px; }}
+    }}
+  </style>
+</head>
+<body>
+  <header class="seo-hero">
+    <div class="seo-shell">
+      <nav class="seo-nav" aria-label="Primary">
+        <a class="seo-brand" href="/">Global Home Atlas</a>
+        <div class="seo-nav-links">
+          <a href="/">Dashboard</a>
+          <a href="#comparison">Comparison</a>
+          <a href="#faq">FAQ</a>
+        </div>
+      </nav>
+      <div class="seo-hero-grid">
+        <div>
+          <p class="seo-eyebrow">{escape(page["theme"])} · updated {updated}</p>
+          <h1>{escape(page["h1"])}</h1>
+          <p class="seo-lede">{escape(description)} This guide is written for {escape(page["intent"])}.</p>
+          <div class="seo-actions">
+            <a class="seo-button" href="/#destinations">Open the full dashboard</a>
+            <a class="seo-button secondary" href="#comparison">Compare markets</a>
+          </div>
+        </div>
+        <aside class="seo-hero-card">
+          <span>Top current match</span>
+          <strong>{escape(top["name"])}</strong>
+          <span>Alternative to test</span>
+          <strong>{escape(runner_up["name"])}</strong>
+          <span>Markets compared</span>
+          <strong>{len(selected)}</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="seo-shell">
+      <section class="seo-panel" aria-label="Guide summary">
+        <div class="seo-stats">
+          <div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div>
+          <div><span>Destinations</span><strong>{len(selected)}</strong></div>
+          <div><span>Countries</span><strong>{country_count}</strong></div>
+          <div><span>Top score</span><strong>{top.get("decision_score", 0):.2f}/5</strong></div>
+        </div>
+      </section>
+      <div class="seo-content">
+        <article class="seo-article">
+          <section class="seo-section">
+            <h2>How to Read This Shortlist</h2>
+            <p>The right answer for {escape(page["keyword"])} is rarely the market with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process. Global Home Atlas ranks markets through ten decision dimensions: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry.</p>
+            <p>That weighting is designed for affluent global citizens who may use one property for several jobs over time. A home can begin as a vacation base, become a semi-retirement address, then eventually need to rent or sell. The best markets on this page are therefore not selected only for near-term excitement. They are selected because the evidence points to a more durable combination of livability, practicality, and investment defensibility.</p>
+            <p>Use this page as a first-pass filter. It narrows the research field, highlights where each market is strong, and shows which tradeoffs need professional verification. Before buying, confirm title, taxes, foreign-buyer rules, visa status, insurance, building condition, local rental permits, manager quality, and resale comparables with independent local advisers.</p>
+          </section>
+
+          <section class="seo-section" id="comparison">
+            <h2>Best Markets to Compare First</h2>
+            <p>For this search, the strongest candidates are {escape(top["name"])} and {escape(runner_up["name"])} because they balance high decision scores with practical ownership and lifestyle use. The table below keeps the comparison deliberately concrete: entry benchmark, yield context, ownership clarity, retirement fit, and the committee read. These are the variables most likely to change a real buy/no-buy decision.</p>
+            {build_seo_destination_table(selected)}
+          </section>
+
+          <section class="seo-section">
+            <h2>Market Notes for Serious Buyers</h2>
+            <div class="seo-card-grid">
+              {build_seo_destination_cards(selected)}
+            </div>
+          </section>
+
+          <section class="seo-section">
+            <h2>Decision Framework</h2>
+            <h3>1. Start with ownership clarity</h3>
+            <p>Foreign buyers should eliminate markets where the legal structure is hard to explain, hard to finance, or heavily dependent on informal assumptions. A beautiful asset can become a poor decision if land rights, permits, taxes, or resale procedures are unclear. The ownership score in this guide is therefore intentionally prominent.</p>
+            <h3>2. Underwrite lifestyle as demand</h3>
+            <p>Lifestyle is not decoration. Food, healthcare, airport access, safety, climate, and year-round activity are the forces that make a place usable by the owner and attractive to future buyers or tenants. A market with repeated lifestyle demand has more ways to work if the original plan changes.</p>
+            <h3>3. Treat yield as a stress test</h3>
+            <p>Rental income should offset risk, not justify ignoring it. Net yield estimates need to survive management fees, vacancy, repairs, taxes, furnishing, platform costs, insurance, and regulatory changes. A lower but cleaner yield in a liquid market can be superior to a headline yield that depends on aggressive occupancy or fragile short-term-rental permissions.</p>
+            <h3>4. Plan the exit before entry</h3>
+            <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
+          </section>
+
+          <section class="seo-section" id="faq">
+            <h2>FAQ</h2>
+            {build_faq_html(page.get("faqs", []))}
+          </section>
+        </article>
+
+        <aside class="seo-aside">
+          <section class="seo-aside-card">
+            <h2>Use the Full Atlas</h2>
+            <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
+            <a class="seo-button" href="/#destinations">Open dashboard</a>
+          </section>
+          <section class="seo-aside-card">
+            <h3>Related Guides</h3>
+            <nav>{related_links}</nav>
+          </section>
+          <section class="seo-aside-card">
+            <h3>Research Caveat</h3>
+            <p>Scores and listing benchmarks are research inputs, not financial, legal, tax, or immigration advice. Verify current rules locally before acting.</p>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="seo-footer">
+    <div class="seo-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
+      <nav>{seo_guide_links(pages, page["slug"])}</nav>
+    </div>
+  </footer>
+</body>
+</html>
+"""
+
+
 def build() -> Path:
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = sorted(destinations, key=lambda item: item["rank"])
@@ -419,6 +965,7 @@ def build() -> Path:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2310241f'/%3E%3Cpath d='M17 37 32 18l15 19v11H36V36h-8v12H17Z' fill='%23fffdf8'/%3E%3C/svg%3E">
   <title>Global Home Atlas | Compare Global Property Investment Destinations</title>
   <meta name="description" content="Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.">
   <link rel="canonical" href="https://globalhomeatlas.com/">
@@ -913,13 +1460,51 @@ def build() -> Path:
       font-size: 13px;
       line-height: 1.5;
     }
+    .guide-section {
+      margin: 0 0 54px;
+      padding: 26px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 12px 40px rgba(16, 36, 31, .07);
+    }
+    .guide-section__header {
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: end;
+      margin-bottom: 18px;
+    }
+    .guide-section__header h2 {
+      margin: 0;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(24px, 4vw, 38px);
+    }
+    .guide-section__header p { margin: 6px 0 0; color: var(--muted); max-width: 680px; }
+    .guide-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+    .guide-grid article {
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .guide-grid span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .guide-grid h3 { margin: 8px 0; font-size: 18px; line-height: 1.15; }
+    .guide-grid p { margin: 0; color: var(--muted); font-size: 14px; }
     .hidden { display: none; }
     @media (max-width: 980px) {
       .hero { min-height: auto; padding-bottom: 66px; }
       .hero-grid, .workbench { grid-template-columns: 1fr; }
       .control-panel { position: static; }
       .mobile-jump { display: flex; }
-      .spotlight-grid { grid-template-columns: 1fr; }
+      .spotlight-grid, .guide-grid { grid-template-columns: 1fr; }
       .metric-strip, .brief-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 680px) {
@@ -960,6 +1545,7 @@ def build() -> Path:
           <a href="#shortlist">Shortlist</a>
           <a href="#research">Research Method</a>
           <a href="#destinations">Destinations</a>
+          <a href="#guides">Guides</a>
         </div>
       </div>
     </nav>
@@ -1100,6 +1686,18 @@ def build() -> Path:
           </section>
         </div>
       </div>
+      <section class="guide-section" id="guides">
+        <div class="guide-section__header">
+          <div>
+            <h2>Buyer Guides</h2>
+            <p>Crawlable research pages for the highest-intent searches: retirement property, vacation homes, expat ownership, country comparisons, and overseas investment.</p>
+          </div>
+          <a href="/best-places-to-buy-property-abroad-for-retirement/">Start with retirement</a>
+        </div>
+        <div class="guide-grid">
+          __SEO_GUIDES__
+        </div>
+      </section>
     </div>
   </main>
 
@@ -1379,6 +1977,7 @@ def build() -> Path:
         "__WEIGHT_CONTROLS__": build_weight_controls(destinations),
         "__SPOTLIGHT__": build_spotlight(destinations),
         "__CARDS__": cards,
+        "__SEO_GUIDES__": build_home_guide_section(SEO_PAGES),
         "__APP_DATA__": app_data,
     }
     for key, value in replacements.items():
@@ -1392,6 +1991,13 @@ def build() -> Path:
     sitemap = ARTIFACTS / "sitemap.xml"
     out.write_text(html, encoding="utf-8")
     index.write_text(html, encoding="utf-8")
+    for page in SEO_PAGES:
+        page_dir = ARTIFACTS / page["slug"]
+        page_dir.mkdir(parents=True, exist_ok=True)
+        (page_dir / "index.html").write_text(
+            build_seo_page(page, destinations, SEO_PAGES),
+            encoding="utf-8",
+        )
     cname.write_text(f"{SITE_DOMAIN}\n", encoding="utf-8")
     robots.write_text(
         f"""User-agent: *
@@ -1401,15 +2007,23 @@ Sitemap: {SITE_URL}sitemap.xml
 """,
         encoding="utf-8",
     )
+    sitemap_urls = [
+        (SITE_URL, "1.0"),
+        *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
+    ]
+    sitemap_entries = "\n".join(
+        f"""  <url>
+    <loc>{escape(loc)}</loc>
+    <lastmod>{date.today().isoformat()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>{priority}</priority>
+  </url>"""
+        for loc, priority in sitemap_urls
+    )
     sitemap.write_text(
         f"""<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>{SITE_URL}</loc>
-    <lastmod>{date.today().isoformat()}</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>1.0</priority>
-  </url>
+{sitemap_entries}
 </urlset>
 """,
         encoding="utf-8",
