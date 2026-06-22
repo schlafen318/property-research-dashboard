@@ -13,6 +13,8 @@ Core assets in the repo:
 
 - Site generator: `src/build_unified_app.py`
 - Search Console report script: `scripts/seo_monitor.py`
+- Closed-loop action script: `scripts/seo_feedback_loop.py`
+- Scheduled workflow: `.github/workflows/seo-feedback-loop.yml`
 - Generated site: `artifacts/`
 - Live sitemap: `https://globalhomeatlas.com/sitemap.xml`
 - Search Console property: `sc-domain:globalhomeatlas.com`
@@ -38,9 +40,15 @@ python3 scripts/seo_monitor.py --write
 python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
 ```
 
-4. Review the report written under `output/seo/`.
+4. Dry-run the closed loop:
 
-5. Summarize:
+```bash
+python3 scripts/seo_feedback_loop.py --dry-run
+```
+
+5. Review the report written under `output/seo/`.
+
+6. Summarize:
 
 - Sitemap URL count and errors/warnings
 - Whether Search Console returned query/page data
@@ -48,6 +56,7 @@ python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
 - Pages with impressions but low CTR
 - Tracking/conversion coverage status
 - Recommended next action
+- Issues or draft PRs created by the loop, if any
 
 ## Tracking Expectations
 
@@ -78,6 +87,10 @@ curl -s https://globalhomeatlas.com/contact/ | rg "custom-shortlist-form|custom_
 ```
 
 If the sitemap changes, submit it through Search Console using `scripts/seo_monitor.py` for status and the existing Google API setup where available.
+
+## Closed-Loop Policy
+
+The scheduled loop may create GitHub issues and draft PRs. Auto-merge is reserved for deterministic fixes labeled `auto-merge-safe`; broad growth work such as new landing pages must remain `needs-human-review`.
 
 ## Reporting Standard
 

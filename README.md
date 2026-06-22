@@ -127,6 +127,24 @@ submission status, top queries, top pages, and pages with impressions but low
 CTR. The script reads `tmp/globalhomeatlas-google-token.json` when available;
 `tmp/` and `output/` are intentionally ignored.
 
+The closed-loop workflow runs from `.github/workflows/seo-feedback-loop.yml`.
+It needs this repository secret:
+
+```text
+GOOGLE_SEARCH_CONSOLE_TOKEN_JSON
+```
+
+Manual local dry run:
+
+```bash
+python3 scripts/seo_monitor.py --write --json-output output/seo/latest.json
+python3 scripts/seo_feedback_loop.py --dry-run
+```
+
+The loop updates the `Global Home Atlas Analytics Control Center` GitHub issue,
+creates deduplicated analytics issues, and opens draft PR scaffolds for broad
+growth opportunities that require human review.
+
 ## Codex Analytics Skill
 
 This repo includes a versioned Codex skill at:
