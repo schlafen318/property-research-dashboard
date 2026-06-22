@@ -127,6 +127,25 @@ submission status, top queries, top pages, and pages with impressions but low
 CTR. The script reads `tmp/globalhomeatlas-google-token.json` when available;
 `tmp/` and `output/` are intentionally ignored.
 
+## Codex Analytics Skill
+
+This repo includes a versioned Codex skill at:
+
+```text
+codex-skills/global-home-atlas-analytics/
+```
+
+Use it when asking Codex to monitor Global Home Atlas analytics, Search Console,
+sitemap health, conversion tracking, or weekly SEO reports. Its verifier can be
+run directly:
+
+```bash
+python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
+```
+
+To make it auto-discoverable in future Codex sessions, copy or install the skill
+folder into your global Codex skills directory.
+
 ## Publish
 
 The production entrypoint is generated at `artifacts/index.html`.

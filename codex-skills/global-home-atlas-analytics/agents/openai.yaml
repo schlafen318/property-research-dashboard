@@ -1,0 +1,4 @@
+interface:
+  display_name: "Global Home Atlas Analytics"
+  short_description: "Track SEO and conversion analytics"
+  default_prompt: "Use $global-home-atlas-analytics to generate the latest SEO and conversion analytics report."
