@@ -14,6 +14,7 @@
   <meta property="og:description" content="Compare Greece and Portugal retirement property options for foreign buyers focused on lifestyle, value, ownership, rentals, and long-term livability.">
   <meta property="og:url" content="https://globalhomeatlas.com/greece-vs-portugal-retirement-property/">
   <meta name="twitter:card" content="summary_large_image">
+
   <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","name":"Greece vs Portugal Retirement Property","url":"https://globalhomeatlas.com/greece-vs-portugal-retirement-property/","description":"Compare Greece and Portugal retirement property options for foreign buyers focused on lifestyle, value, ownership, rentals, and long-term livability.","dateModified":"2026-06-23","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Home Atlas","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Greece vs Portugal Retirement Property","item":"https://globalhomeatlas.com/greece-vs-portugal-retirement-property/"}]},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"Is Greece cheaper than Portugal for retirement property?","acceptedAnswer":{"@type":"Answer","text":"Some Greek markets can offer attractive entry values, but buyers must compare micro-location, maintenance, flights, seasonality, and resale depth."}},{"@type":"Question","name":"Which is better for year-round living?","acceptedAnswer":{"@type":"Answer","text":"Portugal often screens well for year-round expat infrastructure, while Greece can be compelling where healthcare, access, and local services are strong."}},{"@type":"Question","name":"What is the main risk in island retirement property?","acceptedAnswer":{"@type":"Answer","text":"Seasonality, healthcare distance, maintenance logistics, and narrower resale pools can matter more than the purchase price."}}]}]</script>
 
   <style>
@@ -124,8 +125,8 @@
           <h1>Greece vs Portugal Retirement Property</h1>
           <p class="seo-lede">Compare Greece and Portugal retirement property options for foreign buyers focused on lifestyle, value, ownership, rentals, and long-term livability. This guide is written for buyers weighing Mediterranean value, island lifestyle, legal clarity, and retirement resilience.</p>
           <div class="seo-actions">
-            <a class="seo-button" href="/#destinations">Open the full dashboard</a>
-            <a class="seo-button secondary" href="#comparison">Compare markets</a>
+          <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="Greece vs Portugal Retirement Property hero">Open the full dashboard</a>
+          <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="Greece vs Portugal Retirement Property">Compare markets</a>
           </div>
         </div>
         <aside class="seo-hero-card">
@@ -376,7 +377,8 @@
           <section class="seo-aside-card">
             <h2>Use the Full Atlas</h2>
             <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
-            <a class="seo-button" href="/#destinations">Open dashboard</a>
+            <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="Greece vs Portugal Retirement Property aside">Open dashboard</a>
+            <a class="seo-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="Greece vs Portugal Retirement Property">Request custom shortlist</a>
           </section>
           <section class="seo-aside-card">
             <h3>Related Guides</h3>
@@ -409,5 +411,88 @@
 <a href="/best-places-to-buy-property-in-europe/">Best Places to Buy Property in Europe</a></nav>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      const measurementReady = Boolean("");
+      const sessionKey = "gha_session_id";
+      const eventKey = "gha_event_queue";
+      function sessionId() {
+        let id = localStorage.getItem(sessionKey);
+        if (!id) {
+          id = String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+          localStorage.setItem(sessionKey, id);
+        }
+        return id;
+      }
+      function pushLocal(eventName, params) {
+        try {
+          const queue = JSON.parse(localStorage.getItem(eventKey) || "[]");
+          queue.push({
+            event: eventName,
+            params: params,
+            path: location.pathname,
+            title: document.title,
+            session_id: sessionId(),
+            timestamp: new Date().toISOString()
+          });
+          localStorage.setItem(eventKey, JSON.stringify(queue.slice(-100)));
+        } catch (error) {}
+      }
+      function track(eventName, params) {
+        const payload = Object.assign({
+          page_path: location.pathname,
+          page_title: document.title
+        }, params || {});
+        pushLocal(eventName, payload);
+        if (measurementReady && typeof window.gtag === "function") {
+          window.gtag("event", eventName, payload);
+        }
+      }
+      window.GHA = Object.assign(window.GHA || {}, { track });
+      document.addEventListener("click", function (event) {
+        const target = event.target.closest("a, button");
+        if (!target) return;
+        const explicit = target.getAttribute("data-track");
+        const href = target.getAttribute("href") || "";
+        if (explicit) {
+          track(explicit, {
+            label: target.getAttribute("data-track-label") || target.textContent.trim(),
+            href: href
+          });
+          return;
+        }
+        if (href.startsWith("/destinations/")) track("destination_click", { href });
+        else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", { href });
+        else if (href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
+        else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", { href });
+        else if (href.startsWith("mailto:")) track("contact_click", { href });
+      });
+      document.addEventListener("submit", function (event) {
+        const form = event.target.closest("#custom-shortlist-form");
+        if (!form) return;
+        event.preventDefault();
+        const data = new FormData(form);
+        const lines = [
+          "Global Home Atlas custom shortlist request",
+          "",
+          "Name: " + (data.get("name") || ""),
+          "Email: " + (data.get("email") || ""),
+          "Budget: " + (data.get("budget") || ""),
+          "Target regions: " + (data.get("regions") || ""),
+          "Primary goal: " + (data.get("goal") || ""),
+          "Holding period: " + (data.get("holding_period") || ""),
+          "Notes: " + (data.get("notes") || "")
+        ];
+        track("custom_shortlist_submit", {
+          budget: data.get("budget") || "",
+          regions: data.get("regions") || "",
+          goal: data.get("goal") || ""
+        });
+        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\n"));
+      });
+    })();
+  </script>
+
 </body>
 </html>

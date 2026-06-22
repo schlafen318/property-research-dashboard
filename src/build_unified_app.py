@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import unicodedata
 from datetime import date
@@ -17,6 +18,9 @@ SITE_DESCRIPTION = (
     "Compare global home and property investment destinations with decision scores, "
     "ownership clarity, lifestyle fit, yields, and representative market evidence."
 )
+GA4_MEASUREMENT_ID = os.environ.get("GA4_MEASUREMENT_ID", "").strip()
+BING_SITE_VERIFICATION = os.environ.get("BING_SITE_VERIFICATION", "").strip()
+CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "hello@globalhomeatlas.com").strip()
 
 DIMENSIONS = [
     {
@@ -358,7 +362,7 @@ def build_listing_card(item: dict) -> str:
           <div><dt>Size</dt><dd>{number(item.get("size_m2"))} m2</dd></div>
           <div><dt>Local</dt><dd>{escape(item.get("local_currency") or "")} {number(item.get("local_price"))}</dd></div>
         </dl>
-        <a class="source-link" href="{escape(item.get("source_url") or "#")}" target="_blank" rel="noreferrer">
+        <a class="source-link" href="{escape(item.get("source_url") or "#")}" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="{escape(item.get("listing_name") or "Representative listing")}">
           {escape(item.get("source_name") or "Source")} · {escape(item.get("confidence") or "n/a")} confidence
         </a>
       </article>
@@ -591,6 +595,110 @@ def json_ld(data: dict | list[dict]) -> str:
     return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
 
 
+def analytics_head_tags() -> str:
+    parts = []
+    if BING_SITE_VERIFICATION:
+        parts.append(f'  <meta name="msvalidate.01" content="{escape(BING_SITE_VERIFICATION)}">')
+    if GA4_MEASUREMENT_ID:
+        measurement_id = escape(GA4_MEASUREMENT_ID)
+        parts.append(
+            f"""  <script async src="https://www.googletagmanager.com/gtag/js?id={measurement_id}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){{dataLayer.push(arguments);}}
+    gtag("js", new Date());
+    gtag("config", "{measurement_id}", {{"send_page_view": true}});
+  </script>"""
+        )
+    return "\n".join(parts)
+
+
+def analytics_event_script() -> str:
+    return f"""
+  <script>
+    (function () {{
+      const measurementReady = Boolean("{escape(GA4_MEASUREMENT_ID)}");
+      const sessionKey = "gha_session_id";
+      const eventKey = "gha_event_queue";
+      function sessionId() {{
+        let id = localStorage.getItem(sessionKey);
+        if (!id) {{
+          id = String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+          localStorage.setItem(sessionKey, id);
+        }}
+        return id;
+      }}
+      function pushLocal(eventName, params) {{
+        try {{
+          const queue = JSON.parse(localStorage.getItem(eventKey) || "[]");
+          queue.push({{
+            event: eventName,
+            params: params,
+            path: location.pathname,
+            title: document.title,
+            session_id: sessionId(),
+            timestamp: new Date().toISOString()
+          }});
+          localStorage.setItem(eventKey, JSON.stringify(queue.slice(-100)));
+        }} catch (error) {{}}
+      }}
+      function track(eventName, params) {{
+        const payload = Object.assign({{
+          page_path: location.pathname,
+          page_title: document.title
+        }}, params || {{}});
+        pushLocal(eventName, payload);
+        if (measurementReady && typeof window.gtag === "function") {{
+          window.gtag("event", eventName, payload);
+        }}
+      }}
+      window.GHA = Object.assign(window.GHA || {{}}, {{ track }});
+      document.addEventListener("click", function (event) {{
+        const target = event.target.closest("a, button");
+        if (!target) return;
+        const explicit = target.getAttribute("data-track");
+        const href = target.getAttribute("href") || "";
+        if (explicit) {{
+          track(explicit, {{
+            label: target.getAttribute("data-track-label") || target.textContent.trim(),
+            href: href
+          }});
+          return;
+        }}
+        if (href.startsWith("/destinations/")) track("destination_click", {{ href }});
+        else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", {{ href }});
+        else if (href === "/#destinations" || href === "#destinations") track("dashboard_open", {{ href }});
+        else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", {{ href }});
+        else if (href.startsWith("mailto:")) track("contact_click", {{ href }});
+      }});
+      document.addEventListener("submit", function (event) {{
+        const form = event.target.closest("#custom-shortlist-form");
+        if (!form) return;
+        event.preventDefault();
+        const data = new FormData(form);
+        const lines = [
+          "Global Home Atlas custom shortlist request",
+          "",
+          "Name: " + (data.get("name") || ""),
+          "Email: " + (data.get("email") || ""),
+          "Budget: " + (data.get("budget") || ""),
+          "Target regions: " + (data.get("regions") || ""),
+          "Primary goal: " + (data.get("goal") || ""),
+          "Holding period: " + (data.get("holding_period") || ""),
+          "Notes: " + (data.get("notes") || "")
+        ];
+        track("custom_shortlist_submit", {{
+          budget: data.get("budget") || "",
+          regions: data.get("regions") || "",
+          goal: data.get("goal") || ""
+        }});
+        location.href = "mailto:{escape(CONTACT_EMAIL)}?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\\n"));
+      }});
+    }})();
+  </script>
+"""
+
+
 def head_html(title: str, description: str, canonical: str, schema: list[dict]) -> str:
     return f"""
   <meta charset="utf-8">
@@ -605,6 +713,7 @@ def head_html(title: str, description: str, canonical: str, schema: list[dict]) 
   <meta property="og:description" content="{escape(description)}">
   <meta property="og:url" content="{escape(canonical)}">
   <meta name="twitter:card" content="summary_large_image">
+{analytics_head_tags()}
   <script type="application/ld+json">{json_ld(schema)}</script>
 """
 
@@ -927,8 +1036,8 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
           <h1>{escape(page["h1"])}</h1>
           <p class="seo-lede">{escape(description)} This guide is written for {escape(page["intent"])}.</p>
           <div class="seo-actions">
-            <a class="seo-button" href="/#destinations">Open the full dashboard</a>
-            <a class="seo-button secondary" href="#comparison">Compare markets</a>
+          <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a>
+          <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare markets</a>
           </div>
         </div>
         <aside class="seo-hero-card">
@@ -996,7 +1105,8 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
           <section class="seo-aside-card">
             <h2>Use the Full Atlas</h2>
             <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
-            <a class="seo-button" href="/#destinations">Open dashboard</a>
+            <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open dashboard</a>
+            <a class="seo-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(page["h1"])}">Request custom shortlist</a>
           </section>
           <section class="seo-aside-card">
             <h3>Related Guides</h3>
@@ -1017,6 +1127,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
       <nav>{seo_guide_links(pages, page["slug"])}</nav>
     </div>
   </footer>
+{analytics_event_script()}
 </body>
 </html>
 """
@@ -1078,6 +1189,34 @@ def shared_content_css() -> str:
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
+    .intake-form { display: grid; gap: 14px; margin-top: 16px; }
+    .intake-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .intake-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .intake-form input, .intake-form select, .intake-form textarea {
+      width: 100%;
+      min-height: 44px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 10px 12px;
+      font: inherit;
+      letter-spacing: 0;
+      text-transform: none;
+    }
+    .intake-form textarea { min-height: 120px; resize: vertical; }
+    .intake-form button {
+      width: max-content;
+      min-height: 44px;
+      border: 0;
+      border-radius: 6px;
+      background: var(--deep);
+      color: #fffdf8;
+      padding: 0 16px;
+      font: inherit;
+      font-weight: 850;
+      cursor: pointer;
+    }
     .score-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
     .score-list li { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .score-list div { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
@@ -1098,7 +1237,7 @@ def shared_content_css() -> str:
     @media (max-width: 560px) {
       .page-shell { width: min(100% - 28px, 1120px); }
       .page-nav-links { display: none; }
-      .page-stats, .page-grid, .score-list { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
     }
 """
@@ -1241,7 +1380,8 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
           <section class="page-aside-card">
             <h2>Compare in Atlas</h2>
             <p>Use the dashboard to compare {escape(dest["name"])} against every market in the 10-dimension model.</p>
-            <a class="page-button" href="/#destinations">Open dashboard</a>
+            <a class="page-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(dest["name"])} destination">Open dashboard</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(dest["name"])} destination">Request custom shortlist</a>
           </section>
           <section class="page-aside-card">
             <h3>Related Destinations</h3>
@@ -1266,6 +1406,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
       <nav>{seo_guide_links(pages, limit=6)} {trust_page_links()}</nav>
     </div>
   </footer>
+{analytics_event_script()}
 </body>
 </html>
 """
@@ -1338,10 +1479,30 @@ def trust_page_body(page: dict) -> str:
           </section>
         """
     return """
-      <section class="page-section">
+      <section class="page-section" id="custom-shortlist">
         <h2>Contact and Research Requests</h2>
-        <p>For data corrections, research questions, partnership inquiries, or custom shortlist requests, use the contact path associated with the Global Home Atlas project repository or domain administration. A dedicated inquiry workflow will be added as the product moves from research prototype to public operating service.</p>
+        <p>For data corrections, research questions, partnership inquiries, or custom shortlist requests, use this intake path. The form opens a structured email so the request can be handled without adding a server-side backend yet.</p>
         <p>Useful context for any request: target countries, budget range, intended use, preferred holding period, rental expectations, citizenship/residency constraints, and whether the priority is retirement, lifestyle, income, capital preservation, or optionality.</p>
+        <form class="intake-form" id="custom-shortlist-form">
+          <div class="intake-grid">
+            <label>Name<input name="name" autocomplete="name" required></label>
+            <label>Email<input name="email" type="email" autocomplete="email" required></label>
+            <label>Budget range<input name="budget" placeholder="Example: US$750k-1.5m"></label>
+            <label>Target regions<input name="regions" placeholder="Example: Portugal, Japan, Thailand"></label>
+            <label>Primary goal
+              <select name="goal">
+                <option>Retirement optionality</option>
+                <option>Vacation home</option>
+                <option>Rental income</option>
+                <option>Capital preservation</option>
+                <option>Mixed lifestyle and investment</option>
+              </select>
+            </label>
+            <label>Holding period<input name="holding_period" placeholder="Example: 7-10 years"></label>
+          </div>
+          <label>Notes<textarea name="notes" placeholder="Citizenship, family use, healthcare needs, rental expectations, timing, and any must-avoid risks."></textarea></label>
+          <button type="submit" data-track="custom_shortlist_submit_click">Prepare request</button>
+        </form>
       </section>
       <section class="page-section">
         <h2>Before You Send a Deal</h2>
@@ -1398,7 +1559,8 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
           <section class="page-aside-card">
             <h2>Explore the Atlas</h2>
             <p>Open the dashboard to compare all destinations and adjust the scoring weights.</p>
-            <a class="page-button" href="/#destinations">Open dashboard</a>
+            <a class="page-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} trust page">Open dashboard</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(page["h1"])} trust page">Request custom shortlist</a>
           </section>
           <section class="page-aside-card">
             <h3>Research Guides</h3>
@@ -1423,6 +1585,7 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
       <nav>{seo_guide_links(pages, limit=6)} {destination_links(destinations, limit=6)}</nav>
     </div>
   </footer>
+{analytics_event_script()}
 </body>
 </html>
 """
@@ -1478,6 +1641,7 @@ def build() -> Path:
   <meta property="og:description" content="Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.">
   <meta property="og:url" content="https://globalhomeatlas.com/">
   <meta name="twitter:card" content="summary_large_image">
+  __ANALYTICS_HEAD__
   <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."}</script>
   <style>
     :root {
@@ -2059,8 +2223,8 @@ def build() -> Path:
         <h1>Global Home Atlas</h1>
         <p class="lede">A research-grade atlas for affluent global buyers comparing lifestyle, ownership clarity, yield realism, exit liquidity, and long-term retirement optionality across 25 property destinations.</p>
         <div class="hero-actions">
-          <a class="primary-action" href="#destinations">Explore destinations</a>
-          <a class="secondary-action" href="#research">Review methodology</a>
+          <a class="primary-action" href="#destinations" data-track="dashboard_open" data-track-label="homepage hero">Explore destinations</a>
+          <a class="secondary-action" href="/methodology/" data-track="methodology_click" data-track-label="homepage hero">Review methodology</a>
         </div>
       </div>
       <aside class="trust-panel" aria-label="Credibility snapshot">
@@ -2161,6 +2325,16 @@ def build() -> Path:
             </div>
           </section>
 
+          <section class="section-card" id="conversion">
+            <div class="section-header">
+              <div>
+                <h2>Custom Global Property Shortlist</h2>
+                <p>Turn the Atlas into a buyer-specific research brief across lifestyle plan, budget, citizenship constraints, rental expectations, and holding period.</p>
+              </div>
+              <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="homepage conversion section">Request shortlist</a>
+            </div>
+          </section>
+
           <section class="compare-panel" id="compare">
             <div class="section-header">
               <div>
@@ -2196,7 +2370,7 @@ def build() -> Path:
             <h2>Buyer Guides</h2>
             <p>Crawlable research pages for the highest-intent searches: retirement property, vacation homes, expat ownership, country comparisons, and overseas investment.</p>
           </div>
-          <a href="/best-places-to-buy-property-abroad-for-retirement/">Start with retirement</a>
+          <a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="guide_click" data-track-label="homepage guide section">Start with retirement</a>
         </div>
         <div class="guide-grid">
           __SEO_GUIDES__
@@ -2209,7 +2383,7 @@ def build() -> Path:
             <h2>Destination Research</h2>
             <p>Individual destination dossiers for global buyers who need ownership, retirement, rental, risk, and resale context before local due diligence.</p>
           </div>
-          <a href="/destinations/fukuoka-itoshima/">View top destination</a>
+          <a href="/destinations/fukuoka-itoshima/" data-track="destination_click" data-track-label="homepage destination section">View top destination</a>
         </div>
         <div class="guide-grid">
           __DESTINATION_GUIDES__
@@ -2222,7 +2396,7 @@ def build() -> Path:
             <h2>Trust Layer</h2>
             <p>Research standards, scoring methodology, caveats, and contact context to establish credibility before a buyer relies on the Atlas.</p>
           </div>
-          <a href="/research-standards/">Read standards</a>
+          <a href="/research-standards/" data-track="trust_click" data-track-label="homepage trust section">Read standards</a>
         </div>
         <div class="guide-grid">
           __TRUST_GUIDES__
@@ -2356,6 +2530,7 @@ def build() -> Path:
       }
       if (checked) compareSelected.add(id);
       else compareSelected.delete(id);
+      if (window.GHA) window.GHA.track("compare_selection", { destination_id: id, selected: checked, selected_count: compareSelected.size });
       renderCompare();
     }
 
@@ -2382,9 +2557,11 @@ def build() -> Path:
         if (memoShortlist.has(id)) {
           memoShortlist.delete(id);
           button.textContent = "Add to memo shortlist";
+          if (window.GHA) window.GHA.track("memo_shortlist_remove", { destination_id: id, selected_count: memoShortlist.size });
         } else {
           memoShortlist.add(id);
           button.textContent = "Remove from memo";
+          if (window.GHA) window.GHA.track("memo_shortlist_add", { destination_id: id, selected_count: memoShortlist.size });
         }
       });
     });
@@ -2407,10 +2584,12 @@ def build() -> Path:
     }
 
     document.getElementById("export").addEventListener("click", () => {
+      if (window.GHA) window.GHA.track("data_export_json", { destination_count: data.destinations.length });
       downloadFile("destination-property-dashboard-data.json", "application/json", JSON.stringify(data, null, 2));
     });
 
     document.getElementById("exportCsv").addEventListener("click", () => {
+      if (window.GHA) window.GHA.track("data_export_csv", { destination_count: data.destinations.length });
       const rows = [
         ["rank", "destination", "country", "category", "decision_score", "custom_score", "usd_per_m2", "net_yield", "ownership_score", "retirement_score"],
         ...data.destinations.map((d) => [
@@ -2486,11 +2665,13 @@ def build() -> Path:
     }
 
     document.getElementById("exportMemo").addEventListener("click", () => {
+      if (window.GHA) window.GHA.track("memo_export", { selected_count: memoDestinations().length });
       downloadFile("investor-shortlist-memo.html", "text/html", buildMemoHtml());
     });
 
     recalculateScores();
   </script>
+  __ANALYTICS_EVENT_SCRIPT__
 </body>
 </html>
 """
@@ -2511,6 +2692,8 @@ def build() -> Path:
         "__DESTINATION_GUIDES__": build_home_destination_section(destinations),
         "__TRUST_GUIDES__": build_home_trust_section(),
         "__APP_DATA__": app_data,
+        "__ANALYTICS_HEAD__": analytics_head_tags(),
+        "__ANALYTICS_EVENT_SCRIPT__": analytics_event_script(),
     }
     for key, value in replacements.items():
         html = html.replace(key, value)

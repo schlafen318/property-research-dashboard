@@ -14,6 +14,7 @@
   <meta property="og:description" content="Use a structured framework to buy property abroad: shortlist countries, compare ownership risk, underwrite income, and plan exit liquidity.">
   <meta property="og:url" content="https://globalhomeatlas.com/buy-property-abroad/">
   <meta name="twitter:card" content="summary_large_image">
+
   <script type="application/ld+json">[{"@context":"https://schema.org","@type":"WebPage","name":"Buy Property Abroad","url":"https://globalhomeatlas.com/buy-property-abroad/","description":"Use a structured framework to buy property abroad: shortlist countries, compare ownership risk, underwrite income, and plan exit liquidity.","dateModified":"2026-06-23","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Home Atlas","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Buy Property Abroad","item":"https://globalhomeatlas.com/buy-property-abroad/"}]},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"What is the first step to buy property abroad?","acceptedAnswer":{"@type":"Answer","text":"Define the job of the property: retirement base, vacation home, income asset, capital preservation, or a blend."}},{"@type":"Question","name":"How many markets should I compare?","acceptedAnswer":{"@type":"Answer","text":"Start with five to eight markets, then reduce to two or three after legal, tax, visa, and neighborhood checks."}},{"@type":"Question","name":"What should I verify before an offer?","acceptedAnswer":{"@type":"Answer","text":"Verify title, permits, taxes, financing, insurance, building condition, rental rules, and resale comparables."}}]}]</script>
 
   <style>
@@ -124,8 +125,8 @@
           <h1>Buy Property Abroad</h1>
           <p class="seo-lede">Use a structured framework to buy property abroad: shortlist countries, compare ownership risk, underwrite income, and plan exit liquidity. This guide is written for buyers moving from inspiration to a disciplined international property shortlist.</p>
           <div class="seo-actions">
-            <a class="seo-button" href="/#destinations">Open the full dashboard</a>
-            <a class="seo-button secondary" href="#comparison">Compare markets</a>
+          <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="Buy Property Abroad hero">Open the full dashboard</a>
+          <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="Buy Property Abroad">Compare markets</a>
           </div>
         </div>
         <aside class="seo-hero-card">
@@ -396,7 +397,8 @@
           <section class="seo-aside-card">
             <h2>Use the Full Atlas</h2>
             <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
-            <a class="seo-button" href="/#destinations">Open dashboard</a>
+            <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="Buy Property Abroad aside">Open dashboard</a>
+            <a class="seo-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="Buy Property Abroad">Request custom shortlist</a>
           </section>
           <section class="seo-aside-card">
             <h3>Related Guides</h3>
@@ -429,5 +431,88 @@
 <a href="/best-places-to-buy-property-in-europe/">Best Places to Buy Property in Europe</a></nav>
     </div>
   </footer>
+
+  <script>
+    (function () {
+      const measurementReady = Boolean("");
+      const sessionKey = "gha_session_id";
+      const eventKey = "gha_event_queue";
+      function sessionId() {
+        let id = localStorage.getItem(sessionKey);
+        if (!id) {
+          id = String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+          localStorage.setItem(sessionKey, id);
+        }
+        return id;
+      }
+      function pushLocal(eventName, params) {
+        try {
+          const queue = JSON.parse(localStorage.getItem(eventKey) || "[]");
+          queue.push({
+            event: eventName,
+            params: params,
+            path: location.pathname,
+            title: document.title,
+            session_id: sessionId(),
+            timestamp: new Date().toISOString()
+          });
+          localStorage.setItem(eventKey, JSON.stringify(queue.slice(-100)));
+        } catch (error) {}
+      }
+      function track(eventName, params) {
+        const payload = Object.assign({
+          page_path: location.pathname,
+          page_title: document.title
+        }, params || {});
+        pushLocal(eventName, payload);
+        if (measurementReady && typeof window.gtag === "function") {
+          window.gtag("event", eventName, payload);
+        }
+      }
+      window.GHA = Object.assign(window.GHA || {}, { track });
+      document.addEventListener("click", function (event) {
+        const target = event.target.closest("a, button");
+        if (!target) return;
+        const explicit = target.getAttribute("data-track");
+        const href = target.getAttribute("href") || "";
+        if (explicit) {
+          track(explicit, {
+            label: target.getAttribute("data-track-label") || target.textContent.trim(),
+            href: href
+          });
+          return;
+        }
+        if (href.startsWith("/destinations/")) track("destination_click", { href });
+        else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", { href });
+        else if (href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
+        else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", { href });
+        else if (href.startsWith("mailto:")) track("contact_click", { href });
+      });
+      document.addEventListener("submit", function (event) {
+        const form = event.target.closest("#custom-shortlist-form");
+        if (!form) return;
+        event.preventDefault();
+        const data = new FormData(form);
+        const lines = [
+          "Global Home Atlas custom shortlist request",
+          "",
+          "Name: " + (data.get("name") || ""),
+          "Email: " + (data.get("email") || ""),
+          "Budget: " + (data.get("budget") || ""),
+          "Target regions: " + (data.get("regions") || ""),
+          "Primary goal: " + (data.get("goal") || ""),
+          "Holding period: " + (data.get("holding_period") || ""),
+          "Notes: " + (data.get("notes") || "")
+        ];
+        track("custom_shortlist_submit", {
+          budget: data.get("budget") || "",
+          regions: data.get("regions") || "",
+          goal: data.get("goal") || ""
+        });
+        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\n"));
+      });
+    })();
+  </script>
+
 </body>
 </html>

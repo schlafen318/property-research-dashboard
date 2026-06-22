@@ -95,6 +95,38 @@ python3 src/build_unified_app.py
 
 Open `artifacts/unified_destination_dashboard.html` in a browser.
 
+Optional production configuration is read from environment variables during the
+static build:
+
+```bash
+GA4_MEASUREMENT_ID=G-XXXXXXXXXX \
+BING_SITE_VERIFICATION=YOUR_BING_META_VALUE \
+CONTACT_EMAIL=hello@globalhomeatlas.com \
+python3 src/build_unified_app.py
+```
+
+If `GA4_MEASUREMENT_ID` is omitted, the site still records first-party event
+payloads into browser `localStorage` under `gha_event_queue`; once the GA4 ID is
+provided, the same events are also sent through `gtag`.
+
+Tracked events include dashboard opens, guide clicks, destination clicks,
+comparison selections, memo shortlist additions/removals, memo export, JSON/CSV
+exports, outbound listing clicks, and custom shortlist submissions.
+
+## SEO Monitoring
+
+Generate a Search Console report from the live sitemap and ignored local OAuth
+token:
+
+```bash
+python3 scripts/seo_monitor.py --write
+```
+
+The report writes to `output/seo/` and includes sitemap URL counts, sitemap
+submission status, top queries, top pages, and pages with impressions but low
+CTR. The script reads `tmp/globalhomeatlas-google-token.json` when available;
+`tmp/` and `output/` are intentionally ignored.
+
 ## Publish
 
 The production entrypoint is generated at `artifacts/index.html`.
