@@ -10,7 +10,8 @@ ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 ARTIFACTS = ROOT / "artifacts"
 SITE_NAME = "Global Home Atlas"
-SITE_URL = "https://globalhomeatlas.com/"
+SITE_DOMAIN = "globalhomeatlas.com"
+SITE_URL = f"https://{SITE_DOMAIN}/"
 SITE_DESCRIPTION = (
     "Compare global home and property investment destinations with decision scores, "
     "ownership clarity, lifestyle fit, yields, and representative market evidence."
@@ -1386,8 +1387,33 @@ def build() -> Path:
     ARTIFACTS.mkdir(exist_ok=True)
     out = ARTIFACTS / "unified_destination_dashboard.html"
     index = ARTIFACTS / "index.html"
+    cname = ARTIFACTS / "CNAME"
+    robots = ARTIFACTS / "robots.txt"
+    sitemap = ARTIFACTS / "sitemap.xml"
     out.write_text(html, encoding="utf-8")
     index.write_text(html, encoding="utf-8")
+    cname.write_text(f"{SITE_DOMAIN}\n", encoding="utf-8")
+    robots.write_text(
+        f"""User-agent: *
+Allow: /
+
+Sitemap: {SITE_URL}sitemap.xml
+""",
+        encoding="utf-8",
+    )
+    sitemap.write_text(
+        f"""<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>{SITE_URL}</loc>
+    <lastmod>{date.today().isoformat()}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
+""",
+        encoding="utf-8",
+    )
     return out
 
 
