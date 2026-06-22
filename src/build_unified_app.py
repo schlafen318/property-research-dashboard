@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import re
+import unicodedata
 from datetime import date
 from html import escape
 from pathlib import Path
@@ -240,6 +241,37 @@ SEO_PAGES = [
             ("Is Europe better for lifestyle or yield?", "Europe is often strongest as a lifestyle and capital-preservation decision, while yield depends heavily on local rules and asset selection."),
             ("How should I compare European property markets?", "Compare city access, healthcare, taxation, rental rules, seasonality, entry price, and resale depth at the regional level."),
         ],
+    },
+]
+
+TRUST_PAGES = [
+    {
+        "slug": "methodology",
+        "title": "Methodology | Global Home Atlas",
+        "h1": "Methodology",
+        "description": "How Global Home Atlas scores global property destinations across lifestyle, ownership clarity, yield realism, retirement fit, liquidity, and value.",
+        "theme": "Research process",
+    },
+    {
+        "slug": "research-standards",
+        "title": "Research Standards | Global Home Atlas",
+        "h1": "Research Standards",
+        "description": "The research standards, caveats, data basis, and verification expectations behind Global Home Atlas destination analysis.",
+        "theme": "Trust and caveats",
+    },
+    {
+        "slug": "about",
+        "title": "About | Global Home Atlas",
+        "h1": "About Global Home Atlas",
+        "description": "Global Home Atlas helps globally mobile property buyers compare destinations with a disciplined lifestyle and investment framework.",
+        "theme": "About",
+    },
+    {
+        "slug": "contact",
+        "title": "Contact | Global Home Atlas",
+        "h1": "Contact Global Home Atlas",
+        "description": "Contact Global Home Atlas for research questions, data corrections, partnerships, and custom global property shortlist requests.",
+        "theme": "Contact",
     },
 ]
 
@@ -538,6 +570,23 @@ def page_url(slug: str | None = None) -> str:
     return f"{SITE_URL}{slug}/"
 
 
+def slugify(value: str) -> str:
+    normalized = unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode("ascii")
+    return re.sub(r"-+", "-", re.sub(r"[^a-z0-9]+", "-", normalized.lower())).strip("-")
+
+
+def destination_slug(dest: dict) -> str:
+    return slugify(dest.get("name") or dest["id"])
+
+
+def destination_path(dest: dict) -> str:
+    return f"destinations/{destination_slug(dest)}"
+
+
+def destination_url(dest: dict) -> str:
+    return page_url(destination_path(dest))
+
+
 def json_ld(data: dict | list[dict]) -> str:
     return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
 
@@ -581,9 +630,29 @@ def seo_guide_links(pages: list[dict], current_slug: str | None = None, limit: i
     return "\n".join(links)
 
 
+def trust_page_links(current_slug: str | None = None) -> str:
+    return "\n".join(
+        f'<a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a>'
+        for page in TRUST_PAGES
+        if page["slug"] != current_slug
+    )
+
+
+def destination_links(destinations: list[dict], current_slug: str | None = None, limit: int | None = None) -> str:
+    links = []
+    for dest in destinations:
+        slug = destination_slug(dest)
+        if slug == current_slug:
+            continue
+        links.append(f'<a href="/destinations/{escape(slug)}/">{escape(dest["name"])}</a>')
+    if limit:
+        links = links[:limit]
+    return "\n".join(links)
+
+
 def build_home_guide_section(pages: list[dict]) -> str:
     cards = []
-    for page in pages[:6]:
+    for page in pages:
         cards.append(
             f"""
             <article>
@@ -594,6 +663,34 @@ def build_home_guide_section(pages: list[dict]) -> str:
             """
         )
     return "\n".join(cards)
+
+
+def build_home_destination_section(destinations: list[dict]) -> str:
+    cards = []
+    for dest in destinations:
+        cards.append(
+            f"""
+            <article>
+              <span>#{dest["rank"]} · {escape(dest.get("country") or "")}</span>
+              <h3><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></h3>
+              <p>{escape(dest.get("panel_verdict") or dest.get("panel_summary") or "")}</p>
+            </article>
+            """
+        )
+    return "\n".join(cards)
+
+
+def build_home_trust_section() -> str:
+    return "\n".join(
+        f"""
+        <article>
+          <span>{escape(page["theme"])}</span>
+          <h3><a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a></h3>
+          <p>{escape(page["description"])}</p>
+        </article>
+        """
+        for page in TRUST_PAGES
+    )
 
 
 def metric_value(dest: dict, dimension_key: str) -> float:
@@ -647,7 +744,7 @@ def build_seo_destination_cards(destinations: list[dict]) -> str:
             <article class="seo-destination-card">
               <div>
                 <span>#{dest["rank"]} global scorecard</span>
-                <h3>{escape(dest["name"])}</h3>
+                <h3><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></h3>
                 <p>{escape(dest.get("panel_summary") or "")}</p>
               </div>
               <dl>
@@ -918,6 +1015,412 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
       <strong>{SITE_NAME}</strong>
       <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
       <nav>{seo_guide_links(pages, page["slug"])}</nav>
+    </div>
+  </footer>
+</body>
+</html>
+"""
+
+
+def shared_content_css() -> str:
+    return """
+    :root {
+      color: #16231f;
+      background: #f7f4ee;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --ink: #16231f;
+      --muted: #65736d;
+      --line: rgba(22, 35, 31, .14);
+      --paper: #fffdf8;
+      --deep: #10241f;
+      --teal: #176b62;
+      --gold: #a77a35;
+      --clay: #b85f3f;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; }
+    a { color: var(--teal); text-underline-offset: 3px; overflow-wrap: anywhere; }
+    p, li { line-height: 1.65; }
+    .page-shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .page-hero {
+      color: #fffdf8;
+      background:
+        linear-gradient(135deg, rgba(16, 36, 31, .97), rgba(23, 107, 98, .76), rgba(167, 122, 53, .40)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'%3E%3Crect width='1500' height='900' fill='%2310241f'/%3E%3Cpath d='M0 560c150-62 304-58 462 12 163 72 300 79 465-18 177-104 371-133 573-25v371H0Z' fill='%23fffdf8' fill-opacity='.12'/%3E%3Cpath d='M110 128h1280M110 270h1280M110 412h1280M110 554h1280M110 696h1280M278 70v760M536 70v760M794 70v760M1052 70v760M1310 70v760' stroke='%23fffdf8' stroke-opacity='.11'/%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+      padding: 18px 0 58px;
+    }
+    .page-nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 70px; }
+    .page-brand { color: #fffdf8; font-weight: 900; text-decoration: none; }
+    .page-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
+    .page-nav-links a { color: rgba(255, 253, 248, .86); text-decoration: none; font-size: 13px; font-weight: 800; }
+    .page-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }
+    .page-eyebrow { margin: 0 0 12px; color: #e1c17e; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }
+    .page-lede { max-width: 760px; margin: 22px 0 0; color: rgba(255, 253, 248, .84); font-size: clamp(16px, 2vw, 20px); }
+    .page-hero-card { padding: 16px; border: 1px solid rgba(255, 253, 248, .26); border-radius: 8px; background: rgba(255, 253, 248, .1); backdrop-filter: blur(16px); }
+    .page-hero-card span { display: block; color: rgba(255, 253, 248, .68); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .page-hero-card strong { display: block; margin: 6px 0 14px; font-size: 24px; overflow-wrap: anywhere; }
+    .page-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 15px; border-radius: 6px; background: #fffdf8; color: var(--deep); font-weight: 850; text-decoration: none; }
+    main { margin-top: -30px; }
+    .page-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--line); box-shadow: 0 18px 50px rgba(16, 36, 31, .08); }
+    .page-stats div { min-width: 0; padding: 16px; background: var(--paper); }
+    .page-stats span, dt { display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .page-stats strong, dd { display: block; margin: 5px 0 0; font-weight: 900; overflow-wrap: anywhere; }
+    .page-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }
+    .page-article { display: grid; gap: 24px; min-width: 0; }
+    .page-section { min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    .page-section h2 { margin: 0 0 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 4vw, 38px); line-height: 1.04; }
+    .page-section h3 { margin: 18px 0 8px; font-size: 18px; }
+    .page-section p, .page-section li { color: #3f4d48; }
+    .page-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .page-card h3 { margin-top: 0; }
+    .page-card ul { margin: 0; padding-left: 18px; }
+    .score-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin: 0; padding: 0; list-style: none; }
+    .score-list li { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .score-list div { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
+    .score-list i { display: block; height: 6px; margin: 8px 0; border-radius: 999px; background: linear-gradient(90deg, var(--teal) var(--value), #e6e1d8 var(--value)); }
+    .page-aside { position: sticky; top: 16px; display: grid; gap: 14px; }
+    .page-aside-card { padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    .page-aside-card h2, .page-aside-card h3 { margin: 0 0 10px; font-size: 16px; }
+    .page-aside-card nav { display: grid; gap: 10px; }
+    .page-aside-card p, .page-aside-card a { font-size: 14px; }
+    .page-footer { padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--muted); }
+    .page-footer nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
+    @media (max-width: 860px) {
+      .page-nav { margin-bottom: 48px; }
+      .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
+      .page-aside { position: static; }
+      .page-stats, .page-grid, .score-list { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 560px) {
+      .page-shell { width: min(100% - 28px, 1120px); }
+      .page-nav-links { display: none; }
+      .page-stats, .page-grid, .score-list { grid-template-columns: 1fr; }
+      .page-section { padding: 18px; }
+    }
+"""
+
+
+def schema_for_destination(dest: dict, canonical: str) -> list[dict]:
+    return [
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": f"{dest['name']} Property Research",
+            "url": canonical,
+            "description": f"{dest['name']} property research for global buyers, including ownership clarity, retirement fit, rental context, risks, and destination score.",
+            "dateModified": date.today().isoformat(),
+            "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Destinations", "item": f"{SITE_URL}#destinations"},
+                {"@type": "ListItem", "position": 3, "name": dest["name"], "item": canonical},
+            ],
+        },
+    ]
+
+
+def build_destination_page(dest: dict, listings: list[dict], destinations: list[dict], pages: list[dict]) -> str:
+    slug = destination_slug(dest)
+    canonical = destination_url(dest)
+    title = f"{dest['name']} Property Research | Global Home Atlas"
+    description = (
+        f"{dest['name']} property research for global buyers: ownership clarity, retirement fit, "
+        f"rental income context, USD/m2 benchmark, risks, and long-term lifestyle thesis."
+    )
+    peer_destinations = [
+        item
+        for item in destinations
+        if item["id"] != dest["id"] and (item.get("country") == dest.get("country") or item.get("category") == dest.get("category"))
+    ][:6]
+    pros = "".join(f"<li>{escape(item)}</li>" for item in dest.get("pros", []))
+    cons = "".join(f"<li>{escape(item)}</li>" for item in dest.get("cons", []))
+    listing_cards = "\n".join(build_listing_card(item) for item in listings)
+    dimension_rows = "\n".join(
+        f"""
+        <li>
+          <div><span>{escape(item["label"])}</span><strong>{float(item.get("score", 0)):.1f}/5</strong></div>
+          <i style="--value: {score_width(float(item.get("score", 0) or 0))}"></i>
+          <p>{escape(item.get("evidence") or "")}</p>
+        </li>
+        """
+        for item in dest.get("decision_dimensions", [])
+    )
+    peer_links = destination_links(peer_destinations, limit=6) or destination_links(destinations, slug, limit=6)
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(title, description, canonical, schema_for_destination(dest, canonical))}
+  <style>{shared_content_css()}</style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      <nav class="page-nav" aria-label="Primary">
+        <a class="page-brand" href="/">Global Home Atlas</a>
+        <div class="page-nav-links">
+          <a href="/">Dashboard</a>
+          <a href="/methodology/">Methodology</a>
+          <a href="/research-standards/">Standards</a>
+        </div>
+      </nav>
+      <div class="page-hero-grid">
+        <div>
+          <p class="page-eyebrow">{escape(dest.get("category") or "Destination")} · {escape(dest.get("country") or "")} · updated {date.today().isoformat()}</p>
+          <h1>{escape(dest["name"])} Property Research</h1>
+          <p class="page-lede">{escape(dest.get("panel_summary") or "")}</p>
+        </div>
+        <aside class="page-hero-card">
+          <span>Global rank</span><strong>#{dest["rank"]}</strong>
+          <span>Decision score</span><strong>{dest.get("decision_score", 0):.2f}/5</strong>
+          <span>Entry benchmark</span><strong>{money(dest.get("usd_per_m2"))}/m2</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="page-stats" aria-label="Destination metrics">
+        <div><span>Net yield</span><strong>{escape(dest.get("net_yield_estimate") or "n/a")}</strong></div>
+        <div><span>Ownership</span><strong>{metric_value(dest, "ownership_clarity"):.1f}/5</strong></div>
+        <div><span>Retirement</span><strong>{metric_value(dest, "retirement_fit"):.1f}/5</strong></div>
+        <div><span>Exit liquidity</span><strong>{metric_value(dest, "exit_liquidity"):.1f}/5</strong></div>
+      </section>
+      <div class="page-layout">
+        <article class="page-article">
+          <section class="page-section">
+            <h2>Investment Thesis</h2>
+            <p>{escape(dest.get("profit_driver") or dest.get("panel_verdict") or "")}</p>
+            <p>{escape(dest.get("panel_verdict") or "")} This page is built for a global buyer deciding whether {escape(dest["name"])} belongs on a serious property shortlist, not for casual travel inspiration. The useful question is whether the destination can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process.</p>
+          </section>
+          <section class="page-section">
+            <h2>Buyer Fit</h2>
+            <div class="page-grid">
+              <article class="page-card"><h3>Best Fit</h3><ul>{pros}</ul></article>
+              <article class="page-card"><h3>Risk Check</h3><ul>{cons}</ul></article>
+            </div>
+          </section>
+          <section class="page-section">
+            <h2>Ownership and Governance</h2>
+            <p>{escape(dest.get("ownership_notes") or "Confirm title structure, foreign-buyer rules, taxes, transfer process, and local counsel requirements before relying on any market-level conclusion.")}</p>
+            <p>{escape(dest.get("red_flags") or "Verify current rules, building condition, liquidity, and rental permissions before committing capital.")}</p>
+          </section>
+          <section class="page-section">
+            <h2>Long-Term Lifestyle Plan</h2>
+            <p>For an affluent global buyer, {escape(dest["name"])} should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
+            <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
+          </section>
+          <section class="page-section">
+            <h2>10-Dimension Rating</h2>
+            <ul class="score-list">{dimension_rows}</ul>
+          </section>
+          <section class="page-section">
+            <h2>Representative Listing Evidence</h2>
+            <p>{escape(dest.get("price_basis") or "Listing samples are used as evidence anchors for current market texture, not availability guarantees.")}</p>
+            <div class="page-article">{listing_cards}</div>
+          </section>
+          <section class="page-section">
+            <h2>Due Diligence Checklist</h2>
+            <ul>
+              <li>Verify clean title, transfer process, foreign-buyer restrictions, and beneficial ownership structure with independent local counsel.</li>
+              <li>Model acquisition tax, annual property tax, income tax, wealth tax exposure, financing availability, insurance, repairs, and property management fees.</li>
+              <li>Confirm short-term-rental rules, licensing, building permissions, homeowners association rules, and realistic net income after vacancy and operating costs.</li>
+              <li>Stress-test resale liquidity by reviewing recent comparable transactions, buyer nationality mix, time on market, and local agent depth.</li>
+            </ul>
+          </section>
+        </article>
+        <aside class="page-aside">
+          <section class="page-aside-card">
+            <h2>Compare in Atlas</h2>
+            <p>Use the dashboard to compare {escape(dest["name"])} against every market in the 10-dimension model.</p>
+            <a class="page-button" href="/#destinations">Open dashboard</a>
+          </section>
+          <section class="page-aside-card">
+            <h3>Related Destinations</h3>
+            <nav>{peer_links}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Research Guides</h3>
+            <nav>{seo_guide_links(pages, limit=5)}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Trust Layer</h3>
+            <nav>{trust_page_links()}</nav>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="page-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Scores and listing benchmarks are research inputs, not financial, legal, tax, or immigration advice.</p>
+      <nav>{seo_guide_links(pages, limit=6)} {trust_page_links()}</nav>
+    </div>
+  </footer>
+</body>
+</html>
+"""
+
+
+def schema_for_trust_page(page: dict, canonical: str) -> list[dict]:
+    return [
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": page["h1"],
+            "url": canonical,
+            "description": page["description"],
+            "dateModified": date.today().isoformat(),
+            "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": page["h1"], "item": canonical},
+            ],
+        },
+    ]
+
+
+def trust_page_body(page: dict) -> str:
+    slug = page["slug"]
+    if slug == "methodology":
+        dimensions = "\n".join(
+            f"<li><strong>{escape(item['label'])}</strong>: {escape(item['evidence'])} Base weight {item['weight'] * 100:.0f}%.</li>"
+            for item in DIMENSIONS
+        )
+        return f"""
+          <section class="page-section">
+            <h2>What the Score Measures</h2>
+            <p>Global Home Atlas uses a 10-dimension decision model to compare property destinations for buyers who care about lifestyle, legal clarity, rental realism, retirement optionality, and long-term exit quality. The model is deliberately practical: it rewards places that can be lived in, rented responsibly, owned with confidence, and sold into a real buyer pool.</p>
+            <ul>{dimensions}</ul>
+          </section>
+          <section class="page-section">
+            <h2>How to Use the Score</h2>
+            <p>The score is a shortlist tool, not a purchase instruction. It helps compare destinations on a consistent basis, then forces the buyer to investigate the local legal, tax, financing, building, and neighborhood questions that decide the actual transaction.</p>
+            <p>Weights are visible because different buyers should be able to challenge the model. A retirement buyer may raise healthcare and convenience. A pure investor may raise yield and exit liquidity. A lifestyle buyer may raise access and year-round activity.</p>
+          </section>
+        """
+    if slug == "research-standards":
+        return """
+          <section class="page-section">
+            <h2>Data Basis</h2>
+            <p>Global Home Atlas combines destination scorecards, representative listing samples, pricing benchmarks, rental context, ownership notes, and committee-style qualitative reads. Listings are evidence anchors for market texture and price range. They are not availability guarantees and should not be treated as offers.</p>
+            <p>Every page carries a verification expectation: buyers must confirm title, taxes, permits, foreign ownership rules, local rental rules, building condition, financing, insurance, and resale liquidity through qualified local professionals before making an investment decision.</p>
+          </section>
+          <section class="page-section">
+            <h2>Editorial Standard</h2>
+            <p>The site prioritizes decision usefulness over destination promotion. Markets can score well while still carrying material risks. Risks are surfaced directly because affluent global buyers need to understand what can break before they spend time on lawyers, agents, flights, or offers.</p>
+            <p>Global Home Atlas is research content. It is not financial, legal, tax, immigration, or investment advice.</p>
+          </section>
+        """
+    if slug == "about":
+        return """
+          <section class="page-section">
+            <h2>Why Global Home Atlas Exists</h2>
+            <p>Global property search is usually split between beautiful listing portals and fragmented local advice. That is not enough for globally mobile buyers who are choosing a future lifestyle base, retirement option, or cross-border investment. Global Home Atlas organizes the decision around comparable scores, market caveats, listing evidence, and long-term livability.</p>
+            <p>The target user is an affluent global citizen who wants to know where a property can support life plans over many years: family use, seasonal living, income support, healthcare access, resilience, and eventual exit.</p>
+          </section>
+          <section class="page-section">
+            <h2>What Makes the Atlas Different</h2>
+            <p>The product compares destinations before it compares individual homes. That sequence matters. The wrong jurisdiction, ownership structure, or liquidity profile can make a beautiful property a poor decision. The Atlas helps buyers narrow the world to markets worthy of deeper local due diligence.</p>
+          </section>
+        """
+    return """
+      <section class="page-section">
+        <h2>Contact and Research Requests</h2>
+        <p>For data corrections, research questions, partnership inquiries, or custom shortlist requests, use the contact path associated with the Global Home Atlas project repository or domain administration. A dedicated inquiry workflow will be added as the product moves from research prototype to public operating service.</p>
+        <p>Useful context for any request: target countries, budget range, intended use, preferred holding period, rental expectations, citizenship/residency constraints, and whether the priority is retirement, lifestyle, income, capital preservation, or optionality.</p>
+      </section>
+      <section class="page-section">
+        <h2>Before You Send a Deal</h2>
+        <p>Do not send confidential transaction documents until an explicit review process exists. The current site is designed for destination-level research, not legal review of individual property contracts.</p>
+      </section>
+    """
+
+
+def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) -> str:
+    canonical = page_url(page["slug"])
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(page["title"], page["description"], canonical, schema_for_trust_page(page, canonical))}
+  <style>{shared_content_css()}</style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      <nav class="page-nav" aria-label="Primary">
+        <a class="page-brand" href="/">Global Home Atlas</a>
+        <div class="page-nav-links">
+          <a href="/">Dashboard</a>
+          <a href="/methodology/">Methodology</a>
+          <a href="/research-standards/">Standards</a>
+          <a href="/about/">About</a>
+        </div>
+      </nav>
+      <div class="page-hero-grid">
+        <div>
+          <p class="page-eyebrow">{escape(page["theme"])} · updated {date.today().isoformat()}</p>
+          <h1>{escape(page["h1"])}</h1>
+          <p class="page-lede">{escape(page["description"])}</p>
+        </div>
+        <aside class="page-hero-card">
+          <span>Destinations</span><strong>{len(destinations)}</strong>
+          <span>Decision dimensions</span><strong>{len(DIMENSIONS)}</strong>
+          <span>Guide pages</span><strong>{len(pages)}</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="page-stats" aria-label="Trust metrics">
+        <div><span>Model</span><strong>10 dimensions</strong></div>
+        <div><span>Destinations</span><strong>{len(destinations)}</strong></div>
+        <div><span>Listings</span><strong>75 samples</strong></div>
+        <div><span>Updated</span><strong>{date.today().isoformat()}</strong></div>
+      </section>
+      <div class="page-layout">
+        <article class="page-article">{trust_page_body(page)}</article>
+        <aside class="page-aside">
+          <section class="page-aside-card">
+            <h2>Explore the Atlas</h2>
+            <p>Open the dashboard to compare all destinations and adjust the scoring weights.</p>
+            <a class="page-button" href="/#destinations">Open dashboard</a>
+          </section>
+          <section class="page-aside-card">
+            <h3>Research Guides</h3>
+            <nav>{seo_guide_links(pages, limit=6)}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Destination Examples</h3>
+            <nav>{destination_links(destinations, limit=6)}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Trust Pages</h3>
+            <nav>{trust_page_links(page["slug"])}</nav>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="page-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
+      <nav>{seo_guide_links(pages, limit=6)} {destination_links(destinations, limit=6)}</nav>
     </div>
   </footer>
 </body>
@@ -1546,6 +2049,7 @@ def build() -> Path:
           <a href="#research">Research Method</a>
           <a href="#destinations">Destinations</a>
           <a href="#guides">Guides</a>
+          <a href="/methodology/">Methodology</a>
         </div>
       </div>
     </nav>
@@ -1696,6 +2200,32 @@ def build() -> Path:
         </div>
         <div class="guide-grid">
           __SEO_GUIDES__
+        </div>
+      </section>
+
+      <section class="guide-section" id="destination-index">
+        <div class="guide-section__header">
+          <div>
+            <h2>Destination Research</h2>
+            <p>Individual destination dossiers for global buyers who need ownership, retirement, rental, risk, and resale context before local due diligence.</p>
+          </div>
+          <a href="/destinations/fukuoka-itoshima/">View top destination</a>
+        </div>
+        <div class="guide-grid">
+          __DESTINATION_GUIDES__
+        </div>
+      </section>
+
+      <section class="guide-section" id="trust">
+        <div class="guide-section__header">
+          <div>
+            <h2>Trust Layer</h2>
+            <p>Research standards, scoring methodology, caveats, and contact context to establish credibility before a buyer relies on the Atlas.</p>
+          </div>
+          <a href="/research-standards/">Read standards</a>
+        </div>
+        <div class="guide-grid">
+          __TRUST_GUIDES__
         </div>
       </section>
     </div>
@@ -1978,6 +2508,8 @@ def build() -> Path:
         "__SPOTLIGHT__": build_spotlight(destinations),
         "__CARDS__": cards,
         "__SEO_GUIDES__": build_home_guide_section(SEO_PAGES),
+        "__DESTINATION_GUIDES__": build_home_destination_section(destinations),
+        "__TRUST_GUIDES__": build_home_trust_section(),
         "__APP_DATA__": app_data,
     }
     for key, value in replacements.items():
@@ -1998,6 +2530,22 @@ def build() -> Path:
             build_seo_page(page, destinations, SEO_PAGES),
             encoding="utf-8",
         )
+    destinations_dir = ARTIFACTS / "destinations"
+    destinations_dir.mkdir(exist_ok=True)
+    for dest in destinations:
+        page_dir = destinations_dir / destination_slug(dest)
+        page_dir.mkdir(parents=True, exist_ok=True)
+        (page_dir / "index.html").write_text(
+            build_destination_page(dest, listings_by_dest.get(dest["id"], []), destinations, SEO_PAGES),
+            encoding="utf-8",
+        )
+    for page in TRUST_PAGES:
+        page_dir = ARTIFACTS / page["slug"]
+        page_dir.mkdir(parents=True, exist_ok=True)
+        (page_dir / "index.html").write_text(
+            build_trust_page(page, destinations, SEO_PAGES),
+            encoding="utf-8",
+        )
     cname.write_text(f"{SITE_DOMAIN}\n", encoding="utf-8")
     robots.write_text(
         f"""User-agent: *
@@ -2010,6 +2558,8 @@ Sitemap: {SITE_URL}sitemap.xml
     sitemap_urls = [
         (SITE_URL, "1.0"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
+        *[(destination_url(dest), "0.80") for dest in destinations],
+        *[(page_url(page["slug"]), "0.70") for page in TRUST_PAGES],
     ]
     sitemap_entries = "\n".join(
         f"""  <url>
