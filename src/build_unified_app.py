@@ -2550,9 +2550,9 @@ def build_brand_mockups_page() -> str:
           <p class="page-lede">{description}</p>
         </div>
         <aside class="page-hero-card">
-          <span>Directions</span><strong>3</strong>
+          <span>Directions</span><strong>5</strong>
           <span>Primary lane</span><strong>Atlas intelligence</strong>
-          <span>Best hybrid</span><strong>1 + 3</strong>
+          <span>Newest set</span><strong>4 + 5</strong>
         </aside>
       </div>
     </div>
@@ -2561,6 +2561,9 @@ def build_brand_mockups_page() -> str:
     <div class="page-shell">
       <section class="mockup-frame" aria-label="Global Home Atlas design mockup board">
         <img src="/brand-mockups/global-home-atlas-mockups.png" alt="Three Global Home Atlas homepage design mockups: Atlas Intelligence, Private Briefing, and Destination Dossier">
+      </section>
+      <section class="mockup-frame" aria-label="Global Home Atlas second design mockup board" style="margin-top: 22px;">
+        <img src="/brand-mockups/global-home-atlas-mockups-2.png" alt="Two Global Home Atlas homepage design mockups: Jurisdiction Ledger and Lifestyle Index">
       </section>
       <section class="mockup-notes" aria-label="Mockup direction notes">
         <article>
@@ -2577,6 +2580,16 @@ def build_brand_mockups_page() -> str:
           <span>Direction 3</span>
           <h2>Destination Dossier</h2>
           <p>Best for destination and country pages: verdicts, watch-outs, ownership clarity, score bars, and buyer-fit modules.</p>
+        </article>
+        <article>
+          <span>Direction 4</span>
+          <h2>Jurisdiction Ledger</h2>
+          <p>Best for making ownership clarity, legal structure, tax friction, and exit risk feel like the brand's core intelligence edge.</p>
+        </article>
+        <article>
+          <span>Direction 5</span>
+          <h2>Lifestyle Index</h2>
+          <p>Best for adding emotional warmth while keeping the product grounded in long-stay fit, healthcare, access, and daily-life signals.</p>
         </article>
       </section>
     </div>
