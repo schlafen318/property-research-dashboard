@@ -143,6 +143,21 @@ SEO_PAGES = [
         ],
     },
     {
+        "slug": "best-countries-to-buy-property-as-a-foreigner",
+        "title": "Best Countries to Buy Property as a Foreigner | Global Home Atlas",
+        "description": "Compare countries and destinations for foreign property buyers using ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth.",
+        "h1": "Best Countries to Buy Property as a Foreigner",
+        "keyword": "best countries to buy property as a foreigner",
+        "theme": "foreign-buyer access",
+        "intent": "foreign buyers comparing legal access, title clarity, transaction practicality, lifestyle quality, and resale depth before choosing markets for local diligence",
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "lake-como", "costa-brava-girona", "hakone-izu", "phuket-koh-samui"],
+        "faqs": [
+            ("Which countries are best for foreigners to buy property?", "The best options are markets where foreign buyers can understand the title path, hire independent local counsel, fund the purchase cleanly, use the property realistically, and resell into a broad buyer pool."),
+            ("What legal risks should foreign buyers check first?", "Start with title structure, transfer process, taxes, permits, foreign ownership restrictions, financing access, rental rules, and whether the structure is simple enough to explain without relying on informal assurances."),
+            ("Is freehold ownership always better than leasehold?", "Freehold can be cleaner, but the safer choice depends on enforceability, local rules, asset quality, liquidity, taxes, and whether the buyer understands the full structure before committing capital."),
+        ],
+    },
+    {
         "slug": "buy-property-abroad",
         "title": "Buy Property Abroad: Global Buyer Checklist | Global Home Atlas",
         "description": "Use a structured framework to buy property abroad: shortlist countries, compare ownership risk, underwrite income, and plan exit liquidity.",
@@ -788,13 +803,11 @@ def build_home_guide_section(pages: list[dict]) -> str:
     cards = []
     for page in pages:
         cards.append(
-            f"""
-            <article>
+            f"""            <article>
               <span>{escape(page["theme"])}</span>
               <h3><a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a></h3>
               <p>{escape(page["description"])}</p>
-            </article>
-            """
+            </article>"""
         )
     return "\n".join(cards)
 

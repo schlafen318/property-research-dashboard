@@ -19,6 +19,7 @@ DEFAULT_JSON_OUTPUT = DEFAULT_OUTPUT / "latest.json"
 PRIORITY_INDEXING_PATHS = [
     "/",
     "/buy-property-abroad/",
+    "/best-countries-to-buy-property-as-a-foreigner/",
     "/overseas-property-investment/",
     "/best-places-to-buy-property-abroad-for-retirement/",
     "/best-places-to-buy-vacation-home-abroad/",
