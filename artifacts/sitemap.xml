@@ -318,4 +318,10 @@
     <changefreq>weekly</changefreq>
     <priority>0.70</priority>
   </url>
+  <url>
+    <loc>https://globalhomeatlas.com/brand-mockups/</loc>
+    <lastmod>2026-06-23</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.40</priority>
+  </url>
 </urlset>

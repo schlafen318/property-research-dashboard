@@ -2466,6 +2466,134 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
 """
 
 
+def build_brand_mockups_page() -> str:
+    canonical = page_url("brand-mockups")
+    title = "Global Home Atlas Brand Mockups"
+    description = "Three visual directions for the Global Home Atlas premium atlas, briefing, and destination dossier experience."
+    schema = [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": title,
+            "url": canonical,
+            "description": description,
+            "dateModified": date.today().isoformat(),
+            "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
+        },
+    ]
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(title, description, canonical, schema)}
+  <style>
+{shared_content_css()}
+    main {{ margin-top: 0; }}
+    .mockup-stage {{
+      padding: 34px 0 64px;
+      background: #f7f4ee;
+    }}
+    .mockup-frame {{
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+      box-shadow: 0 22px 70px rgba(16, 36, 31, .12);
+    }}
+    .mockup-frame img {{
+      display: block;
+      width: 100%;
+      height: auto;
+    }}
+    .mockup-notes {{
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }}
+    .mockup-notes article {{
+      min-width: 0;
+      padding: 16px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf8;
+    }}
+    .mockup-notes span {{
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }}
+    .mockup-notes h2 {{
+      margin: 8px 0;
+      font-size: 18px;
+    }}
+    .mockup-notes p {{
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }}
+    @media (max-width: 760px) {{
+      .mockup-notes {{ grid-template-columns: 1fr; }}
+    }}
+  </style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      {primary_nav_html()}
+      <div class="page-hero-grid">
+        <div>
+          <p class="page-eyebrow">Brand exploration · visual directions</p>
+          <h1>Global Home Atlas Brand Mockups</h1>
+          <p class="page-lede">{description}</p>
+        </div>
+        <aside class="page-hero-card">
+          <span>Directions</span><strong>3</strong>
+          <span>Primary lane</span><strong>Atlas intelligence</strong>
+          <span>Best hybrid</span><strong>1 + 3</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main class="mockup-stage">
+    <div class="page-shell">
+      <section class="mockup-frame" aria-label="Global Home Atlas design mockup board">
+        <img src="/brand-mockups/global-home-atlas-mockups.png" alt="Three Global Home Atlas homepage design mockups: Atlas Intelligence, Private Briefing, and Destination Dossier">
+      </section>
+      <section class="mockup-notes" aria-label="Mockup direction notes">
+        <article>
+          <span>Direction 1</span>
+          <h2>Atlas Intelligence</h2>
+          <p>Best for homepage brand impact: dark cartography, coordinates, trust metrics, and premium decision framing.</p>
+        </article>
+        <article>
+          <span>Direction 2</span>
+          <h2>Private Briefing</h2>
+          <p>Best for methodology, guide hubs, and comparison surfaces where density and credibility matter most.</p>
+        </article>
+        <article>
+          <span>Direction 3</span>
+          <h2>Destination Dossier</h2>
+          <p>Best for destination and country pages: verdicts, watch-outs, ownership clarity, score bars, and buyer-fit modules.</p>
+        </article>
+      </section>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="page-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Brand and visual direction board for the premium atlas experience.</p>
+      <nav><a href="/">Dashboard</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></nav>
+    </div>
+  </footer>
+{analytics_event_script()}
+</body>
+</html>
+"""
+
+
 def build() -> Path:
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = sorted(destinations, key=lambda item: item["rank"])
@@ -3690,6 +3818,12 @@ def build() -> Path:
             clean_generated_html(build_trust_page(page, destinations, SEO_PAGES)),
             encoding="utf-8",
         )
+    brand_mockups_dir = ARTIFACTS / "brand-mockups"
+    brand_mockups_dir.mkdir(parents=True, exist_ok=True)
+    (brand_mockups_dir / "index.html").write_text(
+        clean_generated_html(build_brand_mockups_page()),
+        encoding="utf-8",
+    )
     cname.write_text(f"{SITE_DOMAIN}\n", encoding="utf-8")
     robots.write_text(
         f"""User-agent: *
@@ -3707,6 +3841,7 @@ Sitemap: {SITE_URL}sitemap.xml
         *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],
         *[(destination_url(dest), "0.80") for dest in destinations],
         *[(page_url(page["slug"]), "0.70") for page in TRUST_PAGES],
+        (page_url("brand-mockups"), "0.40"),
     ]
     sitemap_entries = "\n".join(
         f"""  <url>
