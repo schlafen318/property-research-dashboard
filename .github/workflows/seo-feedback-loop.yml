@@ -55,11 +55,24 @@ jobs:
       - name: Submit URLs to IndexNow
         run: python3 scripts/indexnow_submit.py --write --output output/seo/indexnow-latest.json --allow-failure
 
+      - name: Generate SEO status dashboard
+        run: python3 scripts/seo_status_dashboard.py --report output/seo/latest.json --indexnow-report output/seo/indexnow-latest.json --output artifacts/seo-status/index.html
+
       - name: Verify tracking coverage
         run: python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
 
       - name: Run feedback loop
         run: python3 scripts/seo_feedback_loop.py --apply
+
+      - name: Commit SEO status dashboard
+        run: |
+          git add artifacts/seo-status/index.html
+          if git diff --cached --quiet; then
+            echo "SEO status dashboard unchanged."
+          else
+            git commit -m "Update SEO status dashboard"
+            git push
+          fi
 
       - name: Upload SEO reports
         uses: actions/upload-artifact@v4

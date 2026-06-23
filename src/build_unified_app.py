@@ -1202,6 +1202,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
         <div class="page-nav-links">
           <a href="/">Dashboard</a>
           <a href="/guides/">Guides</a>
+          <a href="/seo-status/">SEO Status</a>
           <a href="/methodology/">Methodology</a>
           <a href="/research-standards/">Standards</a>
         </div>
@@ -1250,7 +1251,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
           </section>
           <section class="page-aside-card">
             <h3>Trust Layer</h3>
-            <nav>{trust_page_links()}</nav>
+            <nav><a href="/seo-status/">SEO status dashboard</a>{trust_page_links()}</nav>
           </section>
         </aside>
       </div>
