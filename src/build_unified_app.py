@@ -2552,7 +2552,7 @@ def build_brand_mockups_page() -> str:
         <aside class="page-hero-card">
           <span>Directions</span><strong>5</strong>
           <span>Primary lane</span><strong>Atlas intelligence</strong>
-          <span>Color study</span><strong>Nordic + Mediterranean</strong>
+          <span>Color study</span><strong>Nordic + Coastal</strong>
         </aside>
       </div>
     </div>
@@ -2567,6 +2567,9 @@ def build_brand_mockups_page() -> str:
       </section>
       <section class="mockup-frame" aria-label="Global Home Atlas color tone exploration board" style="margin-top: 22px;">
         <img src="/brand-mockups/global-home-atlas-color-tones.png" alt="Global Home Atlas color tone exploration comparing Nordic Mineral and Mediterranean Ledger across Atlas Intelligence, Private Briefing, and Destination Dossier">
+      </section>
+      <section class="mockup-frame" aria-label="Global Home Atlas relaxed Coastal Sage color exploration board" style="margin-top: 22px;">
+        <img src="/brand-mockups/global-home-atlas-coastal-sage.png" alt="Global Home Atlas relaxed Coastal Sage color exploration across Atlas Intelligence, Private Briefing, and Destination Dossier">
       </section>
       <section class="mockup-notes" aria-label="Mockup direction notes">
         <article>
@@ -2603,6 +2606,11 @@ def build_brand_mockups_page() -> str:
           <span>Color tone B</span>
           <h2>Mediterranean Ledger</h2>
           <p>Warmer and more editorial: ivory, ink charcoal, olive, muted terracotta, aged gold, and parchment neutrals.</p>
+        </article>
+        <article>
+          <span>Color tone C</span>
+          <h2>Coastal Sage</h2>
+          <p>Most relaxed and approachable: warm ivory, soft sage, eucalyptus, sea-glass blue, weathered stone, muted terracotta, aged brass, and charcoal ink.</p>
         </article>
       </section>
     </div>
