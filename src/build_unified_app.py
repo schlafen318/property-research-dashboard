@@ -24,6 +24,78 @@ GUIDE_HUB_DESCRIPTION = (
     "Browse Global Home Atlas buying guides for overseas property, retirement homes, "
     "second homes, foreign ownership, investment risk, and destination shortlists."
 )
+COUNTRY_HUBS = [
+    {
+        "slug": "spain-property",
+        "country": "Spain",
+        "title": "Spain Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Spain property destinations for foreign buyers, including Valencia, Malaga, Costa Brava, and Mallorca across lifestyle, ownership, rentals, and retirement fit.",
+        "h1": "Spain Property Guide for Foreign Buyers",
+        "thesis": "Spain is one of the deepest lifestyle-property markets in the Atlas because it combines city infrastructure, Mediterranean living, healthcare access, and several resale buyer pools. The discipline is entry price and local rental regulation.",
+        "destination_ids": ["valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
+        "guide_slugs": ["portugal-vs-spain-retirement-property", "best-places-to-buy-property-in-europe", "buying-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad"],
+    },
+    {
+        "slug": "portugal-property",
+        "country": "Portugal",
+        "title": "Portugal Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Portugal property markets for foreign buyers, including Algarve, Cascais, and Madeira across retirement fit, ownership clarity, value, and rental caveats.",
+        "h1": "Portugal Property Guide for Foreign Buyers",
+        "thesis": "Portugal remains a core benchmark for retirement and second-home planning. It screens well for foreigner practicality and lifestyle, but buyer returns depend heavily on micro-location, licensing, taxes, and entry-price discipline.",
+        "destination_ids": ["algarve-cascais", "madeira"],
+        "guide_slugs": ["portugal-vs-spain-retirement-property", "greece-vs-portugal-retirement-property", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad"],
+    },
+    {
+        "slug": "japan-property",
+        "country": "Japan",
+        "title": "Japan Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Japan property destinations for foreign buyers, including Fukuoka, Itoshima, Hakone, Izu, Hakuba, and Niseko across ownership clarity, lifestyle, and yield realism.",
+        "h1": "Japan Property Guide for Foreign Buyers",
+        "thesis": "Japan is unusually strong on ownership clarity, safety, food, infrastructure, and healthcare. The main question is not whether foreigners can buy; it is whether the chosen asset and location match the buyer's visa, income, and long-term use case.",
+        "destination_ids": ["fukuoka-itoshima", "hakone-izu", "hakuba", "niseko"],
+        "guide_slugs": ["japan-retirement-property-foreign-buyers", "best-countries-to-buy-property-as-a-foreigner", "buying-property-abroad-for-retirement", "best-places-to-buy-vacation-home-abroad"],
+    },
+    {
+        "slug": "thailand-property",
+        "country": "Thailand",
+        "title": "Thailand Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Assess Thailand property for foreign buyers, including Phuket and Koh Samui ownership structures, villa risks, rental appeal, and alternatives.",
+        "h1": "Thailand Property Guide for Foreign Buyers",
+        "thesis": "Thailand can be compelling for lifestyle, rental demand, and regional access, but the legal structure matters more than the brochure. Villa buyers need to understand land, leasehold, company, and condominium rules before underwriting income.",
+        "destination_ids": ["phuket-koh-samui"],
+        "guide_slugs": ["thailand-villa-ownership-foreigners", "foreign-property-investment-risks", "where-can-foreigners-buy-property", "overseas-property-investment"],
+    },
+    {
+        "slug": "greece-property",
+        "country": "Greece",
+        "title": "Greece Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Assess Greece property for foreign buyers through Crete, island-seasonality, retirement practicality, value, ownership clarity, and resale depth.",
+        "h1": "Greece Property Guide for Foreign Buyers",
+        "thesis": "Greece can offer lifestyle value and Mediterranean appeal, especially where access and services are strong. The risk is assuming island romance automatically creates year-round livability, healthcare practicality, or deep resale liquidity.",
+        "destination_ids": ["crete"],
+        "guide_slugs": ["greece-vs-portugal-retirement-property", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-property-in-europe", "buy-property-abroad"],
+    },
+    {
+        "slug": "italy-property",
+        "country": "Italy",
+        "title": "Italy Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Italy property destinations for foreign buyers, including Lake Como and the Dolomites across prestige, lifestyle, value discipline, and exit liquidity.",
+        "h1": "Italy Property Guide for Foreign Buyers",
+        "thesis": "Italy is strongest when the property thesis is lifestyle, prestige, and capital preservation rather than yield maximization. Buyers should separate globally liquid trophy markets from beautiful but thin local resale markets.",
+        "destination_ids": ["lake-como", "dolomites-south-tyrol"],
+        "guide_slugs": ["best-places-to-buy-property-in-europe", "best-places-to-buy-vacation-home-abroad", "foreign-property-investment-risks", "buy-property-abroad"],
+    },
+    {
+        "slug": "switzerland-property",
+        "country": "Switzerland",
+        "title": "Switzerland Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Switzerland property options for foreign buyers, including Andermatt, Lake Lugano, Valais, and Vaud across ownership limits, liquidity, lifestyle, and entry price.",
+        "h1": "Switzerland Property Guide for Foreign Buyers",
+        "thesis": "Switzerland is a capital-preservation and lifestyle market with high entry costs and meaningful foreign-buyer constraints. The strongest cases depend on legal access, liquidity, and whether the buyer accepts lower yield for resilience.",
+        "destination_ids": ["andermatt", "ticino-lake-lugano", "swiss-valais-vaud-alps"],
+        "guide_slugs": ["where-can-foreigners-buy-property", "foreign-property-investment-risks", "best-places-to-buy-vacation-home-abroad", "overseas-property-investment"],
+    },
+]
 GA4_MEASUREMENT_ID = os.environ.get("GA4_MEASUREMENT_ID", "").strip()
 BING_SITE_VERIFICATION = os.environ.get("BING_SITE_VERIFICATION", "").strip()
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "hello@globalhomeatlas.com").strip()
@@ -810,6 +882,11 @@ def destinations_for_page(page: dict, destinations: list[dict]) -> list[dict]:
     return picked or destinations[:8]
 
 
+def destinations_for_ids(destination_ids: list[str], destinations: list[dict]) -> list[dict]:
+    by_id = destination_lookup(destinations)
+    return [by_id[item] for item in destination_ids if item in by_id]
+
+
 def seo_guide_links(pages: list[dict], current_slug: str | None = None, limit: int | None = None) -> str:
     links = [
         f'<a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a>'
@@ -861,6 +938,28 @@ def guide_links_for_destination(dest: dict, pages: list[dict], limit: int = 5) -
         f'<a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a>'
         for page in matches[:limit]
     )
+
+
+def country_path(hub: dict) -> str:
+    return f"countries/{hub['slug']}"
+
+
+def country_url(hub: dict) -> str:
+    return page_url(country_path(hub))
+
+
+def country_hub_for_destination(dest: dict) -> dict | None:
+    for hub in COUNTRY_HUBS:
+        if dest["id"] in hub.get("destination_ids", []):
+            return hub
+    return None
+
+
+def country_hub_links(current_slug: str | None = None, limit: int | None = None) -> str:
+    hubs = [hub for hub in COUNTRY_HUBS if hub["slug"] != current_slug]
+    if limit:
+        hubs = hubs[:limit]
+    return "\n".join(f'<a href="/countries/{escape(hub["slug"])}/">{escape(hub["country"])}</a>' for hub in hubs)
 
 
 def global_schema_entities() -> list[dict]:
@@ -1181,6 +1280,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     )
     top_destinations = destinations[:6]
     top_destination_links = destination_links(top_destinations, limit=6)
+    country_links = country_hub_links(limit=7)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -1236,6 +1336,11 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
             <p>Start with the page that matches the job of the property, then compare the linked destination dossiers before talking to local agents. The goal is to avoid falling in love with a listing before the market, ownership path, rental rules, healthcare practicality, and resale depth have been tested.</p>
             <p>Every guide connects back to the same 10-dimension model: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry. That keeps broad searches comparable instead of turning each market into a separate story.</p>
           </section>
+          <section class="page-section">
+            <h2>Country and Region Hubs</h2>
+            <p>Use these geographic hubs to move from broad buyer intent into local destination choices, ownership questions, and country-level tradeoffs.</p>
+            <nav class="page-grid">{country_links}</nav>
+          </section>
           {cluster_html}
         </article>
         <aside class="page-aside">
@@ -1262,6 +1367,179 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
       <strong>{SITE_NAME}</strong>
       <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
       <nav>{seo_guide_links(pages, limit=8)} {trust_page_links()}</nav>
+    </div>
+  </footer>
+{analytics_event_script()}
+</body>
+</html>
+"""
+
+
+def schema_for_country_hub(hub: dict, selected: list[dict], canonical: str) -> list[dict]:
+    return [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": hub["h1"],
+            "url": canonical,
+            "description": hub["description"],
+            "dateModified": date.today().isoformat(),
+            "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
+            "mainEntity": {
+                "@type": "ItemList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": index + 1,
+                        "name": dest["name"],
+                        "url": destination_url(dest),
+                    }
+                    for index, dest in enumerate(selected)
+                ],
+            },
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Countries", "item": f"{SITE_URL}guides/"},
+                {"@type": "ListItem", "position": 3, "name": hub["country"], "item": canonical},
+            ],
+        },
+    ]
+
+
+def country_destination_cards(destinations: list[dict]) -> str:
+    cards = []
+    for dest in destinations:
+        cards.append(
+            f"""
+            <article class="page-card">
+              <span>#{dest["rank"]} global rank</span>
+              <h3><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></h3>
+              <p>{escape(dest.get("panel_verdict") or dest.get("panel_summary") or "")}</p>
+              <ul>
+                <li>Decision score: {dest.get("decision_score", 0):.2f}/5</li>
+                <li>Ownership clarity: {metric_value(dest, "ownership_clarity"):.1f}/5</li>
+                <li>Retirement fit: {metric_value(dest, "retirement_fit"):.1f}/5</li>
+                <li>Entry benchmark: {money(dest.get("usd_per_m2"))}/m2</li>
+              </ul>
+            </article>
+            """.rstrip()
+        )
+    return "\n".join(cards)
+
+
+def country_guide_links(hub: dict, pages: list[dict]) -> str:
+    by_slug = {page["slug"]: page for page in pages}
+    links = []
+    for slug in hub.get("guide_slugs", []):
+        page = by_slug.get(slug)
+        if page:
+            links.append(f'<a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a>')
+    return "\n".join(links)
+
+
+def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict]) -> str:
+    selected = destinations_for_ids(hub["destination_ids"], destinations)
+    canonical = country_url(hub)
+    updated = date.today().isoformat()
+    avg_score = sum(float(dest.get("decision_score", 0) or 0) for dest in selected) / max(1, len(selected))
+    best = selected[0] if selected else destinations[0]
+    guide_links = country_guide_links(hub, pages)
+    peer_country_links = country_hub_links(hub["slug"], limit=6)
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(hub["title"], hub["description"], canonical, schema_for_country_hub(hub, selected, canonical))}
+  <style>{shared_content_css()}</style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      <nav class="page-nav" aria-label="Primary">
+        <a class="page-brand" href="/">Global Home Atlas</a>
+        <div class="page-nav-links">
+          <a href="/">Dashboard</a>
+          <a href="/guides/">Guides</a>
+          <a href="/methodology/">Methodology</a>
+          <a href="/research-standards/">Standards</a>
+        </div>
+      </nav>
+      <div class="page-hero-grid">
+        <div>
+          <p class="page-eyebrow">{escape(hub["country"])} country hub · updated {updated}</p>
+          <h1>{escape(hub["h1"])}</h1>
+          <p class="page-lede">{escape(hub["description"])}</p>
+        </div>
+        <aside class="page-hero-card">
+          <span>Markets compared</span><strong>{len(selected)}</strong>
+          <span>Average score</span><strong>{avg_score:.2f}/5</strong>
+          <span>Top match</span><strong>{escape(best["name"])}</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="page-stats" aria-label="Country hub metrics">
+        <div><span>Country</span><strong>{escape(hub["country"])}</strong></div>
+        <div><span>Destinations</span><strong>{len(selected)}</strong></div>
+        <div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div>
+        <div><span>Updated</span><strong>{updated}</strong></div>
+      </section>
+      <div class="page-layout">
+        <article class="page-article">
+          <section class="page-section">
+            <h2>Country Thesis</h2>
+            <p>{escape(hub["thesis"])}</p>
+            <p>This page is a country-level filter for global buyers. Use it to decide whether {escape(hub["country"])} deserves deeper local diligence before comparing individual homes, agents, or legal structures.</p>
+          </section>
+          <section class="page-section">
+            <h2>Destinations to Compare</h2>
+            <div class="page-grid">{country_destination_cards(selected)}</div>
+          </section>
+          <section class="page-section">
+            <h2>How to Underwrite {escape(hub["country"])}</h2>
+            <ul>
+              <li>Start with ownership clarity, transfer process, taxes, and whether the structure is simple enough to explain without informal assumptions.</li>
+              <li>Stress-test the market for retirement fit, healthcare practicality, airport access, year-round services, and non-peak-season livability.</li>
+              <li>Separate headline yield from realistic net income after manager quality, vacancy, repairs, taxes, licensing, furnishing, and currency movement.</li>
+              <li>Plan exit liquidity before entry by checking buyer depth, comparable transactions, agent quality, and whether demand depends on one foreign-buyer group.</li>
+            </ul>
+          </section>
+          <section class="page-section">
+            <h2>Related Buying Guides</h2>
+            <nav class="page-grid">{guide_links}</nav>
+          </section>
+        </article>
+        <aside class="page-aside">
+          <section class="page-aside-card">
+            <h2>Use the Atlas</h2>
+            <p>Compare these markets against the full destination model and export a shortlist memo.</p>
+            <a class="page-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(hub["country"])} country hub">Open dashboard</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(hub["country"])} country hub">Request custom shortlist</a>
+          </section>
+          <section class="page-aside-card">
+            <h3>Other Country Hubs</h3>
+            <nav>{peer_country_links}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Trust Layer</h3>
+            <nav>{trust_page_links()}</nav>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="page-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Country hubs are research inputs, not financial, legal, tax, immigration, or transaction advice.</p>
+      <nav>{country_hub_links(hub["slug"], limit=6)} {seo_guide_links(pages, limit=4)}</nav>
     </div>
   </footer>
 {analytics_event_script()}
@@ -1671,6 +1949,12 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
     )
     peer_links = destination_links(peer_destinations, limit=6) or destination_links(destinations, slug, limit=6)
     destination_guide_links = guide_links_for_destination(dest, pages)
+    country_hub = country_hub_for_destination(dest)
+    country_hub_link = (
+        f'<a href="/countries/{escape(country_hub["slug"])}/">{escape(country_hub["h1"])}</a>'
+        if country_hub
+        else ""
+    )
 
     return f"""<!doctype html>
 <html lang="en">
@@ -1770,6 +2054,10 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
           <section class="page-aside-card">
             <h3>Related Destinations</h3>
             <nav>{peer_links}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Country Context</h3>
+            <nav>{country_hub_link or country_hub_links(limit=4)}</nav>
           </section>
           <section class="page-aside-card">
             <h3>Research Guides</h3>
@@ -3120,6 +3408,15 @@ def build() -> Path:
             build_destination_page(dest, listings_by_dest.get(dest["id"], []), destinations, SEO_PAGES),
             encoding="utf-8",
         )
+    countries_dir = ARTIFACTS / "countries"
+    countries_dir.mkdir(exist_ok=True)
+    for hub in COUNTRY_HUBS:
+        page_dir = countries_dir / hub["slug"]
+        page_dir.mkdir(parents=True, exist_ok=True)
+        (page_dir / "index.html").write_text(
+            build_country_hub_page(hub, destinations, SEO_PAGES),
+            encoding="utf-8",
+        )
     for page in TRUST_PAGES:
         page_dir = ARTIFACTS / page["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
@@ -3141,6 +3438,7 @@ Sitemap: {SITE_URL}sitemap.xml
         (SITE_URL, "1.0"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
+        *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],
         *[(destination_url(dest), "0.80") for dest in destinations],
         *[(page_url(page["slug"]), "0.70") for page in TRUST_PAGES],
     ]
