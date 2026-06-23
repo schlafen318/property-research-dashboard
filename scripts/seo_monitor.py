@@ -24,6 +24,38 @@ PRIORITY_INDEXING_PATHS = [
     "/best-places-to-buy-property-abroad-for-retirement/",
     "/best-places-to-buy-vacation-home-abroad/",
 ]
+TRACKED_SEO_GOALS = [
+    {
+        "name": "Foreign-buyer landing page",
+        "url": "https://globalhomeatlas.com/best-countries-to-buy-property-as-a-foreigner/",
+        "launch_date": "2026-06-23",
+        "indexed_deadline": "2026-06-30",
+        "impressions_at_risk_date": "2026-07-07",
+        "impressions_deadline": "2026-07-23",
+    }
+]
+SEED_TEMPLATE_PAGES = [
+    {
+        "title": "Buying Property Abroad for Retirement",
+        "url": "https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
+        "status": "not_started",
+    },
+    {
+        "title": "Best Places to Buy a Second Home Abroad",
+        "url": "https://globalhomeatlas.com/best-places-to-buy-a-second-home-abroad/",
+        "status": "not_started",
+    },
+    {
+        "title": "Foreign Property Investment Risks",
+        "url": "https://globalhomeatlas.com/foreign-property-investment-risks/",
+        "status": "not_started",
+    },
+    {
+        "title": "Where Can Foreigners Buy Property",
+        "url": "https://globalhomeatlas.com/where-can-foreigners-buy-property/",
+        "status": "not_started",
+    },
+]
 
 
 def fetch_sitemap(url: str) -> list[str]:
@@ -74,6 +106,30 @@ def search_analytics(service, site_url: str, start_date: str, end_date: str, dim
         "rowLimit": row_limit,
     }
     return service.searchanalytics().query(siteUrl=site_url, body=body).execute().get("rows", [])
+
+
+def page_analytics(service, site_url: str, start_date: str, end_date: str, page_url: str) -> dict:
+    body = {
+        "startDate": start_date,
+        "endDate": end_date,
+        "dimensions": ["page"],
+        "dimensionFilterGroups": [
+            {
+                "filters": [
+                    {
+                        "dimension": "page",
+                        "operator": "equals",
+                        "expression": page_url,
+                    }
+                ]
+            }
+        ],
+        "rowLimit": 1,
+    }
+    rows = service.searchanalytics().query(siteUrl=site_url, body=body).execute().get("rows", [])
+    if not rows:
+        return {"page": page_url, "clicks": 0, "impressions": 0, "ctr": 0, "position": 0}
+    return row_to_dict(rows[0], ["page"])
 
 
 def sitemap_status(service, site_url: str, sitemap_url: str) -> dict:
@@ -184,6 +240,103 @@ def fmt_inspections(inspections: list[dict]) -> str:
     return "\n".join(out) + "\n"
 
 
+def inspection_by_url(inspections: list[dict], url: str) -> dict:
+    for item in inspections:
+        if item.get("url") == url:
+            return item
+    return {}
+
+
+def status_for_indexing(today: dt.date, goal: dict, inspection: dict) -> str:
+    if inspection.get("verdict") == "PASS":
+        return "met"
+    launch = dt.date.fromisoformat(goal["launch_date"])
+    deadline = dt.date.fromisoformat(goal["indexed_deadline"])
+    if today > deadline:
+        return "missed"
+    if (today - launch).days >= 5:
+        return "at_risk"
+    return "on_track"
+
+
+def status_for_impressions(today: dt.date, goal: dict, analytics: dict) -> str:
+    if int(analytics.get("impressions") or 0) > 0:
+        return "met"
+    at_risk = dt.date.fromisoformat(goal["impressions_at_risk_date"])
+    deadline = dt.date.fromisoformat(goal["impressions_deadline"])
+    if today > deadline:
+        return "missed"
+    if today >= at_risk:
+        return "at_risk"
+    return "on_track"
+
+
+def build_goal_scorecard(today: dt.date, inspections: list[dict], page_metrics: dict[str, dict]) -> dict:
+    page_goals = []
+    for goal in TRACKED_SEO_GOALS:
+        inspection = inspection_by_url(inspections, goal["url"])
+        analytics = page_metrics.get(goal["url"], {"page": goal["url"], "clicks": 0, "impressions": 0, "ctr": 0, "position": 0})
+        page_goals.append(
+            {
+                **goal,
+                "index_status": status_for_indexing(today, goal, inspection),
+                "impression_status": status_for_impressions(today, goal, analytics),
+                "inspection": inspection,
+                "analytics": analytics,
+            }
+        )
+    return {
+        "generated_for": today.isoformat(),
+        "page_goals": page_goals,
+        "template_reuse": {
+            "target_count": 4,
+            "completed_count": sum(1 for item in SEED_TEMPLATE_PAGES if item["status"] == "published"),
+            "pages": SEED_TEMPLATE_PAGES,
+        },
+    }
+
+
+def fmt_goal_scorecard(scorecard: dict) -> str:
+    rows = [
+        "| Goal | Launch | Deadline | Current signal | Status |",
+        "| --- | --- | --- | --- | --- |",
+    ]
+    for goal in scorecard.get("page_goals", []):
+        inspection = goal.get("inspection") or {}
+        analytics = goal.get("analytics") or {}
+        rows.append(
+            "| "
+            + " | ".join(
+                [
+                    f"Index {goal['url']}",
+                    goal["launch_date"],
+                    goal["indexed_deadline"],
+                    inspection.get("coverage_state") or "n/a",
+                    goal["index_status"],
+                ]
+            )
+            + " |"
+        )
+        rows.append(
+            "| "
+            + " | ".join(
+                [
+                    f"First impressions {goal['url']}",
+                    goal["launch_date"],
+                    goal["impressions_deadline"],
+                    str(analytics.get("impressions", 0)),
+                    goal["impression_status"],
+                ]
+            )
+            + " |"
+        )
+    template = scorecard.get("template_reuse", {})
+    rows.append(
+        f"| Reuse template for next 4 seed pages | n/a | n/a | {template.get('completed_count', 0)}/{template.get('target_count', 4)} published | on_track |"
+    )
+    return "\n".join(rows) + "\n"
+
+
 def fmt_rows(rows: list[dict], headers: list[str]) -> str:
     if not rows:
         return "_No rows returned for this period._\n"
@@ -244,6 +397,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
     sitemap_submission: dict = {}
     priority_urls = priority_indexing_urls(sitemap_urls)
     priority_inspections: list[dict] = []
+    tracked_page_metrics: dict[str, dict] = {}
     query_rows: list[dict] = []
     page_rows: list[dict] = []
     low_ctr_rows: list[dict] = []
@@ -304,6 +458,11 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
             if row.get("impressions", 0) >= args.content_gap_impressions
             and not any(page_matches_query(row.get("keys", [""])[0], url) for url in sitemap_urls)
         ]
+        tracked_page_metrics = {
+            goal["url"]: page_analytics(service, args.site_url, start_date, end_date, goal["url"])
+            for goal in TRACKED_SEO_GOALS
+        }
+        goal_scorecard = build_goal_scorecard(today, priority_inspections, tracked_page_metrics)
         lines.extend(
             [
                 "## Top Queries",
@@ -333,6 +492,9 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
                 "## Priority URL Inspection API Results",
                 "",
                 fmt_inspections(priority_inspections),
+                "## SEO Goal Scorecard",
+                "",
+                fmt_goal_scorecard(goal_scorecard),
             ]
         )
     else:
@@ -345,6 +507,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
             ]
         )
 
+    goal_scorecard = build_goal_scorecard(today, priority_inspections, tracked_page_metrics)
     report = "\n".join(lines)
     data = {
         "generated_at": dt.datetime.now(dt.timezone.utc).isoformat(),
@@ -381,6 +544,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
             "near_ranking_pages": [row_to_dict(row, ["page"]) for row in near_ranking_rows],
             "content_gap_queries": [row_to_dict(row, ["query"]) for row in content_gap_rows],
         },
+        "goals": goal_scorecard,
     }
     output_path = None
     json_output_path = None

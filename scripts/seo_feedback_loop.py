@@ -27,6 +27,8 @@ LABELS = {
     "no-search-console-rows": "d93f0b",
     "priority-page-not-indexed": "fbca04",
     "trust-signal-gap": "fbca04",
+    "seo-goal-at-risk": "fbca04",
+    "seo-goal-missed": "b60205",
     "content-refresh": "fbca04",
     "landing-page-candidate": "5319e7",
 }
@@ -197,6 +199,31 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
         )
 
     sc = report.get("search_console", {})
+    goals = report.get("goals", {})
+    for goal in goals.get("page_goals", []):
+        for field, label in (("index_status", "Indexing"), ("impression_status", "First impressions")):
+            status_value = goal.get(field)
+            if status_value not in {"at_risk", "missed"}:
+                continue
+            kind = "seo-goal-missed" if status_value == "missed" else "seo-goal-at-risk"
+            severity = "high" if status_value == "missed" else "medium"
+            findings.append(
+                Finding(
+                    kind=kind,
+                    title=f"{label} goal {status_value.replace('_', ' ')} for {goal.get('url')}",
+                    summary=(
+                        f"{label} goal for `{goal.get('url')}` is `{status_value}`. "
+                        f"Launch date: {goal.get('launch_date')}. "
+                        f"Index deadline: {goal.get('indexed_deadline')}. "
+                        f"Impression deadline: {goal.get('impressions_deadline')}."
+                    ),
+                    severity=severity,
+                    labels=("analytics-loop", kind, "seo-opportunity", "needs-human-review"),
+                    fingerprint=stable_fingerprint(kind, f"{field}:{goal.get('url')}"),
+                    payload=goal,
+                )
+            )
+
     if sc.get("available") and not sc.get("top_queries") and not sc.get("top_pages"):
         findings.append(
             Finding(
@@ -337,6 +364,9 @@ def control_issue_body(
 ## IndexNow Summary
 {format_indexnow(indexnow)}
 
+## SEO Goal Scorecard
+{format_goal_scorecard(report.get('goals', {}))}
+
 ## Findings
 - High severity: `{by_severity.get('high', 0)}`
 - Medium severity: `{by_severity.get('medium', 0)}`
@@ -371,6 +401,28 @@ def format_indexnow(indexnow: dict) -> str:
             f"- Reason: `{response.get('reason')}`",
         ]
     )
+
+
+def format_goal_scorecard(goals: dict) -> str:
+    if not goals:
+        return "- Not configured"
+    lines = []
+    for goal in goals.get("page_goals", []):
+        inspection = goal.get("inspection") or {}
+        analytics = goal.get("analytics") or {}
+        lines.extend(
+            [
+                f"- Page: `{goal.get('url')}`",
+                f"  - Launch date: `{goal.get('launch_date')}`",
+                f"  - Indexed by: `{goal.get('indexed_deadline')}`; status `{goal.get('index_status')}`; signal `{inspection.get('coverage_state') or 'n/a'}`",
+                f"  - First impressions by: `{goal.get('impressions_deadline')}`; status `{goal.get('impression_status')}`; impressions `{analytics.get('impressions', 0)}`",
+            ]
+        )
+    template = goals.get("template_reuse") or {}
+    lines.append(f"- Template reuse: `{template.get('completed_count', 0)}/{template.get('target_count', 4)}` seed pages published")
+    for page in template.get("pages", []):
+        lines.append(f"  - `{page.get('status')}` {page.get('url')}")
+    return "\n".join(lines)
 
 
 def format_priority_inspections(inspections: list[dict]) -> str:
