@@ -2299,6 +2299,16 @@ def shared_content_css() -> str:
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+      }
+      .page-section p, .page-section li, .page-card p, .brief-panel p, .trust-brief p, .comparison-card p, .page-aside-card p {
+        max-width: 100%;
+        overflow-wrap: anywhere;
+        word-break: normal;
+      }
       .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
@@ -3653,6 +3663,8 @@ def build() -> Path:
       h1 { max-width: min(100%, 362px); font-size: clamp(34px, 10vw, 44px); line-height: 1; overflow-wrap: anywhere; }
       .lede { margin-top: 18px; font-size: 16px; }
       .hero-actions { margin-top: 18px; }
+      .atlas-visual__route { left: 10px; right: 10px; max-width: none; justify-content: flex-end; }
+      .atlas-visual__route span { padding: 5px 7px; font-size: 10px; }
       .trust-panel { padding: 14px; }
       .trust-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
       .trust-grid div { padding: 10px; }
