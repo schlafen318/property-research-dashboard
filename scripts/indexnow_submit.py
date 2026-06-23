@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_SITE_URL = "https://globalhomeatlas.com/"
 DEFAULT_SITEMAP = "https://globalhomeatlas.com/sitemap.xml"
 DEFAULT_OUTPUT = ROOT / "output" / "seo" / "indexnow-latest.json"
-DEFAULT_ENDPOINT = "https://api.indexnow.org/indexnow"
+DEFAULT_ENDPOINT = "https://www.bing.com/indexnow"
 DEFAULT_KEY = "37c568eb0fbc24832815d94b646237ca"
 
 

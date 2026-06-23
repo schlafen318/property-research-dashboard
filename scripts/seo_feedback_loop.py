@@ -325,6 +325,7 @@ def control_issue_body(
 - Content-gap queries: `{len(sc.get('content_gap_queries', []))}`
 
 ## Indexing Summary
+- Sitemap resubmitted this run: `{sitemap.get('submission', {}).get('ok')}`
 - Submitted URLs reported by Google: `{sitemap.get('indexing', {}).get('submitted_reported')}`
 - Indexed URLs reported by Google: `{sitemap.get('indexing', {}).get('indexed_reported')}`
 - Priority URLs in sitemap: `{sum(1 for item in sitemap.get('indexing', {}).get('priority_urls', []) if item.get('in_sitemap'))}`

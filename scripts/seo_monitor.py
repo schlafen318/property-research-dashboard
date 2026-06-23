@@ -83,6 +83,14 @@ def sitemap_status(service, site_url: str, sitemap_url: str) -> dict:
     return {}
 
 
+def submit_sitemap(service, site_url: str, sitemap_url: str) -> dict:
+    try:
+        service.sitemaps().submit(siteUrl=site_url, feedpath=sitemap_url).execute()
+        return {"ok": True, "sitemap": sitemap_url}
+    except Exception as exc:
+        return {"ok": False, "sitemap": sitemap_url, "error": str(exc)}
+
+
 def sitemap_index_counts(status: dict) -> tuple[int | None, int | None]:
     submitted = None
     indexed = None
@@ -233,6 +241,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
     destination_count = sum("/destinations/" in url for url in sitemap_urls)
     trust_count = sum(url.rstrip("/").split("/")[-1] in {"methodology", "research-standards", "about", "contact"} for url in sitemap_urls)
     status: dict = {}
+    sitemap_submission: dict = {}
     priority_urls = priority_indexing_urls(sitemap_urls)
     priority_inspections: list[dict] = []
     query_rows: list[dict] = []
@@ -256,6 +265,8 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
 
     if args.token.exists():
         service = load_search_console(args.token)
+        if args.submit_sitemap:
+            sitemap_submission = submit_sitemap(service, args.site_url, args.sitemap)
         status = sitemap_status(service, args.site_url, args.sitemap)
         submitted_count, indexed_count = sitemap_index_counts(status)
         priority_inspections = inspect_priority_urls(service, args.site_url, priority_urls, args.inspect_priority_urls)
@@ -270,6 +281,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
                 f"- Errors: {status.get('errors', 'n/a')}",
                 f"- Submitted URLs reported by Google: {submitted_count if submitted_count is not None else 'n/a'}",
                 f"- Indexed URLs reported by Google: {indexed_count if indexed_count is not None else 'n/a'}",
+                f"- Sitemap resubmitted this run: {sitemap_submission.get('ok', False)}",
                 "",
             ]
         )
@@ -344,6 +356,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
             "trust_count": trust_count,
             "urls": sitemap_urls,
             "status": status,
+            "submission": sitemap_submission,
             "indexing": {
                 "submitted_reported": sitemap_index_counts(status)[0],
                 "indexed_reported": sitemap_index_counts(status)[1],
@@ -399,6 +412,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--near-ranking-max-position", type=float, default=30)
     parser.add_argument("--content-gap-impressions", type=int, default=20)
     parser.add_argument("--inspect-priority-urls", action=argparse.BooleanOptionalAction, default=True)
+    parser.add_argument("--submit-sitemap", action="store_true")
     parser.add_argument("--json-output", type=Path, default=None)
     parser.add_argument("--write", action="store_true", help="Write the report to output/seo/.")
     return parser.parse_args(argv)

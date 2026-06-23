@@ -50,7 +50,7 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
       - name: Generate SEO monitor report
-        run: python3 scripts/seo_monitor.py --write --json-output output/seo/latest.json
+        run: python3 scripts/seo_monitor.py --write --submit-sitemap --json-output output/seo/latest.json
 
       - name: Submit URLs to IndexNow
         run: python3 scripts/indexnow_submit.py --write --output output/seo/indexnow-latest.json --allow-failure
