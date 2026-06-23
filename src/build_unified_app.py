@@ -1541,6 +1541,24 @@ def country_destination_table(destinations: list[dict]) -> str:
     """
 
 
+def country_cluster_visual(destinations: list[dict]) -> str:
+    chips = "\n".join(
+        f"""
+        <div>
+          <span>#{dest["rank"]}</span>
+          <strong>{escape(dest["name"])}</strong>
+          <em>{dest.get("decision_score", 0):.2f}/5</em>
+        </div>
+        """.rstrip()
+        for dest in destinations
+    )
+    return f"""
+      <div class="cluster-map" aria-label="Destination cluster visual">
+        <div class="cluster-map__grid">{chips}</div>
+      </div>
+    """
+
+
 def country_guide_links(hub: dict, pages: list[dict]) -> str:
     by_slug = {page["slug"]: page for page in pages}
     links = []
@@ -1617,6 +1635,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
           <section class="page-section" id="destination-comparison">
             <h2>Destination Comparison Table</h2>
             <p>Use this country table to compare score, ownership, retirement practicality, exit liquidity, and the briefing read before opening a destination dossier.</p>
+            {country_cluster_visual(selected)}
             {country_destination_table(selected)}
           </section>
           <section class="page-section">
@@ -1687,17 +1706,24 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
 {head_html(title, description, canonical, schema_for_page(page, canonical))}
   <style>
     :root {{
-      color: #16231f;
-      background: #f7f4ee;
+      color: #24312d;
+      background: #f5f1e9;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --ink: #16231f;
-      --muted: #65736d;
-      --line: rgba(22, 35, 31, .14);
-      --paper: #fffdf8;
-      --deep: #10241f;
-      --teal: #176b62;
-      --gold: #a77a35;
-      --clay: #b85f3f;
+      --ink: #24312d;
+      --muted: #68776f;
+      --line: rgba(36, 49, 45, .13);
+      --paper: #fffdf7;
+      --ivory: #fffdf7;
+      --stone: #ebe5da;
+      --sage: #c7d3c2;
+      --eucalyptus: #5f7f72;
+      --sea-glass: #b9ced0;
+      --brass: #a98a4b;
+      --terracotta: #b76f57;
+      --deep: #24312d;
+      --teal: #5f7f72;
+      --gold: #a98a4b;
+      --clay: #b76f57;
     }}
     * {{ box-sizing: border-box; }}
     body {{ margin: 0; min-width: 320px; }}
@@ -1705,35 +1731,35 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
     p, li {{ line-height: 1.65; }}
     .seo-shell {{ width: min(1120px, calc(100% - 32px)); margin: 0 auto; }}
     .seo-hero {{
-      color: #fffdf8;
+      color: var(--ink);
       background:
-        linear-gradient(135deg, rgba(16, 36, 31, .97), rgba(23, 107, 98, .74), rgba(184, 95, 63, .42)),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'%3E%3Crect width='1500' height='900' fill='%2310241f'/%3E%3Cpath d='M0 560c150-62 304-58 462 12 163 72 300 79 465-18 177-104 371-133 573-25v371H0Z' fill='%23fffdf8' fill-opacity='.12'/%3E%3Cpath d='M110 128h1280M110 270h1280M110 412h1280M110 554h1280M110 696h1280M278 70v760M536 70v760M794 70v760M1052 70v760M1310 70v760' stroke='%23fffdf8' stroke-opacity='.11'/%3E%3C/svg%3E");
+        linear-gradient(135deg, rgba(255, 253, 247, .96), rgba(199, 211, 194, .70), rgba(185, 206, 208, .46)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'%3E%3Crect width='1500' height='900' fill='%23f5f1e9'/%3E%3Cpath d='M0 560c150-62 304-58 462 12 163 72 300 79 465-18 177-104 371-133 573-25v371H0Z' fill='%235f7f72' fill-opacity='.10'/%3E%3Cpath d='M110 128h1280M110 270h1280M110 412h1280M110 554h1280M110 696h1280M278 70v760M536 70v760M794 70v760M1052 70v760M1310 70v760' stroke='%2324312d' stroke-opacity='.08'/%3E%3C/svg%3E");
       background-size: cover;
       background-position: center;
       padding: 18px 0 64px;
     }}
     .seo-nav {{ display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 78px; }}
-    .seo-brand {{ color: #fffdf8; font-weight: 900; text-decoration: none; }}
+    .seo-brand {{ color: var(--ink); font-weight: 900; text-decoration: none; }}
     .seo-nav-links {{ display: flex; gap: 18px; flex-wrap: wrap; }}
-    .seo-nav-links a {{ color: rgba(255, 253, 248, .86); text-decoration: none; font-size: 13px; font-weight: 800; }}
+    .seo-nav-links a {{ color: rgba(36, 49, 45, .76); text-decoration: none; font-size: 13px; font-weight: 800; }}
     .mobile-menu {{ display: none; position: relative; }}
-    .mobile-menu summary {{ min-height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 0 13px; border: 1px solid rgba(255, 253, 248, .32); border-radius: 6px; color: #fffdf8; font-size: 13px; font-weight: 850; list-style: none; cursor: pointer; }}
+    .mobile-menu summary {{ min-height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 0 13px; border: 1px solid rgba(36, 49, 45, .20); border-radius: 6px; color: var(--ink); font-size: 13px; font-weight: 850; list-style: none; cursor: pointer; }}
     .mobile-menu summary::-webkit-details-marker {{ display: none; }}
-    .mobile-menu nav {{ position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(78vw, 280px); display: grid; gap: 2px; padding: 8px; border: 1px solid rgba(255, 253, 248, .28); border-radius: 8px; background: rgba(16, 36, 31, .98); box-shadow: 0 20px 50px rgba(0, 0, 0, .25); }}
-    .mobile-menu nav a {{ padding: 12px; border-radius: 6px; color: #fffdf8; text-decoration: none; font-weight: 800; }}
+    .mobile-menu nav {{ position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(78vw, 280px); display: grid; gap: 2px; padding: 8px; border: 1px solid rgba(36, 49, 45, .16); border-radius: 8px; background: rgba(255, 253, 247, .98); box-shadow: 0 20px 50px rgba(36, 49, 45, .16); }}
+    .mobile-menu nav a {{ padding: 12px; border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 800; }}
     .seo-hero-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }}
-    .seo-eyebrow {{ margin: 0 0 12px; color: #e1c17e; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }}
+    .seo-eyebrow {{ margin: 0 0 12px; color: var(--brass); font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }}
     h1 {{ margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }}
-    .seo-lede {{ max-width: 760px; margin: 22px 0 0; color: rgba(255, 253, 248, .84); font-size: clamp(16px, 2vw, 20px); }}
-    .seo-hero-card {{ padding: 16px; border: 1px solid rgba(255, 253, 248, .26); border-radius: 8px; background: rgba(255, 253, 248, .1); backdrop-filter: blur(16px); }}
-    .seo-hero-card span {{ display: block; color: rgba(255, 253, 248, .68); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .seo-lede {{ max-width: 760px; margin: 22px 0 0; color: rgba(36, 49, 45, .72); font-size: clamp(16px, 2vw, 20px); }}
+    .seo-hero-card {{ padding: 16px; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: rgba(255, 253, 247, .72); box-shadow: 0 18px 44px rgba(36, 49, 45, .08); backdrop-filter: blur(16px); }}
+    .seo-hero-card span {{ display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .seo-hero-card strong {{ display: block; margin: 6px 0 14px; font-size: 24px; }}
     .seo-actions {{ display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }}
-    .seo-button {{ display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 15px; border-radius: 6px; background: #fffdf8; color: var(--deep); font-weight: 850; text-decoration: none; }}
-    .seo-button.secondary {{ background: transparent; color: #fffdf8; border: 1px solid rgba(255, 253, 248, .34); }}
+    .seo-button {{ display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 15px; border-radius: 6px; background: var(--eucalyptus); color: #fffdf7; font-weight: 850; text-decoration: none; }}
+    .seo-button.secondary {{ background: rgba(255, 253, 247, .58); color: var(--ink); border: 1px solid rgba(36, 49, 45, .20); }}
     main {{ margin-top: -32px; }}
-    .seo-panel {{ border: 1px solid var(--line); border-radius: 8px; background: var(--paper); overflow: hidden; box-shadow: 0 18px 50px rgba(16, 36, 31, .08); }}
+    .seo-panel {{ border: 1px solid var(--line); border-radius: 8px; background: var(--paper); overflow: hidden; box-shadow: 0 18px 50px rgba(36, 49, 45, .08); }}
     .seo-stats {{ display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); }}
     .seo-stats div {{ min-width: 0; padding: 16px; background: var(--paper); }}
     .seo-stats span, dt {{ display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }}
@@ -1908,17 +1934,24 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
 def shared_content_css() -> str:
     return """
     :root {
-      color: #16231f;
-      background: #f7f4ee;
+      color: #24312d;
+      background: #f5f1e9;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --ink: #16231f;
-      --muted: #65736d;
-      --line: rgba(22, 35, 31, .14);
-      --paper: #fffdf8;
-      --deep: #10241f;
-      --teal: #176b62;
-      --gold: #a77a35;
-      --clay: #b85f3f;
+      --ink: #24312d;
+      --muted: #68776f;
+      --line: rgba(36, 49, 45, .13);
+      --paper: #fffdf7;
+      --ivory: #fffdf7;
+      --stone: #ebe5da;
+      --sage: #c7d3c2;
+      --eucalyptus: #5f7f72;
+      --sea-glass: #b9ced0;
+      --brass: #a98a4b;
+      --terracotta: #b76f57;
+      --deep: #24312d;
+      --teal: #5f7f72;
+      --gold: #a98a4b;
+      --clay: #b76f57;
     }
     * { box-sizing: border-box; }
     body { margin: 0; min-width: 320px; }
@@ -1926,18 +1959,18 @@ def shared_content_css() -> str:
     p, li { line-height: 1.65; }
     .page-shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
     .page-hero {
-      color: #fffdf8;
+      color: var(--ink);
       background:
-        linear-gradient(135deg, rgba(16, 36, 31, .97), rgba(23, 107, 98, .76), rgba(167, 122, 53, .40)),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'%3E%3Crect width='1500' height='900' fill='%2310241f'/%3E%3Cpath d='M0 560c150-62 304-58 462 12 163 72 300 79 465-18 177-104 371-133 573-25v371H0Z' fill='%23fffdf8' fill-opacity='.12'/%3E%3Cpath d='M110 128h1280M110 270h1280M110 412h1280M110 554h1280M110 696h1280M278 70v760M536 70v760M794 70v760M1052 70v760M1310 70v760' stroke='%23fffdf8' stroke-opacity='.11'/%3E%3C/svg%3E");
+        linear-gradient(135deg, rgba(255, 253, 247, .96), rgba(199, 211, 194, .70), rgba(185, 206, 208, .48)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'%3E%3Crect width='1500' height='900' fill='%23f5f1e9'/%3E%3Cpath d='M0 560c150-62 304-58 462 12 163 72 300 79 465-18 177-104 371-133 573-25v371H0Z' fill='%235f7f72' fill-opacity='.10'/%3E%3Cpath d='M110 128h1280M110 270h1280M110 412h1280M110 554h1280M110 696h1280M278 70v760M536 70v760M794 70v760M1052 70v760M1310 70v760' stroke='%2324312d' stroke-opacity='.08'/%3E%3C/svg%3E");
       background-size: cover;
       background-position: center;
       padding: 18px 0 58px;
     }
     .page-nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 70px; }
-    .page-brand { color: #fffdf8; font-weight: 900; text-decoration: none; }
+    .page-brand { color: var(--ink); font-weight: 900; text-decoration: none; }
     .page-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
-    .page-nav-links a { color: rgba(255, 253, 248, .86); text-decoration: none; font-size: 13px; font-weight: 800; }
+    .page-nav-links a { color: rgba(36, 49, 45, .76); text-decoration: none; font-size: 13px; font-weight: 800; }
     .mobile-menu { display: none; position: relative; }
     .mobile-menu summary {
       min-height: 42px;
@@ -1945,9 +1978,9 @@ def shared_content_css() -> str:
       align-items: center;
       justify-content: center;
       padding: 0 13px;
-      border: 1px solid rgba(255, 253, 248, .32);
+      border: 1px solid rgba(36, 49, 45, .20);
       border-radius: 6px;
-      color: #fffdf8;
+      color: var(--ink);
       font-size: 13px;
       font-weight: 850;
       list-style: none;
@@ -1963,23 +1996,23 @@ def shared_content_css() -> str:
       display: grid;
       gap: 2px;
       padding: 8px;
-      border: 1px solid rgba(255, 253, 248, .28);
+      border: 1px solid rgba(36, 49, 45, .16);
       border-radius: 8px;
-      background: rgba(16, 36, 31, .98);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+      background: rgba(255, 253, 247, .98);
+      box-shadow: 0 20px 50px rgba(36, 49, 45, .16);
     }
-    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: #fffdf8; text-decoration: none; font-weight: 800; }
-    .mobile-menu nav a:focus, .mobile-menu nav a:hover { background: rgba(255, 253, 248, .12); }
+    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 800; }
+    .mobile-menu nav a:focus, .mobile-menu nav a:hover { background: rgba(199, 211, 194, .38); }
     .page-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }
-    .page-eyebrow { margin: 0 0 12px; color: #e1c17e; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .page-eyebrow { margin: 0 0 12px; color: var(--brass); font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
     h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }
-    .page-lede { max-width: 760px; margin: 22px 0 0; color: rgba(255, 253, 248, .84); font-size: clamp(16px, 2vw, 20px); }
-    .page-hero-card { padding: 16px; border: 1px solid rgba(255, 253, 248, .26); border-radius: 8px; background: rgba(255, 253, 248, .1); backdrop-filter: blur(16px); }
-    .page-hero-card span { display: block; color: rgba(255, 253, 248, .68); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .page-lede { max-width: 760px; margin: 22px 0 0; color: rgba(36, 49, 45, .72); font-size: clamp(16px, 2vw, 20px); }
+    .page-hero-card { padding: 16px; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: rgba(255, 253, 247, .72); box-shadow: 0 18px 44px rgba(36, 49, 45, .08); backdrop-filter: blur(16px); }
+    .page-hero-card span { display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .page-hero-card strong { display: block; margin: 6px 0 14px; font-size: 24px; overflow-wrap: anywhere; }
-    .page-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 15px; border-radius: 6px; background: #fffdf8; color: var(--deep); font-weight: 850; text-decoration: none; }
+    .page-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 15px; border-radius: 6px; background: var(--eucalyptus); color: #fffdf7; font-weight: 850; text-decoration: none; }
     main { margin-top: -30px; }
-    .page-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--line); box-shadow: 0 18px 50px rgba(16, 36, 31, .08); }
+    .page-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--line); box-shadow: 0 18px 50px rgba(36, 49, 45, .08); }
     .page-stats div { min-width: 0; padding: 16px; background: var(--paper); }
     .page-stats span, dt { display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .page-stats strong, dd { display: block; margin: 5px 0 0; font-weight: 900; overflow-wrap: anywhere; }
@@ -1991,7 +2024,7 @@ def shared_content_css() -> str:
     .page-section p, .page-section li { color: #3f4d48; }
     .page-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .page-section nav.page-grid a { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-weight: 850; text-decoration: none; }
-    .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
     .sticky-jump {
@@ -2003,7 +2036,7 @@ def shared_content_css() -> str:
       overflow-x: auto;
       margin: 18px 0 0;
       padding: 10px 0;
-      background: linear-gradient(180deg, #f7f4ee 72%, rgba(247, 244, 238, 0));
+      background: linear-gradient(180deg, #f5f1e9 72%, rgba(245, 241, 233, 0));
       scrollbar-width: none;
     }
     .sticky-jump a {
@@ -2011,7 +2044,7 @@ def shared_content_css() -> str:
       padding: 9px 12px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: #fffdf8;
+      background: #fffdf7;
       color: var(--ink);
       font-size: 13px;
       font-weight: 850;
@@ -2027,7 +2060,7 @@ def shared_content_css() -> str:
       border-radius: 8px;
       background: var(--line);
     }
-    .trust-brief div { min-width: 0; padding: 16px; background: #fffdf8; }
+    .trust-brief div { min-width: 0; padding: 16px; background: #fffdf7; }
     .trust-brief span, .brief-panel span {
       color: var(--gold);
       font-size: 11px;
@@ -2043,13 +2076,41 @@ def shared_content_css() -> str:
       gap: 12px;
       margin-top: 18px;
     }
-    .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; }
     .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
     .comparison-table th { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .cluster-map {
+      min-height: 240px;
+      display: grid;
+      align-items: end;
+      margin: 16px 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 24% 34%, rgba(95, 127, 114, .30) 0 4px, transparent 5px),
+        radial-gradient(circle at 62% 48%, rgba(169, 138, 75, .32) 0 4px, transparent 5px),
+        radial-gradient(circle at 76% 62%, rgba(185, 206, 208, .50) 0 4px, transparent 5px),
+        linear-gradient(135deg, rgba(255, 253, 247, .94), rgba(199, 211, 194, .30)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='440' viewBox='0 0 900 440'%3E%3Cpath d='M70 110h760M70 210h760M70 310h760M180 58v324M340 58v324M500 58v324M660 58v324' stroke='%2324312d' stroke-opacity='.08'/%3E%3Cpath d='M80 266c132-78 254-86 366-24 108 60 214 54 374-34' fill='none' stroke='%235f7f72' stroke-opacity='.22' stroke-width='3'/%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+    }
+    .cluster-map__grid { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+    .cluster-map__grid div {
+      min-width: min(180px, 100%);
+      padding: 10px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .82);
+      box-shadow: 0 10px 24px rgba(36, 49, 45, .06);
+    }
+    .cluster-map__grid span, .cluster-map__grid em { color: var(--muted); font-size: 11px; font-style: normal; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .cluster-map__grid strong { display: block; margin: 4px 0; }
     .intake-form { display: grid; gap: 14px; margin-top: 16px; }
     .intake-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .intake-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
@@ -2072,7 +2133,7 @@ def shared_content_css() -> str:
       border: 0;
       border-radius: 6px;
       background: var(--deep);
-      color: #fffdf8;
+      color: #fffdf7;
       padding: 0 16px;
       font: inherit;
       font-weight: 850;
@@ -2202,6 +2263,11 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         <div><span>Retirement</span><strong>{metric_value(dest, "retirement_fit"):.1f}/5</strong></div>
         <div><span>Exit liquidity</span><strong>{metric_value(dest, "exit_liquidity"):.1f}/5</strong></div>
       </section>
+      <section class="brief-panel" aria-label="Destination dossier summary">
+        <article><span>Decision score</span><strong>{dest.get("decision_score", 0):.2f}/5</strong><p>Composite score across ownership, lifestyle, yield realism, retirement fit, value entry, and future exit quality.</p></article>
+        <article><span>Ownership clarity</span><strong>{metric_value(dest, "ownership_clarity"):.1f}/5</strong><p>{escape(dest.get("ownership_notes") or "Confirm title structure, foreign-buyer rules, transfer taxes, and local counsel requirements.")}</p></article>
+        <article><span>Lifestyle and retirement fit</span><strong>{metric_value(dest, "retirement_fit"):.1f}/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
+      </section>
       {sticky_page_nav([("Verdict", "verdict"), ("Buyer Fit", "buyer-fit"), ("Ownership", "ownership"), ("Lifestyle", "lifestyle"), ("Scores", "scores"), ("Evidence", "evidence"), ("Trust", "trust-context")])}
       {trust_brief_html()}
       <div class="page-layout">
@@ -2224,7 +2290,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
             <p>{escape(dest.get("red_flags") or "Verify current rules, building condition, liquidity, and rental permissions before committing capital.")}</p>
           </section>
           <section class="page-section" id="lifestyle">
-            <h2>Long-Term Lifestyle Plan</h2>
+            <h2>Lifestyle and Retirement Fit</h2>
             <p>For an affluent global buyer, {escape(dest["name"])} should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
             <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
           </section>
@@ -2234,11 +2300,11 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
             <nav class="page-grid">{destination_guide_links}</nav>
           </section>
           <section class="page-section" id="scores">
-            <h2>10-Dimension Rating</h2>
+            <h2>Score Breakdown</h2>
             <ul class="score-list">{dimension_rows}</ul>
           </section>
           <section class="page-section" id="evidence">
-            <h2>Representative Listing Evidence</h2>
+            <h2>Evidence Trail</h2>
             <p>{escape(dest.get("price_basis") or "Listing samples are used as evidence anchors for current market texture, not availability guarantees.")}</p>
             <div class="page-article">{listing_cards}</div>
           </section>
@@ -2491,14 +2557,14 @@ def build_brand_mockups_page() -> str:
     main {{ margin-top: 0; }}
     .mockup-stage {{
       padding: 34px 0 64px;
-      background: #f7f4ee;
+      background: #f5f1e9;
     }}
     .mockup-frame {{
       overflow: hidden;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fffdf8;
-      box-shadow: 0 22px 70px rgba(16, 36, 31, .12);
+      background: #fffdf7;
+      box-shadow: 0 22px 70px rgba(36, 49, 45, .12);
     }}
     .mockup-frame img {{
       display: block;
@@ -2516,7 +2582,7 @@ def build_brand_mockups_page() -> str:
       padding: 16px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: #fffdf8;
+      background: #fffdf7;
     }}
     .mockup-notes span {{
       color: var(--gold);
@@ -2682,22 +2748,29 @@ def build() -> Path:
   <script type="application/ld+json">__HOME_SCHEMA__</script>
   <style>
     :root {
-      color: #15211d;
-      background: #f6f3ee;
+      color: #24312d;
+      background: #f5f1e9;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       font-synthesis: none;
       text-rendering: optimizeLegibility;
-      --ink: #15211d;
-      --muted: #66736c;
-      --line: rgba(21, 33, 29, .12);
-      --paper: #fffdf8;
-      --cream: #f6f3ee;
-      --deep: #10241f;
-      --teal: #176b62;
-      --gold: #a77a35;
-      --clay: #b85f3f;
-      --blue: #536d93;
-      --shadow: 0 20px 60px rgba(16, 36, 31, .10);
+      --ink: #24312d;
+      --muted: #68776f;
+      --line: rgba(36, 49, 45, .13);
+      --paper: #fffdf7;
+      --cream: #f5f1e9;
+      --ivory: #fffdf7;
+      --stone: #ebe5da;
+      --sage: #c7d3c2;
+      --eucalyptus: #5f7f72;
+      --sea-glass: #b9ced0;
+      --brass: #a98a4b;
+      --terracotta: #b76f57;
+      --deep: #24312d;
+      --teal: #5f7f72;
+      --gold: #a98a4b;
+      --clay: #b76f57;
+      --blue: #7f9ea0;
+      --shadow: 0 18px 48px rgba(36, 49, 45, .10);
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
@@ -2714,10 +2787,10 @@ def build() -> Path:
       display: grid;
       align-items: end;
       padding: 24px 0 28px;
-      color: #fffdf8;
+      color: var(--ink);
       background:
-        linear-gradient(135deg, rgba(16, 36, 31, .95), rgba(22, 55, 55, .74) 42%, rgba(167, 122, 53, .34)),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' x2='1' y1='0' y2='1'%3E%3Cstop stop-color='%230d2527'/%3E%3Cstop offset='.48' stop-color='%232c645f'/%3E%3Cstop offset='1' stop-color='%23c9a86b'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='1600' height='1000' fill='url(%23g)'/%3E%3Cpath d='M0 704C190 622 291 603 450 645c168 45 256 137 442 98 169-35 261-159 427-154 108 3 197 59 281 129v282H0Z' fill='%23f6f3ee' fill-opacity='.16'/%3E%3Cpath d='M0 383c126-50 239-53 347-12 152 57 246 35 395-52 142-83 290-143 468-88 154 48 250 148 390 128v641H0Z' fill='%23fffdf8' fill-opacity='.08'/%3E%3Cpath d='M120 170h1360M120 288h1360M120 406h1360M120 524h1360M120 642h1360M120 760h1360M260 90v820M520 90v820M780 90v820M1040 90v820M1300 90v820' stroke='%23fffdf8' stroke-opacity='.10'/%3E%3Ccircle cx='1220' cy='264' r='96' fill='%23fffdf8' fill-opacity='.13'/%3E%3C/svg%3E");
+        linear-gradient(135deg, rgba(255, 253, 247, .96), rgba(199, 211, 194, .68) 46%, rgba(185, 206, 208, .46)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1600' height='1000' viewBox='0 0 1600 1000'%3E%3Crect width='1600' height='1000' fill='%23f5f1e9'/%3E%3Cpath d='M0 704C190 622 291 603 450 645c168 45 256 137 442 98 169-35 261-159 427-154 108 3 197 59 281 129v282H0Z' fill='%235f7f72' fill-opacity='.12'/%3E%3Cpath d='M0 383c126-50 239-53 347-12 152 57 246 35 395-52 142-83 290-143 468-88 154 48 250 148 390 128v641H0Z' fill='%23b9ced0' fill-opacity='.10'/%3E%3Cpath d='M120 170h1360M120 288h1360M120 406h1360M120 524h1360M120 642h1360M120 760h1360M260 90v820M520 90v820M780 90v820M1040 90v820M1300 90v820' stroke='%2324312d' stroke-opacity='.08'/%3E%3Ccircle cx='1220' cy='264' r='96' fill='%23fffdf7' fill-opacity='.20'/%3E%3C/svg%3E");
       background-size: cover;
       background-position: center;
     }
@@ -2726,7 +2799,7 @@ def build() -> Path:
       position: absolute;
       inset: auto 0 0;
       height: 34%;
-      background: linear-gradient(180deg, rgba(246, 243, 238, 0), var(--cream));
+      background: linear-gradient(180deg, rgba(245, 241, 233, 0), var(--cream));
       z-index: -1;
     }
     .topbar {
@@ -2749,12 +2822,12 @@ def build() -> Path:
       height: 34px;
       display: grid;
       place-items: center;
-      border: 1px solid rgba(255, 253, 248, .45);
+      border: 1px solid rgba(36, 49, 45, .20);
       border-radius: 50%;
-      background: rgba(255, 253, 248, .08);
+      background: rgba(255, 253, 247, .62);
     }
     .top-links { display: flex; gap: 18px; align-items: center; }
-    .top-links a { color: rgba(255, 253, 248, .86); text-decoration: none; font-size: 13px; font-weight: 750; }
+    .top-links a { color: rgba(36, 49, 45, .76); text-decoration: none; font-size: 13px; font-weight: 750; }
     .mobile-menu { display: none; position: relative; }
     .mobile-menu summary {
       min-height: 42px;
@@ -2762,9 +2835,9 @@ def build() -> Path:
       align-items: center;
       justify-content: center;
       padding: 0 13px;
-      border: 1px solid rgba(255, 253, 248, .36);
+      border: 1px solid rgba(36, 49, 45, .20);
       border-radius: 6px;
-      color: #fffdf8;
+      color: var(--ink);
       font-size: 13px;
       font-weight: 850;
       list-style: none;
@@ -2780,25 +2853,60 @@ def build() -> Path:
       display: grid;
       gap: 2px;
       padding: 8px;
-      border: 1px solid rgba(255, 253, 248, .26);
+      border: 1px solid rgba(36, 49, 45, .16);
       border-radius: 8px;
-      background: rgba(16, 36, 31, .98);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+      background: rgba(255, 253, 247, .98);
+      box-shadow: 0 20px 50px rgba(36, 49, 45, .16);
     }
-    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: #fffdf8; text-decoration: none; font-weight: 800; }
+    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 800; }
     .atlas-visual {
       margin-top: 14px;
       min-height: 180px;
-      border: 1px solid rgba(255, 253, 248, .20);
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(36, 49, 45, .13);
       border-radius: 8px;
       background:
-        radial-gradient(circle at 30% 34%, rgba(255, 253, 248, .42) 0 3px, transparent 4px),
-        radial-gradient(circle at 62% 46%, rgba(225, 193, 126, .66) 0 4px, transparent 5px),
-        radial-gradient(circle at 72% 58%, rgba(255, 253, 248, .45) 0 3px, transparent 4px),
-        linear-gradient(135deg, rgba(255, 253, 248, .10), rgba(255, 253, 248, .03)),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='300' viewBox='0 0 520 300'%3E%3Cpath d='M70 68c70 26 107 20 165-12 64-35 126-28 189 36M47 196c83-56 164-60 244-12 62 38 114 38 182-8M88 38v228M196 24v252M304 24v252M412 38v228M34 88h452M34 150h452M34 212h452' fill='none' stroke='%23fffdf8' stroke-opacity='.18'/%3E%3Cpath d='M88 142l78-44 86 26 72-58 108 82-56 68-116-26-72 54-100-30z' fill='%23fffdf8' fill-opacity='.10' stroke='%23fffdf8' stroke-opacity='.28'/%3E%3C/svg%3E");
+        radial-gradient(circle at 30% 34%, rgba(95, 127, 114, .50) 0 3px, transparent 4px),
+        radial-gradient(circle at 62% 46%, rgba(169, 138, 75, .62) 0 4px, transparent 5px),
+        radial-gradient(circle at 72% 58%, rgba(185, 206, 208, .72) 0 3px, transparent 4px),
+        linear-gradient(135deg, rgba(255, 253, 247, .72), rgba(199, 211, 194, .22)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='520' height='300' viewBox='0 0 520 300'%3E%3Cpath d='M70 68c70 26 107 20 165-12 64-35 126-28 189 36M47 196c83-56 164-60 244-12 62 38 114 38 182-8M88 38v228M196 24v252M304 24v252M412 38v228M34 88h452M34 150h452M34 212h452' fill='none' stroke='%2324312d' stroke-opacity='.16'/%3E%3Cpath d='M88 142l78-44 86 26 72-58 108 82-56 68-116-26-72 54-100-30z' fill='%235f7f72' fill-opacity='.10' stroke='%235f7f72' stroke-opacity='.28'/%3E%3C/svg%3E");
       background-size: cover;
       background-position: center;
+    }
+    .atlas-visual__label {
+      position: absolute;
+      left: 14px;
+      top: 14px;
+      display: grid;
+      gap: 4px;
+      padding: 10px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 6px;
+      background: rgba(255, 253, 247, .78);
+      color: var(--ink);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .atlas-visual__label span { color: var(--muted); font-size: 10px; letter-spacing: .08em; text-transform: uppercase; }
+    .atlas-visual__route {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-width: 80%;
+    }
+    .atlas-visual__route span {
+      padding: 6px 8px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, .78);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 850;
     }
     .hero-grid {
       display: grid;
@@ -2809,7 +2917,7 @@ def build() -> Path:
     }
     .eyebrow {
       margin: 0 0 12px;
-      color: #d7b980;
+      color: var(--brass);
       font-size: 12px;
       font-weight: 900;
       letter-spacing: .14em;
@@ -2826,14 +2934,14 @@ def build() -> Path:
     .lede {
       max-width: 760px;
       margin: 24px 0 0;
-      color: rgba(255, 253, 248, .82);
+      color: rgba(36, 49, 45, .72);
       font-size: clamp(16px, 2.2vw, 20px);
     }
     .trust-panel {
       padding: 18px;
-      border: 1px solid rgba(255, 253, 248, .24);
+      border: 1px solid rgba(36, 49, 45, .13);
       border-radius: 8px;
-      background: rgba(255, 253, 248, .10);
+      background: rgba(255, 253, 247, .72);
       box-shadow: var(--shadow);
       backdrop-filter: blur(18px);
     }
@@ -2844,8 +2952,8 @@ def build() -> Path:
       text-transform: uppercase;
     }
     .trust-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; }
-    .trust-grid div { padding: 12px; border-radius: 6px; background: rgba(255, 253, 248, .11); }
-    .trust-grid span { display: block; color: rgba(255, 253, 248, .66); font-size: 11px; font-weight: 850; text-transform: uppercase; }
+    .trust-grid div { padding: 12px; border-radius: 6px; background: rgba(199, 211, 194, .28); }
+    .trust-grid span { display: block; color: var(--muted); font-size: 11px; font-weight: 850; text-transform: uppercase; }
     .trust-grid strong { display: block; margin-top: 5px; font-size: 22px; }
     .hero-actions { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 26px; }
     .primary-action, .secondary-action {
@@ -2858,8 +2966,8 @@ def build() -> Path:
       font-weight: 850;
       text-decoration: none;
     }
-    .primary-action { background: #fffdf8; color: var(--deep); }
-    .secondary-action { border: 1px solid rgba(255, 253, 248, .34); color: #fffdf8; }
+    .primary-action { background: var(--eucalyptus); color: #fffdf7; }
+    .secondary-action { border: 1px solid rgba(36, 49, 45, .20); color: var(--ink); background: rgba(255, 253, 247, .58); }
     main { margin-top: -34px; position: relative; z-index: 3; }
     .insight-bar {
       display: grid;
@@ -2894,8 +3002,8 @@ def build() -> Path:
       padding: 16px;
       border: 1px solid var(--line);
       border-radius: 8px;
-      background: rgba(255, 253, 248, .92);
-      box-shadow: 0 12px 40px rgba(16, 36, 31, .08);
+      background: rgba(255, 253, 247, .92);
+      box-shadow: 0 12px 40px rgba(36, 49, 45, .08);
       backdrop-filter: blur(18px);
     }
     .control-panel h2 { margin: 0 0 4px; font-size: 19px; }
@@ -2920,7 +3028,7 @@ def build() -> Path:
       color: var(--ink);
       font-weight: 800;
     }
-    .lens-grid button[aria-pressed="true"] { background: var(--deep); color: #fffdf8; border-color: var(--deep); }
+    .lens-grid button[aria-pressed="true"] { background: var(--eucalyptus); color: #fffdf7; border-color: var(--eucalyptus); }
     .export-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 12px; }
     .weight-panel {
       margin-top: 16px;
@@ -3021,7 +3129,7 @@ def build() -> Path:
     .section-header p { margin: 6px 0 0; color: var(--muted); max-width: 680px; }
     #resultCount { white-space: nowrap; color: var(--muted); font-size: 13px; font-weight: 850; }
     .spotlight-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: var(--line); }
-    .spotlight-card { min-width: 0; padding: 18px; background: #fffdf8; }
+    .spotlight-card { min-width: 0; padding: 18px; background: #fffdf7; }
     .spotlight-card span {
       display: inline-flex;
       align-items: center;
@@ -3030,7 +3138,7 @@ def build() -> Path:
       height: 38px;
       border-radius: 50%;
       background: var(--deep);
-      color: #fffdf8;
+      color: #fffdf7;
       font-weight: 900;
     }
     .spotlight-card h3 { margin: 14px 0 4px; font-size: 19px; }
@@ -3215,7 +3323,7 @@ def build() -> Path:
       border: 1px solid var(--line);
       border-radius: 8px;
       background: var(--paper);
-      box-shadow: 0 12px 40px rgba(16, 36, 31, .07);
+      box-shadow: 0 12px 40px rgba(36, 49, 45, .07);
     }
     .guide-section__header {
       display: flex;
@@ -3316,9 +3424,9 @@ def build() -> Path:
     </nav>
     <div class="shell hero-grid">
       <div>
-        <p class="eyebrow">Global home and investment intelligence</p>
+        <p class="eyebrow">Global mobility and property intelligence</p>
         <h1>Global Home Atlas</h1>
-        <p class="lede">A research-grade atlas for affluent global buyers comparing lifestyle, ownership clarity, yield realism, exit liquidity, and long-term retirement optionality across 25 property destinations.</p>
+        <p class="lede">A calm research atlas for affluent global buyers comparing where a next home, second base, or long-stay investment can work across lifestyle, ownership clarity, yield realism, exit liquidity, and retirement optionality.</p>
         <div class="hero-actions">
           <a class="primary-action" href="#destinations" data-track="dashboard_open" data-track-label="homepage hero">Explore destinations</a>
           <a class="secondary-action" href="/countries/spain-property/" data-track="country_hub_click" data-track-label="homepage hero">Explore countries</a>
@@ -3327,8 +3435,15 @@ def build() -> Path:
         </div>
       </div>
       <aside class="trust-panel" aria-label="Credibility snapshot">
-        <h2>Built for decisions, not browsing</h2>
-        <div class="atlas-visual" aria-hidden="true"></div>
+        <h2>Independent, not paid placement</h2>
+        <div class="atlas-visual" aria-hidden="true">
+          <div class="atlas-visual__label"><span>Atlas route</span>Ownership · lifestyle · exit</div>
+          <div class="atlas-visual__route">
+            <span>Valencia</span>
+            <span>Fukuoka</span>
+            <span>Algarve</span>
+          </div>
+        </div>
         <div class="trust-grid">
           <div><span>Destinations</span><strong>__DEST_COUNT__</strong></div>
           <div><span>Countries</span><strong>__COUNTRY_COUNT__</strong></div>
@@ -3422,7 +3537,7 @@ def build() -> Path:
             <div class="section-header">
               <div>
                 <h2>Priority Shortlist</h2>
-                <p>The top three markets surface immediately so credibility is established before the user has to dig.</p>
+                <p>The strongest current candidates surface immediately, then the dashboard lets buyers test ownership, lifestyle, retirement, yield, and exit assumptions.</p>
               </div>
             </div>
             <div class="spotlight-grid">
@@ -3755,7 +3870,7 @@ def build() -> Path:
       return `<!doctype html>
         <html><head><meta charset="utf-8"><title>Investor Shortlist Memo</title>
         <style>
-          body{font-family:Inter,Arial,sans-serif;margin:40px;color:#15211d;background:#fffdf8;line-height:1.5}
+          body{font-family:Inter,Arial,sans-serif;margin:40px;color:#24312d;background:#fffdf7;line-height:1.5}
           h1{font-family:Georgia,serif;font-size:42px;line-height:1;margin:0 0 8px} h2{margin-top:32px;border-top:1px solid #ddd4c7;padding-top:24px}
           h2 span{color:#66736c;font-size:16px;font-weight:500} h3{margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
           dl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px} dl div{border:1px solid #ddd4c7;padding:10px;border-radius:6px}

@@ -19,17 +19,24 @@
 
   <style>
     :root {
-      color: #16231f;
-      background: #f7f4ee;
+      color: #24312d;
+      background: #f5f1e9;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --ink: #16231f;
-      --muted: #65736d;
-      --line: rgba(22, 35, 31, .14);
-      --paper: #fffdf8;
-      --deep: #10241f;
-      --teal: #176b62;
-      --gold: #a77a35;
-      --clay: #b85f3f;
+      --ink: #24312d;
+      --muted: #68776f;
+      --line: rgba(36, 49, 45, .13);
+      --paper: #fffdf7;
+      --ivory: #fffdf7;
+      --stone: #ebe5da;
+      --sage: #c7d3c2;
+      --eucalyptus: #5f7f72;
+      --sea-glass: #b9ced0;
+      --brass: #a98a4b;
+      --terracotta: #b76f57;
+      --deep: #24312d;
+      --teal: #5f7f72;
+      --gold: #a98a4b;
+      --clay: #b76f57;
     }
     * { box-sizing: border-box; }
     body { margin: 0; min-width: 320px; }
@@ -37,18 +44,18 @@
     p, li { line-height: 1.65; }
     .page-shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
     .page-hero {
-      color: #fffdf8;
+      color: var(--ink);
       background:
-        linear-gradient(135deg, rgba(16, 36, 31, .97), rgba(23, 107, 98, .76), rgba(167, 122, 53, .40)),
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'%3E%3Crect width='1500' height='900' fill='%2310241f'/%3E%3Cpath d='M0 560c150-62 304-58 462 12 163 72 300 79 465-18 177-104 371-133 573-25v371H0Z' fill='%23fffdf8' fill-opacity='.12'/%3E%3Cpath d='M110 128h1280M110 270h1280M110 412h1280M110 554h1280M110 696h1280M278 70v760M536 70v760M794 70v760M1052 70v760M1310 70v760' stroke='%23fffdf8' stroke-opacity='.11'/%3E%3C/svg%3E");
+        linear-gradient(135deg, rgba(255, 253, 247, .96), rgba(199, 211, 194, .70), rgba(185, 206, 208, .48)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1500' height='900' viewBox='0 0 1500 900'%3E%3Crect width='1500' height='900' fill='%23f5f1e9'/%3E%3Cpath d='M0 560c150-62 304-58 462 12 163 72 300 79 465-18 177-104 371-133 573-25v371H0Z' fill='%235f7f72' fill-opacity='.10'/%3E%3Cpath d='M110 128h1280M110 270h1280M110 412h1280M110 554h1280M110 696h1280M278 70v760M536 70v760M794 70v760M1052 70v760M1310 70v760' stroke='%2324312d' stroke-opacity='.08'/%3E%3C/svg%3E");
       background-size: cover;
       background-position: center;
       padding: 18px 0 58px;
     }
     .page-nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 70px; }
-    .page-brand { color: #fffdf8; font-weight: 900; text-decoration: none; }
+    .page-brand { color: var(--ink); font-weight: 900; text-decoration: none; }
     .page-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
-    .page-nav-links a { color: rgba(255, 253, 248, .86); text-decoration: none; font-size: 13px; font-weight: 800; }
+    .page-nav-links a { color: rgba(36, 49, 45, .76); text-decoration: none; font-size: 13px; font-weight: 800; }
     .mobile-menu { display: none; position: relative; }
     .mobile-menu summary {
       min-height: 42px;
@@ -56,9 +63,9 @@
       align-items: center;
       justify-content: center;
       padding: 0 13px;
-      border: 1px solid rgba(255, 253, 248, .32);
+      border: 1px solid rgba(36, 49, 45, .20);
       border-radius: 6px;
-      color: #fffdf8;
+      color: var(--ink);
       font-size: 13px;
       font-weight: 850;
       list-style: none;
@@ -74,23 +81,23 @@
       display: grid;
       gap: 2px;
       padding: 8px;
-      border: 1px solid rgba(255, 253, 248, .28);
+      border: 1px solid rgba(36, 49, 45, .16);
       border-radius: 8px;
-      background: rgba(16, 36, 31, .98);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+      background: rgba(255, 253, 247, .98);
+      box-shadow: 0 20px 50px rgba(36, 49, 45, .16);
     }
-    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: #fffdf8; text-decoration: none; font-weight: 800; }
-    .mobile-menu nav a:focus, .mobile-menu nav a:hover { background: rgba(255, 253, 248, .12); }
+    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 800; }
+    .mobile-menu nav a:focus, .mobile-menu nav a:hover { background: rgba(199, 211, 194, .38); }
     .page-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }
-    .page-eyebrow { margin: 0 0 12px; color: #e1c17e; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+    .page-eyebrow { margin: 0 0 12px; color: var(--brass); font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
     h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }
-    .page-lede { max-width: 760px; margin: 22px 0 0; color: rgba(255, 253, 248, .84); font-size: clamp(16px, 2vw, 20px); }
-    .page-hero-card { padding: 16px; border: 1px solid rgba(255, 253, 248, .26); border-radius: 8px; background: rgba(255, 253, 248, .1); backdrop-filter: blur(16px); }
-    .page-hero-card span { display: block; color: rgba(255, 253, 248, .68); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .page-lede { max-width: 760px; margin: 22px 0 0; color: rgba(36, 49, 45, .72); font-size: clamp(16px, 2vw, 20px); }
+    .page-hero-card { padding: 16px; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: rgba(255, 253, 247, .72); box-shadow: 0 18px 44px rgba(36, 49, 45, .08); backdrop-filter: blur(16px); }
+    .page-hero-card span { display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .page-hero-card strong { display: block; margin: 6px 0 14px; font-size: 24px; overflow-wrap: anywhere; }
-    .page-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 15px; border-radius: 6px; background: #fffdf8; color: var(--deep); font-weight: 850; text-decoration: none; }
+    .page-button { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 15px; border-radius: 6px; background: var(--eucalyptus); color: #fffdf7; font-weight: 850; text-decoration: none; }
     main { margin-top: -30px; }
-    .page-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--line); box-shadow: 0 18px 50px rgba(16, 36, 31, .08); }
+    .page-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; background: var(--line); box-shadow: 0 18px 50px rgba(36, 49, 45, .08); }
     .page-stats div { min-width: 0; padding: 16px; background: var(--paper); }
     .page-stats span, dt { display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .page-stats strong, dd { display: block; margin: 5px 0 0; font-weight: 900; overflow-wrap: anywhere; }
@@ -102,7 +109,7 @@
     .page-section p, .page-section li { color: #3f4d48; }
     .page-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .page-section nav.page-grid a { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-weight: 850; text-decoration: none; }
-    .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
     .sticky-jump {
@@ -114,7 +121,7 @@
       overflow-x: auto;
       margin: 18px 0 0;
       padding: 10px 0;
-      background: linear-gradient(180deg, #f7f4ee 72%, rgba(247, 244, 238, 0));
+      background: linear-gradient(180deg, #f5f1e9 72%, rgba(245, 241, 233, 0));
       scrollbar-width: none;
     }
     .sticky-jump a {
@@ -122,7 +129,7 @@
       padding: 9px 12px;
       border: 1px solid var(--line);
       border-radius: 999px;
-      background: #fffdf8;
+      background: #fffdf7;
       color: var(--ink);
       font-size: 13px;
       font-weight: 850;
@@ -138,7 +145,7 @@
       border-radius: 8px;
       background: var(--line);
     }
-    .trust-brief div { min-width: 0; padding: 16px; background: #fffdf8; }
+    .trust-brief div { min-width: 0; padding: 16px; background: #fffdf7; }
     .trust-brief span, .brief-panel span {
       color: var(--gold);
       font-size: 11px;
@@ -154,13 +161,41 @@
       gap: 12px;
       margin-top: 18px;
     }
-    .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; }
     .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
     .comparison-table th { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .cluster-map {
+      min-height: 240px;
+      display: grid;
+      align-items: end;
+      margin: 16px 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 24% 34%, rgba(95, 127, 114, .30) 0 4px, transparent 5px),
+        radial-gradient(circle at 62% 48%, rgba(169, 138, 75, .32) 0 4px, transparent 5px),
+        radial-gradient(circle at 76% 62%, rgba(185, 206, 208, .50) 0 4px, transparent 5px),
+        linear-gradient(135deg, rgba(255, 253, 247, .94), rgba(199, 211, 194, .30)),
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='440' viewBox='0 0 900 440'%3E%3Cpath d='M70 110h760M70 210h760M70 310h760M180 58v324M340 58v324M500 58v324M660 58v324' stroke='%2324312d' stroke-opacity='.08'/%3E%3Cpath d='M80 266c132-78 254-86 366-24 108 60 214 54 374-34' fill='none' stroke='%235f7f72' stroke-opacity='.22' stroke-width='3'/%3E%3C/svg%3E");
+      background-size: cover;
+      background-position: center;
+    }
+    .cluster-map__grid { display: flex; flex-wrap: wrap; gap: 8px; align-items: flex-end; }
+    .cluster-map__grid div {
+      min-width: min(180px, 100%);
+      padding: 10px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .82);
+      box-shadow: 0 10px 24px rgba(36, 49, 45, .06);
+    }
+    .cluster-map__grid span, .cluster-map__grid em { color: var(--muted); font-size: 11px; font-style: normal; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .cluster-map__grid strong { display: block; margin: 4px 0; }
     .intake-form { display: grid; gap: 14px; margin-top: 16px; }
     .intake-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .intake-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
@@ -183,7 +218,7 @@
       border: 0;
       border-radius: 6px;
       background: var(--deep);
-      color: #fffdf8;
+      color: #fffdf7;
       padding: 0 16px;
       font: inherit;
       font-weight: 850;
@@ -271,6 +306,11 @@
         <div><span>Retirement</span><strong>4.6/5</strong></div>
         <div><span>Exit liquidity</span><strong>4.5/5</strong></div>
       </section>
+      <section class="brief-panel" aria-label="Destination dossier summary">
+        <article><span>Decision score</span><strong>4.03/5</strong><p>Composite score across ownership, lifestyle, yield realism, retirement fit, value entry, and future exit quality.</p></article>
+        <article><span>Ownership clarity</span><strong>4.5/5</strong><p>Foreigners can generally buy Spanish property, but Andalusia/municipal STR registration and community rules should be verified.</p></article>
+        <article><span>Lifestyle and retirement fit</span><strong>4.6/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
+      </section>
       <nav class="sticky-jump" aria-label="Page sections"><a href="#verdict">Verdict</a><a href="#buyer-fit">Buyer Fit</a><a href="#ownership">Ownership</a><a href="#lifestyle">Lifestyle</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#trust-context">Trust</a></nav>
 
       <section class="trust-brief" id="trust-context" aria-label="Research credibility">
@@ -311,7 +351,7 @@
             <p>Rapid price inflation, anti-tourism politics, summer heat/water, lower scarcity outside prime zones.</p>
           </section>
           <section class="page-section" id="lifestyle">
-            <h2>Long-Term Lifestyle Plan</h2>
+            <h2>Lifestyle and Retirement Fit</h2>
             <p>For an affluent global buyer, Málaga / Costa del Sol should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
             <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
           </section>
@@ -325,7 +365,7 @@
 <a href="/buying-property-abroad-for-retirement/">Buying Property Abroad for Retirement</a></nav>
           </section>
           <section class="page-section" id="scores">
-            <h2>10-Dimension Rating</h2>
+            <h2>Score Breakdown</h2>
             <ul class="score-list">
         <li>
           <div><span>Lifestyle magnetism</span><strong>4.5/5</strong></div>
@@ -398,7 +438,7 @@
         </ul>
           </section>
           <section class="page-section" id="evidence">
-            <h2>Representative Listing Evidence</h2>
+            <h2>Evidence Trail</h2>
             <p>Blended built-property proxy. Prime Málaga/Costa del Sol districts exceed €8,000/m²; broader quality product is lower. Dashboard uses a mid-prime blended proxy (~€4,880/m² × EUR/USD).</p>
             <div class="page-article">
       <article class="listing">
