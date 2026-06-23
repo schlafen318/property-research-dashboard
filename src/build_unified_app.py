@@ -2798,7 +2798,7 @@ Sitemap: {SITE_URL}sitemap.xml
 """,
         encoding="utf-8",
     )
-    indexnow_key_file.write_text(INDEXNOW_KEY, encoding="utf-8")
+    indexnow_key_file.write_text(f"{INDEXNOW_KEY}\n", encoding="utf-8")
     sitemap_urls = [
         (SITE_URL, "1.0"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
