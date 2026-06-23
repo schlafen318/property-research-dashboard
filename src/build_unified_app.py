@@ -111,7 +111,7 @@ SEO_PAGES = [
         "keyword": "best places to buy property abroad for retirement",
         "theme": "retirement planning",
         "intent": "buyers who want one property to support retirement optionality, seasonal living, and defensible resale value",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "lake-como", "hakone-izu", "malaga-costa-del-sol"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "lake-como", "hakone-izu", "m-laga-costa-del-sol"],
         "faqs": [
             ("What matters most when buying abroad for retirement?", "Ownership clarity, healthcare access, daily convenience, tax and visa planning, and resale liquidity should be weighted before lifestyle appeal."),
             ("Should retirement buyers prioritize rental yield?", "Yield helps offset ownership costs, but retirement buyers should avoid assets where income depends on fragile short-term-rental rules."),
@@ -141,7 +141,7 @@ SEO_PAGES = [
         "keyword": "best countries for expats to buy property",
         "theme": "expat ownership",
         "intent": "globally mobile buyers who need clear foreign ownership, usable infrastructure, and a livable long-term base",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "da-nang-hoi-an", "phuket-koh-samui"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "da-nang-hoi-an", "phuket-koh-samui"],
         "faqs": [
             ("Which countries are easiest for expats to buy in?", "Ease depends on title structure, local counsel quality, banking, taxes, and residency rules, not only whether foreign ownership is technically allowed."),
             ("Should expats buy before moving?", "Usually only after validating healthcare, transport, language friction, taxes, and the specific neighborhood through extended stays."),
@@ -156,7 +156,7 @@ SEO_PAGES = [
         "keyword": "best countries to buy property as a foreigner",
         "theme": "foreign-buyer access",
         "intent": "foreign buyers comparing legal access, title clarity, transaction practicality, lifestyle quality, and resale depth before choosing markets for local diligence",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "lake-como", "costa-brava-girona", "hakone-izu", "phuket-koh-samui"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "lake-como", "costa-brava-girona", "hakone-izu", "phuket-koh-samui"],
         "faqs": [
             ("Which countries are best for foreigners to buy property?", "The best options are markets where foreign buyers can understand the title path, hire independent local counsel, fund the purchase cleanly, use the property realistically, and resell into a broad buyer pool."),
             ("What legal risks should foreign buyers check first?", "Start with title structure, transfer process, taxes, permits, foreign ownership restrictions, financing access, rental rules, and whether the structure is simple enough to explain without relying on informal assurances."),
@@ -171,7 +171,7 @@ SEO_PAGES = [
         "keyword": "buy property abroad",
         "theme": "global purchase process",
         "intent": "buyers moving from inspiration to a disciplined international property shortlist",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "lake-como", "madeira", "costa-brava-girona", "crete"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "lake-como", "madeira", "costa-brava-girona", "crete"],
         "faqs": [
             ("What is the first step to buy property abroad?", "Define the job of the property: retirement base, vacation home, income asset, capital preservation, or a blend."),
             ("How many markets should I compare?", "Start with five to eight markets, then reduce to two or three after legal, tax, visa, and neighborhood checks."),
@@ -186,7 +186,7 @@ SEO_PAGES = [
         "keyword": "buying property abroad for retirement",
         "theme": "retirement buyer framework",
         "intent": "retirement-oriented buyers comparing healthcare, daily convenience, ownership practicality, and future resale flexibility before choosing a long-stay market",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "hakone-izu", "lake-como", "malaga-costa-del-sol"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "hakone-izu", "lake-como", "m-laga-costa-del-sol"],
         "faqs": [
             ("What should retirees verify before buying abroad?", "Retirement buyers should verify healthcare access, visa and tax planning needs, daily convenience, title clarity, insurance, building condition, and future resale demand before focusing on lifestyle appeal."),
             ("Should retirement buyers prioritize rental income?", "Rental income can offset carrying costs, but a retirement property should not depend on fragile short-term-rental assumptions or a structure the buyer cannot comfortably manage."),
@@ -216,7 +216,7 @@ SEO_PAGES = [
         "keyword": "overseas property investment",
         "theme": "investment underwriting",
         "intent": "investors comparing income, appreciation, governance, and the ability to exit cleanly",
-        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "malaga-costa-del-sol", "da-nang-hoi-an", "phuket-koh-samui", "bali", "croatia-istria-dalmatia", "costa-brava-girona"],
+        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "m-laga-costa-del-sol", "da-nang-hoi-an", "phuket-koh-samui", "bali", "croatia-istria-dalmatia", "costa-brava-girona"],
         "faqs": [
             ("What is a good overseas property investment?", "A good investment combines realistic net income, legal clarity, demand durability, price discipline, and a broad future buyer pool."),
             ("Should I chase the highest yield?", "No. High yield can signal regulatory, seasonality, management, title, or liquidity risk."),
@@ -231,7 +231,7 @@ SEO_PAGES = [
         "keyword": "foreign property investment risks",
         "theme": "risk framework",
         "intent": "buyers searching for a disciplined risk checklist before committing capital to property abroad",
-        "destination_ids": ["phuket-koh-samui", "bali", "da-nang-hoi-an", "croatia-istria-dalmatia", "malaga-costa-del-sol", "algarve-cascais", "lake-como", "andermatt"],
+        "destination_ids": ["phuket-koh-samui", "bali", "da-nang-hoi-an", "croatia-istria-dalmatia", "m-laga-costa-del-sol", "algarve-cascais", "lake-como", "andermatt"],
         "faqs": [
             ("What are the biggest risks of buying property abroad?", "The major risks are unclear title, foreign-ownership restrictions, changing rental rules, tax surprises, currency movement, weak management, poor building condition, and thin resale liquidity."),
             ("How do currency and tax risks affect returns?", "Currency and taxes can change the real return even when the local property performs well, so buyers should model acquisition costs, annual costs, income taxation, exit costs, and FX movement separately."),
@@ -246,7 +246,7 @@ SEO_PAGES = [
         "keyword": "Portugal vs Spain retirement property",
         "theme": "country comparison",
         "intent": "retirement buyers choosing between Iberian lifestyle, value, and legal-market depth",
-        "destination_ids": ["algarve-cascais", "madeira", "valencia", "malaga-costa-del-sol", "costa-brava-girona", "mallorca"],
+        "destination_ids": ["algarve-cascais", "madeira", "valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
         "faqs": [
             ("Is Portugal or Spain better for retirement property?", "The better choice depends on tax, residency, healthcare access, local price discipline, and whether you prefer smaller resort markets or deeper city-region liquidity."),
             ("Which has stronger resale liquidity?", "Spain generally offers deeper regional buyer pools in major coastal and city markets, while Portugal can offer focused demand in established expat corridors."),
@@ -321,7 +321,7 @@ SEO_PAGES = [
         "keyword": "where can foreigners buy property",
         "theme": "foreign ownership map",
         "intent": "early-stage global buyers looking for a practical map of foreign-buyer access and markets worth researching first",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "lake-como", "hakone-izu", "phuket-koh-samui", "da-nang-hoi-an"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "lake-como", "hakone-izu", "phuket-koh-samui", "da-nang-hoi-an"],
         "faqs": [
             ("Can foreigners buy freehold property abroad?", "In some markets foreigners can buy freehold property, while others rely on leasehold, condominium rules, local companies, or special structures. The practical answer must be verified locally before purchase."),
             ("Which markets are hardest for foreign buyers?", "Markets become harder when land ownership is restricted, financing is limited, tax treatment is unclear, rental permits are uncertain, or the transaction structure requires assumptions the buyer cannot verify."),
@@ -821,6 +821,48 @@ def seo_guide_links(pages: list[dict], current_slug: str | None = None, limit: i
     return "\n".join(links)
 
 
+def related_guide_pages(page: dict, pages: list[dict], limit: int = 4) -> list[dict]:
+    current_destinations = set(page.get("destination_ids", []))
+    scored = []
+    for candidate in pages:
+        if candidate["slug"] == page["slug"]:
+            continue
+        overlap = len(current_destinations.intersection(candidate.get("destination_ids", [])))
+        theme_match = int(candidate.get("theme") == page.get("theme"))
+        keyword_match = len(set(page.get("keyword", "").lower().split()).intersection(candidate.get("keyword", "").lower().split()))
+        scored.append((overlap, theme_match, keyword_match, candidate))
+    scored.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
+    return [candidate for *_, candidate in scored[:limit]]
+
+
+def contextual_related_guides(page: dict, pages: list[dict]) -> str:
+    cards = []
+    for candidate in related_guide_pages(page, pages):
+        cards.append(
+            f"""
+            <article class="seo-link-card">
+              <span>{escape(candidate["theme"])}</span>
+              <h3><a href="/{escape(candidate["slug"])}/">{escape(candidate["h1"])}</a></h3>
+              <p>{escape(candidate["description"])}</p>
+            </article>
+            """.rstrip()
+        )
+    return "\n".join(cards)
+
+
+def guide_links_for_destination(dest: dict, pages: list[dict], limit: int = 5) -> str:
+    matches = []
+    for page in pages:
+        if dest["id"] in page.get("destination_ids", []):
+            matches.append(page)
+    if not matches:
+        matches = pages[:limit]
+    return "\n".join(
+        f'<a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a>'
+        for page in matches[:limit]
+    )
+
+
 def global_schema_entities() -> list[dict]:
     return [
         {
@@ -927,7 +969,7 @@ def build_seo_destination_table(destinations: list[dict]) -> str:
               <td>{metric_value(dest, "retirement_fit"):.1f}/5</td>
               <td>{escape(dest.get("panel_verdict") or "")}</td>
             </tr>
-            """
+            """.rstrip()
         )
     return f"""
       <div class="seo-table-wrap">
@@ -1233,6 +1275,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
     top = selected[0]
     runner_up = selected[1] if len(selected) > 1 else selected[0]
     related_links = seo_guide_links(pages, page["slug"], limit=5)
+    contextual_links = contextual_related_guides(page, pages)
     title = page["title"]
     description = page["description"]
     updated = date.today().isoformat()
@@ -1302,6 +1345,11 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
     .seo-table th {{ color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }}
     .seo-table span {{ color: var(--muted); }}
     .seo-card-grid {{ display: grid; gap: 12px; }}
+    .seo-link-grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }}
+    .seo-link-card {{ min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }}
+    .seo-link-card span {{ color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .seo-link-card h3 {{ margin: 8px 0; }}
+    .seo-link-card p {{ margin: 0; font-size: 14px; }}
     .seo-destination-card {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .54fr); gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }}
     .seo-destination-card span {{ color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .seo-destination-card h3 {{ margin: 7px 0; }}
@@ -1328,7 +1376,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
       .seo-nav {{ align-items: flex-start; }}
       .seo-nav-links {{ display: none; }}
       .seo-hero {{ padding-bottom: 48px; }}
-      .seo-stats, .seo-destination-card, .seo-destination-card dl {{ grid-template-columns: 1fr; }}
+      .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid {{ grid-template-columns: 1fr; }}
       .seo-section {{ padding: 18px; }}
     }}
   </style>
@@ -1409,6 +1457,12 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
             <p>Rental income should offset risk, not justify ignoring it. Net yield estimates need to survive management fees, vacancy, repairs, taxes, furnishing, platform costs, insurance, and regulatory changes. A lower but cleaner yield in a liquid market can be superior to a headline yield that depends on aggressive occupancy or fragile short-term-rental permissions.</p>
             <h3>4. Plan the exit before entry</h3>
             <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
+          </section>
+
+          <section class="seo-section">
+            <h2>Related Buying Guides</h2>
+            <p>Use these adjacent guides to test the same shortlist from a different buyer intent before committing to local diligence.</p>
+            <div class="seo-link-grid">{contextual_links}</div>
           </section>
 
           <section class="seo-section" id="faq">
@@ -1506,6 +1560,7 @@ def shared_content_css() -> str:
     .page-section h3 { margin: 18px 0 8px; font-size: 18px; }
     .page-section p, .page-section li { color: #3f4d48; }
     .page-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .page-section nav.page-grid a { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; font-weight: 850; text-decoration: none; }
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
@@ -1614,6 +1669,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         for item in dest.get("decision_dimensions", [])
     )
     peer_links = destination_links(peer_destinations, limit=6) or destination_links(destinations, slug, limit=6)
+    destination_guide_links = guide_links_for_destination(dest, pages)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -1678,6 +1734,11 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
             <h2>Long-Term Lifestyle Plan</h2>
             <p>For an affluent global buyer, {escape(dest["name"])} should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
             <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
+          </section>
+          <section class="page-section">
+            <h2>Guide Context for This Market</h2>
+            <p>Use these buying guides to compare {escape(dest["name"])} against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
+            <nav class="page-grid">{destination_guide_links}</nav>
           </section>
           <section class="page-section">
             <h2>10-Dimension Rating</h2>

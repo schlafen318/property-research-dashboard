@@ -77,6 +77,11 @@
     .seo-table th { color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
     .seo-table span { color: var(--muted); }
     .seo-card-grid { display: grid; gap: 12px; }
+    .seo-link-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .seo-link-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .seo-link-card span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .seo-link-card h3 { margin: 8px 0; }
+    .seo-link-card p { margin: 0; font-size: 14px; }
     .seo-destination-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .54fr); gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .seo-destination-card span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .seo-destination-card h3 { margin: 7px 0; }
@@ -103,7 +108,7 @@
       .seo-nav { align-items: flex-start; }
       .seo-nav-links { display: none; }
       .seo-hero { padding-bottom: 48px; }
-      .seo-stats, .seo-destination-card, .seo-destination-card dl { grid-template-columns: 1fr; }
+      .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid { grid-template-columns: 1fr; }
       .seo-section { padding: 18px; }
     }
   </style>
@@ -188,7 +193,6 @@
               <td>4.6/5</td>
               <td>Keep as a top-tier shortlist candidate. It is the “highest probability of working” option rather than the most romantic one.</td>
             </tr>
-            
             <tr>
               <td><strong>Hakone / Izu</strong><br><span>Japan</span></td>
               <td>3.95</td>
@@ -198,7 +202,6 @@
               <td>4.3/5</td>
               <td>Keep as a practical Japan alternative. Best for personal use and domestic demand, less compelling as a global trophy asset.</td>
             </tr>
-            
             <tr>
               <td><strong>Hakuba</strong><br><span>Japan</span></td>
               <td>3.86</td>
@@ -208,7 +211,6 @@
               <td>3.9/5</td>
               <td>Keep as an upside candidate. It is more venture-like than Fukuoka or Algarve: higher upside, higher operating risk.</td>
             </tr>
-            
             <tr>
               <td><strong>Niseko</strong><br><span>Japan</span></td>
               <td>3.79</td>
@@ -218,7 +220,6 @@
               <td>4.0/5</td>
               <td>Keep as a trophy/specialist candidate, not a default top pick. Needs asset-specific edge to justify the price.</td>
             </tr>
-            
             <tr>
               <td><strong>Valencia</strong><br><span>Spain</span></td>
               <td>4.09</td>
@@ -228,7 +229,6 @@
               <td>4.7/5</td>
               <td>Keep near the top. Best suited for retirement optionality and long-stay demand, not ultra-luxury holiday yield.</td>
             </tr>
-            
             <tr>
               <td><strong>Algarve / Cascais</strong><br><span>Portugal</span></td>
               <td>4.06</td>
@@ -237,8 +237,7 @@
               <td>4.7/5</td>
               <td>4.7/5</td>
               <td>Keep as a core European benchmark. Strong for retirement and lifestyle, only average for development yield.</td>
-            </tr>
-            </tbody>
+            </tr></tbody>
         </table>
       </div>
     
@@ -344,6 +343,35 @@
             <p>Rental income should offset risk, not justify ignoring it. Net yield estimates need to survive management fees, vacancy, repairs, taxes, furnishing, platform costs, insurance, and regulatory changes. A lower but cleaner yield in a liquid market can be superior to a headline yield that depends on aggressive occupancy or fragile short-term-rental permissions.</p>
             <h3>4. Plan the exit before entry</h3>
             <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
+          </section>
+
+          <section class="seo-section">
+            <h2>Related Buying Guides</h2>
+            <p>Use these adjacent guides to test the same shortlist from a different buyer intent before committing to local diligence.</p>
+            <div class="seo-link-grid">
+            <article class="seo-link-card">
+              <span>retirement planning</span>
+              <h3><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a></h3>
+              <p>Compare the best places to buy property abroad for retirement using ownership clarity, healthcare, lifestyle, value, rental resilience, and exit liquidity.</p>
+            </article>
+
+            <article class="seo-link-card">
+              <span>retirement buyer framework</span>
+              <h3><a href="/buying-property-abroad-for-retirement/">Buying Property Abroad for Retirement</a></h3>
+              <p>A retirement-focused framework for buying property abroad, comparing ownership clarity, healthcare practicality, lifestyle fit, value, and resale flexibility.</p>
+            </article>
+
+            <article class="seo-link-card">
+              <span>foreign-buyer access</span>
+              <h3><a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a></h3>
+              <p>Compare countries and destinations for foreign property buyers using ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth.</p>
+            </article>
+
+            <article class="seo-link-card">
+              <span>foreign ownership map</span>
+              <h3><a href="/where-can-foreigners-buy-property/">Where Can Foreigners Buy Property?</a></h3>
+              <p>Compare where foreigners can buy property using ownership clarity, transaction practicality, lifestyle quality, value, and resale depth across global destinations.</p>
+            </article></div>
           </section>
 
           <section class="seo-section" id="faq">

@@ -77,6 +77,11 @@
     .seo-table th { color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
     .seo-table span { color: var(--muted); }
     .seo-card-grid { display: grid; gap: 12px; }
+    .seo-link-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .seo-link-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .seo-link-card span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .seo-link-card h3 { margin: 8px 0; }
+    .seo-link-card p { margin: 0; font-size: 14px; }
     .seo-destination-card { display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .54fr); gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .seo-destination-card span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .seo-destination-card h3 { margin: 7px 0; }
@@ -103,7 +108,7 @@
       .seo-nav { align-items: flex-start; }
       .seo-nav-links { display: none; }
       .seo-hero { padding-bottom: 48px; }
-      .seo-stats, .seo-destination-card, .seo-destination-card dl { grid-template-columns: 1fr; }
+      .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid { grid-template-columns: 1fr; }
       .seo-section { padding: 18px; }
     }
   </style>
@@ -188,7 +193,6 @@
               <td>4.6/5</td>
               <td>Keep as a top-tier shortlist candidate. It is the “highest probability of working” option rather than the most romantic one.</td>
             </tr>
-            
             <tr>
               <td><strong>Algarve / Cascais</strong><br><span>Portugal</span></td>
               <td>4.06</td>
@@ -198,7 +202,6 @@
               <td>4.7/5</td>
               <td>Keep as a core European benchmark. Strong for retirement and lifestyle, only average for development yield.</td>
             </tr>
-            
             <tr>
               <td><strong>Madeira</strong><br><span>Portugal</span></td>
               <td>3.91</td>
@@ -208,7 +211,6 @@
               <td>4.5/5</td>
               <td>Keep as a differentiated Europe water/nature candidate. Attractive, but size positions conservatively because liquidity is thinner.</td>
             </tr>
-            
             <tr>
               <td><strong>Costa Brava / Girona</strong><br><span>Spain</span></td>
               <td>3.85</td>
@@ -218,7 +220,6 @@
               <td>4.4/5</td>
               <td>Keep. One of the better “quality of life plus accessible coast” European options.</td>
             </tr>
-            
             <tr>
               <td><strong>Lake Como</strong><br><span>Italy</span></td>
               <td>3.96</td>
@@ -228,7 +229,6 @@
               <td>4.6/5</td>
               <td>Keep for prestige and long-term liquidity. Do not rank it as a yield destination unless a very specific asset is mispriced.</td>
             </tr>
-            
             <tr>
               <td><strong>Crete</strong><br><span>Greece</span></td>
               <td>3.81</td>
@@ -238,7 +238,6 @@
               <td>4.2/5</td>
               <td>Keep as a value-oriented Europe candidate. Strong for lifestyle, but underwrite conservatively for exit and operations.</td>
             </tr>
-            
             <tr>
               <td><strong>Phuket / Koh Samui</strong><br><span>Thailand</span></td>
               <td>3.67</td>
@@ -248,7 +247,6 @@
               <td>4.0/5</td>
               <td>Keep as a yield candidate only with conservative legal structuring. Not a clean core holding.</td>
             </tr>
-            
             <tr>
               <td><strong>Mallorca</strong><br><span>Spain</span></td>
               <td>3.77</td>
@@ -257,8 +255,7 @@
               <td>4.3/5</td>
               <td>4.5/5</td>
               <td>Keep, but only if licence and micro-location are exceptional. It is a mature market, not a bargain market.</td>
-            </tr>
-            </tbody>
+            </tr></tbody>
         </table>
       </div>
     
@@ -364,6 +361,35 @@
             <p>Rental income should offset risk, not justify ignoring it. Net yield estimates need to survive management fees, vacancy, repairs, taxes, furnishing, platform costs, insurance, and regulatory changes. A lower but cleaner yield in a liquid market can be superior to a headline yield that depends on aggressive occupancy or fragile short-term-rental permissions.</p>
             <h3>4. Plan the exit before entry</h3>
             <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
+          </section>
+
+          <section class="seo-section">
+            <h2>Related Buying Guides</h2>
+            <p>Use these adjacent guides to test the same shortlist from a different buyer intent before committing to local diligence.</p>
+            <div class="seo-link-grid">
+            <article class="seo-link-card">
+              <span>second-home shortlist</span>
+              <h3><a href="/best-places-to-buy-a-second-home-abroad/">Best Places to Buy a Second Home Abroad</a></h3>
+              <p>Compare second-home destinations abroad by access, personal-use appeal, rental offset potential, ownership clarity, value discipline, and exit liquidity.</p>
+            </article>
+
+            <article class="seo-link-card">
+              <span>foreign-buyer access</span>
+              <h3><a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a></h3>
+              <p>Compare countries and destinations for foreign property buyers using ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth.</p>
+            </article>
+
+            <article class="seo-link-card">
+              <span>Europe shortlist</span>
+              <h3><a href="/best-places-to-buy-property-in-europe/">Best Places to Buy Property in Europe</a></h3>
+              <p>Compare the best places to buy property in Europe for lifestyle, retirement, rental resilience, value discipline, and long-term resale liquidity.</p>
+            </article>
+
+            <article class="seo-link-card">
+              <span>global purchase process</span>
+              <h3><a href="/buy-property-abroad/">Buy Property Abroad</a></h3>
+              <p>Use a structured framework to buy property abroad: shortlist countries, compare ownership risk, underwrite income, and plan exit liquidity.</p>
+            </article></div>
           </section>
 
           <section class="seo-section" id="faq">
