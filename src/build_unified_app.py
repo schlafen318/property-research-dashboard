@@ -21,7 +21,7 @@ SITE_DESCRIPTION = (
 GA4_MEASUREMENT_ID = os.environ.get("GA4_MEASUREMENT_ID", "").strip()
 BING_SITE_VERIFICATION = os.environ.get("BING_SITE_VERIFICATION", "").strip()
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "hello@globalhomeatlas.com").strip()
-INDEXNOW_KEY = os.environ.get("INDEXNOW_KEY", "").strip() or "5f0b9a6d2c134e8790a1b8c3d4e5f607"
+INDEXNOW_KEY = os.environ.get("INDEXNOW_KEY", "").strip() or "37c568eb0fbc24832815d94b646237ca"
 
 DIMENSIONS = [
     {

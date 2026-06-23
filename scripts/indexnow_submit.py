@@ -16,7 +16,7 @@ DEFAULT_SITE_URL = "https://globalhomeatlas.com/"
 DEFAULT_SITEMAP = "https://globalhomeatlas.com/sitemap.xml"
 DEFAULT_OUTPUT = ROOT / "output" / "seo" / "indexnow-latest.json"
 DEFAULT_ENDPOINT = "https://api.indexnow.org/indexnow"
-DEFAULT_KEY = "5f0b9a6d2c134e8790a1b8c3d4e5f607"
+DEFAULT_KEY = "37c568eb0fbc24832815d94b646237ca"
 
 
 def indexnow_key() -> str:
