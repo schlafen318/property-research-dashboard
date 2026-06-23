@@ -16,6 +16,13 @@ DEFAULT_SITEMAP = "https://globalhomeatlas.com/sitemap.xml"
 DEFAULT_TOKEN = ROOT / "tmp" / "globalhomeatlas-google-token.json"
 DEFAULT_OUTPUT = ROOT / "output" / "seo"
 DEFAULT_JSON_OUTPUT = DEFAULT_OUTPUT / "latest.json"
+PRIORITY_INDEXING_PATHS = [
+    "/",
+    "/buy-property-abroad/",
+    "/overseas-property-investment/",
+    "/best-places-to-buy-property-abroad-for-retirement/",
+    "/best-places-to-buy-vacation-home-abroad/",
+]
 
 
 def fetch_sitemap(url: str) -> list[str]:
@@ -73,6 +80,32 @@ def sitemap_status(service, site_url: str, sitemap_url: str) -> dict:
         if item.get("path") == sitemap_url:
             return item
     return {}
+
+
+def sitemap_index_counts(status: dict) -> tuple[int | None, int | None]:
+    submitted = None
+    indexed = None
+    for item in status.get("contents", []) or []:
+        if item.get("type") != "web":
+            continue
+        try:
+            submitted = int(item.get("submitted"))
+        except (TypeError, ValueError):
+            submitted = None
+        try:
+            indexed = int(item.get("indexed"))
+        except (TypeError, ValueError):
+            indexed = None
+    return submitted, indexed
+
+
+def priority_indexing_urls(sitemap_urls: list[str]) -> list[dict]:
+    sitemap_set = set(sitemap_urls)
+    rows = []
+    for path in PRIORITY_INDEXING_PATHS:
+        url = "https://globalhomeatlas.com/" if path == "/" else f"https://globalhomeatlas.com{path}"
+        rows.append({"url": url, "in_sitemap": url in sitemap_set})
+    return rows
 
 
 def fmt_rows(rows: list[dict], headers: list[str]) -> str:
@@ -154,6 +187,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
     if args.token.exists():
         service = load_search_console(args.token)
         status = sitemap_status(service, args.site_url, args.sitemap)
+        submitted_count, indexed_count = sitemap_index_counts(status)
         lines.extend(
             [
                 "## Search Console Sitemap Status",
@@ -163,6 +197,8 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
                 f"- Pending: {status.get('isPending', 'n/a')}",
                 f"- Warnings: {status.get('warnings', 'n/a')}",
                 f"- Errors: {status.get('errors', 'n/a')}",
+                f"- Submitted URLs reported by Google: {submitted_count if submitted_count is not None else 'n/a'}",
+                f"- Indexed URLs reported by Google: {indexed_count if indexed_count is not None else 'n/a'}",
                 "",
             ]
         )
@@ -202,6 +238,14 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
                 "## New Query Content Gaps",
                 "",
                 fmt_rows(content_gap_rows, ["Query", "Clicks", "Impressions", "CTR", "Position"]),
+                "## Priority Indexing Checklist",
+                "",
+                "| URL | In sitemap | Manual action |",
+                "| --- | --- | --- |",
+                *[
+                    f"| {item['url']} | {item['in_sitemap']} | Inspect URL and request indexing if not indexed |"
+                    for item in priority_indexing_urls(sitemap_urls)
+                ],
             ]
         )
     else:
@@ -225,6 +269,11 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
             "trust_count": trust_count,
             "urls": sitemap_urls,
             "status": status,
+            "indexing": {
+                "submitted_reported": sitemap_index_counts(status)[0],
+                "indexed_reported": sitemap_index_counts(status)[1],
+                "priority_urls": priority_indexing_urls(sitemap_urls),
+            },
         },
         "window": {"start_date": start_date, "end_date": end_date, "days": args.days},
         "thresholds": {

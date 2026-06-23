@@ -22,6 +22,10 @@ LABELS = {
     "growth-opportunity": "a371f7",
     "tracking-regression": "b60205",
     "sitemap-regression": "b60205",
+    "indexing-stalled": "b60205",
+    "no-search-console-rows": "d93f0b",
+    "priority-page-not-indexed": "fbca04",
+    "trust-signal-gap": "fbca04",
     "content-refresh": "fbca04",
     "landing-page-candidate": "5319e7",
 }
@@ -90,9 +94,12 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
     findings: list[Finding] = []
     sitemap = report.get("sitemap", {})
     status = sitemap.get("status") or {}
+    indexing = sitemap.get("indexing") or {}
     warnings = int(status.get("warnings") or 0)
     errors = int(status.get("errors") or 0)
     urls = sitemap.get("urls") or []
+    indexed_reported = indexing.get("indexed_reported")
+    submitted_reported = indexing.get("submitted_reported")
 
     if errors or warnings:
         key = f"{sitemap.get('url')}:{errors}:{warnings}"
@@ -106,6 +113,39 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                 fingerprint=stable_fingerprint("sitemap-regression", key),
                 auto_merge_safe=True,
                 payload={"errors": errors, "warnings": warnings, "sitemap": sitemap.get("url")},
+            )
+        )
+
+    if submitted_reported and indexed_reported == 0 and status.get("isPending") is False:
+        findings.append(
+            Finding(
+                kind="indexing-stalled",
+                title="Indexing is stalled after sitemap submission",
+                summary=(
+                    f"Search Console reports {submitted_reported} submitted sitemap URLs but 0 indexed URLs. "
+                    "Inspect the homepage and priority guide URLs, then request indexing for pages that are live and crawlable."
+                ),
+                severity="high",
+                labels=("analytics-loop", "indexing-stalled", "seo-opportunity", "needs-human-review"),
+                fingerprint=stable_fingerprint("indexing-stalled", f"{sitemap.get('url')}:{submitted_reported}:0"),
+                payload={"submitted_reported": submitted_reported, "indexed_reported": indexed_reported},
+            )
+        )
+
+    priority_urls = [item for item in indexing.get("priority_urls", []) if item.get("in_sitemap")]
+    if priority_urls and submitted_reported and (indexed_reported or 0) < len(priority_urls):
+        findings.append(
+            Finding(
+                kind="priority-page-not-indexed",
+                title="Request indexing for priority SEO pages",
+                summary=(
+                    "Priority URLs are present in the sitemap, but Search Console has not confirmed enough indexed URLs "
+                    "to cover the homepage and highest-intent guide pages."
+                ),
+                severity="medium",
+                labels=("analytics-loop", "priority-page-not-indexed", "seo-opportunity", "needs-human-review"),
+                fingerprint=stable_fingerprint("priority-page-not-indexed", sitemap.get("url") or "priority-pages"),
+                payload={"priority_urls": priority_urls, "indexed_reported": indexed_reported, "submitted_reported": submitted_reported},
             )
         )
 
@@ -123,6 +163,22 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
         )
 
     sc = report.get("search_console", {})
+    if sc.get("available") and not sc.get("top_queries") and not sc.get("top_pages"):
+        findings.append(
+            Finding(
+                kind="no-search-console-rows",
+                title="No Search Console performance rows yet",
+                summary=(
+                    "Search Console access is working, but the latest reporting window returned no query or page rows. "
+                    "Keep indexing work active and review again after Google has crawled and tested the site in search results."
+                ),
+                severity="low",
+                labels=("analytics-loop", "no-search-console-rows", "seo-opportunity"),
+                fingerprint=stable_fingerprint("no-search-console-rows", str(report.get("site_url") or "globalhomeatlas")),
+                payload={"window": report.get("window"), "sitemap": sitemap.get("url")},
+            )
+        )
+
     for row in sc.get("low_ctr_pages", []):
         page = row.get("page", "")
         findings.append(
@@ -226,6 +282,11 @@ def control_issue_body(report: dict, findings: list[Finding], issue_links: list[
 - Near-ranking pages: `{len(sc.get('near_ranking_pages', []))}`
 - Content-gap queries: `{len(sc.get('content_gap_queries', []))}`
 
+## Indexing Summary
+- Submitted URLs reported by Google: `{sitemap.get('indexing', {}).get('submitted_reported')}`
+- Indexed URLs reported by Google: `{sitemap.get('indexing', {}).get('indexed_reported')}`
+- Priority URLs in sitemap: `{sum(1 for item in sitemap.get('indexing', {}).get('priority_urls', []) if item.get('in_sitemap'))}`
+
 ## Findings
 - High severity: `{by_severity.get('high', 0)}`
 - Medium severity: `{by_severity.get('medium', 0)}`
@@ -241,8 +302,19 @@ def control_issue_body(report: dict, findings: list[Finding], issue_links: list[
 {chr(10).join(f'- {link}' for link in auto_merged) if auto_merged else '- None'}
 
 ## Recommended Next Action
-{"Review draft landing-page PRs and human-review issues." if findings else "No action needed; continue monitoring."}
+{recommended_next_action(findings)}
 """
+
+
+def recommended_next_action(findings: list[Finding]) -> str:
+    kinds = {finding.kind for finding in findings}
+    if "indexing-stalled" in kinds or "priority-page-not-indexed" in kinds:
+        return "Use Search Console URL inspection for the homepage and priority guide pages, then request indexing where available."
+    if "no-search-console-rows" in kinds:
+        return "Continue daily monitoring; no content-growth action should be automated until query or page rows appear."
+    if findings:
+        return "Review draft landing-page PRs and human-review issues."
+    return "No action needed; continue monitoring."
 
 
 def ensure_labels(dry_run: bool) -> None:

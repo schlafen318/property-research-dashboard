@@ -739,6 +739,30 @@ def seo_guide_links(pages: list[dict], current_slug: str | None = None, limit: i
     return "\n".join(links)
 
 
+def global_schema_entities() -> list[dict]:
+    return [
+        {
+            "@context": "https://schema.org",
+            "@type": "Organization",
+            "name": SITE_NAME,
+            "url": SITE_URL,
+            "description": SITE_DESCRIPTION,
+            "contactPoint": {
+                "@type": "ContactPoint",
+                "email": CONTACT_EMAIL,
+                "contactType": "research inquiries",
+            },
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "WebSite",
+            "name": SITE_NAME,
+            "url": SITE_URL,
+            "description": SITE_DESCRIPTION,
+        },
+    ]
+
+
 def trust_page_links(current_slug: str | None = None) -> str:
     return "\n".join(
         f'<a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a>'
@@ -898,6 +922,16 @@ def schema_for_page(page: dict, canonical: str) -> list[dict]:
         "dateModified": date.today().isoformat(),
         "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
     }
+    article = {
+        "@context": "https://schema.org",
+        "@type": "Article",
+        "headline": page["h1"],
+        "description": page["description"],
+        "url": canonical,
+        "dateModified": date.today().isoformat(),
+        "publisher": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL},
+        "mainEntityOfPage": canonical,
+    }
     faq = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -910,7 +944,7 @@ def schema_for_page(page: dict, canonical: str) -> list[dict]:
             for question, answer in page.get("faqs", [])
         ],
     }
-    return [webpage, breadcrumb, faq]
+    return [*global_schema_entities(), webpage, article, breadcrumb, faq]
 
 
 def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> str:
@@ -1057,14 +1091,15 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
         <div class="seo-stats">
           <div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div>
           <div><span>Destinations</span><strong>{len(selected)}</strong></div>
-          <div><span>Countries</span><strong>{country_count}</strong></div>
-          <div><span>Top score</span><strong>{top.get("decision_score", 0):.2f}/5</strong></div>
+          <div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div>
+          <div><span>Research status</span><strong>Updated {updated}</strong></div>
         </div>
       </section>
       <div class="seo-content">
         <article class="seo-article">
           <section class="seo-section">
             <h2>How to Read This Shortlist</h2>
+            <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
             <p>The right answer for {escape(page["keyword"])} is rarely the market with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process. Global Home Atlas ranks markets through ten decision dimensions: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry.</p>
             <p>That weighting is designed for affluent global citizens who may use one property for several jobs over time. A home can begin as a vacation base, become a semi-retirement address, then eventually need to rent or sell. The best markets on this page are therefore not selected only for near-term excitement. They are selected because the evidence points to a more durable combination of livability, practicality, and investment defensibility.</p>
             <p>Use this page as a first-pass filter. It narrows the research field, highlights where each market is strong, and shows which tradeoffs need professional verification. Before buying, confirm title, taxes, foreign-buyer rules, visa status, insurance, building condition, local rental permits, manager quality, and resale comparables with independent local advisers.</p>
@@ -1113,6 +1148,10 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
             <nav>{related_links}</nav>
           </section>
           <section class="seo-aside-card">
+            <h3>Trust Layer</h3>
+            <nav>{trust_page_links()}</nav>
+          </section>
+          <section class="seo-aside-card">
             <h3>Research Caveat</h3>
             <p>Scores and listing benchmarks are research inputs, not financial, legal, tax, or immigration advice. Verify current rules locally before acting.</p>
           </section>
@@ -1124,7 +1163,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
     <div class="seo-shell">
       <strong>{SITE_NAME}</strong>
       <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
-      <nav>{seo_guide_links(pages, page["slug"])}</nav>
+      <nav>{seo_guide_links(pages, page["slug"])} {trust_page_links()}</nav>
     </div>
   </footer>
 {analytics_event_script()}
@@ -1245,6 +1284,7 @@ def shared_content_css() -> str:
 
 def schema_for_destination(dest: dict, canonical: str) -> list[dict]:
     return [
+        *global_schema_entities(),
         {
             "@context": "https://schema.org",
             "@type": "WebPage",
@@ -1414,6 +1454,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
 
 def schema_for_trust_page(page: dict, canonical: str) -> list[dict]:
     return [
+        *global_schema_entities(),
         {
             "@context": "https://schema.org",
             "@type": "WebPage",
@@ -1642,7 +1683,7 @@ def build() -> Path:
   <meta property="og:url" content="https://globalhomeatlas.com/">
   <meta name="twitter:card" content="summary_large_image">
   __ANALYTICS_HEAD__
-  <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."}</script>
+  <script type="application/ld+json">__HOME_SCHEMA__</script>
   <style>
     :root {
       color: #15211d;
@@ -2232,8 +2273,10 @@ def build() -> Path:
         <div class="trust-grid">
           <div><span>Destinations</span><strong>__DEST_COUNT__</strong></div>
           <div><span>Countries</span><strong>__COUNTRY_COUNT__</strong></div>
-          <div><span>Listing samples</span><strong>__LISTING_COUNT__</strong></div>
-          <div><span>FX date</span><strong>__FX_AS_OF__</strong></div>
+          <div><span>Decision model</span><strong>10 dimensions</strong></div>
+          <div><span>Evidence base</span><strong>__LISTING_COUNT__ samples</strong></div>
+          <div><span>Updated</span><strong>__GENERATED__</strong></div>
+          <div><span>Advice type</span><strong>Research only</strong></div>
         </div>
       </aside>
     </div>
@@ -2308,6 +2351,7 @@ def build() -> Path:
               <li>Foreign ownership and exit friction are scored before romance.</li>
               <li>Yield is treated as underwriting context, not a promise.</li>
               <li>Listings are evidence anchors, not availability guarantees.</li>
+              <li><a href="/research-standards/">Research standards</a>, <a href="/methodology/">methodology</a>, and <a href="/contact/">contact</a> stay one tap away.</li>
             </ul>
           </div>
         </aside>
@@ -2692,6 +2736,7 @@ def build() -> Path:
         "__DESTINATION_GUIDES__": build_home_destination_section(destinations),
         "__TRUST_GUIDES__": build_home_trust_section(),
         "__APP_DATA__": app_data,
+        "__HOME_SCHEMA__": json_ld(global_schema_entities()),
         "__ANALYTICS_HEAD__": analytics_head_tags(),
         "__ANALYTICS_EVENT_SCRIPT__": analytics_event_script(),
     }
