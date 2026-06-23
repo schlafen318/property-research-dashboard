@@ -102,6 +102,7 @@ static build:
 GA4_MEASUREMENT_ID=G-XXXXXXXXXX \
 BING_SITE_VERIFICATION=YOUR_BING_META_VALUE \
 CONTACT_EMAIL=hello@globalhomeatlas.com \
+INDEXNOW_KEY=YOUR_INDEXNOW_KEY \
 python3 src/build_unified_app.py
 ```
 
@@ -134,10 +135,15 @@ It needs this repository secret:
 GOOGLE_SEARCH_CONSOLE_TOKEN_JSON
 ```
 
+The workflow also submits the live sitemap URLs to IndexNow for supported search
+engines. `INDEXNOW_KEY` is optional; if omitted, the static build and submission
+script use the repo default key and publish the matching root key file.
+
 Manual local dry run:
 
 ```bash
 python3 scripts/seo_monitor.py --write --json-output output/seo/latest.json
+python3 scripts/indexnow_submit.py --write --output output/seo/indexnow-latest.json --allow-failure
 python3 scripts/seo_feedback_loop.py --dry-run
 ```
 

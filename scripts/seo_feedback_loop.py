@@ -12,6 +12,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT = ROOT / "output" / "seo" / "latest.json"
+DEFAULT_INDEXNOW_REPORT = ROOT / "output" / "seo" / "indexnow-latest.json"
 CONTROL_ISSUE_TITLE = "Global Home Atlas Analytics Control Center"
 CONTROL_LABELS = ["analytics-loop"]
 LABELS = {
@@ -72,6 +73,12 @@ def slugify(value: str) -> str:
 
 
 def load_report(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_optional_json(path: Path) -> dict:
+    if not path.exists():
+        return {}
     return json.loads(path.read_text(encoding="utf-8"))
 
 
@@ -287,7 +294,14 @@ def issue_body(finding: Finding) -> str:
 """
 
 
-def control_issue_body(report: dict, findings: list[Finding], issue_links: list[str], pr_links: list[str], auto_merged: list[str]) -> str:
+def control_issue_body(
+    report: dict,
+    findings: list[Finding],
+    issue_links: list[str],
+    pr_links: list[str],
+    auto_merged: list[str],
+    indexnow: dict,
+) -> str:
     sitemap = report.get("sitemap", {})
     status = sitemap.get("status") or {}
     sc = report.get("search_console", {})
@@ -319,6 +333,9 @@ def control_issue_body(report: dict, findings: list[Finding], issue_links: list[
 ## Priority URL Inspection Results
 {format_priority_inspections(priority_inspections)}
 
+## IndexNow Summary
+{format_indexnow(indexnow)}
+
 ## Findings
 - High severity: `{by_severity.get('high', 0)}`
 - Medium severity: `{by_severity.get('medium', 0)}`
@@ -336,6 +353,23 @@ def control_issue_body(report: dict, findings: list[Finding], issue_links: list[
 ## Recommended Next Action
 {recommended_next_action(findings)}
 """
+
+
+def format_indexnow(indexnow: dict) -> str:
+    if not indexnow:
+        return "- Not run"
+    response = indexnow.get("response") or {}
+    return "\n".join(
+        [
+            f"- Generated: `{indexnow.get('generated_at')}`",
+            f"- Endpoint: `{indexnow.get('endpoint')}`",
+            f"- Submitted URLs: `{indexnow.get('url_count')}`",
+            f"- Key location: `{indexnow.get('key_location')}`",
+            f"- Accepted: `{response.get('ok')}`",
+            f"- HTTP status: `{response.get('status')}`",
+            f"- Reason: `{response.get('reason')}`",
+        ]
+    )
 
 
 def format_priority_inspections(inspections: list[dict]) -> str:
@@ -409,9 +443,17 @@ def create_or_update_issue(finding: Finding, issues: list[dict], dry_run: bool) 
     return completed.stdout.strip()
 
 
-def create_or_update_control_issue(report: dict, findings: list[Finding], issue_links: list[str], pr_links: list[str], auto_merged: list[str], dry_run: bool) -> str:
+def create_or_update_control_issue(
+    report: dict,
+    findings: list[Finding],
+    issue_links: list[str],
+    pr_links: list[str],
+    auto_merged: list[str],
+    indexnow: dict,
+    dry_run: bool,
+) -> str:
     issues = list_issues() if not dry_run else []
-    body = control_issue_body(report, findings, issue_links, pr_links, auto_merged)
+    body = control_issue_body(report, findings, issue_links, pr_links, auto_merged, indexnow)
     existing = find_control_issue(issues)
     if dry_run:
         print(f"[dry-run] update control issue with {len(findings)} findings")
@@ -511,6 +553,7 @@ def tracking_status() -> bool:
 def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Turn SEO monitor output into GitHub issues and draft PRs.")
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
+    parser.add_argument("--indexnow-report", type=Path, default=DEFAULT_INDEXNOW_REPORT)
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--apply", action="store_true")
     return parser.parse_args(argv)
@@ -521,6 +564,7 @@ def main(argv: list[str]) -> int:
     if not args.dry_run and not args.apply:
         raise SystemExit("Pass --dry-run or --apply.")
     report = load_report(args.report)
+    indexnow = load_optional_json(args.indexnow_report)
     dry_run = args.dry_run
     tracking_ok = tracking_status()
     findings = classify(report, tracking_ok)
@@ -537,7 +581,7 @@ def main(argv: list[str]) -> int:
         merge_url = maybe_auto_merge(pr_url, finding, dry_run)
         if merge_url:
             auto_merged.append(merge_url)
-    control_link = create_or_update_control_issue(report, findings, issue_links, pr_links, auto_merged, dry_run)
+    control_link = create_or_update_control_issue(report, findings, issue_links, pr_links, auto_merged, indexnow, dry_run)
     print(json.dumps({"findings": len(findings), "issues": issue_links, "prs": pr_links, "control": control_link}, indent=2))
     return 0
 

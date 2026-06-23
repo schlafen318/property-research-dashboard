@@ -21,6 +21,7 @@ SITE_DESCRIPTION = (
 GA4_MEASUREMENT_ID = os.environ.get("GA4_MEASUREMENT_ID", "").strip()
 BING_SITE_VERIFICATION = os.environ.get("BING_SITE_VERIFICATION", "").strip()
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "hello@globalhomeatlas.com").strip()
+INDEXNOW_KEY = os.environ.get("INDEXNOW_KEY", "").strip() or "5f0b9a6d2c134e8790a1b8c3d4e5f607"
 
 DIMENSIONS = [
     {
@@ -2749,6 +2750,7 @@ def build() -> Path:
     cname = ARTIFACTS / "CNAME"
     robots = ARTIFACTS / "robots.txt"
     sitemap = ARTIFACTS / "sitemap.xml"
+    indexnow_key_file = ARTIFACTS / f"{INDEXNOW_KEY}.txt"
     out.write_text(html, encoding="utf-8")
     index.write_text(html, encoding="utf-8")
     for page in SEO_PAGES:
@@ -2783,6 +2785,7 @@ Sitemap: {SITE_URL}sitemap.xml
 """,
         encoding="utf-8",
     )
+    indexnow_key_file.write_text(INDEXNOW_KEY, encoding="utf-8")
     sitemap_urls = [
         (SITE_URL, "1.0"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
