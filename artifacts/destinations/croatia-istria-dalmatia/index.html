@@ -247,10 +247,36 @@
     .score-list div { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
     .score-list i { display: block; height: 6px; margin: 8px 0; border-radius: 999px; background: linear-gradient(90deg, var(--teal) var(--value), #e6e1d8 var(--value)); }
     .page-aside { position: sticky; top: 16px; display: grid; gap: 14px; }
+    .mobile-resources > summary { display: none; list-style: none; cursor: pointer; }
+    .mobile-resources > summary::-webkit-details-marker { display: none; }
     .page-aside-card { padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
     .page-aside-card h2, .page-aside-card h3 { margin: 0 0 10px; font-size: 16px; }
     .page-aside-card nav { display: grid; gap: 10px; }
     .page-aside-card p, .page-aside-card a { font-size: 14px; }
+    .evidence-list { margin-top: 12px; }
+    .listing { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .55fr); gap: 14px; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .listing__type { margin: 0 0 5px; color: var(--gold) !important; font-size: 11px !important; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .listing h5 { margin: 0 0 5px; font-size: 16px; }
+    .listing p { margin: 0; color: var(--muted); font-size: 13px; }
+    .listing__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 0; }
+    .listing dd { margin: 3px 0 0; font-weight: 900; }
+    .source-link { grid-column: 1 / -1; font-size: 13px; font-weight: 850; }
+    .evidence-more { margin-top: 12px; }
+    .evidence-more > summary {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fffdf7;
+      color: var(--ink);
+      font-weight: 850;
+      cursor: pointer;
+      list-style: none;
+    }
+    .evidence-more > summary::-webkit-details-marker { display: none; }
+    .evidence-more[open] > summary { margin-bottom: 12px; }
     .page-footer { padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--muted); }
     .page-footer nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
     @media (max-width: 860px) {
@@ -276,6 +302,43 @@
       .page-hero-card { display: none; }
       .page-hero .brief-panel { gap: 8px; }
       .page-hero .brief-panel article { padding: 13px; }
+      .mobile-resources {
+        position: static;
+        display: block;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+      }
+      .mobile-resources > summary {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--ink);
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 23px;
+        font-weight: 900;
+      }
+      .mobile-resources > summary::after {
+        content: "+";
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--teal);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+      }
+      .mobile-resources[open] > summary { margin-bottom: 12px; }
+      .mobile-resources[open] > summary::after { content: "-"; }
+      .mobile-resources .page-aside-card { margin-top: 10px; }
+      .listing, .listing__facts { grid-template-columns: 1fr; }
       .page-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         box-shadow: none;
@@ -542,7 +605,8 @@
           <details class="page-section" id="evidence" open>
             <summary><h2>Evidence Trail</h2></summary>
             <p>Built-property coastal proxy. Dalmatia ~€4,089/m² × EUR/USD 1.14784 ≈ $4,693/m²; Istria can be lower or similar in prime towns.</p>
-            <div class="page-article">
+
+      <div class="page-article evidence-list">
       <article class="listing">
         <div>
           <p class="listing__type">Villa</p>
@@ -577,8 +641,10 @@
           Croatia Property Sales · Medium confidence
         </a>
       </article>
-
-
+    </div>
+      <details class="evidence-more">
+        <summary>Show full evidence trail (1 more)</summary>
+        <div class="page-article">
       <article class="listing">
         <div>
           <p class="listing__type">Waterfront villa</p>
@@ -596,6 +662,8 @@
         </a>
       </article>
     </div>
+      </details>
+
           </details>
           <details class="page-section" open>
             <summary><h2>Due Diligence Checklist</h2></summary>
@@ -607,7 +675,8 @@
             </ul>
           </details>
         </article>
-        <aside class="page-aside">
+        <details class="page-aside mobile-resources" open>
+          <summary>More resources</summary>
           <section class="page-aside-card">
             <h2>Compare in Atlas</h2>
             <p>Use the dashboard to compare Croatia / Istria-Dalmatia against every market in the 10-dimension model.</p>
@@ -645,7 +714,7 @@
 <a href="/about/">About Global Home Atlas</a>
 <a href="/contact/">Contact Global Home Atlas</a></nav>
           </section>
-        </aside>
+        </details>
       </div>
     </div>
   </main>
@@ -669,11 +738,15 @@
     (() => {
       const query = window.matchMedia("(max-width: 560px)");
       const details = Array.from(document.querySelectorAll("details.page-section"));
+      const resources = Array.from(document.querySelectorAll("details.mobile-resources"));
       if (!details.length) return;
       const apply = () => {
         details.forEach((item, index) => {
           if (query.matches) item.open = index === 0;
           else item.open = true;
+        });
+        resources.forEach((item) => {
+          item.open = !query.matches;
         });
       };
       apply();

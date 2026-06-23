@@ -502,9 +502,10 @@ def load_json(name: str):
     return json.loads((DATA / name).read_text(encoding="utf-8"))
 
 
-def build_listing_card(item: dict) -> str:
+def build_listing_card(item: dict, extra_class: str = "") -> str:
+    class_name = "listing" + (f" {extra_class}" if extra_class else "")
     return f"""
-      <article class="listing">
+      <article class="{escape(class_name)}">
         <div>
           <p class="listing__type">{escape(item.get("property_type") or "Listing")}</p>
           <h5>{escape(item.get("listing_name") or "Representative listing")}</h5>
@@ -520,6 +521,24 @@ def build_listing_card(item: dict) -> str:
           {escape(item.get("source_name") or "Source")} · {escape(item.get("confidence") or "n/a")} confidence
         </a>
       </article>
+    """
+
+
+def build_evidence_cards(listings: list[dict], visible_count: int = 2) -> str:
+    if not listings:
+        return '<p>No representative listing evidence is currently attached to this destination.</p>'
+    visible = "\n".join(build_listing_card(item) for item in listings[:visible_count])
+    hidden_items = listings[visible_count:]
+    if not hidden_items:
+        return f'<div class="page-article evidence-list">{visible}</div>'
+    hidden = "\n".join(build_listing_card(item) for item in hidden_items)
+    hidden_count = len(hidden_items)
+    return f"""
+      <div class="page-article evidence-list">{visible}</div>
+      <details class="evidence-more">
+        <summary>Show full evidence trail ({hidden_count} more)</summary>
+        <div class="page-article">{hidden}</div>
+      </details>
     """
 
 
@@ -1070,11 +1089,15 @@ def mobile_disclosure_script() -> str:
     (() => {
       const query = window.matchMedia("(max-width: 560px)");
       const details = Array.from(document.querySelectorAll("details.page-section"));
+      const resources = Array.from(document.querySelectorAll("details.mobile-resources"));
       if (!details.length) return;
       const apply = () => {
         details.forEach((item, index) => {
           if (query.matches) item.open = index === 0;
           else item.open = true;
+        });
+        resources.forEach((item) => {
+          item.open = !query.matches;
         });
       };
       apply();
@@ -1693,10 +1716,6 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
             {country_destination_mobile_cards(selected)}
             {country_destination_table(selected)}
           </details>
-          <details class="page-section" open>
-            <summary><h2>Destinations to Compare</h2></summary>
-            <div class="page-grid">{country_destination_cards(selected)}</div>
-          </details>
           <details class="page-section" id="risk-posture" open>
             <summary><h2>How to Underwrite {escape(hub["country"])}</h2></summary>
             <ul>
@@ -1711,7 +1730,8 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
             <nav class="page-grid">{guide_links}</nav>
           </details>
         </article>
-        <aside class="page-aside">
+        <details class="page-aside mobile-resources" open>
+          <summary>More resources</summary>
           <section class="page-aside-card">
             <h2>Use the Atlas</h2>
             <p>Compare these markets against the full destination model and export a shortlist memo.</p>
@@ -1726,7 +1746,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
             <h3>Trust Layer</h3>
             <nav>{trust_page_links()}</nav>
           </section>
-        </aside>
+        </details>
       </div>
     </div>
   </main>
@@ -2218,10 +2238,36 @@ def shared_content_css() -> str:
     .score-list div { display: flex; justify-content: space-between; gap: 12px; align-items: baseline; }
     .score-list i { display: block; height: 6px; margin: 8px 0; border-radius: 999px; background: linear-gradient(90deg, var(--teal) var(--value), #e6e1d8 var(--value)); }
     .page-aside { position: sticky; top: 16px; display: grid; gap: 14px; }
+    .mobile-resources > summary { display: none; list-style: none; cursor: pointer; }
+    .mobile-resources > summary::-webkit-details-marker { display: none; }
     .page-aside-card { padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
     .page-aside-card h2, .page-aside-card h3 { margin: 0 0 10px; font-size: 16px; }
     .page-aside-card nav { display: grid; gap: 10px; }
     .page-aside-card p, .page-aside-card a { font-size: 14px; }
+    .evidence-list { margin-top: 12px; }
+    .listing { min-width: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(220px, .55fr); gap: 14px; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .listing__type { margin: 0 0 5px; color: var(--gold) !important; font-size: 11px !important; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .listing h5 { margin: 0 0 5px; font-size: 16px; }
+    .listing p { margin: 0; color: var(--muted); font-size: 13px; }
+    .listing__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; margin: 0; }
+    .listing dd { margin: 3px 0 0; font-weight: 900; }
+    .source-link { grid-column: 1 / -1; font-size: 13px; font-weight: 850; }
+    .evidence-more { margin-top: 12px; }
+    .evidence-more > summary {
+      min-height: 44px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 14px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fffdf7;
+      color: var(--ink);
+      font-weight: 850;
+      cursor: pointer;
+      list-style: none;
+    }
+    .evidence-more > summary::-webkit-details-marker { display: none; }
+    .evidence-more[open] > summary { margin-bottom: 12px; }
     .page-footer { padding: 26px 0 40px; border-top: 1px solid var(--line); color: var(--muted); }
     .page-footer nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
     @media (max-width: 860px) {
@@ -2247,6 +2293,43 @@ def shared_content_css() -> str:
       .page-hero-card { display: none; }
       .page-hero .brief-panel { gap: 8px; }
       .page-hero .brief-panel article { padding: 13px; }
+      .mobile-resources {
+        position: static;
+        display: block;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--paper);
+      }
+      .mobile-resources > summary {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        color: var(--ink);
+        font-family: Georgia, "Times New Roman", serif;
+        font-size: 23px;
+        font-weight: 900;
+      }
+      .mobile-resources > summary::after {
+        content: "+";
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--teal);
+        font-family: Inter, ui-sans-serif, system-ui, sans-serif;
+        font-size: 16px;
+      }
+      .mobile-resources[open] > summary { margin-bottom: 12px; }
+      .mobile-resources[open] > summary::after { content: "-"; }
+      .mobile-resources .page-aside-card { margin-top: 10px; }
+      .listing, .listing__facts { grid-template-columns: 1fr; }
       .page-stats {
         grid-template-columns: repeat(2, minmax(0, 1fr));
         box-shadow: none;
@@ -2359,7 +2442,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
     ][:6]
     pros = "".join(f"<li>{escape(item)}</li>" for item in dest.get("pros", []))
     cons = "".join(f"<li>{escape(item)}</li>" for item in dest.get("cons", []))
-    listing_cards = "\n".join(build_listing_card(item) for item in listings)
+    evidence_cards = build_evidence_cards(listings)
     dimension_rows = "\n".join(
         f"""
         <li>
@@ -2460,7 +2543,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
           <details class="page-section" id="evidence" open>
             <summary><h2>Evidence Trail</h2></summary>
             <p>{escape(dest.get("price_basis") or "Listing samples are used as evidence anchors for current market texture, not availability guarantees.")}</p>
-            <div class="page-article">{listing_cards}</div>
+            {evidence_cards}
           </details>
           <details class="page-section" open>
             <summary><h2>Due Diligence Checklist</h2></summary>
@@ -2472,7 +2555,8 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
             </ul>
           </details>
         </article>
-        <aside class="page-aside">
+        <details class="page-aside mobile-resources" open>
+          <summary>More resources</summary>
           <section class="page-aside-card">
             <h2>Compare in Atlas</h2>
             <p>Use the dashboard to compare {escape(dest["name"])} against every market in the 10-dimension model.</p>
@@ -2495,7 +2579,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
             <h3>Trust Layer</h3>
             <nav>{trust_page_links()}</nav>
           </section>
-        </aside>
+        </details>
       </div>
     </div>
   </main>
