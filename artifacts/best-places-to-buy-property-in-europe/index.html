@@ -49,6 +49,11 @@
     .seo-brand { color: #fffdf8; font-weight: 900; text-decoration: none; }
     .seo-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
     .seo-nav-links a { color: rgba(255, 253, 248, .86); text-decoration: none; font-size: 13px; font-weight: 800; }
+    .mobile-menu { display: none; position: relative; }
+    .mobile-menu summary { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 0 13px; border: 1px solid rgba(255, 253, 248, .32); border-radius: 6px; color: #fffdf8; font-size: 13px; font-weight: 850; list-style: none; cursor: pointer; }
+    .mobile-menu summary::-webkit-details-marker { display: none; }
+    .mobile-menu nav { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(78vw, 280px); display: grid; gap: 2px; padding: 8px; border: 1px solid rgba(255, 253, 248, .28); border-radius: 8px; background: rgba(16, 36, 31, .98); box-shadow: 0 20px 50px rgba(0, 0, 0, .25); }
+    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: #fffdf8; text-decoration: none; font-weight: 800; }
     .seo-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }
     .seo-eyebrow { margin: 0 0 12px; color: #e1c17e; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
     h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }
@@ -107,6 +112,7 @@
       .seo-shell { width: min(100% - 28px, 1120px); }
       .seo-nav { align-items: flex-start; }
       .seo-nav-links { display: none; }
+      .mobile-menu { display: block; }
       .seo-hero { padding-bottom: 48px; }
       .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid { grid-template-columns: 1fr; }
       .seo-section { padding: 18px; }
@@ -116,15 +122,31 @@
 <body>
   <header class="seo-hero">
     <div class="seo-shell">
+
       <nav class="seo-nav" aria-label="Primary">
         <a class="seo-brand" href="/">Global Home Atlas</a>
         <div class="seo-nav-links">
-          <a href="/">Dashboard</a>
+          <a href="/#compare">Compare</a>
           <a href="/guides/">Guides</a>
-          <a href="#comparison">Comparison</a>
-          <a href="#faq">FAQ</a>
+          <a href="/#destination-index">Destinations</a>
+          <a href="/countries/spain-property/">Countries</a>
+          <a href="/methodology/">Methodology</a>
+          <a href="/contact/">Contact</a>
+
         </div>
+        <details class="mobile-menu">
+          <summary>Menu</summary>
+          <nav aria-label="Mobile primary">
+            <a href="/#compare">Compare</a>
+            <a href="/countries/spain-property/">Countries</a>
+            <a href="/#destination-index">Destinations</a>
+            <a href="/guides/">Guides</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/contact/">Contact</a>
+          </nav>
+        </details>
       </nav>
+
       <div class="seo-hero-grid">
         <div>
           <p class="seo-eyebrow">Europe shortlist · updated 2026-06-23</p>
@@ -169,7 +191,7 @@
           <section class="seo-section" id="comparison">
             <h2>Best Markets to Compare First</h2>
             <p>For this search, the strongest candidates are Valencia and Algarve / Cascais because they balance high decision scores with practical ownership and lifestyle use. The table below keeps the comparison deliberately concrete: entry benchmark, yield context, ownership clarity, retirement fit, and the committee read. These are the variables most likely to change a real buy/no-buy decision.</p>
-            
+
       <div class="seo-table-wrap">
         <table class="seo-table">
           <thead>
@@ -276,13 +298,13 @@
             </tr></tbody>
         </table>
       </div>
-    
+
           </section>
 
           <section class="seo-section">
             <h2>Market Notes for Serious Buyers</h2>
             <div class="seo-card-grid">
-              
+
             <article class="seo-destination-card">
               <div>
                 <span>#2 global scorecard</span>
@@ -412,24 +434,24 @@
 
           <section class="seo-section" id="faq">
             <h2>FAQ</h2>
-            
+
         <details class="faq-item">
           <summary>Where should foreign buyers start in Europe?</summary>
           <p>Start with regions that combine livability, transport, healthcare, clear ownership, and a resale market broader than one nationality.</p>
         </details>
-        
+
 
         <details class="faq-item">
           <summary>Is Europe better for lifestyle or yield?</summary>
           <p>Europe is often strongest as a lifestyle and capital-preservation decision, while yield depends heavily on local rules and asset selection.</p>
         </details>
-        
+
 
         <details class="faq-item">
           <summary>How should I compare European property markets?</summary>
           <p>Compare city access, healthcare, taxation, rental rules, seasonality, entry price, and resale depth at the regional level.</p>
         </details>
-        
+
           </section>
         </article>
 

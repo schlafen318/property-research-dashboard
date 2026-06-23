@@ -49,6 +49,38 @@
     .page-brand { color: #fffdf8; font-weight: 900; text-decoration: none; }
     .page-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
     .page-nav-links a { color: rgba(255, 253, 248, .86); text-decoration: none; font-size: 13px; font-weight: 800; }
+    .mobile-menu { display: none; position: relative; }
+    .mobile-menu summary {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 13px;
+      border: 1px solid rgba(255, 253, 248, .32);
+      border-radius: 6px;
+      color: #fffdf8;
+      font-size: 13px;
+      font-weight: 850;
+      list-style: none;
+      cursor: pointer;
+    }
+    .mobile-menu summary::-webkit-details-marker { display: none; }
+    .mobile-menu nav {
+      position: absolute;
+      right: 0;
+      top: calc(100% + 8px);
+      z-index: 20;
+      width: min(78vw, 280px);
+      display: grid;
+      gap: 2px;
+      padding: 8px;
+      border: 1px solid rgba(255, 253, 248, .28);
+      border-radius: 8px;
+      background: rgba(16, 36, 31, .98);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, .25);
+    }
+    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: #fffdf8; text-decoration: none; font-weight: 800; }
+    .mobile-menu nav a:focus, .mobile-menu nav a:hover { background: rgba(255, 253, 248, .12); }
     .page-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }
     .page-eyebrow { margin: 0 0 12px; color: #e1c17e; font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
     h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }
@@ -73,6 +105,62 @@
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
+    .sticky-jump {
+      position: sticky;
+      top: 0;
+      z-index: 12;
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      margin: 18px 0 0;
+      padding: 10px 0;
+      background: linear-gradient(180deg, #f7f4ee 72%, rgba(247, 244, 238, 0));
+      scrollbar-width: none;
+    }
+    .sticky-jump a {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: #fffdf8;
+      color: var(--ink);
+      font-size: 13px;
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .trust-brief {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+    }
+    .trust-brief div { min-width: 0; padding: 16px; background: #fffdf8; }
+    .trust-brief span, .brief-panel span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .trust-brief strong { display: block; margin: 6px 0; font-size: 16px; }
+    .trust-brief p { margin: 0; color: var(--muted); font-size: 13px; }
+    .brief-panel {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 18px;
+    }
+    .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; }
+    .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+    .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+    .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
+    .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
+    .comparison-table th { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .intake-form { display: grid; gap: 14px; margin-top: 16px; }
     .intake-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .intake-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
@@ -114,14 +202,16 @@
     .page-footer nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 12px; }
     @media (max-width: 860px) {
       .page-nav { margin-bottom: 48px; }
+      .page-nav-links { display: none; }
+      .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(100% - 28px, 1120px); }
-      .page-nav-links { display: none; }
-      .page-stats, .page-grid, .score-list, .intake-grid { grid-template-columns: 1fr; }
+      .page-nav { align-items: flex-start; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
     }
 </style>
@@ -129,15 +219,31 @@
 <body>
   <header class="page-hero">
     <div class="page-shell">
+
       <nav class="page-nav" aria-label="Primary">
         <a class="page-brand" href="/">Global Home Atlas</a>
         <div class="page-nav-links">
-          <a href="/">Dashboard</a>
+          <a href="/#compare">Compare</a>
           <a href="/guides/">Guides</a>
+          <a href="/#destination-index">Destinations</a>
+          <a href="/countries/spain-property/">Countries</a>
           <a href="/methodology/">Methodology</a>
-          <a href="/research-standards/">Standards</a>
+          <a href="/contact/">Contact</a>
+
         </div>
+        <details class="mobile-menu">
+          <summary>Menu</summary>
+          <nav aria-label="Mobile primary">
+            <a href="/#compare">Compare</a>
+            <a href="/countries/spain-property/">Countries</a>
+            <a href="/#destination-index">Destinations</a>
+            <a href="/guides/">Guides</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/contact/">Contact</a>
+          </nav>
+        </details>
       </nav>
+
       <div class="page-hero-grid">
         <div>
           <p class="page-eyebrow">Thailand country hub · updated 2026-06-23</p>
@@ -160,12 +266,74 @@
         <div><span>Decision model</span><strong>10 dimensions</strong></div>
         <div><span>Updated</span><strong>2026-06-23</strong></div>
       </section>
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#country-thesis">Thesis</a><a href="#buyer-fit">Buyer Fit</a><a href="#destination-comparison">Compare</a><a href="#risk-posture">Risk</a><a href="#related-guides">Guides</a></nav>
+      <section class="brief-panel" aria-label="Country briefing">
+        <article><span>Top destination match</span><strong>Phuket / Koh Samui</strong><p>Keep as a yield candidate only with conservative legal structuring. Not a clean core holding.</p></article>
+        <article><span>Buyer profile</span><strong>Affluent global planners</strong><p>Best for buyers comparing lifestyle use, legal clarity, tax and ownership friction, rental realism, and future liquidity before local deal work.</p></article>
+        <article><span>Risk posture</span><strong>2.0/5 ownership clarity</strong><p>Use country-level rules as the first screen, then verify title, taxes, rental permissions, and local transaction mechanics by asset.</p></article>
+      </section>
+
+      <section class="trust-brief" id="trust-context" aria-label="Research credibility">
+        <div>
+          <span>Methodology</span>
+          <strong>10-dimension destination score</strong>
+          <p>Markets are compared across lifestyle, access, ownership clarity, regulatory safety, yield realism, capital upside, retirement fit, liquidity, foreigner fit, and value entry.</p>
+        </div>
+        <div>
+          <span>Research standard</span>
+          <strong>Independent destination intelligence</strong>
+          <p>Representative listings anchor market texture. They are not offers, availability guarantees, brokerage placements, or paid destination promotion.</p>
+        </div>
+        <div>
+          <span>Update cadence</span>
+          <strong>Regenerated with current source data</strong>
+          <p>Scores, caveats, and benchmark evidence should be treated as shortlist inputs, then verified with local legal, tax, immigration, and property advisers.</p>
+        </div>
+      </section>
+
       <div class="page-layout">
         <article class="page-article">
-          <section class="page-section">
+          <section class="page-section" id="country-thesis">
             <h2>Country Thesis</h2>
             <p>Thailand can be compelling for lifestyle, rental demand, and regional access, but the legal structure matters more than the brochure. Villa buyers need to understand land, leasehold, company, and condominium rules before underwriting income.</p>
             <p>This page is a country-level filter for global buyers. Use it to decide whether Thailand deserves deeper local diligence before comparing individual homes, agents, or legal structures.</p>
+          </section>
+          <section class="page-section" id="buyer-fit">
+            <h2>Buyer Fit</h2>
+            <div class="brief-panel">
+              <article><span>Best for</span><strong>Lifestyle-led capital</strong><p>Buyers who value repeated owner use, healthcare and access, jurisdictional clarity, and a defensible resale path.</p></article>
+              <article><span>Watch-outs</span><strong>Micro-market discipline</strong><p>Do not underwrite the country average. Local rules, asset condition, manager quality, and seasonality decide the actual result.</p></article>
+              <article><span>Ownership clarity</span><strong>Verify locally</strong><p>Confirm title path, foreign-buyer restrictions, transfer taxes, rental licensing, inheritance treatment, and exit process before offers.</p></article>
+            </div>
+          </section>
+          <section class="page-section" id="destination-comparison">
+            <h2>Destination Comparison Table</h2>
+            <p>Use this country table to compare score, ownership, retirement practicality, exit liquidity, and the briefing read before opening a destination dossier.</p>
+
+      <div class="comparison-table-wrap">
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Destination</th>
+              <th>Decision</th>
+              <th>Ownership</th>
+              <th>Retirement</th>
+              <th>Exit</th>
+              <th>Briefing read</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong><a href="/destinations/phuket-koh-samui/">Phuket / Koh Samui</a></strong><br><span>Water</span></td>
+              <td>3.67/5</td>
+              <td>2.0/5</td>
+              <td>4.0/5</td>
+              <td>3.1/5</td>
+              <td>Keep as a yield candidate only with conservative legal structuring. Not a clean core holding.</td>
+            </tr></tbody>
+        </table>
+      </div>
+
           </section>
           <section class="page-section">
             <h2>Destinations to Compare</h2>
@@ -182,7 +350,7 @@
               </ul>
             </article></div>
           </section>
-          <section class="page-section">
+          <section class="page-section" id="risk-posture">
             <h2>How to Underwrite Thailand</h2>
             <ul>
               <li>Start with ownership clarity, transfer process, taxes, and whether the structure is simple enough to explain without informal assumptions.</li>
@@ -191,7 +359,7 @@
               <li>Plan exit liquidity before entry by checking buyer depth, comparable transactions, agent quality, and whether demand depends on one foreign-buyer group.</li>
             </ul>
           </section>
-          <section class="page-section">
+          <section class="page-section" id="related-guides">
             <h2>Related Buying Guides</h2>
             <nav class="page-grid"><a href="/thailand-villa-ownership-foreigners/">Thailand Villa Ownership for Foreigners</a>
 <a href="/foreign-property-investment-risks/">Foreign Property Investment Risks</a>
