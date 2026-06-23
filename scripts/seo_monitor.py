@@ -20,6 +20,10 @@ PRIORITY_INDEXING_PATHS = [
     "/",
     "/buy-property-abroad/",
     "/best-countries-to-buy-property-as-a-foreigner/",
+    "/buying-property-abroad-for-retirement/",
+    "/best-places-to-buy-a-second-home-abroad/",
+    "/foreign-property-investment-risks/",
+    "/where-can-foreigners-buy-property/",
     "/overseas-property-investment/",
     "/best-places-to-buy-property-abroad-for-retirement/",
     "/best-places-to-buy-vacation-home-abroad/",
@@ -32,28 +36,60 @@ TRACKED_SEO_GOALS = [
         "indexed_deadline": "2026-06-30",
         "impressions_at_risk_date": "2026-07-07",
         "impressions_deadline": "2026-07-23",
-    }
+    },
+    {
+        "name": "Retirement abroad landing page",
+        "url": "https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
+        "launch_date": "2026-06-23",
+        "indexed_deadline": "2026-06-30",
+        "impressions_at_risk_date": "2026-07-07",
+        "impressions_deadline": "2026-07-23",
+    },
+    {
+        "name": "Second-home abroad landing page",
+        "url": "https://globalhomeatlas.com/best-places-to-buy-a-second-home-abroad/",
+        "launch_date": "2026-06-23",
+        "indexed_deadline": "2026-06-30",
+        "impressions_at_risk_date": "2026-07-07",
+        "impressions_deadline": "2026-07-23",
+    },
+    {
+        "name": "Foreign property risks landing page",
+        "url": "https://globalhomeatlas.com/foreign-property-investment-risks/",
+        "launch_date": "2026-06-23",
+        "indexed_deadline": "2026-06-30",
+        "impressions_at_risk_date": "2026-07-07",
+        "impressions_deadline": "2026-07-23",
+    },
+    {
+        "name": "Where foreigners can buy landing page",
+        "url": "https://globalhomeatlas.com/where-can-foreigners-buy-property/",
+        "launch_date": "2026-06-23",
+        "indexed_deadline": "2026-06-30",
+        "impressions_at_risk_date": "2026-07-07",
+        "impressions_deadline": "2026-07-23",
+    },
 ]
 SEED_TEMPLATE_PAGES = [
     {
         "title": "Buying Property Abroad for Retirement",
         "url": "https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
-        "status": "not_started",
+        "status": "published",
     },
     {
         "title": "Best Places to Buy a Second Home Abroad",
         "url": "https://globalhomeatlas.com/best-places-to-buy-a-second-home-abroad/",
-        "status": "not_started",
+        "status": "published",
     },
     {
         "title": "Foreign Property Investment Risks",
         "url": "https://globalhomeatlas.com/foreign-property-investment-risks/",
-        "status": "not_started",
+        "status": "published",
     },
     {
         "title": "Where Can Foreigners Buy Property",
         "url": "https://globalhomeatlas.com/where-can-foreigners-buy-property/",
-        "status": "not_started",
+        "status": "published",
     },
 ]
 
