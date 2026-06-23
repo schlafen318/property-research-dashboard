@@ -39,6 +39,7 @@
       --clay: #b76f57;
     }
     * { box-sizing: border-box; }
+    html, body { overflow-x: hidden; }
     body { margin: 0; min-width: 320px; }
     a { color: var(--teal); text-underline-offset: 3px; overflow-wrap: anywhere; }
     p, li { line-height: 1.65; }
@@ -89,8 +90,9 @@
     .mobile-menu nav a { padding: 12px; border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 800; }
     .mobile-menu nav a:focus, .mobile-menu nav a:hover { background: rgba(199, 211, 194, .38); }
     .page-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }
+    .page-hero-grid > *, .page-layout > * { min-width: 0; }
     .page-eyebrow { margin: 0 0 12px; color: var(--brass); font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
-    h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }
+    h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; overflow-wrap: anywhere; }
     .page-lede { max-width: 760px; margin: 22px 0 0; color: rgba(36, 49, 45, .72); font-size: clamp(16px, 2vw, 20px); }
     .page-hero-card { padding: 16px; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: rgba(255, 253, 247, .72); box-shadow: 0 18px 44px rgba(36, 49, 45, .08); backdrop-filter: blur(16px); }
     .page-hero-card span { display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
@@ -135,6 +137,7 @@
       font-weight: 850;
       text-decoration: none;
     }
+    .mobile-action-strip { display: none; }
     .trust-brief {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -162,12 +165,27 @@
       margin-top: 18px;
     }
     .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
-    .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; }
-    .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+    .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; word-break: break-word; }
+    .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
     .comparison-table th { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .mobile-comparison-cards { display: none; }
+    .comparison-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .comparison-card__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .comparison-card__head span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .comparison-card h3 { margin: 0; font-size: 18px; }
+    .comparison-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+    .comparison-card dl div { min-width: 0; padding: 9px; border-radius: 6px; background: #f2f5f1; }
+    .comparison-card p { margin: 0; color: var(--muted); font-size: 13px; }
+    details.page-section > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    details.page-section > summary::-webkit-details-marker { display: none; }
+    details.page-section > summary h2 { margin-bottom: 0; }
+    details.page-section[open] > summary h2 { margin-bottom: 12px; }
     .cluster-map {
       min-height: 240px;
       display: grid;
@@ -244,14 +262,93 @@
       .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
-      .page-shell { width: min(100% - 28px, 1120px); }
+      .page-shell { width: min(1120px, calc(100% - 28px)); }
       .page-nav { align-items: flex-start; }
+      .page-hero-grid > div { max-width: min(100%, 362px); }
+      h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
+      .page-lede { max-width: min(100%, 362px); }
+      .page-lede { font-size: 16px; }
       .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
+      body.has-mobile-actions { padding-bottom: 74px; }
+      main { margin-top: -18px; }
+      .page-hero { padding-bottom: 44px; }
+      .page-hero-card { display: none; }
+      .page-hero .brief-panel { gap: 8px; }
+      .page-hero .brief-panel article { padding: 13px; }
+      .page-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        box-shadow: none;
+      }
+      .sticky-jump {
+        margin-top: 12px;
+        padding: 8px 0;
+        background: linear-gradient(180deg, #f5f1e9 80%, rgba(245, 241, 233, 0));
+      }
+      .sticky-jump a { padding: 8px 10px; font-size: 12px; }
+      .mobile-action-strip {
+        position: fixed;
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        z-index: 40;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 8px;
+        border: 1px solid rgba(36, 49, 45, .14);
+        border-radius: 8px;
+        background: rgba(255, 253, 247, .96);
+        box-shadow: 0 18px 46px rgba(36, 49, 45, .20);
+        backdrop-filter: blur(14px);
+      }
+      .mobile-action-strip a {
+        min-width: 0;
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 10px;
+        border-radius: 6px;
+        background: var(--eucalyptus);
+        color: #fffdf7;
+        font-size: 12px;
+        font-weight: 850;
+        text-align: center;
+        text-decoration: none;
+      }
+      .mobile-action-strip a + a { background: #fffdf7; color: var(--ink); border: 1px solid var(--line); }
+      details.page-section > summary {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      details.page-section > summary::after {
+        content: "+";
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--teal);
+        font-weight: 900;
+      }
+      details.page-section[open] > summary::after { content: "-"; }
+      details.page-section > summary h2 { font-size: 23px; }
+      .comparison-table-wrap { display: none; }
+      .mobile-comparison-cards { display: grid; gap: 10px; }
+      .cluster-map { min-height: 160px; padding: 12px; }
+      .cluster-map__grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+      .cluster-map__grid div { flex: 0 0 170px; }
     }
 </style>
 </head>
-<body>
+<body class="has-mobile-actions">
   <header class="page-hero">
     <div class="page-shell">
 
@@ -313,6 +410,12 @@
       </section>
       <nav class="sticky-jump" aria-label="Page sections"><a href="#verdict">Verdict</a><a href="#buyer-fit">Buyer Fit</a><a href="#ownership">Ownership</a><a href="#lifestyle">Lifestyle</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#trust-context">Trust</a></nav>
 
+      <nav class="mobile-action-strip" aria-label="Priority actions">
+        <a href="#scores">Scores</a>
+        <a href="/#destinations">Compare</a>
+      </nav>
+
+
       <section class="trust-brief" id="trust-context" aria-label="Research credibility">
         <div>
           <span>Methodology</span>
@@ -333,35 +436,35 @@
 
       <div class="page-layout">
         <article class="page-article">
-          <section class="page-section" id="verdict">
-            <h2>Investment Thesis</h2>
+          <details class="page-section" id="verdict" open>
+            <summary><h2>Investment Thesis</h2></summary>
             <p>Premium winter ADR, global Asian/Australian ski demand, branded residences, summer golf/cycling/wellness extension.</p>
             <p>Keep as a trophy/specialist candidate, not a default top pick. Needs asset-specific edge to justify the price. This page is built for a global buyer deciding whether Niseko belongs on a serious property shortlist, not for casual travel inspiration. The useful question is whether the destination can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process.</p>
-          </section>
-          <section class="page-section" id="buyer-fit">
-            <h2>Buyer Fit</h2>
+          </details>
+          <details class="page-section" id="buyer-fit" open>
+            <summary><h2>Buyer Fit</h2></summary>
             <div class="page-grid">
               <article class="page-card"><h3>Best Fit</h3><ul><li>Global ski brand</li><li>clean Japan ownership</li><li>strong Chinese/Southeast Asian familiarity</li><li>high ADR potential</li><li>proven luxury buyer pool.</li></ul></article>
               <article class="page-card"><h3>Risk Check</h3><ul><li>Built property is expensive</li><li>heavy winter dependence despite summer potential</li><li>construction/maintenance costs are high</li><li>exit liquidity is narrower than major cities.</li></ul></article>
             </div>
-          </section>
-          <section class="page-section" id="ownership">
-            <h2>Ownership and Governance</h2>
+          </details>
+          <details class="page-section" id="ownership" open>
+            <summary><h2>Ownership and Governance</h2></summary>
             <p>Foreigners can generally own land and buildings freehold in Japan. STR requires either minpaku notification, hotel/ryokan route, or local-compliant structure. Minpaku is capped nationally at 180 days/year and local rules can be tighter.</p>
             <p>High build costs, operator dependency, snow/climate sensitivity, local pushback if overtourism rises.</p>
-          </section>
-          <section class="page-section" id="lifestyle">
-            <h2>Lifestyle and Retirement Fit</h2>
+          </details>
+          <details class="page-section" id="lifestyle" open>
+            <summary><h2>Lifestyle and Retirement Fit</h2></summary>
             <p>For an affluent global buyer, Niseko should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
             <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
-          </section>
-          <section class="page-section">
-            <h2>Guide Context for This Market</h2>
+          </details>
+          <details class="page-section" open>
+            <summary><h2>Guide Context</h2></summary>
             <p>Use these buying guides to compare Niseko against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
             <nav class="page-grid"><a href="/japan-retirement-property-foreign-buyers/">Japan Retirement Property for Foreign Buyers</a></nav>
-          </section>
-          <section class="page-section" id="scores">
-            <h2>Score Breakdown</h2>
+          </details>
+          <details class="page-section" id="scores" open>
+            <summary><h2>Score Breakdown</h2></summary>
             <ul class="score-list">
         <li>
           <div><span>Lifestyle magnetism</span><strong>4.5/5</strong></div>
@@ -432,9 +535,9 @@
           <p>Price discipline, USD/m2 reasonableness, and margin of safety at acquisition.</p>
         </li>
         </ul>
-          </section>
-          <section class="page-section" id="evidence">
-            <h2>Evidence Trail</h2>
+          </details>
+          <details class="page-section" id="evidence" open>
+            <summary><h2>Evidence Trail</h2></summary>
             <p>Built-property benchmark, not land. Hirafu condominium average sales price reported at ~$14,644/m². For development reference only: official/land benchmarks are far lower and highly location-sensitive, from Niseko town land to prime Hirafu plots.</p>
             <div class="page-article">
       <article class="listing">
@@ -490,16 +593,16 @@
         </a>
       </article>
     </div>
-          </section>
-          <section class="page-section">
-            <h2>Due Diligence Checklist</h2>
+          </details>
+          <details class="page-section" open>
+            <summary><h2>Due Diligence Checklist</h2></summary>
             <ul>
               <li>Verify clean title, transfer process, foreign-buyer restrictions, and beneficial ownership structure with independent local counsel.</li>
               <li>Model acquisition tax, annual property tax, income tax, wealth tax exposure, financing availability, insurance, repairs, and property management fees.</li>
               <li>Confirm short-term-rental rules, licensing, building permissions, homeowners association rules, and realistic net income after vacancy and operating costs.</li>
               <li>Stress-test resale liquidity by reviewing recent comparable transactions, buyer nationality mix, time on market, and local agent depth.</li>
             </ul>
-          </section>
+          </details>
         </article>
         <aside class="page-aside">
           <section class="page-aside-card">
@@ -555,6 +658,24 @@
 <a href="/contact/">Contact Global Home Atlas</a></nav>
     </div>
   </footer>
+
+  <script>
+    (() => {
+      const query = window.matchMedia("(max-width: 560px)");
+      const details = Array.from(document.querySelectorAll("details.page-section"));
+      if (!details.length) return;
+      const apply = () => {
+        details.forEach((item, index) => {
+          if (query.matches) item.open = index === 0;
+          else item.open = true;
+        });
+      };
+      apply();
+      if (query.addEventListener) query.addEventListener("change", apply);
+      else query.addListener(apply);
+    })();
+  </script>
+
 
   <script>
     (function () {

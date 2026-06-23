@@ -1033,6 +1033,15 @@ def sticky_page_nav(items: list[tuple[str, str]]) -> str:
     ) + "</nav>"
 
 
+def mobile_action_strip(primary_href: str, primary_label: str, secondary_href: str, secondary_label: str) -> str:
+    return f"""
+      <nav class="mobile-action-strip" aria-label="Priority actions">
+        <a href="{escape(primary_href)}">{escape(primary_label)}</a>
+        <a href="{escape(secondary_href)}">{escape(secondary_label)}</a>
+      </nav>
+    """
+
+
 def trust_brief_html() -> str:
     return """
       <section class="trust-brief" id="trust-context" aria-label="Research credibility">
@@ -1052,6 +1061,27 @@ def trust_brief_html() -> str:
           <p>Scores, caveats, and benchmark evidence should be treated as shortlist inputs, then verified with local legal, tax, immigration, and property advisers.</p>
         </div>
       </section>
+    """
+
+
+def mobile_disclosure_script() -> str:
+    return """
+  <script>
+    (() => {
+      const query = window.matchMedia("(max-width: 560px)");
+      const details = Array.from(document.querySelectorAll("details.page-section"));
+      if (!details.length) return;
+      const apply = () => {
+        details.forEach((item, index) => {
+          if (query.matches) item.open = index === 0;
+          else item.open = true;
+        });
+      };
+      apply();
+      if (query.addEventListener) query.addEventListener("change", apply);
+      else query.addListener(apply);
+    })();
+  </script>
     """
 
 
@@ -1507,6 +1537,29 @@ def country_destination_cards(destinations: list[dict]) -> str:
     return "\n".join(cards)
 
 
+def country_destination_mobile_cards(destinations: list[dict]) -> str:
+    cards = []
+    for dest in destinations:
+        cards.append(
+            f"""
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <span>#{dest["rank"]}</span>
+                <h3><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></h3>
+              </div>
+              <dl>
+                <div><dt>Score</dt><dd>{dest.get("decision_score", 0):.2f}/5</dd></div>
+                <div><dt>Ownership</dt><dd>{metric_value(dest, "ownership_clarity"):.1f}/5</dd></div>
+                <div><dt>Retirement</dt><dd>{metric_value(dest, "retirement_fit"):.1f}/5</dd></div>
+                <div><dt>Exit</dt><dd>{metric_value(dest, "exit_liquidity"):.1f}/5</dd></div>
+              </dl>
+              <p>{escape(dest.get("panel_verdict") or "")}</p>
+            </article>
+            """.rstrip()
+        )
+    return f'<div class="mobile-comparison-cards" aria-label="Mobile destination comparison">{"".join(cards)}</div>'
+
+
 def country_destination_table(destinations: list[dict]) -> str:
     rows = []
     for dest in destinations:
@@ -1584,7 +1637,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
 {head_html(hub["title"], hub["description"], canonical, schema_for_country_hub(hub, selected, canonical))}
   <style>{shared_content_css()}</style>
 </head>
-<body>
+<body class="has-mobile-actions">
   <header class="page-hero">
     <div class="page-shell">
       {primary_nav_html()}
@@ -1611,6 +1664,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
         <div><span>Updated</span><strong>{updated}</strong></div>
       </section>
       {sticky_page_nav([("Thesis", "country-thesis"), ("Buyer Fit", "buyer-fit"), ("Compare", "destination-comparison"), ("Risk", "risk-posture"), ("Guides", "related-guides")])}
+      {mobile_action_strip("#destination-comparison", "Compare", "/contact/#custom-shortlist", "Brief")}
       <section class="brief-panel" aria-label="Country briefing">
         <article><span>Top destination match</span><strong>{escape(best["name"])}</strong><p>{escape(best.get("panel_verdict") or "")}</p></article>
         <article><span>Buyer profile</span><strong>Affluent global planners</strong><p>Best for buyers comparing lifestyle use, legal clarity, tax and ownership friction, rental realism, and future liquidity before local deal work.</p></article>
@@ -1619,42 +1673,43 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
-          <section class="page-section" id="country-thesis">
-            <h2>Country Thesis</h2>
+          <details class="page-section" id="country-thesis" open>
+            <summary><h2>Country Thesis</h2></summary>
             <p>{escape(hub["thesis"])}</p>
             <p>This page is a country-level filter for global buyers. Use it to decide whether {escape(hub["country"])} deserves deeper local diligence before comparing individual homes, agents, or legal structures.</p>
-          </section>
-          <section class="page-section" id="buyer-fit">
-            <h2>Buyer Fit</h2>
+          </details>
+          <details class="page-section" id="buyer-fit" open>
+            <summary><h2>Buyer Fit</h2></summary>
             <div class="brief-panel">
               <article><span>Best for</span><strong>Lifestyle-led capital</strong><p>Buyers who value repeated owner use, healthcare and access, jurisdictional clarity, and a defensible resale path.</p></article>
               <article><span>Watch-outs</span><strong>Micro-market discipline</strong><p>Do not underwrite the country average. Local rules, asset condition, manager quality, and seasonality decide the actual result.</p></article>
               <article><span>Ownership clarity</span><strong>Verify locally</strong><p>Confirm title path, foreign-buyer restrictions, transfer taxes, rental licensing, inheritance treatment, and exit process before offers.</p></article>
             </div>
-          </section>
-          <section class="page-section" id="destination-comparison">
-            <h2>Destination Comparison Table</h2>
+          </details>
+          <details class="page-section" id="destination-comparison" open>
+            <summary><h2>Destination Comparison</h2></summary>
             <p>Use this country table to compare score, ownership, retirement practicality, exit liquidity, and the briefing read before opening a destination dossier.</p>
             {country_cluster_visual(selected)}
+            {country_destination_mobile_cards(selected)}
             {country_destination_table(selected)}
-          </section>
-          <section class="page-section">
-            <h2>Destinations to Compare</h2>
+          </details>
+          <details class="page-section" open>
+            <summary><h2>Destinations to Compare</h2></summary>
             <div class="page-grid">{country_destination_cards(selected)}</div>
-          </section>
-          <section class="page-section" id="risk-posture">
-            <h2>How to Underwrite {escape(hub["country"])}</h2>
+          </details>
+          <details class="page-section" id="risk-posture" open>
+            <summary><h2>How to Underwrite {escape(hub["country"])}</h2></summary>
             <ul>
               <li>Start with ownership clarity, transfer process, taxes, and whether the structure is simple enough to explain without informal assumptions.</li>
               <li>Stress-test the market for retirement fit, healthcare practicality, airport access, year-round services, and non-peak-season livability.</li>
               <li>Separate headline yield from realistic net income after manager quality, vacancy, repairs, taxes, licensing, furnishing, and currency movement.</li>
               <li>Plan exit liquidity before entry by checking buyer depth, comparable transactions, agent quality, and whether demand depends on one foreign-buyer group.</li>
             </ul>
-          </section>
-          <section class="page-section" id="related-guides">
-            <h2>Related Buying Guides</h2>
+          </details>
+          <details class="page-section" id="related-guides" open>
+            <summary><h2>Related Buying Guides</h2></summary>
             <nav class="page-grid">{guide_links}</nav>
-          </section>
+          </details>
         </article>
         <aside class="page-aside">
           <section class="page-aside-card">
@@ -1682,6 +1737,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
       <nav>{country_hub_links(hub["slug"], limit=6)} {seo_guide_links(pages, limit=4)}</nav>
     </div>
   </footer>
+{mobile_disclosure_script()}
 {analytics_event_script()}
 </body>
 </html>
@@ -1954,6 +2010,7 @@ def shared_content_css() -> str:
       --clay: #b76f57;
     }
     * { box-sizing: border-box; }
+    html, body { overflow-x: hidden; }
     body { margin: 0; min-width: 320px; }
     a { color: var(--teal); text-underline-offset: 3px; overflow-wrap: anywhere; }
     p, li { line-height: 1.65; }
@@ -2004,8 +2061,9 @@ def shared_content_css() -> str:
     .mobile-menu nav a { padding: 12px; border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 800; }
     .mobile-menu nav a:focus, .mobile-menu nav a:hover { background: rgba(199, 211, 194, .38); }
     .page-hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) 310px; gap: 28px; align-items: end; }
+    .page-hero-grid > *, .page-layout > * { min-width: 0; }
     .page-eyebrow { margin: 0 0 12px; color: var(--brass); font-size: 12px; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
-    h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; }
+    h1 { margin: 0; max-width: 900px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 86px); line-height: .95; letter-spacing: 0; overflow-wrap: anywhere; }
     .page-lede { max-width: 760px; margin: 22px 0 0; color: rgba(36, 49, 45, .72); font-size: clamp(16px, 2vw, 20px); }
     .page-hero-card { padding: 16px; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: rgba(255, 253, 247, .72); box-shadow: 0 18px 44px rgba(36, 49, 45, .08); backdrop-filter: blur(16px); }
     .page-hero-card span { display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
@@ -2050,6 +2108,7 @@ def shared_content_css() -> str:
       font-weight: 850;
       text-decoration: none;
     }
+    .mobile-action-strip { display: none; }
     .trust-brief {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -2077,12 +2136,27 @@ def shared_content_css() -> str:
       margin-top: 18px;
     }
     .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
-    .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; }
-    .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; }
+    .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; word-break: break-word; }
+    .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
     .comparison-table th { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
+    .mobile-comparison-cards { display: none; }
+    .comparison-card { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .comparison-card__head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+    .comparison-card__head span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .comparison-card h3 { margin: 0; font-size: 18px; }
+    .comparison-card dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0; }
+    .comparison-card dl div { min-width: 0; padding: 9px; border-radius: 6px; background: #f2f5f1; }
+    .comparison-card p { margin: 0; color: var(--muted); font-size: 13px; }
+    details.page-section > summary {
+      list-style: none;
+      cursor: pointer;
+    }
+    details.page-section > summary::-webkit-details-marker { display: none; }
+    details.page-section > summary h2 { margin-bottom: 0; }
+    details.page-section[open] > summary h2 { margin-bottom: 12px; }
     .cluster-map {
       min-height: 240px;
       display: grid;
@@ -2159,10 +2233,89 @@ def shared_content_css() -> str:
       .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
-      .page-shell { width: min(100% - 28px, 1120px); }
+      .page-shell { width: min(1120px, calc(100% - 28px)); }
       .page-nav { align-items: flex-start; }
+      .page-hero-grid > div { max-width: min(100%, 362px); }
+      h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
+      .page-lede { max-width: min(100%, 362px); }
+      .page-lede { font-size: 16px; }
       .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
+      body.has-mobile-actions { padding-bottom: 74px; }
+      main { margin-top: -18px; }
+      .page-hero { padding-bottom: 44px; }
+      .page-hero-card { display: none; }
+      .page-hero .brief-panel { gap: 8px; }
+      .page-hero .brief-panel article { padding: 13px; }
+      .page-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        box-shadow: none;
+      }
+      .sticky-jump {
+        margin-top: 12px;
+        padding: 8px 0;
+        background: linear-gradient(180deg, #f5f1e9 80%, rgba(245, 241, 233, 0));
+      }
+      .sticky-jump a { padding: 8px 10px; font-size: 12px; }
+      .mobile-action-strip {
+        position: fixed;
+        right: 12px;
+        bottom: 12px;
+        left: 12px;
+        z-index: 40;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        padding: 8px;
+        border: 1px solid rgba(36, 49, 45, .14);
+        border-radius: 8px;
+        background: rgba(255, 253, 247, .96);
+        box-shadow: 0 18px 46px rgba(36, 49, 45, .20);
+        backdrop-filter: blur(14px);
+      }
+      .mobile-action-strip a {
+        min-width: 0;
+        min-height: 42px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 10px;
+        border-radius: 6px;
+        background: var(--eucalyptus);
+        color: #fffdf7;
+        font-size: 12px;
+        font-weight: 850;
+        text-align: center;
+        text-decoration: none;
+      }
+      .mobile-action-strip a + a { background: #fffdf7; color: var(--ink); border: 1px solid var(--line); }
+      details.page-section > summary {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+      }
+      details.page-section > summary::after {
+        content: "+";
+        flex: 0 0 auto;
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        color: var(--teal);
+        font-weight: 900;
+      }
+      details.page-section[open] > summary::after { content: "-"; }
+      details.page-section > summary h2 { font-size: 23px; }
+      .comparison-table-wrap { display: none; }
+      .mobile-comparison-cards { display: grid; gap: 10px; }
+      .cluster-map { min-height: 160px; padding: 12px; }
+      .cluster-map__grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
+      .cluster-map__grid div { flex: 0 0 170px; }
     }
 """
 
@@ -2232,7 +2385,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
 {head_html(title, description, canonical, schema_for_destination(dest, canonical))}
   <style>{shared_content_css()}</style>
 </head>
-<body>
+<body class="has-mobile-actions">
   <header class="page-hero">
     <div class="page-shell">
       {primary_nav_html()}
@@ -2269,54 +2422,55 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         <article><span>Lifestyle and retirement fit</span><strong>{metric_value(dest, "retirement_fit"):.1f}/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
       </section>
       {sticky_page_nav([("Verdict", "verdict"), ("Buyer Fit", "buyer-fit"), ("Ownership", "ownership"), ("Lifestyle", "lifestyle"), ("Scores", "scores"), ("Evidence", "evidence"), ("Trust", "trust-context")])}
+      {mobile_action_strip("#scores", "Scores", "/#destinations", "Compare")}
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
-          <section class="page-section" id="verdict">
-            <h2>Investment Thesis</h2>
+          <details class="page-section" id="verdict" open>
+            <summary><h2>Investment Thesis</h2></summary>
             <p>{escape(dest.get("profit_driver") or dest.get("panel_verdict") or "")}</p>
             <p>{escape(dest.get("panel_verdict") or "")} This page is built for a global buyer deciding whether {escape(dest["name"])} belongs on a serious property shortlist, not for casual travel inspiration. The useful question is whether the destination can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process.</p>
-          </section>
-          <section class="page-section" id="buyer-fit">
-            <h2>Buyer Fit</h2>
+          </details>
+          <details class="page-section" id="buyer-fit" open>
+            <summary><h2>Buyer Fit</h2></summary>
             <div class="page-grid">
               <article class="page-card"><h3>Best Fit</h3><ul>{pros}</ul></article>
               <article class="page-card"><h3>Risk Check</h3><ul>{cons}</ul></article>
             </div>
-          </section>
-          <section class="page-section" id="ownership">
-            <h2>Ownership and Governance</h2>
+          </details>
+          <details class="page-section" id="ownership" open>
+            <summary><h2>Ownership and Governance</h2></summary>
             <p>{escape(dest.get("ownership_notes") or "Confirm title structure, foreign-buyer rules, taxes, transfer process, and local counsel requirements before relying on any market-level conclusion.")}</p>
             <p>{escape(dest.get("red_flags") or "Verify current rules, building condition, liquidity, and rental permissions before committing capital.")}</p>
-          </section>
-          <section class="page-section" id="lifestyle">
-            <h2>Lifestyle and Retirement Fit</h2>
+          </details>
+          <details class="page-section" id="lifestyle" open>
+            <summary><h2>Lifestyle and Retirement Fit</h2></summary>
             <p>For an affluent global buyer, {escape(dest["name"])} should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
             <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
-          </section>
-          <section class="page-section">
-            <h2>Guide Context for This Market</h2>
+          </details>
+          <details class="page-section" open>
+            <summary><h2>Guide Context</h2></summary>
             <p>Use these buying guides to compare {escape(dest["name"])} against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
             <nav class="page-grid">{destination_guide_links}</nav>
-          </section>
-          <section class="page-section" id="scores">
-            <h2>Score Breakdown</h2>
+          </details>
+          <details class="page-section" id="scores" open>
+            <summary><h2>Score Breakdown</h2></summary>
             <ul class="score-list">{dimension_rows}</ul>
-          </section>
-          <section class="page-section" id="evidence">
-            <h2>Evidence Trail</h2>
+          </details>
+          <details class="page-section" id="evidence" open>
+            <summary><h2>Evidence Trail</h2></summary>
             <p>{escape(dest.get("price_basis") or "Listing samples are used as evidence anchors for current market texture, not availability guarantees.")}</p>
             <div class="page-article">{listing_cards}</div>
-          </section>
-          <section class="page-section">
-            <h2>Due Diligence Checklist</h2>
+          </details>
+          <details class="page-section" open>
+            <summary><h2>Due Diligence Checklist</h2></summary>
             <ul>
               <li>Verify clean title, transfer process, foreign-buyer restrictions, and beneficial ownership structure with independent local counsel.</li>
               <li>Model acquisition tax, annual property tax, income tax, wealth tax exposure, financing availability, insurance, repairs, and property management fees.</li>
               <li>Confirm short-term-rental rules, licensing, building permissions, homeowners association rules, and realistic net income after vacancy and operating costs.</li>
               <li>Stress-test resale liquidity by reviewing recent comparable transactions, buyer nationality mix, time on market, and local agent depth.</li>
             </ul>
-          </section>
+          </details>
         </article>
         <aside class="page-aside">
           <section class="page-aside-card">
@@ -2352,6 +2506,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
       <nav><a href="/guides/">All buying guides</a> {seo_guide_links(pages, limit=6)} {trust_page_links()}</nav>
     </div>
   </footer>
+{mobile_disclosure_script()}
 {analytics_event_script()}
 </body>
 </html>
