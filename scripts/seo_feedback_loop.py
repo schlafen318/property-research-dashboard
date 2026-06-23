@@ -100,6 +100,7 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
     urls = sitemap.get("urls") or []
     indexed_reported = indexing.get("indexed_reported")
     submitted_reported = indexing.get("submitted_reported")
+    priority_inspections = indexing.get("priority_inspections") or []
 
     if errors or warnings:
         key = f"{sitemap.get('url')}:{errors}:{warnings}"
@@ -116,7 +117,15 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
             )
         )
 
-    if submitted_reported and indexed_reported == 0 and status.get("isPending") is False:
+    inspected_priority_urls = [item for item in priority_inspections if item.get("ok")]
+    inspected_priority_passes = [item for item in inspected_priority_urls if item.get("verdict") == "PASS"]
+
+    if (
+        submitted_reported
+        and indexed_reported == 0
+        and status.get("isPending") is False
+        and len(inspected_priority_passes) < max(1, len(inspected_priority_urls))
+    ):
         findings.append(
             Finding(
                 kind="indexing-stalled",
@@ -128,24 +137,42 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                 severity="high",
                 labels=("analytics-loop", "indexing-stalled", "seo-opportunity", "needs-human-review"),
                 fingerprint=stable_fingerprint("indexing-stalled", f"{sitemap.get('url')}:{submitted_reported}:0"),
-                payload={"submitted_reported": submitted_reported, "indexed_reported": indexed_reported},
+                payload={
+                    "submitted_reported": submitted_reported,
+                    "indexed_reported": indexed_reported,
+                    "priority_inspections": priority_inspections,
+                },
             )
         )
 
     priority_urls = [item for item in indexing.get("priority_urls", []) if item.get("in_sitemap")]
-    if priority_urls and submitted_reported and (indexed_reported or 0) < len(priority_urls):
+    not_indexed_inspections = [
+        item
+        for item in priority_inspections
+        if item.get("ok")
+        and item.get("verdict") not in {"PASS"}
+    ]
+    inspection_errors = [item for item in priority_inspections if not item.get("ok")]
+    if priority_urls and submitted_reported and (not_indexed_inspections or inspection_errors or (not priority_inspections and (indexed_reported or 0) < len(priority_urls))):
         findings.append(
             Finding(
                 kind="priority-page-not-indexed",
                 title="Request indexing for priority SEO pages",
                 summary=(
-                    "Priority URLs are present in the sitemap, but Search Console has not confirmed enough indexed URLs "
-                    "to cover the homepage and highest-intent guide pages."
+                    "Priority URLs are present in the sitemap, but Search Console has not confirmed that the homepage "
+                    "and highest-intent guide pages are indexed."
                 ),
                 severity="medium",
                 labels=("analytics-loop", "priority-page-not-indexed", "seo-opportunity", "needs-human-review"),
                 fingerprint=stable_fingerprint("priority-page-not-indexed", sitemap.get("url") or "priority-pages"),
-                payload={"priority_urls": priority_urls, "indexed_reported": indexed_reported, "submitted_reported": submitted_reported},
+                payload={
+                    "priority_urls": priority_urls,
+                    "priority_inspections": priority_inspections,
+                    "not_indexed_inspections": not_indexed_inspections,
+                    "inspection_errors": inspection_errors,
+                    "indexed_reported": indexed_reported,
+                    "submitted_reported": submitted_reported,
+                },
             )
         )
 
@@ -267,6 +294,7 @@ def control_issue_body(report: dict, findings: list[Finding], issue_links: list[
     by_severity = {"high": 0, "medium": 0, "low": 0}
     for finding in findings:
         by_severity[finding.severity] = by_severity.get(finding.severity, 0) + 1
+    priority_inspections = sitemap.get("indexing", {}).get("priority_inspections", [])
     return f"""## Latest Run
 - Generated: `{report.get('generated_at')}`
 - Window: `{report.get('window', {}).get('start_date')}` to `{report.get('window', {}).get('end_date')}`
@@ -286,6 +314,10 @@ def control_issue_body(report: dict, findings: list[Finding], issue_links: list[
 - Submitted URLs reported by Google: `{sitemap.get('indexing', {}).get('submitted_reported')}`
 - Indexed URLs reported by Google: `{sitemap.get('indexing', {}).get('indexed_reported')}`
 - Priority URLs in sitemap: `{sum(1 for item in sitemap.get('indexing', {}).get('priority_urls', []) if item.get('in_sitemap'))}`
+- Priority URL inspections: `{len(priority_inspections)}`
+
+## Priority URL Inspection Results
+{format_priority_inspections(priority_inspections)}
 
 ## Findings
 - High severity: `{by_severity.get('high', 0)}`
@@ -304,6 +336,24 @@ def control_issue_body(report: dict, findings: list[Finding], issue_links: list[
 ## Recommended Next Action
 {recommended_next_action(findings)}
 """
+
+
+def format_priority_inspections(inspections: list[dict]) -> str:
+    if not inspections:
+        return "- Not run"
+    rows = []
+    for item in inspections:
+        if not item.get("ok"):
+            rows.append(f"- `{item.get('url')}`: inspection error: {item.get('error')}")
+            continue
+        rows.append(
+            "- "
+            f"`{item.get('url')}`: verdict `{item.get('verdict') or 'n/a'}`, "
+            f"coverage `{item.get('coverage_state') or 'n/a'}`, "
+            f"fetch `{item.get('page_fetch_state') or 'n/a'}`, "
+            f"last crawl `{item.get('last_crawl_time') or 'n/a'}`"
+        )
+    return "\n".join(rows)
 
 
 def recommended_next_action(findings: list[Finding]) -> str:

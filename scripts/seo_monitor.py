@@ -108,6 +108,73 @@ def priority_indexing_urls(sitemap_urls: list[str]) -> list[dict]:
     return rows
 
 
+def inspect_url(service, site_url: str, url: str) -> dict:
+    try:
+        response = (
+            service.urlInspection()
+            .index()
+            .inspect(body={"inspectionUrl": url, "siteUrl": site_url, "languageCode": "en-US"})
+            .execute()
+        )
+    except Exception as exc:  # Google client exceptions vary by transport/version.
+        return {"url": url, "ok": False, "error": str(exc)}
+
+    result = response.get("inspectionResult", {})
+    index_status = result.get("indexStatusResult", {})
+    mobile_status = result.get("mobileUsabilityResult", {})
+    rich_results = result.get("richResultsResult", {})
+    return {
+        "url": url,
+        "ok": True,
+        "verdict": index_status.get("verdict"),
+        "coverage_state": index_status.get("coverageState"),
+        "indexing_state": index_status.get("indexingState"),
+        "robots_txt_state": index_status.get("robotsTxtState"),
+        "page_fetch_state": index_status.get("pageFetchState"),
+        "last_crawl_time": index_status.get("lastCrawlTime"),
+        "google_canonical": index_status.get("googleCanonical"),
+        "user_canonical": index_status.get("userCanonical"),
+        "sitemap": index_status.get("sitemap"),
+        "referring_urls": index_status.get("referringUrls", []),
+        "mobile_verdict": mobile_status.get("verdict"),
+        "rich_results_verdict": rich_results.get("verdict"),
+    }
+
+
+def inspect_priority_urls(service, site_url: str, priority_urls: list[dict], enabled: bool) -> list[dict]:
+    if not enabled:
+        return []
+    return [inspect_url(service, site_url, item["url"]) for item in priority_urls if item.get("in_sitemap")]
+
+
+def fmt_inspections(inspections: list[dict]) -> str:
+    if not inspections:
+        return "_Priority URL inspection was skipped._\n"
+    out = [
+        "| URL | Verdict | Coverage | Fetch | Last crawl | Canonical |",
+        "| --- | --- | --- | --- | --- | --- |",
+    ]
+    for item in inspections:
+        if not item.get("ok"):
+            out.append(f"| {item.get('url')} | error | {str(item.get('error', 'n/a'))[:120]} | n/a | n/a | n/a |")
+            continue
+        out.append(
+            "| "
+            + " | ".join(
+                [
+                    item.get("url") or "",
+                    item.get("verdict") or "n/a",
+                    item.get("coverage_state") or "n/a",
+                    item.get("page_fetch_state") or "n/a",
+                    item.get("last_crawl_time") or "n/a",
+                    item.get("google_canonical") or item.get("user_canonical") or "n/a",
+                ]
+            )
+            + " |"
+        )
+    return "\n".join(out) + "\n"
+
+
 def fmt_rows(rows: list[dict], headers: list[str]) -> str:
     if not rows:
         return "_No rows returned for this period._\n"
@@ -165,6 +232,8 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
     destination_count = sum("/destinations/" in url for url in sitemap_urls)
     trust_count = sum(url.rstrip("/").split("/")[-1] in {"methodology", "research-standards", "about", "contact"} for url in sitemap_urls)
     status: dict = {}
+    priority_urls = priority_indexing_urls(sitemap_urls)
+    priority_inspections: list[dict] = []
     query_rows: list[dict] = []
     page_rows: list[dict] = []
     low_ctr_rows: list[dict] = []
@@ -188,6 +257,7 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
         service = load_search_console(args.token)
         status = sitemap_status(service, args.site_url, args.sitemap)
         submitted_count, indexed_count = sitemap_index_counts(status)
+        priority_inspections = inspect_priority_urls(service, args.site_url, priority_urls, args.inspect_priority_urls)
         lines.extend(
             [
                 "## Search Console Sitemap Status",
@@ -244,8 +314,12 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
                 "| --- | --- | --- |",
                 *[
                     f"| {item['url']} | {item['in_sitemap']} | Inspect URL and request indexing if not indexed |"
-                    for item in priority_indexing_urls(sitemap_urls)
+                    for item in priority_urls
                 ],
+                "",
+                "## Priority URL Inspection API Results",
+                "",
+                fmt_inspections(priority_inspections),
             ]
         )
     else:
@@ -272,7 +346,8 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
             "indexing": {
                 "submitted_reported": sitemap_index_counts(status)[0],
                 "indexed_reported": sitemap_index_counts(status)[1],
-                "priority_urls": priority_indexing_urls(sitemap_urls),
+                "priority_urls": priority_urls,
+                "priority_inspections": priority_inspections,
             },
         },
         "window": {"start_date": start_date, "end_date": end_date, "days": args.days},
@@ -322,6 +397,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--near-ranking-min-position", type=float, default=8)
     parser.add_argument("--near-ranking-max-position", type=float, default=30)
     parser.add_argument("--content-gap-impressions", type=int, default=20)
+    parser.add_argument("--inspect-priority-urls", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--json-output", type=Path, default=None)
     parser.add_argument("--write", action="store_true", help="Write the report to output/seo/.")
     return parser.parse_args(argv)
