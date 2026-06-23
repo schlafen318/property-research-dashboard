@@ -18,6 +18,7 @@ DEFAULT_OUTPUT = ROOT / "output" / "seo"
 DEFAULT_JSON_OUTPUT = DEFAULT_OUTPUT / "latest.json"
 PRIORITY_INDEXING_PATHS = [
     "/",
+    "/guides/",
     "/buy-property-abroad/",
     "/best-countries-to-buy-property-as-a-foreigner/",
     "/buying-property-abroad-for-retirement/",
@@ -29,6 +30,14 @@ PRIORITY_INDEXING_PATHS = [
     "/best-places-to-buy-vacation-home-abroad/",
 ]
 TRACKED_SEO_GOALS = [
+    {
+        "name": "Buying guides hub",
+        "url": "https://globalhomeatlas.com/guides/",
+        "launch_date": "2026-06-23",
+        "indexed_deadline": "2026-06-30",
+        "impressions_at_risk_date": "2026-07-07",
+        "impressions_deadline": "2026-07-23",
+    },
     {
         "name": "Foreign-buyer landing page",
         "url": "https://globalhomeatlas.com/best-countries-to-buy-property-as-a-foreigner/",

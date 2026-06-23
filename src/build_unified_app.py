@@ -18,6 +18,12 @@ SITE_DESCRIPTION = (
     "Compare global home and property investment destinations with decision scores, "
     "ownership clarity, lifestyle fit, yields, and representative market evidence."
 )
+GUIDE_HUB_SLUG = "guides"
+GUIDE_HUB_TITLE = "Global Property Buying Guides | Global Home Atlas"
+GUIDE_HUB_DESCRIPTION = (
+    "Browse Global Home Atlas buying guides for overseas property, retirement homes, "
+    "second homes, foreign ownership, investment risk, and destination shortlists."
+)
 GA4_MEASUREMENT_ID = os.environ.get("GA4_MEASUREMENT_ID", "").strip()
 BING_SITE_VERIFICATION = os.environ.get("BING_SITE_VERIFICATION", "").strip()
 CONTACT_EMAIL = os.environ.get("CONTACT_EMAIL", "hello@globalhomeatlas.com").strip()
@@ -105,7 +111,7 @@ SEO_PAGES = [
         "keyword": "best places to buy property abroad for retirement",
         "theme": "retirement planning",
         "intent": "buyers who want one property to support retirement optionality, seasonal living, and defensible resale value",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "lake-como", "hakone-izu", "m-laga-costa-del-sol"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "lake-como", "hakone-izu", "malaga-costa-del-sol"],
         "faqs": [
             ("What matters most when buying abroad for retirement?", "Ownership clarity, healthcare access, daily convenience, tax and visa planning, and resale liquidity should be weighted before lifestyle appeal."),
             ("Should retirement buyers prioritize rental yield?", "Yield helps offset ownership costs, but retirement buyers should avoid assets where income depends on fragile short-term-rental rules."),
@@ -135,7 +141,7 @@ SEO_PAGES = [
         "keyword": "best countries for expats to buy property",
         "theme": "expat ownership",
         "intent": "globally mobile buyers who need clear foreign ownership, usable infrastructure, and a livable long-term base",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "da-nang-hoi-an", "phuket-koh-samui"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "da-nang-hoi-an", "phuket-koh-samui"],
         "faqs": [
             ("Which countries are easiest for expats to buy in?", "Ease depends on title structure, local counsel quality, banking, taxes, and residency rules, not only whether foreign ownership is technically allowed."),
             ("Should expats buy before moving?", "Usually only after validating healthcare, transport, language friction, taxes, and the specific neighborhood through extended stays."),
@@ -150,7 +156,7 @@ SEO_PAGES = [
         "keyword": "best countries to buy property as a foreigner",
         "theme": "foreign-buyer access",
         "intent": "foreign buyers comparing legal access, title clarity, transaction practicality, lifestyle quality, and resale depth before choosing markets for local diligence",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "lake-como", "costa-brava-girona", "hakone-izu", "phuket-koh-samui"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "lake-como", "costa-brava-girona", "hakone-izu", "phuket-koh-samui"],
         "faqs": [
             ("Which countries are best for foreigners to buy property?", "The best options are markets where foreign buyers can understand the title path, hire independent local counsel, fund the purchase cleanly, use the property realistically, and resell into a broad buyer pool."),
             ("What legal risks should foreign buyers check first?", "Start with title structure, transfer process, taxes, permits, foreign ownership restrictions, financing access, rental rules, and whether the structure is simple enough to explain without relying on informal assurances."),
@@ -165,7 +171,7 @@ SEO_PAGES = [
         "keyword": "buy property abroad",
         "theme": "global purchase process",
         "intent": "buyers moving from inspiration to a disciplined international property shortlist",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "lake-como", "madeira", "costa-brava-girona", "crete"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "lake-como", "madeira", "costa-brava-girona", "crete"],
         "faqs": [
             ("What is the first step to buy property abroad?", "Define the job of the property: retirement base, vacation home, income asset, capital preservation, or a blend."),
             ("How many markets should I compare?", "Start with five to eight markets, then reduce to two or three after legal, tax, visa, and neighborhood checks."),
@@ -180,7 +186,7 @@ SEO_PAGES = [
         "keyword": "buying property abroad for retirement",
         "theme": "retirement buyer framework",
         "intent": "retirement-oriented buyers comparing healthcare, daily convenience, ownership practicality, and future resale flexibility before choosing a long-stay market",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "hakone-izu", "lake-como", "m-laga-costa-del-sol"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "hakone-izu", "lake-como", "malaga-costa-del-sol"],
         "faqs": [
             ("What should retirees verify before buying abroad?", "Retirement buyers should verify healthcare access, visa and tax planning needs, daily convenience, title clarity, insurance, building condition, and future resale demand before focusing on lifestyle appeal."),
             ("Should retirement buyers prioritize rental income?", "Rental income can offset carrying costs, but a retirement property should not depend on fragile short-term-rental assumptions or a structure the buyer cannot comfortably manage."),
@@ -210,7 +216,7 @@ SEO_PAGES = [
         "keyword": "overseas property investment",
         "theme": "investment underwriting",
         "intent": "investors comparing income, appreciation, governance, and the ability to exit cleanly",
-        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "m-laga-costa-del-sol", "da-nang-hoi-an", "phuket-koh-samui", "bali", "croatia-istria-dalmatia", "costa-brava-girona"],
+        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "malaga-costa-del-sol", "da-nang-hoi-an", "phuket-koh-samui", "bali", "croatia-istria-dalmatia", "costa-brava-girona"],
         "faqs": [
             ("What is a good overseas property investment?", "A good investment combines realistic net income, legal clarity, demand durability, price discipline, and a broad future buyer pool."),
             ("Should I chase the highest yield?", "No. High yield can signal regulatory, seasonality, management, title, or liquidity risk."),
@@ -225,7 +231,7 @@ SEO_PAGES = [
         "keyword": "foreign property investment risks",
         "theme": "risk framework",
         "intent": "buyers searching for a disciplined risk checklist before committing capital to property abroad",
-        "destination_ids": ["phuket-koh-samui", "bali", "da-nang-hoi-an", "croatia-istria-dalmatia", "m-laga-costa-del-sol", "algarve-cascais", "lake-como", "andermatt"],
+        "destination_ids": ["phuket-koh-samui", "bali", "da-nang-hoi-an", "croatia-istria-dalmatia", "malaga-costa-del-sol", "algarve-cascais", "lake-como", "andermatt"],
         "faqs": [
             ("What are the biggest risks of buying property abroad?", "The major risks are unclear title, foreign-ownership restrictions, changing rental rules, tax surprises, currency movement, weak management, poor building condition, and thin resale liquidity."),
             ("How do currency and tax risks affect returns?", "Currency and taxes can change the real return even when the local property performs well, so buyers should model acquisition costs, annual costs, income taxation, exit costs, and FX movement separately."),
@@ -240,7 +246,7 @@ SEO_PAGES = [
         "keyword": "Portugal vs Spain retirement property",
         "theme": "country comparison",
         "intent": "retirement buyers choosing between Iberian lifestyle, value, and legal-market depth",
-        "destination_ids": ["algarve-cascais", "madeira", "valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
+        "destination_ids": ["algarve-cascais", "madeira", "valencia", "malaga-costa-del-sol", "costa-brava-girona", "mallorca"],
         "faqs": [
             ("Is Portugal or Spain better for retirement property?", "The better choice depends on tax, residency, healthcare access, local price discipline, and whether you prefer smaller resort markets or deeper city-region liquidity."),
             ("Which has stronger resale liquidity?", "Spain generally offers deeper regional buyer pools in major coastal and city markets, while Portugal can offer focused demand in established expat corridors."),
@@ -315,7 +321,7 @@ SEO_PAGES = [
         "keyword": "where can foreigners buy property",
         "theme": "foreign ownership map",
         "intent": "early-stage global buyers looking for a practical map of foreign-buyer access and markets worth researching first",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "lake-como", "hakone-izu", "phuket-koh-samui", "da-nang-hoi-an"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "lake-como", "hakone-izu", "phuket-koh-samui", "da-nang-hoi-an"],
         "faqs": [
             ("Can foreigners buy freehold property abroad?", "In some markets foreigners can buy freehold property, while others rely on leasehold, condominium rules, local companies, or special structures. The practical answer must be verified locally before purchase."),
             ("Which markets are hardest for foreign buyers?", "Markets become harder when land ownership is restricted, financing is limited, tax treatment is unclear, rental permits are uncertain, or the transaction structure requires assumptions the buyer cannot verify."),
@@ -961,7 +967,7 @@ def build_seo_destination_cards(destinations: list[dict]) -> str:
                 <div><dt>Exit liquidity</dt><dd>{metric_value(dest, "exit_liquidity"):.1f}/5</dd></div>
               </dl>
             </article>
-            """
+            """.rstrip()
         )
     return "\n".join(cards)
 
@@ -984,7 +990,8 @@ def schema_for_page(page: dict, canonical: str) -> list[dict]:
         "@type": "BreadcrumbList",
         "itemListElement": [
             {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
-            {"@type": "ListItem", "position": 2, "name": page["h1"], "item": canonical},
+            {"@type": "ListItem", "position": 2, "name": "Guides", "item": page_url(GUIDE_HUB_SLUG)},
+            {"@type": "ListItem", "position": 3, "name": page["h1"], "item": canonical},
         ],
     }
     webpage = {
@@ -1019,6 +1026,205 @@ def schema_for_page(page: dict, canonical: str) -> list[dict]:
         ],
     }
     return [*global_schema_entities(), webpage, article, breadcrumb, faq]
+
+
+def schema_for_guide_hub(canonical: str, pages: list[dict]) -> list[dict]:
+    return [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "Global Property Buying Guides",
+            "url": canonical,
+            "description": GUIDE_HUB_DESCRIPTION,
+            "dateModified": date.today().isoformat(),
+            "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
+            "mainEntity": {
+                "@type": "ItemList",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": index + 1,
+                        "name": page["h1"],
+                        "url": page_url(page["slug"]),
+                    }
+                    for index, page in enumerate(pages)
+                ],
+            },
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Guides", "item": canonical},
+            ],
+        },
+    ]
+
+
+def guide_cards_for_slugs(slugs: list[str], pages: list[dict], destinations: list[dict]) -> str:
+    by_slug = {page["slug"]: page for page in pages}
+    cards = []
+    for slug in slugs:
+        page = by_slug.get(slug)
+        if not page:
+            continue
+        selected = destinations_for_page(page, destinations)[:3]
+        market_links = " ".join(
+            f'<a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a>'
+            for dest in selected
+        )
+        cards.append(
+            f"""
+            <article class="page-card">
+              <span>{escape(page["theme"])}</span>
+              <h3><a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a></h3>
+              <p>{escape(page["description"])}</p>
+              <p><strong>Use when:</strong> {escape(page["intent"])}</p>
+              <p><strong>Start with:</strong> {market_links}</p>
+            </article>
+            """.rstrip()
+        )
+    return "\n".join(cards)
+
+
+def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
+    canonical = page_url(GUIDE_HUB_SLUG)
+    updated = date.today().isoformat()
+    clusters = [
+        (
+            "Start Here",
+            "Core frameworks for buyers who are still shaping the job of the property: retirement base, second home, foreign-buyer access, or investment.",
+            [
+                "buy-property-abroad",
+                "best-countries-to-buy-property-as-a-foreigner",
+                "buying-property-abroad-for-retirement",
+                "best-places-to-buy-a-second-home-abroad",
+                "foreign-property-investment-risks",
+                "where-can-foreigners-buy-property",
+            ],
+        ),
+        (
+            "Retirement and Lifestyle",
+            "Pages for buyers testing long-stay livability, healthcare practicality, family use, and future retirement optionality.",
+            [
+                "best-places-to-buy-property-abroad-for-retirement",
+                "best-places-to-buy-vacation-home-abroad",
+                "portugal-vs-spain-retirement-property",
+                "greece-vs-portugal-retirement-property",
+                "japan-retirement-property-foreign-buyers",
+            ],
+        ),
+        (
+            "Regional and Ownership Deep Dives",
+            "More focused pages for buyers comparing Europe, expat ownership, and markets where structure matters before viewing property.",
+            [
+                "best-countries-for-expats-to-buy-property",
+                "best-places-to-buy-property-in-europe",
+                "overseas-property-investment",
+                "thailand-villa-ownership-foreigners",
+            ],
+        ),
+    ]
+    cluster_html = "\n".join(
+        f"""
+          <section class="page-section" id="{slugify(title)}">
+            <h2>{escape(title)}</h2>
+            <p>{escape(description)}</p>
+            <div class="page-grid">{guide_cards_for_slugs(slugs, pages, destinations)}</div>
+          </section>
+        """
+        for title, description, slugs in clusters
+    )
+    top_destinations = destinations[:6]
+    top_destination_links = destination_links(top_destinations, limit=6)
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(GUIDE_HUB_TITLE, GUIDE_HUB_DESCRIPTION, canonical, schema_for_guide_hub(canonical, pages))}
+  <style>
+{shared_content_css()}
+    .page-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .page-card p strong {{ color: var(--ink); }}
+    .page-card p:last-child {{ display: grid; gap: 6px; }}
+    .page-card p:last-child a {{ margin-right: 8px; font-size: 13px; font-weight: 800; }}
+  </style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      <nav class="page-nav" aria-label="Primary">
+        <a class="page-brand" href="/">Global Home Atlas</a>
+        <div class="page-nav-links">
+          <a href="/">Dashboard</a>
+          <a href="/guides/">Guides</a>
+          <a href="/methodology/">Methodology</a>
+          <a href="/research-standards/">Standards</a>
+        </div>
+      </nav>
+      <div class="page-hero-grid">
+        <div>
+          <p class="page-eyebrow">Buyer guide hub · updated {updated}</p>
+          <h1>Global Property Buying Guides</h1>
+          <p class="page-lede">{GUIDE_HUB_DESCRIPTION} Use this hub to move from broad intent to a shortlist that can survive legal review, long-term lifestyle use, and resale scrutiny.</p>
+        </div>
+        <aside class="page-hero-card">
+          <span>Guide pages</span><strong>{len(pages)}</strong>
+          <span>Destinations linked</span><strong>{len(destinations)}</strong>
+          <span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="page-stats" aria-label="Guide hub metrics">
+        <div><span>Primary job</span><strong>Choose a market</strong></div>
+        <div><span>Buyer type</span><strong>Global citizen</strong></div>
+        <div><span>Risk lens</span><strong>Ownership first</strong></div>
+        <div><span>Updated</span><strong>{updated}</strong></div>
+      </section>
+      <div class="page-layout">
+        <article class="page-article">
+          <section class="page-section">
+            <h2>How to Use These Guides</h2>
+            <p>Start with the page that matches the job of the property, then compare the linked destination dossiers before talking to local agents. The goal is to avoid falling in love with a listing before the market, ownership path, rental rules, healthcare practicality, and resale depth have been tested.</p>
+            <p>Every guide connects back to the same 10-dimension model: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry. That keeps broad searches comparable instead of turning each market into a separate story.</p>
+          </section>
+          {cluster_html}
+        </article>
+        <aside class="page-aside">
+          <section class="page-aside-card">
+            <h2>Use the Atlas</h2>
+            <p>Open the dashboard to compare all destination scores and export a shortlist memo.</p>
+            <a class="page-button" href="/#destinations" data-track="dashboard_open" data-track-label="guide hub">Open dashboard</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="guide hub">Request custom shortlist</a>
+          </section>
+          <section class="page-aside-card">
+            <h3>Best Starting Destinations</h3>
+            <nav>{top_destination_links}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Trust Layer</h3>
+            <nav>{trust_page_links()}</nav>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="page-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
+      <nav>{seo_guide_links(pages, limit=8)} {trust_page_links()}</nav>
+    </div>
+  </footer>
+{analytics_event_script()}
+</body>
+</html>
+"""
 
 
 def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> str:
@@ -1134,6 +1340,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
         <a class="seo-brand" href="/">Global Home Atlas</a>
         <div class="seo-nav-links">
           <a href="/">Dashboard</a>
+          <a href="/guides/">Guides</a>
           <a href="#comparison">Comparison</a>
           <a href="#faq">FAQ</a>
         </div>
@@ -1219,7 +1426,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
           </section>
           <section class="seo-aside-card">
             <h3>Related Guides</h3>
-            <nav>{related_links}</nav>
+            <nav><a href="/guides/">All buying guides</a>{related_links}</nav>
           </section>
           <section class="seo-aside-card">
             <h3>Trust Layer</h3>
@@ -1237,7 +1444,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
     <div class="seo-shell">
       <strong>{SITE_NAME}</strong>
       <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
-      <nav>{seo_guide_links(pages, page["slug"])} {trust_page_links()}</nav>
+      <nav><a href="/guides/">All buying guides</a> {seo_guide_links(pages, page["slug"])} {trust_page_links()}</nav>
     </div>
   </footer>
 {analytics_event_script()}
@@ -1421,6 +1628,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         <a class="page-brand" href="/">Global Home Atlas</a>
         <div class="page-nav-links">
           <a href="/">Dashboard</a>
+          <a href="/guides/">Guides</a>
           <a href="/methodology/">Methodology</a>
           <a href="/research-standards/">Standards</a>
         </div>
@@ -1503,7 +1711,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
           </section>
           <section class="page-aside-card">
             <h3>Research Guides</h3>
-            <nav>{seo_guide_links(pages, limit=5)}</nav>
+            <nav><a href="/guides/">All buying guides</a>{seo_guide_links(pages, limit=5)}</nav>
           </section>
           <section class="page-aside-card">
             <h3>Trust Layer</h3>
@@ -1517,7 +1725,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
     <div class="page-shell">
       <strong>{SITE_NAME}</strong>
       <p>Scores and listing benchmarks are research inputs, not financial, legal, tax, or immigration advice.</p>
-      <nav>{seo_guide_links(pages, limit=6)} {trust_page_links()}</nav>
+      <nav><a href="/guides/">All buying guides</a> {seo_guide_links(pages, limit=6)} {trust_page_links()}</nav>
     </div>
   </footer>
 {analytics_event_script()}
@@ -1641,6 +1849,7 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
         <a class="page-brand" href="/">Global Home Atlas</a>
         <div class="page-nav-links">
           <a href="/">Dashboard</a>
+          <a href="/guides/">Guides</a>
           <a href="/methodology/">Methodology</a>
           <a href="/research-standards/">Standards</a>
           <a href="/about/">About</a>
@@ -1679,7 +1888,7 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
           </section>
           <section class="page-aside-card">
             <h3>Research Guides</h3>
-            <nav>{seo_guide_links(pages, limit=6)}</nav>
+            <nav><a href="/guides/">All buying guides</a>{seo_guide_links(pages, limit=6)}</nav>
           </section>
           <section class="page-aside-card">
             <h3>Destination Examples</h3>
@@ -1697,7 +1906,7 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
     <div class="page-shell">
       <strong>{SITE_NAME}</strong>
       <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
-      <nav>{seo_guide_links(pages, limit=6)} {destination_links(destinations, limit=6)}</nav>
+      <nav><a href="/guides/">All buying guides</a> {seo_guide_links(pages, limit=6)} {destination_links(destinations, limit=6)}</nav>
     </div>
   </footer>
 {analytics_event_script()}
@@ -2327,7 +2536,7 @@ def build() -> Path:
           <a href="#shortlist">Shortlist</a>
           <a href="#research">Research Method</a>
           <a href="#destinations">Destinations</a>
-          <a href="#guides">Guides</a>
+          <a href="/guides/">Guides</a>
           <a href="/methodology/">Methodology</a>
         </div>
       </div>
@@ -2417,6 +2626,7 @@ def build() -> Path:
             <a href="#shortlist">Shortlist</a>
             <a href="#compare">Compare</a>
             <a href="#destinations">All destinations</a>
+            <a href="/guides/">Guides</a>
             <a href="#top">Top</a>
           </div>
           <div class="method-card">
@@ -2488,7 +2698,7 @@ def build() -> Path:
             <h2>Buyer Guides</h2>
             <p>Crawlable research pages for the highest-intent searches: retirement property, vacation homes, expat ownership, country comparisons, and overseas investment.</p>
           </div>
-          <a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="guide_click" data-track-label="homepage guide section">Start with retirement</a>
+          <a href="/guides/" data-track="guide_click" data-track-label="homepage guide section">Browse guides</a>
         </div>
         <div class="guide-grid">
           __SEO_GUIDES__
@@ -2826,6 +3036,12 @@ def build() -> Path:
     indexnow_key_file = ARTIFACTS / f"{INDEXNOW_KEY}.txt"
     out.write_text(html, encoding="utf-8")
     index.write_text(html, encoding="utf-8")
+    guide_hub_dir = ARTIFACTS / GUIDE_HUB_SLUG
+    guide_hub_dir.mkdir(parents=True, exist_ok=True)
+    (guide_hub_dir / "index.html").write_text(
+        build_guide_hub_page(SEO_PAGES, destinations),
+        encoding="utf-8",
+    )
     for page in SEO_PAGES:
         page_dir = ARTIFACTS / page["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
@@ -2861,6 +3077,7 @@ Sitemap: {SITE_URL}sitemap.xml
     indexnow_key_file.write_text(f"{INDEXNOW_KEY}\n", encoding="utf-8")
     sitemap_urls = [
         (SITE_URL, "1.0"),
+        (page_url(GUIDE_HUB_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
         *[(destination_url(dest), "0.80") for dest in destinations],
         *[(page_url(page["slug"]), "0.70") for page in TRUST_PAGES],
