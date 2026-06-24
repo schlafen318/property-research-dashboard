@@ -494,9 +494,20 @@
       <div class="page-layout">
         <article class="page-article">
       <section class="page-section" id="custom-shortlist">
-        <h2>Contact and Research Requests</h2>
-        <p>For data corrections, research questions, partnership inquiries, or custom shortlist requests, use this intake path. The form opens a structured email so the request can be handled without adding a server-side backend yet.</p>
-        <p>Useful context for any request: target countries, budget range, intended use, preferred holding period, rental expectations, citizenship/residency constraints, and whether the priority is retirement, lifestyle, income, capital preservation, or optionality.</p>
+        <h2>Custom Global Property Shortlist</h2>
+        <p>Use this intake when you want the Atlas translated into a buyer-specific research brief. The form opens a structured email so the request can be handled without adding a server-side backend yet.</p>
+        <div class="page-grid">
+          <article class="page-card">
+            <span>What you receive</span>
+            <h3>Decision-ready shortlist</h3>
+            <p>A focused market shortlist matched to your budget, lifestyle plan, citizenship constraints, rental expectations, risk tolerance, and holding period.</p>
+          </article>
+          <article class="page-card">
+            <span>What it is not</span>
+            <h3>No legal or tax advice</h3>
+            <p>The brief helps you choose where to spend diligence time. Local lawyers, tax advisers, immigration advisers, and property inspectors still need to verify transaction details.</p>
+          </article>
+        </div>
         <form class="intake-form" id="custom-shortlist-form">
           <div class="intake-grid">
             <label>Name<input name="name" autocomplete="name" required></label>
@@ -512,7 +523,24 @@
                 <option>Mixed lifestyle and investment</option>
               </select>
             </label>
+            <label>Citizenship / residency<input name="citizenship" placeholder="Example: US citizen, Singapore PR"></label>
+            <label>Rental expectations
+              <select name="rental_expectations">
+                <option>Personal use first, rental optional</option>
+                <option>Rental offset expected</option>
+                <option>Income-led investment</option>
+                <option>No rental plans</option>
+              </select>
+            </label>
+            <label>Risk tolerance
+              <select name="risk_tolerance">
+                <option>Low: clean ownership and liquidity matter most</option>
+                <option>Medium: balanced lifestyle and return tradeoffs</option>
+                <option>Higher: willing to underwrite complexity for upside</option>
+              </select>
+            </label>
             <label>Holding period<input name="holding_period" placeholder="Example: 7-10 years"></label>
+            <label>Timing<input name="timing" placeholder="Example: researching now, buy in 12-24 months"></label>
           </div>
           <label>Notes<textarea name="notes" placeholder="Citizenship, family use, healthcare needs, rental expectations, timing, and any must-avoid risks."></textarea></label>
           <button type="submit" data-track="custom_shortlist_submit_click">Prepare request</button>
@@ -521,6 +549,7 @@
       <section class="page-section">
         <h2>Before You Send a Deal</h2>
         <p>Do not send confidential transaction documents until an explicit review process exists. The current site is designed for destination-level research, not legal review of individual property contracts.</p>
+        <p>Useful requests are framed around decisions: where to focus, which countries to avoid, what risks to underwrite first, and what kind of local adviser should be involved before property-specific diligence begins.</p>
       </section>
     </article>
         <aside class="page-aside">
@@ -645,13 +674,19 @@
           "Budget: " + (data.get("budget") || ""),
           "Target regions: " + (data.get("regions") || ""),
           "Primary goal: " + (data.get("goal") || ""),
+          "Citizenship / residency: " + (data.get("citizenship") || ""),
+          "Rental expectations: " + (data.get("rental_expectations") || ""),
+          "Risk tolerance: " + (data.get("risk_tolerance") || ""),
           "Holding period: " + (data.get("holding_period") || ""),
+          "Timing: " + (data.get("timing") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
           budget: data.get("budget") || "",
           regions: data.get("regions") || "",
-          goal: data.get("goal") || ""
+          goal: data.get("goal") || "",
+          risk_tolerance: data.get("risk_tolerance") || "",
+          timing: data.get("timing") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\n"));
       });

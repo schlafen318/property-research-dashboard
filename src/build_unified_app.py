@@ -875,13 +875,19 @@ def analytics_event_script() -> str:
           "Budget: " + (data.get("budget") || ""),
           "Target regions: " + (data.get("regions") || ""),
           "Primary goal: " + (data.get("goal") || ""),
+          "Citizenship / residency: " + (data.get("citizenship") || ""),
+          "Rental expectations: " + (data.get("rental_expectations") || ""),
+          "Risk tolerance: " + (data.get("risk_tolerance") || ""),
           "Holding period: " + (data.get("holding_period") || ""),
+          "Timing: " + (data.get("timing") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {{
           budget: data.get("budget") || "",
           regions: data.get("regions") || "",
-          goal: data.get("goal") || ""
+          goal: data.get("goal") || "",
+          risk_tolerance: data.get("risk_tolerance") || "",
+          timing: data.get("timing") || ""
         }});
         location.href = "mailto:{escape(CONTACT_EMAIL)}?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\\n"));
       }});
@@ -1223,14 +1229,44 @@ def build_landing_buyer_paths() -> str:
 
 def build_landing_recommendations(destinations: list[dict]) -> str:
     picks = [
-        ("fukuoka-itoshima", "Best overall", "Clean ownership, high livability, and strong city-region fundamentals without resort-only dependence."),
-        ("valencia", "European lifestyle balance", "Food, healthcare, airport access, beach, culture, and year-round demand in one practical market."),
-        ("algarve-cascais", "Retirement optionality", "A familiar expat corridor with lifestyle depth, services, and multiple sub-market choices."),
-        ("lake-como", "Premium lifestyle market", "Prestige and scarcity remain attractive, but value discipline and exit assumptions need care."),
-        ("madeira", "Value lifestyle route", "Island lifestyle appeal with a lower entry point than many mature European second-home markets."),
+        (
+            "fukuoka-itoshima",
+            "Best overall",
+            "Clean ownership, high livability, and strong city-region fundamentals without resort-only dependence.",
+            "Buyers who want daily life, food culture, healthcare access, and Japan title clarity.",
+            "Skip if you need aggressive rental yield or resort-style English-language convenience.",
+        ),
+        (
+            "valencia",
+            "European lifestyle balance",
+            "Food, healthcare, airport access, beach, culture, and year-round demand in one practical market.",
+            "Retirement-optional buyers who want a real city rather than a pure holiday resort.",
+            "Skip if you need ultra-luxury holiday yield or low-regulation short-term rentals.",
+        ),
+        (
+            "algarve-cascais",
+            "Retirement optionality",
+            "A familiar expat corridor with lifestyle depth, services, and multiple sub-market choices.",
+            "Buyers who value services, community, climate, and a well-understood foreign-buyer path.",
+            "Skip if you want an undiscovered market or a bargain entry point in prime areas.",
+        ),
+        (
+            "lake-como",
+            "Premium lifestyle market",
+            "Prestige and scarcity remain attractive, but value discipline and exit assumptions need care.",
+            "Lifestyle-led buyers who care about beauty, scarcity, and prestige more than income.",
+            "Skip if yield, liquidity, and entry discipline are the first priorities.",
+        ),
+        (
+            "madeira",
+            "Value lifestyle route",
+            "Island lifestyle appeal with a lower entry point than many mature European second-home markets.",
+            "Buyers seeking European lifestyle, climate, and relative value outside the most obvious hubs.",
+            "Skip if you need large-market liquidity or direct access to many business hubs.",
+        ),
     ]
     cards = []
-    for destination_id, label, rationale in picks:
+    for destination_id, label, rationale, best_for, skip_if in picks:
         dest = destination_by_id(destinations, destination_id)
         if not dest:
             continue
@@ -1242,10 +1278,58 @@ def build_landing_recommendations(destinations: list[dict]) -> str:
               <p>{escape(dest.get("country") or "")} · {escape(dest.get("category") or "")}</p>
               <strong>{dest.get("decision_score", 0):.2f}/5</strong>
               <em>{escape(rationale)}</em>
+              <dl>
+                <div><dt>Best for</dt><dd>{escape(best_for)}</dd></div>
+                <div><dt>Skip if</dt><dd>{escape(skip_if)}</dd></div>
+              </dl>
             </article>
             """.rstrip()
         )
     return "\n".join(cards)
+
+
+def build_market_finder_data(destinations: list[dict]) -> str:
+    routes = {
+        "retirement": [
+            ("valencia", "Best city lifestyle and retirement practicality"),
+            ("algarve-cascais", "Most familiar retirement-optional corridor"),
+            ("madeira", "Good climate and relative value for European lifestyle"),
+        ],
+        "second-home": [
+            ("algarve-cascais", "Easy second-home use with mature services"),
+            ("lake-como", "Premium emotional pull and scarcity"),
+            ("mallorca", "Classic second-home demand with liquidity caveats"),
+        ],
+        "investment": [
+            ("fukuoka-itoshima", "High probability market with clean ownership"),
+            ("valencia", "Balanced demand and practical entry point"),
+            ("m-laga-costa-del-sol", "Deep tourism demand with regulation risk to underwrite"),
+        ],
+        "ownership": [
+            ("fukuoka-itoshima", "Clean title path and high foreigner fit"),
+            ("valencia", "EU freehold structure with city-region liquidity"),
+            ("algarve-cascais", "Well-understood foreign-buyer process"),
+        ],
+    }
+    by_id = {dest["id"]: dest for dest in destinations}
+    payload: dict[str, list[dict]] = {}
+    for route, picks in routes.items():
+        payload[route] = []
+        for destination_id, reason in picks:
+            dest = by_id.get(destination_id)
+            if not dest:
+                continue
+            payload[route].append(
+                {
+                    "name": dest["name"],
+                    "country": dest.get("country") or "",
+                    "score": f"{dest.get('decision_score', 0):.2f}",
+                    "href": f"/destinations/{destination_slug(dest)}/",
+                    "reason": reason,
+                    "watch": dest.get("red_flags") or "Verify legal, tax, rental, and resale assumptions locally.",
+                }
+            )
+    return json.dumps(payload, ensure_ascii=False)
 
 
 def build_landing_country_tiles() -> str:
@@ -1408,6 +1492,17 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     .recommendation-grid {{ grid-template-columns: repeat(5, minmax(0, 1fr)); }}
     .country-grid {{ grid-template-columns: repeat(7, minmax(0, 1fr)); }}
     .trust-grid, .guide-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
+    .finder-grid {{ display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; align-items: start; }}
+    .finder-panel {{ display: grid; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
+    .finder-panel label {{ display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }}
+    .finder-panel select {{ min-height: 46px; width: 100%; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); padding: 0 12px; font: inherit; letter-spacing: 0; text-transform: none; }}
+    .finder-note {{ margin: 0; color: var(--muted); font-size: 13px; }}
+    .finder-results {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
+    .finder-result {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
+    .finder-result span, .finder-result dt {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .finder-result h3 {{ margin: 8px 0 4px; font-size: 19px; line-height: 1.12; }}
+    .finder-result p {{ margin: 0 0 10px; color: var(--muted); font-size: 14px; }}
+    .finder-result dd {{ margin: 4px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.42; }}
     .path-card, .country-tile {{ color: var(--ink); text-decoration: none; }}
     .path-card, .recommendation-card, .country-tile, .trust-card, .guide-card {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
     .path-card span, .recommendation-card span, .country-tile span, .guide-card span {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
@@ -1416,6 +1511,9 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     .recommendation-card h3, .guide-card h3 {{ margin: 8px 0 4px; font-size: 18px; line-height: 1.12; }}
     .recommendation-card strong {{ display: block; margin: 12px 0 8px; font-size: 24px; }}
     .recommendation-card em {{ display: block; color: #3f4d48; font-size: 13px; font-style: normal; line-height: 1.45; }}
+    .recommendation-card dl {{ display: grid; gap: 8px; margin: 12px 0 0; }}
+    .recommendation-card dt {{ color: var(--brass); font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .recommendation-card dd {{ margin: 3px 0 0; color: var(--muted); font-size: 12px; line-height: 1.38; }}
     .trust-card span {{ width: 34px; height: 34px; display: grid; place-items: center; margin-bottom: 12px; border-radius: 50%; background: #eef3f0; color: var(--deep); font-weight: 900; }}
     .cta-band {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 26px; border-radius: 8px; background: var(--deep); color: #fffdf7; }}
     .cta-band h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); }}
@@ -1426,7 +1524,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     @media (max-width: 980px) {{
       .hero {{ min-height: auto; padding-bottom: 58px; }}
       .hero-grid {{ grid-template-columns: 1fr; }}
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
     }}
     @media (max-width: 640px) {{
       .shell {{ width: min(1160px, calc(100% - 28px)); }}
@@ -1443,7 +1541,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       .section-header, .cta-band {{ display: block; }}
       .section-header h2 {{ max-width: 300px; font-size: 24px; line-height: 1.05; }}
       .section-header a, .cta-band a {{ margin-top: 14px; }}
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid {{ grid-template-columns: 1fr; }}
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results {{ grid-template-columns: 1fr; }}
       .atlas-visual {{ min-height: 140px; }}
     }}
   </style>
@@ -1500,6 +1598,30 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
         </div>
         <div class="path-grid">
           {build_landing_buyer_paths()}
+        </div>
+      </section>
+
+      <section class="section" id="market-finder">
+        <div class="section-header">
+          <div>
+            <h2>Find your market fit</h2>
+            <p>Use this quick lens when you want a useful starting point without opening the full dashboard.</p>
+          </div>
+          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="market finder">Ask for a custom brief</a>
+        </div>
+        <div class="finder-grid">
+          <div class="finder-panel">
+            <label for="finderGoal">Buying goal
+              <select id="finderGoal">
+                <option value="retirement">Retirement or lifestyle base</option>
+                <option value="second-home">Second home abroad</option>
+                <option value="investment">Investment-led shortlist</option>
+                <option value="ownership">Clean ownership markets</option>
+              </select>
+            </label>
+            <p class="finder-note">The output is a first-pass research route. Final decisions still need local legal, tax, immigration, and property review.</p>
+          </div>
+          <div class="finder-results" id="finderResults" aria-live="polite"></div>
         </div>
       </section>
 
@@ -1577,6 +1699,32 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       </nav>
     </div>
   </footer>
+  <script>
+    (function () {{
+      const finderData = {build_market_finder_data(destinations)};
+      const select = document.getElementById("finderGoal");
+      const results = document.getElementById("finderResults");
+      function renderFinder() {{
+        if (!select || !results) return;
+        const route = select.value;
+        const picks = finderData[route] || [];
+        results.innerHTML = picks.map((item, index) => `
+          <article class="finder-result">
+            <span>#${{index + 1}} match</span>
+            <h3><a href="${{item.href}}" data-track="destination_click" data-track-label="finder ${{item.name}}">${{item.name}}</a></h3>
+            <p>${{item.country}} · score ${{item.score}}/5</p>
+            <dl>
+              <div><dt>Why this route</dt><dd>${{item.reason}}</dd></div>
+              <div><dt>Watch-out</dt><dd>${{item.watch}}</dd></div>
+            </dl>
+          </article>
+        `).join("");
+        if (window.GHA) window.GHA.track("market_finder_change", {{ goal: route, result_count: picks.length }});
+      }}
+      if (select) select.addEventListener("change", renderFinder);
+      renderFinder();
+    }})();
+  </script>
   {analytics_event_script()}
 </body>
 </html>
@@ -3098,9 +3246,20 @@ def trust_page_body(page: dict) -> str:
         """
     return """
       <section class="page-section" id="custom-shortlist">
-        <h2>Contact and Research Requests</h2>
-        <p>For data corrections, research questions, partnership inquiries, or custom shortlist requests, use this intake path. The form opens a structured email so the request can be handled without adding a server-side backend yet.</p>
-        <p>Useful context for any request: target countries, budget range, intended use, preferred holding period, rental expectations, citizenship/residency constraints, and whether the priority is retirement, lifestyle, income, capital preservation, or optionality.</p>
+        <h2>Custom Global Property Shortlist</h2>
+        <p>Use this intake when you want the Atlas translated into a buyer-specific research brief. The form opens a structured email so the request can be handled without adding a server-side backend yet.</p>
+        <div class="page-grid">
+          <article class="page-card">
+            <span>What you receive</span>
+            <h3>Decision-ready shortlist</h3>
+            <p>A focused market shortlist matched to your budget, lifestyle plan, citizenship constraints, rental expectations, risk tolerance, and holding period.</p>
+          </article>
+          <article class="page-card">
+            <span>What it is not</span>
+            <h3>No legal or tax advice</h3>
+            <p>The brief helps you choose where to spend diligence time. Local lawyers, tax advisers, immigration advisers, and property inspectors still need to verify transaction details.</p>
+          </article>
+        </div>
         <form class="intake-form" id="custom-shortlist-form">
           <div class="intake-grid">
             <label>Name<input name="name" autocomplete="name" required></label>
@@ -3116,7 +3275,24 @@ def trust_page_body(page: dict) -> str:
                 <option>Mixed lifestyle and investment</option>
               </select>
             </label>
+            <label>Citizenship / residency<input name="citizenship" placeholder="Example: US citizen, Singapore PR"></label>
+            <label>Rental expectations
+              <select name="rental_expectations">
+                <option>Personal use first, rental optional</option>
+                <option>Rental offset expected</option>
+                <option>Income-led investment</option>
+                <option>No rental plans</option>
+              </select>
+            </label>
+            <label>Risk tolerance
+              <select name="risk_tolerance">
+                <option>Low: clean ownership and liquidity matter most</option>
+                <option>Medium: balanced lifestyle and return tradeoffs</option>
+                <option>Higher: willing to underwrite complexity for upside</option>
+              </select>
+            </label>
             <label>Holding period<input name="holding_period" placeholder="Example: 7-10 years"></label>
+            <label>Timing<input name="timing" placeholder="Example: researching now, buy in 12-24 months"></label>
           </div>
           <label>Notes<textarea name="notes" placeholder="Citizenship, family use, healthcare needs, rental expectations, timing, and any must-avoid risks."></textarea></label>
           <button type="submit" data-track="custom_shortlist_submit_click">Prepare request</button>
@@ -3125,6 +3301,7 @@ def trust_page_body(page: dict) -> str:
       <section class="page-section">
         <h2>Before You Send a Deal</h2>
         <p>Do not send confidential transaction documents until an explicit review process exists. The current site is designed for destination-level research, not legal review of individual property contracts.</p>
+        <p>Useful requests are framed around decisions: where to focus, which countries to avoid, what risks to underwrite first, and what kind of local adviser should be involved before property-specific diligence begins.</p>
       </section>
     """
 

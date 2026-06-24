@@ -831,13 +831,19 @@
           "Budget: " + (data.get("budget") || ""),
           "Target regions: " + (data.get("regions") || ""),
           "Primary goal: " + (data.get("goal") || ""),
+          "Citizenship / residency: " + (data.get("citizenship") || ""),
+          "Rental expectations: " + (data.get("rental_expectations") || ""),
+          "Risk tolerance: " + (data.get("risk_tolerance") || ""),
           "Holding period: " + (data.get("holding_period") || ""),
+          "Timing: " + (data.get("timing") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
           budget: data.get("budget") || "",
           regions: data.get("regions") || "",
-          goal: data.get("goal") || ""
+          goal: data.get("goal") || "",
+          risk_tolerance: data.get("risk_tolerance") || "",
+          timing: data.get("timing") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\n"));
       });
