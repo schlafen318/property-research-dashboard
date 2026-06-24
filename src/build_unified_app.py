@@ -1332,6 +1332,147 @@ def build_market_finder_data(destinations: list[dict]) -> str:
     return json.dumps(payload, ensure_ascii=False)
 
 
+def country_summary_metrics(hub: dict, destinations: list[dict]) -> dict:
+    selected = destinations_for_ids(hub.get("destination_ids", []), destinations)
+    if not selected:
+        return {"count": 0, "score": 0, "entry": 0, "ownership": 0, "retirement": 0, "liquidity": 0, "top": ""}
+    return {
+        "count": len(selected),
+        "score": sum(float(dest.get("decision_score", 0) or 0) for dest in selected) / len(selected),
+        "entry": sum(float(dest.get("usd_per_m2", 0) or 0) for dest in selected) / len(selected),
+        "ownership": sum(metric_value(dest, "ownership_clarity") for dest in selected) / len(selected),
+        "retirement": sum(metric_value(dest, "retirement_fit") for dest in selected) / len(selected),
+        "liquidity": sum(metric_value(dest, "exit_liquidity") for dest in selected) / len(selected),
+        "top": selected[0]["name"],
+    }
+
+
+def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -> str:
+    canonical = page_url("country-comparison")
+    title = "Compare Countries for Buying Property Abroad | Global Home Atlas"
+    description = "Compare country-level property buying routes by ownership clarity, retirement fit, entry value, liquidity, and best-fit buyer type."
+    rows = []
+    cards = []
+    for hub in COUNTRY_HUBS:
+        metrics = country_summary_metrics(hub, destinations)
+        rows.append(
+            f"""
+            <tr>
+              <td><strong><a href="/countries/{escape(hub["slug"])}/">{escape(hub["country"])}</a></strong><br><span>{escape(hub["description"])}</span></td>
+              <td>{metrics["count"]}</td>
+              <td>{metrics["score"]:.2f}/5</td>
+              <td>{money(metrics["entry"])}/m2</td>
+              <td>{metrics["ownership"]:.1f}/5</td>
+              <td>{metrics["retirement"]:.1f}/5</td>
+              <td>{metrics["liquidity"]:.1f}/5</td>
+              <td>{escape(metrics["top"])}</td>
+            </tr>
+            """.rstrip()
+        )
+        cards.append(
+            f"""
+            <article class="page-card">
+              <span>{metrics["count"]} markets</span>
+              <h3><a href="/countries/{escape(hub["slug"])}/">{escape(hub["country"])}</a></h3>
+              <p>{escape(hub["description"])}</p>
+              <p><strong>{metrics["score"]:.2f}/5</strong> average decision score · <strong>{metrics["ownership"]:.1f}/5</strong> ownership clarity</p>
+            </article>
+            """.rstrip()
+        )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(title, description, canonical, [*global_schema_entities(), {"@context": "https://schema.org", "@type": "CollectionPage", "name": "Compare Countries for Buying Property Abroad", "url": canonical, "description": description, "dateModified": date.today().isoformat()}])}
+  <style>{shared_content_css()}</style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      {primary_nav_html()}
+      <div class="page-hero-grid">
+        <div>
+          <p class="page-eyebrow">Country comparison · updated {date.today().isoformat()}</p>
+          <h1>Compare Countries for Buying Property Abroad</h1>
+          <p class="page-lede">Choose the country route before choosing the property. This view compares ownership clarity, retirement practicality, entry value, and resale depth at the country level.</p>
+        </div>
+        <aside class="page-hero-card">
+          <span>Countries</span><strong>{len(COUNTRY_HUBS)}</strong>
+          <span>Destinations</span><strong>{len(destinations)}</strong>
+          <span>Model</span><strong>10 dimensions</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="page-stats" aria-label="Country comparison summary">
+        <div><span>Use this for</span><strong>Country-first decisions</strong></div>
+        <div><span>Best next step</span><strong>Country hub</strong></div>
+        <div><span>Risk lens</span><strong>Ownership and exit</strong></div>
+        <div><span>Updated</span><strong>{date.today().isoformat()}</strong></div>
+      </section>
+      {sticky_page_nav([("Compare", "compare"), ("Country Cards", "country-cards"), ("Guides", "guides")])}
+      <div class="page-layout">
+        <article class="page-article">
+          <section class="page-section" id="compare">
+            <h2>Country Comparison Matrix</h2>
+            <p>Use this as a first-pass routing tool. A country can look attractive overall while a specific city, title route, or rental rule still changes the decision.</p>
+            <div class="comparison-table-wrap">
+              <table class="comparison-table">
+                <thead>
+                  <tr>
+                    <th>Country</th>
+                    <th>Markets</th>
+                    <th>Avg score</th>
+                    <th>Avg entry</th>
+                    <th>Ownership</th>
+                    <th>Retirement</th>
+                    <th>Exit</th>
+                    <th>Top match</th>
+                  </tr>
+                </thead>
+                <tbody>{"".join(rows)}</tbody>
+              </table>
+            </div>
+          </section>
+          <section class="page-section" id="country-cards">
+            <h2>Country Routes</h2>
+            <div class="page-grid">{"".join(cards)}</div>
+          </section>
+          <section class="page-section" id="guides">
+            <h2>Helpful Buyer Guides</h2>
+            <nav class="page-grid">{seo_guide_links(pages, limit=6)}</nav>
+          </section>
+        </article>
+        <aside class="page-aside mobile-resources" open>
+          <summary>Decision Support</summary>
+          <section class="page-aside-card">
+            <h3>How to use this page</h3>
+            <p>Start with country constraints, then move into destination-level due diligence once ownership, taxes, residency, and resale assumptions are plausible.</p>
+          </section>
+          <section class="page-aside-card">
+            <h3>Custom shortlist</h3>
+            <p>Need the country route mapped to your citizenship, budget, and holding period?</p>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="country comparison">Request shortlist</a>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="page-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Country comparison is a research starting point, not financial, legal, tax, or immigration advice.</p>
+      <nav><a href="/guides/">All buying guides</a> {seo_guide_links(pages, limit=6)} {trust_page_links()}</nav>
+    </div>
+  </footer>
+  {mobile_disclosure_script()}
+  {analytics_event_script()}
+</body>
+</html>
+"""
+
+
 def build_landing_country_tiles() -> str:
     priority = ["spain-property", "portugal-property", "japan-property", "italy-property", "greece-property", "thailand-property", "switzerland-property"]
     by_slug = {hub["slug"]: hub for hub in COUNTRY_HUBS}
@@ -1554,7 +1695,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
         <div class="top-links">
           <a href="#start">Start</a>
           <a href="#recommendations">Recommendations</a>
-          <a href="#countries">Countries</a>
+          <a href="/country-comparison/">Compare Countries</a>
           <a href="/guides/">Guides</a>
           <a href="/methodology/">Methodology</a>
           <a href="/contact/">Contact</a>
@@ -1644,6 +1785,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
             <h2>Browse by country</h2>
             <p>Use country hubs when legal structure, residency, tax, and regional differences matter more than a single destination score.</p>
           </div>
+          <a href="/country-comparison/" data-track="country_compare_click" data-track-label="landing country section">Compare countries</a>
         </div>
         <div class="country-grid">
           {build_landing_country_tiles()}
@@ -1692,6 +1834,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       <p>Independent research for overseas property decisions. Research only; verify legal, tax, immigration, and property advice locally.</p>
       <nav aria-label="Footer">
         <a href="/dashboard/">Research dashboard</a>
+        <a href="/country-comparison/">Compare countries</a>
         <a href="/guides/">Guides</a>
         <a href="/methodology/">Methodology</a>
         <a href="/research-standards/">Research standards</a>
@@ -3838,6 +3981,22 @@ def build() -> Path:
       text-transform: uppercase;
     }
     .insight-bar strong { display: block; margin-top: 7px; font-size: clamp(20px, 3vw, 28px); }
+    .dashboard-onboarding {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(36, 49, 45, .07);
+    }
+    .dashboard-onboarding__head { padding: 18px; border-bottom: 1px solid var(--line); }
+    .dashboard-onboarding__head h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(24px, 4vw, 38px); }
+    .dashboard-onboarding__head p { max-width: 720px; margin: 7px 0 0; color: var(--muted); }
+    .dashboard-onboarding__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); }
+    .dashboard-onboarding__grid article { min-width: 0; padding: 16px; background: #fffdf7; }
+    .dashboard-onboarding__grid span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .dashboard-onboarding__grid strong { display: block; margin: 7px 0; font-size: 17px; line-height: 1.15; }
+    .dashboard-onboarding__grid p { margin: 0; color: var(--muted); font-size: 13px; }
     .workbench {
       display: grid;
       grid-template-columns: 320px minmax(0, 1fr);
@@ -4235,7 +4394,7 @@ def build() -> Path:
       .hero-grid, .workbench { grid-template-columns: 1fr; }
       .control-panel { position: static; }
       .mobile-jump { display: flex; }
-      .spotlight-grid, .guide-grid { grid-template-columns: 1fr; }
+      .spotlight-grid, .guide-grid, .dashboard-onboarding__grid { grid-template-columns: 1fr; }
       .metric-strip, .brief-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 680px) {
@@ -4346,6 +4505,18 @@ def build() -> Path:
           Clarity is the ultimate luxury.
           <cite>Research. Perspective. Freedom to choose.</cite>
         </blockquote>
+      </section>
+      <section class="dashboard-onboarding" aria-label="How to use the research dashboard">
+        <div class="dashboard-onboarding__head">
+          <h2>Use the dashboard when you are ready to compare</h2>
+          <p>This is the advanced research surface. Start with a lens, select 2-4 destinations, then adjust weights only when your buyer thesis is clear.</p>
+        </div>
+        <div class="dashboard-onboarding__grid">
+          <article><span>Step 1</span><strong>Choose a buyer lens</strong><p>Use shortlist, clean title, retirement, or all markets to reduce noise first.</p></article>
+          <article><span>Step 2</span><strong>Select 2-4 markets</strong><p>Comparison works best when you compare plausible substitutes, not every destination.</p></article>
+          <article><span>Step 3</span><strong>Challenge the weights</strong><p>Raise ownership, retirement, value, or yield only when it matches your real plan.</p></article>
+          <article><span>Step 4</span><strong>Export a memo</strong><p>Use the memo as a discussion brief before local legal and tax diligence.</p></article>
+        </div>
       </section>
 
       <div class="workbench">
@@ -4823,6 +4994,12 @@ def build() -> Path:
         clean_generated_html(build_guide_hub_page(SEO_PAGES, destinations)),
         encoding="utf-8",
     )
+    country_comparison_dir = ARTIFACTS / "country-comparison"
+    country_comparison_dir.mkdir(parents=True, exist_ok=True)
+    (country_comparison_dir / "index.html").write_text(
+        clean_generated_html(build_country_comparison_page(destinations, SEO_PAGES)),
+        encoding="utf-8",
+    )
     for page in SEO_PAGES:
         page_dir = ARTIFACTS / page["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
@@ -4874,6 +5051,7 @@ Sitemap: {SITE_URL}sitemap.xml
     sitemap_urls = [
         (SITE_URL, "1.0"),
         (page_url("dashboard"), "0.92"),
+        (page_url("country-comparison"), "0.88"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
         *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],

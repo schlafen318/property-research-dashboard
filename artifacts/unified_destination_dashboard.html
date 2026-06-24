@@ -259,6 +259,22 @@
       text-transform: uppercase;
     }
     .insight-bar strong { display: block; margin-top: 7px; font-size: clamp(20px, 3vw, 28px); }
+    .dashboard-onboarding {
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(36, 49, 45, .07);
+    }
+    .dashboard-onboarding__head { padding: 18px; border-bottom: 1px solid var(--line); }
+    .dashboard-onboarding__head h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(24px, 4vw, 38px); }
+    .dashboard-onboarding__head p { max-width: 720px; margin: 7px 0 0; color: var(--muted); }
+    .dashboard-onboarding__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; background: var(--line); }
+    .dashboard-onboarding__grid article { min-width: 0; padding: 16px; background: #fffdf7; }
+    .dashboard-onboarding__grid span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .dashboard-onboarding__grid strong { display: block; margin: 7px 0; font-size: 17px; line-height: 1.15; }
+    .dashboard-onboarding__grid p { margin: 0; color: var(--muted); font-size: 13px; }
     .workbench {
       display: grid;
       grid-template-columns: 320px minmax(0, 1fr);
@@ -656,7 +672,7 @@
       .hero-grid, .workbench { grid-template-columns: 1fr; }
       .control-panel { position: static; }
       .mobile-jump { display: flex; }
-      .spotlight-grid, .guide-grid { grid-template-columns: 1fr; }
+      .spotlight-grid, .guide-grid, .dashboard-onboarding__grid { grid-template-columns: 1fr; }
       .metric-strip, .brief-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 680px) {
@@ -767,6 +783,18 @@
           Clarity is the ultimate luxury.
           <cite>Research. Perspective. Freedom to choose.</cite>
         </blockquote>
+      </section>
+      <section class="dashboard-onboarding" aria-label="How to use the research dashboard">
+        <div class="dashboard-onboarding__head">
+          <h2>Use the dashboard when you are ready to compare</h2>
+          <p>This is the advanced research surface. Start with a lens, select 2-4 destinations, then adjust weights only when your buyer thesis is clear.</p>
+        </div>
+        <div class="dashboard-onboarding__grid">
+          <article><span>Step 1</span><strong>Choose a buyer lens</strong><p>Use shortlist, clean title, retirement, or all markets to reduce noise first.</p></article>
+          <article><span>Step 2</span><strong>Select 2-4 markets</strong><p>Comparison works best when you compare plausible substitutes, not every destination.</p></article>
+          <article><span>Step 3</span><strong>Challenge the weights</strong><p>Raise ownership, retirement, value, or yield only when it matches your real plan.</p></article>
+          <article><span>Step 4</span><strong>Export a memo</strong><p>Use the memo as a discussion brief before local legal and tax diligence.</p></article>
+        </div>
       </section>
 
       <div class="workbench">
