@@ -377,6 +377,31 @@
     }
     .method-card h3 { margin: 0 0 8px; font-size: 14px; }
     .method-card ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .saved-shortlist {
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+    }
+    .saved-shortlist h3 { margin: 0 0 8px; font-size: 14px; }
+    .saved-shortlist p { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .saved-shortlist__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .saved-shortlist button, .saved-shortlist a {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .saved-shortlist a { background: var(--deep); color: #fffdf7; }
     .mobile-jump {
       display: none;
       gap: 8px;
@@ -933,6 +958,14 @@
               <li><a href="/research-standards/">Research standards</a>, <a href="/methodology/">methodology</a>, and <a href="/contact/">contact</a> stay one tap away.</li>
             </ul>
           </div>
+          <div class="saved-shortlist" aria-live="polite">
+            <h3>Saved Shortlist</h3>
+            <p id="savedShortlistStatus">No saved destinations yet.</p>
+            <div class="saved-shortlist__actions">
+              <button type="button" id="clearMemoShortlist">Clear saved list</button>
+              <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="saved shortlist">Review my shortlist</a>
+            </div>
+          </div>
         </aside>
 
         <div class="content-stack">
@@ -986,10 +1019,10 @@
           <section class="section-card" id="conversion">
             <div class="section-header">
               <div>
-                <h2>Custom Global Property Shortlist</h2>
+                <h2>Shortlist Review</h2>
                 <p>Turn the Atlas into a buyer-specific research brief across lifestyle plan, budget, citizenship constraints, rental expectations, and holding period.</p>
               </div>
-              <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="homepage conversion section">Request shortlist</a>
+              <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="homepage conversion section">Review my shortlist</a>
             </div>
           </section>
 
@@ -8300,14 +8333,54 @@
     const lensButtons = Array.from(document.querySelectorAll("[data-quick]"));
     const weightInputs = Array.from(document.querySelectorAll("[data-weight-key]"));
     const compareOutput = document.getElementById("compareOutput");
+    const savedShortlistStatus = document.getElementById("savedShortlistStatus");
+    const clearMemoShortlist = document.getElementById("clearMemoShortlist");
     const compareSelected = new Set();
-    const memoShortlist = new Set();
+    const memoKey = "gha_memo_shortlist";
     let quickView = "all";
 
     const destinationsById = new Map(data.destinations.map((destination) => [destination.id, destination]));
+    function loadSavedMemoIds() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(memoKey) || "[]");
+        return Array.isArray(raw) ? raw.filter((id) => destinationsById.has(id)) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+    const savedMemoIds = loadSavedMemoIds();
+    const memoShortlist = new Set(savedMemoIds);
     data.destinations.forEach((destination) => {
       destination.custom_score = destination.decision_score;
     });
+
+    function saveMemoShortlist() {
+      try {
+        localStorage.setItem(memoKey, JSON.stringify([...memoShortlist]));
+      } catch (error) {
+        // Storage can be unavailable in private browsing; the in-page shortlist still works.
+      }
+    }
+
+    function updateSavedShortlistStatus() {
+      if (!savedShortlistStatus) return;
+      const selected = [...memoShortlist].map((id) => destinationsById.get(id)).filter(Boolean);
+      if (!selected.length) {
+        savedShortlistStatus.textContent = "No saved destinations yet. Add markets from the dossiers, then export or request a review.";
+        return;
+      }
+      savedShortlistStatus.textContent = selected.length + (selected.length === 1 ? " destination saved: " : " destinations saved: ") + selected.map((item) => item.name).join(", ");
+    }
+
+    function updateMemoButtons() {
+      document.querySelectorAll(".memo-add").forEach((button) => {
+        const id = button.dataset.memoId;
+        const selected = memoShortlist.has(id);
+        button.textContent = selected ? "Saved to shortlist" : "Add to memo shortlist";
+        button.setAttribute("aria-pressed", String(selected));
+      });
+      updateSavedShortlistStatus();
+    }
 
     function cardRank(card) {
       return Number(card.querySelector(".rank-mark span").textContent.replace("#", ""));
@@ -8439,15 +8512,25 @@
         const id = button.dataset.memoId;
         if (memoShortlist.has(id)) {
           memoShortlist.delete(id);
-          button.textContent = "Add to memo shortlist";
+          saveMemoShortlist();
+          updateMemoButtons();
           if (window.GHA) window.GHA.track("memo_shortlist_remove", { destination_id: id, selected_count: memoShortlist.size });
         } else {
           memoShortlist.add(id);
-          button.textContent = "Remove from memo";
+          saveMemoShortlist();
+          updateMemoButtons();
           if (window.GHA) window.GHA.track("memo_shortlist_add", { destination_id: id, selected_count: memoShortlist.size });
         }
       });
     });
+    if (clearMemoShortlist) {
+      clearMemoShortlist.addEventListener("click", () => {
+        memoShortlist.clear();
+        saveMemoShortlist();
+        updateMemoButtons();
+        if (window.GHA) window.GHA.track("memo_shortlist_clear", { selected_count: 0 });
+      });
+    }
     document.getElementById("clearCompare").addEventListener("click", () => {
       compareSelected.clear();
       document.querySelectorAll(".compare-toggle").forEach((checkbox) => {
@@ -8552,6 +8635,7 @@
       downloadFile("investor-shortlist-memo.html", "text/html", buildMemoHtml());
     });
 
+    updateMemoButtons();
     recalculateScores();
   </script>
 
@@ -8606,8 +8690,8 @@
           return;
         }
         if (href.startsWith("/destinations/")) track("destination_click", { href });
+        else if (href === "/dashboard/#destinations" || href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
         else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", { href });
-        else if (href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
         else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", { href });
         else if (href.startsWith("mailto:")) track("contact_click", { href });
       });
@@ -8617,7 +8701,7 @@
         event.preventDefault();
         const data = new FormData(form);
         const lines = [
-          "Global Home Atlas custom shortlist request",
+          "Global Home Atlas shortlist review request",
           "",
           "Name: " + (data.get("name") || ""),
           "Email: " + (data.get("email") || ""),
@@ -8638,7 +8722,7 @@
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || ""
         });
-        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\n"));
+        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });
     })();
   </script>

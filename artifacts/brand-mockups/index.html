@@ -168,6 +168,20 @@
     .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; word-break: break-word; }
     .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+    .executive-summary {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .88);
+      box-shadow: 0 18px 44px rgba(36, 49, 45, .06);
+    }
+    .executive-summary h2 { margin: 0 0 6px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 3.4vw, 36px); line-height: 1.04; }
+    .executive-summary > p { max-width: 760px; margin: 0 0 14px; color: var(--muted); }
+    .executive-summary__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .executive-summary article { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .executive-summary span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .executive-summary p { margin: 8px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -286,7 +300,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -295,7 +309,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -305,7 +319,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -631,8 +645,8 @@
           return;
         }
         if (href.startsWith("/destinations/")) track("destination_click", { href });
+        else if (href === "/dashboard/#destinations" || href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
         else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", { href });
-        else if (href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
         else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", { href });
         else if (href.startsWith("mailto:")) track("contact_click", { href });
       });
@@ -642,7 +656,7 @@
         event.preventDefault();
         const data = new FormData(form);
         const lines = [
-          "Global Home Atlas custom shortlist request",
+          "Global Home Atlas shortlist review request",
           "",
           "Name: " + (data.get("name") || ""),
           "Email: " + (data.get("email") || ""),
@@ -663,7 +677,7 @@
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || ""
         });
-        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\n"));
+        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });
     })();
   </script>

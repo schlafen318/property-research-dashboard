@@ -102,6 +102,29 @@
     .finder-result h3 { margin: 8px 0 4px; font-size: 19px; line-height: 1.12; }
     .finder-result p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
     .finder-result dd { margin: 4px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.42; }
+    .inspired-band { display: grid; grid-template-columns: minmax(0, .62fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
+    .inspired-visual {
+      min-height: 320px;
+      display: grid;
+      align-items: end;
+      padding: 22px;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(36, 49, 45, .08), rgba(36, 49, 45, .58)),
+        url("/assets/coastal-sage-landscape-band.jpg");
+      background-size: cover;
+      background-position: center;
+      color: #fffdf7;
+    }
+    .inspired-visual span { color: rgba(255, 253, 247, .78); font-size: 12px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+    .inspired-visual strong { display: block; max-width: 420px; margin-top: 8px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4vw, 46px); line-height: 1; }
+    .inspired-routes { display: grid; gap: 12px; }
+    .inspired-routes article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .inspired-routes span, .inspired-routes dt { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .inspired-routes h3 { margin: 7px 0 6px; font-size: 20px; }
+    .inspired-routes p, .inspired-routes dd { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
+    .inspired-routes dl { margin: 12px 0 10px; }
+    .inspired-routes a { font-weight: 900; }
     .path-card, .country-tile { color: var(--ink); text-decoration: none; }
     .path-card, .recommendation-card, .country-tile, .trust-card, .guide-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .path-card span, .recommendation-card span, .country-tile span, .guide-card span { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
@@ -123,7 +146,7 @@
     @media (max-width: 980px) {
       .hero { min-height: auto; padding-bottom: 58px; }
       .hero-grid { grid-template-columns: 1fr; }
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 640px) {
       .shell { width: min(1160px, calc(100% - 28px)); }
@@ -140,7 +163,8 @@
       .section-header, .cta-band { display: block; }
       .section-header h2 { max-width: 300px; font-size: 24px; line-height: 1.05; }
       .section-header a, .cta-band a { margin-top: 14px; }
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results { grid-template-columns: 1fr; }
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band { grid-template-columns: 1fr; }
+      .inspired-visual { min-height: 230px; }
       .atlas-visual { min-height: 140px; }
     }
   </style>
@@ -229,7 +253,7 @@
             <h2>Find your market fit</h2>
             <p>Use this quick lens when you want a useful starting point without opening the full dashboard.</p>
           </div>
-          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="market finder">Ask for a custom brief</a>
+          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="market finder">Review my shortlist</a>
         </div>
         <div class="finder-grid">
           <div class="finder-panel">
@@ -316,6 +340,47 @@
                 <div><dt>Skip if</dt><dd>Skip if you need large-market liquidity or direct access to many business hubs.</dd></div>
               </dl>
             </article>
+        </div>
+      </section>
+
+      <section class="section" id="inspiration">
+        <div class="section-header">
+          <div>
+            <h2>Feel inspired, then make it investable</h2>
+            <p>The best markets should create emotional pull and still survive ownership, liquidity, rental, and long-stay tests.</p>
+          </div>
+          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="inspired routes">Review my shortlist</a>
+        </div>
+        <div class="inspired-band">
+          <div class="inspired-visual" aria-hidden="true">
+            <div><span>Atlas routes</span><strong>From dream location to defensible shortlist.</strong></div>
+          </div>
+          <div class="inspired-routes">
+
+        <article>
+          <span>Atlas route</span>
+          <h3>Live well year-round</h3>
+          <p>Valencia, Fukuoka, and the Algarve suit buyers who want the property to support normal life, not only holiday weeks.</p>
+          <dl><div><dt>Best for</dt><dd>Retirement-optional households, remote founders, and families planning repeat long stays.</dd></div></dl>
+          <a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="inspired_route_click" data-track-label="Live well year-round">Open route</a>
+        </article>
+
+        <article>
+          <span>Atlas route</span>
+          <h3>Own with clarity</h3>
+          <p>Japan, Spain, and Portugal routes are useful starting points when clean title, adviser depth, and resale process matter.</p>
+          <dl><div><dt>Best for</dt><dd>Buyers who want to understand the jurisdiction before they compare villas or apartments.</dd></div></dl>
+          <a href="/where-can-foreigners-buy-property/" data-track="inspired_route_click" data-track-label="Own with clarity">Open route</a>
+        </article>
+
+        <article>
+          <span>Atlas route</span>
+          <h3>Keep optionality</h3>
+          <p>Madeira, Malaga, and selected second-home markets can work when lifestyle pull is balanced against liquidity and regulation.</p>
+          <dl><div><dt>Best for</dt><dd>Buyers who may use the home personally, rent selectively, and exit if family plans change.</dd></div></dl>
+          <a href="/best-places-to-buy-a-second-home-abroad/" data-track="inspired_route_click" data-track-label="Keep optionality">Open route</a>
+        </article>
+          </div>
         </div>
       </section>
 
@@ -408,7 +473,7 @@
           <h2>Need a buyer-specific answer?</h2>
           <p>Turn the Atlas into a custom research brief across budget, citizenship constraints, lifestyle plan, rental expectations, and holding period.</p>
         </div>
-        <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="landing cta">Request custom shortlist</a>
+        <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="landing cta">Review my shortlist</a>
       </section>
 
       <section class="section" id="guides">
@@ -553,8 +618,8 @@
           return;
         }
         if (href.startsWith("/destinations/")) track("destination_click", { href });
+        else if (href === "/dashboard/#destinations" || href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
         else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", { href });
-        else if (href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
         else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", { href });
         else if (href.startsWith("mailto:")) track("contact_click", { href });
       });
@@ -564,7 +629,7 @@
         event.preventDefault();
         const data = new FormData(form);
         const lines = [
-          "Global Home Atlas custom shortlist request",
+          "Global Home Atlas shortlist review request",
           "",
           "Name: " + (data.get("name") || ""),
           "Email: " + (data.get("email") || ""),
@@ -585,7 +650,7 @@
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || ""
         });
-        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\n"));
+        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });
     })();
   </script>

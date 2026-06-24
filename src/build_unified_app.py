@@ -857,8 +857,8 @@ def analytics_event_script() -> str:
           return;
         }}
         if (href.startsWith("/destinations/")) track("destination_click", {{ href }});
+        else if (href === "/dashboard/#destinations" || href === "/#destinations" || href === "#destinations") track("dashboard_open", {{ href }});
         else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", {{ href }});
-        else if (href === "/#destinations" || href === "#destinations") track("dashboard_open", {{ href }});
         else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", {{ href }});
         else if (href.startsWith("mailto:")) track("contact_click", {{ href }});
       }});
@@ -868,7 +868,7 @@ def analytics_event_script() -> str:
         event.preventDefault();
         const data = new FormData(form);
         const lines = [
-          "Global Home Atlas custom shortlist request",
+          "Global Home Atlas shortlist review request",
           "",
           "Name: " + (data.get("name") || ""),
           "Email: " + (data.get("email") || ""),
@@ -889,7 +889,7 @@ def analytics_event_script() -> str:
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || ""
         }});
-        location.href = "mailto:{escape(CONTACT_EMAIL)}?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\\n"));
+        location.href = "mailto:{escape(CONTACT_EMAIL)}?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\\n"));
       }});
     }})();
   </script>
@@ -1332,6 +1332,68 @@ def build_market_finder_data(destinations: list[dict]) -> str:
     return json.dumps(payload, ensure_ascii=False)
 
 
+def build_landing_inspired_routes() -> str:
+    routes = [
+        (
+            "Live well year-round",
+            "Valencia, Fukuoka, and the Algarve suit buyers who want the property to support normal life, not only holiday weeks.",
+            "Best for",
+            "Retirement-optional households, remote founders, and families planning repeat long stays.",
+            "/best-places-to-buy-property-abroad-for-retirement/",
+        ),
+        (
+            "Own with clarity",
+            "Japan, Spain, and Portugal routes are useful starting points when clean title, adviser depth, and resale process matter.",
+            "Best for",
+            "Buyers who want to understand the jurisdiction before they compare villas or apartments.",
+            "/where-can-foreigners-buy-property/",
+        ),
+        (
+            "Keep optionality",
+            "Madeira, Malaga, and selected second-home markets can work when lifestyle pull is balanced against liquidity and regulation.",
+            "Best for",
+            "Buyers who may use the home personally, rent selectively, and exit if family plans change.",
+            "/best-places-to-buy-a-second-home-abroad/",
+        ),
+    ]
+    return "\n".join(
+        f"""
+        <article>
+          <span>Atlas route</span>
+          <h3>{escape(title)}</h3>
+          <p>{escape(copy)}</p>
+          <dl><div><dt>{escape(fit_label)}</dt><dd>{escape(fit)}</dd></div></dl>
+          <a href="{escape(href)}" data-track="inspired_route_click" data-track-label="{escape(title)}">Open route</a>
+        </article>
+        """.rstrip()
+        for title, copy, fit_label, fit, href in routes
+    )
+
+
+def destination_executive_summary_cards(dest: dict) -> str:
+    pros = dest.get("pros") or []
+    cons = dest.get("cons") or []
+    best_buyer = pros[0] if pros else "Lifestyle-led global buyers"
+    buy_for = dest.get("profit_driver") or dest.get("panel_verdict") or "A balanced overseas property shortlist candidate."
+    underwrite = cons[0] if cons else dest.get("red_flags") or "Verify legal, tax, rental, and resale assumptions locally."
+    next_step = "Compare against two or three alternatives, then request a shortlist review before contacting local agents."
+    cards = [
+        ("Best buyer", best_buyer),
+        ("Buy for", buy_for),
+        ("Underwrite first", underwrite),
+        ("Next step", next_step),
+    ]
+    return "\n".join(
+        f"""
+        <article>
+          <span>{escape(label)}</span>
+          <p>{escape(text)}</p>
+        </article>
+        """.rstrip()
+        for label, text in cards
+    )
+
+
 def country_summary_metrics(hub: dict, destinations: list[dict]) -> dict:
     selected = destinations_for_ids(hub.get("destination_ids", []), destinations)
     if not selected:
@@ -1453,7 +1515,7 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
           <section class="page-aside-card">
             <h3>Custom shortlist</h3>
             <p>Need the country route mapped to your citizenship, budget, and holding period?</p>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="country comparison">Request shortlist</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="country comparison">Review my shortlist</a>
           </section>
         </aside>
       </div>
@@ -1644,6 +1706,29 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     .finder-result h3 {{ margin: 8px 0 4px; font-size: 19px; line-height: 1.12; }}
     .finder-result p {{ margin: 0 0 10px; color: var(--muted); font-size: 14px; }}
     .finder-result dd {{ margin: 4px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.42; }}
+    .inspired-band {{ display: grid; grid-template-columns: minmax(0, .62fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }}
+    .inspired-visual {{
+      min-height: 320px;
+      display: grid;
+      align-items: end;
+      padding: 22px;
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(36, 49, 45, .08), rgba(36, 49, 45, .58)),
+        url("/assets/coastal-sage-landscape-band.jpg");
+      background-size: cover;
+      background-position: center;
+      color: #fffdf7;
+    }}
+    .inspired-visual span {{ color: rgba(255, 253, 247, .78); font-size: 12px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }}
+    .inspired-visual strong {{ display: block; max-width: 420px; margin-top: 8px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4vw, 46px); line-height: 1; }}
+    .inspired-routes {{ display: grid; gap: 12px; }}
+    .inspired-routes article {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
+    .inspired-routes span, .inspired-routes dt {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .inspired-routes h3 {{ margin: 7px 0 6px; font-size: 20px; }}
+    .inspired-routes p, .inspired-routes dd {{ margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }}
+    .inspired-routes dl {{ margin: 12px 0 10px; }}
+    .inspired-routes a {{ font-weight: 900; }}
     .path-card, .country-tile {{ color: var(--ink); text-decoration: none; }}
     .path-card, .recommendation-card, .country-tile, .trust-card, .guide-card {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
     .path-card span, .recommendation-card span, .country-tile span, .guide-card span {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
@@ -1665,7 +1750,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     @media (max-width: 980px) {{
       .hero {{ min-height: auto; padding-bottom: 58px; }}
       .hero-grid {{ grid-template-columns: 1fr; }}
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
     }}
     @media (max-width: 640px) {{
       .shell {{ width: min(1160px, calc(100% - 28px)); }}
@@ -1682,7 +1767,8 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       .section-header, .cta-band {{ display: block; }}
       .section-header h2 {{ max-width: 300px; font-size: 24px; line-height: 1.05; }}
       .section-header a, .cta-band a {{ margin-top: 14px; }}
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results {{ grid-template-columns: 1fr; }}
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band {{ grid-template-columns: 1fr; }}
+      .inspired-visual {{ min-height: 230px; }}
       .atlas-visual {{ min-height: 140px; }}
     }}
   </style>
@@ -1748,7 +1834,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
             <h2>Find your market fit</h2>
             <p>Use this quick lens when you want a useful starting point without opening the full dashboard.</p>
           </div>
-          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="market finder">Ask for a custom brief</a>
+          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="market finder">Review my shortlist</a>
         </div>
         <div class="finder-grid">
           <div class="finder-panel">
@@ -1776,6 +1862,24 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
         </div>
         <div class="recommendation-grid">
           {build_landing_recommendations(destinations)}
+        </div>
+      </section>
+
+      <section class="section" id="inspiration">
+        <div class="section-header">
+          <div>
+            <h2>Feel inspired, then make it investable</h2>
+            <p>The best markets should create emotional pull and still survive ownership, liquidity, rental, and long-stay tests.</p>
+          </div>
+          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="inspired routes">Review my shortlist</a>
+        </div>
+        <div class="inspired-band">
+          <div class="inspired-visual" aria-hidden="true">
+            <div><span>Atlas routes</span><strong>From dream location to defensible shortlist.</strong></div>
+          </div>
+          <div class="inspired-routes">
+            {build_landing_inspired_routes()}
+          </div>
         </div>
       </section>
 
@@ -1810,7 +1914,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
           <h2>Need a buyer-specific answer?</h2>
           <p>Turn the Atlas into a custom research brief across budget, citizenship constraints, lifestyle plan, rental expectations, and holding period.</p>
         </div>
-        <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="landing cta">Request custom shortlist</a>
+        <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="landing cta">Review my shortlist</a>
       </section>
 
       <section class="section" id="guides">
@@ -2136,10 +2240,17 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
 {head_html(GUIDE_HUB_TITLE, GUIDE_HUB_DESCRIPTION, canonical, schema_for_guide_hub(canonical, pages))}
   <style>
 {shared_content_css()}
+    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }}
+    .journey-card {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; text-decoration: none; }}
+    .journey-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .journey-card strong {{ display: block; margin: 8px 0 6px; color: var(--ink); font-size: 18px; line-height: 1.14; }}
+    .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }}
     .page-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .page-card p strong {{ color: var(--ink); }}
     .page-card p:last-child {{ display: grid; gap: 6px; }}
     .page-card p:last-child a {{ margin-right: 8px; font-size: 13px; font-weight: 800; }}
+    @media (max-width: 860px) {{ .journey-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
+    @media (max-width: 560px) {{ .journey-grid {{ grid-template-columns: 1fr; }} }}
   </style>
 </head>
 <body>
@@ -2172,6 +2283,16 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
+          <section class="page-section" id="choose-journey">
+            <h2>Choose Your Buyer Journey</h2>
+            <p>Use the guide hub as a route map. Start with the job the property needs to perform, then compare countries and destinations only after the buyer intent is clear.</p>
+            <div class="journey-grid">
+              <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement route"><span>Route 01</span><strong>Retirement or lifestyle base</strong><p>Healthcare, daily convenience, climate, community, and resale depth.</p></a>
+              <a class="journey-card" href="#second-homes" data-track="guide_journey_click" data-track-label="Second home route"><span>Route 02</span><strong>Second home abroad</strong><p>Repeat use, family visits, rental offset, and sensible ownership process.</p></a>
+              <a class="journey-card" href="#investment" data-track="guide_journey_click" data-track-label="Investment route"><span>Route 03</span><strong>Investment-led shortlist</strong><p>Yield realism, value entry, regulatory risk, and future exit liquidity.</p></a>
+              <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Risk route"><span>Route 04</span><strong>Ownership and risk first</strong><p>Title clarity, foreign-buyer rules, taxes, permits, and adviser depth.</p></a>
+            </div>
+          </section>
           <section class="page-section">
             <h2>How to Use These Guides</h2>
             <p>Start with the page that matches the job of the property, then compare the linked destination dossiers before talking to local agents. The goal is to avoid falling in love with a listing before the market, ownership path, rental rules, healthcare practicality, and resale depth have been tested.</p>
@@ -2188,8 +2309,8 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
           <section class="page-aside-card">
             <h2>Use the Atlas</h2>
             <p>Open the dashboard to compare all destination scores and export a shortlist memo.</p>
-            <a class="page-button" href="/#destinations" data-track="dashboard_open" data-track-label="guide hub">Open dashboard</a>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="guide hub">Request custom shortlist</a>
+            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="guide hub">Open dashboard</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="guide hub">Review my shortlist</a>
           </section>
           <section class="page-aside-card">
             <h3>Best Starting Destinations</h3>
@@ -2448,8 +2569,8 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
           <section class="page-aside-card">
             <h2>Use the Atlas</h2>
             <p>Compare these markets against the full destination model and export a shortlist memo.</p>
-            <a class="page-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(hub["country"])} country hub">Open dashboard</a>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(hub["country"])} country hub">Request custom shortlist</a>
+            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(hub["country"])} country hub">Open dashboard</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(hub["country"])} country hub">Review my shortlist</a>
           </section>
           <section class="page-aside-card">
             <h3>Other Country Hubs</h3>
@@ -2612,7 +2733,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
           <h1>{escape(page["h1"])}</h1>
           <p class="seo-lede">{escape(description)} This guide is written for {escape(page["intent"])}.</p>
           <div class="seo-actions">
-          <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a>
+          <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a>
           <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare markets</a>
           </div>
         </div>
@@ -2688,8 +2809,8 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
           <section class="seo-aside-card">
             <h2>Use the Full Atlas</h2>
             <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
-            <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open dashboard</a>
-            <a class="seo-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(page["h1"])}">Request custom shortlist</a>
+            <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open dashboard</a>
+            <a class="seo-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(page["h1"])}">Review my shortlist</a>
           </section>
           <section class="seo-aside-card">
             <h3>Related Guides</h3>
@@ -2871,6 +2992,20 @@ def shared_content_css() -> str:
     .brief-panel article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .brief-panel strong { display: block; margin-top: 6px; font-size: 18px; overflow-wrap: anywhere; word-break: break-word; }
     .brief-panel p { margin: 8px 0 0; color: var(--muted); font-size: 13px; overflow-wrap: anywhere; }
+    .executive-summary {
+      margin-top: 18px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .88);
+      box-shadow: 0 18px 44px rgba(36, 49, 45, .06);
+    }
+    .executive-summary h2 { margin: 0 0 6px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 3.4vw, 36px); line-height: 1.04; }
+    .executive-summary > p { max-width: 760px; margin: 0 0 14px; color: var(--muted); }
+    .executive-summary__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+    .executive-summary article { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .executive-summary span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .executive-summary p { margin: 8px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -2989,7 +3124,7 @@ def shared_content_css() -> str:
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -2998,7 +3133,7 @@ def shared_content_css() -> str:
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -3008,7 +3143,7 @@ def shared_content_css() -> str:
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -3227,8 +3362,15 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         <article><span>Ownership clarity</span><strong>{metric_value(dest, "ownership_clarity"):.1f}/5</strong><p>{escape(dest.get("ownership_notes") or "Confirm title structure, foreign-buyer rules, transfer taxes, and local counsel requirements.")}</p></article>
         <article><span>Lifestyle and retirement fit</span><strong>{metric_value(dest, "retirement_fit"):.1f}/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
       </section>
+      <section class="executive-summary" aria-label="Destination executive summary">
+        <h2>Is this market for you?</h2>
+        <p>A fast decision read for buyers deciding whether {escape(dest["name"])} deserves deeper local diligence or should be replaced by a better-fit market.</p>
+        <div class="executive-summary__grid">
+          {destination_executive_summary_cards(dest)}
+        </div>
+      </section>
       {sticky_page_nav([("Verdict", "verdict"), ("Buyer Fit", "buyer-fit"), ("Ownership", "ownership"), ("Lifestyle", "lifestyle"), ("Scores", "scores"), ("Evidence", "evidence"), ("Trust", "trust-context")])}
-      {mobile_action_strip("#scores", "Scores", "/#destinations", "Compare")}
+      {mobile_action_strip("#scores", "Scores", "/contact/#custom-shortlist", "Review")}
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
@@ -3283,8 +3425,8 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
           <section class="page-aside-card">
             <h2>Compare in Atlas</h2>
             <p>Use the dashboard to compare {escape(dest["name"])} against every market in the 10-dimension model.</p>
-            <a class="page-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(dest["name"])} destination">Open dashboard</a>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(dest["name"])} destination">Request custom shortlist</a>
+            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(dest["name"])} destination">Open dashboard</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(dest["name"])} destination">Review my shortlist</a>
           </section>
           <section class="page-aside-card">
             <h3>Related Destinations</h3>
@@ -3389,11 +3531,16 @@ def trust_page_body(page: dict) -> str:
         """
     return """
       <section class="page-section" id="custom-shortlist">
-        <h2>Custom Global Property Shortlist</h2>
-        <p>Use this intake when you want the Atlas translated into a buyer-specific research brief. The form opens a structured email so the request can be handled without adding a server-side backend yet.</p>
+        <h2>Request a Shortlist Review</h2>
+        <p>Use this intake when you want the Atlas translated into a buyer-specific research brief. The first step is a structured review of your goals, budget, citizenship constraints, risk tolerance, and saved destinations.</p>
         <div class="page-grid">
           <article class="page-card">
-            <span>What you receive</span>
+            <span>Free intake</span>
+            <h3>Fit and scope check</h3>
+            <p>Share the decision you are trying to make. The response can clarify whether a custom shortlist, paid research brief, or local adviser route is the right next step.</p>
+          </article>
+          <article class="page-card">
+            <span>Paid research path</span>
             <h3>Decision-ready shortlist</h3>
             <p>A focused market shortlist matched to your budget, lifestyle plan, citizenship constraints, rental expectations, risk tolerance, and holding period.</p>
           </article>
@@ -3401,6 +3548,11 @@ def trust_page_body(page: dict) -> str:
             <span>What it is not</span>
             <h3>No legal or tax advice</h3>
             <p>The brief helps you choose where to spend diligence time. Local lawyers, tax advisers, immigration advisers, and property inspectors still need to verify transaction details.</p>
+          </article>
+          <article class="page-card">
+            <span>Best use</span>
+            <h3>Before agents and listings</h3>
+            <p>The review is most useful before a buyer starts touring homes, because jurisdiction, liquidity, permits, and ownership structure should narrow the search first.</p>
           </article>
         </div>
         <form class="intake-form" id="custom-shortlist-form">
@@ -3491,8 +3643,8 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
           <section class="page-aside-card">
             <h2>Explore the Atlas</h2>
             <p>Open the dashboard to compare all destinations and adjust the scoring weights.</p>
-            <a class="page-button" href="/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} trust page">Open dashboard</a>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(page["h1"])} trust page">Request custom shortlist</a>
+            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} trust page">Open dashboard</a>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(page["h1"])} trust page">Review my shortlist</a>
           </section>
           <section class="page-aside-card" id="guides-link">
             <h3>Research Guides</h3>
@@ -4099,6 +4251,31 @@ def build() -> Path:
     }
     .method-card h3 { margin: 0 0 8px; font-size: 14px; }
     .method-card ul { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .saved-shortlist {
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+    }
+    .saved-shortlist h3 { margin: 0 0 8px; font-size: 14px; }
+    .saved-shortlist p { margin: 0 0 12px; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .saved-shortlist__actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .saved-shortlist button, .saved-shortlist a {
+      min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fff;
+      color: var(--ink);
+      padding: 0 12px;
+      font-size: 13px;
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .saved-shortlist a { background: var(--deep); color: #fffdf7; }
     .mobile-jump {
       display: none;
       gap: 8px;
@@ -4584,6 +4761,14 @@ def build() -> Path:
               <li><a href="/research-standards/">Research standards</a>, <a href="/methodology/">methodology</a>, and <a href="/contact/">contact</a> stay one tap away.</li>
             </ul>
           </div>
+          <div class="saved-shortlist" aria-live="polite">
+            <h3>Saved Shortlist</h3>
+            <p id="savedShortlistStatus">No saved destinations yet.</p>
+            <div class="saved-shortlist__actions">
+              <button type="button" id="clearMemoShortlist">Clear saved list</button>
+              <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="saved shortlist">Review my shortlist</a>
+            </div>
+          </div>
         </aside>
 
         <div class="content-stack">
@@ -4602,10 +4787,10 @@ def build() -> Path:
           <section class="section-card" id="conversion">
             <div class="section-header">
               <div>
-                <h2>Custom Global Property Shortlist</h2>
+                <h2>Shortlist Review</h2>
                 <p>Turn the Atlas into a buyer-specific research brief across lifestyle plan, budget, citizenship constraints, rental expectations, and holding period.</p>
               </div>
-              <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="homepage conversion section">Request shortlist</a>
+              <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="homepage conversion section">Review my shortlist</a>
             </div>
           </section>
 
@@ -4691,14 +4876,54 @@ def build() -> Path:
     const lensButtons = Array.from(document.querySelectorAll("[data-quick]"));
     const weightInputs = Array.from(document.querySelectorAll("[data-weight-key]"));
     const compareOutput = document.getElementById("compareOutput");
+    const savedShortlistStatus = document.getElementById("savedShortlistStatus");
+    const clearMemoShortlist = document.getElementById("clearMemoShortlist");
     const compareSelected = new Set();
-    const memoShortlist = new Set();
+    const memoKey = "gha_memo_shortlist";
     let quickView = "all";
 
     const destinationsById = new Map(data.destinations.map((destination) => [destination.id, destination]));
+    function loadSavedMemoIds() {
+      try {
+        const raw = JSON.parse(localStorage.getItem(memoKey) || "[]");
+        return Array.isArray(raw) ? raw.filter((id) => destinationsById.has(id)) : [];
+      } catch (error) {
+        return [];
+      }
+    }
+    const savedMemoIds = loadSavedMemoIds();
+    const memoShortlist = new Set(savedMemoIds);
     data.destinations.forEach((destination) => {
       destination.custom_score = destination.decision_score;
     });
+
+    function saveMemoShortlist() {
+      try {
+        localStorage.setItem(memoKey, JSON.stringify([...memoShortlist]));
+      } catch (error) {
+        // Storage can be unavailable in private browsing; the in-page shortlist still works.
+      }
+    }
+
+    function updateSavedShortlistStatus() {
+      if (!savedShortlistStatus) return;
+      const selected = [...memoShortlist].map((id) => destinationsById.get(id)).filter(Boolean);
+      if (!selected.length) {
+        savedShortlistStatus.textContent = "No saved destinations yet. Add markets from the dossiers, then export or request a review.";
+        return;
+      }
+      savedShortlistStatus.textContent = selected.length + (selected.length === 1 ? " destination saved: " : " destinations saved: ") + selected.map((item) => item.name).join(", ");
+    }
+
+    function updateMemoButtons() {
+      document.querySelectorAll(".memo-add").forEach((button) => {
+        const id = button.dataset.memoId;
+        const selected = memoShortlist.has(id);
+        button.textContent = selected ? "Saved to shortlist" : "Add to memo shortlist";
+        button.setAttribute("aria-pressed", String(selected));
+      });
+      updateSavedShortlistStatus();
+    }
 
     function cardRank(card) {
       return Number(card.querySelector(".rank-mark span").textContent.replace("#", ""));
@@ -4830,15 +5055,25 @@ def build() -> Path:
         const id = button.dataset.memoId;
         if (memoShortlist.has(id)) {
           memoShortlist.delete(id);
-          button.textContent = "Add to memo shortlist";
+          saveMemoShortlist();
+          updateMemoButtons();
           if (window.GHA) window.GHA.track("memo_shortlist_remove", { destination_id: id, selected_count: memoShortlist.size });
         } else {
           memoShortlist.add(id);
-          button.textContent = "Remove from memo";
+          saveMemoShortlist();
+          updateMemoButtons();
           if (window.GHA) window.GHA.track("memo_shortlist_add", { destination_id: id, selected_count: memoShortlist.size });
         }
       });
     });
+    if (clearMemoShortlist) {
+      clearMemoShortlist.addEventListener("click", () => {
+        memoShortlist.clear();
+        saveMemoShortlist();
+        updateMemoButtons();
+        if (window.GHA) window.GHA.track("memo_shortlist_clear", { selected_count: 0 });
+      });
+    }
     document.getElementById("clearCompare").addEventListener("click", () => {
       compareSelected.clear();
       document.querySelectorAll(".compare-toggle").forEach((checkbox) => {
@@ -4943,6 +5178,7 @@ def build() -> Path:
       downloadFile("investor-shortlist-memo.html", "text/html", buildMemoHtml());
     });
 
+    updateMemoButtons();
     recalculateScores();
   </script>
   __ANALYTICS_EVENT_SCRIPT__

@@ -160,7 +160,7 @@
           <h1>Best Countries to Buy Property as a Foreigner</h1>
           <p class="seo-lede">Compare countries and destinations for foreign property buyers using ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth. This guide is written for foreign buyers comparing legal access, title clarity, transaction practicality, lifestyle quality, and resale depth before choosing markets for local diligence.</p>
           <div class="seo-actions">
-          <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="Best Countries to Buy Property as a Foreigner hero">Open the full dashboard</a>
+          <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="Best Countries to Buy Property as a Foreigner hero">Open the full dashboard</a>
           <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="Best Countries to Buy Property as a Foreigner">Compare markets</a>
           </div>
         </div>
@@ -466,8 +466,8 @@
           <section class="seo-aside-card">
             <h2>Use the Full Atlas</h2>
             <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
-            <a class="seo-button" href="/#destinations" data-track="dashboard_open" data-track-label="Best Countries to Buy Property as a Foreigner aside">Open dashboard</a>
-            <a class="seo-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="Best Countries to Buy Property as a Foreigner">Request custom shortlist</a>
+            <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="Best Countries to Buy Property as a Foreigner aside">Open dashboard</a>
+            <a class="seo-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="Best Countries to Buy Property as a Foreigner">Review my shortlist</a>
           </section>
           <section class="seo-aside-card">
             <h3>Related Guides</h3>
@@ -567,8 +567,8 @@
           return;
         }
         if (href.startsWith("/destinations/")) track("destination_click", { href });
+        else if (href === "/dashboard/#destinations" || href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
         else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", { href });
-        else if (href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
         else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", { href });
         else if (href.startsWith("mailto:")) track("contact_click", { href });
       });
@@ -578,7 +578,7 @@
         event.preventDefault();
         const data = new FormData(form);
         const lines = [
-          "Global Home Atlas custom shortlist request",
+          "Global Home Atlas shortlist review request",
           "",
           "Name: " + (data.get("name") || ""),
           "Email: " + (data.get("email") || ""),
@@ -599,7 +599,7 @@
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || ""
         });
-        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Custom Global Property Shortlist") + "&body=" + encodeURIComponent(lines.join("\n"));
+        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });
     })();
   </script>
