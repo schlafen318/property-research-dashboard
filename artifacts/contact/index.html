@@ -114,6 +114,21 @@
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
+    .report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .report-card {
+      min-width: 0;
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+      border: 1px solid rgba(36, 49, 45, .16);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fffdf7, #f4eee2);
+    }
+    .report-card span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .report-card h3 { margin: 0; font-size: 19px; line-height: 1.14; }
+    .report-card p { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
+    .report-card strong { color: var(--ink); font-size: 13px; line-height: 1.45; }
+    .report-card a { font-weight: 900; }
     .sticky-jump {
       position: sticky;
       top: 0;
@@ -229,6 +244,15 @@
     .cluster-map__grid span, .cluster-map__grid em { color: var(--muted); font-size: 11px; font-style: normal; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .cluster-map__grid strong { display: block; margin: 4px 0; }
     .intake-form { display: grid; gap: 14px; margin-top: 16px; }
+    .saved-shortlist-bridge {
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef3f0;
+    }
+    .saved-shortlist-bridge span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .saved-shortlist-bridge p { margin: 6px 0 0; color: #3f4d48; font-size: 14px; line-height: 1.45; }
     .intake-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .intake-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .intake-form input, .intake-form select, .intake-form textarea {
@@ -299,7 +323,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -318,7 +342,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -539,7 +563,12 @@
             <p>Once the shortlist narrows, the next step may be local legal, tax, immigration, financing, buyer-agent, or property-management review. Any commercial introduction should be disclosed before referral.</p>
           </article>
         </div>
+        <div class="saved-shortlist-bridge" id="savedShortlistBridge" hidden>
+          <span>Saved from dashboard</span>
+          <p id="savedShortlistBridgeText">No saved destinations detected in this browser.</p>
+        </div>
         <form class="intake-form" id="custom-shortlist-form">
+          <input type="hidden" name="saved_shortlist" id="savedShortlistInput">
           <div class="intake-grid">
             <label>Name<input name="name" autocomplete="name" required></label>
             <label>Email<input name="email" type="email" autocomplete="email" required></label>
@@ -638,6 +667,30 @@
   </footer>
 
   <script>
+    (() => {
+      const destinationsById = {"fukuoka-itoshima": {"name": "Fukuoka / Itoshima", "country": "Japan"}, "valencia": {"name": "Valencia", "country": "Spain"}, "algarve-cascais": {"name": "Algarve / Cascais", "country": "Portugal"}, "m-laga-costa-del-sol": {"name": "Málaga / Costa del Sol", "country": "Spain"}, "lake-como": {"name": "Lake Como", "country": "Italy"}, "hakone-izu": {"name": "Hakone / Izu", "country": "Japan"}, "madeira": {"name": "Madeira", "country": "Portugal"}, "costa-brava-girona": {"name": "Costa Brava / Girona", "country": "Spain"}, "hakuba": {"name": "Hakuba", "country": "Japan"}, "crete": {"name": "Crete", "country": "Greece"}, "annecy": {"name": "Annecy", "country": "France"}, "mallorca": {"name": "Mallorca", "country": "Spain"}, "niseko": {"name": "Niseko", "country": "Japan"}, "croatia-istria-dalmatia": {"name": "Croatia / Istria-Dalmatia", "country": "Croatia"}, "queenstown": {"name": "Queenstown", "country": "New Zealand"}, "phuket-koh-samui": {"name": "Phuket / Koh Samui", "country": "Thailand"}, "dolomites-south-tyrol": {"name": "Dolomites / South Tyrol", "country": "Italy"}, "bali": {"name": "Bali", "country": "Indonesia"}, "chamonix": {"name": "Chamonix", "country": "France"}, "da-nang-hoi-an": {"name": "Da Nang / Hoi An", "country": "Vietnam"}, "whistler": {"name": "Whistler", "country": "Canada"}, "innsbruck-tyrol": {"name": "Innsbruck / Tyrol", "country": "Austria"}, "andermatt": {"name": "Andermatt", "country": "Switzerland"}, "ticino-lake-lugano": {"name": "Ticino / Lake Lugano", "country": "Switzerland"}, "swiss-valais-vaud-alps": {"name": "Swiss Valais / Vaud Alps", "country": "Switzerland"}};
+      const bridge = document.getElementById("savedShortlistBridge");
+      const bridgeText = document.getElementById("savedShortlistBridgeText");
+      const input = document.getElementById("savedShortlistInput");
+      if (!bridge || !bridgeText || !input) return;
+      let saved = [];
+      try {
+        const raw = JSON.parse(localStorage.getItem("gha_memo_shortlist") || "[]");
+        saved = Array.isArray(raw) ? raw.map((id) => destinationsById[id]).filter(Boolean) : [];
+      } catch (error) {
+        saved = [];
+      }
+      if (!saved.length) return;
+      const names = saved.map((item) => item.name + (item.country ? " (" + item.country + ")" : ""));
+      input.value = names.join(", ");
+      bridge.hidden = false;
+      bridgeText.textContent = names.length + (names.length === 1 ? " destination will be included: " : " destinations will be included: ") + names.join(", ");
+      if (window.GHA) window.GHA.track("saved_shortlist_intake_prefill", { selected_count: names.length });
+    })();
+  </script>
+
+
+  <script>
     (function () {
       const measurementReady = Boolean("");
       const sessionKey = "gha_session_id";
@@ -712,6 +765,7 @@
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
           "Adviser needs: " + (data.get("adviser_needs") || ""),
+          "Saved shortlist: " + (data.get("saved_shortlist") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
@@ -720,7 +774,8 @@
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || "",
-          adviser_needs: data.get("adviser_needs") || ""
+          adviser_needs: data.get("adviser_needs") || "",
+          saved_shortlist: data.get("saved_shortlist") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });

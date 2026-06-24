@@ -125,6 +125,13 @@
     .inspired-routes p, .inspired-routes dd { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
     .inspired-routes dl { margin: 12px 0 10px; }
     .inspired-routes a { font-weight: 900; }
+    .report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .report-card { min-width: 0; display: grid; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(180deg, #fffdf7, #f4eee2); }
+    .report-card span { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .report-card h3 { margin: 0; font-size: 20px; line-height: 1.14; }
+    .report-card p { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
+    .report-card strong { color: var(--ink); font-size: 13px; line-height: 1.45; }
+    .report-card a { font-weight: 900; }
     .path-card, .country-tile { color: var(--ink); text-decoration: none; }
     .path-card, .recommendation-card, .country-tile, .trust-card, .guide-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .path-card span, .recommendation-card span, .country-tile span, .guide-card span { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
@@ -146,7 +153,7 @@
     @media (max-width: 980px) {
       .hero { min-height: auto; padding-bottom: 58px; }
       .hero-grid { grid-template-columns: 1fr; }
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band, .report-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 640px) {
       .shell { width: min(1160px, calc(100% - 28px)); }
@@ -163,7 +170,7 @@
       .section-header, .cta-band { display: block; }
       .section-header h2 { max-width: 300px; font-size: 24px; line-height: 1.05; }
       .section-header a, .cta-band a { margin-top: 14px; }
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band { grid-template-columns: 1fr; }
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band, .report-grid { grid-template-columns: 1fr; }
       .inspired-visual { min-height: 230px; }
       .atlas-visual { min-height: 140px; }
     }
@@ -381,6 +388,42 @@
           <a href="/best-places-to-buy-a-second-home-abroad/" data-track="inspired_route_click" data-track-label="Keep optionality">Open route</a>
         </article>
           </div>
+        </div>
+      </section>
+
+      <section class="section" id="premium-briefs">
+        <div class="section-header">
+          <div>
+            <h2>Premium research paths</h2>
+            <p>When a public guide is not specific enough, these briefs turn the Atlas into a buyer-specific decision memo.</p>
+          </div>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="premium briefs">Discuss a brief</a>
+        </div>
+        <div class="report-grid">
+
+        <article class="report-card">
+          <span>Premium brief</span>
+          <h3>Retirement Market Brief</h3>
+          <p>A buyer-specific screen for lifestyle durability, healthcare practicality, ownership clarity, tax flags, and future exit options.</p>
+          <strong>Best for retirement-optional families choosing between Europe and Asia.</strong>
+          <a href="/shortlist-review/" data-track="report_teaser_click" data-track-label="Retirement Market Brief">Discuss this brief</a>
+        </article>
+
+        <article class="report-card">
+          <span>Premium brief</span>
+          <h3>Second-Home Shortlist Memo</h3>
+          <p>A structured comparison of personal-use appeal, rental offset realism, seasonality, access, and local operating friction.</p>
+          <strong>Best before viewings, agent mandates, and property-specific legal work.</strong>
+          <a href="/shortlist-review/" data-track="report_teaser_click" data-track-label="Second-Home Shortlist Memo">Discuss this brief</a>
+        </article>
+
+        <article class="report-card">
+          <span>Premium brief</span>
+          <h3>Investment Risk Review</h3>
+          <p>A risk-first memo that separates yield claims from permits, taxes, financing, liquidity, and asset-management assumptions.</p>
+          <strong>Best for buyers who want income support without ignoring downside.</strong>
+          <a href="/shortlist-review/" data-track="report_teaser_click" data-track-label="Investment Risk Review">Discuss this brief</a>
+        </article>
         </div>
       </section>
 
@@ -642,6 +685,7 @@
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
           "Adviser needs: " + (data.get("adviser_needs") || ""),
+          "Saved shortlist: " + (data.get("saved_shortlist") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
@@ -650,7 +694,8 @@
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || "",
-          adviser_needs: data.get("adviser_needs") || ""
+          adviser_needs: data.get("adviser_needs") || "",
+          saved_shortlist: data.get("saved_shortlist") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });

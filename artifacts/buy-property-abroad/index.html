@@ -575,6 +575,7 @@
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
           "Adviser needs: " + (data.get("adviser_needs") || ""),
+          "Saved shortlist: " + (data.get("saved_shortlist") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
@@ -583,7 +584,8 @@
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || "",
-          adviser_needs: data.get("adviser_needs") || ""
+          adviser_needs: data.get("adviser_needs") || "",
+          saved_shortlist: data.get("saved_shortlist") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });

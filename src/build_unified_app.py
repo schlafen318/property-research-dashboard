@@ -887,6 +887,7 @@ def analytics_event_script() -> str:
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
           "Adviser needs: " + (data.get("adviser_needs") || ""),
+          "Saved shortlist: " + (data.get("saved_shortlist") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {{
@@ -895,7 +896,8 @@ def analytics_event_script() -> str:
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || "",
-          adviser_needs: data.get("adviser_needs") || ""
+          adviser_needs: data.get("adviser_needs") || "",
+          saved_shortlist: data.get("saved_shortlist") || ""
         }});
         location.href = "mailto:{escape(CONTACT_EMAIL)}?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\\n"));
       }});
@@ -1404,6 +1406,38 @@ def destination_executive_summary_cards(dest: dict) -> str:
     )
 
 
+def build_premium_report_teasers() -> str:
+    reports = [
+        (
+            "Retirement Market Brief",
+            "A buyer-specific screen for lifestyle durability, healthcare practicality, ownership clarity, tax flags, and future exit options.",
+            "Best for retirement-optional families choosing between Europe and Asia.",
+        ),
+        (
+            "Second-Home Shortlist Memo",
+            "A structured comparison of personal-use appeal, rental offset realism, seasonality, access, and local operating friction.",
+            "Best before viewings, agent mandates, and property-specific legal work.",
+        ),
+        (
+            "Investment Risk Review",
+            "A risk-first memo that separates yield claims from permits, taxes, financing, liquidity, and asset-management assumptions.",
+            "Best for buyers who want income support without ignoring downside.",
+        ),
+    ]
+    return "\n".join(
+        f"""
+        <article class="report-card">
+          <span>Premium brief</span>
+          <h3>{escape(title)}</h3>
+          <p>{escape(copy)}</p>
+          <strong>{escape(best_for)}</strong>
+          <a href="/shortlist-review/" data-track="report_teaser_click" data-track-label="{escape(title)}">Discuss this brief</a>
+        </article>
+        """.rstrip()
+        for title, copy, best_for in reports
+    )
+
+
 def country_summary_metrics(hub: dict, destinations: list[dict]) -> dict:
     selected = destinations_for_ids(hub.get("destination_ids", []), destinations)
     if not selected:
@@ -1615,7 +1649,7 @@ def build_shortlist_review_page(destinations: list[dict], pages: list[dict]) -> 
         <div><span>Step 3</span><strong>Risk order</strong></div>
         <div><span>Step 4</span><strong>Next diligence</strong></div>
       </section>
-      {sticky_page_nav([("Fit", "fit"), ("Process", "process"), ("Output", "output"), ("Limits", "limits"), ("Specialists", "specialists"), ("Start", "start")])}
+      {sticky_page_nav([("Fit", "fit"), ("Process", "process"), ("Output", "output"), ("Briefs", "premium-briefs"), ("Limits", "limits"), ("Specialists", "specialists"), ("Start", "start")])}
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
@@ -1657,6 +1691,13 @@ def build_shortlist_review_page(destinations: list[dict], pages: list[dict]) -> 
                   <li>Suggested next diligence questions for local specialists.</li>
                 </ul>
               </article>
+            </div>
+          </section>
+          <section class="page-section" id="premium-briefs">
+            <h2>Premium Research Paths</h2>
+            <p>These are the natural paid extensions of a shortlist review. They keep the work focused on the decision the buyer needs to make before local advisers and property-specific diligence begin.</p>
+            <div class="report-grid">
+              {build_premium_report_teasers()}
             </div>
           </section>
           <section class="page-section" id="limits">
@@ -1907,6 +1948,13 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     .inspired-routes p, .inspired-routes dd {{ margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }}
     .inspired-routes dl {{ margin: 12px 0 10px; }}
     .inspired-routes a {{ font-weight: 900; }}
+    .report-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
+    .report-card {{ min-width: 0; display: grid; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(180deg, #fffdf7, #f4eee2); }}
+    .report-card span {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .report-card h3 {{ margin: 0; font-size: 20px; line-height: 1.14; }}
+    .report-card p {{ margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }}
+    .report-card strong {{ color: var(--ink); font-size: 13px; line-height: 1.45; }}
+    .report-card a {{ font-weight: 900; }}
     .path-card, .country-tile {{ color: var(--ink); text-decoration: none; }}
     .path-card, .recommendation-card, .country-tile, .trust-card, .guide-card {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
     .path-card span, .recommendation-card span, .country-tile span, .guide-card span {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
@@ -1928,7 +1976,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     @media (max-width: 980px) {{
       .hero {{ min-height: auto; padding-bottom: 58px; }}
       .hero-grid {{ grid-template-columns: 1fr; }}
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band, .report-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
     }}
     @media (max-width: 640px) {{
       .shell {{ width: min(1160px, calc(100% - 28px)); }}
@@ -1945,7 +1993,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       .section-header, .cta-band {{ display: block; }}
       .section-header h2 {{ max-width: 300px; font-size: 24px; line-height: 1.05; }}
       .section-header a, .cta-band a {{ margin-top: 14px; }}
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band {{ grid-template-columns: 1fr; }}
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band, .report-grid {{ grid-template-columns: 1fr; }}
       .inspired-visual {{ min-height: 230px; }}
       .atlas-visual {{ min-height: 140px; }}
     }}
@@ -2058,6 +2106,19 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
           <div class="inspired-routes">
             {build_landing_inspired_routes()}
           </div>
+        </div>
+      </section>
+
+      <section class="section" id="premium-briefs">
+        <div class="section-header">
+          <div>
+            <h2>Premium research paths</h2>
+            <p>When a public guide is not specific enough, these briefs turn the Atlas into a buyer-specific decision memo.</p>
+          </div>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="premium briefs">Discuss a brief</a>
+        </div>
+        <div class="report-grid">
+          {build_premium_report_teasers()}
         </div>
       </section>
 
@@ -3117,6 +3178,21 @@ def shared_content_css() -> str:
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
+    .report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .report-card {
+      min-width: 0;
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+      border: 1px solid rgba(36, 49, 45, .16);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fffdf7, #f4eee2);
+    }
+    .report-card span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .report-card h3 { margin: 0; font-size: 19px; line-height: 1.14; }
+    .report-card p { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
+    .report-card strong { color: var(--ink); font-size: 13px; line-height: 1.45; }
+    .report-card a { font-weight: 900; }
     .sticky-jump {
       position: sticky;
       top: 0;
@@ -3232,6 +3308,15 @@ def shared_content_css() -> str:
     .cluster-map__grid span, .cluster-map__grid em { color: var(--muted); font-size: 11px; font-style: normal; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .cluster-map__grid strong { display: block; margin: 4px 0; }
     .intake-form { display: grid; gap: 14px; margin-top: 16px; }
+    .saved-shortlist-bridge {
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef3f0;
+    }
+    .saved-shortlist-bridge span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .saved-shortlist-bridge p { margin: 6px 0 0; color: #3f4d48; font-size: 14px; line-height: 1.45; }
     .intake-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .intake-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .intake-form input, .intake-form select, .intake-form textarea {
@@ -3302,7 +3387,7 @@ def shared_content_css() -> str:
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -3321,7 +3406,7 @@ def shared_content_css() -> str:
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -3738,7 +3823,12 @@ def trust_page_body(page: dict) -> str:
             <p>Once the shortlist narrows, the next step may be local legal, tax, immigration, financing, buyer-agent, or property-management review. Any commercial introduction should be disclosed before referral.</p>
           </article>
         </div>
+        <div class="saved-shortlist-bridge" id="savedShortlistBridge" hidden>
+          <span>Saved from dashboard</span>
+          <p id="savedShortlistBridgeText">No saved destinations detected in this browser.</p>
+        </div>
         <form class="intake-form" id="custom-shortlist-form">
+          <input type="hidden" name="saved_shortlist" id="savedShortlistInput">
           <div class="intake-grid">
             <label>Name<input name="name" autocomplete="name" required></label>
             <label>Email<input name="email" type="email" autocomplete="email" required></label>
@@ -3787,6 +3877,36 @@ def trust_page_body(page: dict) -> str:
 
 def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) -> str:
     canonical = page_url(page["slug"])
+    saved_shortlist_script = ""
+    if page["slug"] == "contact":
+        destination_lookup = {
+            dest["id"]: {"name": dest["name"], "country": dest.get("country") or ""}
+            for dest in destinations
+        }
+        saved_shortlist_script = f"""
+  <script>
+    (() => {{
+      const destinationsById = {json.dumps(destination_lookup, ensure_ascii=False)};
+      const bridge = document.getElementById("savedShortlistBridge");
+      const bridgeText = document.getElementById("savedShortlistBridgeText");
+      const input = document.getElementById("savedShortlistInput");
+      if (!bridge || !bridgeText || !input) return;
+      let saved = [];
+      try {{
+        const raw = JSON.parse(localStorage.getItem("gha_memo_shortlist") || "[]");
+        saved = Array.isArray(raw) ? raw.map((id) => destinationsById[id]).filter(Boolean) : [];
+      }} catch (error) {{
+        saved = [];
+      }}
+      if (!saved.length) return;
+      const names = saved.map((item) => item.name + (item.country ? " (" + item.country + ")" : ""));
+      input.value = names.join(", ");
+      bridge.hidden = false;
+      bridgeText.textContent = names.length + (names.length === 1 ? " destination will be included: " : " destinations will be included: ") + names.join(", ");
+      if (window.GHA) window.GHA.track("saved_shortlist_intake_prefill", {{ selected_count: names.length }});
+    }})();
+  </script>
+        """
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -3853,6 +3973,7 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
       <nav><a href="/guides/">All buying guides</a> {seo_guide_links(pages, limit=6)} {destination_links(destinations, limit=6)}</nav>
     </div>
   </footer>
+{saved_shortlist_script}
 {analytics_event_script()}
 </body>
 </html>

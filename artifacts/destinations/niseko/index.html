@@ -114,6 +114,21 @@
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
+    .report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .report-card {
+      min-width: 0;
+      display: grid;
+      gap: 10px;
+      padding: 16px;
+      border: 1px solid rgba(36, 49, 45, .16);
+      border-radius: 8px;
+      background: linear-gradient(180deg, #fffdf7, #f4eee2);
+    }
+    .report-card span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .report-card h3 { margin: 0; font-size: 19px; line-height: 1.14; }
+    .report-card p { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
+    .report-card strong { color: var(--ink); font-size: 13px; line-height: 1.45; }
+    .report-card a { font-weight: 900; }
     .sticky-jump {
       position: sticky;
       top: 0;
@@ -229,6 +244,15 @@
     .cluster-map__grid span, .cluster-map__grid em { color: var(--muted); font-size: 11px; font-style: normal; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .cluster-map__grid strong { display: block; margin: 4px 0; }
     .intake-form { display: grid; gap: 14px; margin-top: 16px; }
+    .saved-shortlist-bridge {
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef3f0;
+    }
+    .saved-shortlist-bridge span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .saved-shortlist-bridge p { margin: 6px 0 0; color: #3f4d48; font-size: 14px; line-height: 1.45; }
     .intake-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
     .intake-form label { display: grid; gap: 6px; color: var(--muted); font-size: 12px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .intake-form input, .intake-form select, .intake-form textarea {
@@ -299,7 +323,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -318,7 +342,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -877,6 +901,7 @@
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
           "Adviser needs: " + (data.get("adviser_needs") || ""),
+          "Saved shortlist: " + (data.get("saved_shortlist") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
@@ -885,7 +910,8 @@
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
           timing: data.get("timing") || "",
-          adviser_needs: data.get("adviser_needs") || ""
+          adviser_needs: data.get("adviser_needs") || "",
+          saved_shortlist: data.get("saved_shortlist") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });
