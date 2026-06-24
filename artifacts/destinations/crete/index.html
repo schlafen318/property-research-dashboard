@@ -880,6 +880,7 @@
           "Risk tolerance: " + (data.get("risk_tolerance") || ""),
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
+          "Adviser needs: " + (data.get("adviser_needs") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
@@ -887,7 +888,8 @@
           regions: data.get("regions") || "",
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
-          timing: data.get("timing") || ""
+          timing: data.get("timing") || "",
+          adviser_needs: data.get("adviser_needs") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });

@@ -886,6 +886,7 @@ def analytics_event_script() -> str:
           "Risk tolerance: " + (data.get("risk_tolerance") || ""),
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
+          "Adviser needs: " + (data.get("adviser_needs") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {{
@@ -893,7 +894,8 @@ def analytics_event_script() -> str:
           regions: data.get("regions") || "",
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
-          timing: data.get("timing") || ""
+          timing: data.get("timing") || "",
+          adviser_needs: data.get("adviser_needs") || ""
         }});
         location.href = "mailto:{escape(CONTACT_EMAIL)}?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\\n"));
       }});
@@ -1613,7 +1615,7 @@ def build_shortlist_review_page(destinations: list[dict], pages: list[dict]) -> 
         <div><span>Step 3</span><strong>Risk order</strong></div>
         <div><span>Step 4</span><strong>Next diligence</strong></div>
       </section>
-      {sticky_page_nav([("Fit", "fit"), ("Process", "process"), ("Output", "output"), ("Limits", "limits"), ("Start", "start")])}
+      {sticky_page_nav([("Fit", "fit"), ("Process", "process"), ("Output", "output"), ("Limits", "limits"), ("Specialists", "specialists"), ("Start", "start")])}
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
@@ -1661,6 +1663,14 @@ def build_shortlist_review_page(destinations: list[dict], pages: list[dict]) -> 
             <h2>Independence and Limits</h2>
             <p>Global Home Atlas is research-led and not a brokerage. Representative listings are market evidence, not availability guarantees or paid placement. The review does not replace local legal, tax, immigration, financing, insurance, inspection, or regulated investment advice.</p>
             <p>The goal is to help you decide where diligence time is worth spending before you become anchored to a listing, local sales process, or one adviser’s jurisdiction.</p>
+          </section>
+          <section class="page-section" id="specialists">
+            <h2>Specialist Introduction Path</h2>
+            <p>Some buyers eventually need local lawyers, tax advisers, immigration advisers, mortgage brokers, buyer agents, or property managers. Global Home Atlas can help identify the type of specialist to look for, and any future introductions should be clearly disclosed and quality-controlled.</p>
+            <div class="page-grid">
+              <article class="page-card"><h3>When useful</h3><ul><li>After a market shortlist is narrowed to one or two jurisdictions.</li><li>When ownership, residency, tax, financing, or rental rules decide the next step.</li><li>Before viewing specific properties or signing local mandates.</li></ul></article>
+              <article class="page-card"><h3>Disclosure standard</h3><ul><li>No hidden paid placement in destination rankings.</li><li>Any commercial introduction should be disclosed before referral.</li><li>Buyer remains responsible for independent local due diligence.</li></ul></article>
+            </div>
           </section>
           <section class="page-section" id="start">
             <h2>Start the Review</h2>
@@ -3722,6 +3732,11 @@ def trust_page_body(page: dict) -> str:
             <h3>Before agents and listings</h3>
             <p>The review is most useful before a buyer starts touring homes, because jurisdiction, liquidity, permits, and ownership structure should narrow the search first.</p>
           </article>
+          <article class="page-card">
+            <span>Later-stage support</span>
+            <h3>Specialist direction</h3>
+            <p>Once the shortlist narrows, the next step may be local legal, tax, immigration, financing, buyer-agent, or property-management review. Any commercial introduction should be disclosed before referral.</p>
+          </article>
         </div>
         <form class="intake-form" id="custom-shortlist-form">
           <div class="intake-grid">
@@ -3756,6 +3771,7 @@ def trust_page_body(page: dict) -> str:
             </label>
             <label>Holding period<input name="holding_period" placeholder="Example: 7-10 years"></label>
             <label>Timing<input name="timing" placeholder="Example: researching now, buy in 12-24 months"></label>
+            <label>Adviser needs<input name="adviser_needs" placeholder="Example: local lawyer, tax, residency, buyer agent"></label>
           </div>
           <label>Notes<textarea name="notes" placeholder="Citizenship, family use, healthcare needs, rental expectations, timing, and any must-avoid risks."></textarea></label>
           <button type="submit" data-track="custom_shortlist_submit_click">Prepare request</button>
@@ -5318,6 +5334,12 @@ def build() -> Path:
           <p>${escapeHtml(d.profit_driver || d.panel_summary || "")}</p>
           <h3>Risk check</h3>
           <p>${escapeHtml(d.red_flags || "Verify title, tax, permit, and local market liquidity before committing capital.")}</p>
+          <h3>Next diligence questions</h3>
+          <ul>
+            <li>Which ownership structure is available to this buyer profile, and what local counsel should verify first?</li>
+            <li>What rental, tax, insurance, financing, and building-permit assumptions could change the underwriting?</li>
+            <li>How deep is the resale pool outside peak season, and who is the likely future buyer?</li>
+          </ul>
           <h3>10-dimension rating</h3>
           <table>
             <tbody>${d.decision_dimensions.map((item) => `<tr><th>${escapeHtml(item.label)}</th><td>${Number(item.score).toFixed(1)}</td><td>${escapeHtml(item.evidence)}</td></tr>`).join("")}</tbody>
@@ -5332,11 +5354,18 @@ def build() -> Path:
           h2 span{color:#66736c;font-size:16px;font-weight:500} h3{margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
           dl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px} dl div{border:1px solid #ddd4c7;padding:10px;border-radius:6px}
           dt{color:#66736c;font-size:11px;text-transform:uppercase;font-weight:800} dd{margin:4px 0 0;font-weight:800}
+          .next{margin:22px 0;padding:16px;border:1px solid #ddd4c7;border-radius:8px;background:#f5f1e9}
+          .next p{margin:6px 0 0}
           table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;border-top:1px solid #ddd4c7;padding:8px;vertical-align:top;font-size:13px}
           @media(max-width:720px){body{margin:20px}dl{grid-template-columns:1fr}}
         </style></head><body>
         <h1>Investor Shortlist Memo</h1>
         <p>Generated ${generated}. Scores use the current 10-dimension weighting model from Global Home Atlas.</p>
+        <div class="next">
+          <h2>How to use this memo</h2>
+          <p>Use this as a pre-adviser briefing. It should help you decide which jurisdictions deserve legal, tax, immigration, financing, insurance, and property-management review before you become anchored to a listing.</p>
+          <p>For a buyer-specific review, open https://globalhomeatlas.com/shortlist-review/ and include the destinations in this memo.</p>
+        </div>
         ${rows}
         </body></html>`;
     }

@@ -8607,6 +8607,12 @@
           <p>${escapeHtml(d.profit_driver || d.panel_summary || "")}</p>
           <h3>Risk check</h3>
           <p>${escapeHtml(d.red_flags || "Verify title, tax, permit, and local market liquidity before committing capital.")}</p>
+          <h3>Next diligence questions</h3>
+          <ul>
+            <li>Which ownership structure is available to this buyer profile, and what local counsel should verify first?</li>
+            <li>What rental, tax, insurance, financing, and building-permit assumptions could change the underwriting?</li>
+            <li>How deep is the resale pool outside peak season, and who is the likely future buyer?</li>
+          </ul>
           <h3>10-dimension rating</h3>
           <table>
             <tbody>${d.decision_dimensions.map((item) => `<tr><th>${escapeHtml(item.label)}</th><td>${Number(item.score).toFixed(1)}</td><td>${escapeHtml(item.evidence)}</td></tr>`).join("")}</tbody>
@@ -8621,11 +8627,18 @@
           h2 span{color:#66736c;font-size:16px;font-weight:500} h3{margin-bottom:6px;font-size:13px;text-transform:uppercase;letter-spacing:.06em}
           dl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px} dl div{border:1px solid #ddd4c7;padding:10px;border-radius:6px}
           dt{color:#66736c;font-size:11px;text-transform:uppercase;font-weight:800} dd{margin:4px 0 0;font-weight:800}
+          .next{margin:22px 0;padding:16px;border:1px solid #ddd4c7;border-radius:8px;background:#f5f1e9}
+          .next p{margin:6px 0 0}
           table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;border-top:1px solid #ddd4c7;padding:8px;vertical-align:top;font-size:13px}
           @media(max-width:720px){body{margin:20px}dl{grid-template-columns:1fr}}
         </style></head><body>
         <h1>Investor Shortlist Memo</h1>
         <p>Generated ${generated}. Scores use the current 10-dimension weighting model from Global Home Atlas.</p>
+        <div class="next">
+          <h2>How to use this memo</h2>
+          <p>Use this as a pre-adviser briefing. It should help you decide which jurisdictions deserve legal, tax, immigration, financing, insurance, and property-management review before you become anchored to a listing.</p>
+          <p>For a buyer-specific review, open https://globalhomeatlas.com/shortlist-review/ and include the destinations in this memo.</p>
+        </div>
         ${rows}
         </body></html>`;
     }
@@ -8713,6 +8726,7 @@
           "Risk tolerance: " + (data.get("risk_tolerance") || ""),
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
+          "Adviser needs: " + (data.get("adviser_needs") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
@@ -8720,7 +8734,8 @@
           regions: data.get("regions") || "",
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
-          timing: data.get("timing") || ""
+          timing: data.get("timing") || "",
+          adviser_needs: data.get("adviser_needs") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });

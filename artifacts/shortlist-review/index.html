@@ -500,7 +500,7 @@
         <div><span>Step 3</span><strong>Risk order</strong></div>
         <div><span>Step 4</span><strong>Next diligence</strong></div>
       </section>
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#fit">Fit</a><a href="#process">Process</a><a href="#output">Output</a><a href="#limits">Limits</a><a href="#start">Start</a></nav>
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#fit">Fit</a><a href="#process">Process</a><a href="#output">Output</a><a href="#limits">Limits</a><a href="#specialists">Specialists</a><a href="#start">Start</a></nav>
 
       <section class="trust-brief" id="trust-context" aria-label="Research credibility">
         <div>
@@ -566,6 +566,14 @@
             <h2>Independence and Limits</h2>
             <p>Global Home Atlas is research-led and not a brokerage. Representative listings are market evidence, not availability guarantees or paid placement. The review does not replace local legal, tax, immigration, financing, insurance, inspection, or regulated investment advice.</p>
             <p>The goal is to help you decide where diligence time is worth spending before you become anchored to a listing, local sales process, or one adviser’s jurisdiction.</p>
+          </section>
+          <section class="page-section" id="specialists">
+            <h2>Specialist Introduction Path</h2>
+            <p>Some buyers eventually need local lawyers, tax advisers, immigration advisers, mortgage brokers, buyer agents, or property managers. Global Home Atlas can help identify the type of specialist to look for, and any future introductions should be clearly disclosed and quality-controlled.</p>
+            <div class="page-grid">
+              <article class="page-card"><h3>When useful</h3><ul><li>After a market shortlist is narrowed to one or two jurisdictions.</li><li>When ownership, residency, tax, financing, or rental rules decide the next step.</li><li>Before viewing specific properties or signing local mandates.</li></ul></article>
+              <article class="page-card"><h3>Disclosure standard</h3><ul><li>No hidden paid placement in destination rankings.</li><li>Any commercial introduction should be disclosed before referral.</li><li>Buyer remains responsible for independent local due diligence.</li></ul></article>
+            </div>
           </section>
           <section class="page-section" id="start">
             <h2>Start the Review</h2>
@@ -692,6 +700,7 @@
           "Risk tolerance: " + (data.get("risk_tolerance") || ""),
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
+          "Adviser needs: " + (data.get("adviser_needs") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
@@ -699,7 +708,8 @@
           regions: data.get("regions") || "",
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
-          timing: data.get("timing") || ""
+          timing: data.get("timing") || "",
+          adviser_needs: data.get("adviser_needs") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });

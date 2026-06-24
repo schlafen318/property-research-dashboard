@@ -533,6 +533,11 @@
             <h3>Before agents and listings</h3>
             <p>The review is most useful before a buyer starts touring homes, because jurisdiction, liquidity, permits, and ownership structure should narrow the search first.</p>
           </article>
+          <article class="page-card">
+            <span>Later-stage support</span>
+            <h3>Specialist direction</h3>
+            <p>Once the shortlist narrows, the next step may be local legal, tax, immigration, financing, buyer-agent, or property-management review. Any commercial introduction should be disclosed before referral.</p>
+          </article>
         </div>
         <form class="intake-form" id="custom-shortlist-form">
           <div class="intake-grid">
@@ -567,6 +572,7 @@
             </label>
             <label>Holding period<input name="holding_period" placeholder="Example: 7-10 years"></label>
             <label>Timing<input name="timing" placeholder="Example: researching now, buy in 12-24 months"></label>
+            <label>Adviser needs<input name="adviser_needs" placeholder="Example: local lawyer, tax, residency, buyer agent"></label>
           </div>
           <label>Notes<textarea name="notes" placeholder="Citizenship, family use, healthcare needs, rental expectations, timing, and any must-avoid risks."></textarea></label>
           <button type="submit" data-track="custom_shortlist_submit_click">Prepare request</button>
@@ -705,6 +711,7 @@
           "Risk tolerance: " + (data.get("risk_tolerance") || ""),
           "Holding period: " + (data.get("holding_period") || ""),
           "Timing: " + (data.get("timing") || ""),
+          "Adviser needs: " + (data.get("adviser_needs") || ""),
           "Notes: " + (data.get("notes") || "")
         ];
         track("custom_shortlist_submit", {
@@ -712,7 +719,8 @@
           regions: data.get("regions") || "",
           goal: data.get("goal") || "",
           risk_tolerance: data.get("risk_tolerance") || "",
-          timing: data.get("timing") || ""
+          timing: data.get("timing") || "",
+          adviser_needs: data.get("adviser_needs") || ""
         });
         location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
       });
