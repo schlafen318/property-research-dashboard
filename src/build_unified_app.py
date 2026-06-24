@@ -4581,6 +4581,25 @@ def build() -> Path:
       text-decoration: none;
     }
     .saved-shortlist a { background: var(--deep); color: #fffdf7; }
+    .saved-brief {
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fff;
+    }
+    .saved-brief h3 { margin: 0 0 8px; font-size: 14px; }
+    .saved-brief__list { display: grid; gap: 8px; margin-top: 10px; }
+    .saved-brief__item {
+      padding: 10px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+    }
+    .saved-brief__item strong { display: block; font-size: 14px; }
+    .saved-brief__item span { color: var(--muted); font-size: 12px; }
+    .saved-brief__item p { margin: 6px 0 0; color: #3f4d48; font-size: 12px; line-height: 1.4; }
+    .saved-brief__empty { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
     .mobile-jump {
       display: none;
       gap: 8px;
@@ -5074,6 +5093,12 @@ def build() -> Path:
               <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="saved shortlist">Review my shortlist</a>
             </div>
           </div>
+          <div class="saved-brief" aria-live="polite">
+            <h3>Private Brief Preview</h3>
+            <div id="savedBriefOutput">
+              <p class="saved-brief__empty">Save destinations to build a private brief preview here.</p>
+            </div>
+          </div>
         </aside>
 
         <div class="content-stack">
@@ -5182,6 +5207,7 @@ def build() -> Path:
     const weightInputs = Array.from(document.querySelectorAll("[data-weight-key]"));
     const compareOutput = document.getElementById("compareOutput");
     const savedShortlistStatus = document.getElementById("savedShortlistStatus");
+    const savedBriefOutput = document.getElementById("savedBriefOutput");
     const clearMemoShortlist = document.getElementById("clearMemoShortlist");
     const compareSelected = new Set();
     const memoKey = "gha_memo_shortlist";
@@ -5220,6 +5246,22 @@ def build() -> Path:
       savedShortlistStatus.textContent = selected.length + (selected.length === 1 ? " destination saved: " : " destinations saved: ") + selected.map((item) => item.name).join(", ");
     }
 
+    function renderSavedBrief() {
+      if (!savedBriefOutput) return;
+      const selected = [...memoShortlist].map((id) => destinationsById.get(id)).filter(Boolean);
+      if (!selected.length) {
+        savedBriefOutput.innerHTML = '<p class="saved-brief__empty">Save destinations to build a private brief preview here.</p>';
+        return;
+      }
+      savedBriefOutput.innerHTML = '<div class="saved-brief__list">' + selected.map((destination) => `
+        <article class="saved-brief__item">
+          <strong>${escapeHtml(destination.name)}</strong>
+          <span>${escapeHtml(destination.country || "")} · ${Number(destination.custom_score || destination.decision_score || 0).toFixed(2)}/5 · ownership ${destinationMetric(destination, "ownership_clarity").toFixed(1)}/5</span>
+          <p>${escapeHtml(destination.red_flags || "Verify title, tax, permits, liquidity, and local adviser requirements before committing capital.")}</p>
+        </article>
+      `).join("") + '</div>';
+    }
+
     function updateMemoButtons() {
       document.querySelectorAll(".memo-add").forEach((button) => {
         const id = button.dataset.memoId;
@@ -5228,6 +5270,7 @@ def build() -> Path:
         button.setAttribute("aria-pressed", String(selected));
       });
       updateSavedShortlistStatus();
+      renderSavedBrief();
     }
 
     function cardRank(card) {
@@ -5258,6 +5301,7 @@ def build() -> Path:
         }
       });
       renderCompare();
+      renderSavedBrief();
       applyFilters();
     }
 
