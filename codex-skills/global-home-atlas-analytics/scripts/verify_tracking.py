@@ -125,8 +125,10 @@ def main() -> int:
             failures.append((url, "missing tracking layer"))
 
     homepage = (ARTIFACTS / "index.html").read_text(encoding="utf-8")
+    dashboard = (ARTIFACTS / "dashboard" / "index.html").read_text(encoding="utf-8")
     contact = (ARTIFACTS / "contact" / "index.html").read_text(encoding="utf-8")
-    missing_events = sorted(event for event in EXPECTED_EVENTS if event not in homepage and event not in contact)
+    tracked_surfaces = homepage + dashboard + contact
+    missing_events = sorted(event for event in EXPECTED_EVENTS if event not in tracked_surfaces)
     for event in missing_events:
         failures.append(("events", f"missing {event}"))
     if 'id="custom-shortlist-form"' not in contact:
