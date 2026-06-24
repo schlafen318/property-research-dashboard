@@ -27,6 +27,12 @@ GUIDE_HUB_DESCRIPTION = (
     "Browse Global Home Atlas buying guides for overseas property, retirement homes, "
     "second homes, foreign ownership, investment risk, and destination shortlists."
 )
+SHORTLIST_REVIEW_SLUG = "shortlist-review"
+SHORTLIST_REVIEW_TITLE = "Shortlist Review | Global Home Atlas"
+SHORTLIST_REVIEW_DESCRIPTION = (
+    "Request a Global Home Atlas shortlist review before speaking to agents, with a "
+    "research-led route across buyer intent, budget, citizenship, risk, and holding period."
+)
 COUNTRY_HUBS = [
     {
         "slug": "spain-property",
@@ -1043,22 +1049,24 @@ def primary_nav_html(css_prefix: str = "page", include_seo_status: bool = False)
       <nav class="{css_prefix}-nav" aria-label="Primary">
         <a class="{css_prefix}-brand" href="/">Global Home Atlas</a>
         <div class="{css_prefix}-nav-links">
-          <a href="/#compare">Compare</a>
+          <a href="/dashboard/#compare">Compare</a>
           <a href="/guides/">Guides</a>
           <a href="/#destination-index">Destinations</a>
           <a href="/countries/spain-property/">Countries</a>
           <a href="/methodology/">Methodology</a>
+          <a href="/shortlist-review/">Shortlist Review</a>
           <a href="/contact/">Contact</a>
           {seo_status}
         </div>
         <details class="mobile-menu">
           <summary>Menu</summary>
           <nav aria-label="Mobile primary">
-            <a href="/#compare">Compare</a>
+            <a href="/dashboard/#compare">Compare</a>
             <a href="/countries/spain-property/">Countries</a>
             <a href="/#destination-index">Destinations</a>
             <a href="/guides/">Guides</a>
             <a href="/methodology/">Methodology</a>
+            <a href="/shortlist-review/">Shortlist Review</a>
             <a href="/contact/">Contact</a>
           </nav>
         </details>
@@ -1515,7 +1523,7 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
           <section class="page-aside-card">
             <h3>Custom shortlist</h3>
             <p>Need the country route mapped to your citizenship, budget, and holding period?</p>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="country comparison">Review my shortlist</a>
+            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="country comparison">Review my shortlist</a>
           </section>
         </aside>
       </div>
@@ -1530,6 +1538,166 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
   </footer>
   {mobile_disclosure_script()}
   {analytics_event_script()}
+</body>
+</html>
+"""
+
+
+def build_shortlist_review_page(destinations: list[dict], pages: list[dict]) -> str:
+    canonical = page_url(SHORTLIST_REVIEW_SLUG)
+    top_links = destination_links(destinations[:5], limit=5)
+    guide_links = seo_guide_links(pages, limit=6)
+    schema = [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "Service",
+            "name": "Global Home Atlas Shortlist Review",
+            "url": canonical,
+            "description": SHORTLIST_REVIEW_DESCRIPTION,
+            "provider": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL},
+            "serviceType": "Property destination research",
+            "areaServed": "Global",
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Shortlist Review", "item": canonical},
+            ],
+        },
+    ]
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(SHORTLIST_REVIEW_TITLE, SHORTLIST_REVIEW_DESCRIPTION, canonical, schema)}
+  <style>
+{shared_content_css()}
+    .offer-steps {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }}
+    .offer-steps article {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
+    .offer-steps span, .offer-comparison span {{ color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .offer-steps strong {{ display: block; margin: 8px 0 6px; font-size: 18px; line-height: 1.12; }}
+    .offer-steps p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }}
+    .offer-comparison {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }}
+    .offer-comparison article {{ min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
+    .offer-comparison h3 {{ margin: 8px 0 10px; }}
+    .offer-comparison ul {{ margin: 0; padding-left: 18px; color: #3f4d48; }}
+    @media (max-width: 860px) {{ .offer-steps, .offer-comparison {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
+    @media (max-width: 560px) {{ .offer-steps, .offer-comparison {{ grid-template-columns: 1fr; }} }}
+  </style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      {primary_nav_html()}
+      <div class="page-hero-grid">
+        <div>
+          <p class="page-eyebrow">Shortlist review · research before agents</p>
+          <h1>Review Your Overseas Property Shortlist</h1>
+          <p class="page-lede">Before you speak to agents or chase listings, use a structured review to test whether your countries and destinations match your budget, citizenship, lifestyle plan, risk tolerance, and holding period.</p>
+        </div>
+        <aside class="page-hero-card">
+          <span>Primary job</span><strong>Narrow markets</strong>
+          <span>Best timing</span><strong>Before viewings</strong>
+          <span>Output</span><strong>Research route</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="page-stats" aria-label="Shortlist review summary">
+        <div><span>Step 1</span><strong>Fit check</strong></div>
+        <div><span>Step 2</span><strong>Market screen</strong></div>
+        <div><span>Step 3</span><strong>Risk order</strong></div>
+        <div><span>Step 4</span><strong>Next diligence</strong></div>
+      </section>
+      {sticky_page_nav([("Fit", "fit"), ("Process", "process"), ("Output", "output"), ("Limits", "limits"), ("Start", "start")])}
+      {trust_brief_html()}
+      <div class="page-layout">
+        <article class="page-article">
+          <section class="page-section" id="fit">
+            <h2>Who This Is For</h2>
+            <p>The shortlist review is for serious international buyers who are still choosing the right market. It is most useful when the buyer has a budget range, a target use case, and a few possible countries, but has not yet committed to agents, viewings, lawyers, or a specific property.</p>
+            <div class="page-grid">
+              <article class="page-card"><h3>Good fit</h3><ul><li>Retirement or second-home buyers comparing countries.</li><li>Families balancing lifestyle, healthcare, access, and future resale.</li><li>Investors who want yield realism without ignoring ownership and liquidity.</li></ul></article>
+              <article class="page-card"><h3>Not the right fit</h3><ul><li>Property-specific legal, tax, immigration, or contract review.</li><li>Requests for guaranteed returns or rental projections.</li><li>Brokerage, paid placement, or undisclosed listing promotion.</li></ul></article>
+            </div>
+          </section>
+          <section class="page-section" id="process">
+            <h2>How the Review Works</h2>
+            <div class="offer-steps">
+              <article><span>01</span><strong>Clarify the job</strong><p>Define whether the property is for retirement, second-home use, rental support, capital preservation, or mixed goals.</p></article>
+              <article><span>02</span><strong>Screen jurisdictions</strong><p>Compare ownership clarity, foreigner fit, tax and residency caveats, rental rules, and adviser depth.</p></article>
+              <article><span>03</span><strong>Rank market fit</strong><p>Use the Atlas model to prioritize destinations that fit the buyer instead of the most photogenic listings.</p></article>
+              <article><span>04</span><strong>Order diligence</strong><p>Identify what to verify first with local counsel, tax advisers, immigration advisers, agents, or property managers.</p></article>
+            </div>
+          </section>
+          <section class="page-section" id="output">
+            <h2>What You Can Receive</h2>
+            <div class="offer-comparison">
+              <article>
+                <span>Free intake</span>
+                <h3>Fit and scope check</h3>
+                <ul>
+                  <li>Confirm whether your question fits Global Home Atlas research.</li>
+                  <li>Identify the most useful starting guides and dashboard filters.</li>
+                  <li>Clarify whether a deeper custom research brief is appropriate.</li>
+                </ul>
+              </article>
+              <article>
+                <span>Paid research path</span>
+                <h3>Decision-ready shortlist brief</h3>
+                <ul>
+                  <li>Buyer-specific destination shortlist and avoid list.</li>
+                  <li>Ownership, lifestyle, rental, retirement, and exit tradeoffs.</li>
+                  <li>Suggested next diligence questions for local specialists.</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+          <section class="page-section" id="limits">
+            <h2>Independence and Limits</h2>
+            <p>Global Home Atlas is research-led and not a brokerage. Representative listings are market evidence, not availability guarantees or paid placement. The review does not replace local legal, tax, immigration, financing, insurance, inspection, or regulated investment advice.</p>
+            <p>The goal is to help you decide where diligence time is worth spending before you become anchored to a listing, local sales process, or one adviser’s jurisdiction.</p>
+          </section>
+          <section class="page-section" id="start">
+            <h2>Start the Review</h2>
+            <p>Send your budget range, citizenship or residency context, target regions, buying goal, rental expectations, risk tolerance, and timing. If you already saved destinations in the dashboard, include those names in the notes field.</p>
+            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="shortlist review page">Open intake form</a>
+          </section>
+        </article>
+        <aside class="page-aside">
+          <section class="page-aside-card">
+            <h2>Use Before You Submit</h2>
+            <p>Compare your saved markets in the dashboard, export a memo, then send the shortlist for review.</p>
+            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="shortlist review page">Open dashboard</a>
+          </section>
+          <section class="page-aside-card">
+            <h3>Strong Starting Markets</h3>
+            <nav>{top_links}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Useful Guides</h3>
+            <nav>{guide_links}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Trust Layer</h3>
+            <nav>{trust_page_links()}</nav>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="page-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Independent research for international property decisions before local diligence begins.</p>
+      <nav><a href="/dashboard/">Research dashboard</a> <a href="/contact/#custom-shortlist">Open intake</a> {trust_page_links()}</nav>
+    </div>
+  </footer>
+{analytics_event_script()}
 </body>
 </html>
 """
@@ -1834,7 +2002,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
             <h2>Find your market fit</h2>
             <p>Use this quick lens when you want a useful starting point without opening the full dashboard.</p>
           </div>
-          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="market finder">Review my shortlist</a>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="market finder">Review my shortlist</a>
         </div>
         <div class="finder-grid">
           <div class="finder-panel">
@@ -1871,7 +2039,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
             <h2>Feel inspired, then make it investable</h2>
             <p>The best markets should create emotional pull and still survive ownership, liquidity, rental, and long-stay tests.</p>
           </div>
-          <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="inspired routes">Review my shortlist</a>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="inspired routes">Review my shortlist</a>
         </div>
         <div class="inspired-band">
           <div class="inspired-visual" aria-hidden="true">
@@ -1914,7 +2082,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
           <h2>Need a buyer-specific answer?</h2>
           <p>Turn the Atlas into a custom research brief across budget, citizenship constraints, lifestyle plan, rental expectations, and holding period.</p>
         </div>
-        <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="landing cta">Review my shortlist</a>
+        <a class="primary-action" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="landing cta">Review my shortlist</a>
       </section>
 
       <section class="section" id="guides">
@@ -2310,7 +2478,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
             <h2>Use the Atlas</h2>
             <p>Open the dashboard to compare all destination scores and export a shortlist memo.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="guide hub">Open dashboard</a>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="guide hub">Review my shortlist</a>
+            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub">Review my shortlist</a>
           </section>
           <section class="page-aside-card">
             <h3>Best Starting Destinations</h3>
@@ -2521,7 +2689,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
         <div><span>Updated</span><strong>{updated}</strong></div>
       </section>
       {sticky_page_nav([("Thesis", "country-thesis"), ("Buyer Fit", "buyer-fit"), ("Compare", "destination-comparison"), ("Risk", "risk-posture"), ("Guides", "related-guides")])}
-      {mobile_action_strip("#destination-comparison", "Compare", "/contact/#custom-shortlist", "Brief")}
+      {mobile_action_strip("#destination-comparison", "Compare", "/shortlist-review/", "Brief")}
       <section class="brief-panel" aria-label="Country briefing">
         <article><span>Top destination match</span><strong>{escape(best["name"])}</strong><p>{escape(best.get("panel_verdict") or "")}</p></article>
         <article><span>Buyer profile</span><strong>Affluent global planners</strong><p>Best for buyers comparing lifestyle use, legal clarity, tax and ownership friction, rental realism, and future liquidity before local deal work.</p></article>
@@ -2570,7 +2738,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
             <h2>Use the Atlas</h2>
             <p>Compare these markets against the full destination model and export a shortlist memo.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(hub["country"])} country hub">Open dashboard</a>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(hub["country"])} country hub">Review my shortlist</a>
+            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(hub["country"])} country hub">Review my shortlist</a>
           </section>
           <section class="page-aside-card">
             <h3>Other Country Hubs</h3>
@@ -2810,7 +2978,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
             <h2>Use the Full Atlas</h2>
             <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open dashboard</a>
-            <a class="seo-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(page["h1"])}">Review my shortlist</a>
+            <a class="seo-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(page["h1"])}">Review my shortlist</a>
           </section>
           <section class="seo-aside-card">
             <h3>Related Guides</h3>
@@ -3370,7 +3538,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         </div>
       </section>
       {sticky_page_nav([("Verdict", "verdict"), ("Buyer Fit", "buyer-fit"), ("Ownership", "ownership"), ("Lifestyle", "lifestyle"), ("Scores", "scores"), ("Evidence", "evidence"), ("Trust", "trust-context")])}
-      {mobile_action_strip("#scores", "Scores", "/contact/#custom-shortlist", "Review")}
+      {mobile_action_strip("#scores", "Scores", "/shortlist-review/", "Review")}
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
@@ -3426,7 +3594,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
             <h2>Compare in Atlas</h2>
             <p>Use the dashboard to compare {escape(dest["name"])} against every market in the 10-dimension model.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(dest["name"])} destination">Open dashboard</a>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(dest["name"])} destination">Review my shortlist</a>
+            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(dest["name"])} destination">Review my shortlist</a>
           </section>
           <section class="page-aside-card">
             <h3>Related Destinations</h3>
@@ -3644,7 +3812,7 @@ def build_trust_page(page: dict, destinations: list[dict], pages: list[dict]) ->
             <h2>Explore the Atlas</h2>
             <p>Open the dashboard to compare all destinations and adjust the scoring weights.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} trust page">Open dashboard</a>
-            <a class="page-button" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="{escape(page["h1"])} trust page">Review my shortlist</a>
+            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(page["h1"])} trust page">Review my shortlist</a>
           </section>
           <section class="page-aside-card" id="guides-link">
             <h3>Research Guides</h3>
@@ -4766,7 +4934,7 @@ def build() -> Path:
             <p id="savedShortlistStatus">No saved destinations yet.</p>
             <div class="saved-shortlist__actions">
               <button type="button" id="clearMemoShortlist">Clear saved list</button>
-              <a href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="saved shortlist">Review my shortlist</a>
+              <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="saved shortlist">Review my shortlist</a>
             </div>
           </div>
         </aside>
@@ -4790,7 +4958,7 @@ def build() -> Path:
                 <h2>Shortlist Review</h2>
                 <p>Turn the Atlas into a buyer-specific research brief across lifestyle plan, budget, citizenship constraints, rental expectations, and holding period.</p>
               </div>
-              <a class="primary-action" href="/contact/#custom-shortlist" data-track="custom_shortlist_cta" data-track-label="homepage conversion section">Review my shortlist</a>
+              <a class="primary-action" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="homepage conversion section">Review my shortlist</a>
             </div>
           </section>
 
@@ -5236,6 +5404,12 @@ def build() -> Path:
         clean_generated_html(build_country_comparison_page(destinations, SEO_PAGES)),
         encoding="utf-8",
     )
+    shortlist_review_dir = ARTIFACTS / SHORTLIST_REVIEW_SLUG
+    shortlist_review_dir.mkdir(parents=True, exist_ok=True)
+    (shortlist_review_dir / "index.html").write_text(
+        clean_generated_html(build_shortlist_review_page(destinations, SEO_PAGES)),
+        encoding="utf-8",
+    )
     for page in SEO_PAGES:
         page_dir = ARTIFACTS / page["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
@@ -5287,6 +5461,7 @@ Sitemap: {SITE_URL}sitemap.xml
     sitemap_urls = [
         (SITE_URL, "1.0"),
         (page_url("dashboard"), "0.92"),
+        (page_url(SHORTLIST_REVIEW_SLUG), "0.90"),
         (page_url("country-comparison"), "0.88"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
