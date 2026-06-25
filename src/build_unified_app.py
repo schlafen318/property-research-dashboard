@@ -71,6 +71,26 @@ COUNTRY_HUBS = [
         "guide_slugs": ["japan-retirement-property-foreign-buyers", "best-countries-to-buy-property-as-a-foreigner", "buying-property-abroad-for-retirement", "best-places-to-buy-vacation-home-abroad"],
     },
     {
+        "slug": "united-states-property",
+        "country": "United States",
+        "title": "United States Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Compare United States second-home and resort property markets, including Aspen, Park City, Lake Tahoe, and Jackson Hole across ownership clarity, price discipline, rental rules, and climate risk.",
+        "h1": "United States Property Guide for Foreign Buyers",
+        "thesis": "The United States offers clean title and deep luxury-market liquidity, but resort property underwriting is rarely simple. Buyers need to separate trophy scarcity from income potential, then model local rental rules, insurance, taxes, and carrying costs market by market.",
+        "destination_ids": ["park-city-deer-valley", "lake-tahoe", "jackson-hole", "aspen-snowmass"],
+        "guide_slugs": ["best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "overseas-property-investment", "where-can-foreigners-buy-property"],
+    },
+    {
+        "slug": "canada-property",
+        "country": "Canada",
+        "title": "Canada Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Canada lifestyle property markets for foreign buyers, including Whistler and Vancouver Island across mountain, water, retirement, rental, tax, and policy considerations.",
+        "h1": "Canada Property Guide for Foreign Buyers",
+        "thesis": "Canada adds a useful North American lifestyle benchmark: clear institutions, strong livability, and real mountain/water appeal. The caution is policy. Foreign-buyer rules, vacancy and speculation taxes, local rental limits, and high carrying costs can change the practical answer.",
+        "destination_ids": ["vancouver-island-victoria", "whistler"],
+        "guide_slugs": ["best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "where-can-foreigners-buy-property"],
+    },
+    {
         "slug": "thailand-property",
         "country": "Thailand",
         "title": "Thailand Property Guide for Foreign Buyers | Global Home Atlas",
@@ -916,7 +936,9 @@ def head_html(title: str, description: str, canonical: str, schema: list[dict]) 
     return f"""
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2310241f'/%3E%3Cpath d='M17 37 32 18l15 19v11H36V36h-8v12H17Z' fill='%23fffdf8'/%3E%3C/svg%3E">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
+  <link rel="manifest" href="/assets/site.webmanifest">
   <title>{escape(title)}</title>
   <meta name="description" content="{escape(description)}">
   <link rel="canonical" href="{escape(canonical)}">
@@ -1215,35 +1237,44 @@ def build_landing_buyer_paths() -> str:
             "Find markets where healthcare, daily ease, culture, and resale depth matter more than headline yield.",
             "/best-places-to-buy-property-abroad-for-retirement/",
             "Retirement",
+            "01",
+            "#8f6f3d",
         ),
         (
             "Second home abroad",
             "Compare places that can support regular owner use, family visits, and sensible rental offset.",
             "/best-places-to-buy-a-second-home-abroad/",
             "Second homes",
+            "02",
+            "#5f7f72",
         ),
         (
             "Investment-led shortlist",
             "Start with yield realism, entry value, regulatory safety, and exit liquidity before falling in love with the place.",
             "/overseas-property-investment/",
             "Investment",
+            "03",
+            "#365f6d",
         ),
         (
             "Clean ownership markets",
             "Prioritize title clarity, foreigner fit, and governance where cross-border ownership can be explained simply.",
             "/where-can-foreigners-buy-property/",
             "Ownership",
+            "04",
+            "#7b5f80",
         ),
     ]
     return "\n".join(
         f"""
-        <a class="path-card" href="{href}" data-track="buyer_path_click" data-track-label="{escape(label)}">
-          <span>{escape(kicker)}</span>
+        <a class="path-card" href="{href}" data-track="buyer_path_click" data-track-label="{escape(label)}" style="--path-accent: {escape(accent)};">
+          <span><b>{escape(icon)}</b>{escape(kicker)}</span>
           <strong>{escape(label)}</strong>
           <p>{escape(copy)}</p>
+          <em>Open path</em>
         </a>
         """.rstrip()
-        for label, copy, href, kicker in paths
+        for label, copy, href, kicker, icon, accent in paths
     )
 
 
@@ -1298,10 +1329,14 @@ def build_landing_recommendations(destinations: list[dict]) -> str:
               <p>{escape(dest.get("country") or "")} · {escape(dest.get("category") or "")}</p>
               <strong>{dest.get("decision_score", 0):.2f}/5</strong>
               <em>{escape(rationale)}</em>
-              <dl>
-                <div><dt>Best for</dt><dd>{escape(best_for)}</dd></div>
-                <div><dt>Skip if</dt><dd>{escape(skip_if)}</dd></div>
-              </dl>
+              <details open>
+                <summary>Best for / skip if</summary>
+                <dl>
+                  <div><dt>Best for</dt><dd>{escape(best_for)}</dd></div>
+                  <div><dt>Skip if</dt><dd>{escape(skip_if)}</dd></div>
+                </dl>
+              </details>
+              <a class="card-link" href="/destinations/{escape(destination_slug(dest))}/" data-track="destination_click" data-track-label="landing recommendation cta {escape(dest['name'])}">See full profile</a>
             </article>
             """.rstrip()
         )
@@ -1940,7 +1975,7 @@ def build_shortlist_review_page(destinations: list[dict], pages: list[dict]) -> 
 
 
 def build_landing_country_tiles() -> str:
-    priority = ["spain-property", "portugal-property", "japan-property", "italy-property", "greece-property", "thailand-property", "switzerland-property"]
+    priority = ["spain-property", "portugal-property", "japan-property", "united-states-property", "canada-property", "italy-property", "greece-property", "thailand-property", "switzerland-property"]
     by_slug = {hub["slug"]: hub for hub in COUNTRY_HUBS}
     cards = []
     for slug in priority:
@@ -2011,7 +2046,9 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2310241f'/%3E%3Cpath d='M17 37 32 18l15 19v11H36V36h-8v12H17Z' fill='%23fffdf8'/%3E%3C/svg%3E">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
+  <link rel="manifest" href="/assets/site.webmanifest">
   <title>Global Home Atlas | Find Your Best-Fit Overseas Property Market</title>
   <meta name="description" content="Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan with independent Global Home Atlas research.">
   <link rel="canonical" href="{SITE_URL}">
@@ -2041,15 +2078,16 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     }}
     * {{ box-sizing: border-box; }}
     html {{ scroll-behavior: smooth; }}
-    body {{ margin: 0; min-width: 320px; background: var(--cream); color: var(--ink); }}
+    html, body {{ overflow-x: hidden; }}
+    body {{ margin: 0; background: var(--cream); color: var(--ink); }}
     a {{ color: var(--eucalyptus); text-underline-offset: 3px; }}
     p {{ line-height: 1.58; }}
     .shell {{ width: min(1160px, calc(100% - 32px)); margin: 0 auto; }}
     .hero {{
-      min-height: 86vh;
+      min-height: 78vh;
       display: grid;
-      align-items: end;
-      padding: 22px 0 44px;
+      align-items: center;
+      padding: 22px 0 76px;
       background:
         linear-gradient(90deg, rgba(255, 253, 247, .98) 0 38%, rgba(255, 253, 247, .76) 62%, rgba(199, 211, 194, .30)),
         linear-gradient(180deg, rgba(245, 241, 233, .04), rgba(245, 241, 233, .50)),
@@ -2060,14 +2098,16 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     .topbar {{ position: absolute; inset: 0 0 auto; padding: 18px 0; }}
     .topbar__inner {{ display: flex; align-items: center; justify-content: space-between; gap: 18px; }}
     .brand {{ display: flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 900; text-decoration: none; }}
-    .brand-mark {{ width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(36, 49, 45, .20); border-radius: 50%; background: rgba(255, 253, 247, .70); }}
+    .brand-logo {{ width: 174px; max-width: 48vw; height: auto; display: block; }}
     .top-links {{ display: flex; gap: 18px; flex-wrap: wrap; }}
     .top-links a {{ color: rgba(36, 49, 45, .76); font-size: 13px; font-weight: 800; text-decoration: none; }}
-    .hero-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(310px, 390px); gap: 34px; align-items: end; padding-top: 94px; }}
-    .eyebrow {{ max-width: 100%; margin: 0 0 12px; color: var(--brass); font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; overflow-wrap: anywhere; }}
+    .top-links a:hover {{ color: var(--ink); }}
+    .hero-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(310px, 390px); gap: 34px; align-items: center; padding-top: 74px; }}
+    .eyebrow {{ max-width: 100%; margin: 0 0 12px; color: #806738; font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; overflow-wrap: anywhere; }}
     h1 {{ max-width: 860px; margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(46px, 8vw, 104px); line-height: .9; letter-spacing: 0; }}
-    .lede {{ max-width: 720px; margin: 24px 0 0; color: rgba(36, 49, 45, .74); font-size: clamp(17px, 2.2vw, 21px); }}
-    .hero-proof {{ margin: 14px 0 0; color: var(--muted); font-size: 13px; font-weight: 850; letter-spacing: .03em; }}
+    .lede {{ max-width: 720px; margin: 24px 0 0; color: #45534e; font-size: clamp(17px, 2.2vw, 21px); }}
+    .hero-proof {{ width: fit-content; margin: 16px 0 0; display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid rgba(95, 127, 114, .28); border-radius: 999px; background: rgba(255, 253, 247, .82); color: #344640; font-size: 13px; font-weight: 700; letter-spacing: 0; }}
+    .hero-proof i {{ width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; background: var(--eucalyptus); color: #fffdf7; font-style: normal; font-size: 12px; }}
     .hero-actions {{ display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }}
     .primary-action, .secondary-action {{
       min-height: 46px;
@@ -2076,40 +2116,64 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       justify-content: center;
       padding: 0 16px;
       border-radius: 6px;
-      font-weight: 850;
+      font-weight: 700;
       text-decoration: none;
+      letter-spacing: 0;
     }}
     .primary-action {{ background: var(--eucalyptus); color: #fffdf7; }}
     .secondary-action {{ border: 1px solid rgba(36, 49, 45, .20); background: rgba(255, 253, 247, .66); color: var(--ink); }}
-    .trust-snapshot {{ padding: 18px; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: rgba(255, 253, 247, .78); box-shadow: var(--shadow); backdrop-filter: blur(18px); }}
+    .text-action {{ min-height: 46px; display: inline-flex; align-items: center; color: var(--ink); font-size: 15px; font-weight: 650; text-decoration: none; letter-spacing: 0; }}
+    .text-action::after, .card-link::after, .path-card em::after, .inspired-visual::after {{ content: " ->"; }}
+    .primary-action:hover, .secondary-action:hover {{ transform: translateY(-1px); box-shadow: 0 10px 24px rgba(36, 49, 45, .13); }}
+    .text-action:hover, .card-link:hover {{ color: #365f6d; }}
+    .trust-snapshot {{ padding: 18px; border: 1px solid rgba(36, 49, 45, .18); border-radius: 8px; background: rgba(255, 253, 247, .82); box-shadow: var(--shadow); backdrop-filter: blur(18px); }}
     .trust-snapshot h2 {{ margin: 0 0 12px; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }}
     .atlas-visual {{ min-height: 178px; position: relative; overflow: hidden; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: linear-gradient(135deg, rgba(255, 253, 247, .48), rgba(199, 211, 194, .12)), url("/assets/atlas-map-coastal-sage.jpg"); background-size: cover; background-position: center; }}
     .atlas-visual span {{ position: absolute; left: 14px; top: 14px; padding: 9px 10px; border: 1px solid rgba(36, 49, 45, .12); border-radius: 6px; background: rgba(255, 253, 247, .82); color: var(--ink); font-size: 12px; font-weight: 850; }}
+    .map-link {{ position: absolute; width: 14px; height: 14px; border: 2px solid #fffdf7; border-radius: 50%; background: var(--eucalyptus); box-shadow: 0 0 0 5px rgba(95, 127, 114, .22); text-indent: -999px; overflow: hidden; transition: transform .18s ease, background .18s ease; }}
+    .map-link:hover, .map-link:focus-visible {{ transform: scale(1.18); background: #806738; }}
+    .map-link--canada {{ left: 14%; top: 37%; }}
+    .map-link--portugal {{ left: 47%; top: 47%; }}
+    .map-link--spain {{ left: 49%; top: 45%; }}
+    .map-link--italy {{ left: 53%; top: 42%; }}
+    .map-link--greece {{ left: 57%; top: 49%; }}
+    .map-link--japan {{ right: 16%; top: 42%; }}
+    .map-link--thailand {{ right: 23%; top: 60%; }}
+    .map-link--nz {{ right: 9%; bottom: 13%; }}
     .snapshot-grid {{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }}
     .snapshot-grid div {{ padding: 12px; border-radius: 6px; background: rgba(199, 211, 194, .28); }}
     .snapshot-grid span {{ display: block; color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; }}
     .snapshot-grid strong {{ display: block; margin-top: 5px; font-size: 21px; }}
     main {{ margin-top: -24px; position: relative; z-index: 2; }}
-    .section {{ margin-bottom: 24px; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 12px 40px rgba(36, 49, 45, .07); }}
+    .section {{ margin-bottom: 28px; padding: 26px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 12px 40px rgba(36, 49, 45, .07); }}
+    .section--finder {{ padding: 30px; border-color: rgba(95, 127, 114, .30); background: linear-gradient(135deg, #fffdf7, #eef4ef); }}
     .section-header {{ display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 18px; }}
     .section-header h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 42px); line-height: 1; }}
     .section-header p {{ max-width: 680px; margin: 8px 0 0; color: var(--muted); }}
     .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid {{ display: grid; gap: 12px; }}
     .path-grid {{ grid-template-columns: repeat(4, minmax(0, 1fr)); }}
-    .recommendation-grid {{ grid-template-columns: repeat(5, minmax(0, 1fr)); }}
+    .recommendation-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
     .country-grid {{ grid-template-columns: repeat(7, minmax(0, 1fr)); }}
     .trust-grid, .guide-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
-    .finder-grid {{ display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; align-items: start; }}
-    .finder-panel {{ display: grid; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
-    .finder-panel label {{ display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }}
-    .finder-panel select {{ min-height: 46px; width: 100%; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); padding: 0 12px; font: inherit; letter-spacing: 0; text-transform: none; }}
-    .finder-note {{ margin: 0; color: var(--muted); font-size: 13px; }}
+    .finder-grid {{ display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }}
+    .finder-panel, .finder-output {{ display: grid; align-content: start; gap: 14px; }}
+    .finder-panel {{ padding: 18px 0 0; }}
+    .finder-output {{ padding-top: 18px; }}
+    .finder-step, .finder-panel label, .finder-result span, .finder-result dt {{ color: #806738; font-size: 11px; font-weight: 800; letter-spacing: .07em; line-height: 1.2; text-transform: uppercase; }}
+    .finder-step {{ margin: 0; }}
+    .finder-panel label {{ display: grid; gap: 9px; }}
+    .finder-panel select {{ min-height: 48px; width: 100%; appearance: none; border: 1px solid rgba(95, 127, 114, .24); border-radius: 7px; background: linear-gradient(180deg, #fff, #f8faf6) padding-box, linear-gradient(135deg, transparent calc(100% - 36px), rgba(95, 127, 114, .10) 0) border-box; color: var(--ink); padding: 0 42px 0 14px; font: inherit; font-size: 13px; font-weight: 650; letter-spacing: 0; text-transform: none; }}
+    .finder-panel label {{ position: relative; }}
+    .finder-panel label::after {{ content: ""; position: absolute; right: 15px; bottom: 19px; width: 8px; height: 8px; border-right: 2px solid #365f6d; border-bottom: 2px solid #365f6d; transform: rotate(45deg); pointer-events: none; }}
+    .finder-panel .secondary-action {{ min-height: 44px; width: 100%; justify-content: center; border-color: rgba(95, 127, 114, .24); background: #f8faf6; font-size: 13px; }}
+    .finder-note {{ margin: 2px 0 0; color: var(--muted); font-size: 13px; }}
     .finder-results {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
-    .finder-result {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
-    .finder-result span, .finder-result dt {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
-    .finder-result h3 {{ margin: 8px 0 4px; font-size: 19px; line-height: 1.12; }}
+    .finder-result {{ min-width: 0; display: grid; align-content: start; padding: 17px; border: 1px solid rgba(95, 127, 114, .22); border-radius: 8px; background: #fffdf7; box-shadow: 0 10px 26px rgba(36, 49, 45, .06); }}
+    .finder-result h3 {{ margin: 8px 0 4px; font-family: Georgia, "Times New Roman", serif; font-size: 19px; font-weight: 700; line-height: 1.12; }}
+    .finder-result h3 a {{ color: var(--sage); text-decoration-thickness: 1px; text-underline-offset: 3px; }}
     .finder-result p {{ margin: 0 0 10px; color: var(--muted); font-size: 14px; }}
     .finder-result dd {{ margin: 4px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.42; }}
+    .card-link {{ align-self: end; margin-top: 12px; font-weight: 700; text-decoration: none; }}
     .inspired-band {{ display: grid; grid-template-columns: minmax(0, .62fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }}
     .inspired-visual {{
       min-height: 320px;
@@ -2123,11 +2187,12 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       background-size: cover;
       background-position: center;
       color: #fffdf7;
+      text-decoration: none;
     }}
     .inspired-visual span {{ color: rgba(255, 253, 247, .78); font-size: 12px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }}
     .inspired-visual strong {{ display: block; max-width: 420px; margin-top: 8px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4vw, 46px); line-height: 1; }}
     .inspired-routes {{ display: grid; gap: 12px; }}
-    .inspired-routes article {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
+    .inspired-routes article {{ min-width: 0; padding: 16px; border: 1px solid rgba(95, 127, 114, .20); border-left: 4px solid var(--eucalyptus); border-radius: 8px; background: #f9fbf6; }}
     .inspired-routes span, .inspired-routes dt {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .inspired-routes h3 {{ margin: 7px 0 6px; font-size: 20px; }}
     .inspired-routes p, .inspired-routes dd {{ margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }}
@@ -2142,30 +2207,45 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     .report-card a {{ font-weight: 900; }}
     .path-card, .country-tile {{ color: var(--ink); text-decoration: none; }}
     .path-card, .recommendation-card, .country-tile, .trust-card, .guide-card {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
-    .path-card span, .recommendation-card span, .country-tile span, .guide-card span {{ color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .path-card {{ position: relative; border-top: 4px solid var(--path-accent, var(--brass)); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }}
+    .path-card:hover, .recommendation-card:hover, .country-tile:hover, .guide-card:hover {{ transform: translateY(-2px); border-color: rgba(95, 127, 114, .34); box-shadow: 0 14px 30px rgba(36, 49, 45, .08); }}
+    .path-card span, .recommendation-card span, .country-tile span, .guide-card span {{ color: #806738; font-size: 12px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }}
+    .path-card span {{ display: inline-flex; align-items: center; gap: 8px; }}
+    .path-card b {{ width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--path-accent, var(--brass)) 18%, white); color: var(--path-accent, var(--brass)); font-size: 11px; }}
     .path-card strong, .country-tile strong, .trust-card strong {{ display: block; margin: 8px 0; font-size: 18px; line-height: 1.12; }}
     .path-card p, .recommendation-card p, .country-tile p, .trust-card p, .guide-card p {{ margin: 0; color: var(--muted); font-size: 14px; }}
+    .path-card em {{ display: inline-block; margin-top: 14px; color: var(--path-accent, var(--brass)); font-size: 13px; font-style: normal; font-weight: 900; }}
     .recommendation-card h3, .guide-card h3 {{ margin: 8px 0 4px; font-size: 18px; line-height: 1.12; }}
     .recommendation-card strong {{ display: block; margin: 12px 0 8px; font-size: 24px; }}
     .recommendation-card em {{ display: block; color: #3f4d48; font-size: 13px; font-style: normal; line-height: 1.45; }}
     .recommendation-card dl {{ display: grid; gap: 8px; margin: 12px 0 0; }}
     .recommendation-card dt {{ color: var(--brass); font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .recommendation-card dd {{ margin: 3px 0 0; color: var(--muted); font-size: 12px; line-height: 1.38; }}
+    .recommendation-card summary {{ margin-top: 12px; cursor: pointer; color: var(--ink); font-size: 13px; font-weight: 900; }}
     .trust-card span {{ width: 34px; height: 34px; display: grid; place-items: center; margin-bottom: 12px; border-radius: 50%; background: #eef3f0; color: var(--deep); font-weight: 900; }}
     .cta-band {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 26px; border-radius: 8px; background: var(--deep); color: #fffdf7; }}
     .cta-band h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); }}
     .cta-band p {{ max-width: 700px; margin: 8px 0 0; color: rgba(255, 253, 247, .78); }}
     .cta-band .primary-action {{ background: #fffdf7; color: var(--deep); }}
+    .cta-band--light {{ margin-bottom: 28px; background: #eef4ef; color: var(--ink); border: 1px solid rgba(95, 127, 114, .25); }}
+    .cta-band--light p {{ color: #45534e; }}
+    .cta-band--light .primary-action {{ background: var(--eucalyptus); color: #fffdf7; }}
+    .sticky-fit-cta {{ position: fixed; right: 18px; bottom: 18px; z-index: 20; min-height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 0 14px; border-radius: 999px; background: var(--deep); color: #fffdf7; box-shadow: 0 16px 36px rgba(36, 49, 45, .22); font-size: 13px; font-weight: 700; text-decoration: none; letter-spacing: 0; }}
+    a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible {{ outline: 3px solid rgba(169, 138, 75, .55); outline-offset: 3px; }}
     .footer {{ padding: 26px 0 42px; color: var(--muted); }}
+    .footer-grid {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, 340px); gap: 24px; align-items: start; }}
     .footer nav {{ display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }}
+    .footer-signup {{ padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255, 253, 247, .68); }}
+    .footer-signup p {{ margin: 8px 0 12px; }}
     @media (max-width: 980px) {{
       .hero {{ min-height: auto; padding-bottom: 58px; }}
       .hero-grid {{ grid-template-columns: 1fr; }}
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band, .report-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band, .report-grid, .footer-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
     }}
     @media (max-width: 640px) {{
       .shell {{ width: min(1160px, calc(100% - 28px)); }}
       .top-links {{ display: none; }}
+      .brand-logo {{ width: 158px; max-width: 66vw; }}
       .hero-grid {{ gap: 18px; padding-top: 80px; }}
       .eyebrow {{ max-width: 330px; font-size: 11px; letter-spacing: .12em; }}
       h1 {{ max-width: min(100%, 362px); font-size: clamp(36px, 10vw, 48px); line-height: 1; overflow-wrap: anywhere; }}
@@ -2175,12 +2255,14 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       .hero-proof {{ font-size: 12px; }}
       .trust-snapshot {{ display: none; }}
       .section {{ padding: 18px; }}
+      .section--finder {{ padding: 20px; }}
       .section-header, .cta-band {{ display: block; }}
       .section-header h2 {{ max-width: 300px; font-size: 24px; line-height: 1.05; }}
       .section-header a, .cta-band a {{ margin-top: 14px; }}
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band, .report-grid {{ grid-template-columns: 1fr; }}
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band, .report-grid, .footer-grid {{ grid-template-columns: 1fr; }}
       .inspired-visual {{ min-height: 230px; }}
       .atlas-visual {{ min-height: 140px; }}
+      .sticky-fit-cta {{ left: 14px; right: 14px; bottom: 12px; }}
     }}
   </style>
 </head>
@@ -2188,10 +2270,11 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
   <header class="hero" id="top">
     <nav class="topbar" aria-label="Primary">
       <div class="shell topbar__inner">
-        <a class="brand" href="/"><span class="brand-mark">G</span><span>Global Home Atlas</span></a>
+        <a class="brand" href="/" aria-label="Global Home Atlas home"><img class="brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="top-links">
           <a href="#start">Start</a>
-          <a href="#recommendations">Recommendations</a>
+          <a href="#market-finder">Market Fit</a>
+          <a href="#recommendations">Top Markets</a>
           <a href="/country-comparison/">Compare Countries</a>
           <a href="/guides/">Guides</a>
           <a href="/methodology/">Methodology</a>
@@ -2204,16 +2287,26 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
         <p class="eyebrow">Global mobility and property intelligence</p>
         <h1>Global Home Atlas</h1>
         <p class="lede">Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan.</p>
-        <p class="hero-proof">Independent research. Not paid placement.</p>
+        <p class="hero-proof"><i aria-hidden="true">✓</i> Independent research. Not paid placement.</p>
         <div class="hero-actions">
-          <a class="primary-action" href="#start" data-track="homepage_start_click" data-track-label="hero">Find my best-fit markets</a>
-          <a class="secondary-action" href="#countries" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
-          <a class="secondary-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
+          <a class="primary-action" href="#market-finder" data-track="homepage_start_click" data-track-label="hero">Find my best-fit markets</a>
+          <a class="text-action" href="#countries" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
+          <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
         </div>
       </div>
       <aside class="trust-snapshot" aria-label="Research snapshot">
-        <h2>Independent, not paid placement</h2>
-        <div class="atlas-visual" aria-hidden="true"><span>Ownership · lifestyle · exit</span></div>
+        <h2>Research coverage at a glance</h2>
+        <div class="atlas-visual" aria-label="Featured atlas routes">
+          <span>Ownership · lifestyle · exit</span>
+          <a class="map-link map-link--canada" href="/destinations/whistler/" aria-label="Open Whistler destination profile">Whistler</a>
+          <a class="map-link map-link--portugal" href="/destinations/algarve-cascais/" aria-label="Open Algarve and Cascais destination profile">Algarve / Cascais</a>
+          <a class="map-link map-link--spain" href="/destinations/valencia/" aria-label="Open Valencia destination profile">Valencia</a>
+          <a class="map-link map-link--italy" href="/destinations/lake-como/" aria-label="Open Lake Como destination profile">Lake Como</a>
+          <a class="map-link map-link--greece" href="/destinations/crete/" aria-label="Open Crete destination profile">Crete</a>
+          <a class="map-link map-link--japan" href="/destinations/fukuoka-itoshima/" aria-label="Open Fukuoka and Itoshima destination profile">Fukuoka / Itoshima</a>
+          <a class="map-link map-link--thailand" href="/destinations/phuket-koh-samui/" aria-label="Open Phuket and Koh Samui destination profile">Phuket / Koh Samui</a>
+          <a class="map-link map-link--nz" href="/destinations/queenstown/" aria-label="Open Queenstown destination profile">Queenstown</a>
+        </div>
         <div class="snapshot-grid">
           <div><span>Destinations</span><strong>{len(destinations)}</strong></div>
           <div><span>Countries</span><strong>{countries}</strong></div>
@@ -2226,6 +2319,48 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
 
   <main>
     <div class="shell">
+      <section class="section section--finder" id="market-finder">
+        <div class="section-header">
+          <div>
+            <h2>Find your market fit</h2>
+            <p>Choose the job of the property and get three defensible starting markets before opening the full dashboard.</p>
+          </div>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="market finder">Request custom brief</a>
+        </div>
+        <div class="finder-grid">
+          <div class="finder-panel">
+            <p class="finder-step">Step 1 of 2</p>
+            <label for="finderGoal">Buying goal
+              <select id="finderGoal">
+                <option value="retirement">Retirement or lifestyle base</option>
+                <option value="second-home">Second home abroad</option>
+                <option value="investment">Investment-led shortlist</option>
+                <option value="ownership">Clean ownership markets</option>
+              </select>
+            </label>
+            <a class="secondary-action" href="/dashboard/" data-track="dashboard_open" data-track-label="market finder panel">Open full dashboard</a>
+          </div>
+          <div class="finder-output">
+            <p class="finder-step">Step 2 of 2</p>
+            <div class="finder-results" id="finderResults" aria-live="polite"></div>
+            <p class="finder-note">The output is a first-pass research route. Final decisions still need local legal, tax, immigration, and property review.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="section" id="premium-briefs">
+        <div class="section-header">
+          <div>
+            <h2>Premium research paths</h2>
+            <p>When a public guide is not specific enough, these briefs turn the Atlas into a buyer-specific decision memo.</p>
+          </div>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="premium briefs">Request a custom brief</a>
+        </div>
+        <div class="report-grid">
+          {build_premium_report_teasers()}
+        </div>
+      </section>
+
       <section class="section" id="start">
         <div class="section-header">
           <div>
@@ -2236,30 +2371,6 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
         </div>
         <div class="path-grid">
           {build_landing_buyer_paths()}
-        </div>
-      </section>
-
-      <section class="section" id="market-finder">
-        <div class="section-header">
-          <div>
-            <h2>Find your market fit</h2>
-            <p>Use this quick lens when you want a useful starting point without opening the full dashboard.</p>
-          </div>
-          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="market finder">Review my shortlist</a>
-        </div>
-        <div class="finder-grid">
-          <div class="finder-panel">
-            <label for="finderGoal">Buying goal
-              <select id="finderGoal">
-                <option value="retirement">Retirement or lifestyle base</option>
-                <option value="second-home">Second home abroad</option>
-                <option value="investment">Investment-led shortlist</option>
-                <option value="ownership">Clean ownership markets</option>
-              </select>
-            </label>
-            <p class="finder-note">The output is a first-pass research route. Final decisions still need local legal, tax, immigration, and property review.</p>
-          </div>
-          <div class="finder-results" id="finderResults" aria-live="polite"></div>
         </div>
       </section>
 
@@ -2276,6 +2387,14 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
         </div>
       </section>
 
+      <section class="cta-band cta-band--light" id="mid-conversion">
+        <div>
+          <h2>Want the shortlist translated into a buyer memo?</h2>
+          <p>Use the top markets as a starting point, then pressure-test them against budget, citizenship, rental needs, and holding period.</p>
+        </div>
+        <a class="primary-action" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="landing mid cta">Request custom brief</a>
+      </section>
+
       <section class="section" id="inspiration">
         <div class="section-header">
           <div>
@@ -2285,25 +2404,12 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
           <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="inspired routes">Review my shortlist</a>
         </div>
         <div class="inspired-band">
-          <div class="inspired-visual" aria-hidden="true">
+          <a class="inspired-visual" href="/guides/" data-track="guide_click" data-track-label="inspired visual">
             <div><span>Atlas routes</span><strong>From dream location to defensible shortlist.</strong></div>
-          </div>
+          </a>
           <div class="inspired-routes">
             {build_landing_inspired_routes()}
           </div>
-        </div>
-      </section>
-
-      <section class="section" id="premium-briefs">
-        <div class="section-header">
-          <div>
-            <h2>Premium research paths</h2>
-            <p>When a public guide is not specific enough, these briefs turn the Atlas into a buyer-specific decision memo.</p>
-          </div>
-          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="premium briefs">Discuss a brief</a>
-        </div>
-        <div class="report-grid">
-          {build_premium_report_teasers()}
         </div>
       </section>
 
@@ -2358,18 +2464,28 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
 
   <footer class="footer">
     <div class="shell">
-      <strong>Global Home Atlas</strong>
-      <p>Independent research for overseas property decisions. Research only; verify legal, tax, immigration, and property advice locally.</p>
-      <nav aria-label="Footer">
-        <a href="/dashboard/">Research dashboard</a>
-        <a href="/country-comparison/">Compare countries</a>
-        <a href="/guides/">Guides</a>
-        <a href="/methodology/">Methodology</a>
-        <a href="/research-standards/">Research standards</a>
-        <a href="/contact/">Contact</a>
-      </nav>
+      <div class="footer-grid">
+        <div>
+          <strong>Global Home Atlas</strong>
+          <p>Independent research for overseas property decisions. Research only; verify legal, tax, immigration, and property advice locally.</p>
+          <nav aria-label="Footer">
+            <a href="/dashboard/">Research dashboard</a>
+            <a href="/country-comparison/">Compare countries</a>
+            <a href="/guides/">Guides</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/research-standards/">Research standards</a>
+            <a href="/contact/">Contact</a>
+          </nav>
+        </div>
+        <div class="footer-signup">
+          <strong>Get market updates</strong>
+          <p>Ask to be notified when new destination research or country hubs are added.</p>
+          <a class="secondary-action" href="mailto:{escape(CONTACT_EMAIL)}?subject=Global%20Home%20Atlas%20updates" data-track="contact_click" data-track-label="footer updates">Email {escape(CONTACT_EMAIL)}</a>
+        </div>
+      </div>
     </div>
   </footer>
+  <a class="sticky-fit-cta" href="#market-finder" data-track="homepage_start_click" data-track-label="sticky">Find market fit</a>
   <script>
     (function () {{
       const finderData = {build_market_finder_data(destinations)};
@@ -2388,6 +2504,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
               <div><dt>Why this route</dt><dd>${{item.reason}}</dd></div>
               <div><dt>Watch-out</dt><dd>${{item.watch}}</dd></div>
             </dl>
+            <a class="card-link" href="${{item.href}}" data-track="destination_click" data-track-label="finder cta ${{item.name}}">See full profile</a>
           </article>
         `).join("");
         if (window.GHA) window.GHA.track("market_finder_change", {{ goal: route, result_count: picks.length }});
@@ -4234,6 +4351,54 @@ def build_brand_mockups_page() -> str:
       width: 100%;
       height: auto;
     }}
+    .logo-options {{
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }}
+    .logo-card {{
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+      box-shadow: 0 18px 50px rgba(36, 49, 45, .08);
+    }}
+    .logo-card__stage {{
+      min-height: 168px;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      border: 1px solid rgba(36, 49, 45, .10);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 253, 247, .94), rgba(238, 244, 239, .72)),
+        radial-gradient(circle at 30% 24%, rgba(185, 206, 208, .28), transparent 42%);
+    }}
+    .logo-card svg {{
+      width: min(100%, 360px);
+      height: auto;
+      overflow: visible;
+    }}
+    .logo-card span {{
+      display: block;
+      margin-top: 14px;
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }}
+    .logo-card h2 {{
+      margin: 7px 0 6px;
+      font-size: 18px;
+    }}
+    .logo-card p {{
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }}
     .mockup-notes {{
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -4264,6 +4429,7 @@ def build_brand_mockups_page() -> str:
       font-size: 14px;
     }}
     @media (max-width: 760px) {{
+      .logo-options {{ grid-template-columns: 1fr; }}
       .mockup-notes {{ grid-template-columns: 1fr; }}
     }}
   </style>
@@ -4288,6 +4454,118 @@ def build_brand_mockups_page() -> str:
   </header>
   <main class="mockup-stage">
     <div class="page-shell">
+      <section class="logo-options" aria-label="Global Home Atlas logo directions">
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoCompassTitle">
+              <title id="logoCompassTitle">Compass monogram logo concept</title>
+              <circle cx="54" cy="58" r="38" fill="none" stroke="#a98a4b" stroke-width="2"/>
+              <circle cx="54" cy="58" r="24" fill="none" stroke="#5f7f72" stroke-width="1.6" opacity=".75"/>
+              <path d="M54 20v76M16 58h76" stroke="#a98a4b" stroke-width="1.4"/>
+              <path d="M54 30 61 58 54 86 47 58Z" fill="#24312d"/>
+              <path d="M26 58 54 51 82 58 54 65Z" fill="#c7d3c2"/>
+              <circle cx="54" cy="58" r="4" fill="#a98a4b"/>
+              <text x="112" y="43" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="760" letter-spacing="2.2">GLOBAL</text>
+              <text x="112" y="65" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="760" letter-spacing="2.2">HOME ATLAS</text>
+              <text x="112" y="86" fill="#a98a4b" font-family="Inter, Arial, sans-serif" font-size="8.5" font-weight="750" letter-spacing="1.35">INDEPENDENT RESEARCH FOR GLOBAL PROPERTY DECISIONS</text>
+            </svg>
+          </div>
+          <span>Style 01</span>
+          <h2>Compass Monogram</h2>
+          <p>Most classic and premium. Reads as navigation, judgment, and global orientation.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoMeridianTitle">
+              <title id="logoMeridianTitle">Meridian home logo concept</title>
+              <circle cx="55" cy="58" r="39" fill="#fffdf7" stroke="#24312d" stroke-width="1.8"/>
+              <path d="M25 58h60M55 20c-13 10-21 24-21 38s8 28 21 38M55 20c13 10 21 24 21 38s-8 28-21 38" fill="none" stroke="#5f7f72" stroke-width="1.6" opacity=".72"/>
+              <path d="M34 62 55 43l21 19v17H62V67H48v12H34Z" fill="#24312d"/>
+              <circle cx="55" cy="58" r="3" fill="#a98a4b"/>
+              <text x="114" y="48" fill="#24312d" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="700">Global Home Atlas</text>
+              <path d="M115 61h136" stroke="#a98a4b" stroke-width="1.4"/>
+              <text x="115" y="82" fill="#68776f" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="650" letter-spacing="2">GLOBAL PROPERTY INTELLIGENCE</text>
+            </svg>
+          </div>
+          <span>Style 02</span>
+          <h2>Meridian Home</h2>
+          <p>Most literal. Balances home search with world-map intelligence and clear title.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoSealTitle">
+              <title id="logoSealTitle">Atlas seal logo concept</title>
+              <circle cx="58" cy="58" r="43" fill="#24312d"/>
+              <circle cx="58" cy="58" r="34" fill="none" stroke="#a98a4b" stroke-width="2"/>
+              <path d="M35 70c9-23 37-23 46 0" fill="none" stroke="#fffdf7" stroke-width="3" stroke-linecap="round"/>
+              <path d="M39 54c11-11 27-11 38 0" fill="none" stroke="#c7d3c2" stroke-width="3" stroke-linecap="round"/>
+              <path d="M58 35v47M41 58h34" stroke="#fffdf7" stroke-width="2" opacity=".78"/>
+              <text x="121" y="46" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="750" letter-spacing="4">GLOBAL HOME</text>
+              <text x="121" y="80" fill="#24312d" font-family="Georgia, 'Times New Roman', serif" font-size="38" font-weight="700">Atlas</text>
+            </svg>
+          </div>
+          <span>Style 03</span>
+          <h2>Atlas Seal</h2>
+          <p>Most institutional. Works well for reports, methodology, and premium memos.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoLedgerTitle">
+              <title id="logoLedgerTitle">Dossier ledger logo concept</title>
+              <rect x="18" y="22" width="80" height="72" rx="8" fill="#fffdf7" stroke="#24312d" stroke-width="2"/>
+              <path d="M35 43h46M35 58h30M35 73h39" stroke="#5f7f72" stroke-width="3" stroke-linecap="round"/>
+              <path d="M74 36 86 28 82 43Z" fill="#a98a4b"/>
+              <circle cx="74" cy="36" r="4" fill="#24312d"/>
+              <path d="M121 34h120M121 82h120" stroke="#c7d3c2" stroke-width="2"/>
+              <text x="121" y="66" fill="#24312d" font-family="Georgia, 'Times New Roman', serif" font-size="31" font-weight="700">Global Home Atlas</text>
+              <text x="247" y="66" fill="#5f7f72" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="650" letter-spacing="2"></text>
+            </svg>
+          </div>
+          <span>Style 04</span>
+          <h2>Dossier Ledger</h2>
+          <p>Most research-led. Emphasizes scorecards, diligence, and decision memos.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage" style="background:#071f1d;">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoDarkAtlasTitle">
+              <title id="logoDarkAtlasTitle">Dark cartographic atlas logo concept</title>
+              <g transform="translate(22 19)" fill="none" stroke="#a98a4b" stroke-width="1.7">
+                <circle cx="39" cy="39" r="31"/>
+                <circle cx="39" cy="39" r="19" opacity=".8"/>
+                <path d="M39 2v74M2 39h74M18 18l42 42M60 18 18 60"/>
+                <path d="M39 14 47 39 39 64 31 39Z" fill="#071f1d"/>
+              </g>
+              <circle cx="61" cy="58" r="4" fill="#a98a4b"/>
+              <text x="116" y="40" fill="#fffdf7" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" letter-spacing="2.4">GLOBAL</text>
+              <text x="116" y="62" fill="#fffdf7" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" letter-spacing="2.4">HOME ATLAS</text>
+              <text x="116" y="84" fill="#a98a4b" font-family="Inter, Arial, sans-serif" font-size="8.5" font-weight="750" letter-spacing="1.35">INDEPENDENT RESEARCH FOR GLOBAL PROPERTY DECISIONS</text>
+            </svg>
+          </div>
+          <span>Style 05</span>
+          <h2>Dark Cartographic</h2>
+          <p>Closest to the mockup: compact compass device, brass detail, and private-bank restraint.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoLightCartographicTitle">
+              <title id="logoLightCartographicTitle">Light cartographic atlas logo concept</title>
+              <g transform="translate(22 19)" fill="none" stroke="#a98a4b" stroke-width="1.7">
+                <circle cx="39" cy="39" r="31"/>
+                <circle cx="39" cy="39" r="19" opacity=".85"/>
+                <path d="M39 2v74M2 39h74M18 18l42 42M60 18 18 60"/>
+                <path d="M39 14 47 39 39 64 31 39Z" fill="#fffdf7"/>
+              </g>
+              <circle cx="61" cy="58" r="4" fill="#a98a4b"/>
+              <text x="116" y="40" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" letter-spacing="2.4">GLOBAL</text>
+              <text x="116" y="62" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" letter-spacing="2.4">HOME ATLAS</text>
+              <text x="116" y="84" fill="#806738" font-family="Inter, Arial, sans-serif" font-size="8.5" font-weight="750" letter-spacing="1.35">INDEPENDENT RESEARCH FOR GLOBAL PROPERTY DECISIONS</text>
+            </svg>
+          </div>
+          <span>Style 06</span>
+          <h2>Light Cartographic</h2>
+          <p>Same mark and hierarchy as the dark version, adapted for the current pale header.</p>
+        </article>
+      </section>
       <section class="mockup-frame" aria-label="Global Home Atlas design mockup board">
         <img src="/brand-mockups/global-home-atlas-mockups.png" alt="Three Global Home Atlas homepage design mockups: Atlas Intelligence, Private Briefing, and Destination Dossier">
       </section>
@@ -4397,7 +4675,9 @@ def build() -> Path:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2310241f'/%3E%3Cpath d='M17 37 32 18l15 19v11H36V36h-8v12H17Z' fill='%23fffdf8'/%3E%3C/svg%3E">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
+  <link rel="manifest" href="/assets/site.webmanifest">
   <title>Global Home Atlas | Compare Global Property Investment Destinations</title>
   <meta name="description" content="Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.">
   <link rel="canonical" href="https://globalhomeatlas.com/">
@@ -4481,15 +4761,7 @@ def build() -> Path:
       gap: 18px;
     }
     .brand { display: flex; align-items: center; gap: 12px; font-weight: 850; letter-spacing: .02em; }
-    .brand-mark {
-      width: 34px;
-      height: 34px;
-      display: grid;
-      place-items: center;
-      border: 1px solid rgba(36, 49, 45, .20);
-      border-radius: 50%;
-      background: rgba(255, 253, 247, .62);
-    }
+    .brand-logo { width: 164px; max-width: 46vw; height: auto; display: block; }
     .top-links { display: flex; gap: 18px; align-items: center; }
     .top-links a { color: rgba(36, 49, 45, .76); text-decoration: none; font-size: 13px; font-weight: 750; }
     .mobile-menu { display: none; position: relative; }
@@ -5198,7 +5470,7 @@ def build() -> Path:
   <header class="hero" id="top">
     <nav class="topbar" aria-label="Primary">
       <div class="shell topbar__inner">
-        <div class="brand"><span class="brand-mark">G</span><span>Global Home Atlas</span></div>
+        <div class="brand"><img class="brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></div>
         <div class="top-links">
           <a href="#shortlist">Shortlist</a>
           <a href="#compare">Compare</a>

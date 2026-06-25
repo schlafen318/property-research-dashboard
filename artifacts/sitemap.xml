@@ -145,6 +145,18 @@
     <priority>0.82</priority>
   </url>
   <url>
+    <loc>https://globalhomeatlas.com/countries/united-states-property/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
+    <loc>https://globalhomeatlas.com/countries/canada-property/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.82</priority>
+  </url>
+  <url>
     <loc>https://globalhomeatlas.com/countries/thailand-property/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
@@ -217,13 +229,13 @@
     <priority>0.80</priority>
   </url>
   <url>
-    <loc>https://globalhomeatlas.com/destinations/hakuba/</loc>
+    <loc>https://globalhomeatlas.com/destinations/crete/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
-    <loc>https://globalhomeatlas.com/destinations/crete/</loc>
+    <loc>https://globalhomeatlas.com/destinations/hakuba/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
@@ -241,13 +253,13 @@
     <priority>0.80</priority>
   </url>
   <url>
-    <loc>https://globalhomeatlas.com/destinations/niseko/</loc>
+    <loc>https://globalhomeatlas.com/destinations/croatia-istria-dalmatia/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
-    <loc>https://globalhomeatlas.com/destinations/croatia-istria-dalmatia/</loc>
+    <loc>https://globalhomeatlas.com/destinations/niseko/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
@@ -260,6 +272,12 @@
   </url>
   <url>
     <loc>https://globalhomeatlas.com/destinations/phuket-koh-samui/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://globalhomeatlas.com/destinations/vancouver-island-victoria/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
@@ -283,6 +301,12 @@
     <priority>0.80</priority>
   </url>
   <url>
+    <loc>https://globalhomeatlas.com/destinations/park-city-deer-valley/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
     <loc>https://globalhomeatlas.com/destinations/da-nang-hoi-an/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
@@ -295,19 +319,37 @@
     <priority>0.80</priority>
   </url>
   <url>
-    <loc>https://globalhomeatlas.com/destinations/innsbruck-tyrol/</loc>
-    <lastmod>2026-06-25</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
     <loc>https://globalhomeatlas.com/destinations/andermatt/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
   </url>
   <url>
+    <loc>https://globalhomeatlas.com/destinations/innsbruck-tyrol/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://globalhomeatlas.com/destinations/lake-tahoe/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://globalhomeatlas.com/destinations/jackson-hole/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
     <loc>https://globalhomeatlas.com/destinations/ticino-lake-lugano/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://globalhomeatlas.com/destinations/aspen-snowmass/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>
