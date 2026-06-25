@@ -204,6 +204,32 @@
     .executive-summary article { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .executive-summary span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .executive-summary p { margin: 8px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+    .decision-panel {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
+      gap: 1px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+      box-shadow: 0 18px 50px rgba(36, 49, 45, .08);
+    }
+    .decision-panel__intro, .decision-panel__facts div { min-width: 0; background: var(--paper); }
+    .decision-panel__intro { padding: 20px; }
+    .decision-panel span, .page-card span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .decision-panel h2 { margin: 8px 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.04; }
+    .decision-panel p { margin: 0; color: #3f4d48; }
+    .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
+    .decision-panel__facts div { padding: 16px; }
+    .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .delight-grid { margin-top: 14px; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -331,7 +357,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -340,7 +366,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -350,7 +376,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -504,11 +530,6 @@
           <p class="page-eyebrow">Mountain + Water · New Zealand · updated 2026-06-25</p>
           <h1>Queenstown Property Research</h1>
           <p class="page-lede">Queenstown is a world-class scenery and activity market, but the foreign-buyer restriction is a major structural problem. The panel would only proceed if the ownership pathway is clearly available.</p>
-          <div class="brief-panel">
-            <article><span>Verdict</span><strong>Specialist only. Beautiful and high quality, but ownership constraints make it hard to rank near the top.</strong><p>Global adventure tourism, scarce lake/mountain land, strong ADR, four-season demand.</p></article>
-            <article><span>Best for</span><strong>Exceptional scenery</strong><p>Use this market when lifestyle demand, ownership confidence, and a future resale route can all be underwritten.</p></article>
-            <article><span>Watch-outs</span><strong>Foreign residential ownership restrictions</strong><p>Foreign-buyer restrictions, expensive entry, housing politics, limited local labour.</p></article>
-          </div>
         </div>
         <aside class="page-hero-card">
           <span>Global rank</span><strong>#15</strong>
@@ -520,47 +541,25 @@
   </header>
   <main>
     <div class="page-shell">
-      <section class="page-stats" aria-label="Destination metrics">
-        <div><span>Net yield</span><strong>2.5–4.5% est. net</strong></div>
-        <div><span>Ownership</span><strong>2.3/5</strong></div>
-        <div><span>Retirement</span><strong>4.4/5</strong></div>
-        <div><span>Exit liquidity</span><strong>3.6/5</strong></div>
-      </section>
-      <section class="brief-panel" aria-label="Destination dossier summary">
-        <article><span>Decision score</span><strong>3.70/5</strong><p>Composite score across ownership, lifestyle, yield realism, retirement fit, value entry, and future exit quality.</p></article>
-        <article><span>Ownership clarity</span><strong>2.3/5</strong><p>Overseas people usually cannot buy residential land unless eligible/consented; Australian and Singaporean citizens have specific pathways. Development or visa-linked exceptions require legal diligence.</p></article>
-        <article><span>Lifestyle and retirement fit</span><strong>4.4/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
-      </section>
-      <section class="executive-summary" aria-label="Destination executive summary">
-        <h2>Is this market for you?</h2>
-        <p>A fast decision read for buyers deciding whether Queenstown deserves deeper local diligence or should be replaced by a better-fit market.</p>
-        <div class="executive-summary__grid">
 
-        <article>
-          <span>Best buyer</span>
-          <p>Exceptional scenery</p>
-        </article>
-
-        <article>
-          <span>Buy for</span>
-          <p>Global adventure tourism, scarce lake/mountain land, strong ADR, four-season demand.</p>
-        </article>
-
-        <article>
-          <span>Underwrite first</span>
-          <p>Foreign residential ownership restrictions</p>
-        </article>
-
-        <article>
-          <span>Next step</span>
-          <p>Compare against two or three alternatives, then request a shortlist review before contacting local agents.</p>
-        </article>
+      <section class="decision-panel" aria-label="Quick destination decision">
+        <div class="decision-panel__intro">
+          <span>30-second decision</span>
+          <h2>Should this destination stay on your shortlist?</h2>
+          <p>Specialist only. Beautiful and high quality, but ownership constraints make it hard to rank near the top.</p>
         </div>
+        <div class="decision-panel__facts"><div><span>Best buyer</span><strong>Exceptional scenery</strong></div>
+<div><span>Best use case</span><strong>Global adventure tourism, scarce lake/mountain land, strong ADR, four-season demand.</strong></div>
+<div><span>Ownership</span><strong>Overseas people usually cannot buy residential land unless eligible/consented; Australian and Singaporean citizens have specific pathways. Development or visa-linked exceptions require legal diligence.</strong></div>
+<div><span>Budget signal</span><strong>$4,200/m2 benchmark</strong></div>
+<div><span>Rental realism</span><strong>2.5–4.5% est. net</strong></div>
+<div><span>Main risk</span><strong>Foreign residential ownership restrictions</strong></div></div>
       </section>
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#verdict">Verdict</a><a href="#buyer-fit">Buyer Fit</a><a href="#ownership">Ownership</a><a href="#lifestyle">Lifestyle</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#trust-context">Trust</a></nav>
+
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#overview">Overview</a><a href="#lifestyle">Lifestyle</a><a href="#buyer-fit">Buyer Fit</a><a href="#where-to-look">Locations</a><a href="#budget">Budget</a><a href="#risks">Risks</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#compare">Compare</a></nav>
 
       <nav class="mobile-action-strip" aria-label="Priority actions">
-        <a href="#scores">Scores</a>
+        <a href="#budget">Budget</a>
         <a href="/shortlist-review/">Review</a>
       </nav>
 
@@ -585,29 +584,136 @@
 
       <div class="page-layout">
         <article class="page-article">
-          <details class="page-section" id="verdict" open>
-            <summary><h2>Investment Thesis</h2></summary>
+          <details class="page-section" id="overview" data-mobile-open="true" open>
+            <summary><h2>Shortlist Verdict</h2></summary>
             <p>Global adventure tourism, scarce lake/mountain land, strong ADR, four-season demand.</p>
-            <p>Specialist only. Beautiful and high quality, but ownership constraints make it hard to rank near the top. This page is built for a global buyer deciding whether Queenstown belongs on a serious property shortlist, not for casual travel inspiration. The useful question is whether the destination can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process.</p>
+            <p>Specialist only. Beautiful and high quality, but ownership constraints make it hard to rank near the top. The useful question is whether Queenstown can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process without relying on a single perfect listing.</p>
           </details>
-          <details class="page-section" id="buyer-fit" open>
-            <summary><h2>Buyer Fit</h2></summary>
-            <div class="page-grid">
-              <article class="page-card"><h3>Best Fit</h3><ul><li>Exceptional scenery</li><li>strong summer/winter activities</li><li>global recognition</li><li>safe, English-speaking, high-quality environment.</li></ul></article>
-              <article class="page-card"><h3>Risk Check</h3><ul><li>Foreign residential ownership restrictions</li><li>expensive entry price</li><li>lower yield after costs</li><li>remote from Asia/global business centres versus European city-adjacent markets.</li></ul></article>
-            </div>
-          </details>
+
+      <details class="page-section" id="lifestyle" data-mobile-open="true" open>
+        <summary><h2>Why People Choose It</h2></summary>
+        <p>Queenstown should be read first as a place to use, then as a property market. The strongest overseas buys usually combine emotional pull with practical routines: access, healthcare, food, services, and a reason to return outside peak season.</p>
+        <div class="page-grid delight-grid"><article class="page-card"><span>Daily usability</span><h3>Daily usability</h3><p>Test whether Queenstown supports repeat stays, errands, healthcare, transport, food, and family routines outside the most photogenic season.</p></article>
+<article class="page-card"><span>Lifestyle pull</span><h3>Lifestyle pull</h3><p>Global adventure tourism, scarce lake/mountain land, strong ADR, four-season demand.</p></article>
+<article class="page-card"><span>Long-stay resilience</span><h3>Long-stay resilience</h3><p>A destination earns shortlist space when it can work for weeks or months, not just a single holiday visit.</p></article></div>
+      </details>
+
+
+      <details class="page-section" id="buyer-fit" data-mobile-open="true" open>
+        <summary><h2>Buyer Fit</h2></summary>
+        <div class="page-grid">
+          <article class="page-card"><span>Good fit</span><h3>If you want</h3><ul><li>Exceptional scenery</li><li>strong summer/winter activities</li><li>global recognition</li><li>safe, English-speaking, high-quality environment.</li></ul></article>
+          <article class="page-card"><span>Poor fit</span><h3>If you need to avoid</h3><ul><li>Foreign residential ownership restrictions</li><li>expensive entry price</li><li>lower yield after costs</li><li>remote from Asia/global business centres versus European city-adjacent markets.</li></ul></article>
+        </div>
+      </details>
+
+
+      <details class="page-section" id="where-to-look" data-mobile-open="true" open>
+        <summary><h2>Where to Look</h2></summary>
+        <p>Micro-location decides whether Queenstown feels easy to own, easy to use, and realistic to resell. Start with the role the property should play, then compare locations against that role.</p>
+        <div class="cluster-map" aria-label="Destination micro-location map">
+          <div class="cluster-map__grid"><div><span>Core location</span><strong>Best for resale, services, and buyer depth.</strong><em>Usually less value on entry.</em></div>
+<div><span>Lifestyle fringe</span><strong>Best for space, privacy, and personal use.</strong><em>Liquidity and daily convenience need testing.</em></div>
+<div><span>Trophy pocket</span><strong>Best for scarcity and emotional pull.</strong><em>Price discipline and exit assumptions matter more.</em></div></div>
+        </div>
+        <div class="page-grid">
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Core location</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for resale, services, and buyer depth.</p>
+          <p><strong>Underwrite:</strong> Usually less value on entry.</p>
+        </article>
+
+
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Lifestyle fringe</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for space, privacy, and personal use.</p>
+          <p><strong>Underwrite:</strong> Liquidity and daily convenience need testing.</p>
+        </article>
+
+
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Trophy pocket</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for scarcity and emotional pull.</p>
+          <p><strong>Underwrite:</strong> Price discipline and exit assumptions matter more.</p>
+        </article>
+        </div>
+      </details>
+
+
+      <details class="page-section" id="budget" data-mobile-open="true" open>
+        <summary><h2>What You Can Buy</h2></summary>
+        <p>Improved-property/build-cost proxy rather than clean market €/m² equivalent. Queenstown average property value was NZ$1.94m in May 2026, while high-end build-cost proxy is NZ$6,000–8,000/m²; converted at 1 NZD = 0.5737 USD. Land/location premium can push effective cost higher.</p>
+        <div class="page-article evidence-list">
+      <article class="listing">
+        <div>
+          <p class="listing__type">Apartment</p>
+          <h5>Sawmill Road 2-bed apartment from</h5>
+          <p>Entry apartment/new-development example; size estimated.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$447,486</dd></div>
+          <div><dt>USD/m2</dt><dd>$5,966</dd></div>
+          <div><dt>Size</dt><dd>75 m2</dd></div>
+          <div><dt>Local</dt><dd>NZD 780,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://rwqueenstown.co.nz/properties/for-sale?category=&amp;suburbPostCode=" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Sawmill Road 2-bed apartment from">
+          Ray White Queenstown · Medium confidence
+        </a>
+      </article>
+
+
+      <article class="listing">
+        <div>
+          <p class="listing__type">Apartment</p>
+          <h5>Queenstown apartment, Frankton</h5>
+          <p>Frankton apartment example; exact size not exposed in snippet.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$567,963</dd></div>
+          <div><dt>USD/m2</dt><dd>$6,311</dd></div>
+          <div><dt>Size</dt><dd>90 m2</dd></div>
+          <div><dt>Local</dt><dd>NZD 990,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://www.realestate.co.nz/residential/sale/central-otago-lakes-district/queenstown/apartment" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Queenstown apartment, Frankton">
+          realestate.co.nz · Medium confidence
+        </a>
+      </article>
+
+
+      <article class="listing">
+        <div>
+          <p class="listing__type">Luxury / development</p>
+          <h5>Queenstown Hill development/home opportunity</h5>
+          <p>Representative higher-end Queenstown Hill opportunity; verify details.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$1,434,250</dd></div>
+          <div><dt>USD/m2</dt><dd>$5,737</dd></div>
+          <div><dt>Size</dt><dd>250 m2</dd></div>
+          <div><dt>Local</dt><dd>NZD 2,500,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://properties.lefigaro.com/announces/luxury-real%2Bestate-otago-new%2Bzealand/?ville=queenstown" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Queenstown Hill development/home opportunity">
+          Le Figaro Properties · Medium confidence
+        </a>
+      </article>
+    </div>
+      </details>
+
           <details class="page-section" id="ownership" open>
             <summary><h2>Ownership and Governance</h2></summary>
             <p>Overseas people usually cannot buy residential land unless eligible/consented; Australian and Singaporean citizens have specific pathways. Development or visa-linked exceptions require legal diligence.</p>
             <p>Foreign-buyer restrictions, expensive entry, housing politics, limited local labour.</p>
           </details>
-          <details class="page-section" id="lifestyle" open>
-            <summary><h2>Lifestyle and Retirement Fit</h2></summary>
-            <p>For an affluent global buyer, Queenstown should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
-            <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
-          </details>
-          <details class="page-section" open>
+
+      <details class="page-section" id="risks" open>
+        <summary><h2>Risks to Underwrite First</h2></summary>
+        <ul><li>Confirm local rental permissions, building rules, licensing, and realistic net income after vacancy and management.</li>
+<li>Inspect building condition, insurance, climate exposure, renovation cost, and property-management depth.</li>
+<li>Stress-test resale liquidity by reviewing recent comparable sales, buyer mix, and time on market.</li>
+<li>Validate title, transfer process, taxes, financing, and ownership structure with independent local advisers.</li></ul>
+      </details>
+
+          <details class="page-section">
             <summary><h2>Guide Context</h2></summary>
             <p>Use these buying guides to compare Queenstown against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
             <nav class="page-grid"><a href="/best-places-to-buy-a-second-home-abroad/">Best Places to Buy a Second Home Abroad</a></nav>
@@ -748,15 +854,61 @@
       </details>
 
           </details>
-          <details class="page-section" open>
-            <summary><h2>Due Diligence Checklist</h2></summary>
-            <ul>
-              <li>Verify clean title, transfer process, foreign-buyer restrictions, and beneficial ownership structure with independent local counsel.</li>
-              <li>Model acquisition tax, annual property tax, income tax, wealth tax exposure, financing availability, insurance, repairs, and property management fees.</li>
-              <li>Confirm short-term-rental rules, licensing, building permissions, homeowners association rules, and realistic net income after vacancy and operating costs.</li>
-              <li>Stress-test resale liquidity by reviewing recent comparable transactions, buyer nationality mix, time on market, and local agent depth.</li>
-            </ul>
-          </details>
+
+      <details class="page-section" id="compare" open>
+        <summary><h2>Compare Before You Commit</h2></summary>
+        <p>The destination decision gets clearer when Queenstown is compared against a few plausible alternatives rather than judged in isolation.</p>
+        <div class="page-grid">
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/lake-como/">Lake Como</a></h3>
+                <span>3.96/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$4,650/m2</dd></div>
+                <div><dt>Yield</dt><dd>2–3.8% est. net</dd></div>
+              </dl>
+              <p>Keep for prestige and long-term liquidity. Do not rank it as a yield destination unless a very specific asset is mispriced.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/hakone-izu/">Hakone / Izu</a></h3>
+                <span>3.95/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$3,000/m2</dd></div>
+                <div><dt>Yield</dt><dd>2.5–4% est. net</dd></div>
+              </dl>
+              <p>Keep as a practical Japan alternative. Best for personal use and domestic demand, less compelling as a global trophy asset.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/annecy/">Annecy</a></h3>
+                <span>3.77/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$8,720/m2</dd></div>
+                <div><dt>Yield</dt><dd>2.2–3.8% est. net</dd></div>
+              </dl>
+              <p>Keep as a premium lifestyle contender. Excellent to own; hard to make the numbers exciting.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/lake-tahoe/">Lake Tahoe</a></h3>
+                <span>3.63/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$12,400/m2</dd></div>
+                <div><dt>Yield</dt><dd>2-3.5% est. net</dd></div>
+              </dl>
+              <p>Add as the North America mountain-water benchmark, but underwrite risk harder than lifestyle appeal.</p>
+            </article>
+            </div>
+      </details>
+
         </article>
         <details class="page-aside mobile-resources" open>
           <summary>More resources</summary>
@@ -824,7 +976,7 @@
       if (!details.length) return;
       const apply = () => {
         details.forEach((item, index) => {
-          if (query.matches) item.open = index === 0;
+          if (query.matches) item.open = item.dataset.mobileOpen === "true" || index === 0;
           else item.open = true;
         });
         resources.forEach((item) => {

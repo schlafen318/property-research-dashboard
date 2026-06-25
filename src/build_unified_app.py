@@ -1155,7 +1155,7 @@ def mobile_disclosure_script() -> str:
       if (!details.length) return;
       const apply = () => {
         details.forEach((item, index) => {
-          if (query.matches) item.open = index === 0;
+          if (query.matches) item.open = item.dataset.mobileOpen === "true" || index === 0;
           else item.open = true;
         });
         resources.forEach((item) => {
@@ -1458,6 +1458,194 @@ def destination_executive_summary_cards(dest: dict) -> str:
         """.rstrip()
         for label, text in cards
     )
+
+
+def destination_quick_decision_html(dest: dict) -> str:
+    pros = dest.get("pros") or []
+    cons = dest.get("cons") or []
+    fields = [
+        ("Best buyer", pros[0] if pros else "Lifestyle-led global buyer"),
+        ("Best use case", dest.get("profit_driver") or "Personal use with investment discipline."),
+        ("Ownership", dest.get("ownership_notes") or "Confirm title and foreign-buyer pathway locally."),
+        ("Budget signal", f"{money(dest.get('usd_per_m2'))}/m2 benchmark"),
+        ("Rental realism", dest.get("net_yield_estimate") or "Underwrite net yield by asset type."),
+        ("Main risk", cons[0] if cons else dest.get("red_flags") or "Verify local legal, rental, and resale risk."),
+    ]
+    items = "\n".join(
+        f"<div><span>{escape(label)}</span><strong>{escape(text)}</strong></div>"
+        for label, text in fields
+    )
+    return f"""
+      <section class="decision-panel" aria-label="Quick destination decision">
+        <div class="decision-panel__intro">
+          <span>30-second decision</span>
+          <h2>Should this destination stay on your shortlist?</h2>
+          <p>{escape(dest.get("panel_verdict") or dest.get("panel_summary") or "Use this market as a disciplined shortlist candidate, then verify the local transaction details.")}</p>
+        </div>
+        <div class="decision-panel__facts">{items}</div>
+      </section>
+    """
+
+
+def destination_lifestyle_html(dest: dict) -> str:
+    name = dest["name"]
+    if dest.get("id") == "fukuoka-itoshima":
+        tiles = [
+            ("City-to-coast rhythm", "Use central Fukuoka for daily convenience and Itoshima for slower coastal weekends, food, beaches, and repeatable personal use."),
+            ("Airport advantage", "Fukuoka Airport keeps the thesis practical: the destination works for shorter visits, regional Asia trips, and eventual long-stay routines."),
+            ("Food and daily life", "The appeal is not only scenery. Food culture, healthcare, safety, and normal city services make the market easier to use outside peak holiday periods."),
+        ]
+        intro = "Fukuoka / Itoshima is strongest when it is treated as a livable Japan base with coastal upside, not as a pure resort trophy. The delight is in how ordinary life can work: airport access, ramen and seafood, station-linked errands, beach drives, healthcare, and enough city depth to return throughout the year."
+    else:
+        tiles = [
+            ("Daily usability", f"Test whether {name} supports repeat stays, errands, healthcare, transport, food, and family routines outside the most photogenic season."),
+            ("Lifestyle pull", dest.get("profit_driver") or "Look for repeatable reasons to return, not only scenery or listing photography."),
+            ("Long-stay resilience", "A destination earns shortlist space when it can work for weeks or months, not just a single holiday visit."),
+        ]
+        intro = f"{name} should be read first as a place to use, then as a property market. The strongest overseas buys usually combine emotional pull with practical routines: access, healthcare, food, services, and a reason to return outside peak season."
+    cards = "\n".join(
+        f"<article class=\"page-card\"><span>{escape(label)}</span><h3>{escape(label)}</h3><p>{escape(copy)}</p></article>"
+        for label, copy in tiles
+    )
+    return f"""
+      <details class="page-section" id="lifestyle" data-mobile-open="true" open>
+        <summary><h2>Why People Choose It</h2></summary>
+        <p>{escape(intro)}</p>
+        <div class="page-grid delight-grid">{cards}</div>
+      </details>
+    """
+
+
+def destination_where_to_look_html(dest: dict) -> str:
+    name = dest["name"]
+    if dest.get("id") == "fukuoka-itoshima":
+        areas = [
+            ("Central Fukuoka", "Best for liquidity, daily convenience, healthcare, airport access, and a larger resale buyer pool.", "Lower emotional scarcity; more urban than coastal."),
+            ("Station-linked Itoshima", "Best for a practical coastal lifestyle that still supports errands, access, and repeat use.", "Value changes sharply by station, age, and micro-location."),
+            ("Beach-adjacent Itoshima", "Best for lifestyle appeal, family use, and a more memorable Japan second-home experience.", "Scarcity, maintenance, rental permissions, and resale depth need more diligence."),
+        ]
+    elif dest.get("category") == "Mountain":
+        areas = [
+            ("Core village", "Best for walkability, rentals, restaurants, and easier resale.", "Higher entry price and less privacy."),
+            ("Access corridor", "Best for value and larger homes if transport remains practical.", "Car dependence and thinner off-season demand."),
+            ("Prime view / slope zones", "Best for emotional pull and trophy scarcity.", "Maintenance, seasonality, and price discipline matter more."),
+        ]
+    elif dest.get("category") == "Water":
+        areas = [
+            ("Urban base", "Best for services, liquidity, healthcare, and year-round use.", "Less resort emotion."),
+            ("Lifestyle coast", "Best for personal use, views, and repeat holiday appeal.", "Asset quality and micro-location drive outcomes."),
+            ("Prime waterfront", "Best for scarcity and emotional conviction.", "Expensive, harder to underwrite, and often lower yielding."),
+        ]
+    else:
+        areas = [
+            ("Core location", "Best for resale, services, and buyer depth.", "Usually less value on entry."),
+            ("Lifestyle fringe", "Best for space, privacy, and personal use.", "Liquidity and daily convenience need testing."),
+            ("Trophy pocket", "Best for scarcity and emotional pull.", "Price discipline and exit assumptions matter more."),
+        ]
+    markers = "\n".join(
+        f"<div><span>{escape(label)}</span><strong>{escape(read)}</strong><em>{escape(watch)}</em></div>"
+        for label, read, watch in areas
+    )
+    rows = "\n".join(
+        f"""
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>{escape(label)}</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> {escape(read)}</p>
+          <p><strong>Underwrite:</strong> {escape(watch)}</p>
+        </article>
+        """
+        for label, read, watch in areas
+    )
+    return f"""
+      <details class="page-section" id="where-to-look" data-mobile-open="true" open>
+        <summary><h2>Where to Look</h2></summary>
+        <p>Micro-location decides whether {escape(name)} feels easy to own, easy to use, and realistic to resell. Start with the role the property should play, then compare locations against that role.</p>
+        <div class="cluster-map" aria-label="Destination micro-location map">
+          <div class="cluster-map__grid">{markers}</div>
+        </div>
+        <div class="page-grid">{rows}</div>
+      </details>
+    """
+
+
+def destination_budget_html(dest: dict, listings: list[dict]) -> str:
+    if not listings:
+        return ""
+    ordered = sorted(listings, key=lambda item: item.get("usd_price") or 0)
+    cards = "\n".join(build_listing_card(item) for item in ordered[:3])
+    return f"""
+      <details class="page-section" id="budget" data-mobile-open="true" open>
+        <summary><h2>What You Can Buy</h2></summary>
+        <p>{escape(dest.get("price_basis") or "Representative listings anchor the market texture. Verify current availability, location, condition, and transaction costs before relying on any sample.")}</p>
+        <div class="page-article evidence-list">{cards}</div>
+      </details>
+    """
+
+
+def destination_fit_html(dest: dict, pros: str, cons: str) -> str:
+    return f"""
+      <details class="page-section" id="buyer-fit" data-mobile-open="true" open>
+        <summary><h2>Buyer Fit</h2></summary>
+        <div class="page-grid">
+          <article class="page-card"><span>Good fit</span><h3>If you want</h3><ul>{pros}</ul></article>
+          <article class="page-card"><span>Poor fit</span><h3>If you need to avoid</h3><ul>{cons}</ul></article>
+        </div>
+      </details>
+    """
+
+
+def destination_risk_checklist_html(dest: dict) -> str:
+    specific = []
+    if dest.get("id") == "fukuoka-itoshima":
+        specific = [
+            "Confirm STR licensing, building-level rules, and the practical effect of Japan's annual rental caps before underwriting income.",
+            "Check distance to rail, airport routing, and day-to-day car dependence for the exact Itoshima micro-location.",
+            "Inspect coastal maintenance exposure, building age, earthquake resilience, insurance, and renovation needs.",
+            "Stress-test resale depth separately for central Fukuoka, station-linked Itoshima, and beach-adjacent homes.",
+        ]
+    else:
+        specific = [
+            "Confirm local rental permissions, building rules, licensing, and realistic net income after vacancy and management.",
+            "Inspect building condition, insurance, climate exposure, renovation cost, and property-management depth.",
+            "Stress-test resale liquidity by reviewing recent comparable sales, buyer mix, and time on market.",
+            "Validate title, transfer process, taxes, financing, and ownership structure with independent local advisers.",
+        ]
+    items = "\n".join(f"<li>{escape(item)}</li>" for item in specific)
+    return f"""
+      <details class="page-section" id="risks" open>
+        <summary><h2>Risks to Underwrite First</h2></summary>
+        <ul>{items}</ul>
+      </details>
+    """
+
+
+def destination_compare_html(dest: dict, peers: list[dict]) -> str:
+    if not peers:
+        return ""
+    rows = []
+    for peer in peers[:4]:
+        rows.append(
+            f"""
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/{escape(destination_slug(peer))}/">{escape(peer["name"])}</a></h3>
+                <span>{peer.get("decision_score", 0):.2f}/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>{money(peer.get("usd_per_m2"))}/m2</dd></div>
+                <div><dt>Yield</dt><dd>{escape(peer.get("net_yield_estimate") or "n/a")}</dd></div>
+              </dl>
+              <p>{escape(peer.get("panel_verdict") or peer.get("panel_summary") or "Compare buyer fit, ownership, yield, and exit liquidity.")}</p>
+            </article>
+            """
+        )
+    return f"""
+      <details class="page-section" id="compare" open>
+        <summary><h2>Compare Before You Commit</h2></summary>
+        <p>The destination decision gets clearer when {escape(dest["name"])} is compared against a few plausible alternatives rather than judged in isolation.</p>
+        <div class="page-grid">{"".join(rows)}</div>
+      </details>
+    """
 
 
 def premium_report_catalog() -> list[dict]:
@@ -3620,6 +3808,32 @@ def shared_content_css() -> str:
     .executive-summary article { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .executive-summary span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .executive-summary p { margin: 8px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+    .decision-panel {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
+      gap: 1px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+      box-shadow: 0 18px 50px rgba(36, 49, 45, .08);
+    }
+    .decision-panel__intro, .decision-panel__facts div { min-width: 0; background: var(--paper); }
+    .decision-panel__intro { padding: 20px; }
+    .decision-panel span, .page-card span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .decision-panel h2 { margin: 8px 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.04; }
+    .decision-panel p { margin: 0; color: #3f4d48; }
+    .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
+    .decision-panel__facts div { padding: 16px; }
+    .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .delight-grid { margin-top: 14px; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -3747,7 +3961,7 @@ def shared_content_css() -> str:
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -3756,7 +3970,7 @@ def shared_content_css() -> str:
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -3766,7 +3980,7 @@ def shared_content_css() -> str:
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -3936,6 +4150,13 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
     )
     peer_links = destination_links(peer_destinations, limit=6) or destination_links(destinations, slug, limit=6)
     destination_guide_links = guide_links_for_destination(dest, pages)
+    quick_decision = destination_quick_decision_html(dest)
+    lifestyle_section = destination_lifestyle_html(dest)
+    buyer_fit_section = destination_fit_html(dest, pros, cons)
+    where_to_look_section = destination_where_to_look_html(dest)
+    budget_section = destination_budget_html(dest, listings)
+    risk_section = destination_risk_checklist_html(dest)
+    compare_section = destination_compare_html(dest, peer_destinations)
     country_hub = country_hub_for_destination(dest)
     country_hub_link = (
         f'<a href="/countries/{escape(country_hub["slug"])}/">{escape(country_hub["h1"])}</a>'
@@ -3958,11 +4179,6 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
           <p class="page-eyebrow">{escape(dest.get("category") or "Destination")} · {escape(dest.get("country") or "")} · updated {date.today().isoformat()}</p>
           <h1>{escape(dest["name"])} Property Research</h1>
           <p class="page-lede">{escape(dest.get("panel_summary") or "")}</p>
-          <div class="brief-panel">
-            <article><span>Verdict</span><strong>{escape(dest.get("panel_verdict") or "Shortlist candidate")}</strong><p>{escape(dest.get("profit_driver") or "")}</p></article>
-            <article><span>Best for</span><strong>{escape((dest.get("pros") or ["Lifestyle-led buyers"])[0])}</strong><p>Use this market when lifestyle demand, ownership confidence, and a future resale route can all be underwritten.</p></article>
-            <article><span>Watch-outs</span><strong>{escape((dest.get("cons") or ["Verify local risk"])[0])}</strong><p>{escape(dest.get("red_flags") or "Verify current rules, asset condition, and resale depth before acting.")}</p></article>
-          </div>
         </div>
         <aside class="page-hero-card">
           <span>Global rank</span><strong>#{dest["rank"]}</strong>
@@ -3974,52 +4190,28 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
   </header>
   <main>
     <div class="page-shell">
-      <section class="page-stats" aria-label="Destination metrics">
-        <div><span>Net yield</span><strong>{escape(dest.get("net_yield_estimate") or "n/a")}</strong></div>
-        <div><span>Ownership</span><strong>{metric_value(dest, "ownership_clarity"):.1f}/5</strong></div>
-        <div><span>Retirement</span><strong>{metric_value(dest, "retirement_fit"):.1f}/5</strong></div>
-        <div><span>Exit liquidity</span><strong>{metric_value(dest, "exit_liquidity"):.1f}/5</strong></div>
-      </section>
-      <section class="brief-panel" aria-label="Destination dossier summary">
-        <article><span>Decision score</span><strong>{dest.get("decision_score", 0):.2f}/5</strong><p>Composite score across ownership, lifestyle, yield realism, retirement fit, value entry, and future exit quality.</p></article>
-        <article><span>Ownership clarity</span><strong>{metric_value(dest, "ownership_clarity"):.1f}/5</strong><p>{escape(dest.get("ownership_notes") or "Confirm title structure, foreign-buyer rules, transfer taxes, and local counsel requirements.")}</p></article>
-        <article><span>Lifestyle and retirement fit</span><strong>{metric_value(dest, "retirement_fit"):.1f}/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
-      </section>
-      <section class="executive-summary" aria-label="Destination executive summary">
-        <h2>Is this market for you?</h2>
-        <p>A fast decision read for buyers deciding whether {escape(dest["name"])} deserves deeper local diligence or should be replaced by a better-fit market.</p>
-        <div class="executive-summary__grid">
-          {destination_executive_summary_cards(dest)}
-        </div>
-      </section>
-      {sticky_page_nav([("Verdict", "verdict"), ("Buyer Fit", "buyer-fit"), ("Ownership", "ownership"), ("Lifestyle", "lifestyle"), ("Scores", "scores"), ("Evidence", "evidence"), ("Trust", "trust-context")])}
-      {mobile_action_strip("#scores", "Scores", "/shortlist-review/", "Review")}
+      {quick_decision}
+      {sticky_page_nav([("Overview", "overview"), ("Lifestyle", "lifestyle"), ("Buyer Fit", "buyer-fit"), ("Locations", "where-to-look"), ("Budget", "budget"), ("Risks", "risks"), ("Scores", "scores"), ("Evidence", "evidence"), ("Compare", "compare")])}
+      {mobile_action_strip("#budget", "Budget", "/shortlist-review/", "Review")}
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
-          <details class="page-section" id="verdict" open>
-            <summary><h2>Investment Thesis</h2></summary>
+          <details class="page-section" id="overview" data-mobile-open="true" open>
+            <summary><h2>Shortlist Verdict</h2></summary>
             <p>{escape(dest.get("profit_driver") or dest.get("panel_verdict") or "")}</p>
-            <p>{escape(dest.get("panel_verdict") or "")} This page is built for a global buyer deciding whether {escape(dest["name"])} belongs on a serious property shortlist, not for casual travel inspiration. The useful question is whether the destination can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process.</p>
+            <p>{escape(dest.get("panel_verdict") or "")} The useful question is whether {escape(dest["name"])} can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process without relying on a single perfect listing.</p>
           </details>
-          <details class="page-section" id="buyer-fit" open>
-            <summary><h2>Buyer Fit</h2></summary>
-            <div class="page-grid">
-              <article class="page-card"><h3>Best Fit</h3><ul>{pros}</ul></article>
-              <article class="page-card"><h3>Risk Check</h3><ul>{cons}</ul></article>
-            </div>
-          </details>
+          {lifestyle_section}
+          {buyer_fit_section}
+          {where_to_look_section}
+          {budget_section}
           <details class="page-section" id="ownership" open>
             <summary><h2>Ownership and Governance</h2></summary>
             <p>{escape(dest.get("ownership_notes") or "Confirm title structure, foreign-buyer rules, taxes, transfer process, and local counsel requirements before relying on any market-level conclusion.")}</p>
             <p>{escape(dest.get("red_flags") or "Verify current rules, building condition, liquidity, and rental permissions before committing capital.")}</p>
           </details>
-          <details class="page-section" id="lifestyle" open>
-            <summary><h2>Lifestyle and Retirement Fit</h2></summary>
-            <p>For an affluent global buyer, {escape(dest["name"])} should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
-            <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
-          </details>
-          <details class="page-section" open>
+          {risk_section}
+          <details class="page-section">
             <summary><h2>Guide Context</h2></summary>
             <p>Use these buying guides to compare {escape(dest["name"])} against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
             <nav class="page-grid">{destination_guide_links}</nav>
@@ -4033,15 +4225,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
             <p>{escape(dest.get("price_basis") or "Listing samples are used as evidence anchors for current market texture, not availability guarantees.")}</p>
             {evidence_cards}
           </details>
-          <details class="page-section" open>
-            <summary><h2>Due Diligence Checklist</h2></summary>
-            <ul>
-              <li>Verify clean title, transfer process, foreign-buyer restrictions, and beneficial ownership structure with independent local counsel.</li>
-              <li>Model acquisition tax, annual property tax, income tax, wealth tax exposure, financing availability, insurance, repairs, and property management fees.</li>
-              <li>Confirm short-term-rental rules, licensing, building permissions, homeowners association rules, and realistic net income after vacancy and operating costs.</li>
-              <li>Stress-test resale liquidity by reviewing recent comparable transactions, buyer nationality mix, time on market, and local agent depth.</li>
-            </ul>
-          </details>
+          {compare_section}
         </article>
         <details class="page-aside mobile-resources" open>
           <summary>More resources</summary>

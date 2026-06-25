@@ -204,6 +204,32 @@
     .executive-summary article { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .executive-summary span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .executive-summary p { margin: 8px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+    .decision-panel {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
+      gap: 1px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+      box-shadow: 0 18px 50px rgba(36, 49, 45, .08);
+    }
+    .decision-panel__intro, .decision-panel__facts div { min-width: 0; background: var(--paper); }
+    .decision-panel__intro { padding: 20px; }
+    .decision-panel span, .page-card span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .decision-panel h2 { margin: 8px 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.04; }
+    .decision-panel p { margin: 0; color: #3f4d48; }
+    .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
+    .decision-panel__facts div { padding: 16px; }
+    .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .delight-grid { margin-top: 14px; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -331,7 +357,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -340,7 +366,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -350,7 +376,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -504,11 +530,6 @@
           <p class="page-eyebrow">Water · Canada · updated 2026-06-25</p>
           <h1>Vancouver Island / Victoria Property Research</h1>
           <p class="page-lede">A calmer North American water-and-retirement benchmark with healthcare, English-language ease, and lifestyle depth, but Canada foreign-buyer/tax rules and BC housing policy require care.</p>
-          <div class="brief-panel">
-            <article><span>Verdict</span><strong>Add as the North American retirement-water benchmark. Strong lifestyle fit, but policy and tax diligence matter.</strong><p>Retirement suitability, healthcare/livability, English-language ease, and water-oriented lifestyle scarcity.</p></article>
-            <article><span>Best for</span><strong>High livability and healthcare access</strong><p>Use this market when lifestyle demand, ownership confidence, and a future resale route can all be underwritten.</p></article>
-            <article><span>Watch-outs</span><strong>Canadian foreign-buyer restrictions and taxes can apply</strong><p>Foreign-buyer policy, BC speculation/vacancy taxes, STR restrictions, and lower yield after ownership costs.</p></article>
-          </div>
         </div>
         <aside class="page-hero-card">
           <span>Global rank</span><strong>#17</strong>
@@ -520,47 +541,25 @@
   </header>
   <main>
     <div class="page-shell">
-      <section class="page-stats" aria-label="Destination metrics">
-        <div><span>Net yield</span><strong>2.5-3.8% est. net</strong></div>
-        <div><span>Ownership</span><strong>4.3/5</strong></div>
-        <div><span>Retirement</span><strong>4.5/5</strong></div>
-        <div><span>Exit liquidity</span><strong>3.7/5</strong></div>
-      </section>
-      <section class="brief-panel" aria-label="Destination dossier summary">
-        <article><span>Decision score</span><strong>3.66/5</strong><p>Composite score across ownership, lifestyle, yield realism, retirement fit, value entry, and future exit quality.</p></article>
-        <article><span>Ownership clarity</span><strong>4.3/5</strong><p>Canada generally has clear title, but foreign-buyer restrictions, vacancy/speculation taxes, and provincial/municipal rules must be checked before assuming eligibility.</p></article>
-        <article><span>Lifestyle and retirement fit</span><strong>4.5/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
-      </section>
-      <section class="executive-summary" aria-label="Destination executive summary">
-        <h2>Is this market for you?</h2>
-        <p>A fast decision read for buyers deciding whether Vancouver Island / Victoria deserves deeper local diligence or should be replaced by a better-fit market.</p>
-        <div class="executive-summary__grid">
 
-        <article>
-          <span>Best buyer</span>
-          <p>High livability and healthcare access</p>
-        </article>
-
-        <article>
-          <span>Buy for</span>
-          <p>Retirement suitability, healthcare/livability, English-language ease, and water-oriented lifestyle scarcity.</p>
-        </article>
-
-        <article>
-          <span>Underwrite first</span>
-          <p>Canadian foreign-buyer restrictions and taxes can apply</p>
-        </article>
-
-        <article>
-          <span>Next step</span>
-          <p>Compare against two or three alternatives, then request a shortlist review before contacting local agents.</p>
-        </article>
+      <section class="decision-panel" aria-label="Quick destination decision">
+        <div class="decision-panel__intro">
+          <span>30-second decision</span>
+          <h2>Should this destination stay on your shortlist?</h2>
+          <p>Add as the North American retirement-water benchmark. Strong lifestyle fit, but policy and tax diligence matter.</p>
         </div>
+        <div class="decision-panel__facts"><div><span>Best buyer</span><strong>High livability and healthcare access</strong></div>
+<div><span>Best use case</span><strong>Retirement suitability, healthcare/livability, English-language ease, and water-oriented lifestyle scarcity.</strong></div>
+<div><span>Ownership</span><strong>Canada generally has clear title, but foreign-buyer restrictions, vacancy/speculation taxes, and provincial/municipal rules must be checked before assuming eligibility.</strong></div>
+<div><span>Budget signal</span><strong>$6,800/m2 benchmark</strong></div>
+<div><span>Rental realism</span><strong>2.5-3.8% est. net</strong></div>
+<div><span>Main risk</span><strong>Canadian foreign-buyer restrictions and taxes can apply</strong></div></div>
       </section>
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#verdict">Verdict</a><a href="#buyer-fit">Buyer Fit</a><a href="#ownership">Ownership</a><a href="#lifestyle">Lifestyle</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#trust-context">Trust</a></nav>
+
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#overview">Overview</a><a href="#lifestyle">Lifestyle</a><a href="#buyer-fit">Buyer Fit</a><a href="#where-to-look">Locations</a><a href="#budget">Budget</a><a href="#risks">Risks</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#compare">Compare</a></nav>
 
       <nav class="mobile-action-strip" aria-label="Priority actions">
-        <a href="#scores">Scores</a>
+        <a href="#budget">Budget</a>
         <a href="/shortlist-review/">Review</a>
       </nav>
 
@@ -585,29 +584,136 @@
 
       <div class="page-layout">
         <article class="page-article">
-          <details class="page-section" id="verdict" open>
-            <summary><h2>Investment Thesis</h2></summary>
+          <details class="page-section" id="overview" data-mobile-open="true" open>
+            <summary><h2>Shortlist Verdict</h2></summary>
             <p>Retirement suitability, healthcare/livability, English-language ease, and water-oriented lifestyle scarcity.</p>
-            <p>Add as the North American retirement-water benchmark. Strong lifestyle fit, but policy and tax diligence matter. This page is built for a global buyer deciding whether Vancouver Island / Victoria belongs on a serious property shortlist, not for casual travel inspiration. The useful question is whether the destination can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process.</p>
+            <p>Add as the North American retirement-water benchmark. Strong lifestyle fit, but policy and tax diligence matter. The useful question is whether Vancouver Island / Victoria can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process without relying on a single perfect listing.</p>
           </details>
-          <details class="page-section" id="buyer-fit" open>
-            <summary><h2>Buyer Fit</h2></summary>
-            <div class="page-grid">
-              <article class="page-card"><h3>Best Fit</h3><ul><li>High livability and healthcare access</li><li>English-language ease</li><li>waterfront and island lifestyle</li><li>strong retirement fit</li><li>more practical than trophy US resorts</li></ul></article>
-              <article class="page-card"><h3>Risk Check</h3><ul><li>Canadian foreign-buyer restrictions and taxes can apply</li><li>lower short-term-rental upside in many areas</li><li>high ownership costs versus income</li><li>ferry/airport friction outside Victoria</li><li>wet winter climate</li></ul></article>
-            </div>
-          </details>
+
+      <details class="page-section" id="lifestyle" data-mobile-open="true" open>
+        <summary><h2>Why People Choose It</h2></summary>
+        <p>Vancouver Island / Victoria should be read first as a place to use, then as a property market. The strongest overseas buys usually combine emotional pull with practical routines: access, healthcare, food, services, and a reason to return outside peak season.</p>
+        <div class="page-grid delight-grid"><article class="page-card"><span>Daily usability</span><h3>Daily usability</h3><p>Test whether Vancouver Island / Victoria supports repeat stays, errands, healthcare, transport, food, and family routines outside the most photogenic season.</p></article>
+<article class="page-card"><span>Lifestyle pull</span><h3>Lifestyle pull</h3><p>Retirement suitability, healthcare/livability, English-language ease, and water-oriented lifestyle scarcity.</p></article>
+<article class="page-card"><span>Long-stay resilience</span><h3>Long-stay resilience</h3><p>A destination earns shortlist space when it can work for weeks or months, not just a single holiday visit.</p></article></div>
+      </details>
+
+
+      <details class="page-section" id="buyer-fit" data-mobile-open="true" open>
+        <summary><h2>Buyer Fit</h2></summary>
+        <div class="page-grid">
+          <article class="page-card"><span>Good fit</span><h3>If you want</h3><ul><li>High livability and healthcare access</li><li>English-language ease</li><li>waterfront and island lifestyle</li><li>strong retirement fit</li><li>more practical than trophy US resorts</li></ul></article>
+          <article class="page-card"><span>Poor fit</span><h3>If you need to avoid</h3><ul><li>Canadian foreign-buyer restrictions and taxes can apply</li><li>lower short-term-rental upside in many areas</li><li>high ownership costs versus income</li><li>ferry/airport friction outside Victoria</li><li>wet winter climate</li></ul></article>
+        </div>
+      </details>
+
+
+      <details class="page-section" id="where-to-look" data-mobile-open="true" open>
+        <summary><h2>Where to Look</h2></summary>
+        <p>Micro-location decides whether Vancouver Island / Victoria feels easy to own, easy to use, and realistic to resell. Start with the role the property should play, then compare locations against that role.</p>
+        <div class="cluster-map" aria-label="Destination micro-location map">
+          <div class="cluster-map__grid"><div><span>Urban base</span><strong>Best for services, liquidity, healthcare, and year-round use.</strong><em>Less resort emotion.</em></div>
+<div><span>Lifestyle coast</span><strong>Best for personal use, views, and repeat holiday appeal.</strong><em>Asset quality and micro-location drive outcomes.</em></div>
+<div><span>Prime waterfront</span><strong>Best for scarcity and emotional conviction.</strong><em>Expensive, harder to underwrite, and often lower yielding.</em></div></div>
+        </div>
+        <div class="page-grid">
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Urban base</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for services, liquidity, healthcare, and year-round use.</p>
+          <p><strong>Underwrite:</strong> Less resort emotion.</p>
+        </article>
+
+
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Lifestyle coast</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for personal use, views, and repeat holiday appeal.</p>
+          <p><strong>Underwrite:</strong> Asset quality and micro-location drive outcomes.</p>
+        </article>
+
+
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Prime waterfront</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for scarcity and emotional conviction.</p>
+          <p><strong>Underwrite:</strong> Expensive, harder to underwrite, and often lower yielding.</p>
+        </article>
+        </div>
+      </details>
+
+
+      <details class="page-section" id="budget" data-mobile-open="true" open>
+        <summary><h2>What You Can Buy</h2></summary>
+        <p>Victoria/Vancouver Island built residential benchmark. Approx. US$630/sq ft equivalent, converted to about $6,800/m2; waterfront and Victoria core can be higher.</p>
+        <div class="page-article evidence-list">
+      <article class="listing">
+        <div>
+          <p class="listing__type">Representative market benchmark</p>
+          <h5>Victoria condo benchmark</h5>
+          <p>Condo benchmark for lower-maintenance long-stay ownership.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$441,306</dd></div>
+          <div><dt>USD/m2</dt><dd>$5,382</dd></div>
+          <div><dt>Size</dt><dd>82 m2</dd></div>
+          <div><dt>Local</dt><dd>CAD 625,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://www.realtor.ca/map#ZoomLevel=11&amp;Center=48.4284%2C-123.3656&amp;PropertyTypeGroupID=1&amp;PropertySearchTypeId=1&amp;TransactionTypeId=2" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Victoria condo benchmark">
+          Realtor.ca / Victoria condos search · Low-medium confidence
+        </a>
+      </article>
+
+
+      <article class="listing">
+        <div>
+          <p class="listing__type">Representative market benchmark</p>
+          <h5>Victoria detached home benchmark</h5>
+          <p>Urban Victoria detached-home benchmark for retirement/lifestyle use.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$741,394</dd></div>
+          <div><dt>USD/m2</dt><dd>$4,008</dd></div>
+          <div><dt>Size</dt><dd>185 m2</dd></div>
+          <div><dt>Local</dt><dd>CAD 1,050,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://www.realtor.ca/map#ZoomLevel=11&amp;Center=48.4284%2C-123.3656&amp;LatitudeMax=48.61550&amp;LongitudeMax=-123.06485&amp;LatitudeMin=48.24062&amp;LongitudeMin=-123.66635" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Victoria detached home benchmark">
+          Realtor.ca / Victoria homes search · Low-medium confidence
+        </a>
+      </article>
+
+
+      <article class="listing">
+        <div>
+          <p class="listing__type">Representative market benchmark</p>
+          <h5>Vancouver Island waterfront benchmark</h5>
+          <p>Waterfront/island lifestyle benchmark; submarkets vary sharply.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$1,553,398</dd></div>
+          <div><dt>USD/m2</dt><dd>$5,975</dd></div>
+          <div><dt>Size</dt><dd>260 m2</dd></div>
+          <div><dt>Local</dt><dd>CAD 2,200,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://www.point2homes.com/CA/Real-Estate-Listings/BC/Vancouver-Island.html" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Vancouver Island waterfront benchmark">
+          Point2Homes / Vancouver Island waterfront search · Low-medium confidence
+        </a>
+      </article>
+    </div>
+      </details>
+
           <details class="page-section" id="ownership" open>
             <summary><h2>Ownership and Governance</h2></summary>
             <p>Canada generally has clear title, but foreign-buyer restrictions, vacancy/speculation taxes, and provincial/municipal rules must be checked before assuming eligibility.</p>
             <p>Foreign-buyer policy, BC speculation/vacancy taxes, STR restrictions, and lower yield after ownership costs.</p>
           </details>
-          <details class="page-section" id="lifestyle" open>
-            <summary><h2>Lifestyle and Retirement Fit</h2></summary>
-            <p>For an affluent global buyer, Vancouver Island / Victoria should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
-            <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
-          </details>
-          <details class="page-section" open>
+
+      <details class="page-section" id="risks" open>
+        <summary><h2>Risks to Underwrite First</h2></summary>
+        <ul><li>Confirm local rental permissions, building rules, licensing, and realistic net income after vacancy and management.</li>
+<li>Inspect building condition, insurance, climate exposure, renovation cost, and property-management depth.</li>
+<li>Stress-test resale liquidity by reviewing recent comparable sales, buyer mix, and time on market.</li>
+<li>Validate title, transfer process, taxes, financing, and ownership structure with independent local advisers.</li></ul>
+      </details>
+
+          <details class="page-section">
             <summary><h2>Guide Context</h2></summary>
             <p>Use these buying guides to compare Vancouver Island / Victoria against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
             <nav class="page-grid"><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
@@ -752,15 +858,61 @@
       </details>
 
           </details>
-          <details class="page-section" open>
-            <summary><h2>Due Diligence Checklist</h2></summary>
-            <ul>
-              <li>Verify clean title, transfer process, foreign-buyer restrictions, and beneficial ownership structure with independent local counsel.</li>
-              <li>Model acquisition tax, annual property tax, income tax, wealth tax exposure, financing availability, insurance, repairs, and property management fees.</li>
-              <li>Confirm short-term-rental rules, licensing, building permissions, homeowners association rules, and realistic net income after vacancy and operating costs.</li>
-              <li>Stress-test resale liquidity by reviewing recent comparable transactions, buyer nationality mix, time on market, and local agent depth.</li>
-            </ul>
-          </details>
+
+      <details class="page-section" id="compare" open>
+        <summary><h2>Compare Before You Commit</h2></summary>
+        <p>The destination decision gets clearer when Vancouver Island / Victoria is compared against a few plausible alternatives rather than judged in isolation.</p>
+        <div class="page-grid">
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a></h3>
+                <span>4.27/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$2,620/m2</dd></div>
+                <div><dt>Yield</dt><dd>3–4.8% est. net</dd></div>
+              </dl>
+              <p>Keep as a top-tier shortlist candidate. It is the “highest probability of working” option rather than the most romantic one.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/valencia/">Valencia</a></h3>
+                <span>4.09/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$3,840/m2</dd></div>
+                <div><dt>Yield</dt><dd>3–4.8% est. net</dd></div>
+              </dl>
+              <p>Keep near the top. Best suited for retirement optionality and long-stay demand, not ultra-luxury holiday yield.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/algarve-cascais/">Algarve / Cascais</a></h3>
+                <span>4.06/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$4,600/m2</dd></div>
+                <div><dt>Yield</dt><dd>3–4.5% est. net</dd></div>
+              </dl>
+              <p>Keep as a core European benchmark. Strong for retirement and lifestyle, only average for development yield.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a></h3>
+                <span>4.03/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$5,600/m2</dd></div>
+                <div><dt>Yield</dt><dd>3–5% est. net</dd></div>
+              </dl>
+              <p>Keep, but require strict entry-price discipline. Good destination; not necessarily good at any price.</p>
+            </article>
+            </div>
+      </details>
+
         </article>
         <details class="page-aside mobile-resources" open>
           <summary>More resources</summary>
@@ -826,7 +978,7 @@
       if (!details.length) return;
       const apply = () => {
         details.forEach((item, index) => {
-          if (query.matches) item.open = index === 0;
+          if (query.matches) item.open = item.dataset.mobileOpen === "true" || index === 0;
           else item.open = true;
         });
         resources.forEach((item) => {
