@@ -4,7 +4,9 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2310241f'/%3E%3Cpath d='M17 37 32 18l15 19v11H36V36h-8v12H17Z' fill='%23fffdf8'/%3E%3C/svg%3E">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
+  <link rel="manifest" href="/assets/site.webmanifest">
   <title>Contact | Global Home Atlas</title>
   <meta name="description" content="Contact Global Home Atlas for research questions, data corrections, partnerships, and custom global property shortlist requests.">
   <link rel="canonical" href="https://globalhomeatlas.com/contact/">
@@ -504,7 +506,7 @@
           <p class="page-lede">Contact Global Home Atlas for research questions, data corrections, partnerships, and custom global property shortlist requests.</p>
         </div>
         <aside class="page-hero-card">
-          <span>Destinations</span><strong>25</strong>
+          <span>Destinations</span><strong>30</strong>
           <span>Decision dimensions</span><strong>10</strong>
           <span>Guide pages</span><strong>15</strong>
         </aside>
@@ -515,7 +517,7 @@
     <div class="page-shell">
       <section class="page-stats" aria-label="Trust metrics">
         <div><span>Model</span><strong>10 dimensions</strong></div>
-        <div><span>Destinations</span><strong>25</strong></div>
+        <div><span>Destinations</span><strong>30</strong></div>
         <div><span>Listings</span><strong>75 samples</strong></div>
         <div><span>Updated</span><strong>2026-06-25</strong></div>
       </section>
@@ -676,7 +678,7 @@
 
   <script>
     (() => {
-      const destinationsById = {"fukuoka-itoshima": {"name": "Fukuoka / Itoshima", "country": "Japan"}, "valencia": {"name": "Valencia", "country": "Spain"}, "algarve-cascais": {"name": "Algarve / Cascais", "country": "Portugal"}, "m-laga-costa-del-sol": {"name": "Málaga / Costa del Sol", "country": "Spain"}, "lake-como": {"name": "Lake Como", "country": "Italy"}, "hakone-izu": {"name": "Hakone / Izu", "country": "Japan"}, "madeira": {"name": "Madeira", "country": "Portugal"}, "costa-brava-girona": {"name": "Costa Brava / Girona", "country": "Spain"}, "hakuba": {"name": "Hakuba", "country": "Japan"}, "crete": {"name": "Crete", "country": "Greece"}, "annecy": {"name": "Annecy", "country": "France"}, "mallorca": {"name": "Mallorca", "country": "Spain"}, "niseko": {"name": "Niseko", "country": "Japan"}, "croatia-istria-dalmatia": {"name": "Croatia / Istria-Dalmatia", "country": "Croatia"}, "queenstown": {"name": "Queenstown", "country": "New Zealand"}, "phuket-koh-samui": {"name": "Phuket / Koh Samui", "country": "Thailand"}, "dolomites-south-tyrol": {"name": "Dolomites / South Tyrol", "country": "Italy"}, "bali": {"name": "Bali", "country": "Indonesia"}, "chamonix": {"name": "Chamonix", "country": "France"}, "da-nang-hoi-an": {"name": "Da Nang / Hoi An", "country": "Vietnam"}, "whistler": {"name": "Whistler", "country": "Canada"}, "innsbruck-tyrol": {"name": "Innsbruck / Tyrol", "country": "Austria"}, "andermatt": {"name": "Andermatt", "country": "Switzerland"}, "ticino-lake-lugano": {"name": "Ticino / Lake Lugano", "country": "Switzerland"}, "swiss-valais-vaud-alps": {"name": "Swiss Valais / Vaud Alps", "country": "Switzerland"}};
+      const destinationsById = {"fukuoka-itoshima": {"name": "Fukuoka / Itoshima", "country": "Japan"}, "valencia": {"name": "Valencia", "country": "Spain"}, "algarve-cascais": {"name": "Algarve / Cascais", "country": "Portugal"}, "m-laga-costa-del-sol": {"name": "Málaga / Costa del Sol", "country": "Spain"}, "lake-como": {"name": "Lake Como", "country": "Italy"}, "hakone-izu": {"name": "Hakone / Izu", "country": "Japan"}, "madeira": {"name": "Madeira", "country": "Portugal"}, "costa-brava-girona": {"name": "Costa Brava / Girona", "country": "Spain"}, "crete": {"name": "Crete", "country": "Greece"}, "hakuba": {"name": "Hakuba", "country": "Japan"}, "annecy": {"name": "Annecy", "country": "France"}, "mallorca": {"name": "Mallorca", "country": "Spain"}, "croatia-istria-dalmatia": {"name": "Croatia / Istria-Dalmatia", "country": "Croatia"}, "niseko": {"name": "Niseko", "country": "Japan"}, "queenstown": {"name": "Queenstown", "country": "New Zealand"}, "phuket-koh-samui": {"name": "Phuket / Koh Samui", "country": "Thailand"}, "vancouver-island-victoria": {"name": "Vancouver Island / Victoria", "country": "Canada"}, "dolomites-south-tyrol": {"name": "Dolomites / South Tyrol", "country": "Italy"}, "bali": {"name": "Bali", "country": "Indonesia"}, "chamonix": {"name": "Chamonix", "country": "France"}, "park-city-deer-valley": {"name": "Park City / Deer Valley", "country": "United States"}, "da-nang-hoi-an": {"name": "Da Nang / Hoi An", "country": "Vietnam"}, "whistler": {"name": "Whistler", "country": "Canada"}, "andermatt": {"name": "Andermatt", "country": "Switzerland"}, "innsbruck-tyrol": {"name": "Innsbruck / Tyrol", "country": "Austria"}, "lake-tahoe": {"name": "Lake Tahoe", "country": "United States"}, "jackson-hole": {"name": "Jackson Hole", "country": "United States"}, "ticino-lake-lugano": {"name": "Ticino / Lake Lugano", "country": "Switzerland"}, "aspen-snowmass": {"name": "Aspen / Snowmass", "country": "United States"}, "swiss-valais-vaud-alps": {"name": "Swiss Valais / Vaud Alps", "country": "Switzerland"}};
       const bridge = document.getElementById("savedShortlistBridge");
       const bridgeText = document.getElementById("savedShortlistBridgeText");
       const input = document.getElementById("savedShortlistInput");

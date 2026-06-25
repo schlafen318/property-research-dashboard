@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 260 72" role="img" aria-labelledby="title desc">
+  <title id="title">Global Home Atlas compact logo - dark</title>
+  <desc id="desc">Compact cartographic compass mark and Global Home Atlas wordmark for dark headers.</desc>
+  <rect width="260" height="72" fill="none"/>
+  <g transform="translate(8 8)" fill="none" stroke="#a98a4b" stroke-width="1.6">
+    <circle cx="28" cy="28" r="23"/>
+    <circle cx="28" cy="28" r="14" opacity=".85"/>
+    <path d="M28 1v54M1 28h54M13 13l30 30M43 13 13 43"/>
+    <path d="M28 10 35 28 28 46 21 28Z" fill="#071f1d"/>
+  </g>
+  <circle cx="36" cy="36" r="3.8" fill="#a98a4b"/>
+  <text x="75" y="30" fill="#fffdf7" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="760" letter-spacing="2.1">GLOBAL</text>
+  <text x="75" y="51" fill="#fffdf7" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="760" letter-spacing="2.1">HOME ATLAS</text>
+</svg>

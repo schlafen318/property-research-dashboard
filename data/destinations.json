@@ -925,125 +925,9 @@
     "profit_driver": "Food, scenery, Barcelona/Girona access, less obvious than Mallorca, strong European second-home demand."
   },
   {
-    "id": "hakuba",
-    "name": "Hakuba",
-    "rank": 9,
-    "country": "Japan",
-    "category": "Mountain",
-    "overall_score": 3.88,
-    "usd_per_m2": 6700.0,
-    "net_yield_estimate": "3–5.5% est. net",
-    "quick_metrics": {
-      "usd_m": "$6,700",
-      "net_yield": "3–5.5% est. net",
-      "ownership": "5.0/5",
-      "friendly": "4.0/5"
-    },
-    "panel_summary": "Hakuba is the more affordable and potentially earlier-stage Japan ski thesis versus Niseko. The panel would like the upside but demand a serious execution and seasonality discount.",
-    "pros": [
-      "Clean Japanese ownership",
-      "growing international ski brand",
-      "more affordable than Niseko",
-      "four-season outdoor potential",
-      "Nagano scenery and food."
-    ],
-    "cons": [
-      "Airport access is weaker",
-      "built stock quality varies",
-      "snow/seasonality risk",
-      "rental operations are execution-heavy",
-      "liquidity is thinner than Niseko."
-    ],
-    "panel_verdict": "Keep as an upside candidate. It is more venture-like than Fukuoka or Algarve: higher upside, higher operating risk.",
-    "scores": {
-      "scenery": {
-        "label": "Scenery",
-        "score": 5.0,
-        "weight": 0.07
-      },
-      "airport_access": {
-        "label": "Airport access",
-        "score": 3.4,
-        "weight": 0.07
-      },
-      "business_hub_access": {
-        "label": "Business hub access",
-        "score": 3.5,
-        "weight": 0.05
-      },
-      "year_round_activity": {
-        "label": "Year-round activity",
-        "score": 4.2,
-        "weight": 0.07
-      },
-      "ownership_clarity": {
-        "label": "Ownership clarity",
-        "score": 5.0,
-        "weight": 0.11
-      },
-      "str_regulatory_safety": {
-        "label": "STR regulatory safety",
-        "score": 3.1,
-        "weight": 0.07
-      },
-      "rental_profit_potential": {
-        "label": "Rental profit potential",
-        "score": 4.1,
-        "weight": 0.12
-      },
-      "capital_upside": {
-        "label": "Capital upside",
-        "score": 4.3,
-        "weight": 0.07
-      },
-      "retirement_suitability": {
-        "label": "Retirement suitability",
-        "score": 3.4,
-        "weight": 0.07
-      },
-      "exit_liquidity": {
-        "label": "Exit liquidity",
-        "score": 3.5,
-        "weight": 0.06
-      },
-      "chinese_foreigner_friendliness": {
-        "label": "Chinese/foreigner friendliness",
-        "score": 4.0,
-        "weight": 0.06
-      },
-      "food_quality": {
-        "label": "Food quality",
-        "score": 4.1,
-        "weight": 0.04
-      },
-      "standard_of_living": {
-        "label": "Standard of living",
-        "score": 4.3,
-        "weight": 0.03
-      },
-      "affordability": {
-        "label": "Affordability",
-        "score": 2.6,
-        "weight": 0.11
-      }
-    },
-    "ownership_notes": "Japan freehold ownership is generally open to foreigners; STR route needs local licence/notification and operational compliance.",
-    "red_flags": "Less mature operating ecosystem than Niseko, lower liquidity, execution quality uneven.",
-    "rental": {
-      "gross_yield": "5–8% gross STR potential for well-located chalets/condos",
-      "net_yield": "3–5.5% est. net",
-      "revenue": "AirROI 2026: ~$47,484 average annual Airbnb revenue",
-      "adr_occupancy": "$467 / 36.7%",
-      "confidence": "Medium-high for STR metrics; medium for yield"
-    },
-    "price_basis": "Built chalet/listing proxy. Active 2026 examples imply roughly ¥0.7m–1.6m/m² of building area depending on chalet quality and land bundle; converted at 1 USD = ¥161.305. Land-only Iwatake reference around ¥49,000/m² is shown as a development input, not the comparable buyable-property metric.",
-    "price_confidence": "Medium-low; active-listing proxy, property mix varies widely",
-    "profit_driver": "Lower entry than Niseko, strong winter upside, growing summer hiking/biking demand."
-  },
-  {
     "id": "crete",
     "name": "Crete",
-    "rank": 10,
+    "rank": 9,
     "country": "Greece",
     "category": "Water",
     "overall_score": 3.88,
@@ -1155,6 +1039,122 @@
     "price_basis": "Built residential benchmark. Crete May 2026 average asking price ~€2,578/m² × EUR/USD 1.14784 ≈ $2,959/m².",
     "price_confidence": "Medium-high for regional average",
     "profit_driver": "Food, scenery, lower entry cost, long warm season, improving retirement case."
+  },
+  {
+    "id": "hakuba",
+    "name": "Hakuba",
+    "rank": 10,
+    "country": "Japan",
+    "category": "Mountain",
+    "overall_score": 3.88,
+    "usd_per_m2": 6700.0,
+    "net_yield_estimate": "3–5.5% est. net",
+    "quick_metrics": {
+      "usd_m": "$6,700",
+      "net_yield": "3–5.5% est. net",
+      "ownership": "5.0/5",
+      "friendly": "4.0/5"
+    },
+    "panel_summary": "Hakuba is the more affordable and potentially earlier-stage Japan ski thesis versus Niseko. The panel would like the upside but demand a serious execution and seasonality discount.",
+    "pros": [
+      "Clean Japanese ownership",
+      "growing international ski brand",
+      "more affordable than Niseko",
+      "four-season outdoor potential",
+      "Nagano scenery and food."
+    ],
+    "cons": [
+      "Airport access is weaker",
+      "built stock quality varies",
+      "snow/seasonality risk",
+      "rental operations are execution-heavy",
+      "liquidity is thinner than Niseko."
+    ],
+    "panel_verdict": "Keep as an upside candidate. It is more venture-like than Fukuoka or Algarve: higher upside, higher operating risk.",
+    "scores": {
+      "scenery": {
+        "label": "Scenery",
+        "score": 5.0,
+        "weight": 0.07
+      },
+      "airport_access": {
+        "label": "Airport access",
+        "score": 3.4,
+        "weight": 0.07
+      },
+      "business_hub_access": {
+        "label": "Business hub access",
+        "score": 3.5,
+        "weight": 0.05
+      },
+      "year_round_activity": {
+        "label": "Year-round activity",
+        "score": 4.2,
+        "weight": 0.07
+      },
+      "ownership_clarity": {
+        "label": "Ownership clarity",
+        "score": 5.0,
+        "weight": 0.11
+      },
+      "str_regulatory_safety": {
+        "label": "STR regulatory safety",
+        "score": 3.1,
+        "weight": 0.07
+      },
+      "rental_profit_potential": {
+        "label": "Rental profit potential",
+        "score": 4.1,
+        "weight": 0.12
+      },
+      "capital_upside": {
+        "label": "Capital upside",
+        "score": 4.3,
+        "weight": 0.07
+      },
+      "retirement_suitability": {
+        "label": "Retirement suitability",
+        "score": 3.4,
+        "weight": 0.07
+      },
+      "exit_liquidity": {
+        "label": "Exit liquidity",
+        "score": 3.5,
+        "weight": 0.06
+      },
+      "chinese_foreigner_friendliness": {
+        "label": "Chinese/foreigner friendliness",
+        "score": 4.0,
+        "weight": 0.06
+      },
+      "food_quality": {
+        "label": "Food quality",
+        "score": 4.1,
+        "weight": 0.04
+      },
+      "standard_of_living": {
+        "label": "Standard of living",
+        "score": 4.3,
+        "weight": 0.03
+      },
+      "affordability": {
+        "label": "Affordability",
+        "score": 2.6,
+        "weight": 0.11
+      }
+    },
+    "ownership_notes": "Japan freehold ownership is generally open to foreigners; STR route needs local licence/notification and operational compliance.",
+    "red_flags": "Less mature operating ecosystem than Niseko, lower liquidity, execution quality uneven.",
+    "rental": {
+      "gross_yield": "5–8% gross STR potential for well-located chalets/condos",
+      "net_yield": "3–5.5% est. net",
+      "revenue": "AirROI 2026: ~$47,484 average annual Airbnb revenue",
+      "adr_occupancy": "$467 / 36.7%",
+      "confidence": "Medium-high for STR metrics; medium for yield"
+    },
+    "price_basis": "Built chalet/listing proxy. Active 2026 examples imply roughly ¥0.7m–1.6m/m² of building area depending on chalet quality and land bundle; converted at 1 USD = ¥161.305. Land-only Iwatake reference around ¥49,000/m² is shown as a development input, not the comparable buyable-property metric.",
+    "price_confidence": "Medium-low; active-listing proxy, property mix varies widely",
+    "profit_driver": "Lower entry than Niseko, strong winter upside, growing summer hiking/biking demand."
   },
   {
     "id": "annecy",
@@ -1386,124 +1386,9 @@
     "profit_driver": "European wealth, lifestyle/retirement demand, sailing, beaches, food, long season."
   },
   {
-    "id": "niseko",
-    "name": "Niseko",
-    "rank": 13,
-    "country": "Japan",
-    "category": "Mountain",
-    "overall_score": 3.79,
-    "usd_per_m2": 14644.0,
-    "net_yield_estimate": "3.5–6.5% est. net after management/OPEX",
-    "quick_metrics": {
-      "usd_m": "$14,644",
-      "net_yield": "3.5–6.5% est. net after management/OPEX",
-      "ownership": "5.0/5",
-      "friendly": "4.4/5"
-    },
-    "panel_summary": "Niseko remains the best-known Asia-Pacific ski trophy market, but the corrected built-price data changes the case. The panel would admire the brand but challenge the yield and entry valuation.",
-    "pros": [
-      "Global ski brand",
-      "clean Japan ownership",
-      "strong Chinese/Southeast Asian familiarity",
-      "high ADR potential",
-      "proven luxury buyer pool."
-    ],
-    "cons": [
-      "Built property is expensive",
-      "heavy winter dependence despite summer potential",
-      "construction/maintenance costs are high",
-      "exit liquidity is narrower than major cities."
-    ],
-    "panel_verdict": "Keep as a trophy/specialist candidate, not a default top pick. Needs asset-specific edge to justify the price.",
-    "scores": {
-      "scenery": {
-        "label": "Scenery",
-        "score": 5.0,
-        "weight": 0.07
-      },
-      "airport_access": {
-        "label": "Airport access",
-        "score": 3.5,
-        "weight": 0.07
-      },
-      "business_hub_access": {
-        "label": "Business hub access",
-        "score": 3.5,
-        "weight": 0.05
-      },
-      "year_round_activity": {
-        "label": "Year-round activity",
-        "score": 4.1,
-        "weight": 0.07
-      },
-      "ownership_clarity": {
-        "label": "Ownership clarity",
-        "score": 5.0,
-        "weight": 0.11
-      },
-      "str_regulatory_safety": {
-        "label": "STR regulatory safety",
-        "score": 3.1,
-        "weight": 0.07
-      },
-      "rental_profit_potential": {
-        "label": "Rental profit potential",
-        "score": 4.2,
-        "weight": 0.12
-      },
-      "capital_upside": {
-        "label": "Capital upside",
-        "score": 4.1,
-        "weight": 0.07
-      },
-      "retirement_suitability": {
-        "label": "Retirement suitability",
-        "score": 3.4,
-        "weight": 0.07
-      },
-      "exit_liquidity": {
-        "label": "Exit liquidity",
-        "score": 4.0,
-        "weight": 0.06
-      },
-      "chinese_foreigner_friendliness": {
-        "label": "Chinese/foreigner friendliness",
-        "score": 4.4,
-        "weight": 0.06
-      },
-      "food_quality": {
-        "label": "Food quality",
-        "score": 4.4,
-        "weight": 0.04
-      },
-      "standard_of_living": {
-        "label": "Standard of living",
-        "score": 4.5,
-        "weight": 0.03
-      },
-      "affordability": {
-        "label": "Affordability",
-        "score": 1.1,
-        "weight": 0.11
-      }
-    },
-    "ownership_notes": "Foreigners can generally own land and buildings freehold in Japan. STR requires either minpaku notification, hotel/ryokan route, or local-compliant structure. Minpaku is capped nationally at 180 days/year and local rules can be tighter.",
-    "red_flags": "High build costs, operator dependency, snow/climate sensitivity, local pushback if overtourism rises.",
-    "rental": {
-      "gross_yield": "6–10% STR gross; some 2026 analyses cite ~10% gross for selected resort properties",
-      "net_yield": "3.5–6.5% est. net after management/OPEX",
-      "revenue": "Niseko-specific paid/commercial datasets vary; peak winter occupancy often high, but owner usage and OPEX materially reduce net returns",
-      "adr_occupancy": "High; property/operator-specific / High in winter; shoulder season improving",
-      "confidence": "Medium"
-    },
-    "price_basis": "Built-property benchmark, not land. Hirafu condominium average sales price reported at ~$14,644/m². For development reference only: official/land benchmarks are far lower and highly location-sensitive, from Niseko town land to prime Hirafu plots.",
-    "price_confidence": "Medium; built-condo benchmark in Hirafu, land/villa economics vary materially",
-    "profit_driver": "Premium winter ADR, global Asian/Australian ski demand, branded residences, summer golf/cycling/wellness extension."
-  },
-  {
     "id": "croatia-istria-dalmatia",
     "name": "Croatia / Istria-Dalmatia",
-    "rank": 14,
+    "rank": 13,
     "country": "Croatia",
     "category": "Water",
     "overall_score": 3.79,
@@ -1615,6 +1500,121 @@
     "price_basis": "Built-property coastal proxy. Dalmatia ~€4,089/m² × EUR/USD 1.14784 ≈ $4,693/m²; Istria can be lower or similar in prime towns.",
     "price_confidence": "Medium",
     "profit_driver": "Adriatic scenery, EU access, still cheaper than many Western Med peers, improving infrastructure."
+  },
+  {
+    "id": "niseko",
+    "name": "Niseko",
+    "rank": 14,
+    "country": "Japan",
+    "category": "Mountain",
+    "overall_score": 3.79,
+    "usd_per_m2": 14644.0,
+    "net_yield_estimate": "3.5–6.5% est. net after management/OPEX",
+    "quick_metrics": {
+      "usd_m": "$14,644",
+      "net_yield": "3.5–6.5% est. net after management/OPEX",
+      "ownership": "5.0/5",
+      "friendly": "4.4/5"
+    },
+    "panel_summary": "Niseko remains the best-known Asia-Pacific ski trophy market, but the corrected built-price data changes the case. The panel would admire the brand but challenge the yield and entry valuation.",
+    "pros": [
+      "Global ski brand",
+      "clean Japan ownership",
+      "strong Chinese/Southeast Asian familiarity",
+      "high ADR potential",
+      "proven luxury buyer pool."
+    ],
+    "cons": [
+      "Built property is expensive",
+      "heavy winter dependence despite summer potential",
+      "construction/maintenance costs are high",
+      "exit liquidity is narrower than major cities."
+    ],
+    "panel_verdict": "Keep as a trophy/specialist candidate, not a default top pick. Needs asset-specific edge to justify the price.",
+    "scores": {
+      "scenery": {
+        "label": "Scenery",
+        "score": 5.0,
+        "weight": 0.07
+      },
+      "airport_access": {
+        "label": "Airport access",
+        "score": 3.5,
+        "weight": 0.07
+      },
+      "business_hub_access": {
+        "label": "Business hub access",
+        "score": 3.5,
+        "weight": 0.05
+      },
+      "year_round_activity": {
+        "label": "Year-round activity",
+        "score": 4.1,
+        "weight": 0.07
+      },
+      "ownership_clarity": {
+        "label": "Ownership clarity",
+        "score": 5.0,
+        "weight": 0.11
+      },
+      "str_regulatory_safety": {
+        "label": "STR regulatory safety",
+        "score": 3.1,
+        "weight": 0.07
+      },
+      "rental_profit_potential": {
+        "label": "Rental profit potential",
+        "score": 4.2,
+        "weight": 0.12
+      },
+      "capital_upside": {
+        "label": "Capital upside",
+        "score": 4.1,
+        "weight": 0.07
+      },
+      "retirement_suitability": {
+        "label": "Retirement suitability",
+        "score": 3.4,
+        "weight": 0.07
+      },
+      "exit_liquidity": {
+        "label": "Exit liquidity",
+        "score": 4.0,
+        "weight": 0.06
+      },
+      "chinese_foreigner_friendliness": {
+        "label": "Chinese/foreigner friendliness",
+        "score": 4.4,
+        "weight": 0.06
+      },
+      "food_quality": {
+        "label": "Food quality",
+        "score": 4.4,
+        "weight": 0.04
+      },
+      "standard_of_living": {
+        "label": "Standard of living",
+        "score": 4.5,
+        "weight": 0.03
+      },
+      "affordability": {
+        "label": "Affordability",
+        "score": 1.1,
+        "weight": 0.11
+      }
+    },
+    "ownership_notes": "Foreigners can generally own land and buildings freehold in Japan. STR requires either minpaku notification, hotel/ryokan route, or local-compliant structure. Minpaku is capped nationally at 180 days/year and local rules can be tighter.",
+    "red_flags": "High build costs, operator dependency, snow/climate sensitivity, local pushback if overtourism rises.",
+    "rental": {
+      "gross_yield": "6–10% STR gross; some 2026 analyses cite ~10% gross for selected resort properties",
+      "net_yield": "3.5–6.5% est. net after management/OPEX",
+      "revenue": "Niseko-specific paid/commercial datasets vary; peak winter occupancy often high, but owner usage and OPEX materially reduce net returns",
+      "adr_occupancy": "High; property/operator-specific / High in winter; shoulder season improving",
+      "confidence": "Medium"
+    },
+    "price_basis": "Built-property benchmark, not land. Hirafu condominium average sales price reported at ~$14,644/m². For development reference only: official/land benchmarks are far lower and highly location-sensitive, from Niseko town land to prime Hirafu plots.",
+    "price_confidence": "Medium; built-condo benchmark in Hirafu, land/villa economics vary materially",
+    "profit_driver": "Premium winter ADR, global Asian/Australian ski demand, branded residences, summer golf/cycling/wellness extension."
   },
   {
     "id": "queenstown",
@@ -1846,9 +1846,125 @@
     "profit_driver": "Asian tourism, wellness, high villa ADR, strong operating ecosystem, relatively low construction/labour costs."
   },
   {
+    "id": "vancouver-island-victoria",
+    "name": "Vancouver Island / Victoria",
+    "country": "Canada",
+    "category": "Water",
+    "overall_score": 3.72,
+    "usd_per_m2": 6800.0,
+    "net_yield_estimate": "2.5-3.8% est. net",
+    "quick_metrics": {
+      "usd_m": "$6,800",
+      "net_yield": "2.5-3.8% est. net",
+      "ownership": "4.3/5",
+      "friendly": "4.4/5"
+    },
+    "panel_summary": "A calmer North American water-and-retirement benchmark with healthcare, English-language ease, and lifestyle depth, but Canada foreign-buyer/tax rules and BC housing policy require care.",
+    "pros": [
+      "High livability and healthcare access",
+      "English-language ease",
+      "waterfront and island lifestyle",
+      "strong retirement fit",
+      "more practical than trophy US resorts"
+    ],
+    "cons": [
+      "Canadian foreign-buyer restrictions and taxes can apply",
+      "lower short-term-rental upside in many areas",
+      "high ownership costs versus income",
+      "ferry/airport friction outside Victoria",
+      "wet winter climate"
+    ],
+    "panel_verdict": "Add as the North American retirement-water benchmark. Strong lifestyle fit, but policy and tax diligence matter.",
+    "scores": {
+      "scenery": {
+        "label": "Scenery",
+        "score": 4.3,
+        "weight": 0.07
+      },
+      "airport_access": {
+        "label": "Airport access",
+        "score": 3.8,
+        "weight": 0.07
+      },
+      "business_hub_access": {
+        "label": "Business hub access",
+        "score": 3.5,
+        "weight": 0.05
+      },
+      "year_round_activity": {
+        "label": "Year-round activity",
+        "score": 4.0,
+        "weight": 0.07
+      },
+      "ownership_clarity": {
+        "label": "Ownership clarity",
+        "score": 4.3,
+        "weight": 0.11
+      },
+      "str_regulatory_safety": {
+        "label": "STR regulatory safety",
+        "score": 2.7,
+        "weight": 0.07
+      },
+      "rental_profit_potential": {
+        "label": "Rental profit potential",
+        "score": 3.0,
+        "weight": 0.12
+      },
+      "capital_upside": {
+        "label": "Capital upside",
+        "score": 3.2,
+        "weight": 0.07
+      },
+      "retirement_suitability": {
+        "label": "Retirement suitability",
+        "score": 4.5,
+        "weight": 0.07
+      },
+      "exit_liquidity": {
+        "label": "Exit liquidity",
+        "score": 3.7,
+        "weight": 0.06
+      },
+      "chinese_foreigner_friendliness": {
+        "label": "Chinese/foreigner friendliness",
+        "score": 4.4,
+        "weight": 0.06
+      },
+      "food_quality": {
+        "label": "Food quality",
+        "score": 4.1,
+        "weight": 0.04
+      },
+      "standard_of_living": {
+        "label": "Standard of living",
+        "score": 4.6,
+        "weight": 0.03
+      },
+      "affordability": {
+        "label": "Affordability",
+        "score": 3.0,
+        "weight": 0.11
+      }
+    },
+    "ownership_notes": "Canada generally has clear title, but foreign-buyer restrictions, vacancy/speculation taxes, and provincial/municipal rules must be checked before assuming eligibility.",
+    "red_flags": "Foreign-buyer policy, BC speculation/vacancy taxes, STR restrictions, and lower yield after ownership costs.",
+    "rental": {
+      "gross_yield": "Long-term rental demand is supported by livability and constrained supply; STR upside is more policy-sensitive.",
+      "net_yield": "2.5-3.8% est. net",
+      "revenue": "Use long-stay/retirement housing demand as base case, not aggressive STR.",
+      "adr_occupancy": "Moderate year-round demand; summer tourism peak.",
+      "confidence": "Medium-low; policy-sensitive benchmark"
+    },
+    "price_basis": "Victoria/Vancouver Island built residential benchmark. Approx. US$630/sq ft equivalent, converted to about $6,800/m2; waterfront and Victoria core can be higher.",
+    "price_confidence": "Medium-low; regional benchmark",
+    "profit_driver": "Retirement suitability, healthcare/livability, English-language ease, and water-oriented lifestyle scarcity.",
+    "rank": 17
+  },
+  {
     "id": "dolomites-south-tyrol",
     "name": "Dolomites / South Tyrol",
-    "rank": 17,
+    "rank": 18,
     "country": "Italy",
     "category": "Mountain",
     "overall_score": 3.7,
@@ -1963,7 +2079,7 @@
   {
     "id": "bali",
     "name": "Bali",
-    "rank": 18,
+    "rank": 19,
     "country": "Indonesia",
     "category": "Water",
     "overall_score": 3.68,
@@ -2079,7 +2195,7 @@
   {
     "id": "chamonix",
     "name": "Chamonix",
-    "rank": 19,
+    "rank": 20,
     "country": "France",
     "category": "Mountain",
     "overall_score": 3.67,
@@ -2193,9 +2309,125 @@
     "profit_driver": "Global alpine brand, Geneva access, mountaineering, skiing, summer outdoor sports."
   },
   {
+    "id": "park-city-deer-valley",
+    "name": "Park City / Deer Valley",
+    "country": "United States",
+    "category": "Mountain",
+    "overall_score": 3.66,
+    "usd_per_m2": 14000.0,
+    "net_yield_estimate": "2.5-4% est. net",
+    "quick_metrics": {
+      "usd_m": "$14,000",
+      "net_yield": "2.5-4% est. net",
+      "ownership": "5.0/5",
+      "friendly": "4.5/5"
+    },
+    "panel_summary": "A practical US mountain-market benchmark with better airport access and broader product depth than many trophy resorts, but still expensive and regulation-sensitive.",
+    "pros": [
+      "Strong Salt Lake City airport access",
+      "deep winter and summer demand",
+      "clean US ownership",
+      "large resort ecosystem",
+      "good liquidity versus smaller ski towns"
+    ],
+    "cons": [
+      "High entry prices",
+      "neighborhood-specific STR restrictions",
+      "crowding and development pressure",
+      "snow/climate variability over long holding periods",
+      "US tax and estate planning complexity for foreign buyers"
+    ],
+    "panel_verdict": "Worth adding as the most practical US ski benchmark. More investable than Aspen, but not cheap.",
+    "scores": {
+      "scenery": {
+        "label": "Scenery",
+        "score": 4.5,
+        "weight": 0.07
+      },
+      "airport_access": {
+        "label": "Airport access",
+        "score": 4.6,
+        "weight": 0.07
+      },
+      "business_hub_access": {
+        "label": "Business hub access",
+        "score": 4.0,
+        "weight": 0.05
+      },
+      "year_round_activity": {
+        "label": "Year-round activity",
+        "score": 4.6,
+        "weight": 0.07
+      },
+      "ownership_clarity": {
+        "label": "Ownership clarity",
+        "score": 5.0,
+        "weight": 0.11
+      },
+      "str_regulatory_safety": {
+        "label": "STR regulatory safety",
+        "score": 3.0,
+        "weight": 0.07
+      },
+      "rental_profit_potential": {
+        "label": "Rental profit potential",
+        "score": 3.5,
+        "weight": 0.12
+      },
+      "capital_upside": {
+        "label": "Capital upside",
+        "score": 3.5,
+        "weight": 0.07
+      },
+      "retirement_suitability": {
+        "label": "Retirement suitability",
+        "score": 3.5,
+        "weight": 0.07
+      },
+      "exit_liquidity": {
+        "label": "Exit liquidity",
+        "score": 4.0,
+        "weight": 0.06
+      },
+      "chinese_foreigner_friendliness": {
+        "label": "Chinese/foreigner friendliness",
+        "score": 4.5,
+        "weight": 0.06
+      },
+      "food_quality": {
+        "label": "Food quality",
+        "score": 3.9,
+        "weight": 0.04
+      },
+      "standard_of_living": {
+        "label": "Standard of living",
+        "score": 4.5,
+        "weight": 0.03
+      },
+      "affordability": {
+        "label": "Affordability",
+        "score": 2.2,
+        "weight": 0.11
+      }
+    },
+    "ownership_notes": "US freehold ownership is open to foreign buyers; STR permissions depend heavily on zoning, HOA, and resort area.",
+    "red_flags": "High prices, STR zoning/HOA friction, traffic/crowding, and winter-season concentration.",
+    "rental": {
+      "gross_yield": "Strong ski-season gross demand in permitted zones; underwriting must separate gross revenue from HOA, management, tax, and maintenance.",
+      "net_yield": "2.5-4% est. net",
+      "revenue": "Asset and zone-specific; verify with local STR manager before underwriting.",
+      "adr_occupancy": "High winter peak, summer shoulder support.",
+      "confidence": "Medium-low; destination benchmark"
+    },
+    "price_basis": "Built residential benchmark using Park City/Deer Valley luxury and resort product. Approx. $1,300/sq ft blended benchmark, converted to about $14,000/m2.",
+    "price_confidence": "Medium-low; broad submarket range",
+    "profit_driver": "Airport access, major resort infrastructure, Deer Valley expansion, and broader liquidity than smaller mountain towns.",
+    "rank": 21
+  },
+  {
     "id": "da-nang-hoi-an",
     "name": "Da Nang / Hoi An",
-    "rank": 20,
+    "rank": 22,
     "country": "Vietnam",
     "category": "Water",
     "overall_score": 3.63,
@@ -2310,7 +2542,7 @@
   {
     "id": "whistler",
     "name": "Whistler",
-    "rank": 21,
+    "rank": 23,
     "country": "Canada",
     "category": "Mountain",
     "overall_score": 3.61,
@@ -2424,124 +2656,9 @@
     "profit_driver": "Deep global ski brand, Vancouver access, summer biking, institutional-quality resort ecosystem."
   },
   {
-    "id": "innsbruck-tyrol",
-    "name": "Innsbruck / Tyrol",
-    "rank": 22,
-    "country": "Austria",
-    "category": "Mountain",
-    "overall_score": 3.6,
-    "usd_per_m2": 8600.0,
-    "net_yield_estimate": "2–3.5% est. net",
-    "quick_metrics": {
-      "usd_m": "$8,600",
-      "net_yield": "2–3.5% est. net",
-      "ownership": "3.5/5",
-      "friendly": "3.2/5"
-    },
-    "panel_summary": "Innsbruck/Tyrol is excellent for liveability and alpine access, but Austrian second-home and tourist-let restrictions are a serious barrier. The panel would admire it but keep it below cleaner jurisdictions.",
-    "pros": [
-      "Real alpine city",
-      "airport, hospitals, university and services",
-      "skiing/hiking/cycling",
-      "high standard of living",
-      "strong long-stay quality."
-    ],
-    "cons": [
-      "Second-home and leisure-residence restrictions",
-      "low yields",
-      "expensive property",
-      "rental permission is asset-specific and often restrictive."
-    ],
-    "panel_verdict": "Keep as a lifestyle benchmark, not a leading development candidate unless a legally rentable asset is identified.",
-    "scores": {
-      "scenery": {
-        "label": "Scenery",
-        "score": 4.7,
-        "weight": 0.07
-      },
-      "airport_access": {
-        "label": "Airport access",
-        "score": 4.2,
-        "weight": 0.07
-      },
-      "business_hub_access": {
-        "label": "Business hub access",
-        "score": 4.1,
-        "weight": 0.05
-      },
-      "year_round_activity": {
-        "label": "Year-round activity",
-        "score": 4.5,
-        "weight": 0.07
-      },
-      "ownership_clarity": {
-        "label": "Ownership clarity",
-        "score": 3.5,
-        "weight": 0.11
-      },
-      "str_regulatory_safety": {
-        "label": "STR regulatory safety",
-        "score": 2.5,
-        "weight": 0.07
-      },
-      "rental_profit_potential": {
-        "label": "Rental profit potential",
-        "score": 2.9,
-        "weight": 0.12
-      },
-      "capital_upside": {
-        "label": "Capital upside",
-        "score": 3.6,
-        "weight": 0.07
-      },
-      "retirement_suitability": {
-        "label": "Retirement suitability",
-        "score": 4.5,
-        "weight": 0.07
-      },
-      "exit_liquidity": {
-        "label": "Exit liquidity",
-        "score": 3.9,
-        "weight": 0.06
-      },
-      "chinese_foreigner_friendliness": {
-        "label": "Chinese/foreigner friendliness",
-        "score": 3.2,
-        "weight": 0.06
-      },
-      "food_quality": {
-        "label": "Food quality",
-        "score": 4.2,
-        "weight": 0.04
-      },
-      "standard_of_living": {
-        "label": "Standard of living",
-        "score": 4.8,
-        "weight": 0.03
-      },
-      "affordability": {
-        "label": "Affordability",
-        "score": 2.2,
-        "weight": 0.11
-      }
-    },
-    "ownership_notes": "Austria is restrictive for second homes and holiday rentals, especially in Tyrol. Confirm main-residence, leisure-residence and tourist-rental status before underwriting.",
-    "red_flags": "Foreign/second-home restrictions, low yields, high prices, limited true tourist-let stock.",
-    "rental": {
-      "gross_yield": "Yield compressed; tourist-let permits can create a large value split between rentable and non-rentable stock",
-      "net_yield": "2–3.5% est. net",
-      "revenue": "2026 Tyrol references put Innsbruck apartments around €7,000–7,800/m²; Kitzbühel district >€10,000/m².",
-      "adr_occupancy": "High in ski resorts; Innsbruck more residential / Good year-round urban/alpine occupancy",
-      "confidence": "Medium-low"
-    },
-    "price_basis": "Built apartment benchmark. Innsbruck 2026 range €7,000–7,800/m²; dashboard uses ~€7,500 × EUR/USD 1.14784 ≈ $8,609/m².",
-    "price_confidence": "Medium",
-    "profit_driver": "Real city with airport, university, hospitals and alpine access; strong retirement/liveability case."
-  },
-  {
     "id": "andermatt",
     "name": "Andermatt",
-    "rank": 23,
+    "rank": 24,
     "country": "Switzerland",
     "category": "Mountain",
     "overall_score": 3.6,
@@ -2654,9 +2771,356 @@
     "profit_driver": "Cleaner foreign-buyer access than most Switzerland, strong infrastructure investment, snow/mountain brand."
   },
   {
+    "id": "innsbruck-tyrol",
+    "name": "Innsbruck / Tyrol",
+    "rank": 25,
+    "country": "Austria",
+    "category": "Mountain",
+    "overall_score": 3.6,
+    "usd_per_m2": 8600.0,
+    "net_yield_estimate": "2–3.5% est. net",
+    "quick_metrics": {
+      "usd_m": "$8,600",
+      "net_yield": "2–3.5% est. net",
+      "ownership": "3.5/5",
+      "friendly": "3.2/5"
+    },
+    "panel_summary": "Innsbruck/Tyrol is excellent for liveability and alpine access, but Austrian second-home and tourist-let restrictions are a serious barrier. The panel would admire it but keep it below cleaner jurisdictions.",
+    "pros": [
+      "Real alpine city",
+      "airport, hospitals, university and services",
+      "skiing/hiking/cycling",
+      "high standard of living",
+      "strong long-stay quality."
+    ],
+    "cons": [
+      "Second-home and leisure-residence restrictions",
+      "low yields",
+      "expensive property",
+      "rental permission is asset-specific and often restrictive."
+    ],
+    "panel_verdict": "Keep as a lifestyle benchmark, not a leading development candidate unless a legally rentable asset is identified.",
+    "scores": {
+      "scenery": {
+        "label": "Scenery",
+        "score": 4.7,
+        "weight": 0.07
+      },
+      "airport_access": {
+        "label": "Airport access",
+        "score": 4.2,
+        "weight": 0.07
+      },
+      "business_hub_access": {
+        "label": "Business hub access",
+        "score": 4.1,
+        "weight": 0.05
+      },
+      "year_round_activity": {
+        "label": "Year-round activity",
+        "score": 4.5,
+        "weight": 0.07
+      },
+      "ownership_clarity": {
+        "label": "Ownership clarity",
+        "score": 3.5,
+        "weight": 0.11
+      },
+      "str_regulatory_safety": {
+        "label": "STR regulatory safety",
+        "score": 2.5,
+        "weight": 0.07
+      },
+      "rental_profit_potential": {
+        "label": "Rental profit potential",
+        "score": 2.9,
+        "weight": 0.12
+      },
+      "capital_upside": {
+        "label": "Capital upside",
+        "score": 3.6,
+        "weight": 0.07
+      },
+      "retirement_suitability": {
+        "label": "Retirement suitability",
+        "score": 4.5,
+        "weight": 0.07
+      },
+      "exit_liquidity": {
+        "label": "Exit liquidity",
+        "score": 3.9,
+        "weight": 0.06
+      },
+      "chinese_foreigner_friendliness": {
+        "label": "Chinese/foreigner friendliness",
+        "score": 3.2,
+        "weight": 0.06
+      },
+      "food_quality": {
+        "label": "Food quality",
+        "score": 4.2,
+        "weight": 0.04
+      },
+      "standard_of_living": {
+        "label": "Standard of living",
+        "score": 4.8,
+        "weight": 0.03
+      },
+      "affordability": {
+        "label": "Affordability",
+        "score": 2.2,
+        "weight": 0.11
+      }
+    },
+    "ownership_notes": "Austria is restrictive for second homes and holiday rentals, especially in Tyrol. Confirm main-residence, leisure-residence and tourist-rental status before underwriting.",
+    "red_flags": "Foreign/second-home restrictions, low yields, high prices, limited true tourist-let stock.",
+    "rental": {
+      "gross_yield": "Yield compressed; tourist-let permits can create a large value split between rentable and non-rentable stock",
+      "net_yield": "2–3.5% est. net",
+      "revenue": "2026 Tyrol references put Innsbruck apartments around €7,000–7,800/m²; Kitzbühel district >€10,000/m².",
+      "adr_occupancy": "High in ski resorts; Innsbruck more residential / Good year-round urban/alpine occupancy",
+      "confidence": "Medium-low"
+    },
+    "price_basis": "Built apartment benchmark. Innsbruck 2026 range €7,000–7,800/m²; dashboard uses ~€7,500 × EUR/USD 1.14784 ≈ $8,609/m².",
+    "price_confidence": "Medium",
+    "profit_driver": "Real city with airport, university, hospitals and alpine access; strong retirement/liveability case."
+  },
+  {
+    "id": "lake-tahoe",
+    "name": "Lake Tahoe",
+    "country": "United States",
+    "category": "Mountain + Water",
+    "overall_score": 3.58,
+    "usd_per_m2": 12400.0,
+    "net_yield_estimate": "2-3.5% est. net",
+    "quick_metrics": {
+      "usd_m": "$12,400",
+      "net_yield": "2-3.5% est. net",
+      "ownership": "5.0/5",
+      "friendly": "4.3/5"
+    },
+    "panel_summary": "One of the few North American markets that genuinely combines mountain and water, but wildfire, insurance, local regulation, and California/Nevada submarket differences need heavy diligence.",
+    "pros": [
+      "Rare lake-and-ski lifestyle",
+      "Bay Area and West Coast demand depth",
+      "four-season outdoor use",
+      "Nevada-side tax appeal for some buyers",
+      "scarce waterfront inventory"
+    ],
+    "cons": [
+      "Wildfire and insurance risk",
+      "fragmented rules across California/Nevada and local jurisdictions",
+      "high entry prices for prime lake access",
+      "traffic and environmental constraints",
+      "yield can be weak after costs"
+    ],
+    "panel_verdict": "Add as the North America mountain-water benchmark, but underwrite risk harder than lifestyle appeal.",
+    "scores": {
+      "scenery": {
+        "label": "Scenery",
+        "score": 4.9,
+        "weight": 0.07
+      },
+      "airport_access": {
+        "label": "Airport access",
+        "score": 3.7,
+        "weight": 0.07
+      },
+      "business_hub_access": {
+        "label": "Business hub access",
+        "score": 3.7,
+        "weight": 0.05
+      },
+      "year_round_activity": {
+        "label": "Year-round activity",
+        "score": 4.6,
+        "weight": 0.07
+      },
+      "ownership_clarity": {
+        "label": "Ownership clarity",
+        "score": 5.0,
+        "weight": 0.11
+      },
+      "str_regulatory_safety": {
+        "label": "STR regulatory safety",
+        "score": 2.6,
+        "weight": 0.07
+      },
+      "rental_profit_potential": {
+        "label": "Rental profit potential",
+        "score": 3.2,
+        "weight": 0.12
+      },
+      "capital_upside": {
+        "label": "Capital upside",
+        "score": 3.4,
+        "weight": 0.07
+      },
+      "retirement_suitability": {
+        "label": "Retirement suitability",
+        "score": 3.4,
+        "weight": 0.07
+      },
+      "exit_liquidity": {
+        "label": "Exit liquidity",
+        "score": 3.8,
+        "weight": 0.06
+      },
+      "chinese_foreigner_friendliness": {
+        "label": "Chinese/foreigner friendliness",
+        "score": 4.3,
+        "weight": 0.06
+      },
+      "food_quality": {
+        "label": "Food quality",
+        "score": 3.7,
+        "weight": 0.04
+      },
+      "standard_of_living": {
+        "label": "Standard of living",
+        "score": 4.2,
+        "weight": 0.03
+      },
+      "affordability": {
+        "label": "Affordability",
+        "score": 2.1,
+        "weight": 0.11
+      }
+    },
+    "ownership_notes": "US freehold ownership is open, but rules and tax posture differ materially between California and Nevada sides.",
+    "red_flags": "Wildfire, insurance availability/cost, STR caps, environmental regulation, and extreme waterfront pricing.",
+    "rental": {
+      "gross_yield": "Strong peak-season demand where STRs are permitted, but local caps and risk costs can materially reduce net yield.",
+      "net_yield": "2-3.5% est. net",
+      "revenue": "Highly asset-specific by lake access, ski access, and permit zone.",
+      "adr_occupancy": "Dual ski/summer season, shoulder periods vary.",
+      "confidence": "Low-medium; requires jurisdiction-level diligence"
+    },
+    "price_basis": "Built-property benchmark for prime but not ultra-waterfront Tahoe product. Approx. $1,150/sq ft blended benchmark, converted to about $12,400/m2; waterfront can be far higher.",
+    "price_confidence": "Medium-low; large California/Nevada and waterfront/non-waterfront spread",
+    "profit_driver": "Scarce mountain-water lifestyle, West Coast wealth demand, and Nevada-side tax positioning for some buyers.",
+    "rank": 26
+  },
+  {
+    "id": "jackson-hole",
+    "name": "Jackson Hole",
+    "country": "United States",
+    "category": "Mountain",
+    "overall_score": 3.52,
+    "usd_per_m2": 17200.0,
+    "net_yield_estimate": "1.8-3% est. net",
+    "quick_metrics": {
+      "usd_m": "$17,200",
+      "net_yield": "1.8-3% est. net",
+      "ownership": "5.0/5",
+      "friendly": "4.4/5"
+    },
+    "panel_summary": "A scarcity and tax-positioning benchmark with exceptional landscape quality, but the panel would be cautious on affordability, liquidity depth below trophy assets, and rental economics.",
+    "pros": [
+      "Exceptional scenery and outdoor access",
+      "very limited private land supply",
+      "Wyoming tax appeal",
+      "clean US freehold ownership",
+      "strong high-net-worth demand"
+    ],
+    "cons": [
+      "Very high entry prices",
+      "thin inventory",
+      "local housing and labor constraints",
+      "yield often secondary to wealth preservation",
+      "airport/weather and seasonality limitations"
+    ],
+    "panel_verdict": "Add for scarcity comparison, not as a practical yield market. It is a defensive trophy asset case.",
+    "scores": {
+      "scenery": {
+        "label": "Scenery",
+        "score": 5.0,
+        "weight": 0.07
+      },
+      "airport_access": {
+        "label": "Airport access",
+        "score": 3.5,
+        "weight": 0.07
+      },
+      "business_hub_access": {
+        "label": "Business hub access",
+        "score": 2.9,
+        "weight": 0.05
+      },
+      "year_round_activity": {
+        "label": "Year-round activity",
+        "score": 4.5,
+        "weight": 0.07
+      },
+      "ownership_clarity": {
+        "label": "Ownership clarity",
+        "score": 5.0,
+        "weight": 0.11
+      },
+      "str_regulatory_safety": {
+        "label": "STR regulatory safety",
+        "score": 2.8,
+        "weight": 0.07
+      },
+      "rental_profit_potential": {
+        "label": "Rental profit potential",
+        "score": 2.8,
+        "weight": 0.12
+      },
+      "capital_upside": {
+        "label": "Capital upside",
+        "score": 3.4,
+        "weight": 0.07
+      },
+      "retirement_suitability": {
+        "label": "Retirement suitability",
+        "score": 3.1,
+        "weight": 0.07
+      },
+      "exit_liquidity": {
+        "label": "Exit liquidity",
+        "score": 3.6,
+        "weight": 0.06
+      },
+      "chinese_foreigner_friendliness": {
+        "label": "Chinese/foreigner friendliness",
+        "score": 4.4,
+        "weight": 0.06
+      },
+      "food_quality": {
+        "label": "Food quality",
+        "score": 3.6,
+        "weight": 0.04
+      },
+      "standard_of_living": {
+        "label": "Standard of living",
+        "score": 4.5,
+        "weight": 0.03
+      },
+      "affordability": {
+        "label": "Affordability",
+        "score": 1.5,
+        "weight": 0.11
+      }
+    },
+    "ownership_notes": "US freehold ownership is open; Wyoming tax posture can be attractive, but foreign buyers need US tax and estate advice.",
+    "red_flags": "Extreme scarcity pricing, low yield, thin inventory, and reliance on high-net-worth discretionary demand.",
+    "rental": {
+      "gross_yield": "Luxury rental demand exists, but low yield relative to capital value and operating constraints should be assumed.",
+      "net_yield": "1.8-3% est. net",
+      "revenue": "Asset-specific; verify local manager data and permit status.",
+      "adr_occupancy": "Summer and winter peaks; shoulder-season variability.",
+      "confidence": "Low-medium; trophy-market benchmark"
+    },
+    "price_basis": "Prime Jackson Hole built-property benchmark. Approx. $1,600/sq ft blended benchmark, converted to about $17,200/m2; trophy estates can be far higher.",
+    "price_confidence": "Medium-low; sales-price opacity and submarket spread",
+    "profit_driver": "Scarce private land, Wyoming tax appeal, elite outdoor lifestyle, and long-term wealth-preservation demand.",
+    "rank": 27
+  },
+  {
     "id": "ticino-lake-lugano",
     "name": "Ticino / Lake Lugano",
-    "rank": 24,
+    "rank": 28,
     "country": "Switzerland",
     "category": "Mountain + Water",
     "overall_score": 3.5,
@@ -2770,9 +3234,125 @@
     "profit_driver": "Swiss safety/healthcare with Italian food/climate feel, Milan access, lake lifestyle."
   },
   {
+    "id": "aspen-snowmass",
+    "name": "Aspen / Snowmass",
+    "country": "United States",
+    "category": "Mountain",
+    "overall_score": 3.46,
+    "usd_per_m2": 51700.0,
+    "net_yield_estimate": "1.5-2.8% est. net",
+    "quick_metrics": {
+      "usd_m": "$51,700",
+      "net_yield": "1.5-2.8% est. net",
+      "ownership": "5.0/5",
+      "friendly": "4.4/5"
+    },
+    "panel_summary": "A global trophy-ski benchmark rather than a value case. The panel would use Aspen to calibrate scarcity, liquidity, and ultra-prime pricing, but would not treat it as a yield-led destination.",
+    "pros": [
+      "World-class ski and summer demand",
+      "deep ultra-high-net-worth buyer pool",
+      "clean US freehold ownership",
+      "strong luxury liquidity for prime assets",
+      "excellent services for a mountain resort"
+    ],
+    "cons": [
+      "Extreme entry pricing",
+      "low rental yield after costs",
+      "short-term-rental and housing-policy constraints",
+      "wildfire and insurance risk",
+      "thin inventory and high operating costs"
+    ],
+    "panel_verdict": "Keep as a trophy-market benchmark only. Buy for scarcity and personal use, not for income or affordability.",
+    "scores": {
+      "scenery": {
+        "label": "Scenery",
+        "score": 4.9,
+        "weight": 0.07
+      },
+      "airport_access": {
+        "label": "Airport access",
+        "score": 3.6,
+        "weight": 0.07
+      },
+      "business_hub_access": {
+        "label": "Business hub access",
+        "score": 3.2,
+        "weight": 0.05
+      },
+      "year_round_activity": {
+        "label": "Year-round activity",
+        "score": 4.7,
+        "weight": 0.07
+      },
+      "ownership_clarity": {
+        "label": "Ownership clarity",
+        "score": 5.0,
+        "weight": 0.11
+      },
+      "str_regulatory_safety": {
+        "label": "STR regulatory safety",
+        "score": 2.4,
+        "weight": 0.07
+      },
+      "rental_profit_potential": {
+        "label": "Rental profit potential",
+        "score": 2.4,
+        "weight": 0.12
+      },
+      "capital_upside": {
+        "label": "Capital upside",
+        "score": 3.4,
+        "weight": 0.07
+      },
+      "retirement_suitability": {
+        "label": "Retirement suitability",
+        "score": 3.2,
+        "weight": 0.07
+      },
+      "exit_liquidity": {
+        "label": "Exit liquidity",
+        "score": 4.2,
+        "weight": 0.06
+      },
+      "chinese_foreigner_friendliness": {
+        "label": "Chinese/foreigner friendliness",
+        "score": 4.4,
+        "weight": 0.06
+      },
+      "food_quality": {
+        "label": "Food quality",
+        "score": 4.2,
+        "weight": 0.04
+      },
+      "standard_of_living": {
+        "label": "Standard of living",
+        "score": 4.7,
+        "weight": 0.03
+      },
+      "affordability": {
+        "label": "Affordability",
+        "score": 1.0,
+        "weight": 0.11
+      }
+    },
+    "ownership_notes": "US freehold ownership is open to foreign buyers, subject to normal tax, financing, reporting, and estate-planning advice.",
+    "red_flags": "Ultra-prime pricing, low yield, STR limits, wildfire/insurance exposure, and very high carrying costs.",
+    "rental": {
+      "gross_yield": "Prime ski homes can command high nightly rates, but entry prices and management/HOA/tax costs compress yield.",
+      "net_yield": "1.5-2.8% est. net",
+      "revenue": "Treat as asset-specific; trophy homes can show strong gross revenue but low yield on capital value.",
+      "adr_occupancy": "High-season dependent; verify by permit zone and asset type.",
+      "confidence": "Low-medium; benchmark estimate, not listing-level underwriting"
+    },
+    "price_basis": "Prime Aspen/Snowmass built-property benchmark. Downtown Aspen can trade around $5,000-$6,000/sq ft for nice single-family product; converted to roughly $51,700/m2. Snowmass and condos can vary materially.",
+    "price_confidence": "Medium for prime benchmark; low-medium across submarkets",
+    "profit_driver": "Scarcity, global trophy demand, ski/summer seasonality, and resilient ultra-prime buyer depth.",
+    "rank": 29
+  },
+  {
     "id": "swiss-valais-vaud-alps",
     "name": "Swiss Valais / Vaud Alps",
-    "rank": 25,
+    "rank": 30,
     "country": "Switzerland",
     "category": "Mountain",
     "overall_score": 3.4,

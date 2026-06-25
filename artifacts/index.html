@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2310241f'/%3E%3Cpath d='M17 37 32 18l15 19v11H36V36h-8v12H17Z' fill='%23fffdf8'/%3E%3C/svg%3E">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
+  <link rel="manifest" href="/assets/site.webmanifest">
   <title>Global Home Atlas | Find Your Best-Fit Overseas Property Market</title>
   <meta name="description" content="Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan with independent Global Home Atlas research.">
   <link rel="canonical" href="https://globalhomeatlas.com/">
@@ -33,15 +35,16 @@
     }
     * { box-sizing: border-box; }
     html { scroll-behavior: smooth; }
-    body { margin: 0; min-width: 320px; background: var(--cream); color: var(--ink); }
+    html, body { overflow-x: hidden; }
+    body { margin: 0; background: var(--cream); color: var(--ink); }
     a { color: var(--eucalyptus); text-underline-offset: 3px; }
     p { line-height: 1.58; }
     .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
     .hero {
-      min-height: 86vh;
+      min-height: 78vh;
       display: grid;
-      align-items: end;
-      padding: 22px 0 44px;
+      align-items: center;
+      padding: 22px 0 76px;
       background:
         linear-gradient(90deg, rgba(255, 253, 247, .98) 0 38%, rgba(255, 253, 247, .76) 62%, rgba(199, 211, 194, .30)),
         linear-gradient(180deg, rgba(245, 241, 233, .04), rgba(245, 241, 233, .50)),
@@ -52,14 +55,16 @@
     .topbar { position: absolute; inset: 0 0 auto; padding: 18px 0; }
     .topbar__inner { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
     .brand { display: flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 900; text-decoration: none; }
-    .brand-mark { width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(36, 49, 45, .20); border-radius: 50%; background: rgba(255, 253, 247, .70); }
+    .brand-logo { width: 174px; max-width: 48vw; height: auto; display: block; }
     .top-links { display: flex; gap: 18px; flex-wrap: wrap; }
     .top-links a { color: rgba(36, 49, 45, .76); font-size: 13px; font-weight: 800; text-decoration: none; }
-    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(310px, 390px); gap: 34px; align-items: end; padding-top: 94px; }
-    .eyebrow { max-width: 100%; margin: 0 0 12px; color: var(--brass); font-size: 12px; font-weight: 900; letter-spacing: .14em; text-transform: uppercase; overflow-wrap: anywhere; }
+    .top-links a:hover { color: var(--ink); }
+    .hero-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(310px, 390px); gap: 34px; align-items: center; padding-top: 74px; }
+    .eyebrow { max-width: 100%; margin: 0 0 12px; color: #806738; font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; overflow-wrap: anywhere; }
     h1 { max-width: 860px; margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(46px, 8vw, 104px); line-height: .9; letter-spacing: 0; }
-    .lede { max-width: 720px; margin: 24px 0 0; color: rgba(36, 49, 45, .74); font-size: clamp(17px, 2.2vw, 21px); }
-    .hero-proof { margin: 14px 0 0; color: var(--muted); font-size: 13px; font-weight: 850; letter-spacing: .03em; }
+    .lede { max-width: 720px; margin: 24px 0 0; color: #45534e; font-size: clamp(17px, 2.2vw, 21px); }
+    .hero-proof { width: fit-content; margin: 16px 0 0; display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid rgba(95, 127, 114, .28); border-radius: 999px; background: rgba(255, 253, 247, .82); color: #344640; font-size: 13px; font-weight: 700; letter-spacing: 0; }
+    .hero-proof i { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; background: var(--eucalyptus); color: #fffdf7; font-style: normal; font-size: 12px; }
     .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
     .primary-action, .secondary-action {
       min-height: 46px;
@@ -68,40 +73,64 @@
       justify-content: center;
       padding: 0 16px;
       border-radius: 6px;
-      font-weight: 850;
+      font-weight: 700;
       text-decoration: none;
+      letter-spacing: 0;
     }
     .primary-action { background: var(--eucalyptus); color: #fffdf7; }
     .secondary-action { border: 1px solid rgba(36, 49, 45, .20); background: rgba(255, 253, 247, .66); color: var(--ink); }
-    .trust-snapshot { padding: 18px; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: rgba(255, 253, 247, .78); box-shadow: var(--shadow); backdrop-filter: blur(18px); }
+    .text-action { min-height: 46px; display: inline-flex; align-items: center; color: var(--ink); font-size: 15px; font-weight: 650; text-decoration: none; letter-spacing: 0; }
+    .text-action::after, .card-link::after, .path-card em::after, .inspired-visual::after { content: " ->"; }
+    .primary-action:hover, .secondary-action:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(36, 49, 45, .13); }
+    .text-action:hover, .card-link:hover { color: #365f6d; }
+    .trust-snapshot { padding: 18px; border: 1px solid rgba(36, 49, 45, .18); border-radius: 8px; background: rgba(255, 253, 247, .82); box-shadow: var(--shadow); backdrop-filter: blur(18px); }
     .trust-snapshot h2 { margin: 0 0 12px; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
     .atlas-visual { min-height: 178px; position: relative; overflow: hidden; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: linear-gradient(135deg, rgba(255, 253, 247, .48), rgba(199, 211, 194, .12)), url("/assets/atlas-map-coastal-sage.jpg"); background-size: cover; background-position: center; }
     .atlas-visual span { position: absolute; left: 14px; top: 14px; padding: 9px 10px; border: 1px solid rgba(36, 49, 45, .12); border-radius: 6px; background: rgba(255, 253, 247, .82); color: var(--ink); font-size: 12px; font-weight: 850; }
+    .map-link { position: absolute; width: 14px; height: 14px; border: 2px solid #fffdf7; border-radius: 50%; background: var(--eucalyptus); box-shadow: 0 0 0 5px rgba(95, 127, 114, .22); text-indent: -999px; overflow: hidden; transition: transform .18s ease, background .18s ease; }
+    .map-link:hover, .map-link:focus-visible { transform: scale(1.18); background: #806738; }
+    .map-link--canada { left: 14%; top: 37%; }
+    .map-link--portugal { left: 47%; top: 47%; }
+    .map-link--spain { left: 49%; top: 45%; }
+    .map-link--italy { left: 53%; top: 42%; }
+    .map-link--greece { left: 57%; top: 49%; }
+    .map-link--japan { right: 16%; top: 42%; }
+    .map-link--thailand { right: 23%; top: 60%; }
+    .map-link--nz { right: 9%; bottom: 13%; }
     .snapshot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 12px; }
     .snapshot-grid div { padding: 12px; border-radius: 6px; background: rgba(199, 211, 194, .28); }
     .snapshot-grid span { display: block; color: var(--muted); font-size: 11px; font-weight: 900; text-transform: uppercase; }
     .snapshot-grid strong { display: block; margin-top: 5px; font-size: 21px; }
     main { margin-top: -24px; position: relative; z-index: 2; }
-    .section { margin-bottom: 24px; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 12px 40px rgba(36, 49, 45, .07); }
+    .section { margin-bottom: 28px; padding: 26px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 12px 40px rgba(36, 49, 45, .07); }
+    .section--finder { padding: 30px; border-color: rgba(95, 127, 114, .30); background: linear-gradient(135deg, #fffdf7, #eef4ef); }
     .section-header { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 18px; }
     .section-header h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 42px); line-height: 1; }
     .section-header p { max-width: 680px; margin: 8px 0 0; color: var(--muted); }
     .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid { display: grid; gap: 12px; }
     .path-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .recommendation-grid { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+    .recommendation-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
     .country-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
     .trust-grid, .guide-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .finder-grid { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: 16px; align-items: start; }
-    .finder-panel { display: grid; gap: 12px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
-    .finder-panel label { display: grid; gap: 7px; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
-    .finder-panel select { min-height: 46px; width: 100%; border: 1px solid var(--line); border-radius: 6px; background: #fff; color: var(--ink); padding: 0 12px; font: inherit; letter-spacing: 0; text-transform: none; }
-    .finder-note { margin: 0; color: var(--muted); font-size: 13px; }
+    .finder-grid { display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }
+    .finder-panel, .finder-output { display: grid; align-content: start; gap: 14px; }
+    .finder-panel { padding: 18px 0 0; }
+    .finder-output { padding-top: 18px; }
+    .finder-step, .finder-panel label, .finder-result span, .finder-result dt { color: #806738; font-size: 11px; font-weight: 800; letter-spacing: .07em; line-height: 1.2; text-transform: uppercase; }
+    .finder-step { margin: 0; }
+    .finder-panel label { display: grid; gap: 9px; }
+    .finder-panel select { min-height: 48px; width: 100%; appearance: none; border: 1px solid rgba(95, 127, 114, .24); border-radius: 7px; background: linear-gradient(180deg, #fff, #f8faf6) padding-box, linear-gradient(135deg, transparent calc(100% - 36px), rgba(95, 127, 114, .10) 0) border-box; color: var(--ink); padding: 0 42px 0 14px; font: inherit; font-size: 13px; font-weight: 650; letter-spacing: 0; text-transform: none; }
+    .finder-panel label { position: relative; }
+    .finder-panel label::after { content: ""; position: absolute; right: 15px; bottom: 19px; width: 8px; height: 8px; border-right: 2px solid #365f6d; border-bottom: 2px solid #365f6d; transform: rotate(45deg); pointer-events: none; }
+    .finder-panel .secondary-action { min-height: 44px; width: 100%; justify-content: center; border-color: rgba(95, 127, 114, .24); background: #f8faf6; font-size: 13px; }
+    .finder-note { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
     .finder-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .finder-result { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
-    .finder-result span, .finder-result dt { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-    .finder-result h3 { margin: 8px 0 4px; font-size: 19px; line-height: 1.12; }
+    .finder-result { min-width: 0; display: grid; align-content: start; padding: 17px; border: 1px solid rgba(95, 127, 114, .22); border-radius: 8px; background: #fffdf7; box-shadow: 0 10px 26px rgba(36, 49, 45, .06); }
+    .finder-result h3 { margin: 8px 0 4px; font-family: Georgia, "Times New Roman", serif; font-size: 19px; font-weight: 700; line-height: 1.12; }
+    .finder-result h3 a { color: var(--sage); text-decoration-thickness: 1px; text-underline-offset: 3px; }
     .finder-result p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
     .finder-result dd { margin: 4px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.42; }
+    .card-link { align-self: end; margin-top: 12px; font-weight: 700; text-decoration: none; }
     .inspired-band { display: grid; grid-template-columns: minmax(0, .62fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
     .inspired-visual {
       min-height: 320px;
@@ -115,11 +144,12 @@
       background-size: cover;
       background-position: center;
       color: #fffdf7;
+      text-decoration: none;
     }
     .inspired-visual span { color: rgba(255, 253, 247, .78); font-size: 12px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
     .inspired-visual strong { display: block; max-width: 420px; margin-top: 8px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4vw, 46px); line-height: 1; }
     .inspired-routes { display: grid; gap: 12px; }
-    .inspired-routes article { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .inspired-routes article { min-width: 0; padding: 16px; border: 1px solid rgba(95, 127, 114, .20); border-left: 4px solid var(--eucalyptus); border-radius: 8px; background: #f9fbf6; }
     .inspired-routes span, .inspired-routes dt { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .inspired-routes h3 { margin: 7px 0 6px; font-size: 20px; }
     .inspired-routes p, .inspired-routes dd { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
@@ -134,30 +164,45 @@
     .report-card a { font-weight: 900; }
     .path-card, .country-tile { color: var(--ink); text-decoration: none; }
     .path-card, .recommendation-card, .country-tile, .trust-card, .guide-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
-    .path-card span, .recommendation-card span, .country-tile span, .guide-card span { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .path-card { position: relative; border-top: 4px solid var(--path-accent, var(--brass)); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+    .path-card:hover, .recommendation-card:hover, .country-tile:hover, .guide-card:hover { transform: translateY(-2px); border-color: rgba(95, 127, 114, .34); box-shadow: 0 14px 30px rgba(36, 49, 45, .08); }
+    .path-card span, .recommendation-card span, .country-tile span, .guide-card span { color: #806738; font-size: 12px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+    .path-card span { display: inline-flex; align-items: center; gap: 8px; }
+    .path-card b { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--path-accent, var(--brass)) 18%, white); color: var(--path-accent, var(--brass)); font-size: 11px; }
     .path-card strong, .country-tile strong, .trust-card strong { display: block; margin: 8px 0; font-size: 18px; line-height: 1.12; }
     .path-card p, .recommendation-card p, .country-tile p, .trust-card p, .guide-card p { margin: 0; color: var(--muted); font-size: 14px; }
+    .path-card em { display: inline-block; margin-top: 14px; color: var(--path-accent, var(--brass)); font-size: 13px; font-style: normal; font-weight: 900; }
     .recommendation-card h3, .guide-card h3 { margin: 8px 0 4px; font-size: 18px; line-height: 1.12; }
     .recommendation-card strong { display: block; margin: 12px 0 8px; font-size: 24px; }
     .recommendation-card em { display: block; color: #3f4d48; font-size: 13px; font-style: normal; line-height: 1.45; }
     .recommendation-card dl { display: grid; gap: 8px; margin: 12px 0 0; }
     .recommendation-card dt { color: var(--brass); font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .recommendation-card dd { margin: 3px 0 0; color: var(--muted); font-size: 12px; line-height: 1.38; }
+    .recommendation-card summary { margin-top: 12px; cursor: pointer; color: var(--ink); font-size: 13px; font-weight: 900; }
     .trust-card span { width: 34px; height: 34px; display: grid; place-items: center; margin-bottom: 12px; border-radius: 50%; background: #eef3f0; color: var(--deep); font-weight: 900; }
     .cta-band { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 26px; border-radius: 8px; background: var(--deep); color: #fffdf7; }
     .cta-band h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); }
     .cta-band p { max-width: 700px; margin: 8px 0 0; color: rgba(255, 253, 247, .78); }
     .cta-band .primary-action { background: #fffdf7; color: var(--deep); }
+    .cta-band--light { margin-bottom: 28px; background: #eef4ef; color: var(--ink); border: 1px solid rgba(95, 127, 114, .25); }
+    .cta-band--light p { color: #45534e; }
+    .cta-band--light .primary-action { background: var(--eucalyptus); color: #fffdf7; }
+    .sticky-fit-cta { position: fixed; right: 18px; bottom: 18px; z-index: 20; min-height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 0 14px; border-radius: 999px; background: var(--deep); color: #fffdf7; box-shadow: 0 16px 36px rgba(36, 49, 45, .22); font-size: 13px; font-weight: 700; text-decoration: none; letter-spacing: 0; }
+    a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid rgba(169, 138, 75, .55); outline-offset: 3px; }
     .footer { padding: 26px 0 42px; color: var(--muted); }
+    .footer-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, 340px); gap: 24px; align-items: start; }
     .footer nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+    .footer-signup { padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255, 253, 247, .68); }
+    .footer-signup p { margin: 8px 0 12px; }
     @media (max-width: 980px) {
       .hero { min-height: auto; padding-bottom: 58px; }
       .hero-grid { grid-template-columns: 1fr; }
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band, .report-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .finder-grid, .finder-results, .inspired-band, .report-grid, .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 640px) {
       .shell { width: min(1160px, calc(100% - 28px)); }
       .top-links { display: none; }
+      .brand-logo { width: 158px; max-width: 66vw; }
       .hero-grid { gap: 18px; padding-top: 80px; }
       .eyebrow { max-width: 330px; font-size: 11px; letter-spacing: .12em; }
       h1 { max-width: min(100%, 362px); font-size: clamp(36px, 10vw, 48px); line-height: 1; overflow-wrap: anywhere; }
@@ -167,12 +212,14 @@
       .hero-proof { font-size: 12px; }
       .trust-snapshot { display: none; }
       .section { padding: 18px; }
+      .section--finder { padding: 20px; }
       .section-header, .cta-band { display: block; }
       .section-header h2 { max-width: 300px; font-size: 24px; line-height: 1.05; }
       .section-header a, .cta-band a { margin-top: 14px; }
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band, .report-grid { grid-template-columns: 1fr; }
+      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .snapshot-grid, .finder-grid, .finder-results, .inspired-band, .report-grid, .footer-grid { grid-template-columns: 1fr; }
       .inspired-visual { min-height: 230px; }
       .atlas-visual { min-height: 140px; }
+      .sticky-fit-cta { left: 14px; right: 14px; bottom: 12px; }
     }
   </style>
 </head>
@@ -180,10 +227,11 @@
   <header class="hero" id="top">
     <nav class="topbar" aria-label="Primary">
       <div class="shell topbar__inner">
-        <a class="brand" href="/"><span class="brand-mark">G</span><span>Global Home Atlas</span></a>
+        <a class="brand" href="/" aria-label="Global Home Atlas home"><img class="brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="top-links">
           <a href="#start">Start</a>
-          <a href="#recommendations">Recommendations</a>
+          <a href="#market-finder">Market Fit</a>
+          <a href="#recommendations">Top Markets</a>
           <a href="/country-comparison/">Compare Countries</a>
           <a href="/guides/">Guides</a>
           <a href="/methodology/">Methodology</a>
@@ -196,20 +244,30 @@
         <p class="eyebrow">Global mobility and property intelligence</p>
         <h1>Global Home Atlas</h1>
         <p class="lede">Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan.</p>
-        <p class="hero-proof">Independent research. Not paid placement.</p>
+        <p class="hero-proof"><i aria-hidden="true">✓</i> Independent research. Not paid placement.</p>
         <div class="hero-actions">
-          <a class="primary-action" href="#start" data-track="homepage_start_click" data-track-label="hero">Find my best-fit markets</a>
-          <a class="secondary-action" href="#countries" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
-          <a class="secondary-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
+          <a class="primary-action" href="#market-finder" data-track="homepage_start_click" data-track-label="hero">Find my best-fit markets</a>
+          <a class="text-action" href="#countries" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
+          <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
         </div>
       </div>
       <aside class="trust-snapshot" aria-label="Research snapshot">
-        <h2>Independent, not paid placement</h2>
-        <div class="atlas-visual" aria-hidden="true"><span>Ownership · lifestyle · exit</span></div>
+        <h2>Research coverage at a glance</h2>
+        <div class="atlas-visual" aria-label="Featured atlas routes">
+          <span>Ownership · lifestyle · exit</span>
+          <a class="map-link map-link--canada" href="/destinations/whistler/" aria-label="Open Whistler destination profile">Whistler</a>
+          <a class="map-link map-link--portugal" href="/destinations/algarve-cascais/" aria-label="Open Algarve and Cascais destination profile">Algarve / Cascais</a>
+          <a class="map-link map-link--spain" href="/destinations/valencia/" aria-label="Open Valencia destination profile">Valencia</a>
+          <a class="map-link map-link--italy" href="/destinations/lake-como/" aria-label="Open Lake Como destination profile">Lake Como</a>
+          <a class="map-link map-link--greece" href="/destinations/crete/" aria-label="Open Crete destination profile">Crete</a>
+          <a class="map-link map-link--japan" href="/destinations/fukuoka-itoshima/" aria-label="Open Fukuoka and Itoshima destination profile">Fukuoka / Itoshima</a>
+          <a class="map-link map-link--thailand" href="/destinations/phuket-koh-samui/" aria-label="Open Phuket and Koh Samui destination profile">Phuket / Koh Samui</a>
+          <a class="map-link map-link--nz" href="/destinations/queenstown/" aria-label="Open Queenstown destination profile">Queenstown</a>
+        </div>
         <div class="snapshot-grid">
-          <div><span>Destinations</span><strong>25</strong></div>
-          <div><span>Countries</span><strong>14</strong></div>
-          <div><span>Evidence base</span><strong>75 samples</strong></div>
+          <div><span>Destinations</span><strong>30</strong></div>
+          <div><span>Countries</span><strong>15</strong></div>
+          <div><span>Evidence base</span><strong>90 samples</strong></div>
           <div><span>Updated</span><strong>2026-06-25</strong></div>
         </div>
       </aside>
@@ -218,52 +276,17 @@
 
   <main>
     <div class="shell">
-      <section class="section" id="start">
-        <div class="section-header">
-          <div>
-            <h2>Start with the reason you are buying</h2>
-            <p>Different buyers need different filters. Choose a path first, then go deeper only where the market fits your actual use case.</p>
-          </div>
-          <a href="/dashboard/" data-track="dashboard_open" data-track-label="buyer path section">Open research dashboard</a>
-        </div>
-        <div class="path-grid">
-
-        <a class="path-card" href="/best-places-to-buy-property-abroad-for-retirement/" data-track="buyer_path_click" data-track-label="Retirement or lifestyle base">
-          <span>Retirement</span>
-          <strong>Retirement or lifestyle base</strong>
-          <p>Find markets where healthcare, daily ease, culture, and resale depth matter more than headline yield.</p>
-        </a>
-
-        <a class="path-card" href="/best-places-to-buy-a-second-home-abroad/" data-track="buyer_path_click" data-track-label="Second home abroad">
-          <span>Second homes</span>
-          <strong>Second home abroad</strong>
-          <p>Compare places that can support regular owner use, family visits, and sensible rental offset.</p>
-        </a>
-
-        <a class="path-card" href="/overseas-property-investment/" data-track="buyer_path_click" data-track-label="Investment-led shortlist">
-          <span>Investment</span>
-          <strong>Investment-led shortlist</strong>
-          <p>Start with yield realism, entry value, regulatory safety, and exit liquidity before falling in love with the place.</p>
-        </a>
-
-        <a class="path-card" href="/where-can-foreigners-buy-property/" data-track="buyer_path_click" data-track-label="Clean ownership markets">
-          <span>Ownership</span>
-          <strong>Clean ownership markets</strong>
-          <p>Prioritize title clarity, foreigner fit, and governance where cross-border ownership can be explained simply.</p>
-        </a>
-        </div>
-      </section>
-
-      <section class="section" id="market-finder">
+      <section class="section section--finder" id="market-finder">
         <div class="section-header">
           <div>
             <h2>Find your market fit</h2>
-            <p>Use this quick lens when you want a useful starting point without opening the full dashboard.</p>
+            <p>Choose the job of the property and get three defensible starting markets before opening the full dashboard.</p>
           </div>
-          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="market finder">Review my shortlist</a>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="market finder">Request custom brief</a>
         </div>
         <div class="finder-grid">
           <div class="finder-panel">
+            <p class="finder-step">Step 1 of 2</p>
             <label for="finderGoal">Buying goal
               <select id="finderGoal">
                 <option value="retirement">Retirement or lifestyle base</option>
@@ -272,121 +295,12 @@
                 <option value="ownership">Clean ownership markets</option>
               </select>
             </label>
+            <a class="secondary-action" href="/dashboard/" data-track="dashboard_open" data-track-label="market finder panel">Open full dashboard</a>
+          </div>
+          <div class="finder-output">
+            <p class="finder-step">Step 2 of 2</p>
+            <div class="finder-results" id="finderResults" aria-live="polite"></div>
             <p class="finder-note">The output is a first-pass research route. Final decisions still need local legal, tax, immigration, and property review.</p>
-          </div>
-          <div class="finder-results" id="finderResults" aria-live="polite"></div>
-        </div>
-      </section>
-
-      <section class="section" id="recommendations">
-        <div class="section-header">
-          <div>
-            <h2>Recommended starting points</h2>
-            <p>A short editorial shortlist for common overseas property journeys. Use these as starting points, not final answers.</p>
-          </div>
-          <a href="/dashboard/" data-track="dashboard_open" data-track-label="recommendations">Compare all markets</a>
-        </div>
-        <div class="recommendation-grid">
-
-            <article class="recommendation-card">
-              <span>Best overall</span>
-              <h3><a href="/destinations/fukuoka-itoshima/" data-track="destination_click" data-track-label="landing recommendation Fukuoka / Itoshima">Fukuoka / Itoshima</a></h3>
-              <p>Japan · Water</p>
-              <strong>4.27/5</strong>
-              <em>Clean ownership, high livability, and strong city-region fundamentals without resort-only dependence.</em>
-              <dl>
-                <div><dt>Best for</dt><dd>Buyers who want daily life, food culture, healthcare access, and Japan title clarity.</dd></div>
-                <div><dt>Skip if</dt><dd>Skip if you need aggressive rental yield or resort-style English-language convenience.</dd></div>
-              </dl>
-            </article>
-
-            <article class="recommendation-card">
-              <span>European lifestyle balance</span>
-              <h3><a href="/destinations/valencia/" data-track="destination_click" data-track-label="landing recommendation Valencia">Valencia</a></h3>
-              <p>Spain · Water</p>
-              <strong>4.09/5</strong>
-              <em>Food, healthcare, airport access, beach, culture, and year-round demand in one practical market.</em>
-              <dl>
-                <div><dt>Best for</dt><dd>Retirement-optional buyers who want a real city rather than a pure holiday resort.</dd></div>
-                <div><dt>Skip if</dt><dd>Skip if you need ultra-luxury holiday yield or low-regulation short-term rentals.</dd></div>
-              </dl>
-            </article>
-
-            <article class="recommendation-card">
-              <span>Retirement optionality</span>
-              <h3><a href="/destinations/algarve-cascais/" data-track="destination_click" data-track-label="landing recommendation Algarve / Cascais">Algarve / Cascais</a></h3>
-              <p>Portugal · Water</p>
-              <strong>4.06/5</strong>
-              <em>A familiar expat corridor with lifestyle depth, services, and multiple sub-market choices.</em>
-              <dl>
-                <div><dt>Best for</dt><dd>Buyers who value services, community, climate, and a well-understood foreign-buyer path.</dd></div>
-                <div><dt>Skip if</dt><dd>Skip if you want an undiscovered market or a bargain entry point in prime areas.</dd></div>
-              </dl>
-            </article>
-
-            <article class="recommendation-card">
-              <span>Premium lifestyle market</span>
-              <h3><a href="/destinations/lake-como/" data-track="destination_click" data-track-label="landing recommendation Lake Como">Lake Como</a></h3>
-              <p>Italy · Mountain + Water</p>
-              <strong>3.96/5</strong>
-              <em>Prestige and scarcity remain attractive, but value discipline and exit assumptions need care.</em>
-              <dl>
-                <div><dt>Best for</dt><dd>Lifestyle-led buyers who care about beauty, scarcity, and prestige more than income.</dd></div>
-                <div><dt>Skip if</dt><dd>Skip if yield, liquidity, and entry discipline are the first priorities.</dd></div>
-              </dl>
-            </article>
-
-            <article class="recommendation-card">
-              <span>Value lifestyle route</span>
-              <h3><a href="/destinations/madeira/" data-track="destination_click" data-track-label="landing recommendation Madeira">Madeira</a></h3>
-              <p>Portugal · Water</p>
-              <strong>3.91/5</strong>
-              <em>Island lifestyle appeal with a lower entry point than many mature European second-home markets.</em>
-              <dl>
-                <div><dt>Best for</dt><dd>Buyers seeking European lifestyle, climate, and relative value outside the most obvious hubs.</dd></div>
-                <div><dt>Skip if</dt><dd>Skip if you need large-market liquidity or direct access to many business hubs.</dd></div>
-              </dl>
-            </article>
-        </div>
-      </section>
-
-      <section class="section" id="inspiration">
-        <div class="section-header">
-          <div>
-            <h2>Feel inspired, then make it investable</h2>
-            <p>The best markets should create emotional pull and still survive ownership, liquidity, rental, and long-stay tests.</p>
-          </div>
-          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="inspired routes">Review my shortlist</a>
-        </div>
-        <div class="inspired-band">
-          <div class="inspired-visual" aria-hidden="true">
-            <div><span>Atlas routes</span><strong>From dream location to defensible shortlist.</strong></div>
-          </div>
-          <div class="inspired-routes">
-
-        <article>
-          <span>Atlas route</span>
-          <h3>Live well year-round</h3>
-          <p>Valencia, Fukuoka, and the Algarve suit buyers who want the property to support normal life, not only holiday weeks.</p>
-          <dl><div><dt>Best for</dt><dd>Retirement-optional households, remote founders, and families planning repeat long stays.</dd></div></dl>
-          <a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="inspired_route_click" data-track-label="Live well year-round">Open route</a>
-        </article>
-
-        <article>
-          <span>Atlas route</span>
-          <h3>Own with clarity</h3>
-          <p>Japan, Spain, and Portugal routes are useful starting points when clean title, adviser depth, and resale process matter.</p>
-          <dl><div><dt>Best for</dt><dd>Buyers who want to understand the jurisdiction before they compare villas or apartments.</dd></div></dl>
-          <a href="/where-can-foreigners-buy-property/" data-track="inspired_route_click" data-track-label="Own with clarity">Open route</a>
-        </article>
-
-        <article>
-          <span>Atlas route</span>
-          <h3>Keep optionality</h3>
-          <p>Madeira, Malaga, and selected second-home markets can work when lifestyle pull is balanced against liquidity and regulation.</p>
-          <dl><div><dt>Best for</dt><dd>Buyers who may use the home personally, rent selectively, and exit if family plans change.</dd></div></dl>
-          <a href="/best-places-to-buy-a-second-home-abroad/" data-track="inspired_route_click" data-track-label="Keep optionality">Open route</a>
-        </article>
           </div>
         </div>
       </section>
@@ -397,7 +311,7 @@
             <h2>Premium research paths</h2>
             <p>When a public guide is not specific enough, these briefs turn the Atlas into a buyer-specific decision memo.</p>
           </div>
-          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="premium briefs">Discuss a brief</a>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="premium briefs">Request a custom brief</a>
         </div>
         <div class="report-grid">
 
@@ -435,6 +349,187 @@
         </div>
       </section>
 
+      <section class="section" id="start">
+        <div class="section-header">
+          <div>
+            <h2>Start with the reason you are buying</h2>
+            <p>Different buyers need different filters. Choose a path first, then go deeper only where the market fits your actual use case.</p>
+          </div>
+          <a href="/dashboard/" data-track="dashboard_open" data-track-label="buyer path section">Open research dashboard</a>
+        </div>
+        <div class="path-grid">
+
+        <a class="path-card" href="/best-places-to-buy-property-abroad-for-retirement/" data-track="buyer_path_click" data-track-label="Retirement or lifestyle base" style="--path-accent: #8f6f3d;">
+          <span><b>01</b>Retirement</span>
+          <strong>Retirement or lifestyle base</strong>
+          <p>Find markets where healthcare, daily ease, culture, and resale depth matter more than headline yield.</p>
+          <em>Open path</em>
+        </a>
+
+        <a class="path-card" href="/best-places-to-buy-a-second-home-abroad/" data-track="buyer_path_click" data-track-label="Second home abroad" style="--path-accent: #5f7f72;">
+          <span><b>02</b>Second homes</span>
+          <strong>Second home abroad</strong>
+          <p>Compare places that can support regular owner use, family visits, and sensible rental offset.</p>
+          <em>Open path</em>
+        </a>
+
+        <a class="path-card" href="/overseas-property-investment/" data-track="buyer_path_click" data-track-label="Investment-led shortlist" style="--path-accent: #365f6d;">
+          <span><b>03</b>Investment</span>
+          <strong>Investment-led shortlist</strong>
+          <p>Start with yield realism, entry value, regulatory safety, and exit liquidity before falling in love with the place.</p>
+          <em>Open path</em>
+        </a>
+
+        <a class="path-card" href="/where-can-foreigners-buy-property/" data-track="buyer_path_click" data-track-label="Clean ownership markets" style="--path-accent: #7b5f80;">
+          <span><b>04</b>Ownership</span>
+          <strong>Clean ownership markets</strong>
+          <p>Prioritize title clarity, foreigner fit, and governance where cross-border ownership can be explained simply.</p>
+          <em>Open path</em>
+        </a>
+        </div>
+      </section>
+
+      <section class="section" id="recommendations">
+        <div class="section-header">
+          <div>
+            <h2>Recommended starting points</h2>
+            <p>A short editorial shortlist for common overseas property journeys. Use these as starting points, not final answers.</p>
+          </div>
+          <a href="/dashboard/" data-track="dashboard_open" data-track-label="recommendations">Compare all markets</a>
+        </div>
+        <div class="recommendation-grid">
+
+            <article class="recommendation-card">
+              <span>Best overall</span>
+              <h3><a href="/destinations/fukuoka-itoshima/" data-track="destination_click" data-track-label="landing recommendation Fukuoka / Itoshima">Fukuoka / Itoshima</a></h3>
+              <p>Japan · Water</p>
+              <strong>4.27/5</strong>
+              <em>Clean ownership, high livability, and strong city-region fundamentals without resort-only dependence.</em>
+              <details open>
+                <summary>Best for / skip if</summary>
+                <dl>
+                  <div><dt>Best for</dt><dd>Buyers who want daily life, food culture, healthcare access, and Japan title clarity.</dd></div>
+                  <div><dt>Skip if</dt><dd>Skip if you need aggressive rental yield or resort-style English-language convenience.</dd></div>
+                </dl>
+              </details>
+              <a class="card-link" href="/destinations/fukuoka-itoshima/" data-track="destination_click" data-track-label="landing recommendation cta Fukuoka / Itoshima">See full profile</a>
+            </article>
+
+            <article class="recommendation-card">
+              <span>European lifestyle balance</span>
+              <h3><a href="/destinations/valencia/" data-track="destination_click" data-track-label="landing recommendation Valencia">Valencia</a></h3>
+              <p>Spain · Water</p>
+              <strong>4.09/5</strong>
+              <em>Food, healthcare, airport access, beach, culture, and year-round demand in one practical market.</em>
+              <details open>
+                <summary>Best for / skip if</summary>
+                <dl>
+                  <div><dt>Best for</dt><dd>Retirement-optional buyers who want a real city rather than a pure holiday resort.</dd></div>
+                  <div><dt>Skip if</dt><dd>Skip if you need ultra-luxury holiday yield or low-regulation short-term rentals.</dd></div>
+                </dl>
+              </details>
+              <a class="card-link" href="/destinations/valencia/" data-track="destination_click" data-track-label="landing recommendation cta Valencia">See full profile</a>
+            </article>
+
+            <article class="recommendation-card">
+              <span>Retirement optionality</span>
+              <h3><a href="/destinations/algarve-cascais/" data-track="destination_click" data-track-label="landing recommendation Algarve / Cascais">Algarve / Cascais</a></h3>
+              <p>Portugal · Water</p>
+              <strong>4.06/5</strong>
+              <em>A familiar expat corridor with lifestyle depth, services, and multiple sub-market choices.</em>
+              <details open>
+                <summary>Best for / skip if</summary>
+                <dl>
+                  <div><dt>Best for</dt><dd>Buyers who value services, community, climate, and a well-understood foreign-buyer path.</dd></div>
+                  <div><dt>Skip if</dt><dd>Skip if you want an undiscovered market or a bargain entry point in prime areas.</dd></div>
+                </dl>
+              </details>
+              <a class="card-link" href="/destinations/algarve-cascais/" data-track="destination_click" data-track-label="landing recommendation cta Algarve / Cascais">See full profile</a>
+            </article>
+
+            <article class="recommendation-card">
+              <span>Premium lifestyle market</span>
+              <h3><a href="/destinations/lake-como/" data-track="destination_click" data-track-label="landing recommendation Lake Como">Lake Como</a></h3>
+              <p>Italy · Mountain + Water</p>
+              <strong>3.96/5</strong>
+              <em>Prestige and scarcity remain attractive, but value discipline and exit assumptions need care.</em>
+              <details open>
+                <summary>Best for / skip if</summary>
+                <dl>
+                  <div><dt>Best for</dt><dd>Lifestyle-led buyers who care about beauty, scarcity, and prestige more than income.</dd></div>
+                  <div><dt>Skip if</dt><dd>Skip if yield, liquidity, and entry discipline are the first priorities.</dd></div>
+                </dl>
+              </details>
+              <a class="card-link" href="/destinations/lake-como/" data-track="destination_click" data-track-label="landing recommendation cta Lake Como">See full profile</a>
+            </article>
+
+            <article class="recommendation-card">
+              <span>Value lifestyle route</span>
+              <h3><a href="/destinations/madeira/" data-track="destination_click" data-track-label="landing recommendation Madeira">Madeira</a></h3>
+              <p>Portugal · Water</p>
+              <strong>3.91/5</strong>
+              <em>Island lifestyle appeal with a lower entry point than many mature European second-home markets.</em>
+              <details open>
+                <summary>Best for / skip if</summary>
+                <dl>
+                  <div><dt>Best for</dt><dd>Buyers seeking European lifestyle, climate, and relative value outside the most obvious hubs.</dd></div>
+                  <div><dt>Skip if</dt><dd>Skip if you need large-market liquidity or direct access to many business hubs.</dd></div>
+                </dl>
+              </details>
+              <a class="card-link" href="/destinations/madeira/" data-track="destination_click" data-track-label="landing recommendation cta Madeira">See full profile</a>
+            </article>
+        </div>
+      </section>
+
+      <section class="cta-band cta-band--light" id="mid-conversion">
+        <div>
+          <h2>Want the shortlist translated into a buyer memo?</h2>
+          <p>Use the top markets as a starting point, then pressure-test them against budget, citizenship, rental needs, and holding period.</p>
+        </div>
+        <a class="primary-action" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="landing mid cta">Request custom brief</a>
+      </section>
+
+      <section class="section" id="inspiration">
+        <div class="section-header">
+          <div>
+            <h2>Feel inspired, then make it investable</h2>
+            <p>The best markets should create emotional pull and still survive ownership, liquidity, rental, and long-stay tests.</p>
+          </div>
+          <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="inspired routes">Review my shortlist</a>
+        </div>
+        <div class="inspired-band">
+          <a class="inspired-visual" href="/guides/" data-track="guide_click" data-track-label="inspired visual">
+            <div><span>Atlas routes</span><strong>From dream location to defensible shortlist.</strong></div>
+          </a>
+          <div class="inspired-routes">
+
+        <article>
+          <span>Atlas route</span>
+          <h3>Live well year-round</h3>
+          <p>Valencia, Fukuoka, and the Algarve suit buyers who want the property to support normal life, not only holiday weeks.</p>
+          <dl><div><dt>Best for</dt><dd>Retirement-optional households, remote founders, and families planning repeat long stays.</dd></div></dl>
+          <a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="inspired_route_click" data-track-label="Live well year-round">Open route</a>
+        </article>
+
+        <article>
+          <span>Atlas route</span>
+          <h3>Own with clarity</h3>
+          <p>Japan, Spain, and Portugal routes are useful starting points when clean title, adviser depth, and resale process matter.</p>
+          <dl><div><dt>Best for</dt><dd>Buyers who want to understand the jurisdiction before they compare villas or apartments.</dd></div></dl>
+          <a href="/where-can-foreigners-buy-property/" data-track="inspired_route_click" data-track-label="Own with clarity">Open route</a>
+        </article>
+
+        <article>
+          <span>Atlas route</span>
+          <h3>Keep optionality</h3>
+          <p>Madeira, Malaga, and selected second-home markets can work when lifestyle pull is balanced against liquidity and regulation.</p>
+          <dl><div><dt>Best for</dt><dd>Buyers who may use the home personally, rent selectively, and exit if family plans change.</dd></div></dl>
+          <a href="/best-places-to-buy-a-second-home-abroad/" data-track="inspired_route_click" data-track-label="Keep optionality">Open route</a>
+        </article>
+          </div>
+        </div>
+      </section>
+
       <section class="section" id="countries">
         <div class="section-header">
           <div>
@@ -461,6 +556,18 @@
               <span>4 markets</span>
               <strong>Japan</strong>
               <p>Compare Japan property destinations for foreign buyers, including Fukuoka, Itoshima, Hakone, Izu, Hakuba, and Niseko across ownership clarity, lifestyle, and yield realism.</p>
+            </a>
+
+            <a class="country-tile" href="/countries/united-states-property/" data-track="country_hub_click" data-track-label="landing United States">
+              <span>4 markets</span>
+              <strong>United States</strong>
+              <p>Compare United States second-home and resort property markets, including Aspen, Park City, Lake Tahoe, and Jackson Hole across ownership clarity, price discipline, rental rules, and climate risk.</p>
+            </a>
+
+            <a class="country-tile" href="/countries/canada-property/" data-track="country_hub_click" data-track-label="landing Canada">
+              <span>2 markets</span>
+              <strong>Canada</strong>
+              <p>Compare Canada lifestyle property markets for foreign buyers, including Whistler and Vancouver Island across mountain, water, retirement, rental, tax, and policy considerations.</p>
             </a>
 
             <a class="country-tile" href="/countries/italy-property/" data-track="country_hub_click" data-track-label="landing Italy">
@@ -579,18 +686,28 @@
 
   <footer class="footer">
     <div class="shell">
-      <strong>Global Home Atlas</strong>
-      <p>Independent research for overseas property decisions. Research only; verify legal, tax, immigration, and property advice locally.</p>
-      <nav aria-label="Footer">
-        <a href="/dashboard/">Research dashboard</a>
-        <a href="/country-comparison/">Compare countries</a>
-        <a href="/guides/">Guides</a>
-        <a href="/methodology/">Methodology</a>
-        <a href="/research-standards/">Research standards</a>
-        <a href="/contact/">Contact</a>
-      </nav>
+      <div class="footer-grid">
+        <div>
+          <strong>Global Home Atlas</strong>
+          <p>Independent research for overseas property decisions. Research only; verify legal, tax, immigration, and property advice locally.</p>
+          <nav aria-label="Footer">
+            <a href="/dashboard/">Research dashboard</a>
+            <a href="/country-comparison/">Compare countries</a>
+            <a href="/guides/">Guides</a>
+            <a href="/methodology/">Methodology</a>
+            <a href="/research-standards/">Research standards</a>
+            <a href="/contact/">Contact</a>
+          </nav>
+        </div>
+        <div class="footer-signup">
+          <strong>Get market updates</strong>
+          <p>Ask to be notified when new destination research or country hubs are added.</p>
+          <a class="secondary-action" href="mailto:hello@globalhomeatlas.com?subject=Global%20Home%20Atlas%20updates" data-track="contact_click" data-track-label="footer updates">Email hello@globalhomeatlas.com</a>
+        </div>
+      </div>
     </div>
   </footer>
+  <a class="sticky-fit-cta" href="#market-finder" data-track="homepage_start_click" data-track-label="sticky">Find market fit</a>
   <script>
     (function () {
       const finderData = {"retirement": [{"name": "Valencia", "country": "Spain", "score": "4.09", "href": "/destinations/valencia/", "reason": "Best city lifestyle and retirement practicality", "watch": "Housing-policy pressure, licence restrictions, rising prices, less trophy-scenery than island/lake markets."}, {"name": "Algarve / Cascais", "country": "Portugal", "score": "4.06", "href": "/destinations/algarve-cascais/", "reason": "Most familiar retirement-optional corridor", "watch": "AL licence/local restrictions, rising prices, water/heat risk, lower Asia proximity."}, {"name": "Madeira", "country": "Portugal", "score": "3.91", "href": "/destinations/madeira/", "reason": "Good climate and relative value for European lifestyle", "watch": "Island liquidity/airlift risk, AL/local restrictions, limited medical depth vs mainland, landslide/flood terrain risk."}], "second-home": [{"name": "Algarve / Cascais", "country": "Portugal", "score": "4.06", "href": "/destinations/algarve-cascais/", "reason": "Easy second-home use with mature services", "watch": "AL licence/local restrictions, rising prices, water/heat risk, lower Asia proximity."}, {"name": "Lake Como", "country": "Italy", "score": "3.96", "href": "/destinations/lake-como/", "reason": "Premium emotional pull and scarcity", "watch": "Lower yield, prime lakefront scarcity/price, older buildings, limited winter demand in some villages."}, {"name": "Mallorca", "country": "Spain", "score": "3.77", "href": "/destinations/mallorca/", "reason": "Classic second-home demand with liquidity caveats", "watch": "Tourist rental licence scarcity, anti-tourism politics, summer crowding, heat/water risk."}], "investment": [{"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.27", "href": "/destinations/fukuoka-itoshima/", "reason": "High probability market with clean ownership", "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas."}, {"name": "Valencia", "country": "Spain", "score": "4.09", "href": "/destinations/valencia/", "reason": "Balanced demand and practical entry point", "watch": "Housing-policy pressure, licence restrictions, rising prices, less trophy-scenery than island/lake markets."}, {"name": "Málaga / Costa del Sol", "country": "Spain", "score": "4.03", "href": "/destinations/malaga-costa-del-sol/", "reason": "Deep tourism demand with regulation risk to underwrite", "watch": "Rapid price inflation, anti-tourism politics, summer heat/water, lower scarcity outside prime zones."}], "ownership": [{"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.27", "href": "/destinations/fukuoka-itoshima/", "reason": "Clean title path and high foreigner fit", "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas."}, {"name": "Valencia", "country": "Spain", "score": "4.09", "href": "/destinations/valencia/", "reason": "EU freehold structure with city-region liquidity", "watch": "Housing-policy pressure, licence restrictions, rising prices, less trophy-scenery than island/lake markets."}, {"name": "Algarve / Cascais", "country": "Portugal", "score": "4.06", "href": "/destinations/algarve-cascais/", "reason": "Well-understood foreign-buyer process", "watch": "AL licence/local restrictions, rising prices, water/heat risk, lower Asia proximity."}]};
@@ -609,6 +726,7 @@
               <div><dt>Why this route</dt><dd>${item.reason}</dd></div>
               <div><dt>Watch-out</dt><dd>${item.watch}</dd></div>
             </dl>
+            <a class="card-link" href="${item.href}" data-track="destination_click" data-track-label="finder cta ${item.name}">See full profile</a>
           </article>
         `).join("");
         if (window.GHA) window.GHA.track("market_finder_change", { goal: route, result_count: picks.length });

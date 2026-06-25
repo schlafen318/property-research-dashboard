@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Global Home Atlas favicon</title>
+  <rect width="64" height="64" rx="32" fill="#071f1d"/>
+  <g transform="translate(8 8)" fill="none" stroke="#a98a4b" stroke-width="2">
+    <circle cx="24" cy="24" r="19"/>
+    <circle cx="24" cy="24" r="11.5" opacity=".85"/>
+    <path d="M24 1v46M1 24h46M11 11l26 26M37 11 11 37"/>
+    <path d="M24 9 29 24 24 39 19 24Z" fill="#071f1d"/>
+  </g>
+  <circle cx="32" cy="32" r="3.2" fill="#a98a4b"/>
+</svg>

@@ -4,7 +4,9 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='32' fill='%2310241f'/%3E%3Cpath d='M17 37 32 18l15 19v11H36V36h-8v12H17Z' fill='%23fffdf8'/%3E%3C/svg%3E">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
+  <link rel="manifest" href="/assets/site.webmanifest">
   <title>Global Home Atlas Brand Mockups</title>
   <meta name="description" content="Three visual directions for the Global Home Atlas premium atlas, briefing, and destination dossier experience.">
   <link rel="canonical" href="https://globalhomeatlas.com/brand-mockups/">
@@ -482,6 +484,54 @@
       width: 100%;
       height: auto;
     }
+    .logo-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 14px;
+      margin-bottom: 24px;
+    }
+    .logo-card {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffdf7;
+      box-shadow: 0 18px 50px rgba(36, 49, 45, .08);
+    }
+    .logo-card__stage {
+      min-height: 168px;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      border: 1px solid rgba(36, 49, 45, .10);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 253, 247, .94), rgba(238, 244, 239, .72)),
+        radial-gradient(circle at 30% 24%, rgba(185, 206, 208, .28), transparent 42%);
+    }
+    .logo-card svg {
+      width: min(100%, 360px);
+      height: auto;
+      overflow: visible;
+    }
+    .logo-card span {
+      display: block;
+      margin-top: 14px;
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 850;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .logo-card h2 {
+      margin: 7px 0 6px;
+      font-size: 18px;
+    }
+    .logo-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
     .mockup-notes {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -512,6 +562,7 @@
       font-size: 14px;
     }
     @media (max-width: 760px) {
+      .logo-options { grid-template-columns: 1fr; }
       .mockup-notes { grid-template-columns: 1fr; }
     }
   </style>
@@ -564,6 +615,118 @@
   </header>
   <main class="mockup-stage">
     <div class="page-shell">
+      <section class="logo-options" aria-label="Global Home Atlas logo directions">
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoCompassTitle">
+              <title id="logoCompassTitle">Compass monogram logo concept</title>
+              <circle cx="54" cy="58" r="38" fill="none" stroke="#a98a4b" stroke-width="2"/>
+              <circle cx="54" cy="58" r="24" fill="none" stroke="#5f7f72" stroke-width="1.6" opacity=".75"/>
+              <path d="M54 20v76M16 58h76" stroke="#a98a4b" stroke-width="1.4"/>
+              <path d="M54 30 61 58 54 86 47 58Z" fill="#24312d"/>
+              <path d="M26 58 54 51 82 58 54 65Z" fill="#c7d3c2"/>
+              <circle cx="54" cy="58" r="4" fill="#a98a4b"/>
+              <text x="112" y="43" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="760" letter-spacing="2.2">GLOBAL</text>
+              <text x="112" y="65" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="17" font-weight="760" letter-spacing="2.2">HOME ATLAS</text>
+              <text x="112" y="86" fill="#a98a4b" font-family="Inter, Arial, sans-serif" font-size="8.5" font-weight="750" letter-spacing="1.35">INDEPENDENT RESEARCH FOR GLOBAL PROPERTY DECISIONS</text>
+            </svg>
+          </div>
+          <span>Style 01</span>
+          <h2>Compass Monogram</h2>
+          <p>Most classic and premium. Reads as navigation, judgment, and global orientation.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoMeridianTitle">
+              <title id="logoMeridianTitle">Meridian home logo concept</title>
+              <circle cx="55" cy="58" r="39" fill="#fffdf7" stroke="#24312d" stroke-width="1.8"/>
+              <path d="M25 58h60M55 20c-13 10-21 24-21 38s8 28 21 38M55 20c13 10 21 24 21 38s-8 28-21 38" fill="none" stroke="#5f7f72" stroke-width="1.6" opacity=".72"/>
+              <path d="M34 62 55 43l21 19v17H62V67H48v12H34Z" fill="#24312d"/>
+              <circle cx="55" cy="58" r="3" fill="#a98a4b"/>
+              <text x="114" y="48" fill="#24312d" font-family="Georgia, 'Times New Roman', serif" font-size="26" font-weight="700">Global Home Atlas</text>
+              <path d="M115 61h136" stroke="#a98a4b" stroke-width="1.4"/>
+              <text x="115" y="82" fill="#68776f" font-family="Inter, Arial, sans-serif" font-size="10" font-weight="650" letter-spacing="2">GLOBAL PROPERTY INTELLIGENCE</text>
+            </svg>
+          </div>
+          <span>Style 02</span>
+          <h2>Meridian Home</h2>
+          <p>Most literal. Balances home search with world-map intelligence and clear title.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoSealTitle">
+              <title id="logoSealTitle">Atlas seal logo concept</title>
+              <circle cx="58" cy="58" r="43" fill="#24312d"/>
+              <circle cx="58" cy="58" r="34" fill="none" stroke="#a98a4b" stroke-width="2"/>
+              <path d="M35 70c9-23 37-23 46 0" fill="none" stroke="#fffdf7" stroke-width="3" stroke-linecap="round"/>
+              <path d="M39 54c11-11 27-11 38 0" fill="none" stroke="#c7d3c2" stroke-width="3" stroke-linecap="round"/>
+              <path d="M58 35v47M41 58h34" stroke="#fffdf7" stroke-width="2" opacity=".78"/>
+              <text x="121" y="46" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="14" font-weight="750" letter-spacing="4">GLOBAL HOME</text>
+              <text x="121" y="80" fill="#24312d" font-family="Georgia, 'Times New Roman', serif" font-size="38" font-weight="700">Atlas</text>
+            </svg>
+          </div>
+          <span>Style 03</span>
+          <h2>Atlas Seal</h2>
+          <p>Most institutional. Works well for reports, methodology, and premium memos.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoLedgerTitle">
+              <title id="logoLedgerTitle">Dossier ledger logo concept</title>
+              <rect x="18" y="22" width="80" height="72" rx="8" fill="#fffdf7" stroke="#24312d" stroke-width="2"/>
+              <path d="M35 43h46M35 58h30M35 73h39" stroke="#5f7f72" stroke-width="3" stroke-linecap="round"/>
+              <path d="M74 36 86 28 82 43Z" fill="#a98a4b"/>
+              <circle cx="74" cy="36" r="4" fill="#24312d"/>
+              <path d="M121 34h120M121 82h120" stroke="#c7d3c2" stroke-width="2"/>
+              <text x="121" y="66" fill="#24312d" font-family="Georgia, 'Times New Roman', serif" font-size="31" font-weight="700">Global Home Atlas</text>
+              <text x="247" y="66" fill="#5f7f72" font-family="Inter, Arial, sans-serif" font-size="13" font-weight="650" letter-spacing="2"></text>
+            </svg>
+          </div>
+          <span>Style 04</span>
+          <h2>Dossier Ledger</h2>
+          <p>Most research-led. Emphasizes scorecards, diligence, and decision memos.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage" style="background:#071f1d;">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoDarkAtlasTitle">
+              <title id="logoDarkAtlasTitle">Dark cartographic atlas logo concept</title>
+              <g transform="translate(22 19)" fill="none" stroke="#a98a4b" stroke-width="1.7">
+                <circle cx="39" cy="39" r="31"/>
+                <circle cx="39" cy="39" r="19" opacity=".8"/>
+                <path d="M39 2v74M2 39h74M18 18l42 42M60 18 18 60"/>
+                <path d="M39 14 47 39 39 64 31 39Z" fill="#071f1d"/>
+              </g>
+              <circle cx="61" cy="58" r="4" fill="#a98a4b"/>
+              <text x="116" y="40" fill="#fffdf7" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" letter-spacing="2.4">GLOBAL</text>
+              <text x="116" y="62" fill="#fffdf7" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" letter-spacing="2.4">HOME ATLAS</text>
+              <text x="116" y="84" fill="#a98a4b" font-family="Inter, Arial, sans-serif" font-size="8.5" font-weight="750" letter-spacing="1.35">INDEPENDENT RESEARCH FOR GLOBAL PROPERTY DECISIONS</text>
+            </svg>
+          </div>
+          <span>Style 05</span>
+          <h2>Dark Cartographic</h2>
+          <p>Closest to the mockup: compact compass device, brass detail, and private-bank restraint.</p>
+        </article>
+        <article class="logo-card">
+          <div class="logo-card__stage">
+            <svg viewBox="0 0 360 116" role="img" aria-labelledby="logoLightCartographicTitle">
+              <title id="logoLightCartographicTitle">Light cartographic atlas logo concept</title>
+              <g transform="translate(22 19)" fill="none" stroke="#a98a4b" stroke-width="1.7">
+                <circle cx="39" cy="39" r="31"/>
+                <circle cx="39" cy="39" r="19" opacity=".85"/>
+                <path d="M39 2v74M2 39h74M18 18l42 42M60 18 18 60"/>
+                <path d="M39 14 47 39 39 64 31 39Z" fill="#fffdf7"/>
+              </g>
+              <circle cx="61" cy="58" r="4" fill="#a98a4b"/>
+              <text x="116" y="40" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" letter-spacing="2.4">GLOBAL</text>
+              <text x="116" y="62" fill="#24312d" font-family="Inter, Arial, sans-serif" font-size="16" font-weight="760" letter-spacing="2.4">HOME ATLAS</text>
+              <text x="116" y="84" fill="#806738" font-family="Inter, Arial, sans-serif" font-size="8.5" font-weight="750" letter-spacing="1.35">INDEPENDENT RESEARCH FOR GLOBAL PROPERTY DECISIONS</text>
+            </svg>
+          </div>
+          <span>Style 06</span>
+          <h2>Light Cartographic</h2>
+          <p>Same mark and hierarchy as the dark version, adapted for the current pale header.</p>
+        </article>
+      </section>
       <section class="mockup-frame" aria-label="Global Home Atlas design mockup board">
         <img src="/brand-mockups/global-home-atlas-mockups.png" alt="Three Global Home Atlas homepage design mockups: Atlas Intelligence, Private Briefing, and Destination Dossier">
       </section>

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Global Home Atlas social card</title>
+  <desc id="desc">Social preview card with atlas map styling, compass mark, wordmark, and independent research positioning.</desc>
+  <rect width="1200" height="630" fill="#071f1d"/>
+  <path d="M0 0h1200v630H0Z" fill="#071f1d"/>
+  <g opacity=".22" stroke="#a98a4b" stroke-width="1" fill="none">
+    <path d="M120 86h960M120 168h960M120 250h960M120 332h960M120 414h960M120 496h960"/>
+    <path d="M160 60v510M300 60v510M440 60v510M580 60v510M720 60v510M860 60v510M1000 60v510"/>
+    <path d="M170 445c155-150 321-222 500-216 154 5 278 68 372 188"/>
+    <path d="M219 198c131 84 257 116 379 96 123-20 238-92 345-216"/>
+  </g>
+  <g transform="translate(96 98)" fill="none" stroke="#a98a4b" stroke-width="4">
+    <circle cx="64" cy="64" r="50"/>
+    <circle cx="64" cy="64" r="31" opacity=".85"/>
+    <path d="M64 5v118M5 64h118M29 29l70 70M99 29 29 99"/>
+    <path d="M64 22 77 64 64 106 51 64Z" fill="#071f1d"/>
+  </g>
+  <circle cx="160" cy="162" r="8" fill="#a98a4b"/>
+  <text x="240" y="152" fill="#fffdf7" font-family="Inter, Arial, sans-serif" font-size="46" font-weight="760" letter-spacing="7">GLOBAL</text>
+  <text x="240" y="210" fill="#fffdf7" font-family="Inter, Arial, sans-serif" font-size="46" font-weight="760" letter-spacing="7">HOME ATLAS</text>
+  <text x="240" y="268" fill="#a98a4b" font-family="Inter, Arial, sans-serif" font-size="22" font-weight="750" letter-spacing="4">INDEPENDENT RESEARCH FOR GLOBAL PROPERTY DECISIONS</text>
+  <text x="96" y="478" fill="#fffdf7" font-family="Georgia, 'Times New Roman', serif" font-size="54">Compare where a next home can work.</text>
+  <text x="96" y="536" fill="#c7d3c2" font-family="Inter, Arial, sans-serif" font-size="24" font-weight="500">Ownership clarity · lifestyle fit · yield realism · exit liquidity</text>
+</svg>

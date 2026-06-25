@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-labelledby="title">
+  <title id="title">Global Home Atlas app icon</title>
+  <rect width="180" height="180" rx="42" fill="#071f1d"/>
+  <g transform="translate(30 30)" fill="none" stroke="#a98a4b" stroke-width="4">
+    <circle cx="60" cy="60" r="48"/>
+    <circle cx="60" cy="60" r="30" opacity=".85"/>
+    <path d="M60 3v114M3 60h114M27 27l66 66M93 27 27 93"/>
+    <path d="M60 22 72 60 60 98 48 60Z" fill="#071f1d"/>
+  </g>
+  <circle cx="90" cy="90" r="8" fill="#a98a4b"/>
+</svg>
