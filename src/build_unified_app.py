@@ -1344,6 +1344,15 @@ def build_landing_recommendations(destinations: list[dict]) -> str:
 
 
 def build_market_finder_data(destinations: list[dict]) -> str:
+    def bullets(value: str, *, split_and: bool = False) -> list[str]:
+        normalized = " ".join((value or "").replace(";", ",").split())
+        if not normalized:
+            return []
+        parts = [part.strip(" .") for part in normalized.split(",") if part.strip(" .")]
+        if split_and and len(parts) == 1 and " and " in parts[0]:
+            parts = [part.strip(" .") for part in parts[0].split(" and ") if part.strip(" .")]
+        return parts[:4]
+
     routes = {
         "retirement": [
             ("valencia", "Best city lifestyle and retirement practicality"),
@@ -1381,7 +1390,9 @@ def build_market_finder_data(destinations: list[dict]) -> str:
                     "score": f"{dest.get('decision_score', 0):.2f}",
                     "href": f"/destinations/{destination_slug(dest)}/",
                     "reason": reason,
+                    "reasonBullets": bullets(reason, split_and=True),
                     "watch": dest.get("red_flags") or "Verify legal, tax, rental, and resale assumptions locally.",
+                    "watchBullets": bullets(dest.get("red_flags") or "Verify legal, tax, rental, and resale assumptions locally."),
                 }
             )
     return json.dumps(payload, ensure_ascii=False)
@@ -2168,12 +2179,16 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
     .finder-panel .secondary-action {{ min-height: 44px; width: 100%; justify-content: center; border-color: rgba(95, 127, 114, .24); background: #f8faf6; font-size: 13px; }}
     .finder-note {{ margin: 2px 0 0; color: var(--muted); font-size: 13px; }}
     .finder-results {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
-    .finder-result {{ min-width: 0; display: grid; align-content: start; padding: 17px; border: 1px solid rgba(95, 127, 114, .22); border-radius: 8px; background: #fffdf7; box-shadow: 0 10px 26px rgba(36, 49, 45, .06); }}
+    .finder-result {{ min-width: 0; display: grid; align-content: start; padding: 16px; border: 1px solid rgba(95, 127, 114, .22); border-radius: 8px; background: #fffdf7; box-shadow: 0 10px 26px rgba(36, 49, 45, .06); }}
     .finder-result h3 {{ margin: 8px 0 4px; font-family: Georgia, "Times New Roman", serif; font-size: 19px; font-weight: 700; line-height: 1.12; }}
     .finder-result h3 a {{ color: var(--sage); text-decoration-thickness: 1px; text-underline-offset: 3px; }}
     .finder-result p {{ margin: 0 0 10px; color: var(--muted); font-size: 14px; }}
-    .finder-result dd {{ margin: 4px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.42; }}
-    .card-link {{ align-self: end; margin-top: 12px; font-weight: 700; text-decoration: none; }}
+    .finder-result dl {{ display: grid; gap: 11px; margin: 0; }}
+    .finder-result dd {{ margin: 5px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.38; }}
+    .finder-result ul {{ display: grid; gap: 3px; margin: 0; padding-left: 16px; }}
+    .finder-result li {{ padding-left: 1px; }}
+    .finder-result li::marker {{ color: var(--brass); }}
+    .card-link {{ align-self: end; margin-top: 10px; font-size: 13px; font-weight: 800; text-decoration: none; }}
     .inspired-band {{ display: grid; grid-template-columns: minmax(0, .62fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }}
     .inspired-visual {{
       min-height: 320px;
@@ -2491,6 +2506,19 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       const finderData = {build_market_finder_data(destinations)};
       const select = document.getElementById("finderGoal");
       const results = document.getElementById("finderResults");
+      function escapeHtml(value) {{
+        return String(value || "").replace(/[&<>"']/g, (char) => ({{
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }}[char]));
+      }}
+      function bulletList(items, fallback) {{
+        const bullets = (items && items.length ? items : [fallback]).filter(Boolean);
+        return `<ul>${{bullets.map((item) => `<li>${{escapeHtml(item)}}</li>`).join("")}}</ul>`;
+      }}
       function renderFinder() {{
         if (!select || !results) return;
         const route = select.value;
@@ -2498,13 +2526,13 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
         results.innerHTML = picks.map((item, index) => `
           <article class="finder-result">
             <span>#${{index + 1}} match</span>
-            <h3><a href="${{item.href}}" data-track="destination_click" data-track-label="finder ${{item.name}}">${{item.name}}</a></h3>
-            <p>${{item.country}} · score ${{item.score}}/5</p>
+            <h3><a href="${{escapeHtml(item.href)}}" data-track="destination_click" data-track-label="finder ${{escapeHtml(item.name)}}">${{escapeHtml(item.name)}}</a></h3>
+            <p>${{escapeHtml(item.country)}} - score ${{escapeHtml(item.score)}}/5</p>
             <dl>
-              <div><dt>Why this route</dt><dd>${{item.reason}}</dd></div>
-              <div><dt>Watch-out</dt><dd>${{item.watch}}</dd></div>
+              <div><dt>Why this route</dt><dd>${{bulletList(item.reasonBullets, item.reason)}}</dd></div>
+              <div><dt>Watch-out</dt><dd>${{bulletList(item.watchBullets, item.watch)}}</dd></div>
             </dl>
-            <a class="card-link" href="${{item.href}}" data-track="destination_click" data-track-label="finder cta ${{item.name}}">See full profile</a>
+            <a class="card-link" href="${{escapeHtml(item.href)}}" data-track="destination_click" data-track-label="finder cta ${{escapeHtml(item.name)}}">See full profile</a>
           </article>
         `).join("");
         if (window.GHA) window.GHA.track("market_finder_change", {{ goal: route, result_count: picks.length }});
@@ -5470,7 +5498,7 @@ def build() -> Path:
   <header class="hero" id="top">
     <nav class="topbar" aria-label="Primary">
       <div class="shell topbar__inner">
-        <div class="brand"><img class="brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></div>
+        <a class="brand" href="/" aria-label="Global Home Atlas home"><img class="brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="top-links">
           <a href="#shortlist">Shortlist</a>
           <a href="#compare">Compare</a>

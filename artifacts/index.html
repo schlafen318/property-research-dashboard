@@ -125,12 +125,16 @@
     .finder-panel .secondary-action { min-height: 44px; width: 100%; justify-content: center; border-color: rgba(95, 127, 114, .24); background: #f8faf6; font-size: 13px; }
     .finder-note { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
     .finder-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .finder-result { min-width: 0; display: grid; align-content: start; padding: 17px; border: 1px solid rgba(95, 127, 114, .22); border-radius: 8px; background: #fffdf7; box-shadow: 0 10px 26px rgba(36, 49, 45, .06); }
+    .finder-result { min-width: 0; display: grid; align-content: start; padding: 16px; border: 1px solid rgba(95, 127, 114, .22); border-radius: 8px; background: #fffdf7; box-shadow: 0 10px 26px rgba(36, 49, 45, .06); }
     .finder-result h3 { margin: 8px 0 4px; font-family: Georgia, "Times New Roman", serif; font-size: 19px; font-weight: 700; line-height: 1.12; }
     .finder-result h3 a { color: var(--sage); text-decoration-thickness: 1px; text-underline-offset: 3px; }
     .finder-result p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
-    .finder-result dd { margin: 4px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.42; }
-    .card-link { align-self: end; margin-top: 12px; font-weight: 700; text-decoration: none; }
+    .finder-result dl { display: grid; gap: 11px; margin: 0; }
+    .finder-result dd { margin: 5px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.38; }
+    .finder-result ul { display: grid; gap: 3px; margin: 0; padding-left: 16px; }
+    .finder-result li { padding-left: 1px; }
+    .finder-result li::marker { color: var(--brass); }
+    .card-link { align-self: end; margin-top: 10px; font-size: 13px; font-weight: 800; text-decoration: none; }
     .inspired-band { display: grid; grid-template-columns: minmax(0, .62fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
     .inspired-visual {
       min-height: 320px;
@@ -713,6 +717,28 @@
       const finderData = {"retirement": [{"name": "Valencia", "country": "Spain", "score": "4.09", "href": "/destinations/valencia/", "reason": "Best city lifestyle and retirement practicality", "watch": "Housing-policy pressure, licence restrictions, rising prices, less trophy-scenery than island/lake markets."}, {"name": "Algarve / Cascais", "country": "Portugal", "score": "4.06", "href": "/destinations/algarve-cascais/", "reason": "Most familiar retirement-optional corridor", "watch": "AL licence/local restrictions, rising prices, water/heat risk, lower Asia proximity."}, {"name": "Madeira", "country": "Portugal", "score": "3.91", "href": "/destinations/madeira/", "reason": "Good climate and relative value for European lifestyle", "watch": "Island liquidity/airlift risk, AL/local restrictions, limited medical depth vs mainland, landslide/flood terrain risk."}], "second-home": [{"name": "Algarve / Cascais", "country": "Portugal", "score": "4.06", "href": "/destinations/algarve-cascais/", "reason": "Easy second-home use with mature services", "watch": "AL licence/local restrictions, rising prices, water/heat risk, lower Asia proximity."}, {"name": "Lake Como", "country": "Italy", "score": "3.96", "href": "/destinations/lake-como/", "reason": "Premium emotional pull and scarcity", "watch": "Lower yield, prime lakefront scarcity/price, older buildings, limited winter demand in some villages."}, {"name": "Mallorca", "country": "Spain", "score": "3.77", "href": "/destinations/mallorca/", "reason": "Classic second-home demand with liquidity caveats", "watch": "Tourist rental licence scarcity, anti-tourism politics, summer crowding, heat/water risk."}], "investment": [{"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.27", "href": "/destinations/fukuoka-itoshima/", "reason": "High probability market with clean ownership", "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas."}, {"name": "Valencia", "country": "Spain", "score": "4.09", "href": "/destinations/valencia/", "reason": "Balanced demand and practical entry point", "watch": "Housing-policy pressure, licence restrictions, rising prices, less trophy-scenery than island/lake markets."}, {"name": "Málaga / Costa del Sol", "country": "Spain", "score": "4.03", "href": "/destinations/malaga-costa-del-sol/", "reason": "Deep tourism demand with regulation risk to underwrite", "watch": "Rapid price inflation, anti-tourism politics, summer heat/water, lower scarcity outside prime zones."}], "ownership": [{"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.27", "href": "/destinations/fukuoka-itoshima/", "reason": "Clean title path and high foreigner fit", "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas."}, {"name": "Valencia", "country": "Spain", "score": "4.09", "href": "/destinations/valencia/", "reason": "EU freehold structure with city-region liquidity", "watch": "Housing-policy pressure, licence restrictions, rising prices, less trophy-scenery than island/lake markets."}, {"name": "Algarve / Cascais", "country": "Portugal", "score": "4.06", "href": "/destinations/algarve-cascais/", "reason": "Well-understood foreign-buyer process", "watch": "AL licence/local restrictions, rising prices, water/heat risk, lower Asia proximity."}]};
       const select = document.getElementById("finderGoal");
       const results = document.getElementById("finderResults");
+      function escapeHtml(value) {
+        return String(value || "").replace(/[&<>"']/g, (char) => ({
+          "&": "&amp;",
+          "<": "&lt;",
+          ">": "&gt;",
+          '"': "&quot;",
+          "'": "&#39;"
+        }[char]));
+      }
+      function splitBullets(value, splitAnd = false) {
+        const normalized = String(value || "").replace(/;/g, ",").replace(/\s+/g, " ").trim();
+        if (!normalized) return [];
+        let bullets = normalized.split(",").map((item) => item.replace(/[. ]+$/g, "").trim()).filter(Boolean);
+        if (splitAnd && bullets.length === 1 && bullets[0].includes(" and ")) {
+          bullets = bullets[0].split(" and ").map((item) => item.replace(/[. ]+$/g, "").trim()).filter(Boolean);
+        }
+        return bullets.slice(0, 4);
+      }
+      function bulletList(items, fallback, splitAnd = false) {
+        const bullets = (items && items.length ? items : splitBullets(fallback, splitAnd)).filter(Boolean);
+        return `<ul>${bullets.map((item) => `<li>${escapeHtml(item)}</li>`).join("")}</ul>`;
+      }
       function renderFinder() {
         if (!select || !results) return;
         const route = select.value;
@@ -720,13 +746,13 @@
         results.innerHTML = picks.map((item, index) => `
           <article class="finder-result">
             <span>#${index + 1} match</span>
-            <h3><a href="${item.href}" data-track="destination_click" data-track-label="finder ${item.name}">${item.name}</a></h3>
-            <p>${item.country} · score ${item.score}/5</p>
+            <h3><a href="${escapeHtml(item.href)}" data-track="destination_click" data-track-label="finder ${escapeHtml(item.name)}">${escapeHtml(item.name)}</a></h3>
+            <p>${escapeHtml(item.country)} - score ${escapeHtml(item.score)}/5</p>
             <dl>
-              <div><dt>Why this route</dt><dd>${item.reason}</dd></div>
-              <div><dt>Watch-out</dt><dd>${item.watch}</dd></div>
+              <div><dt>Why this route</dt><dd>${bulletList(item.reasonBullets, item.reason, true)}</dd></div>
+              <div><dt>Watch-out</dt><dd>${bulletList(item.watchBullets, item.watch)}</dd></div>
             </dl>
-            <a class="card-link" href="${item.href}" data-track="destination_click" data-track-label="finder cta ${item.name}">See full profile</a>
+            <a class="card-link" href="${escapeHtml(item.href)}" data-track="destination_click" data-track-label="finder cta ${escapeHtml(item.name)}">See full profile</a>
           </article>
         `).join("");
         if (window.GHA) window.GHA.track("market_finder_change", { goal: route, result_count: picks.length });
