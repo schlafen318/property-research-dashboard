@@ -16,10 +16,20 @@ EXPECTED_EVENTS = {
     "compare_selection",
     "memo_shortlist_add",
     "memo_shortlist_remove",
+    "memo_shortlist_clear",
     "memo_export",
+    "memo_preview_export",
+    "private_brief_preview_render",
+    "shortlist_share_link",
     "data_export_json",
     "data_export_csv",
     "outbound_listing_click",
+    "shortlist_review_click",
+    "report_teaser_click",
+    "report_library_cta",
+    "country_report_cta",
+    "paid_memo_cta",
+    "saved_shortlist_intake_prefill",
     "custom_shortlist_submit",
 }
 
@@ -127,7 +137,10 @@ def main() -> int:
     homepage = (ARTIFACTS / "index.html").read_text(encoding="utf-8")
     dashboard = (ARTIFACTS / "dashboard" / "index.html").read_text(encoding="utf-8")
     contact = (ARTIFACTS / "contact" / "index.html").read_text(encoding="utf-8")
-    tracked_surfaces = homepage + dashboard + contact
+    shortlist_review = (ARTIFACTS / "shortlist-review" / "index.html").read_text(encoding="utf-8")
+    reports = (ARTIFACTS / "reports" / "index.html").read_text(encoding="utf-8")
+    country_hub = (ARTIFACTS / "countries" / "spain-property" / "index.html").read_text(encoding="utf-8")
+    tracked_surfaces = homepage + dashboard + contact + shortlist_review + reports + country_hub
     missing_events = sorted(event for event in EXPECTED_EVENTS if event not in tracked_surfaces)
     for event in missing_events:
         failures.append(("events", f"missing {event}"))

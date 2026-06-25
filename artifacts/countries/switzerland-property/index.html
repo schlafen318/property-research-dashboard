@@ -114,6 +114,7 @@
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
+    .page-card .page-button { margin-top: 12px; }
     .report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .report-card {
       min-width: 0;
@@ -129,6 +130,11 @@
     .report-card p { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
     .report-card strong { color: var(--ink); font-size: 13px; line-height: 1.45; }
     .report-card a { font-weight: 900; }
+    .offer-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .offer-comparison article { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .offer-comparison span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .offer-comparison h3 { margin: 8px 0 10px; }
+    .offer-comparison ul { margin: 0; padding-left: 18px; color: #3f4d48; }
     .sticky-jump {
       position: sticky;
       top: 0;
@@ -323,7 +329,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -342,7 +348,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -470,6 +476,7 @@
           <a href="/guides/">Guides</a>
           <a href="/#destination-index">Destinations</a>
           <a href="/countries/spain-property/">Countries</a>
+          <a href="/reports/">Reports</a>
           <a href="/methodology/">Methodology</a>
           <a href="/shortlist-review/">Shortlist Review</a>
           <a href="/contact/">Contact</a>
@@ -482,6 +489,7 @@
             <a href="/countries/spain-property/">Countries</a>
             <a href="/#destination-index">Destinations</a>
             <a href="/guides/">Guides</a>
+            <a href="/reports/">Reports</a>
             <a href="/methodology/">Methodology</a>
             <a href="/shortlist-review/">Shortlist Review</a>
             <a href="/contact/">Contact</a>
@@ -511,7 +519,7 @@
         <div><span>Decision model</span><strong>10 dimensions</strong></div>
         <div><span>Updated</span><strong>2026-06-25</strong></div>
       </section>
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#country-thesis">Thesis</a><a href="#buyer-fit">Buyer Fit</a><a href="#destination-comparison">Compare</a><a href="#risk-posture">Risk</a><a href="#related-guides">Guides</a></nav>
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#country-thesis">Thesis</a><a href="#buyer-fit">Buyer Fit</a><a href="#premium-brief">Brief</a><a href="#destination-comparison">Compare</a><a href="#risk-posture">Risk</a><a href="#related-guides">Guides</a></nav>
 
       <nav class="mobile-action-strip" aria-label="Priority actions">
         <a href="#destination-comparison">Compare</a>
@@ -555,6 +563,23 @@
               <article><span>Best for</span><strong>Lifestyle-led capital</strong><p>Buyers who value repeated owner use, healthcare and access, jurisdictional clarity, and a defensible resale path.</p></article>
               <article><span>Watch-outs</span><strong>Micro-market discipline</strong><p>Do not underwrite the country average. Local rules, asset condition, manager quality, and seasonality decide the actual result.</p></article>
               <article><span>Ownership clarity</span><strong>Verify locally</strong><p>Confirm title path, foreign-buyer restrictions, transfer taxes, rental licensing, inheritance treatment, and exit process before offers.</p></article>
+            </div>
+          </details>
+          <details class="page-section" id="premium-brief" open>
+            <summary><h2>Recommended Premium Brief</h2></summary>
+            <div class="page-grid">
+              <article class="page-card">
+                <span>Best fit for Switzerland</span>
+                <h3>Investment Risk Review</h3>
+                <p>Useful when ownership structure, permits, taxes, financing, liquidity, and income assumptions need a risk-first screen.</p>
+                <a class="page-button" href="/reports/" data-track="country_report_cta" data-track-label="Switzerland Investment Risk Review">View report options</a>
+              </article>
+              <article class="page-card">
+                <span>Next step</span>
+                <h3>Build a shortlist first</h3>
+                <p>Save one or two Switzerland destinations in the dashboard, export the preview, then request a buyer-specific review.</p>
+                <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="Switzerland report prep">Open dashboard</a>
+              </article>
             </div>
           </details>
           <details class="page-section" id="destination-comparison" open>
@@ -688,6 +713,12 @@
             <p>Compare these markets against the full destination model and export a shortlist memo.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="Switzerland country hub">Open dashboard</a>
             <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="Switzerland country hub">Review my shortlist</a>
+          </section>
+          <section class="page-aside-card">
+            <h3>Recommended Brief</h3>
+            <p><strong>Investment Risk Review</strong></p>
+            <p>Useful when ownership structure, permits, taxes, financing, liquidity, and income assumptions need a risk-first screen.</p>
+            <a class="page-button" href="/reports/" data-track="country_report_cta" data-track-label="Switzerland aside Investment Risk Review">View reports</a>
           </section>
           <section class="page-aside-card">
             <h3>Other Country Hubs</h3>

@@ -33,6 +33,12 @@ SHORTLIST_REVIEW_DESCRIPTION = (
     "Request a Global Home Atlas shortlist review before speaking to agents, with a "
     "research-led route across buyer intent, budget, citizenship, risk, and holding period."
 )
+REPORT_LIBRARY_SLUG = "reports"
+REPORT_LIBRARY_TITLE = "Premium Property Research Reports | Global Home Atlas"
+REPORT_LIBRARY_DESCRIPTION = (
+    "Browse premium Global Home Atlas research brief formats for retirement markets, "
+    "second-home shortlists, overseas property risk, and polished buyer memos."
+)
 COUNTRY_HUBS = [
     {
         "slug": "spain-property",
@@ -1057,6 +1063,7 @@ def primary_nav_html(css_prefix: str = "page", include_seo_status: bool = False)
           <a href="/guides/">Guides</a>
           <a href="/#destination-index">Destinations</a>
           <a href="/countries/spain-property/">Countries</a>
+          <a href="/reports/">Reports</a>
           <a href="/methodology/">Methodology</a>
           <a href="/shortlist-review/">Shortlist Review</a>
           <a href="/contact/">Contact</a>
@@ -1069,6 +1076,7 @@ def primary_nav_html(css_prefix: str = "page", include_seo_status: bool = False)
             <a href="/countries/spain-property/">Countries</a>
             <a href="/#destination-index">Destinations</a>
             <a href="/guides/">Guides</a>
+            <a href="/reports/">Reports</a>
             <a href="/methodology/">Methodology</a>
             <a href="/shortlist-review/">Shortlist Review</a>
             <a href="/contact/">Contact</a>
@@ -1406,40 +1414,63 @@ def destination_executive_summary_cards(dest: dict) -> str:
     )
 
 
-def build_premium_report_teasers() -> str:
-    reports = [
-        (
-            "Polished Buyer Memo",
-            "A paid version of the dashboard preview with personalized fit ranking, markets to avoid, ownership-path notes, transaction-risk priorities, and adviser questions.",
-            "Best after you have compared 2-4 plausible markets and need a decision-ready brief.",
-        ),
-        (
-            "Retirement Market Brief",
-            "A buyer-specific screen for lifestyle durability, healthcare practicality, ownership clarity, tax flags, and future exit options.",
-            "Best for retirement-optional families choosing between Europe and Asia.",
-        ),
-        (
-            "Second-Home Shortlist Memo",
-            "A structured comparison of personal-use appeal, rental offset realism, seasonality, access, and local operating friction.",
-            "Best before viewings, agent mandates, and property-specific legal work.",
-        ),
-        (
-            "Investment Risk Review",
-            "A risk-first memo that separates yield claims from permits, taxes, financing, liquidity, and asset-management assumptions.",
-            "Best for buyers who want income support without ignoring downside.",
-        ),
+def premium_report_catalog() -> list[dict]:
+    return [
+        {
+            "title": "Polished Buyer Memo",
+            "copy": "A paid version of the dashboard preview with personalized fit ranking, markets to avoid, ownership-path notes, transaction-risk priorities, and adviser questions.",
+            "best_for": "Best after you have compared 2-4 plausible markets and need a decision-ready brief.",
+            "deliverables": ["Fit-ranked shortlist", "Avoid-list logic", "Ownership path notes", "Adviser question set"],
+        },
+        {
+            "title": "Retirement Market Brief",
+            "copy": "A buyer-specific screen for lifestyle durability, healthcare practicality, ownership clarity, tax flags, and future exit options.",
+            "best_for": "Best for retirement-optional families choosing between Europe and Asia.",
+            "deliverables": ["Retirement fit screen", "Healthcare and access flags", "Tax and ownership caveats", "Resale-depth priorities"],
+        },
+        {
+            "title": "Second-Home Shortlist Memo",
+            "copy": "A structured comparison of personal-use appeal, rental offset realism, seasonality, access, and local operating friction.",
+            "best_for": "Best before viewings, agent mandates, and property-specific legal work.",
+            "deliverables": ["Use-case ranking", "Rental offset reality check", "Seasonality risks", "Operating-friction checklist"],
+        },
+        {
+            "title": "Investment Risk Review",
+            "copy": "A risk-first memo that separates yield claims from permits, taxes, financing, liquidity, and asset-management assumptions.",
+            "best_for": "Best for buyers who want income support without ignoring downside.",
+            "deliverables": ["Yield claim stress test", "Permit and tax risks", "Liquidity screen", "Manager and financing questions"],
+        },
     ]
+
+
+def build_premium_report_teasers() -> str:
+    reports = premium_report_catalog()
     return "\n".join(
         f"""
         <article class="report-card">
           <span>Premium brief</span>
-          <h3>{escape(title)}</h3>
-          <p>{escape(copy)}</p>
-          <strong>{escape(best_for)}</strong>
-          <a href="/shortlist-review/" data-track="report_teaser_click" data-track-label="{escape(title)}">Discuss this brief</a>
+          <h3>{escape(report["title"])}</h3>
+          <p>{escape(report["copy"])}</p>
+          <strong>{escape(report["best_for"])}</strong>
+          <a href="/shortlist-review/" data-track="report_teaser_click" data-track-label="{escape(report["title"])}">Discuss this brief</a>
         </article>
         """.rstrip()
-        for title, copy, best_for in reports
+        for report in reports
+    )
+
+
+def build_report_library_cards() -> str:
+    return "\n".join(
+        f"""
+        <article class="page-card">
+          <span>Premium brief</span>
+          <h3>{escape(report["title"])}</h3>
+          <p>{escape(report["copy"])}</p>
+          <ul>{"".join(f"<li>{escape(item)}</li>" for item in report["deliverables"])}</ul>
+          <a class="page-button" href="/shortlist-review/" data-track="report_library_cta" data-track-label="{escape(report["title"])}">Discuss this report</a>
+        </article>
+        """.rstrip()
+        for report in premium_report_catalog()
     )
 
 
@@ -1456,6 +1487,24 @@ def country_summary_metrics(hub: dict, destinations: list[dict]) -> dict:
         "liquidity": sum(metric_value(dest, "exit_liquidity") for dest in selected) / len(selected),
         "top": selected[0]["name"],
     }
+
+
+def country_report_recommendation(hub: dict) -> tuple[str, str]:
+    slug = hub["slug"]
+    if slug in {"portugal-property", "spain-property", "greece-property", "japan-property"}:
+        return (
+            "Retirement Market Brief",
+            "Useful when healthcare, long-stay practicality, tax flags, and future resale matter more than headline yield.",
+        )
+    if slug in {"thailand-property", "switzerland-property"}:
+        return (
+            "Investment Risk Review",
+            "Useful when ownership structure, permits, taxes, financing, liquidity, and income assumptions need a risk-first screen.",
+        )
+    return (
+        "Second-Home Shortlist Memo",
+        "Useful when the buyer needs to balance personal use, rental offset, seasonality, access, and operating friction.",
+    )
 
 
 def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -> str:
@@ -1579,6 +1628,137 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
   </footer>
   {mobile_disclosure_script()}
   {analytics_event_script()}
+</body>
+</html>
+"""
+
+
+def build_report_library_page(destinations: list[dict], pages: list[dict]) -> str:
+    canonical = page_url(REPORT_LIBRARY_SLUG)
+    schema = [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": "Premium Property Research Reports",
+            "url": canonical,
+            "description": REPORT_LIBRARY_DESCRIPTION,
+            "dateModified": date.today().isoformat(),
+            "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Reports", "item": canonical},
+            ],
+        },
+    ]
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(REPORT_LIBRARY_TITLE, REPORT_LIBRARY_DESCRIPTION, canonical, schema)}
+  <style>{shared_content_css()}</style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      {primary_nav_html()}
+      <div class="page-hero-grid">
+        <div>
+          <p class="page-eyebrow">Premium brief library · updated {date.today().isoformat()}</p>
+          <h1>Premium Property Research Reports</h1>
+          <p class="page-lede">Use the public Atlas to compare markets. Use a premium brief when the decision needs buyer-specific ranking, exclusions, risk sequencing, and adviser questions.</p>
+        </div>
+        <aside class="page-hero-card">
+          <span>Report formats</span><strong>{len(premium_report_catalog())}</strong>
+          <span>Destinations covered</span><strong>{len(destinations)}</strong>
+          <span>Best timing</span><strong>Before agents</strong>
+        </aside>
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="page-shell">
+      <section class="page-stats" aria-label="Report library summary">
+        <div><span>Free tools</span><strong>Compare and export</strong></div>
+        <div><span>Paid layer</span><strong>Decision memo</strong></div>
+        <div><span>Use before</span><strong>Viewings</strong></div>
+        <div><span>Advice status</span><strong>Research only</strong></div>
+      </section>
+      {sticky_page_nav([("Reports", "reports"), ("Free vs Paid", "free-paid"), ("Process", "process"), ("Start", "start")])}
+      {trust_brief_html()}
+      <div class="page-layout">
+        <article class="page-article">
+          <section class="page-section" id="reports">
+            <h2>Report Formats</h2>
+            <p>Each report format starts from the same Atlas framework, then narrows the analysis around the buyer's actual intent, citizenship or residency context, budget, risk tolerance, and holding period.</p>
+            <div class="page-grid">{build_report_library_cards()}</div>
+          </section>
+          <section class="page-section" id="free-paid">
+            <h2>Free Preview vs Paid Memo</h2>
+            <div class="offer-comparison">
+              <article>
+                <span>Free Atlas</span>
+                <h3>Useful for first-pass comparison</h3>
+                <ul>
+                  <li>Destination and country research pages.</li>
+                  <li>Saved shortlist and exportable preview.</li>
+                  <li>Public scoring methodology and trust layer.</li>
+                </ul>
+              </article>
+              <article>
+                <span>Paid brief</span>
+                <h3>Useful for a real decision</h3>
+                <ul>
+                  <li>Buyer-specific shortlist ranking and exclusions.</li>
+                  <li>Risk order for legal, tax, immigration, financing, and property review.</li>
+                  <li>Next diligence questions for local specialists.</li>
+                </ul>
+              </article>
+            </div>
+          </section>
+          <section class="page-section" id="process">
+            <h2>How to Prepare</h2>
+            <ul>
+              <li>Open the dashboard and save 2-4 destinations that genuinely fit your budget and lifestyle plan.</li>
+              <li>Export the free shortlist preview and check whether the tradeoffs still make sense.</li>
+              <li>Use the shortlist review intake to share citizenship, residency, rental expectations, timing, and adviser needs.</li>
+            </ul>
+          </section>
+          <section class="page-section" id="start">
+            <h2>Start With a Shortlist Review</h2>
+            <p>The first step is not payment. It is a fit and scope check so the report work is matched to the decision you need to make.</p>
+            <a class="page-button" href="/shortlist-review/" data-track="report_library_cta" data-track-label="report library start">Start shortlist review</a>
+          </section>
+        </article>
+        <aside class="page-aside">
+          <section class="page-aside-card">
+            <h2>Build the Source List</h2>
+            <p>Use the dashboard to save markets before requesting a paid brief.</p>
+            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="report library">Open dashboard</a>
+          </section>
+          <section class="page-aside-card">
+            <h3>Useful Guides</h3>
+            <nav>{seo_guide_links(pages, limit=6)}</nav>
+          </section>
+          <section class="page-aside-card">
+            <h3>Trust Layer</h3>
+            <nav>{trust_page_links()}</nav>
+          </section>
+        </aside>
+      </div>
+    </div>
+  </main>
+  <footer class="page-footer">
+    <div class="page-shell">
+      <strong>{SITE_NAME}</strong>
+      <p>Premium reports are research briefs, not financial, legal, tax, immigration, or transaction advice.</p>
+      <nav><a href="/shortlist-review/">Shortlist review</a> <a href="/dashboard/">Research dashboard</a> {trust_page_links()}</nav>
+    </div>
+  </footer>
+{analytics_event_script()}
 </body>
 </html>
 """
@@ -2731,6 +2911,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
     best = selected[0] if selected else destinations[0]
     guide_links = country_guide_links(hub, pages)
     peer_country_links = country_hub_links(hub["slug"], limit=6)
+    report_title, report_reason = country_report_recommendation(hub)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -2764,7 +2945,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
         <div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div>
         <div><span>Updated</span><strong>{updated}</strong></div>
       </section>
-      {sticky_page_nav([("Thesis", "country-thesis"), ("Buyer Fit", "buyer-fit"), ("Compare", "destination-comparison"), ("Risk", "risk-posture"), ("Guides", "related-guides")])}
+      {sticky_page_nav([("Thesis", "country-thesis"), ("Buyer Fit", "buyer-fit"), ("Brief", "premium-brief"), ("Compare", "destination-comparison"), ("Risk", "risk-posture"), ("Guides", "related-guides")])}
       {mobile_action_strip("#destination-comparison", "Compare", "/shortlist-review/", "Brief")}
       <section class="brief-panel" aria-label="Country briefing">
         <article><span>Top destination match</span><strong>{escape(best["name"])}</strong><p>{escape(best.get("panel_verdict") or "")}</p></article>
@@ -2785,6 +2966,23 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
               <article><span>Best for</span><strong>Lifestyle-led capital</strong><p>Buyers who value repeated owner use, healthcare and access, jurisdictional clarity, and a defensible resale path.</p></article>
               <article><span>Watch-outs</span><strong>Micro-market discipline</strong><p>Do not underwrite the country average. Local rules, asset condition, manager quality, and seasonality decide the actual result.</p></article>
               <article><span>Ownership clarity</span><strong>Verify locally</strong><p>Confirm title path, foreign-buyer restrictions, transfer taxes, rental licensing, inheritance treatment, and exit process before offers.</p></article>
+            </div>
+          </details>
+          <details class="page-section" id="premium-brief" open>
+            <summary><h2>Recommended Premium Brief</h2></summary>
+            <div class="page-grid">
+              <article class="page-card">
+                <span>Best fit for {escape(hub["country"])}</span>
+                <h3>{escape(report_title)}</h3>
+                <p>{escape(report_reason)}</p>
+                <a class="page-button" href="/reports/" data-track="country_report_cta" data-track-label="{escape(hub["country"])} {escape(report_title)}">View report options</a>
+              </article>
+              <article class="page-card">
+                <span>Next step</span>
+                <h3>Build a shortlist first</h3>
+                <p>Save one or two {escape(hub["country"])} destinations in the dashboard, export the preview, then request a buyer-specific review.</p>
+                <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(hub["country"])} report prep">Open dashboard</a>
+              </article>
             </div>
           </details>
           <details class="page-section" id="destination-comparison" open>
@@ -2815,6 +3013,12 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
             <p>Compare these markets against the full destination model and export a shortlist memo.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(hub["country"])} country hub">Open dashboard</a>
             <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(hub["country"])} country hub">Review my shortlist</a>
+          </section>
+          <section class="page-aside-card">
+            <h3>Recommended Brief</h3>
+            <p><strong>{escape(report_title)}</strong></p>
+            <p>{escape(report_reason)}</p>
+            <a class="page-button" href="/reports/" data-track="country_report_cta" data-track-label="{escape(hub["country"])} aside {escape(report_title)}">View reports</a>
           </section>
           <section class="page-aside-card">
             <h3>Other Country Hubs</h3>
@@ -3183,6 +3387,7 @@ def shared_content_css() -> str:
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
+    .page-card .page-button { margin-top: 12px; }
     .report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .report-card {
       min-width: 0;
@@ -3198,6 +3403,11 @@ def shared_content_css() -> str:
     .report-card p { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
     .report-card strong { color: var(--ink); font-size: 13px; line-height: 1.45; }
     .report-card a { font-weight: 900; }
+    .offer-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .offer-comparison article { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .offer-comparison span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .offer-comparison h3 { margin: 8px 0 10px; }
+    .offer-comparison ul { margin: 0; padding-left: 18px; color: #3f4d48; }
     .sticky-jump {
       position: sticky;
       top: 0;
@@ -3392,7 +3602,7 @@ def shared_content_css() -> str:
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -3411,7 +3621,7 @@ def shared_content_css() -> str:
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -5143,6 +5353,7 @@ def build() -> Path:
             <p id="savedShortlistStatus">No saved destinations yet.</p>
             <div class="saved-shortlist__actions">
               <button type="button" id="clearMemoShortlist">Clear saved list</button>
+              <button type="button" id="copyShortlistLink">Copy share link</button>
               <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="saved shortlist">Review my shortlist</a>
             </div>
           </div>
@@ -5276,12 +5487,17 @@ def build() -> Path:
     const savedShortlistStatus = document.getElementById("savedShortlistStatus");
     const savedBriefOutput = document.getElementById("savedBriefOutput");
     const clearMemoShortlist = document.getElementById("clearMemoShortlist");
+    const copyShortlistLink = document.getElementById("copyShortlistLink");
     const compareSelected = new Set();
     const memoKey = "gha_memo_shortlist";
     let quickView = "all";
+    let savedBriefTracked = false;
 
     const destinationsById = new Map(data.destinations.map((destination) => [destination.id, destination]));
     function loadSavedMemoIds() {
+      const params = new URLSearchParams(window.location.search);
+      const shared = (params.get("shortlist") || "").split(",").map((id) => id.trim()).filter((id) => destinationsById.has(id));
+      if (shared.length) return shared;
       try {
         const raw = JSON.parse(localStorage.getItem(memoKey) || "[]");
         return Array.isArray(raw) ? raw.filter((id) => destinationsById.has(id)) : [];
@@ -5294,6 +5510,7 @@ def build() -> Path:
     data.destinations.forEach((destination) => {
       destination.custom_score = destination.decision_score;
     });
+    if (new URLSearchParams(window.location.search).get("shortlist")) saveMemoShortlist();
 
     function saveMemoShortlist() {
       try {
@@ -5327,6 +5544,10 @@ def build() -> Path:
           <p>${escapeHtml(destination.red_flags || "Verify title, tax, permits, liquidity, and local adviser requirements before committing capital.")}</p>
         </article>
       `).join("") + '</div>';
+      if (!savedBriefTracked && window.GHA) {
+        savedBriefTracked = true;
+        window.GHA.track("private_brief_preview_render", { selected_count: selected.length });
+      }
     }
 
     function updateMemoButtons() {
@@ -5490,6 +5711,28 @@ def build() -> Path:
         if (window.GHA) window.GHA.track("memo_shortlist_clear", { selected_count: 0 });
       });
     }
+    if (copyShortlistLink) {
+      copyShortlistLink.addEventListener("click", () => {
+        const ids = [...memoShortlist];
+        if (!ids.length) {
+          copyShortlistLink.textContent = "Save destinations first";
+          setTimeout(() => { copyShortlistLink.textContent = "Copy share link"; }, 1800);
+          return;
+        }
+        const url = `${location.origin}${location.pathname}?shortlist=${encodeURIComponent(ids.join(","))}#destinations`;
+        const done = () => {
+          copyShortlistLink.textContent = "Link copied";
+          setTimeout(() => { copyShortlistLink.textContent = "Copy share link"; }, 1800);
+          if (window.GHA) window.GHA.track("shortlist_share_link", { selected_count: ids.length });
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(done).catch(() => downloadFile("global-home-atlas-shortlist-link.txt", "text/plain", url));
+        } else {
+          downloadFile("global-home-atlas-shortlist-link.txt", "text/plain", url);
+          done();
+        }
+      });
+    }
     document.getElementById("clearCompare").addEventListener("click", () => {
       compareSelected.clear();
       document.querySelectorAll(".compare-toggle").forEach((checkbox) => {
@@ -5608,7 +5851,10 @@ def build() -> Path:
     }
 
     document.getElementById("exportMemo").addEventListener("click", () => {
-      if (window.GHA) window.GHA.track("memo_preview_export", { selected_count: memoDestinations().length });
+      if (window.GHA) {
+        window.GHA.track("memo_export", { selected_count: memoDestinations().length });
+        window.GHA.track("memo_preview_export", { selected_count: memoDestinations().length });
+      }
       downloadFile("atlas-shortlist-preview.html", "text/html", buildMemoHtml());
     });
 
@@ -5676,6 +5922,12 @@ def build() -> Path:
         clean_generated_html(build_shortlist_review_page(destinations, SEO_PAGES)),
         encoding="utf-8",
     )
+    report_library_dir = ARTIFACTS / REPORT_LIBRARY_SLUG
+    report_library_dir.mkdir(parents=True, exist_ok=True)
+    (report_library_dir / "index.html").write_text(
+        clean_generated_html(build_report_library_page(destinations, SEO_PAGES)),
+        encoding="utf-8",
+    )
     for page in SEO_PAGES:
         page_dir = ARTIFACTS / page["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
@@ -5728,6 +5980,7 @@ Sitemap: {SITE_URL}sitemap.xml
         (SITE_URL, "1.0"),
         (page_url("dashboard"), "0.92"),
         (page_url(SHORTLIST_REVIEW_SLUG), "0.90"),
+        (page_url(REPORT_LIBRARY_SLUG), "0.88"),
         (page_url("country-comparison"), "0.88"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],

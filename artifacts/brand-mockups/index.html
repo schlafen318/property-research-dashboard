@@ -115,6 +115,7 @@
     .page-card { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .page-card h3 { margin-top: 0; }
     .page-card ul { margin: 0; padding-left: 18px; }
+    .page-card .page-button { margin-top: 12px; }
     .report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
     .report-card {
       min-width: 0;
@@ -130,6 +131,11 @@
     .report-card p { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
     .report-card strong { color: var(--ink); font-size: 13px; line-height: 1.45; }
     .report-card a { font-weight: 900; }
+    .offer-comparison { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .offer-comparison article { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .offer-comparison span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .offer-comparison h3 { margin: 8px 0 10px; }
+    .offer-comparison ul { margin: 0; padding-left: 18px; color: #3f4d48; }
     .sticky-jump {
       position: sticky;
       top: 0;
@@ -324,7 +330,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -343,7 +349,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -521,6 +527,7 @@
           <a href="/guides/">Guides</a>
           <a href="/#destination-index">Destinations</a>
           <a href="/countries/spain-property/">Countries</a>
+          <a href="/reports/">Reports</a>
           <a href="/methodology/">Methodology</a>
           <a href="/shortlist-review/">Shortlist Review</a>
           <a href="/contact/">Contact</a>
@@ -533,6 +540,7 @@
             <a href="/countries/spain-property/">Countries</a>
             <a href="/#destination-index">Destinations</a>
             <a href="/guides/">Guides</a>
+            <a href="/reports/">Reports</a>
             <a href="/methodology/">Methodology</a>
             <a href="/shortlist-review/">Shortlist Review</a>
             <a href="/contact/">Contact</a>

@@ -1030,6 +1030,7 @@
             <p id="savedShortlistStatus">No saved destinations yet.</p>
             <div class="saved-shortlist__actions">
               <button type="button" id="clearMemoShortlist">Clear saved list</button>
+              <button type="button" id="copyShortlistLink">Copy share link</button>
               <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="saved shortlist">Review my shortlist</a>
             </div>
           </div>
@@ -8423,12 +8424,17 @@
     const savedShortlistStatus = document.getElementById("savedShortlistStatus");
     const savedBriefOutput = document.getElementById("savedBriefOutput");
     const clearMemoShortlist = document.getElementById("clearMemoShortlist");
+    const copyShortlistLink = document.getElementById("copyShortlistLink");
     const compareSelected = new Set();
     const memoKey = "gha_memo_shortlist";
     let quickView = "all";
+    let savedBriefTracked = false;
 
     const destinationsById = new Map(data.destinations.map((destination) => [destination.id, destination]));
     function loadSavedMemoIds() {
+      const params = new URLSearchParams(window.location.search);
+      const shared = (params.get("shortlist") || "").split(",").map((id) => id.trim()).filter((id) => destinationsById.has(id));
+      if (shared.length) return shared;
       try {
         const raw = JSON.parse(localStorage.getItem(memoKey) || "[]");
         return Array.isArray(raw) ? raw.filter((id) => destinationsById.has(id)) : [];
@@ -8441,6 +8447,7 @@
     data.destinations.forEach((destination) => {
       destination.custom_score = destination.decision_score;
     });
+    if (new URLSearchParams(window.location.search).get("shortlist")) saveMemoShortlist();
 
     function saveMemoShortlist() {
       try {
@@ -8474,6 +8481,10 @@
           <p>${escapeHtml(destination.red_flags || "Verify title, tax, permits, liquidity, and local adviser requirements before committing capital.")}</p>
         </article>
       `).join("") + '</div>';
+      if (!savedBriefTracked && window.GHA) {
+        savedBriefTracked = true;
+        window.GHA.track("private_brief_preview_render", { selected_count: selected.length });
+      }
     }
 
     function updateMemoButtons() {
@@ -8637,6 +8648,28 @@
         if (window.GHA) window.GHA.track("memo_shortlist_clear", { selected_count: 0 });
       });
     }
+    if (copyShortlistLink) {
+      copyShortlistLink.addEventListener("click", () => {
+        const ids = [...memoShortlist];
+        if (!ids.length) {
+          copyShortlistLink.textContent = "Save destinations first";
+          setTimeout(() => { copyShortlistLink.textContent = "Copy share link"; }, 1800);
+          return;
+        }
+        const url = `${location.origin}${location.pathname}?shortlist=${encodeURIComponent(ids.join(","))}#destinations`;
+        const done = () => {
+          copyShortlistLink.textContent = "Link copied";
+          setTimeout(() => { copyShortlistLink.textContent = "Copy share link"; }, 1800);
+          if (window.GHA) window.GHA.track("shortlist_share_link", { selected_count: ids.length });
+        };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(url).then(done).catch(() => downloadFile("global-home-atlas-shortlist-link.txt", "text/plain", url));
+        } else {
+          downloadFile("global-home-atlas-shortlist-link.txt", "text/plain", url);
+          done();
+        }
+      });
+    }
     document.getElementById("clearCompare").addEventListener("click", () => {
       compareSelected.clear();
       document.querySelectorAll(".compare-toggle").forEach((checkbox) => {
@@ -8755,7 +8788,10 @@
     }
 
     document.getElementById("exportMemo").addEventListener("click", () => {
-      if (window.GHA) window.GHA.track("memo_preview_export", { selected_count: memoDestinations().length });
+      if (window.GHA) {
+        window.GHA.track("memo_export", { selected_count: memoDestinations().length });
+        window.GHA.track("memo_preview_export", { selected_count: memoDestinations().length });
+      }
       downloadFile("atlas-shortlist-preview.html", "text/html", buildMemoHtml());
     });
 

@@ -19,6 +19,12 @@
     <priority>0.90</priority>
   </url>
   <url>
+    <loc>https://globalhomeatlas.com/reports/</loc>
+    <lastmod>2026-06-25</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.88</priority>
+  </url>
+  <url>
     <loc>https://globalhomeatlas.com/country-comparison/</loc>
     <lastmod>2026-06-25</lastmod>
     <changefreq>weekly</changefreq>
