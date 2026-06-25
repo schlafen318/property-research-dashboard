@@ -1409,6 +1409,11 @@ def destination_executive_summary_cards(dest: dict) -> str:
 def build_premium_report_teasers() -> str:
     reports = [
         (
+            "Polished Buyer Memo",
+            "A paid version of the dashboard preview with personalized fit ranking, markets to avoid, ownership-path notes, transaction-risk priorities, and adviser questions.",
+            "Best after you have compared 2-4 plausible markets and need a decision-ready brief.",
+        ),
+        (
             "Retirement Market Brief",
             "A buyer-specific screen for lifestyle durability, healthcare practicality, ownership clarity, tax flags, and future exit options.",
             "Best for retirement-optional families choosing between Europe and Asia.",
@@ -1722,7 +1727,7 @@ def build_shortlist_review_page(destinations: list[dict], pages: list[dict]) -> 
         <aside class="page-aside">
           <section class="page-aside-card">
             <h2>Use Before You Submit</h2>
-            <p>Compare your saved markets in the dashboard, export a memo, then send the shortlist for review.</p>
+            <p>Compare your saved markets in the dashboard, export a preview, then request a polished buyer memo when the shortlist is worth deeper review.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="shortlist review page">Open dashboard</a>
           </section>
           <section class="page-aside-card">
@@ -4521,15 +4526,20 @@ def build() -> Path:
       overflow: hidden;
     }
     .compare-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .compare-actions button, .decision-row button {
+    .compare-actions button, .compare-actions a, .decision-row button {
       min-height: 38px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
       border: 1px solid var(--line);
       border-radius: 6px;
       background: #fff;
       color: var(--ink);
       font-weight: 850;
       padding: 0 12px;
+      text-decoration: none;
     }
+    .compare-actions a { background: var(--deep); color: #fffdf7; }
     .compare-table-wrap { overflow-x: auto; }
     .compare-table { width: 100%; border-collapse: collapse; min-width: 720px; }
     .compare-table th, .compare-table td {
@@ -4541,6 +4551,47 @@ def build() -> Path:
     }
     .compare-table th { color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
     .compare-empty { padding: 18px; color: var(--muted); border-top: 1px solid var(--line); }
+    .memo-upgrade {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      gap: 16px;
+      align-items: center;
+      padding: 16px 18px;
+      border-top: 1px solid var(--line);
+      background: #f5f1e9;
+    }
+    .memo-upgrade h3 { margin: 0 0 6px; font-size: 15px; }
+    .memo-upgrade p { margin: 0; color: var(--muted); font-size: 13px; }
+    .memo-upgrade ul {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 10px 0 0;
+      padding: 0;
+      list-style: none;
+    }
+    .memo-upgrade li {
+      padding: 6px 8px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 999px;
+      background: #fffdf7;
+      color: #3f4d48;
+      font-size: 12px;
+      font-weight: 800;
+    }
+    .memo-upgrade a {
+      min-height: 42px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 14px;
+      border-radius: 6px;
+      background: var(--eucalyptus);
+      color: #fffdf7;
+      font-weight: 850;
+      text-decoration: none;
+      white-space: nowrap;
+    }
     .decision-row {
       display: flex;
       justify-content: flex-end;
@@ -4919,6 +4970,8 @@ def build() -> Path:
       main { margin-top: -24px; }
       .workbench { padding-top: 14px; }
       .section-header, .section-heading { display: block; }
+      .memo-upgrade { grid-template-columns: 1fr; }
+      .memo-upgrade a { width: 100%; }
       #resultCount { display: block; margin-top: 8px; }
       summary { grid-template-columns: 44px minmax(0, 1fr); gap: 12px; min-height: 0; padding: 15px; align-items: start; }
       .rank-mark { width: 40px; height: 40px; }
@@ -5016,7 +5069,7 @@ def build() -> Path:
           <article><span>Step 1</span><strong>Choose a buyer lens</strong><p>Use shortlist, clean title, retirement, or all markets to reduce noise first.</p></article>
           <article><span>Step 2</span><strong>Select 2-4 markets</strong><p>Comparison works best when you compare plausible substitutes, not every destination.</p></article>
           <article><span>Step 3</span><strong>Challenge the weights</strong><p>Raise ownership, retirement, value, or yield only when it matches your real plan.</p></article>
-          <article><span>Step 4</span><strong>Export a memo</strong><p>Use the memo as a discussion brief before local legal and tax diligence.</p></article>
+          <article><span>Step 4</span><strong>Export the preview</strong><p>Use the preview to decide whether the shortlist deserves a polished buyer memo before local legal and tax diligence.</p></article>
         </div>
       </section>
 
@@ -5132,10 +5185,24 @@ def build() -> Path:
               </div>
               <div class="compare-actions">
                 <button type="button" id="clearCompare">Clear</button>
-                <button type="button" id="exportMemo">Export memo</button>
+                <button type="button" id="exportMemo">Export preview</button>
+                <a href="/shortlist-review/" data-track="paid_memo_cta" data-track-label="compare panel">Request polished memo</a>
               </div>
             </div>
             <div id="compareOutput" class="compare-empty">Select at least two destinations to build a comparison table.</div>
+            <div class="memo-upgrade">
+              <div>
+                <h3>Paid buyer memo adds the decision layer</h3>
+                <p>The free preview exports your selected markets. The paid memo turns that shortlist into a buyer-specific brief with exclusions, risk priorities, and next diligence questions.</p>
+                <ul>
+                  <li>Personalized fit ranking</li>
+                  <li>Markets to avoid</li>
+                  <li>Ownership path notes</li>
+                  <li>Transaction-risk checklist</li>
+                </ul>
+              </div>
+              <a href="/shortlist-review/" data-track="paid_memo_cta" data-track-label="memo upgrade panel">Request polished memo</a>
+            </div>
           </section>
 
           <section class="section-card" id="destinations">
@@ -5512,7 +5579,7 @@ def build() -> Path:
         </section>
       `).join("");
       return `<!doctype html>
-        <html><head><meta charset="utf-8"><title>Investor Shortlist Memo</title>
+        <html><head><meta charset="utf-8"><title>Atlas Shortlist Preview</title>
         <style>
           body{font-family:Inter,Arial,sans-serif;margin:40px;color:#24312d;background:#fffdf7;line-height:1.5}
           h1{font-family:Georgia,serif;font-size:42px;line-height:1;margin:0 0 8px} h2{margin-top:32px;border-top:1px solid #ddd4c7;padding-top:24px}
@@ -5520,24 +5587,29 @@ def build() -> Path:
           dl{display:grid;grid-template-columns:repeat(4,1fr);gap:10px} dl div{border:1px solid #ddd4c7;padding:10px;border-radius:6px}
           dt{color:#66736c;font-size:11px;text-transform:uppercase;font-weight:800} dd{margin:4px 0 0;font-weight:800}
           .next{margin:22px 0;padding:16px;border:1px solid #ddd4c7;border-radius:8px;background:#f5f1e9}
+          .upgrade{margin:22px 0;padding:16px;border:1px solid #c7d3c2;border-radius:8px;background:#eef3f0}
           .next p{margin:6px 0 0}
           table{width:100%;border-collapse:collapse;margin-top:8px} th,td{text-align:left;border-top:1px solid #ddd4c7;padding:8px;vertical-align:top;font-size:13px}
           @media(max-width:720px){body{margin:20px}dl{grid-template-columns:1fr}}
         </style></head><body>
-        <h1>Investor Shortlist Memo</h1>
-        <p>Generated ${generated}. Scores use the current 10-dimension weighting model from Global Home Atlas.</p>
+        <h1>Atlas Shortlist Preview</h1>
+        <p>Generated ${generated}. This free preview uses the current 10-dimension weighting model from Global Home Atlas.</p>
         <div class="next">
           <h2>How to use this memo</h2>
           <p>Use this as a pre-adviser briefing. It should help you decide which jurisdictions deserve legal, tax, immigration, financing, insurance, and property-management review before you become anchored to a listing.</p>
-          <p>For a buyer-specific review, open https://globalhomeatlas.com/shortlist-review/ and include the destinations in this memo.</p>
+          <p>For a buyer-specific paid memo, open https://globalhomeatlas.com/shortlist-review/ and include the destinations in this preview.</p>
+        </div>
+        <div class="upgrade">
+          <h2>What the polished buyer memo adds</h2>
+          <p>The paid memo adds personalized fit ranking, markets to avoid, ownership-path notes for your citizenship/residency context, transaction-risk priorities, and next questions for local legal, tax, immigration, financing, and property-management specialists.</p>
         </div>
         ${rows}
         </body></html>`;
     }
 
     document.getElementById("exportMemo").addEventListener("click", () => {
-      if (window.GHA) window.GHA.track("memo_export", { selected_count: memoDestinations().length });
-      downloadFile("investor-shortlist-memo.html", "text/html", buildMemoHtml());
+      if (window.GHA) window.GHA.track("memo_preview_export", { selected_count: memoDestinations().length });
+      downloadFile("atlas-shortlist-preview.html", "text/html", buildMemoHtml());
     });
 
     updateMemoButtons();
