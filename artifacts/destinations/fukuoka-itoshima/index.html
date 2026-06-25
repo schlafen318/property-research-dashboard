@@ -204,6 +204,32 @@
     .executive-summary article { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .executive-summary span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .executive-summary p { margin: 8px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+    .decision-panel {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
+      gap: 1px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+      box-shadow: 0 18px 50px rgba(36, 49, 45, .08);
+    }
+    .decision-panel__intro, .decision-panel__facts div { min-width: 0; background: var(--paper); }
+    .decision-panel__intro { padding: 20px; }
+    .decision-panel span, .page-card span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .decision-panel h2 { margin: 8px 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.04; }
+    .decision-panel p { margin: 0; color: #3f4d48; }
+    .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
+    .decision-panel__facts div { padding: 16px; }
+    .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .delight-grid { margin-top: 14px; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -331,7 +357,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -340,7 +366,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -350,7 +376,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -504,11 +530,6 @@
           <p class="page-eyebrow">Water · Japan · updated 2026-06-25</p>
           <h1>Fukuoka / Itoshima Property Research</h1>
           <p class="page-lede">The panel would treat this as the most practical “use it, rent it, live in it” candidate: not the most dramatic scenery, but the combination of airport access, food, safety, healthcare and clean ownership is unusually strong.</p>
-          <div class="brief-panel">
-            <article><span>Verdict</span><strong>Keep as a top-tier shortlist candidate. It is the “highest probability of working” option rather than the most romantic one.</strong><p>Excellent airport access, food/lifestyle, Korean/Chinese/Taiwanese travel, domestic migration and urban economy.</p></article>
-            <article><span>Best for</span><strong>Clean Japanese freehold ownership</strong><p>Use this market when lifestyle demand, ownership confidence, and a future resale route can all be underwritten.</p></article>
-            <article><span>Watch-outs</span><strong>Less scarce and less trophy-like than prime ski, lake or island markets</strong><p>Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.</p></article>
-          </div>
         </div>
         <aside class="page-hero-card">
           <span>Global rank</span><strong>#1</strong>
@@ -520,47 +541,25 @@
   </header>
   <main>
     <div class="page-shell">
-      <section class="page-stats" aria-label="Destination metrics">
-        <div><span>Net yield</span><strong>3–4.8% est. net</strong></div>
-        <div><span>Ownership</span><strong>5.0/5</strong></div>
-        <div><span>Retirement</span><strong>4.6/5</strong></div>
-        <div><span>Exit liquidity</span><strong>4.1/5</strong></div>
-      </section>
-      <section class="brief-panel" aria-label="Destination dossier summary">
-        <article><span>Decision score</span><strong>4.27/5</strong><p>Composite score across ownership, lifestyle, yield realism, retirement fit, value entry, and future exit quality.</p></article>
-        <article><span>Ownership clarity</span><strong>5.0/5</strong><p>Open Japan freehold ownership; standard Japanese transaction and STR compliance.</p></article>
-        <article><span>Lifestyle and retirement fit</span><strong>4.6/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
-      </section>
-      <section class="executive-summary" aria-label="Destination executive summary">
-        <h2>Is this market for you?</h2>
-        <p>A fast decision read for buyers deciding whether Fukuoka / Itoshima deserves deeper local diligence or should be replaced by a better-fit market.</p>
-        <div class="executive-summary__grid">
 
-        <article>
-          <span>Best buyer</span>
-          <p>Clean Japanese freehold ownership</p>
-        </article>
-
-        <article>
-          <span>Buy for</span>
-          <p>Excellent airport access, food/lifestyle, Korean/Chinese/Taiwanese travel, domestic migration and urban economy.</p>
-        </article>
-
-        <article>
-          <span>Underwrite first</span>
-          <p>Less scarce and less trophy-like than prime ski, lake or island markets</p>
-        </article>
-
-        <article>
-          <span>Next step</span>
-          <p>Compare against two or three alternatives, then request a shortlist review before contacting local agents.</p>
-        </article>
+      <section class="decision-panel" aria-label="Quick destination decision">
+        <div class="decision-panel__intro">
+          <span>30-second decision</span>
+          <h2>Should this destination stay on your shortlist?</h2>
+          <p>Keep as a top-tier shortlist candidate. It is the “highest probability of working” option rather than the most romantic one.</p>
         </div>
+        <div class="decision-panel__facts"><div><span>Best buyer</span><strong>Clean Japanese freehold ownership</strong></div>
+<div><span>Best use case</span><strong>Excellent airport access, food/lifestyle, Korean/Chinese/Taiwanese travel, domestic migration and urban economy.</strong></div>
+<div><span>Ownership</span><strong>Open Japan freehold ownership; standard Japanese transaction and STR compliance.</strong></div>
+<div><span>Budget signal</span><strong>$2,620/m2 benchmark</strong></div>
+<div><span>Rental realism</span><strong>3–4.8% est. net</strong></div>
+<div><span>Main risk</span><strong>Less scarce and less trophy-like than prime ski, lake or island markets</strong></div></div>
       </section>
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#verdict">Verdict</a><a href="#buyer-fit">Buyer Fit</a><a href="#ownership">Ownership</a><a href="#lifestyle">Lifestyle</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#trust-context">Trust</a></nav>
+
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#overview">Overview</a><a href="#lifestyle">Lifestyle</a><a href="#buyer-fit">Buyer Fit</a><a href="#where-to-look">Locations</a><a href="#budget">Budget</a><a href="#risks">Risks</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#compare">Compare</a></nav>
 
       <nav class="mobile-action-strip" aria-label="Priority actions">
-        <a href="#scores">Scores</a>
+        <a href="#budget">Budget</a>
         <a href="/shortlist-review/">Review</a>
       </nav>
 
@@ -585,29 +584,136 @@
 
       <div class="page-layout">
         <article class="page-article">
-          <details class="page-section" id="verdict" open>
-            <summary><h2>Investment Thesis</h2></summary>
+          <details class="page-section" id="overview" data-mobile-open="true" open>
+            <summary><h2>Shortlist Verdict</h2></summary>
             <p>Excellent airport access, food/lifestyle, Korean/Chinese/Taiwanese travel, domestic migration and urban economy.</p>
-            <p>Keep as a top-tier shortlist candidate. It is the “highest probability of working” option rather than the most romantic one. This page is built for a global buyer deciding whether Fukuoka / Itoshima belongs on a serious property shortlist, not for casual travel inspiration. The useful question is whether the destination can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process.</p>
+            <p>Keep as a top-tier shortlist candidate. It is the “highest probability of working” option rather than the most romantic one. The useful question is whether Fukuoka / Itoshima can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process without relying on a single perfect listing.</p>
           </details>
-          <details class="page-section" id="buyer-fit" open>
-            <summary><h2>Buyer Fit</h2></summary>
-            <div class="page-grid">
-              <article class="page-card"><h3>Best Fit</h3><ul><li>Clean Japanese freehold ownership</li><li>excellent airport and city infrastructure</li><li>strong food culture</li><li>good healthcare and daily convenience</li><li>resilient domestic and regional travel demand</li><li>relatively affordable versus global resort markets.</li></ul></article>
-              <article class="page-card"><h3>Risk Check</h3><ul><li>Less scarce and less trophy-like than prime ski, lake or island markets</li><li>STR upside is capped by regulation and asset type</li><li>beachfront scarcity varies sharply by micro-location</li><li>not a pure resort destination.</li></ul></article>
-            </div>
-          </details>
+
+      <details class="page-section" id="lifestyle" data-mobile-open="true" open>
+        <summary><h2>Why People Choose It</h2></summary>
+        <p>Fukuoka / Itoshima is strongest when it is treated as a livable Japan base with coastal upside, not as a pure resort trophy. The delight is in how ordinary life can work: airport access, ramen and seafood, station-linked errands, beach drives, healthcare, and enough city depth to return throughout the year.</p>
+        <div class="page-grid delight-grid"><article class="page-card"><span>City-to-coast rhythm</span><h3>City-to-coast rhythm</h3><p>Use central Fukuoka for daily convenience and Itoshima for slower coastal weekends, food, beaches, and repeatable personal use.</p></article>
+<article class="page-card"><span>Airport advantage</span><h3>Airport advantage</h3><p>Fukuoka Airport keeps the thesis practical: the destination works for shorter visits, regional Asia trips, and eventual long-stay routines.</p></article>
+<article class="page-card"><span>Food and daily life</span><h3>Food and daily life</h3><p>The appeal is not only scenery. Food culture, healthcare, safety, and normal city services make the market easier to use outside peak holiday periods.</p></article></div>
+      </details>
+
+
+      <details class="page-section" id="buyer-fit" data-mobile-open="true" open>
+        <summary><h2>Buyer Fit</h2></summary>
+        <div class="page-grid">
+          <article class="page-card"><span>Good fit</span><h3>If you want</h3><ul><li>Clean Japanese freehold ownership</li><li>excellent airport and city infrastructure</li><li>strong food culture</li><li>good healthcare and daily convenience</li><li>resilient domestic and regional travel demand</li><li>relatively affordable versus global resort markets.</li></ul></article>
+          <article class="page-card"><span>Poor fit</span><h3>If you need to avoid</h3><ul><li>Less scarce and less trophy-like than prime ski, lake or island markets</li><li>STR upside is capped by regulation and asset type</li><li>beachfront scarcity varies sharply by micro-location</li><li>not a pure resort destination.</li></ul></article>
+        </div>
+      </details>
+
+
+      <details class="page-section" id="where-to-look" data-mobile-open="true" open>
+        <summary><h2>Where to Look</h2></summary>
+        <p>Micro-location decides whether Fukuoka / Itoshima feels easy to own, easy to use, and realistic to resell. Start with the role the property should play, then compare locations against that role.</p>
+        <div class="cluster-map" aria-label="Destination micro-location map">
+          <div class="cluster-map__grid"><div><span>Central Fukuoka</span><strong>Best for liquidity, daily convenience, healthcare, airport access, and a larger resale buyer pool.</strong><em>Lower emotional scarcity; more urban than coastal.</em></div>
+<div><span>Station-linked Itoshima</span><strong>Best for a practical coastal lifestyle that still supports errands, access, and repeat use.</strong><em>Value changes sharply by station, age, and micro-location.</em></div>
+<div><span>Beach-adjacent Itoshima</span><strong>Best for lifestyle appeal, family use, and a more memorable Japan second-home experience.</strong><em>Scarcity, maintenance, rental permissions, and resale depth need more diligence.</em></div></div>
+        </div>
+        <div class="page-grid">
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Central Fukuoka</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for liquidity, daily convenience, healthcare, airport access, and a larger resale buyer pool.</p>
+          <p><strong>Underwrite:</strong> Lower emotional scarcity; more urban than coastal.</p>
+        </article>
+
+
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Station-linked Itoshima</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for a practical coastal lifestyle that still supports errands, access, and repeat use.</p>
+          <p><strong>Underwrite:</strong> Value changes sharply by station, age, and micro-location.</p>
+        </article>
+
+
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Beach-adjacent Itoshima</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for lifestyle appeal, family use, and a more memorable Japan second-home experience.</p>
+          <p><strong>Underwrite:</strong> Scarcity, maintenance, rental permissions, and resale depth need more diligence.</p>
+        </article>
+        </div>
+      </details>
+
+
+      <details class="page-section" id="budget" data-mobile-open="true" open>
+        <summary><h2>What You Can Buy</h2></summary>
+        <p>Built residential benchmark. Early-2026 Fukuoka average housing price ~¥422,000/m²; converted at 1 USD = ¥161.305 =&gt; ~$2,616/m². Itoshima varies materially by distance to beach/station.</p>
+        <div class="page-article evidence-list">
+      <article class="listing">
+        <div>
+          <p class="listing__type">Apartment</p>
+          <h5>Itoshima 2LDK apartment</h5>
+          <p>Lower-cost local-living example; verify current status.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$129,568</dd></div>
+          <div><dt>USD/m2</dt><dd>$1,408</dd></div>
+          <div><dt>Size</dt><dd>92 m2</dd></div>
+          <div><dt>Local</dt><dd>JPY 20,900,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://www.akiyajapan.com/city/itoshima" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Itoshima 2LDK apartment">
+          Akiya Japan · Medium confidence
+        </a>
+      </article>
+
+
+      <article class="listing">
+        <div>
+          <p class="listing__type">House</p>
+          <h5>Shima Keya 5LDK new house</h5>
+          <p>Affordable new-build style detached home.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$216,360</dd></div>
+          <div><dt>USD/m2</dt><dd>$2,525</dd></div>
+          <div><dt>Size</dt><dd>85.7 m2</dd></div>
+          <div><dt>Local</dt><dd>JPY 34,900,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://realestate.co.jp/en/forsale/fukuoka/itoshima-shi" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Shima Keya 5LDK new house">
+          RealEstate.co.jp · Medium confidence
+        </a>
+      </article>
+
+
+      <article class="listing">
+        <div>
+          <p class="listing__type">Holiday house</p>
+          <h5>Shima Nogita 2SLDK holiday house</h5>
+          <p>Large coastal holiday-house example; high-end for Itoshima.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$1,115,898</dd></div>
+          <div><dt>USD/m2</dt><dd>$3,831</dd></div>
+          <div><dt>Size</dt><dd>291.3 m2</dd></div>
+          <div><dt>Local</dt><dd>JPY 180,000,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://realestate.co.jp/en/forsale/fukuoka/itoshima-shi" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Shima Nogita 2SLDK holiday house">
+          RealEstate.co.jp · Medium confidence
+        </a>
+      </article>
+    </div>
+      </details>
+
           <details class="page-section" id="ownership" open>
             <summary><h2>Ownership and Governance</h2></summary>
             <p>Open Japan freehold ownership; standard Japanese transaction and STR compliance.</p>
             <p>Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.</p>
           </details>
-          <details class="page-section" id="lifestyle" open>
-            <summary><h2>Lifestyle and Retirement Fit</h2></summary>
-            <p>For an affluent global buyer, Fukuoka / Itoshima should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
-            <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
-          </details>
-          <details class="page-section" open>
+
+      <details class="page-section" id="risks" open>
+        <summary><h2>Risks to Underwrite First</h2></summary>
+        <ul><li>Confirm STR licensing, building-level rules, and the practical effect of Japan&#x27;s annual rental caps before underwriting income.</li>
+<li>Check distance to rail, airport routing, and day-to-day car dependence for the exact Itoshima micro-location.</li>
+<li>Inspect coastal maintenance exposure, building age, earthquake resilience, insurance, and renovation needs.</li>
+<li>Stress-test resale depth separately for central Fukuoka, station-linked Itoshima, and beach-adjacent homes.</li></ul>
+      </details>
+
+          <details class="page-section">
             <summary><h2>Guide Context</h2></summary>
             <p>Use these buying guides to compare Fukuoka / Itoshima against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
             <nav class="page-grid"><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
@@ -752,15 +858,61 @@
       </details>
 
           </details>
-          <details class="page-section" open>
-            <summary><h2>Due Diligence Checklist</h2></summary>
-            <ul>
-              <li>Verify clean title, transfer process, foreign-buyer restrictions, and beneficial ownership structure with independent local counsel.</li>
-              <li>Model acquisition tax, annual property tax, income tax, wealth tax exposure, financing availability, insurance, repairs, and property management fees.</li>
-              <li>Confirm short-term-rental rules, licensing, building permissions, homeowners association rules, and realistic net income after vacancy and operating costs.</li>
-              <li>Stress-test resale liquidity by reviewing recent comparable transactions, buyer nationality mix, time on market, and local agent depth.</li>
-            </ul>
-          </details>
+
+      <details class="page-section" id="compare" open>
+        <summary><h2>Compare Before You Commit</h2></summary>
+        <p>The destination decision gets clearer when Fukuoka / Itoshima is compared against a few plausible alternatives rather than judged in isolation.</p>
+        <div class="page-grid">
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/valencia/">Valencia</a></h3>
+                <span>4.09/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$3,840/m2</dd></div>
+                <div><dt>Yield</dt><dd>3–4.8% est. net</dd></div>
+              </dl>
+              <p>Keep near the top. Best suited for retirement optionality and long-stay demand, not ultra-luxury holiday yield.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/algarve-cascais/">Algarve / Cascais</a></h3>
+                <span>4.06/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$4,600/m2</dd></div>
+                <div><dt>Yield</dt><dd>3–4.5% est. net</dd></div>
+              </dl>
+              <p>Keep as a core European benchmark. Strong for retirement and lifestyle, only average for development yield.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a></h3>
+                <span>4.03/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$5,600/m2</dd></div>
+                <div><dt>Yield</dt><dd>3–5% est. net</dd></div>
+              </dl>
+              <p>Keep, but require strict entry-price discipline. Good destination; not necessarily good at any price.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/hakone-izu/">Hakone / Izu</a></h3>
+                <span>3.95/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$3,000/m2</dd></div>
+                <div><dt>Yield</dt><dd>2.5–4% est. net</dd></div>
+              </dl>
+              <p>Keep as a practical Japan alternative. Best for personal use and domestic demand, less compelling as a global trophy asset.</p>
+            </article>
+            </div>
+      </details>
+
         </article>
         <details class="page-aside mobile-resources" open>
           <summary>More resources</summary>
@@ -826,7 +978,7 @@
       if (!details.length) return;
       const apply = () => {
         details.forEach((item, index) => {
-          if (query.matches) item.open = index === 0;
+          if (query.matches) item.open = item.dataset.mobileOpen === "true" || index === 0;
           else item.open = true;
         });
         resources.forEach((item) => {

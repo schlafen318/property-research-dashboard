@@ -204,6 +204,32 @@
     .executive-summary article { min-width: 0; padding: 13px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
     .executive-summary span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
     .executive-summary p { margin: 8px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.45; overflow-wrap: anywhere; }
+    .decision-panel {
+      display: grid;
+      grid-template-columns: minmax(0, .9fr) minmax(0, 1.4fr);
+      gap: 1px;
+      overflow: hidden;
+      margin-top: 18px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--line);
+      box-shadow: 0 18px 50px rgba(36, 49, 45, .08);
+    }
+    .decision-panel__intro, .decision-panel__facts div { min-width: 0; background: var(--paper); }
+    .decision-panel__intro { padding: 20px; }
+    .decision-panel span, .page-card span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .decision-panel h2 { margin: 8px 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 3.4vw, 38px); line-height: 1.04; }
+    .decision-panel p { margin: 0; color: #3f4d48; }
+    .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
+    .decision-panel__facts div { padding: 16px; }
+    .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .delight-grid { margin-top: 14px; }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -331,7 +357,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel { grid-template-columns: repeat(2, 1fr); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -340,7 +366,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -350,7 +376,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -504,11 +530,6 @@
           <p class="page-eyebrow">Mountain · Austria · updated 2026-06-25</p>
           <h1>Innsbruck / Tyrol Property Research</h1>
           <p class="page-lede">Innsbruck/Tyrol is excellent for liveability and alpine access, but Austrian second-home and tourist-let restrictions are a serious barrier. The panel would admire it but keep it below cleaner jurisdictions.</p>
-          <div class="brief-panel">
-            <article><span>Verdict</span><strong>Keep as a lifestyle benchmark, not a leading development candidate unless a legally rentable asset is identified.</strong><p>Real city with airport, university, hospitals and alpine access; strong retirement/liveability case.</p></article>
-            <article><span>Best for</span><strong>Real alpine city</strong><p>Use this market when lifestyle demand, ownership confidence, and a future resale route can all be underwritten.</p></article>
-            <article><span>Watch-outs</span><strong>Second-home and leisure-residence restrictions</strong><p>Foreign/second-home restrictions, low yields, high prices, limited true tourist-let stock.</p></article>
-          </div>
         </div>
         <aside class="page-hero-card">
           <span>Global rank</span><strong>#25</strong>
@@ -520,47 +541,25 @@
   </header>
   <main>
     <div class="page-shell">
-      <section class="page-stats" aria-label="Destination metrics">
-        <div><span>Net yield</span><strong>2–3.5% est. net</strong></div>
-        <div><span>Ownership</span><strong>3.5/5</strong></div>
-        <div><span>Retirement</span><strong>4.7/5</strong></div>
-        <div><span>Exit liquidity</span><strong>3.9/5</strong></div>
-      </section>
-      <section class="brief-panel" aria-label="Destination dossier summary">
-        <article><span>Decision score</span><strong>3.51/5</strong><p>Composite score across ownership, lifestyle, yield realism, retirement fit, value entry, and future exit quality.</p></article>
-        <article><span>Ownership clarity</span><strong>3.5/5</strong><p>Austria is restrictive for second homes and holiday rentals, especially in Tyrol. Confirm main-residence, leisure-residence and tourist-rental status before underwriting.</p></article>
-        <article><span>Lifestyle and retirement fit</span><strong>4.7/5</strong><p>Use this as a long-stay practicality signal, not a holiday appeal score.</p></article>
-      </section>
-      <section class="executive-summary" aria-label="Destination executive summary">
-        <h2>Is this market for you?</h2>
-        <p>A fast decision read for buyers deciding whether Innsbruck / Tyrol deserves deeper local diligence or should be replaced by a better-fit market.</p>
-        <div class="executive-summary__grid">
 
-        <article>
-          <span>Best buyer</span>
-          <p>Real alpine city</p>
-        </article>
-
-        <article>
-          <span>Buy for</span>
-          <p>Real city with airport, university, hospitals and alpine access; strong retirement/liveability case.</p>
-        </article>
-
-        <article>
-          <span>Underwrite first</span>
-          <p>Second-home and leisure-residence restrictions</p>
-        </article>
-
-        <article>
-          <span>Next step</span>
-          <p>Compare against two or three alternatives, then request a shortlist review before contacting local agents.</p>
-        </article>
+      <section class="decision-panel" aria-label="Quick destination decision">
+        <div class="decision-panel__intro">
+          <span>30-second decision</span>
+          <h2>Should this destination stay on your shortlist?</h2>
+          <p>Keep as a lifestyle benchmark, not a leading development candidate unless a legally rentable asset is identified.</p>
         </div>
+        <div class="decision-panel__facts"><div><span>Best buyer</span><strong>Real alpine city</strong></div>
+<div><span>Best use case</span><strong>Real city with airport, university, hospitals and alpine access; strong retirement/liveability case.</strong></div>
+<div><span>Ownership</span><strong>Austria is restrictive for second homes and holiday rentals, especially in Tyrol. Confirm main-residence, leisure-residence and tourist-rental status before underwriting.</strong></div>
+<div><span>Budget signal</span><strong>$8,600/m2 benchmark</strong></div>
+<div><span>Rental realism</span><strong>2–3.5% est. net</strong></div>
+<div><span>Main risk</span><strong>Second-home and leisure-residence restrictions</strong></div></div>
       </section>
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#verdict">Verdict</a><a href="#buyer-fit">Buyer Fit</a><a href="#ownership">Ownership</a><a href="#lifestyle">Lifestyle</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#trust-context">Trust</a></nav>
+
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#overview">Overview</a><a href="#lifestyle">Lifestyle</a><a href="#buyer-fit">Buyer Fit</a><a href="#where-to-look">Locations</a><a href="#budget">Budget</a><a href="#risks">Risks</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#compare">Compare</a></nav>
 
       <nav class="mobile-action-strip" aria-label="Priority actions">
-        <a href="#scores">Scores</a>
+        <a href="#budget">Budget</a>
         <a href="/shortlist-review/">Review</a>
       </nav>
 
@@ -585,29 +584,136 @@
 
       <div class="page-layout">
         <article class="page-article">
-          <details class="page-section" id="verdict" open>
-            <summary><h2>Investment Thesis</h2></summary>
+          <details class="page-section" id="overview" data-mobile-open="true" open>
+            <summary><h2>Shortlist Verdict</h2></summary>
             <p>Real city with airport, university, hospitals and alpine access; strong retirement/liveability case.</p>
-            <p>Keep as a lifestyle benchmark, not a leading development candidate unless a legally rentable asset is identified. This page is built for a global buyer deciding whether Innsbruck / Tyrol belongs on a serious property shortlist, not for casual travel inspiration. The useful question is whether the destination can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process.</p>
+            <p>Keep as a lifestyle benchmark, not a leading development candidate unless a legally rentable asset is identified. The useful question is whether Innsbruck / Tyrol can support personal use, ownership confidence, rental realism, retirement optionality, and a future resale process without relying on a single perfect listing.</p>
           </details>
-          <details class="page-section" id="buyer-fit" open>
-            <summary><h2>Buyer Fit</h2></summary>
-            <div class="page-grid">
-              <article class="page-card"><h3>Best Fit</h3><ul><li>Real alpine city</li><li>airport, hospitals, university and services</li><li>skiing/hiking/cycling</li><li>high standard of living</li><li>strong long-stay quality.</li></ul></article>
-              <article class="page-card"><h3>Risk Check</h3><ul><li>Second-home and leisure-residence restrictions</li><li>low yields</li><li>expensive property</li><li>rental permission is asset-specific and often restrictive.</li></ul></article>
-            </div>
-          </details>
+
+      <details class="page-section" id="lifestyle" data-mobile-open="true" open>
+        <summary><h2>Why People Choose It</h2></summary>
+        <p>Innsbruck / Tyrol should be read first as a place to use, then as a property market. The strongest overseas buys usually combine emotional pull with practical routines: access, healthcare, food, services, and a reason to return outside peak season.</p>
+        <div class="page-grid delight-grid"><article class="page-card"><span>Daily usability</span><h3>Daily usability</h3><p>Test whether Innsbruck / Tyrol supports repeat stays, errands, healthcare, transport, food, and family routines outside the most photogenic season.</p></article>
+<article class="page-card"><span>Lifestyle pull</span><h3>Lifestyle pull</h3><p>Real city with airport, university, hospitals and alpine access; strong retirement/liveability case.</p></article>
+<article class="page-card"><span>Long-stay resilience</span><h3>Long-stay resilience</h3><p>A destination earns shortlist space when it can work for weeks or months, not just a single holiday visit.</p></article></div>
+      </details>
+
+
+      <details class="page-section" id="buyer-fit" data-mobile-open="true" open>
+        <summary><h2>Buyer Fit</h2></summary>
+        <div class="page-grid">
+          <article class="page-card"><span>Good fit</span><h3>If you want</h3><ul><li>Real alpine city</li><li>airport, hospitals, university and services</li><li>skiing/hiking/cycling</li><li>high standard of living</li><li>strong long-stay quality.</li></ul></article>
+          <article class="page-card"><span>Poor fit</span><h3>If you need to avoid</h3><ul><li>Second-home and leisure-residence restrictions</li><li>low yields</li><li>expensive property</li><li>rental permission is asset-specific and often restrictive.</li></ul></article>
+        </div>
+      </details>
+
+
+      <details class="page-section" id="where-to-look" data-mobile-open="true" open>
+        <summary><h2>Where to Look</h2></summary>
+        <p>Micro-location decides whether Innsbruck / Tyrol feels easy to own, easy to use, and realistic to resell. Start with the role the property should play, then compare locations against that role.</p>
+        <div class="cluster-map" aria-label="Destination micro-location map">
+          <div class="cluster-map__grid"><div><span>Core village</span><strong>Best for walkability, rentals, restaurants, and easier resale.</strong><em>Higher entry price and less privacy.</em></div>
+<div><span>Access corridor</span><strong>Best for value and larger homes if transport remains practical.</strong><em>Car dependence and thinner off-season demand.</em></div>
+<div><span>Prime view / slope zones</span><strong>Best for emotional pull and trophy scarcity.</strong><em>Maintenance, seasonality, and price discipline matter more.</em></div></div>
+        </div>
+        <div class="page-grid">
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Core village</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for walkability, rentals, restaurants, and easier resale.</p>
+          <p><strong>Underwrite:</strong> Higher entry price and less privacy.</p>
+        </article>
+
+
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Access corridor</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for value and larger homes if transport remains practical.</p>
+          <p><strong>Underwrite:</strong> Car dependence and thinner off-season demand.</p>
+        </article>
+
+
+        <article class="comparison-card">
+          <div class="comparison-card__head"><h3>Prime view / slope zones</h3><span>Area read</span></div>
+          <p><strong>Use for:</strong> Best for emotional pull and trophy scarcity.</p>
+          <p><strong>Underwrite:</strong> Maintenance, seasonality, and price discipline matter more.</p>
+        </article>
+        </div>
+      </details>
+
+
+      <details class="page-section" id="budget" data-mobile-open="true" open>
+        <summary><h2>What You Can Buy</h2></summary>
+        <p>Built apartment benchmark. Innsbruck 2026 range €7,000–7,800/m²; dashboard uses ~€7,500 × EUR/USD 1.14784 ≈ $8,609/m².</p>
+        <div class="page-article evidence-list">
+      <article class="listing">
+        <div>
+          <p class="listing__type">Apartment</p>
+          <h5>Innsbruck 36 m² apartment</h5>
+          <p>Compact urban alpine apartment.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$343,204</dd></div>
+          <div><dt>USD/m2</dt><dd>$9,533</dd></div>
+          <div><dt>Size</dt><dd>36 m2</dd></div>
+          <div><dt>Local</dt><dd>EUR 299,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://www.realestate.com.au/international/at/innsbruck-tyrol/" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Innsbruck 36 m² apartment">
+          realestate.com.au International · Medium confidence
+        </a>
+      </article>
+
+
+      <article class="listing">
+        <div>
+          <p class="listing__type">Apartment</p>
+          <h5>Innsbruck 68 m² apartment</h5>
+          <p>Practical city apartment example.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$366,161</dd></div>
+          <div><dt>USD/m2</dt><dd>$5,385</dd></div>
+          <div><dt>Size</dt><dd>68 m2</dd></div>
+          <div><dt>Local</dt><dd>EUR 319,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://www.realestate.com.au/international/at/innsbruck-tyrol/" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Innsbruck 68 m² apartment">
+          realestate.com.au International · Medium confidence
+        </a>
+      </article>
+
+
+      <article class="listing">
+        <div>
+          <p class="listing__type">Luxury chalet</p>
+          <h5>Kitzbühel chalet</h5>
+          <p>Top-end Tyrol trophy chalet; restrictive market.</p>
+        </div>
+        <dl class="listing__facts">
+          <div><dt>USD price</dt><dd>$17,102,816</dd></div>
+          <div><dt>USD/m2</dt><dd>$71,262</dd></div>
+          <div><dt>Size</dt><dd>240 m2</dd></div>
+          <div><dt>Local</dt><dd>EUR 14,900,000</dd></div>
+        </dl>
+        <a class="source-link" href="https://www.muhr-immobilien.com/en/properties/tyrol/" target="_blank" rel="noreferrer" data-track="outbound_listing_click" data-track-label="Kitzbühel chalet">
+          Muhr Immobilien · Medium confidence
+        </a>
+      </article>
+    </div>
+      </details>
+
           <details class="page-section" id="ownership" open>
             <summary><h2>Ownership and Governance</h2></summary>
             <p>Austria is restrictive for second homes and holiday rentals, especially in Tyrol. Confirm main-residence, leisure-residence and tourist-rental status before underwriting.</p>
             <p>Foreign/second-home restrictions, low yields, high prices, limited true tourist-let stock.</p>
           </details>
-          <details class="page-section" id="lifestyle" open>
-            <summary><h2>Lifestyle and Retirement Fit</h2></summary>
-            <p>For an affluent global buyer, Innsbruck / Tyrol should be evaluated as part of a long-term lifestyle plan rather than a standalone property purchase. The practical test is whether the destination can support repeat visits, extended stays, healthcare and daily convenience, family use, professional access, and a future shift from vacation use to retirement or semi-retirement.</p>
-            <p>The Atlas score treats the destination as a portfolio decision. Strong scenery or rental appeal is not enough if the ownership path is unclear, the resale pool is thin, or the buyer would not want to spend real time there outside peak season. This is why the destination page keeps governance, exit liquidity, and retirement fit beside lifestyle and yield.</p>
-          </details>
-          <details class="page-section" open>
+
+      <details class="page-section" id="risks" open>
+        <summary><h2>Risks to Underwrite First</h2></summary>
+        <ul><li>Confirm local rental permissions, building rules, licensing, and realistic net income after vacancy and management.</li>
+<li>Inspect building condition, insurance, climate exposure, renovation cost, and property-management depth.</li>
+<li>Stress-test resale liquidity by reviewing recent comparable sales, buyer mix, and time on market.</li>
+<li>Validate title, transfer process, taxes, financing, and ownership structure with independent local advisers.</li></ul>
+      </details>
+
+          <details class="page-section">
             <summary><h2>Guide Context</h2></summary>
             <p>Use these buying guides to compare Innsbruck / Tyrol against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
             <nav class="page-grid"><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
@@ -752,15 +858,61 @@
       </details>
 
           </details>
-          <details class="page-section" open>
-            <summary><h2>Due Diligence Checklist</h2></summary>
-            <ul>
-              <li>Verify clean title, transfer process, foreign-buyer restrictions, and beneficial ownership structure with independent local counsel.</li>
-              <li>Model acquisition tax, annual property tax, income tax, wealth tax exposure, financing availability, insurance, repairs, and property management fees.</li>
-              <li>Confirm short-term-rental rules, licensing, building permissions, homeowners association rules, and realistic net income after vacancy and operating costs.</li>
-              <li>Stress-test resale liquidity by reviewing recent comparable transactions, buyer nationality mix, time on market, and local agent depth.</li>
-            </ul>
-          </details>
+
+      <details class="page-section" id="compare" open>
+        <summary><h2>Compare Before You Commit</h2></summary>
+        <p>The destination decision gets clearer when Innsbruck / Tyrol is compared against a few plausible alternatives rather than judged in isolation.</p>
+        <div class="page-grid">
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/hakuba/">Hakuba</a></h3>
+                <span>3.86/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$6,700/m2</dd></div>
+                <div><dt>Yield</dt><dd>3–5.5% est. net</dd></div>
+              </dl>
+              <p>Keep as an upside candidate. It is more venture-like than Fukuoka or Algarve: higher upside, higher operating risk.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/niseko/">Niseko</a></h3>
+                <span>3.79/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$14,644/m2</dd></div>
+                <div><dt>Yield</dt><dd>3.5–6.5% est. net after management/OPEX</dd></div>
+              </dl>
+              <p>Keep as a trophy/specialist candidate, not a default top pick. Needs asset-specific edge to justify the price.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/dolomites-south-tyrol/">Dolomites / South Tyrol</a></h3>
+                <span>3.62/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$14,350/m2</dd></div>
+                <div><dt>Yield</dt><dd>2–3.8% est. net</dd></div>
+              </dl>
+              <p>Keep as a premium mountain benchmark. Great lifestyle asset, but financial return depends on buying unusually well.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
+                <h3><a href="/destinations/chamonix/">Chamonix</a></h3>
+                <span>3.59/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$15,880/m2</dd></div>
+                <div><dt>Yield</dt><dd>2.2–4% est. net</dd></div>
+              </dl>
+              <p>Keep as a benchmark, not a priority acquisition unless the asset is exceptional.</p>
+            </article>
+            </div>
+      </details>
+
         </article>
         <details class="page-aside mobile-resources" open>
           <summary>More resources</summary>
@@ -829,7 +981,7 @@
       if (!details.length) return;
       const apply = () => {
         details.forEach((item, index) => {
-          if (query.matches) item.open = index === 0;
+          if (query.matches) item.open = item.dataset.mobileOpen === "true" || index === 0;
           else item.open = true;
         });
         resources.forEach((item) => {
