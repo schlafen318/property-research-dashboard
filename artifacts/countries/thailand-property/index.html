@@ -4,6 +4,7 @@
 
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.ico" sizes="any">
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
   <link rel="manifest" href="/assets/site.webmanifest">
@@ -17,7 +18,7 @@
   <meta property="og:url" content="https://globalhomeatlas.com/countries/thailand-property/">
   <meta name="twitter:card" content="summary_large_image">
 
-  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"CollectionPage","name":"Thailand Property Guide for Foreign Buyers","url":"https://globalhomeatlas.com/countries/thailand-property/","description":"Assess Thailand property for foreign buyers, including Phuket and Koh Samui ownership structures, villa risks, rental appeal, and alternatives.","dateModified":"2026-06-25","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"},"mainEntity":{"@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"name":"Phuket / Koh Samui","url":"https://globalhomeatlas.com/destinations/phuket-koh-samui/"}]}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Home Atlas","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Countries","item":"https://globalhomeatlas.com/guides/"},{"@type":"ListItem","position":3,"name":"Thailand","item":"https://globalhomeatlas.com/countries/thailand-property/"}]}]</script>
+  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"CollectionPage","name":"Thailand Property Guide for Foreign Buyers","url":"https://globalhomeatlas.com/countries/thailand-property/","description":"Assess Thailand property for foreign buyers, including Phuket and Koh Samui ownership structures, villa risks, rental appeal, and alternatives.","dateModified":"2026-06-26","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"},"mainEntity":{"@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"name":"Phuket / Koh Samui","url":"https://globalhomeatlas.com/destinations/phuket-koh-samui/"}]}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Home Atlas","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Countries","item":"https://globalhomeatlas.com/guides/"},{"@type":"ListItem","position":3,"name":"Thailand","item":"https://globalhomeatlas.com/countries/thailand-property/"}]}]</script>
 
   <style>
     :root {
@@ -230,6 +231,185 @@
     .decision-panel__facts div { padding: 16px; }
     .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
     .delight-grid { margin-top: 14px; }
+    .location-map-section {
+      display: grid;
+      grid-template-columns: minmax(0, .72fr) minmax(0, 1.2fr) minmax(180px, .48fr);
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 18px;
+    }
+    .location-map-section__copy span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .location-map-section__copy h2 { margin: 8px 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 3vw, 34px); line-height: 1.04; }
+    .location-map-section__copy p { margin: 0; color: #3f4d48; }
+    .real-map {
+      min-height: 270px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #e9eee9;
+      position: relative;
+    }
+    .real-map iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 270px;
+      border: 0;
+      filter: saturate(.78) contrast(.96);
+    }
+    .real-map a {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      z-index: 2;
+      padding: 7px 9px;
+      border: 1px solid rgba(36, 49, 45, .14);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, .92);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .real-map p {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      z-index: 2;
+      max-width: min(70%, 360px);
+      margin: 0;
+      padding: 8px 10px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .92);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .real-map--area { min-height: 320px; margin: 16px 0; }
+    .real-map--area iframe { min-height: 320px; }
+    .atlas-map {
+      position: relative;
+      min-height: 270px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 253, 247, .96), rgba(185, 206, 208, .26)),
+        repeating-linear-gradient(0deg, rgba(36, 49, 45, .045) 0 1px, transparent 1px 54px),
+        repeating-linear-gradient(90deg, rgba(36, 49, 45, .045) 0 1px, transparent 1px 54px);
+    }
+    .atlas-map svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .atlas-map path, .atlas-map circle {
+      fill: none;
+      stroke: rgba(95, 127, 114, .34);
+      stroke-width: 3;
+      vector-effect: non-scaling-stroke;
+    }
+    .atlas-map circle { stroke: rgba(169, 138, 75, .28); stroke-width: 2; }
+    .locator-map .country-outline path {
+      fill: rgba(95, 127, 114, .22);
+      stroke: rgba(36, 49, 45, .42);
+      stroke-width: 2;
+    }
+    .locator-map .country-outline--japan path { fill: rgba(95, 127, 114, .24); }
+    .locator-map .locator-map__callout {
+      stroke: rgba(183, 111, 87, .72);
+      stroke-width: 2;
+      stroke-dasharray: 4 5;
+    }
+    .locator-map .locator-map__dot {
+      fill: var(--terracotta);
+      stroke: #fffdf7;
+      stroke-width: 3;
+      filter: drop-shadow(0 3px 8px rgba(36, 49, 45, .22));
+    }
+    .locator-map__country-name {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      padding: 7px 10px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, .84);
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .locator-map__label::before { display: none; }
+    .atlas-map__pin {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      z-index: 2;
+      width: min(190px, 44%);
+      transform: translate(-50%, -50%);
+      padding: 10px;
+      border: 1px solid rgba(36, 49, 45, .14);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .88);
+      box-shadow: 0 12px 26px rgba(36, 49, 45, .08);
+    }
+    .atlas-map__pin::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: calc(100% - 2px);
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--terracotta);
+      transform: translate(-50%, 0);
+      box-shadow: 0 0 0 4px rgba(183, 111, 87, .18);
+    }
+    .atlas-map__pin span, .map-context-list span, .atlas-map__legend span {
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .atlas-map__pin strong { display: block; margin-top: 4px; color: var(--ink); font-size: 12px; line-height: 1.25; }
+    .map-context-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .map-context-list li { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .map-context-list strong { display: block; margin-top: 4px; font-size: 13px; line-height: 1.3; }
+    .atlas-map--area { min-height: 300px; margin: 16px 0; }
+    .atlas-map--area .atlas-map__pin { width: min(210px, 36%); }
+    .atlas-map__legend {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 2;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .atlas-map__legend span {
+      padding: 7px 9px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, .84);
+    }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -357,7 +537,8 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section { grid-template-columns: repeat(2, 1fr); }
+      .location-map-section .map-context-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -366,7 +547,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -376,7 +557,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -490,6 +671,29 @@
       .cluster-map { min-height: 160px; padding: 12px; }
       .cluster-map__grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
       .cluster-map__grid div { flex: 0 0 170px; }
+      .location-map-section { gap: 12px; margin-top: 12px; }
+      .real-map, .real-map iframe { min-height: 300px; }
+      .real-map--area, .real-map--area iframe { min-height: 360px; }
+      .real-map p {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        max-width: none;
+        padding: 7px 8px;
+        font-size: 11px;
+      }
+      .real-map a {
+        top: 8px;
+        right: 8px;
+        bottom: auto;
+      }
+      .atlas-map { min-height: 245px; }
+      .atlas-map--area { min-height: 440px; }
+      .atlas-map__pin { width: min(160px, 48%); padding: 8px; }
+      .atlas-map--area .atlas-map__pin { width: min(170px, 52%); }
+      .atlas-map__pin strong { font-size: 11px; }
+      .atlas-map__legend { right: 8px; bottom: 8px; gap: 5px; }
+      .atlas-map__legend span { padding: 6px 7px; font-size: 9px; }
     }
 </style>
 </head>
@@ -527,7 +731,7 @@
 
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">Thailand country hub · updated 2026-06-25</p>
+          <p class="page-eyebrow">Thailand country hub · updated 2026-06-26</p>
           <h1>Thailand Property Guide for Foreign Buyers</h1>
           <p class="page-lede">Assess Thailand property for foreign buyers, including Phuket and Koh Samui ownership structures, villa risks, rental appeal, and alternatives.</p>
         </div>
@@ -545,7 +749,7 @@
         <div><span>Country</span><strong>Thailand</strong></div>
         <div><span>Destinations</span><strong>1</strong></div>
         <div><span>Decision model</span><strong>10 dimensions</strong></div>
-        <div><span>Updated</span><strong>2026-06-25</strong></div>
+        <div><span>Updated</span><strong>2026-06-26</strong></div>
       </section>
       <nav class="sticky-jump" aria-label="Page sections"><a href="#country-thesis">Thesis</a><a href="#buyer-fit">Buyer Fit</a><a href="#premium-brief">Brief</a><a href="#destination-comparison">Compare</a><a href="#risk-posture">Risk</a><a href="#related-guides">Guides</a></nav>
 
