@@ -1559,22 +1559,138 @@ def country_locator_svg(dest: dict) -> tuple[str, int, int, str, str]:
 
 
 def destination_osm_maps(dest: dict) -> dict[str, dict] | None:
-    if dest.get("id") == "fukuoka-itoshima":
-        return {
-            "location": {
-                "title": "Fukuoka / Itoshima in Japan",
-                "bbox": (128.0, 30.1, 143.2, 38.8),
-                "marker": (33.5904, 130.2019),
-                "caption": "Marker sits on northern Kyushu, west of central Fukuoka.",
-            },
-            "area": {
-                "title": "Fukuoka and Itoshima area map",
-                "bbox": (130.02, 33.42, 130.58, 33.76),
-                "marker": (33.5904, 130.2019),
-                "caption": "Use this map to compare central Fukuoka, station-linked Itoshima, and the beach-adjacent coast.",
-            },
+    metadata = {
+        "fukuoka-itoshima": {
+            "location": {"bbox": (128.0, 30.1, 143.2, 38.8), "marker": (33.5904, 130.2019), "caption": "Marker sits on northern Kyushu, west of central Fukuoka."},
+            "area": {"bbox": (130.02, 33.42, 130.58, 33.76), "marker": (33.5904, 130.2019), "caption": "Compare central Fukuoka, station-linked Itoshima, and the beach-adjacent coast."},
+        },
+        "valencia": {
+            "location": {"bbox": (-10.0, 35.2, 4.8, 44.2), "marker": (39.4699, -0.3763), "caption": "Marker shows Valencia on Spain's east coast."},
+            "area": {"bbox": (-0.58, 39.28, -0.12, 39.62), "marker": (39.4699, -0.3763), "caption": "Use this map to compare the city core, beach districts, and airport/rail access."},
+        },
+        "algarve-cascais": {
+            "location": {"bbox": (-10.2, 36.5, -6.0, 42.3), "marker": (37.0194, -7.9304), "caption": "Marker anchors the Algarve; Cascais sits farther north near Lisbon."},
+            "area": {"bbox": (-9.55, 36.85, -7.35, 39.05), "marker": (37.0194, -7.9304), "caption": "Compare Algarve resort towns with the Lisbon/Cascais corridor."},
+        },
+        "m-laga-costa-del-sol": {
+            "location": {"bbox": (-10.0, 35.2, 4.8, 44.2), "marker": (36.7213, -4.4214), "caption": "Marker shows Malaga on Spain's southern Mediterranean coast."},
+            "area": {"bbox": (-5.40, 36.42, -3.55, 37.08), "marker": (36.7213, -4.4214), "caption": "Compare Malaga city, airport access, and the Costa del Sol resort corridor."},
+        },
+        "lake-como": {
+            "location": {"bbox": (6.4, 36.4, 18.8, 47.3), "marker": (45.9840, 9.2600), "caption": "Marker shows Lake Como in northern Italy near Milan and the Swiss border."},
+            "area": {"bbox": (8.85, 45.65, 9.65, 46.25), "marker": (45.9840, 9.2600), "caption": "Compare western shore, central lake villages, Como town, and access back to Milan."},
+        },
+        "hakone-izu": {
+            "location": {"bbox": (128.0, 30.1, 143.2, 38.8), "marker": (35.2324, 139.1069), "caption": "Marker sits southwest of Tokyo in the Hakone/Izu corridor."},
+            "area": {"bbox": (138.75, 34.55, 139.35, 35.35), "marker": (35.2324, 139.1069), "caption": "Compare Hakone access, Izu coast lifestyle, and Tokyo-distance tradeoffs."},
+        },
+        "madeira": {
+            "location": {"bbox": (-18.5, 30.0, -6.0, 42.5), "marker": (32.7607, -16.9595), "caption": "Marker shows Madeira in the Atlantic relative to mainland Portugal."},
+            "area": {"bbox": (-17.35, 32.55, -16.55, 33.00), "marker": (32.7607, -16.9595), "caption": "Compare Funchal convenience, south-coast climate, and hill/terrain exposure."},
+        },
+        "costa-brava-girona": {
+            "location": {"bbox": (-10.0, 35.2, 4.8, 44.2), "marker": (41.9794, 2.8214), "caption": "Marker shows Girona and the Costa Brava in northeast Spain near France."},
+            "area": {"bbox": (2.40, 41.65, 3.35, 42.45), "marker": (41.9794, 2.8214), "caption": "Compare Girona city access with coastal villages and prime coves."},
+        },
+        "crete": {
+            "location": {"bbox": (19.0, 34.0, 29.0, 42.0), "marker": (35.2401, 24.8093), "caption": "Marker shows Crete south of mainland Greece."},
+            "area": {"bbox": (23.30, 34.80, 26.50, 35.80), "marker": (35.2401, 24.8093), "caption": "Compare Chania, Rethymno, Heraklion, and south-coast access."},
+        },
+        "hakuba": {
+            "location": {"bbox": (128.0, 30.1, 143.2, 38.8), "marker": (36.6982, 137.8619), "caption": "Marker shows Hakuba in Nagano, northwest of Tokyo."},
+            "area": {"bbox": (137.70, 36.55, 138.05, 36.85), "marker": (36.6982, 137.8619), "caption": "Compare village access, ski areas, and car-dependent locations."},
+        },
+        "annecy": {
+            "location": {"bbox": (-5.0, 41.0, 10.0, 51.5), "marker": (45.8992, 6.1294), "caption": "Marker shows Annecy in the French Alps near Geneva."},
+            "area": {"bbox": (5.90, 45.75, 6.35, 46.05), "marker": (45.8992, 6.1294), "caption": "Compare Annecy town, lake villages, and Geneva access."},
+        },
+        "mallorca": {
+            "location": {"bbox": (-10.0, 35.2, 4.8, 44.2), "marker": (39.6953, 3.0176), "caption": "Marker shows Mallorca in the Balearic Islands."},
+            "area": {"bbox": (2.25, 39.25, 3.55, 40.10), "marker": (39.6953, 3.0176), "caption": "Compare Palma access, west-coast villages, and north/east resort zones."},
+        },
+        "croatia-istria-dalmatia": {
+            "location": {"bbox": (13.0, 42.0, 19.5, 46.8), "marker": (43.5081, 16.4402), "caption": "Marker anchors Dalmatia; Istria sits farther northwest."},
+            "area": {"bbox": (13.30, 42.30, 18.80, 45.70), "marker": (43.5081, 16.4402), "caption": "Compare Istria, Split/Dalmatia, islands, and airport access."},
+        },
+        "niseko": {
+            "location": {"bbox": (128.0, 30.1, 143.2, 45.8), "marker": (42.8048, 140.6874), "caption": "Marker shows Niseko on Hokkaido, southwest of Sapporo."},
+            "area": {"bbox": (140.55, 42.65, 140.85, 42.95), "marker": (42.8048, 140.6874), "caption": "Compare Hirafu, Niseko Village, Annupuri, and access to Kutchan."},
+        },
+        "queenstown": {
+            "location": {"bbox": (165.0, -47.5, 179.0, -34.0), "marker": (-45.0312, 168.6626), "caption": "Marker shows Queenstown on New Zealand's South Island."},
+            "area": {"bbox": (168.25, -45.25, 169.05, -44.75), "marker": (-45.0312, 168.6626), "caption": "Compare central Queenstown, Frankton access, lakefront, and outer valleys."},
+        },
+        "phuket-koh-samui": {
+            "location": {"bbox": (97.0, 5.0, 106.0, 21.0), "marker": (7.8804, 98.3923), "caption": "Marker anchors Phuket; Koh Samui sits across the peninsula in the Gulf of Thailand."},
+            "area": {"bbox": (98.00, 7.50, 100.40, 10.10), "marker": (7.8804, 98.3923), "caption": "Compare Phuket west/south coast with Koh Samui's villa market."},
+        },
+        "vancouver-island-victoria": {
+            "location": {"bbox": (-141.0, 41.0, -52.0, 84.0), "marker": (48.4284, -123.3656), "caption": "Marker shows Victoria on southern Vancouver Island."},
+            "area": {"bbox": (-125.50, 48.10, -123.00, 50.00), "marker": (48.4284, -123.3656), "caption": "Compare Victoria, southern island access, and more remote coastal areas."},
+        },
+        "dolomites-south-tyrol": {
+            "location": {"bbox": (6.4, 36.4, 18.8, 47.3), "marker": (46.4983, 11.3548), "caption": "Marker shows South Tyrol in northern Italy near Austria."},
+            "area": {"bbox": (10.70, 46.20, 12.50, 46.90), "marker": (46.4983, 11.3548), "caption": "Compare Bolzano access, Dolomite valleys, ski villages, and resort scarcity."},
+        },
+        "bali": {
+            "location": {"bbox": (94.0, -11.0, 142.0, 6.0), "marker": (-8.3405, 115.0920), "caption": "Marker shows Bali within the Indonesian archipelago."},
+            "area": {"bbox": (114.40, -8.90, 115.80, -8.00), "marker": (-8.3405, 115.0920), "caption": "Compare south Bali, Canggu/Berawa, Uluwatu, Ubud, and airport access."},
+        },
+        "chamonix": {
+            "location": {"bbox": (-5.0, 41.0, 10.0, 51.5), "marker": (45.9237, 6.8694), "caption": "Marker shows Chamonix in the French Alps near Switzerland and Italy."},
+            "area": {"bbox": (6.55, 45.75, 7.15, 46.10), "marker": (45.9237, 6.8694), "caption": "Compare Chamonix centre, Argentiere, Les Houches, and valley access."},
+        },
+        "park-city-deer-valley": {
+            "location": {"bbox": (-125.0, 24.0, -66.5, 49.5), "marker": (40.6461, -111.4980), "caption": "Marker shows Park City east of Salt Lake City in Utah."},
+            "area": {"bbox": (-111.70, 40.55, -111.35, 40.78), "marker": (40.6461, -111.4980), "caption": "Compare Park City, Deer Valley, Canyons, and airport-distance tradeoffs."},
+        },
+        "da-nang-hoi-an": {
+            "location": {"bbox": (102.0, 8.0, 110.5, 23.8), "marker": (16.0544, 108.2022), "caption": "Marker shows Da Nang on Vietnam's central coast."},
+            "area": {"bbox": (107.90, 15.75, 108.55, 16.25), "marker": (16.0544, 108.2022), "caption": "Compare Da Nang beach districts, airport access, and Hoi An lifestyle."},
+        },
+        "whistler": {
+            "location": {"bbox": (-141.0, 41.0, -52.0, 84.0), "marker": (50.1163, -122.9574), "caption": "Marker shows Whistler north of Vancouver in British Columbia."},
+            "area": {"bbox": (-123.25, 49.95, -122.65, 50.25), "marker": (50.1163, -122.9574), "caption": "Compare Whistler Village, Creekside, Nordic, and outer neighbourhoods."},
+        },
+        "andermatt": {
+            "location": {"bbox": (5.8, 45.7, 10.6, 47.9), "marker": (46.6357, 8.5941), "caption": "Marker shows Andermatt in central Switzerland."},
+            "area": {"bbox": (8.35, 46.45, 8.85, 46.80), "marker": (46.6357, 8.5941), "caption": "Compare village core, resort development, and alpine pass access."},
+        },
+        "innsbruck-tyrol": {
+            "location": {"bbox": (9.3, 46.3, 17.2, 49.1), "marker": (47.2692, 11.4041), "caption": "Marker shows Innsbruck in Austria's Tyrol region."},
+            "area": {"bbox": (11.10, 47.10, 11.75, 47.45), "marker": (47.2692, 11.4041), "caption": "Compare Innsbruck city access, nearby ski villages, and valley locations."},
+        },
+        "lake-tahoe": {
+            "location": {"bbox": (-125.0, 24.0, -66.5, 49.5), "marker": (39.0968, -120.0324), "caption": "Marker shows Lake Tahoe on the California/Nevada border."},
+            "area": {"bbox": (-120.35, 38.75, -119.75, 39.35), "marker": (39.0968, -120.0324), "caption": "Compare north shore, south shore, ski access, and cross-border rules."},
+        },
+        "jackson-hole": {
+            "location": {"bbox": (-125.0, 24.0, -66.5, 49.5), "marker": (43.4799, -110.7624), "caption": "Marker shows Jackson Hole in western Wyoming near Grand Teton."},
+            "area": {"bbox": (-111.20, 43.25, -110.40, 43.85), "marker": (43.4799, -110.7624), "caption": "Compare Jackson town, Teton Village, Wilson, and protected-land scarcity."},
+        },
+        "ticino-lake-lugano": {
+            "location": {"bbox": (5.8, 45.7, 10.6, 47.9), "marker": (46.0037, 8.9511), "caption": "Marker shows Lugano in Switzerland's Italian-speaking Ticino."},
+            "area": {"bbox": (8.50, 45.75, 9.25, 46.25), "marker": (46.0037, 8.9511), "caption": "Compare Lugano city, lake villages, and cross-border Italy access."},
+        },
+        "aspen-snowmass": {
+            "location": {"bbox": (-125.0, 24.0, -66.5, 49.5), "marker": (39.1911, -106.8175), "caption": "Marker shows Aspen/Snowmass in Colorado's Roaring Fork Valley."},
+            "area": {"bbox": (-107.10, 39.00, -106.60, 39.35), "marker": (39.1911, -106.8175), "caption": "Compare Aspen core, Snowmass, airport access, and valley alternatives."},
+        },
+        "swiss-valais-vaud-alps": {
+            "location": {"bbox": (5.8, 45.7, 10.6, 47.9), "marker": (46.0960, 7.2280), "caption": "Marker anchors Valais/Vaud alpine resort territory in western Switzerland."},
+            "area": {"bbox": (6.70, 45.85, 7.80, 46.55), "marker": (46.0960, 7.2280), "caption": "Compare Verbier, Villars, Crans-Montana, and valley access."},
+        },
+    }
+    item = metadata.get(dest.get("id"))
+    if not item:
+        return None
+    return {
+        key: {
+            "title": f"{dest['name']} {key} map",
+            **value,
         }
-    return None
+        for key, value in item.items()
+    }
 
 
 def osm_embed_html(map_info: dict, class_name: str) -> str:
