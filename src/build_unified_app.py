@@ -546,6 +546,16 @@ def copy_site_assets() -> None:
     for source in SOURCE_ASSETS.iterdir():
         if source.is_file():
             shutil.copy2(source, PUBLIC_ASSETS / source.name)
+    favicon_ico = SOURCE_ASSETS / "favicon.ico"
+    if favicon_ico.exists():
+        shutil.copy2(favicon_ico, ARTIFACTS / "favicon.ico")
+
+
+def favicon_links_html() -> str:
+    return """  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
+  <link rel="manifest" href="/assets/site.webmanifest">"""
 
 
 def build_listing_card(item: dict, extra_class: str = "") -> str:
@@ -936,9 +946,7 @@ def head_html(title: str, description: str, canonical: str, schema: list[dict]) 
     return f"""
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
-  <link rel="manifest" href="/assets/site.webmanifest">
+{favicon_links_html()}
   <title>{escape(title)}</title>
   <meta name="description" content="{escape(description)}">
   <link rel="canonical" href="{escape(canonical)}">
@@ -1487,6 +1495,158 @@ def destination_quick_decision_html(dest: dict) -> str:
     """
 
 
+def country_locator_svg(dest: dict) -> tuple[str, int, int, str, str]:
+    country = dest.get("country") or "Region"
+    if country == "Japan":
+        svg = """
+          <g class="country-outline country-outline--japan">
+            <path d="M518 52 C562 42 604 70 612 110 C620 150 586 178 542 166 C500 154 474 120 486 86 C492 68 502 58 518 52 Z" />
+            <path d="M432 132 C482 136 532 164 530 198 C528 226 494 242 450 234 C412 228 382 208 344 226 C306 244 266 242 252 218 C238 194 268 174 314 176 C360 178 382 126 432 132 Z" />
+            <path d="M310 256 C350 244 388 254 400 280 C386 306 338 314 300 294 C284 282 288 264 310 256 Z" />
+            <path d="M206 252 C244 234 288 250 294 286 C300 322 266 346 224 334 C184 322 172 280 206 252 Z" />
+            <path d="M142 290 C166 276 198 286 204 310 C196 334 158 344 134 326 C122 312 126 298 142 290 Z" />
+            <path d="M252 204 C286 190 324 200 334 226 C322 252 282 264 248 246 C232 232 236 214 252 204 Z" />
+          </g>
+        """
+        if dest.get("id") == "fukuoka-itoshima":
+            return svg, 226, 286, "Fukuoka / Itoshima", "Northern Kyushu"
+        return svg, 316, 236, dest["name"], "Japan"
+    if country == "United States":
+        svg = """
+          <g class="country-outline">
+            <path d="M120 120 C210 82 338 80 452 104 C536 122 594 160 612 220 C546 250 452 264 346 254 C240 244 164 218 108 176 C102 154 106 136 120 120 Z" />
+            <path d="M92 238 C132 232 164 246 180 276 C142 294 102 288 76 262 C78 250 84 242 92 238 Z" />
+          </g>
+        """
+        return svg, 372, 178, dest["name"], country
+    if country == "Canada":
+        svg = """
+          <g class="country-outline">
+            <path d="M92 76 C188 46 296 58 392 72 C486 84 580 78 642 122 C604 176 542 210 452 222 C350 236 238 218 144 190 C98 176 74 138 92 76 Z" />
+          </g>
+        """
+        return svg, 356, 178, dest["name"], country
+    if country in {"Spain", "Portugal", "Italy", "Greece", "France", "Switzerland", "Austria", "Croatia"}:
+        svg = """
+          <g class="country-outline">
+            <path d="M150 96 C250 60 382 68 496 106 C584 136 626 198 590 250 C544 318 406 336 278 304 C170 278 104 218 112 158 C116 130 130 108 150 96 Z" />
+            <path d="M518 258 C548 252 576 264 588 288 C566 306 530 306 504 288 C504 274 508 264 518 258 Z" />
+          </g>
+        """
+        return svg, 344, 188, dest["name"], country
+    if country in {"Thailand", "Vietnam", "Indonesia"}:
+        svg = """
+          <g class="country-outline">
+            <path d="M300 62 C354 92 388 144 380 198 C374 244 334 286 278 306 C246 268 238 220 252 168 C264 120 278 86 300 62 Z" />
+            <path d="M398 228 C458 224 518 244 566 286 C506 306 438 306 378 284 C376 258 382 240 398 228 Z" />
+          </g>
+        """
+        return svg, 360, 214, dest["name"], country
+    if country == "New Zealand":
+        svg = """
+          <g class="country-outline">
+            <path d="M360 72 C404 96 426 136 410 174 C378 182 338 164 322 130 C322 104 336 84 360 72 Z" />
+            <path d="M298 194 C344 194 382 224 388 268 C356 300 300 306 258 278 C250 238 264 208 298 194 Z" />
+          </g>
+        """
+        return svg, 346, 172, dest["name"], country
+    svg = """
+      <g class="country-outline">
+        <path d="M142 86 C238 46 392 58 514 106 C604 142 636 214 584 276 C522 342 370 344 242 304 C138 272 82 206 106 142 C114 116 126 98 142 86 Z" />
+      </g>
+    """
+    return svg, 360, 190, dest["name"], country
+
+
+def destination_osm_maps(dest: dict) -> dict[str, dict] | None:
+    if dest.get("id") == "fukuoka-itoshima":
+        return {
+            "location": {
+                "title": "Fukuoka / Itoshima in Japan",
+                "bbox": (128.0, 30.1, 143.2, 38.8),
+                "marker": (33.5904, 130.2019),
+                "caption": "Marker sits on northern Kyushu, west of central Fukuoka.",
+            },
+            "area": {
+                "title": "Fukuoka and Itoshima area map",
+                "bbox": (130.02, 33.42, 130.58, 33.76),
+                "marker": (33.5904, 130.2019),
+                "caption": "Use this map to compare central Fukuoka, station-linked Itoshima, and the beach-adjacent coast.",
+            },
+        }
+    return None
+
+
+def osm_embed_html(map_info: dict, class_name: str) -> str:
+    west, south, east, north = map_info["bbox"]
+    marker_lat, marker_lon = map_info["marker"]
+    bbox = f"{west},{south},{east},{north}"
+    src = f"https://www.openstreetmap.org/export/embed.html?bbox={bbox}&layer=mapnik&marker={marker_lat},{marker_lon}"
+    link = f"https://www.openstreetmap.org/?mlat={marker_lat}&mlon={marker_lon}#map=10/{marker_lat}/{marker_lon}"
+    return f"""
+      <div class="real-map {escape(class_name)}">
+        <iframe title="{escape(map_info["title"])}" loading="eager" referrerpolicy="no-referrer-when-downgrade" src="{escape(src)}"></iframe>
+        <a href="{escape(link)}" target="_blank" rel="noreferrer">Open larger map</a>
+        <p>{escape(map_info.get("caption") or "")}</p>
+      </div>
+    """
+
+
+def destination_location_map_html(dest: dict) -> str:
+    country_svg, marker_x, marker_y, marker_label, marker_note = country_locator_svg(dest)
+    osm_maps = destination_osm_maps(dest)
+    if dest.get("id") == "fukuoka-itoshima":
+        routes = [
+            ("Seoul", "Short regional flight"),
+            ("Taipei", "Regional access"),
+            ("Shanghai", "North Asia context"),
+        ]
+        copy = "Fukuoka / Itoshima sits on Kyushu's north coast: a city-and-coast Japan base with airport access close enough to make repeat visits realistic."
+    elif dest.get("country"):
+        routes = [
+            ("Capital city", "Gateway context"),
+            ("Regional hub", "Access comparison"),
+            ("Nearby market", "Alternative shortlist"),
+        ]
+        copy = f"Use this location view to place {dest['name']} in context before comparing listings. The key buyer question is how easily the destination connects to airports, services, and alternative markets."
+    else:
+        routes = [("Gateway", "Access context"), ("Alternative", "Comparison market"), ("Hub", "Services")]
+        copy = f"Use this location view to understand where {dest['name']} sits before moving into micro-location and budget diligence."
+    route_html = "\n".join(
+        f"<li><span>{escape(label)}</span><strong>{escape(note)}</strong></li>"
+        for label, note in routes
+    )
+    map_html = (
+        osm_embed_html(osm_maps["location"], "real-map--location")
+        if osm_maps
+        else f"""
+        <div class="atlas-map atlas-map--location locator-map" aria-hidden="true">
+          <span class="locator-map__country-name">{escape(dest.get("country") or "Region")}</span>
+          <svg viewBox="0 0 720 360" role="img" aria-label="{escape(dest['name'])} country locator map">
+            {country_svg}
+            <line class="locator-map__callout" x1="{marker_x}" y1="{marker_y}" x2="{marker_x + 70}" y2="{max(marker_y - 54, 44)}" />
+            <circle class="locator-map__dot" cx="{marker_x}" cy="{marker_y}" r="9" />
+          </svg>
+          <div class="atlas-map__pin locator-map__label" style="--x:{min(marker_x + 95, 650) / 7.2}%; --y:{max(marker_y - 70, 44) / 3.6}%;">
+            <span>{escape(marker_label)}</span>
+            <strong>{escape(marker_note)}</strong>
+          </div>
+        </div>
+        """
+    )
+    return f"""
+      <section class="page-section location-map-section" id="where-it-is" aria-label="Destination location map">
+        <div class="location-map-section__copy">
+          <span>Where it is</span>
+          <h2>Place the destination before you compare homes</h2>
+          <p>{escape(copy)}</p>
+        </div>
+        {map_html}
+        <ul class="map-context-list">{route_html}</ul>
+      </section>
+    """
+
+
 def destination_lifestyle_html(dest: dict) -> str:
     name = dest["name"]
     if dest.get("id") == "fukuoka-itoshima":
@@ -1518,6 +1678,7 @@ def destination_lifestyle_html(dest: dict) -> str:
 
 def destination_where_to_look_html(dest: dict) -> str:
     name = dest["name"]
+    osm_maps = destination_osm_maps(dest)
     if dest.get("id") == "fukuoka-itoshima":
         areas = [
             ("Central Fukuoka", "Best for liquidity, daily convenience, healthcare, airport access, and a larger resale buyer pool.", "Lower emotional scarcity; more urban than coastal."),
@@ -1542,9 +1703,15 @@ def destination_where_to_look_html(dest: dict) -> str:
             ("Lifestyle fringe", "Best for space, privacy, and personal use.", "Liquidity and daily convenience need testing."),
             ("Trophy pocket", "Best for scarcity and emotional pull.", "Price discipline and exit assumptions matter more."),
         ]
+    pin_positions = [(22, 56), (48, 46), (72, 34)]
     markers = "\n".join(
-        f"<div><span>{escape(label)}</span><strong>{escape(read)}</strong><em>{escape(watch)}</em></div>"
-        for label, read, watch in areas
+        f"""
+        <div class="atlas-map__pin atlas-map__pin--area" style="--x:{pin_positions[index][0]}%; --y:{pin_positions[index][1]}%;">
+          <span>{escape(label)}</span>
+          <strong>{escape(read)}</strong>
+        </div>
+        """
+        for index, (label, read, watch) in enumerate(areas)
     )
     rows = "\n".join(
         f"""
@@ -1556,13 +1723,35 @@ def destination_where_to_look_html(dest: dict) -> str:
         """
         for label, read, watch in areas
     )
+    area_map_html = (
+        osm_embed_html(osm_maps["area"], "real-map--area")
+        if osm_maps
+        else f"""
+        <div class="atlas-map atlas-map--area" aria-label="Destination micro-location map">
+          <svg viewBox="0 0 720 360" role="img" aria-label="{escape(name)} area map">
+            <path d="M54 250 C150 196 252 202 346 158 C456 108 564 96 674 122" />
+            <path d="M82 284 C184 258 284 274 382 226 C480 180 564 176 650 206" />
+            <path d="M210 62 L248 322" />
+            <path d="M360 42 L390 324" />
+            <path d="M520 70 L506 310" />
+            <circle cx="164" cy="234" r="46" />
+            <circle cx="356" cy="174" r="58" />
+            <circle cx="540" cy="132" r="50" />
+          </svg>
+          <div class="atlas-map__legend">
+            <span>City / core</span>
+            <span>Access corridor</span>
+            <span>Lifestyle edge</span>
+          </div>
+          {markers}
+        </div>
+        """
+    )
     return f"""
       <details class="page-section" id="where-to-look" data-mobile-open="true" open>
         <summary><h2>Where to Look</h2></summary>
         <p>Micro-location decides whether {escape(name)} feels easy to own, easy to use, and realistic to resell. Start with the role the property should play, then compare locations against that role.</p>
-        <div class="cluster-map" aria-label="Destination micro-location map">
-          <div class="cluster-map__grid">{markers}</div>
-        </div>
+        {area_map_html}
         <div class="page-grid">{rows}</div>
       </details>
     """
@@ -2245,9 +2434,7 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
-  <link rel="manifest" href="/assets/site.webmanifest">
+{favicon_links_html()}
   <title>Global Home Atlas | Find Your Best-Fit Overseas Property Market</title>
   <meta name="description" content="Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan with independent Global Home Atlas research.">
   <link rel="canonical" href="{SITE_URL}">
@@ -3834,6 +4021,185 @@ def shared_content_css() -> str:
     .decision-panel__facts div { padding: 16px; }
     .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
     .delight-grid { margin-top: 14px; }
+    .location-map-section {
+      display: grid;
+      grid-template-columns: minmax(0, .72fr) minmax(0, 1.2fr) minmax(180px, .48fr);
+      gap: 16px;
+      align-items: stretch;
+      margin-top: 18px;
+    }
+    .location-map-section__copy span {
+      color: var(--gold);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .location-map-section__copy h2 { margin: 8px 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 3vw, 34px); line-height: 1.04; }
+    .location-map-section__copy p { margin: 0; color: #3f4d48; }
+    .real-map {
+      min-height: 270px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #e9eee9;
+      position: relative;
+    }
+    .real-map iframe {
+      display: block;
+      width: 100%;
+      height: 100%;
+      min-height: 270px;
+      border: 0;
+      filter: saturate(.78) contrast(.96);
+    }
+    .real-map a {
+      position: absolute;
+      right: 10px;
+      bottom: 10px;
+      z-index: 2;
+      padding: 7px 9px;
+      border: 1px solid rgba(36, 49, 45, .14);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, .92);
+      color: var(--ink);
+      font-size: 11px;
+      font-weight: 850;
+      text-decoration: none;
+    }
+    .real-map p {
+      position: absolute;
+      left: 10px;
+      bottom: 10px;
+      z-index: 2;
+      max-width: min(70%, 360px);
+      margin: 0;
+      padding: 8px 10px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .92);
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .real-map--area { min-height: 320px; margin: 16px 0; }
+    .real-map--area iframe { min-height: 320px; }
+    .atlas-map {
+      position: relative;
+      min-height: 270px;
+      overflow: hidden;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background:
+        linear-gradient(135deg, rgba(255, 253, 247, .96), rgba(185, 206, 208, .26)),
+        repeating-linear-gradient(0deg, rgba(36, 49, 45, .045) 0 1px, transparent 1px 54px),
+        repeating-linear-gradient(90deg, rgba(36, 49, 45, .045) 0 1px, transparent 1px 54px);
+    }
+    .atlas-map svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    .atlas-map path, .atlas-map circle {
+      fill: none;
+      stroke: rgba(95, 127, 114, .34);
+      stroke-width: 3;
+      vector-effect: non-scaling-stroke;
+    }
+    .atlas-map circle { stroke: rgba(169, 138, 75, .28); stroke-width: 2; }
+    .locator-map .country-outline path {
+      fill: rgba(95, 127, 114, .22);
+      stroke: rgba(36, 49, 45, .42);
+      stroke-width: 2;
+    }
+    .locator-map .country-outline--japan path { fill: rgba(95, 127, 114, .24); }
+    .locator-map .locator-map__callout {
+      stroke: rgba(183, 111, 87, .72);
+      stroke-width: 2;
+      stroke-dasharray: 4 5;
+    }
+    .locator-map .locator-map__dot {
+      fill: var(--terracotta);
+      stroke: #fffdf7;
+      stroke-width: 3;
+      filter: drop-shadow(0 3px 8px rgba(36, 49, 45, .22));
+    }
+    .locator-map__country-name {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      z-index: 2;
+      padding: 7px 10px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, .84);
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    .locator-map__label::before { display: none; }
+    .atlas-map__pin {
+      position: absolute;
+      left: var(--x);
+      top: var(--y);
+      z-index: 2;
+      width: min(190px, 44%);
+      transform: translate(-50%, -50%);
+      padding: 10px;
+      border: 1px solid rgba(36, 49, 45, .14);
+      border-radius: 8px;
+      background: rgba(255, 253, 247, .88);
+      box-shadow: 0 12px 26px rgba(36, 49, 45, .08);
+    }
+    .atlas-map__pin::before {
+      content: "";
+      position: absolute;
+      left: 50%;
+      top: calc(100% - 2px);
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--terracotta);
+      transform: translate(-50%, 0);
+      box-shadow: 0 0 0 4px rgba(183, 111, 87, .18);
+    }
+    .atlas-map__pin span, .map-context-list span, .atlas-map__legend span {
+      color: var(--gold);
+      font-size: 10px;
+      font-weight: 900;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+    .atlas-map__pin strong { display: block; margin-top: 4px; color: var(--ink); font-size: 12px; line-height: 1.25; }
+    .map-context-list {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+    .map-context-list li { padding: 12px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
+    .map-context-list strong { display: block; margin-top: 4px; font-size: 13px; line-height: 1.3; }
+    .atlas-map--area { min-height: 300px; margin: 16px 0; }
+    .atlas-map--area .atlas-map__pin { width: min(210px, 36%); }
+    .atlas-map__legend {
+      position: absolute;
+      right: 12px;
+      bottom: 12px;
+      z-index: 2;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .atlas-map__legend span {
+      padding: 7px 9px;
+      border: 1px solid rgba(36, 49, 45, .12);
+      border-radius: 999px;
+      background: rgba(255, 253, 247, .84);
+    }
     .comparison-table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
     .comparison-table { width: 100%; min-width: 760px; border-collapse: collapse; background: #fff; }
     .comparison-table th, .comparison-table td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
@@ -3961,7 +4327,8 @@ def shared_content_css() -> str:
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section { grid-template-columns: repeat(2, 1fr); }
+      .location-map-section .map-context-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 560px) {
       .page-shell { width: min(1120px, calc(100% - 28px)); }
@@ -3970,7 +4337,7 @@ def shared_content_css() -> str:
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -3980,7 +4347,7 @@ def shared_content_css() -> str:
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -4094,6 +4461,29 @@ def shared_content_css() -> str:
       .cluster-map { min-height: 160px; padding: 12px; }
       .cluster-map__grid { flex-wrap: nowrap; overflow-x: auto; padding-bottom: 2px; }
       .cluster-map__grid div { flex: 0 0 170px; }
+      .location-map-section { gap: 12px; margin-top: 12px; }
+      .real-map, .real-map iframe { min-height: 300px; }
+      .real-map--area, .real-map--area iframe { min-height: 360px; }
+      .real-map p {
+        left: 8px;
+        right: 8px;
+        bottom: 8px;
+        max-width: none;
+        padding: 7px 8px;
+        font-size: 11px;
+      }
+      .real-map a {
+        top: 8px;
+        right: 8px;
+        bottom: auto;
+      }
+      .atlas-map { min-height: 245px; }
+      .atlas-map--area { min-height: 440px; }
+      .atlas-map__pin { width: min(160px, 48%); padding: 8px; }
+      .atlas-map--area .atlas-map__pin { width: min(170px, 52%); }
+      .atlas-map__pin strong { font-size: 11px; }
+      .atlas-map__legend { right: 8px; bottom: 8px; gap: 5px; }
+      .atlas-map__legend span { padding: 6px 7px; font-size: 9px; }
     }
 """
 
@@ -4151,6 +4541,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
     peer_links = destination_links(peer_destinations, limit=6) or destination_links(destinations, slug, limit=6)
     destination_guide_links = guide_links_for_destination(dest, pages)
     quick_decision = destination_quick_decision_html(dest)
+    location_map = destination_location_map_html(dest)
     lifestyle_section = destination_lifestyle_html(dest)
     buyer_fit_section = destination_fit_html(dest, pros, cons)
     where_to_look_section = destination_where_to_look_html(dest)
@@ -4191,9 +4582,9 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
   <main>
     <div class="page-shell">
       {quick_decision}
-      {sticky_page_nav([("Overview", "overview"), ("Lifestyle", "lifestyle"), ("Buyer Fit", "buyer-fit"), ("Locations", "where-to-look"), ("Budget", "budget"), ("Risks", "risks"), ("Scores", "scores"), ("Evidence", "evidence"), ("Compare", "compare")])}
+      {location_map}
+      {sticky_page_nav([("Overview", "overview"), ("Map", "where-it-is"), ("Lifestyle", "lifestyle"), ("Buyer Fit", "buyer-fit"), ("Areas", "where-to-look"), ("Budget", "budget"), ("Risks", "risks"), ("Scores", "scores"), ("Evidence", "evidence"), ("Compare", "compare")])}
       {mobile_action_strip("#budget", "Budget", "/shortlist-review/", "Review")}
-      {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
           <details class="page-section" id="overview" data-mobile-open="true" open>
@@ -4887,9 +5278,7 @@ def build() -> Path:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
-  <link rel="manifest" href="/assets/site.webmanifest">
+  __FAVICON_LINKS__
   <title>Global Home Atlas | Compare Global Property Investment Destinations</title>
   <meta name="description" content="Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.">
   <link rel="canonical" href="https://globalhomeatlas.com/">
@@ -6367,6 +6756,7 @@ def build() -> Path:
         "__TRUST_GUIDES__": build_home_trust_section(),
         "__APP_DATA__": app_data,
         "__HOME_SCHEMA__": json_ld(global_schema_entities()),
+        "__FAVICON_LINKS__": favicon_links_html().strip(),
         "__ANALYTICS_HEAD__": analytics_head_tags(),
         "__ANALYTICS_EVENT_SCRIPT__": analytics_event_script(),
     }
