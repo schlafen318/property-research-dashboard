@@ -1016,6 +1016,123 @@ def contextual_related_guides(page: dict, pages: list[dict]) -> str:
     return "\n".join(cards)
 
 
+def country_hubs_for_page(page: dict, destinations: list[dict], limit: int = 4) -> list[dict]:
+    page_destination_ids = set(page.get("destination_ids", []))
+    scored = []
+    for hub in COUNTRY_HUBS:
+        hub_destination_ids = set(hub.get("destination_ids", []))
+        overlap = len(page_destination_ids.intersection(hub_destination_ids))
+        if overlap:
+            scored.append((overlap, hub))
+    if not scored:
+        selected_countries = {
+            dest.get("country")
+            for dest in destinations_for_page(page, destinations)
+            if dest.get("country")
+        }
+        for hub in COUNTRY_HUBS:
+            if hub.get("country") in selected_countries:
+                scored.append((1, hub))
+    scored.sort(key=lambda item: item[0], reverse=True)
+    return [hub for _, hub in scored[:limit]]
+
+
+def country_hub_cards_for_page(page: dict, destinations: list[dict], limit: int = 4) -> str:
+    cards = []
+    for hub in country_hubs_for_page(page, destinations, limit):
+        cards.append(
+            f"""
+            <article class="seo-link-card">
+              <span>{escape(hub["country"])} hub</span>
+              <h3><a href="/countries/{escape(hub["slug"])}/" data-track="country_hub_click" data-track-label="{escape(page["h1"])} to {escape(hub["country"])}">{escape(hub["h1"])}</a></h3>
+              <p>{escape(hub["description"])}</p>
+            </article>
+            """.rstrip()
+        )
+    return "\n".join(cards)
+
+
+def guide_decision_path_html(page: dict, destinations: list[dict], pages: list[dict]) -> str:
+    selected = destinations_for_page(page, destinations)
+    top = selected[0]
+    runner_up = selected[1] if len(selected) > 1 else selected[0]
+    related_cards = contextual_related_guides(page, pages)
+    country_cards = country_hub_cards_for_page(page, destinations)
+    return f"""
+      <section class="decision-path" aria-label="Decision Path">
+        <div>
+          <p class="seo-eyebrow">Decision Path</p>
+          <h2>Compare the strongest route before opening listings</h2>
+          <p>Start with {escape(top["name"])} and test it against {escape(runner_up["name"])}. Then use the linked country hubs and adjacent guides to check ownership clarity, lifestyle fit, rental realism, and exit liquidity before talking to agents.</p>
+        </div>
+        <div class="decision-path__grid">
+          <article>
+            <span>Step 01</span>
+            <strong>Compare destinations</strong>
+            <p>Use the dashboard to compare the shortlist across all {len(DIMENSIONS)} decision dimensions.</p>
+            <a href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} decision path">Open dashboard</a>
+          </article>
+          <article>
+            <span>Step 02</span>
+            <strong>Check country fit</strong>
+            <p>Read the relevant country hubs before narrowing to individual homes.</p>
+            <a href="/guides/" data-track="guide_click" data-track-label="{escape(page["h1"])} decision path guides">Browse guide hub</a>
+          </article>
+          <article>
+            <span>Step 03</span>
+            <strong>Pressure-test the shortlist</strong>
+            <p>Turn this guide into a shortlist review once the buyer intent and markets are clear.</p>
+            <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(page["h1"])} decision path">Review my shortlist</a>
+          </article>
+        </div>
+        <div class="seo-link-grid">{country_cards}{related_cards}</div>
+        <div class="conversion-callout">
+          <h3>Turn this guide into a shortlist</h3>
+          <p>Bring your budget, buyer profile, holding period, citizenship, and preferred use case into a focused review before speaking to local agents.</p>
+          <a class="seo-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(page["h1"])} conversion callout">Start shortlist review</a>
+        </div>
+      </section>
+    """
+
+
+def country_next_step_html(hub: dict, selected: list[dict], pages: list[dict]) -> str:
+    best = selected[0] if selected else None
+    guide_links = country_guide_links(hub, pages)
+    best_name = best["name"] if best else hub["country"]
+    return f"""
+      <section class="buyer-next-step" aria-label="Buyer Next Step">
+        <div>
+          <p class="page-eyebrow">Buyer Next Step</p>
+          <h2>Turn {escape(hub["country"])} research into a shortlist</h2>
+          <p>Start with {escape(best_name)}, compare the related buying guides, then use shortlist review once the buyer profile, holding period, and budget are clear enough for local diligence.</p>
+        </div>
+        <div class="buyer-next-step__grid">
+          <article>
+            <span>First screen</span>
+            <strong>Country fit</strong>
+            <p>Check ownership clarity, tax and transaction friction, visa assumptions, rental rules, and exit liquidity before reviewing listings.</p>
+          </article>
+          <article>
+            <span>Compare</span>
+            <strong>Destination evidence</strong>
+            <p>Open the dashboard to compare {escape(hub["country"])} markets against the wider Atlas model.</p>
+            <a href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(hub["country"])} buyer next step">Open dashboard</a>
+          </article>
+          <article>
+            <span>Route</span>
+            <strong>Related guides</strong>
+            <nav>{guide_links}</nav>
+          </article>
+        </div>
+        <div class="conversion-callout">
+          <h3>Turn {escape(hub["country"])} research into a shortlist</h3>
+          <p>Use a buyer-specific review to compare lifestyle use, legal practicality, budget fit, and the risk items that need professional local checks.</p>
+          <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(hub["country"])} buyer next step">Review my shortlist</a>
+        </div>
+      </section>
+    """
+
+
 def guide_links_for_destination(dest: dict, pages: list[dict], limit: int = 5) -> str:
     matches = []
     for page in pages:
@@ -3293,6 +3410,15 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     top_destinations = destinations[:6]
     top_destination_links = destination_links(top_destinations, limit=6)
     country_links = country_hub_links(limit=7)
+    priority_route_links = guide_cards_for_slugs(
+        [
+            "best-countries-to-buy-property-as-a-foreigner",
+            "best-places-to-buy-property-abroad-for-retirement",
+            "foreign-property-investment-risks",
+        ],
+        pages,
+        destinations,
+    )
 
     return f"""<!doctype html>
 <html lang="en">
@@ -3305,12 +3431,17 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     .journey-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .journey-card strong {{ display: block; margin: 8px 0 6px; color: var(--ink); font-size: 18px; line-height: 1.14; }}
     .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }}
+    .priority-route {{ display: grid; gap: 18px; }}
+    .route-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
+    .conversion-strip {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 18px; border: 1px solid rgba(95, 127, 114, .24); border-radius: 8px; background: #eef4ec; }}
+    .conversion-strip h2, .conversion-strip h3 {{ margin: 0 0 6px; font-family: Georgia, "Times New Roman", serif; font-size: 24px; line-height: 1.08; }}
+    .conversion-strip p {{ margin: 0; color: var(--muted); }}
     .page-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .page-card p strong {{ color: var(--ink); }}
     .page-card p:last-child {{ display: grid; gap: 6px; }}
     .page-card p:last-child a {{ margin-right: 8px; font-size: 13px; font-weight: 800; }}
-    @media (max-width: 860px) {{ .journey-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
-    @media (max-width: 560px) {{ .journey-grid {{ grid-template-columns: 1fr; }} }}
+    @media (max-width: 860px) {{ .journey-grid, .route-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .conversion-strip {{ grid-template-columns: 1fr; }} }}
+    @media (max-width: 560px) {{ .journey-grid, .route-grid {{ grid-template-columns: 1fr; }} }}
   </style>
 </head>
 <body>
@@ -3343,6 +3474,20 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
+          <section class="page-section priority-route" id="priority-route">
+            <div>
+              <h2>Start with the strongest route</h2>
+              <p>Google is starting to index the Atlas, so the first job is to route buyers into the highest-intent pages: foreign-buyer access, retirement property fit, and risk screening. Use these before comparing individual homes.</p>
+            </div>
+            <div class="route-grid">{priority_route_links}</div>
+            <div class="conversion-strip">
+              <div>
+                <h3>Ready to turn research into a shortlist?</h3>
+                <p>Use the dashboard to compare markets, then request a shortlist review once buyer intent, budget, and holding period are clear.</p>
+              </div>
+              <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub priority route">Review my shortlist</a>
+            </div>
+          </section>
           <section class="page-section" id="choose-journey">
             <h2>Choose Your Buyer Journey</h2>
             <p>Use the guide hub as a route map. Start with the job the property needs to perform, then compare countries and destinations only after the buyer intent is clear.</p>
@@ -3371,6 +3516,13 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
             <p>Open the dashboard to compare all destination scores and export a shortlist memo.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="guide hub">Open dashboard</a>
             <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub">Review my shortlist</a>
+          </section>
+          <section class="page-aside-card conversion-strip">
+            <div>
+              <h3>Ready to turn research into a shortlist?</h3>
+              <p>Bring a focused set of markets into a buyer-specific review before local agent conversations.</p>
+            </div>
+            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub aside conversion">Start review</a>
           </section>
           <section class="page-aside-card">
             <h3>Best Starting Destinations</h3>
@@ -3589,6 +3741,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
         <article><span>Risk posture</span><strong>{metric_value(best, "ownership_clarity"):.1f}/5 ownership clarity</strong><p>Use country-level rules as the first screen, then verify title, taxes, rental permissions, and local transaction mechanics by asset.</p></article>
       </section>
       {trust_brief_html()}
+      {country_next_step_html(hub, selected, pages)}
       <div class="page-layout">
         <article class="page-article">
           <details class="page-section" id="country-thesis" open>
@@ -3758,6 +3911,16 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
     .seo-stats div {{ min-width: 0; padding: 16px; background: var(--paper); }}
     .seo-stats span, dt {{ display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }}
     .seo-stats strong, dd {{ display: block; margin: 5px 0 0; font-weight: 900; overflow-wrap: anywhere; }}
+    .decision-path {{ display: grid; gap: 18px; margin-top: 18px; padding: 22px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 18px 50px rgba(36, 49, 45, .06); }}
+    .decision-path h2 {{ margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); line-height: 1.04; }}
+    .decision-path p {{ margin: 0; color: #3f4d48; }}
+    .decision-path__grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
+    .decision-path__grid article, .conversion-callout {{ min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }}
+    .decision-path__grid span {{ color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .decision-path__grid strong {{ display: block; margin: 6px 0; font-size: 18px; line-height: 1.15; }}
+    .decision-path__grid a {{ display: inline-flex; margin-top: 10px; font-weight: 850; }}
+    .conversion-callout {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; background: #eef4ec; }}
+    .conversion-callout h3 {{ margin: 0 0 6px; font-size: 22px; line-height: 1.12; }}
     .seo-content {{ display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }}
     .seo-article {{ display: grid; gap: 28px; min-width: 0; }}
     .seo-section {{ min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }}
@@ -3795,6 +3958,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
       .seo-hero-grid, .seo-content {{ grid-template-columns: 1fr; }}
       .seo-aside {{ position: static; }}
       .seo-stats {{ grid-template-columns: repeat(2, 1fr); }}
+      .decision-path__grid, .conversion-callout {{ grid-template-columns: 1fr; }}
     }}
     @media (max-width: 560px) {{
       .seo-shell {{ width: min(100% - 28px, 1120px); }}
@@ -3842,6 +4006,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
           <div><span>Research status</span><strong>Updated {updated}</strong></div>
         </div>
       </section>
+      {guide_decision_path_html(page, destinations, pages)}
       <div class="seo-content">
         <article class="seo-article">
           <section class="seo-section">
@@ -4012,6 +4177,17 @@ def shared_content_css() -> str:
     .page-stats div { min-width: 0; padding: 16px; background: var(--paper); }
     .page-stats span, dt { display: block; color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .06em; text-transform: uppercase; }
     .page-stats strong, dd { display: block; margin: 5px 0 0; font-weight: 900; overflow-wrap: anywhere; }
+    .buyer-next-step { display: grid; gap: 18px; margin-top: 20px; padding: 22px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 18px 50px rgba(36, 49, 45, .06); }
+    .buyer-next-step h2 { margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); line-height: 1.04; }
+    .buyer-next-step p { margin: 0; color: #3f4d48; }
+    .buyer-next-step__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .buyer-next-step__grid article, .conversion-callout { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .buyer-next-step__grid span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .buyer-next-step__grid strong { display: block; margin: 6px 0; font-size: 18px; line-height: 1.15; }
+    .buyer-next-step__grid nav { display: grid; gap: 8px; margin-top: 8px; }
+    .buyer-next-step__grid a { font-weight: 850; }
+    .conversion-callout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; background: #eef4ec; }
+    .conversion-callout h3 { margin: 0 0 6px; font-size: 22px; line-height: 1.12; }
     .page-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }
     .page-article { display: grid; gap: 24px; min-width: 0; }
     .page-section { min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
@@ -4444,6 +4620,7 @@ def shared_content_css() -> str:
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
       .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section { grid-template-columns: repeat(2, 1fr); }
+      .buyer-next-step__grid, .conversion-callout { grid-template-columns: 1fr; }
       .location-map-section .map-context-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 560px) {
@@ -4453,7 +4630,7 @@ def shared_content_css() -> str:
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li, .buyer-next-step, .buyer-next-step__grid article, .conversion-callout {
         width: 100%;
         max-width: 100%;
         min-width: 0;
