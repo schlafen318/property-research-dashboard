@@ -227,13 +227,13 @@ SEO_PAGES = [
     },
     {
         "slug": "best-places-to-buy-vacation-home-abroad",
-        "title": "Best Places to Buy a Vacation Home Abroad | Global Home Atlas",
-        "description": "Rank global vacation-home destinations by lifestyle pull, rental durability, foreign ownership, value discipline, and long-term exit liquidity.",
-        "h1": "Best Places to Buy a Vacation Home Abroad",
-        "keyword": "best places to buy a vacation home abroad",
+        "title": "Best Countries and Places to Buy a Vacation Home Abroad | Global Home Atlas",
+        "description": "Compare the best countries, places, and locations to buy a vacation home abroad by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.",
+        "h1": "Best Countries and Places to Buy a Vacation Home Abroad",
+        "keyword": "best country to buy a vacation home",
         "theme": "vacation-home acquisition",
         "intent": "buyers who want personal use, repeatable travel demand, and a realistic path to offset carrying costs",
-        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "madeira", "costa-brava-girona", "lake-como", "crete", "phuket-koh-samui", "mallorca"],
+        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "madeira", "costa-brava-girona", "lake-como", "crete", "phuket-koh-samui", "mallorca", "andermatt", "annecy"],
         "faqs": [
             ("What makes a strong overseas vacation-home market?", "Look for repeat visitation, airport access, year-round demand, clear local rental rules, and a resale market beyond foreign buyers."),
             ("Are island homes better investments?", "Not automatically. Islands can have scarcity and appeal, but also seasonality, maintenance friction, and regulatory limits."),
@@ -1095,6 +1095,44 @@ def guide_decision_path_html(page: dict, destinations: list[dict], pages: list[d
     """
 
 
+def vacation_home_quick_answer_html(page: dict, destinations: list[dict]) -> str:
+    if page.get("slug") != "best-places-to-buy-vacation-home-abroad":
+        return ""
+    selected = destinations_for_page(page, destinations)[:10]
+    cards = []
+    for index, dest in enumerate(selected, start=1):
+        cards.append(
+            f"""
+            <article>
+              <span>#{index} vacation-home candidate</span>
+              <h3><a href="/destinations/{escape(destination_slug(dest))}/" data-track="destination_click" data-track-label="vacation home quick answer {escape(dest["name"])}">{escape(dest["name"])}</a></h3>
+              <p>{escape(dest.get("panel_verdict") or dest.get("panel_summary") or "")}</p>
+              <dl>
+                <div><dt>Country</dt><dd>{escape(dest.get("country") or "n/a")}</dd></div>
+                <div><dt>Entry benchmark</dt><dd>{money(dest.get("usd_per_m2"))}/m2</dd></div>
+                <div><dt>Ownership</dt><dd>{metric_value(dest, "ownership_clarity"):.1f}/5</dd></div>
+                <div><dt>Exit</dt><dd>{metric_value(dest, "exit_liquidity"):.1f}/5</dd></div>
+              </dl>
+            </article>
+            """.rstrip()
+        )
+    return f"""
+      <section class="quick-answer" aria-label="Quick Answer">
+        <div>
+          <p class="seo-eyebrow">Quick Answer</p>
+          <h2>Best country to buy a vacation home: start with practical ownership and repeat-use demand</h2>
+          <p>The strongest vacation-home locations abroad are not only beautiful. They combine repeat travel demand, clear ownership path, realistic rental-rule risk, usable airports, and resale depth. Start with these Atlas candidates, then compare the full scorecard before looking at individual homes.</p>
+        </div>
+        <div class="quick-answer__grid">{"".join(cards)}</div>
+        <div class="conversion-callout">
+          <h3>Shortlist vacation-home countries before calling agents</h3>
+          <p>Use the dashboard to compare lifestyle pull, ownership clarity, rental realism, and exit liquidity across countries and locations.</p>
+          <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="vacation home quick answer">Compare vacation-home locations</a>
+        </div>
+      </section>
+    """
+
+
 def country_next_step_html(hub: dict, selected: list[dict], pages: list[dict]) -> str:
     best = selected[0] if selected else None
     guide_links = country_guide_links(hub, pages)
@@ -1608,6 +1646,65 @@ def destination_quick_decision_html(dest: dict) -> str:
           <p>{escape(dest.get("panel_verdict") or dest.get("panel_summary") or "Use this market as a disciplined shortlist candidate, then verify the local transaction details.")}</p>
         </div>
         <div class="decision-panel__facts">{items}</div>
+      </section>
+    """
+
+
+def destination_query_match_html(dest: dict, pages: list[dict]) -> str:
+    destination_id = dest.get("id")
+    if destination_id not in {"andermatt", "annecy"}:
+        return ""
+    if destination_id == "andermatt":
+        title = "Andermatt real estate: what to check before shortlisting"
+        intro = (
+            "Andermatt real estate can screen well for scarcity, infrastructure, and Swiss resilience, "
+            "but the Atlas view starts with entry price, ownership access, carrying costs, and future buyer depth."
+        )
+        points = [
+            ("Price discipline", "Use the USD/m2 benchmark and listing evidence before assuming resort scarcity creates margin of safety."),
+            ("Ownership path", "Check the Swiss foreign-buyer framework and the specific Andermatt exception before comparing units."),
+            ("Exit liquidity", "Stress-test whether the buyer pool is deep enough at the target price point and asset type."),
+        ]
+        related = ["best-places-to-buy-vacation-home-abroad", "foreign-property-investment-risks", "where-can-foreigners-buy-property"]
+    else:
+        title = "Annecy vacation home: what to compare before buying"
+        intro = (
+            "An Annecy vacation home thesis depends on lake lifestyle, Geneva access, year-round use, "
+            "and whether the selected neighborhood can support both owner enjoyment and resale depth."
+        )
+        points = [
+            ("Use case", "Separate lake-area lifestyle demand from a pure rental-income thesis before reviewing homes."),
+            ("Access", "Compare airport and rail practicality with other Alpine and European vacation-home locations."),
+            ("Budget fit", "Use listing evidence to distinguish city, lake-village, and premium lake-adjacent pricing."),
+        ]
+        related = ["best-places-to-buy-vacation-home-abroad", "best-places-to-buy-a-second-home-abroad", "best-places-to-buy-property-in-europe"]
+    by_slug = {page["slug"]: page for page in pages}
+    guide_cards = []
+    for slug in related:
+        page = by_slug.get(slug)
+        if not page:
+            continue
+        guide_cards.append(
+            f'<a href="/{escape(page["slug"])}/" data-track="guide_click" data-track-label="{escape(dest["name"])} query match {escape(page["h1"])}">{escape(page["h1"])}</a>'
+        )
+    point_html = "".join(
+        f"""
+        <article>
+          <span>{escape(label)}</span>
+          <p>{escape(body)}</p>
+        </article>
+        """.rstrip()
+        for label, body in points
+    )
+    return f"""
+      <section class="query-match-panel" aria-label="{escape(title)}">
+        <div>
+          <p class="page-eyebrow">Search match</p>
+          <h2>{escape(title)}</h2>
+          <p>{escape(intro)}</p>
+        </div>
+        <div class="query-match-panel__grid">{point_html}</div>
+        <nav>{''.join(guide_cards)}<a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(dest["name"])} query match">Review my shortlist</a></nav>
       </section>
     """
 
@@ -3921,6 +4018,15 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
     .decision-path__grid a {{ display: inline-flex; margin-top: 10px; font-weight: 850; }}
     .conversion-callout {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; background: #eef4ec; }}
     .conversion-callout h3 {{ margin: 0 0 6px; font-size: 22px; line-height: 1.12; }}
+    .quick-answer {{ display: grid; gap: 18px; margin-top: 18px; padding: 22px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 18px 50px rgba(36, 49, 45, .06); }}
+    .quick-answer h2 {{ margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); line-height: 1.04; }}
+    .quick-answer p {{ margin: 0; color: #3f4d48; }}
+    .quick-answer__grid {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }}
+    .quick-answer__grid article {{ min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }}
+    .quick-answer__grid span {{ color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .quick-answer__grid h3 {{ margin: 7px 0; font-size: 18px; line-height: 1.15; }}
+    .quick-answer__grid dl {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0 0; }}
+    .quick-answer__grid dl div {{ padding: 9px; border-radius: 6px; background: #f2f5f1; }}
     .seo-content {{ display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }}
     .seo-article {{ display: grid; gap: 28px; min-width: 0; }}
     .seo-section {{ min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }}
@@ -3958,7 +4064,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
       .seo-hero-grid, .seo-content {{ grid-template-columns: 1fr; }}
       .seo-aside {{ position: static; }}
       .seo-stats {{ grid-template-columns: repeat(2, 1fr); }}
-      .decision-path__grid, .conversion-callout {{ grid-template-columns: 1fr; }}
+      .decision-path__grid, .conversion-callout, .quick-answer__grid {{ grid-template-columns: 1fr; }}
     }}
     @media (max-width: 560px) {{
       .seo-shell {{ width: min(100% - 28px, 1120px); }}
@@ -3966,7 +4072,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
       .seo-nav-links {{ display: none; }}
       .mobile-menu {{ display: block; }}
       .seo-hero {{ padding-bottom: 48px; }}
-      .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid {{ grid-template-columns: 1fr; }}
+      .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid, .quick-answer__grid dl {{ grid-template-columns: 1fr; }}
       .seo-section {{ padding: 18px; }}
     }}
   </style>
@@ -4007,6 +4113,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> s
         </div>
       </section>
       {guide_decision_path_html(page, destinations, pages)}
+      {vacation_home_quick_answer_html(page, destinations)}
       <div class="seo-content">
         <article class="seo-article">
           <section class="seo-section">
@@ -4312,6 +4419,23 @@ def shared_content_css() -> str:
     .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
     .decision-panel__facts div { padding: 16px; }
     .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .query-match-panel {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 18px 44px rgba(36, 49, 45, .06);
+    }
+    .query-match-panel h2 { margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 3.4vw, 36px); line-height: 1.04; }
+    .query-match-panel p { margin: 0; color: #3f4d48; }
+    .query-match-panel__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .query-match-panel__grid article { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .query-match-panel__grid span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .query-match-panel nav { display: flex; flex-wrap: wrap; gap: 10px; }
+    .query-match-panel nav a { font-weight: 850; }
     .delight-grid { margin-top: 14px; }
     .location-map-section {
       display: grid;
@@ -4619,7 +4743,7 @@ def shared_content_css() -> str:
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section, .query-match-panel__grid { grid-template-columns: repeat(2, 1fr); }
       .buyer-next-step__grid, .conversion-callout { grid-template-columns: 1fr; }
       .location-map-section .map-context-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
@@ -4640,7 +4764,7 @@ def shared_content_css() -> str:
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list, .query-match-panel__grid { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -4834,6 +4958,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
     peer_links = destination_links(peer_destinations, limit=6) or destination_links(destinations, slug, limit=6)
     destination_guide_links = guide_links_for_destination(dest, pages)
     quick_decision = destination_quick_decision_html(dest)
+    query_match_section = destination_query_match_html(dest, pages)
     location_map = destination_location_map_html(dest)
     lifestyle_section = destination_lifestyle_html(dest)
     buyer_fit_section = destination_fit_html(dest, pros, cons)
@@ -4875,6 +5000,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
   <main>
     <div class="page-shell">
       {quick_decision}
+      {query_match_section}
       {location_map}
       {sticky_page_nav([("Overview", "overview"), ("Map", "where-it-is"), ("Lifestyle", "lifestyle"), ("Buyer Fit", "buyer-fit"), ("Areas", "where-to-look"), ("Budget", "budget"), ("Risks", "risks"), ("Scores", "scores"), ("Evidence", "evidence"), ("Compare", "compare")])}
       {mobile_action_strip("#budget", "Budget", "/shortlist-review/", "Review")}

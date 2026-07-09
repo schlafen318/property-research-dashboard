@@ -241,6 +241,23 @@
     .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
     .decision-panel__facts div { padding: 16px; }
     .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .query-match-panel {
+      display: grid;
+      gap: 16px;
+      margin-top: 18px;
+      padding: 20px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 0 18px 44px rgba(36, 49, 45, .06);
+    }
+    .query-match-panel h2 { margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 3.4vw, 36px); line-height: 1.04; }
+    .query-match-panel p { margin: 0; color: #3f4d48; }
+    .query-match-panel__grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+    .query-match-panel__grid article { min-width: 0; padding: 14px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .query-match-panel__grid span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .query-match-panel nav { display: flex; flex-wrap: wrap; gap: 10px; }
+    .query-match-panel nav a { font-weight: 850; }
     .delight-grid { margin-top: 14px; }
     .location-map-section {
       display: grid;
@@ -548,7 +565,7 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section, .query-match-panel__grid { grid-template-columns: repeat(2, 1fr); }
       .buyer-next-step__grid, .conversion-callout { grid-template-columns: 1fr; }
       .location-map-section .map-context-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
@@ -569,7 +586,7 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list, .query-match-panel__grid { grid-template-columns: 1fr; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -1002,7 +1019,7 @@
 <a href="/countries/united-states-property/">United States</a>
 <a href="/countries/thailand-property/">Thailand</a>
 <a href="/countries/greece-property/">Greece</a> <a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
-<a href="/best-places-to-buy-vacation-home-abroad/">Best Places to Buy a Vacation Home Abroad</a>
+<a href="/best-places-to-buy-vacation-home-abroad/">Best Countries and Places to Buy a Vacation Home Abroad</a>
 <a href="/best-countries-for-expats-to-buy-property/">Best Countries for Expats to Buy Property</a>
 <a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a></nav>
     </div>

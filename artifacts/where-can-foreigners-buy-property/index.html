@@ -90,6 +90,15 @@
     .decision-path__grid a { display: inline-flex; margin-top: 10px; font-weight: 850; }
     .conversion-callout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; background: #eef4ec; }
     .conversion-callout h3 { margin: 0 0 6px; font-size: 22px; line-height: 1.12; }
+    .quick-answer { display: grid; gap: 18px; margin-top: 18px; padding: 22px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 18px 50px rgba(36, 49, 45, .06); }
+    .quick-answer h2 { margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); line-height: 1.04; }
+    .quick-answer p { margin: 0; color: #3f4d48; }
+    .quick-answer__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+    .quick-answer__grid article { min-width: 0; padding: 15px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
+    .quick-answer__grid span { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .quick-answer__grid h3 { margin: 7px 0; font-size: 18px; line-height: 1.15; }
+    .quick-answer__grid dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; margin: 12px 0 0; }
+    .quick-answer__grid dl div { padding: 9px; border-radius: 6px; background: #f2f5f1; }
     .seo-content { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }
     .seo-article { display: grid; gap: 28px; min-width: 0; }
     .seo-section { min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
@@ -127,7 +136,7 @@
       .seo-hero-grid, .seo-content { grid-template-columns: 1fr; }
       .seo-aside { position: static; }
       .seo-stats { grid-template-columns: repeat(2, 1fr); }
-      .decision-path__grid, .conversion-callout { grid-template-columns: 1fr; }
+      .decision-path__grid, .conversion-callout, .quick-answer__grid { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       .seo-shell { width: min(100% - 28px, 1120px); }
@@ -135,7 +144,7 @@
       .seo-nav-links { display: none; }
       .mobile-menu { display: block; }
       .seo-hero { padding-bottom: 48px; }
-      .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid { grid-template-columns: 1fr; }
+      .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid, .quick-answer__grid dl { grid-template-columns: 1fr; }
       .seo-section { padding: 18px; }
     }
   </style>
@@ -283,6 +292,7 @@
           <a class="seo-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="Where Can Foreigners Buy Property? conversion callout">Start shortlist review</a>
         </div>
       </section>
+
 
       <div class="seo-content">
         <article class="seo-article">
@@ -571,7 +581,7 @@
           <section class="seo-aside-card">
             <h3>Related Guides</h3>
             <nav><a href="/guides/">All buying guides</a><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
-<a href="/best-places-to-buy-vacation-home-abroad/">Best Places to Buy a Vacation Home Abroad</a>
+<a href="/best-places-to-buy-vacation-home-abroad/">Best Countries and Places to Buy a Vacation Home Abroad</a>
 <a href="/best-countries-for-expats-to-buy-property/">Best Countries for Expats to Buy Property</a>
 <a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a>
 <a href="/buy-property-abroad/">Buy Property Abroad</a></nav>
@@ -596,7 +606,7 @@
       <strong>Global Home Atlas</strong>
       <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
       <nav><a href="/guides/">All buying guides</a> <a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
-<a href="/best-places-to-buy-vacation-home-abroad/">Best Places to Buy a Vacation Home Abroad</a>
+<a href="/best-places-to-buy-vacation-home-abroad/">Best Countries and Places to Buy a Vacation Home Abroad</a>
 <a href="/best-countries-for-expats-to-buy-property/">Best Countries for Expats to Buy Property</a>
 <a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a>
 <a href="/buy-property-abroad/">Buy Property Abroad</a>
