@@ -150,6 +150,8 @@ python3 scripts/seo_feedback_loop.py --dry-run
 The loop updates the `Global Home Atlas Analytics Control Center` GitHub issue,
 creates deduplicated analytics issues, and opens draft PR scaffolds for broad
 growth opportunities that require human review.
+The scheduled workflow also comments on the control issue with `@schlafen318`
+after each run, which can trigger GitHub's normal email notifications.
 
 ## Codex Analytics Skill
 

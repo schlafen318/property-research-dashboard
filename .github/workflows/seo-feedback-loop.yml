@@ -63,7 +63,7 @@ jobs:
         run: python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
 
       - name: Run feedback loop
-        run: python3 scripts/seo_feedback_loop.py --apply
+        run: python3 scripts/seo_feedback_loop.py --apply --notify-user schlafen318
 
       - name: Commit SEO status dashboard
         run: |

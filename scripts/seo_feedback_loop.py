@@ -386,6 +386,44 @@ def control_issue_body(
 """
 
 
+def normalize_github_mention(notify_user: str) -> str:
+    return f"@{notify_user.strip().lstrip('@')}"
+
+
+def build_notification_comment(
+    *,
+    notify_user: str,
+    report: dict,
+    findings: list[Finding],
+    issue_links: list[str],
+    pr_links: list[str],
+    auto_merged: list[str],
+    control_link: str,
+) -> str:
+    by_severity = {"high": 0, "medium": 0, "low": 0}
+    for finding in findings:
+        by_severity[finding.severity] = by_severity.get(finding.severity, 0) + 1
+    window = report.get("window", {})
+    window_label = f"{window.get('start_date', 'n/a')} to {window.get('end_date', 'n/a')}"
+    return f"""{normalize_github_mention(notify_user)} SEO feedback loop finished.
+
+## Run Summary
+- Generated: `{report.get('generated_at', 'n/a')}`
+- Window: `{window_label}`
+- High severity: `{by_severity.get('high', 0)}`
+- Medium severity: `{by_severity.get('medium', 0)}`
+- Low severity: `{by_severity.get('low', 0)}`
+- Issues created or updated: `{len(issue_links)}`
+- Draft PRs opened: `{len(pr_links)}`
+- Auto-merged fixes: `{len(auto_merged)}`
+
+## Next Action
+{recommended_next_action(findings)}
+
+[Control issue]({control_link})
+"""
+
+
 def format_indexnow(indexnow: dict) -> str:
     if not indexnow:
         return "- Not run"
@@ -519,6 +557,35 @@ def create_or_update_control_issue(
     return completed.stdout.strip()
 
 
+def post_notification_comment(
+    *,
+    notify_user: str | None,
+    report: dict,
+    findings: list[Finding],
+    issue_links: list[str],
+    pr_links: list[str],
+    auto_merged: list[str],
+    control_link: str,
+    dry_run: bool,
+) -> str | None:
+    if not notify_user:
+        return None
+    body = build_notification_comment(
+        notify_user=notify_user,
+        report=report,
+        findings=findings,
+        issue_links=issue_links,
+        pr_links=pr_links,
+        auto_merged=auto_merged,
+        control_link=control_link,
+    )
+    if dry_run:
+        print(f"[dry-run] comment on control issue and mention {normalize_github_mention(notify_user)}")
+        return "dry-run:notification-comment"
+    run(["gh", "issue", "comment", control_link, "--body", body])
+    return control_link
+
+
 def scaffold_landing_page_pr(finding: Finding, dry_run: bool) -> str | None:
     if not finding.draft_pr:
         return None
@@ -607,6 +674,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Turn SEO monitor output into GitHub issues and draft PRs.")
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--indexnow-report", type=Path, default=DEFAULT_INDEXNOW_REPORT)
+    parser.add_argument("--notify-user", help="GitHub username to mention on the control issue after each run.")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--apply", action="store_true")
     return parser.parse_args(argv)
@@ -635,7 +703,28 @@ def main(argv: list[str]) -> int:
         if merge_url:
             auto_merged.append(merge_url)
     control_link = create_or_update_control_issue(report, findings, issue_links, pr_links, auto_merged, indexnow, dry_run)
-    print(json.dumps({"findings": len(findings), "issues": issue_links, "prs": pr_links, "control": control_link}, indent=2))
+    notification = post_notification_comment(
+        notify_user=args.notify_user,
+        report=report,
+        findings=findings,
+        issue_links=issue_links,
+        pr_links=pr_links,
+        auto_merged=auto_merged,
+        control_link=control_link,
+        dry_run=dry_run,
+    )
+    print(
+        json.dumps(
+            {
+                "findings": len(findings),
+                "issues": issue_links,
+                "prs": pr_links,
+                "control": control_link,
+                "notification": notification,
+            },
+            indent=2,
+        )
+    )
     return 0
 
 
