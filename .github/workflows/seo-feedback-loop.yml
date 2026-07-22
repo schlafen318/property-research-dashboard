@@ -2,7 +2,8 @@ name: SEO feedback loop
 
 on:
   schedule:
-    - cron: "0 1 * * *"
+    - cron: "17 1 * * *" # 09:17 HKT primary, avoids top-of-hour schedule contention
+    - cron: "47 2 * * *" # 10:47 HKT backup if the primary scheduled event is delayed or dropped
   workflow_dispatch:
 
 permissions:
