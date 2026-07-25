@@ -928,8 +928,12 @@ def pending_auto_internal_link_pairs(
     return pending
 
 
-def scaffold_auto_internal_links_pr(pairs: list[tuple[Finding, str | None]], dry_run: bool) -> str | None:
-    pending_pairs = pending_auto_internal_link_pairs(pairs)
+def scaffold_auto_internal_links_pr(
+    pairs: list[tuple[Finding, str | None]],
+    dry_run: bool,
+    path: Path = SEO_AUTO_INTERNAL_LINKS_PATH,
+) -> str | None:
+    pending_pairs = pending_auto_internal_link_pairs(pairs, path)
     if not pending_pairs:
         return None
     findings = [finding for finding, _ in pending_pairs]
