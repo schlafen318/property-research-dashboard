@@ -153,6 +153,23 @@ growth opportunities that require human review.
 The scheduled workflow also comments on the control issue with `@schlafen318`
 after each run, which can trigger GitHub's normal email notifications.
 
+Optional direct email notifications can be enabled with these repository
+secrets:
+
+```text
+SEO_NOTIFY_SMTP_HOST
+SEO_NOTIFY_SMTP_PORT
+SEO_NOTIFY_SMTP_USERNAME
+SEO_NOTIFY_SMTP_PASSWORD
+SEO_NOTIFY_EMAIL_FROM
+SEO_NOTIFY_EMAIL_TO
+SEO_NOTIFY_SMTP_TLS
+```
+
+`SEO_NOTIFY_SMTP_TLS` is optional and defaults to `true`; `SEO_NOTIFY_SMTP_PORT`
+defaults to `587` when omitted. If the SMTP secrets are not configured, the
+scheduled workflow skips the email step without failing the SEO loop.
+
 ## Codex Analytics Skill
 
 This repo includes a versioned Codex skill at:

@@ -674,6 +674,7 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Turn SEO monitor output into GitHub issues and draft PRs.")
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--indexnow-report", type=Path, default=DEFAULT_INDEXNOW_REPORT)
+    parser.add_argument("--summary-output", type=Path, help="Write a JSON summary of findings, issues, PRs, and notifications.")
     parser.add_argument("--notify-user", help="GitHub username to mention on the control issue after each run.")
     parser.add_argument("--dry-run", action="store_true")
     parser.add_argument("--apply", action="store_true")
@@ -713,18 +714,33 @@ def main(argv: list[str]) -> int:
         control_link=control_link,
         dry_run=dry_run,
     )
-    print(
-        json.dumps(
+    summary = {
+        "findings": [
             {
-                "findings": len(findings),
-                "issues": issue_links,
-                "prs": pr_links,
-                "control": control_link,
-                "notification": notification,
-            },
-            indent=2,
-        )
-    )
+                "kind": finding.kind,
+                "title": finding.title,
+                "summary": finding.summary,
+                "severity": finding.severity,
+                "labels": list(finding.labels),
+                "fingerprint": finding.fingerprint,
+                "auto_merge_safe": finding.auto_merge_safe,
+                "draft_pr": finding.draft_pr,
+            }
+            for finding in findings
+        ],
+        "issue_count": len(issue_links),
+        "issues": issue_links,
+        "pr_count": len(pr_links),
+        "prs": pr_links,
+        "auto_merged_count": len(auto_merged),
+        "auto_merged": auto_merged,
+        "control": control_link,
+        "notification": notification,
+    }
+    if args.summary_output:
+        args.summary_output.parent.mkdir(parents=True, exist_ok=True)
+        args.summary_output.write_text(json.dumps(summary, indent=2) + "\n", encoding="utf-8")
+    print(json.dumps(summary, indent=2))
     return 0
 
 

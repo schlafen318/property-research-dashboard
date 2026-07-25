@@ -64,7 +64,18 @@ jobs:
         run: python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
 
       - name: Run feedback loop
-        run: python3 scripts/seo_feedback_loop.py --apply --notify-user schlafen318
+        run: python3 scripts/seo_feedback_loop.py --apply --notify-user schlafen318 --summary-output output/seo/feedback-loop-summary.json
+
+      - name: Send SEO email notification
+        env:
+          SEO_NOTIFY_SMTP_HOST: ${{ secrets.SEO_NOTIFY_SMTP_HOST }}
+          SEO_NOTIFY_SMTP_PORT: ${{ secrets.SEO_NOTIFY_SMTP_PORT }}
+          SEO_NOTIFY_SMTP_USERNAME: ${{ secrets.SEO_NOTIFY_SMTP_USERNAME }}
+          SEO_NOTIFY_SMTP_PASSWORD: ${{ secrets.SEO_NOTIFY_SMTP_PASSWORD }}
+          SEO_NOTIFY_SMTP_TLS: ${{ secrets.SEO_NOTIFY_SMTP_TLS }}
+          SEO_NOTIFY_EMAIL_FROM: ${{ secrets.SEO_NOTIFY_EMAIL_FROM }}
+          SEO_NOTIFY_EMAIL_TO: ${{ secrets.SEO_NOTIFY_EMAIL_TO }}
+        run: python3 scripts/seo_email_notification.py --feedback-summary output/seo/feedback-loop-summary.json
 
       - name: Commit SEO status dashboard
         run: |
