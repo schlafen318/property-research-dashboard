@@ -170,6 +170,18 @@ SEO_NOTIFY_SMTP_TLS
 defaults to `587` when omitted. If the SMTP secrets are not configured, the
 scheduled workflow skips the email step without failing the SEO loop.
 
+Optional Telegram notifications can be enabled with:
+
+```text
+SEO_NOTIFY_TELEGRAM_BOT_TOKEN
+SEO_NOTIFY_TELEGRAM_CHAT_ID
+```
+
+Create the bot with BotFather, message the bot once from the target account or
+group, then use that chat ID as `SEO_NOTIFY_TELEGRAM_CHAT_ID`. If the Telegram
+secrets are not configured, the scheduled workflow skips Telegram without
+failing the SEO loop.
+
 ## Codex Analytics Skill
 
 This repo includes a versioned Codex skill at:

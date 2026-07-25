@@ -6,6 +6,8 @@ import os
 import smtplib
 import ssl
 import sys
+import urllib.parse
+import urllib.request
 from dataclasses import dataclass
 from email.message import EmailMessage
 from pathlib import Path
@@ -28,6 +30,12 @@ class MailConfig:
     sender: str
     recipient: str
     use_tls: bool
+
+
+@dataclass(frozen=True)
+class TelegramConfig:
+    bot_token: str
+    chat_id: str
 
 
 def load_json(path: Path) -> dict:
@@ -54,6 +62,14 @@ def configured_from_env() -> MailConfig | None:
         recipient=recipient,
         use_tls=os.environ.get("SEO_NOTIFY_SMTP_TLS", "true").strip().lower() != "false",
     )
+
+
+def telegram_configured_from_env() -> TelegramConfig | None:
+    bot_token = os.environ.get("SEO_NOTIFY_TELEGRAM_BOT_TOKEN", "").strip()
+    chat_id = os.environ.get("SEO_NOTIFY_TELEGRAM_CHAT_ID", "").strip()
+    if not bot_token or not chat_id:
+        return None
+    return TelegramConfig(bot_token=bot_token, chat_id=chat_id)
 
 
 def severity_counts(findings: list[dict]) -> dict[str, int]:
@@ -148,6 +164,44 @@ def build_email_body(
     return "\n".join(lines)
 
 
+def build_telegram_message(
+    *,
+    report: dict,
+    indexnow: dict,
+    summary: dict,
+    control_url: str,
+    dashboard_url: str,
+) -> str:
+    sitemap = report.get("sitemap") or {}
+    status = sitemap.get("status") or {}
+    indexing = sitemap.get("indexing") or {}
+    findings = summary_findings(summary)
+    counts = severity_counts(findings)
+    generated = str(report.get("generated_at") or "n/a")
+    window = report.get("window") or {}
+    window_label = f"{window.get('start_date', 'n/a')} to {window.get('end_date', 'n/a')}"
+    lines = [
+        "Global Home Atlas SEO loop finished",
+        "",
+        f"Generated: {generated}",
+        f"Window: {window_label}",
+        f"Sitemap URLs: {sitemap.get('url_count', 'n/a')}",
+        f"Warnings/errors: {status.get('warnings', 'n/a')}/{status.get('errors', 'n/a')}",
+        f"Google indexed/submitted: {indexing.get('indexed_reported', 'n/a')}/{indexing.get('submitted_reported', 'n/a')}",
+        f"Findings: {counts.get('high', 0)} high, {counts.get('medium', 0)} medium, {counts.get('low', 0)} low",
+        f"Issues updated: {summary.get('issue_count', len(summary.get('issues', [])))}",
+        f"Draft PRs: {summary.get('pr_count', len(summary.get('prs', [])))}",
+        f"Auto-merged: {summary.get('auto_merged_count', len(summary.get('auto_merged', [])))}",
+        f"IndexNow: {indexnow_summary(indexnow)}",
+        "",
+        f"Next: {recommended_next_action(findings)}",
+        "",
+        f"Control: {control_url}",
+        f"Dashboard: {dashboard_url}",
+    ]
+    return "\n".join(lines)
+
+
 def summary_findings(summary: dict) -> list[dict]:
     findings = summary.get("findings") or []
     return findings if isinstance(findings, list) else []
@@ -172,8 +226,22 @@ def send_email(config: MailConfig, subject: str, body: str) -> None:
             smtp.send_message(message)
 
 
+def send_telegram(config: TelegramConfig, text: str) -> None:
+    url = f"https://api.telegram.org/bot{config.bot_token}/sendMessage"
+    data = urllib.parse.urlencode(
+        {
+            "chat_id": config.chat_id,
+            "text": text[:4096],
+            "disable_web_page_preview": "true",
+        }
+    ).encode("utf-8")
+    request = urllib.request.Request(url, data=data, method="POST")
+    with urllib.request.urlopen(request, timeout=30) as response:
+        response.read()
+
+
 def parse_args(argv: list[str]) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Send the daily SEO feedback loop email notification.")
+    parser = argparse.ArgumentParser(description="Send daily SEO feedback loop notifications.")
     parser.add_argument("--report", type=Path, default=DEFAULT_REPORT)
     parser.add_argument("--indexnow-report", type=Path, default=DEFAULT_INDEXNOW_REPORT)
     parser.add_argument("--feedback-summary", type=Path, default=DEFAULT_FEEDBACK_SUMMARY)
@@ -196,18 +264,42 @@ def main(argv: list[str]) -> int:
         control_url=args.control_url,
         dashboard_url=args.dashboard_url,
     )
+    telegram_message = build_telegram_message(
+        report=report,
+        indexnow=indexnow,
+        summary=summary,
+        control_url=args.control_url,
+        dashboard_url=args.dashboard_url,
+    )
     if args.dry_run:
         print(subject)
         print()
         print(body)
+        print()
+        print("Telegram")
+        print()
+        print(telegram_message)
         return 0
 
-    config = configured_from_env()
-    if config is None:
+    sent = False
+    mail_config = configured_from_env()
+    if mail_config is None:
         print("SEO email notification skipped: SMTP notification secrets are not configured.")
-        return 0
-    send_email(config, subject, body)
-    print(f"SEO email notification sent to {config.recipient}.")
+    else:
+        send_email(mail_config, subject, body)
+        sent = True
+        print(f"SEO email notification sent to {mail_config.recipient}.")
+
+    telegram_config = telegram_configured_from_env()
+    if telegram_config is None:
+        print("SEO Telegram notification skipped: Telegram notification secrets are not configured.")
+    else:
+        send_telegram(telegram_config, telegram_message)
+        sent = True
+        print(f"SEO Telegram notification sent to chat {telegram_config.chat_id}.")
+
+    if not sent:
+        print("No direct SEO notifications were sent; configure email or Telegram secrets to enable delivery.")
     return 0
 
 
