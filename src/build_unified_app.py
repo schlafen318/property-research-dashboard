@@ -12,6 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
 ARTIFACTS = ROOT / "artifacts"
+SEO_AUTO_INTERNAL_LINKS_PATH = DATA / "seo_auto_internal_links.json"
 SOURCE_ASSETS = ROOT / "src" / "site_assets"
 PUBLIC_ASSETS = ARTIFACTS / "assets"
 SITE_NAME = "Global Home Atlas"
@@ -987,23 +988,46 @@ def seo_guide_links(pages: list[dict], current_slug: str | None = None, limit: i
     return "\n".join(links)
 
 
-def related_guide_pages(page: dict, pages: list[dict], limit: int = 4) -> list[dict]:
+def load_auto_internal_links(path: Path = SEO_AUTO_INTERNAL_LINKS_PATH) -> list[dict]:
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        return []
+    return [item for item in data if isinstance(item, dict)]
+
+
+def related_guide_pages(page: dict, pages: list[dict], limit: int = 4, priority_slugs: list[str] | None = None) -> list[dict]:
     current_destinations = set(page.get("destination_ids", []))
+    by_slug = {candidate["slug"]: candidate for candidate in pages}
+    priority = []
+    seen = {page["slug"]}
+    for slug in priority_slugs or []:
+        candidate = by_slug.get(slug)
+        if not candidate or slug in seen:
+            continue
+        priority.append(candidate)
+        seen.add(slug)
     scored = []
     for candidate in pages:
-        if candidate["slug"] == page["slug"]:
+        if candidate["slug"] in seen:
             continue
         overlap = len(current_destinations.intersection(candidate.get("destination_ids", [])))
         theme_match = int(candidate.get("theme") == page.get("theme"))
         keyword_match = len(set(page.get("keyword", "").lower().split()).intersection(candidate.get("keyword", "").lower().split()))
         scored.append((overlap, theme_match, keyword_match, candidate))
     scored.sort(key=lambda item: (item[0], item[1], item[2]), reverse=True)
-    return [candidate for *_, candidate in scored[:limit]]
+    return [*priority, *[candidate for *_, candidate in scored]][:limit]
 
 
-def contextual_related_guides(page: dict, pages: list[dict]) -> str:
+def contextual_related_guides(page: dict, pages: list[dict], auto_links: list[dict] | None = None) -> str:
+    priority_slugs = [
+        str(item.get("target_slug"))
+        for item in auto_links or []
+        if item.get("source_slug") == page.get("slug") and item.get("target_slug")
+    ]
     cards = []
-    for candidate in related_guide_pages(page, pages):
+    for candidate in related_guide_pages(page, pages, priority_slugs=priority_slugs):
         cards.append(
             f"""
             <article class="seo-link-card">
@@ -3978,13 +4002,13 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
 """
 
 
-def build_seo_page(page: dict, destinations: list[dict], pages: list[dict]) -> str:
+def build_seo_page(page: dict, destinations: list[dict], pages: list[dict], auto_links: list[dict] | None = None) -> str:
     selected = destinations_for_page(page, destinations)
     canonical = page_url(page["slug"])
     top = selected[0]
     runner_up = selected[1] if len(selected) > 1 else selected[0]
     related_links = seo_guide_links(pages, page["slug"], limit=5)
-    contextual_links = contextual_related_guides(page, pages)
+    contextual_links = contextual_related_guides(page, pages, auto_links=auto_links)
     title = page["title"]
     description = page["description"]
     updated = date.today().isoformat()
@@ -7267,11 +7291,12 @@ def build() -> Path:
         clean_generated_html(build_report_library_page(destinations, SEO_PAGES)),
         encoding="utf-8",
     )
+    auto_internal_links = load_auto_internal_links()
     for page in SEO_PAGES:
         page_dir = ARTIFACTS / page["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
         (page_dir / "index.html").write_text(
-            clean_generated_html(build_seo_page(page, destinations, SEO_PAGES)),
+            clean_generated_html(build_seo_page(page, destinations, SEO_PAGES, auto_links=auto_internal_links)),
             encoding="utf-8",
         )
     destinations_dir = ARTIFACTS / "destinations"

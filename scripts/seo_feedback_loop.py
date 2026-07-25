@@ -14,6 +14,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_REPORT = ROOT / "output" / "seo" / "latest.json"
 DEFAULT_INDEXNOW_REPORT = ROOT / "output" / "seo" / "indexnow-latest.json"
+SEO_AUTO_INTERNAL_LINKS_PATH = ROOT / "data" / "seo_auto_internal_links.json"
 CONTROL_ISSUE_TITLE = "Global Home Atlas Analytics Control Center"
 CONTROL_LABELS = ["analytics-loop"]
 LABELS = {
@@ -41,6 +42,8 @@ QUERY_CTR_MIN_IMPRESSIONS = 4
 QUERY_CTR_MAX_CTR = 0.01
 QUERY_CTR_MAX_POSITION = 20.0
 IMPLEMENTATION_PR_KINDS = {"query-ctr-opportunity", "low-ctr-opportunity", "near-ranking-opportunity"}
+AUTO_IMPLEMENTATION_KINDS = {"near-ranking-opportunity"}
+AUTO_INTERNAL_LINK_SOURCE_SLUG = "buy-property-abroad"
 
 
 @dataclass(frozen=True)
@@ -54,6 +57,7 @@ class Finding:
     auto_merge_safe: bool = False
     draft_pr: bool = False
     implementation_pr: bool = False
+    auto_implementation_safe: bool = False
     payload: dict | None = None
 
 
@@ -139,6 +143,45 @@ def ctr_recommendations(query: str, page: str | None) -> list[str]:
         f"Add one query-matched internal anchor pointing to `{target}` from the guide hub or a closely related guide.",
         "Add or sharpen one FAQ that answers the exact query language without keyword stuffing.",
     ]
+
+
+def slug_from_site_url(url: str) -> str | None:
+    if not url.startswith("https://globalhomeatlas.com/"):
+        return None
+    path = url.replace("https://globalhomeatlas.com/", "", 1).strip("/")
+    if not path or "/" in path:
+        return None
+    return path
+
+
+def seo_page_slugs() -> set[str]:
+    if str(ROOT) not in sys.path:
+        sys.path.insert(0, str(ROOT))
+    from src.build_unified_app import SEO_PAGES
+
+    return {str(page["slug"]) for page in SEO_PAGES}
+
+
+def auto_internal_link_entry(finding: Finding) -> dict | None:
+    if finding.kind not in AUTO_IMPLEMENTATION_KINDS:
+        return None
+    payload = finding.payload or {}
+    target_slug = slug_from_site_url(str(payload.get("page") or ""))
+    if not target_slug:
+        return None
+    if target_slug not in seo_page_slugs():
+        return None
+    source_slug = AUTO_INTERNAL_LINK_SOURCE_SLUG
+    if source_slug == target_slug:
+        source_slug = "best-countries-to-buy-property-as-a-foreigner"
+    return {
+        "type": "internal-link",
+        "source_slug": source_slug,
+        "target_slug": target_slug,
+        "anchor": target_slug.replace("-", " "),
+        "fingerprint": finding.fingerprint,
+        "reason": finding.summary,
+    }
 
 
 def classify(report: dict, tracking_ok: bool) -> list[Finding]:
@@ -335,19 +378,41 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
 
     for row in sc.get("near_ranking_pages", []):
         page = row.get("page", "")
+        fingerprint = stable_fingerprint("near-ranking-opportunity", page)
+        summary = (
+            f"Page is ranking around position {row.get('position', 0):.1f} "
+            f"with {row.get('impressions', 0)} impressions. Add internal links, sharpen title/meta, or improve page intent match."
+        )
+        provisional = Finding(
+            kind="near-ranking-opportunity",
+            title=f"Push near-ranking page higher: {page.replace('https://globalhomeatlas.com/', '/')}",
+            summary=summary,
+            severity="medium",
+            labels=("analytics-loop", "seo-opportunity", "content-refresh", "needs-human-review"),
+            fingerprint=fingerprint,
+            implementation_pr=True,
+            payload=row,
+        )
+        auto_entry = auto_internal_link_entry(provisional)
+        labels = provisional.labels
+        payload = row
+        auto_safe = False
+        if auto_entry:
+            labels = ("analytics-loop", "seo-opportunity", "content-refresh", "auto-merge-safe")
+            payload = {**row, "auto_implementation": auto_entry}
+            auto_safe = True
         findings.append(
             Finding(
                 kind="near-ranking-opportunity",
-                title=f"Push near-ranking page higher: {page.replace('https://globalhomeatlas.com/', '/')}",
-                summary=(
-                    f"Page is ranking around position {row.get('position', 0):.1f} "
-                    f"with {row.get('impressions', 0)} impressions. Add internal links, sharpen title/meta, or improve page intent match."
-                ),
+                title=provisional.title,
+                summary=summary,
                 severity="medium",
-                labels=("analytics-loop", "seo-opportunity", "content-refresh", "needs-human-review"),
-                fingerprint=stable_fingerprint("near-ranking-opportunity", page),
+                labels=labels,
+                fingerprint=fingerprint,
+                auto_merge_safe=auto_safe,
                 implementation_pr=True,
-                payload=row,
+                auto_implementation_safe=auto_safe,
+                payload=payload,
             )
         )
 
@@ -387,6 +452,7 @@ def issue_body(finding: Finding) -> str:
 - Auto-merge safe: `{finding.auto_merge_safe}`
 - Draft PR candidate: `{finding.draft_pr}`
 - Implementation PR candidate: `{finding.implementation_pr}`
+- Auto implementation safe: `{finding.auto_implementation_safe}`
 
 ## Acceptance Criteria
 - The issue is either fixed in a linked PR or explicitly closed as not actionable.
@@ -756,6 +822,13 @@ def implementation_branch(finding: Finding) -> str:
     return f"analytics/implementation-{kind}-{slugify(key)[:40]}-{fingerprint_suffix}"
 
 
+def auto_internal_link_branch(finding: Finding) -> str:
+    entry = (finding.payload or {}).get("auto_implementation") or {}
+    target = str(entry.get("target_slug") or (finding.payload or {}).get("page") or finding.title)
+    fingerprint_suffix = finding.fingerprint.rsplit("-", 1)[-1]
+    return f"analytics/auto-internal-link-{slugify(target)[:48]}-{fingerprint_suffix}"
+
+
 def github_repository() -> str:
     return os.environ.get("GITHUB_REPOSITORY", "schlafen318/property-research-dashboard")
 
@@ -786,6 +859,85 @@ def implementation_pr_create_args(finding: Finding, branch: str, pr_body: str, b
         "--label",
         ",".join([*finding.labels, "implementation-queued"]),
     ]
+
+
+def auto_internal_link_pr_create_args(finding: Finding, branch: str, pr_body: str, base: str) -> list[str]:
+    return [
+        "gh",
+        "pr",
+        "create",
+        "--repo",
+        github_repository(),
+        "--base",
+        base,
+        "--head",
+        branch,
+        "--title",
+        f"Auto-implement SEO internal link: {finding.title}",
+        "--body",
+        pr_body,
+        "--label",
+        ",".join([*finding.labels, "implementation-queued"]),
+    ]
+
+
+def load_auto_internal_link_entries(path: Path = SEO_AUTO_INTERNAL_LINKS_PATH) -> list[dict]:
+    if not path.exists():
+        return []
+    data = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(data, list):
+        return []
+    return [item for item in data if isinstance(item, dict)]
+
+
+def upsert_auto_internal_link_entry(entry: dict, path: Path = SEO_AUTO_INTERNAL_LINKS_PATH) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    rows = load_auto_internal_link_entries(path)
+    fingerprint = entry.get("fingerprint")
+    rows = [row for row in rows if row.get("fingerprint") != fingerprint]
+    rows.append(entry)
+    rows.sort(key=lambda row: (str(row.get("source_slug") or ""), str(row.get("target_slug") or ""), str(row.get("fingerprint") or "")))
+    path.write_text(json.dumps(rows, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def scaffold_auto_internal_link_pr(finding: Finding, issue_url: str | None, dry_run: bool) -> str | None:
+    entry = ((finding.payload or {}).get("auto_implementation") or {})
+    if not finding.auto_implementation_safe or entry.get("type") != "internal-link":
+        return None
+    branch = auto_internal_link_branch(finding)
+    existing = existing_pr_for_branch(branch, dry_run)
+    if existing:
+        return existing
+    if dry_run:
+        print(f"[dry-run] create auto implementation PR branch {branch} with {SEO_AUTO_INTERNAL_LINKS_PATH.relative_to(ROOT)}")
+        return f"dry-run:auto-implementation-pr:{branch}"
+
+    pr_body = (
+        f"{issue_body(finding)}\n"
+        "## Auto Implementation\n"
+        f"- Source issue: {issue_url or 'n/a'}\n"
+        f"- Change: add approved internal link `{entry.get('source_slug')}` -> `{entry.get('target_slug')}`\n"
+        f"- Machine-owned file: `{SEO_AUTO_INTERNAL_LINKS_PATH.relative_to(ROOT)}`\n"
+        "- This PR is non-draft because it only links existing pages and does not rewrite editorial copy.\n"
+    )
+    base = base_branch()
+    if remote_branch_exists(branch, dry_run):
+        completed = run(auto_internal_link_pr_create_args(finding, branch, pr_body, base))
+        return completed.stdout.strip()
+
+    run(["git", "switch", "-c", branch])
+    try:
+        upsert_auto_internal_link_entry(entry)
+        run(["python3", "src/build_unified_app.py"])
+        run(["python3", "scripts/verify_static_site.py", "--min-sitemap-urls", "65"])
+        run(["python3", "codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py"])
+        run(["git", "add", str(SEO_AUTO_INTERNAL_LINKS_PATH.relative_to(ROOT)), "artifacts"])
+        run(["git", "commit", "-m", f"Auto-add SEO internal link for {entry.get('target_slug')}"])
+        run(["git", "push", "--set-upstream", "origin", branch])
+        completed = run(auto_internal_link_pr_create_args(finding, branch, pr_body, base))
+        return completed.stdout.strip()
+    finally:
+        run(["git", "switch", base], check=False)
 
 
 def scaffold_implementation_pr(finding: Finding, issue_url: str | None, dry_run: bool) -> str | None:
@@ -905,7 +1057,12 @@ def maybe_auto_merge(pr_url: str | None, finding: Finding, dry_run: bool) -> str
     if dry_run:
         print(f"[dry-run] would enable auto-merge for {pr_url}")
         return f"dry-run:auto-merge:{pr_url}"
-    run(["gh", "pr", "merge", pr_url, "--squash", "--auto"], check=False)
+    completed = run(["gh", "pr", "merge", pr_url, "--squash", "--auto"], check=False)
+    if completed.returncode != 0:
+        stderr = getattr(completed, "stderr", "")
+        if stderr:
+            print(stderr, file=sys.stderr)
+        return None
     return pr_url
 
 
@@ -944,6 +1101,13 @@ def main(argv: list[str]) -> int:
         pr_url = scaffold_landing_page_pr(finding, dry_run)
         if pr_url:
             pr_links.append(pr_url)
+        auto_pr_url = scaffold_auto_internal_link_pr(finding, issue_link, dry_run)
+        if auto_pr_url:
+            pr_links.append(auto_pr_url)
+            merge_url = maybe_auto_merge(auto_pr_url, finding, dry_run)
+            if merge_url:
+                auto_merged.append(merge_url)
+            continue
         implementation_pr_url = scaffold_implementation_pr(finding, issue_link, dry_run)
         if implementation_pr_url:
             pr_links.append(implementation_pr_url)
@@ -973,6 +1137,7 @@ def main(argv: list[str]) -> int:
                 "auto_merge_safe": finding.auto_merge_safe,
                 "draft_pr": finding.draft_pr,
                 "implementation_pr": finding.implementation_pr,
+                "auto_implementation_safe": finding.auto_implementation_safe,
             }
             for finding in findings
         ],
