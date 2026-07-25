@@ -66,7 +66,7 @@ jobs:
       - name: Run feedback loop
         run: python3 scripts/seo_feedback_loop.py --apply --notify-user schlafen318 --summary-output output/seo/feedback-loop-summary.json
 
-      - name: Send SEO email notification
+      - name: Send SEO notifications
         env:
           SEO_NOTIFY_SMTP_HOST: ${{ secrets.SEO_NOTIFY_SMTP_HOST }}
           SEO_NOTIFY_SMTP_PORT: ${{ secrets.SEO_NOTIFY_SMTP_PORT }}
@@ -75,6 +75,8 @@ jobs:
           SEO_NOTIFY_SMTP_TLS: ${{ secrets.SEO_NOTIFY_SMTP_TLS }}
           SEO_NOTIFY_EMAIL_FROM: ${{ secrets.SEO_NOTIFY_EMAIL_FROM }}
           SEO_NOTIFY_EMAIL_TO: ${{ secrets.SEO_NOTIFY_EMAIL_TO }}
+          SEO_NOTIFY_TELEGRAM_BOT_TOKEN: ${{ secrets.SEO_NOTIFY_TELEGRAM_BOT_TOKEN }}
+          SEO_NOTIFY_TELEGRAM_CHAT_ID: ${{ secrets.SEO_NOTIFY_TELEGRAM_CHAT_ID }}
         run: python3 scripts/seo_email_notification.py --feedback-summary output/seo/feedback-loop-summary.json
 
       - name: Commit SEO status dashboard
