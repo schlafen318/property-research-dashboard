@@ -107,6 +107,35 @@ class NotificationCommentTests(unittest.TestCase):
             result,
         )
 
+    def test_implementation_pr_create_args_pins_repo_base_and_head(self) -> None:
+        finding = seo_feedback_loop.Finding(
+            kind="query-ctr-opportunity",
+            title="Improve query CTR for `best locations for vacation homes`",
+            summary="Query has impressions and weak CTR.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review"),
+            fingerprint="gha-query-ctr-opportunity-c6417e4c5792",
+            implementation_pr=True,
+            payload={"query": "best locations for vacation homes"},
+        )
+
+        args = seo_feedback_loop.implementation_pr_create_args(
+            finding,
+            branch="analytics/implementation-query-ctr-best-locations-for-vacation-homes-c6417e4c5792",
+            pr_body="body",
+            base="main",
+        )
+
+        self.assertIn("--repo", args)
+        self.assertIn("schlafen318/property-research-dashboard", args)
+        self.assertIn("--base", args)
+        self.assertIn("main", args)
+        self.assertIn("--head", args)
+        self.assertIn(
+            "analytics/implementation-query-ctr-best-locations-for-vacation-homes-c6417e4c5792",
+            args,
+        )
+
     def test_build_notification_comment_mentions_user_and_summarizes_run(self) -> None:
         findings = [
             seo_feedback_loop.Finding(

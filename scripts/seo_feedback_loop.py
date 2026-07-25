@@ -3,6 +3,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import re
 import subprocess
 import sys
@@ -57,14 +58,21 @@ class Finding:
 
 
 def run(cmd: list[str], *, check: bool = True, capture: bool = True) -> subprocess.CompletedProcess:
-    return subprocess.run(
+    completed = subprocess.run(
         cmd,
         cwd=ROOT,
-        check=check,
+        check=False,
         text=True,
         stdout=subprocess.PIPE if capture else None,
         stderr=subprocess.PIPE if capture else None,
     )
+    if check and completed.returncode != 0:
+        if completed.stdout:
+            print(completed.stdout, file=sys.stdout)
+        if completed.stderr:
+            print(completed.stderr, file=sys.stderr)
+        completed.check_returncode()
+    return completed
 
 
 def gh_json(args: list[str]) -> object:
@@ -705,7 +713,21 @@ def existing_pr_for_branch(branch: str, dry_run: bool) -> str | None:
     if dry_run:
         return None
     completed = run(
-        ["gh", "pr", "list", "--head", branch, "--state", "open", "--json", "url", "--limit", "1"],
+        [
+            "gh",
+            "pr",
+            "list",
+            "--repo",
+            github_repository(),
+            "--head",
+            branch,
+            "--state",
+            "open",
+            "--json",
+            "url",
+            "--limit",
+            "1",
+        ],
         check=False,
     )
     if completed.returncode != 0:
@@ -719,12 +741,51 @@ def existing_pr_for_branch(branch: str, dry_run: bool) -> str | None:
     return None
 
 
+def remote_branch_exists(branch: str, dry_run: bool) -> bool:
+    if dry_run:
+        return False
+    completed = run(["git", "ls-remote", "--exit-code", "--heads", "origin", branch], check=False)
+    return completed.returncode == 0
+
+
 def implementation_branch(finding: Finding) -> str:
     payload = finding.payload or {}
     key = str(payload.get("query") or payload.get("page") or finding.title)
     kind = slugify(finding.kind.replace("-opportunity", ""))
     fingerprint_suffix = finding.fingerprint.rsplit("-", 1)[-1]
     return f"analytics/implementation-{kind}-{slugify(key)[:40]}-{fingerprint_suffix}"
+
+
+def github_repository() -> str:
+    return os.environ.get("GITHUB_REPOSITORY", "schlafen318/property-research-dashboard")
+
+
+def base_branch() -> str:
+    current = run(["git", "branch", "--show-current"]).stdout.strip()
+    if current:
+        return current
+    return os.environ.get("GITHUB_REF_NAME") or os.environ.get("GITHUB_BASE_REF") or "main"
+
+
+def implementation_pr_create_args(finding: Finding, branch: str, pr_body: str, base: str) -> list[str]:
+    return [
+        "gh",
+        "pr",
+        "create",
+        "--repo",
+        github_repository(),
+        "--base",
+        base,
+        "--head",
+        branch,
+        "--draft",
+        "--title",
+        f"Queue SEO implementation: {finding.title}",
+        "--body",
+        pr_body,
+        "--label",
+        ",".join([*finding.labels, "implementation-queued"]),
+    ]
 
 
 def scaffold_implementation_pr(finding: Finding, issue_url: str | None, dry_run: bool) -> str | None:
@@ -743,7 +804,19 @@ def scaffold_implementation_pr(finding: Finding, issue_url: str | None, dry_run:
         print(f"[dry-run] create implementation draft PR branch {branch} with {path.relative_to(ROOT)}")
         return f"dry-run:implementation-pr:{branch}"
 
-    current = run(["git", "branch", "--show-current"]).stdout.strip()
+    pr_body = (
+        f"{issue_body(finding)}\n"
+        "## Implementation Queue\n"
+        f"- Source issue: {issue_url or 'n/a'}\n"
+        f"- Candidate file: `{path.relative_to(ROOT)}`\n"
+        "- Status: `implementation-queued`\n"
+        "- This PR is intentionally draft until a human approves content changes.\n"
+    )
+    base = base_branch()
+    if remote_branch_exists(branch, dry_run):
+        completed = run(implementation_pr_create_args(finding, branch, pr_body, base))
+        return completed.stdout.strip()
+
     run(["git", "switch", "-c", branch])
     try:
         path.parent.mkdir(parents=True, exist_ok=True)
@@ -751,31 +824,10 @@ def scaffold_implementation_pr(finding: Finding, issue_url: str | None, dry_run:
         run(["git", "add", str(path.relative_to(ROOT))])
         run(["git", "commit", "-m", f"Queue SEO implementation for {key[:48]}"])
         run(["git", "push", "--set-upstream", "origin", branch])
-        pr_body = (
-            f"{issue_body(finding)}\n"
-            "## Implementation Queue\n"
-            f"- Source issue: {issue_url or 'n/a'}\n"
-            f"- Candidate file: `{path.relative_to(ROOT)}`\n"
-            "- Status: `implementation-queued`\n"
-            "- This PR is intentionally draft until a human approves content changes.\n"
-        )
-        completed = run(
-            [
-                "gh",
-                "pr",
-                "create",
-                "--draft",
-                "--title",
-                f"Queue SEO implementation: {finding.title}",
-                "--body",
-                pr_body,
-                "--label",
-                ",".join([*finding.labels, "implementation-queued"]),
-            ]
-        )
+        completed = run(implementation_pr_create_args(finding, branch, pr_body, base))
         return completed.stdout.strip()
     finally:
-        run(["git", "switch", current], check=False)
+        run(["git", "switch", base], check=False)
 
 
 def scaffold_landing_page_pr(finding: Finding, dry_run: bool) -> str | None:
