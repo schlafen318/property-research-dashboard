@@ -116,6 +116,9 @@ exports, outbound listing clicks, and custom shortlist submissions.
 
 ## SEO Monitoring
 
+The full automatic SEO growth system is documented in
+[`docs/SEO_GROWTH_SYSTEM.md`](docs/SEO_GROWTH_SYSTEM.md).
+
 Generate a Search Console report from the live sitemap and ignored local OAuth
 token:
 
