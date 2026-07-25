@@ -208,6 +208,58 @@ class NotificationCommentTests(unittest.TestCase):
             result,
         )
 
+    def test_scaffold_auto_internal_links_pr_dry_run_batches_multiple_findings(self) -> None:
+        findings = [
+            seo_feedback_loop.Finding(
+                kind="near-ranking-opportunity",
+                title="Push near-ranking page higher: /best-places-to-buy-a-second-home-abroad/",
+                summary="Second-home page is near-ranking.",
+                severity="medium",
+                labels=("analytics-loop", "auto-merge-safe"),
+                fingerprint="gha-near-ranking-opportunity-28da3b13e19f",
+                auto_merge_safe=True,
+                implementation_pr=True,
+                auto_implementation_safe=True,
+                payload={
+                    "auto_implementation": {
+                        "type": "internal-link",
+                        "source_slug": "buy-property-abroad",
+                        "target_slug": "best-places-to-buy-a-second-home-abroad",
+                        "fingerprint": "gha-near-ranking-opportunity-28da3b13e19f",
+                    }
+                },
+            ),
+            seo_feedback_loop.Finding(
+                kind="near-ranking-opportunity",
+                title="Push near-ranking page higher: /best-places-to-buy-vacation-home-abroad/",
+                summary="Vacation-home page is near-ranking.",
+                severity="medium",
+                labels=("analytics-loop", "auto-merge-safe"),
+                fingerprint="gha-near-ranking-opportunity-91918964e43f",
+                auto_merge_safe=True,
+                implementation_pr=True,
+                auto_implementation_safe=True,
+                payload={
+                    "auto_implementation": {
+                        "type": "internal-link",
+                        "source_slug": "buy-property-abroad",
+                        "target_slug": "best-places-to-buy-vacation-home-abroad",
+                        "fingerprint": "gha-near-ranking-opportunity-91918964e43f",
+                    }
+                },
+            ),
+        ]
+
+        result = seo_feedback_loop.scaffold_auto_internal_links_pr(
+            [(findings[0], "https://github.com/schlafen318/property-research-dashboard/issues/1"), (findings[1], None)],
+            dry_run=True,
+        )
+
+        self.assertEqual(
+            "dry-run:auto-implementation-pr:analytics/auto-internal-links-2-8ff9a393e8de",
+            result,
+        )
+
     def test_upsert_auto_internal_link_entry_dedupes_by_fingerprint(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "seo_auto_internal_links.json"
