@@ -89,7 +89,7 @@ class SeoEmailNotificationTests(unittest.TestCase):
             },
         }
         summary = {
-            "findings": [{"kind": "priority-page-not-indexed", "severity": "medium"}],
+            "findings": [{"kind": "query-ctr-opportunity", "severity": "medium"}],
             "issue_count": 1,
             "pr_count": 0,
             "auto_merged_count": 0,
@@ -106,6 +106,7 @@ class SeoEmailNotificationTests(unittest.TestCase):
         self.assertIn("Global Home Atlas SEO loop finished", message)
         self.assertIn("Findings: 0 high, 1 medium, 0 low", message)
         self.assertIn("Issues updated: 1", message)
+        self.assertIn("Review the human-review issues", message)
         self.assertIn("Control: https://github.com/example/issues/1", message)
 
     def test_main_sends_telegram_when_configured(self) -> None:

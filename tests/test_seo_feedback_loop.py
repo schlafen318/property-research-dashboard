@@ -6,6 +6,51 @@ from scripts import seo_feedback_loop
 
 
 class NotificationCommentTests(unittest.TestCase):
+    def test_classify_creates_query_ctr_opportunity_for_zero_click_top_query(self) -> None:
+        report = {
+            "site_url": "https://globalhomeatlas.com",
+            "sitemap": {
+                "urls": [
+                    "https://globalhomeatlas.com/thailand-villa-ownership-foreigners/",
+                    "https://globalhomeatlas.com/buy-property-abroad/",
+                ],
+                "status": {},
+                "indexing": {},
+            },
+            "search_console": {
+                "available": True,
+                "top_queries": [
+                    {
+                        "query": "foreign buyer guide thailand villa",
+                        "clicks": 0,
+                        "impressions": 50,
+                        "ctr": 0,
+                        "position": 7.4,
+                    }
+                ],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+            },
+        }
+
+        findings = seo_feedback_loop.classify(report, tracking_ok=True)
+        query_findings = [finding for finding in findings if finding.kind == "query-ctr-opportunity"]
+
+        self.assertEqual(1, len(query_findings))
+        finding = query_findings[0]
+        self.assertIn("foreign buyer guide thailand villa", finding.title)
+        self.assertIn("50 impressions", finding.summary)
+        self.assertIn("0 clicks", finding.summary)
+        self.assertIn("needs-human-review", finding.labels)
+        self.assertEqual(
+            "https://globalhomeatlas.com/thailand-villa-ownership-foreigners/",
+            finding.payload["recommended_page"],
+        )
+        self.assertIn("title", finding.payload["recommended_actions"][0].lower())
+        self.assertFalse(finding.auto_merge_safe)
+
     def test_build_notification_comment_mentions_user_and_summarizes_run(self) -> None:
         findings = [
             seo_feedback_loop.Finding(
