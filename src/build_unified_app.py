@@ -3530,6 +3530,14 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }}
     .priority-route {{ display: grid; gap: 18px; }}
     .route-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
+    .approved-paths {{ display: grid; gap: 12px; }}
+    .approved-paths__grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
+    .approved-path-card {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }}
+    .approved-path-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .approved-path-card h3 {{ margin: 8px 0; font-size: 20px; line-height: 1.14; }}
+    .approved-path-card p {{ margin: 0 0 12px; color: var(--muted); font-size: 14px; line-height: 1.5; }}
+    .approved-path-card nav {{ display: grid; gap: 8px; }}
+    .approved-path-card nav a {{ font-weight: 850; }}
     .conversion-strip {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 18px; border: 1px solid rgba(95, 127, 114, .24); border-radius: 8px; background: #eef4ec; }}
     .conversion-strip h2, .conversion-strip h3 {{ margin: 0 0 6px; font-family: Georgia, "Times New Roman", serif; font-size: 24px; line-height: 1.08; }}
     .conversion-strip p {{ margin: 0; color: var(--muted); }}
@@ -3537,8 +3545,8 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     .page-card p strong {{ color: var(--ink); }}
     .page-card p:last-child {{ display: grid; gap: 6px; }}
     .page-card p:last-child a {{ margin-right: 8px; font-size: 13px; font-weight: 800; }}
-    @media (max-width: 860px) {{ .journey-grid, .route-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .conversion-strip {{ grid-template-columns: 1fr; }} }}
-    @media (max-width: 560px) {{ .journey-grid, .route-grid {{ grid-template-columns: 1fr; }} }}
+    @media (max-width: 860px) {{ .journey-grid, .route-grid, .approved-paths__grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .conversion-strip {{ grid-template-columns: 1fr; }} }}
+    @media (max-width: 560px) {{ .journey-grid, .route-grid, .approved-paths__grid {{ grid-template-columns: 1fr; }} }}
   </style>
 </head>
 <body>
@@ -3583,6 +3591,44 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
                 <p>Use the dashboard to compare markets, then request a shortlist review once buyer intent, budget, and holding period are clear.</p>
               </div>
               <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub priority route">Review my shortlist</a>
+            </div>
+          </section>
+          <section class="page-section approved-paths" id="approved-p1-paths">
+            <div>
+              <h2>Approved P1 buyer paths</h2>
+              <p>These are the approved implementation routes from the Search Console feedback loop. They keep the guide hub focused on the two highest-priority buyer intents while giving Google a clearer crawl path into the pages already earning impressions.</p>
+            </div>
+            <div class="approved-paths__grid">
+              <article class="approved-path-card">
+                <span>Issue #9 and #32</span>
+                <h3>Vacation-home buyers</h3>
+                <p>Start with the highest-impression vacation-home guide, then compare second-home and Europe alternatives before choosing destinations.</p>
+                <nav>
+                  <a href="/best-places-to-buy-vacation-home-abroad/">Best countries and places to buy a vacation home abroad</a>
+                  <a href="/best-places-to-buy-a-second-home-abroad/">Best places to buy a second home abroad</a>
+                  <a href="/best-places-to-buy-property-in-europe/">Best places to buy property in Europe</a>
+                </nav>
+              </article>
+              <article class="approved-path-card">
+                <span>Issue #21 and #24</span>
+                <h3>Foreign and expat buyers</h3>
+                <p>Use the expat and foreign-buyer guides together to compare ownership clarity, transaction practicality, livability, and resale depth.</p>
+                <nav>
+                  <a href="/best-countries-for-expats-to-buy-property/">Best countries for expats to buy property</a>
+                  <a href="/best-countries-to-buy-property-as-a-foreigner/">Best countries to buy property as a foreigner</a>
+                  <a href="/where-can-foreigners-buy-property/">Where can foreigners buy property?</a>
+                </nav>
+              </article>
+              <article class="approved-path-card">
+                <span>Issue #18 and #38</span>
+                <h3>Guides indexing fix</h3>
+                <p>Keep the guide hub crawlable, internally linked, and useful as the route map for buyers moving from broad research into a shortlist.</p>
+                <nav>
+                  <a href="/guides/#choose-journey">Choose your buyer journey</a>
+                  <a href="/buy-property-abroad/">Buy property abroad checklist</a>
+                  <a href="/shortlist-review/">Request shortlist review</a>
+                </nav>
+              </article>
             </div>
           </section>
           <section class="page-section" id="choose-journey">
