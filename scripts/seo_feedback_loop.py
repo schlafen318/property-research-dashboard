@@ -829,6 +829,12 @@ def auto_internal_link_branch(finding: Finding) -> str:
     return f"analytics/auto-internal-link-{slugify(target)[:48]}-{fingerprint_suffix}"
 
 
+def auto_internal_links_branch(findings: list[Finding]) -> str:
+    fingerprints = sorted(finding.fingerprint for finding in findings)
+    digest = hashlib.sha1(f"auto-internal-links:{'|'.join(fingerprints)}".encode("utf-8")).hexdigest()[:12]
+    return f"analytics/auto-internal-links-{len(findings)}-{digest}"
+
+
 def github_repository() -> str:
     return os.environ.get("GITHUB_REPOSITORY", "schlafen318/property-research-dashboard")
 
@@ -898,6 +904,78 @@ def upsert_auto_internal_link_entry(entry: dict, path: Path = SEO_AUTO_INTERNAL_
     rows.append(entry)
     rows.sort(key=lambda row: (str(row.get("source_slug") or ""), str(row.get("target_slug") or ""), str(row.get("fingerprint") or "")))
     path.write_text(json.dumps(rows, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def pending_auto_internal_link_pairs(
+    pairs: list[tuple[Finding, str | None]],
+    path: Path = SEO_AUTO_INTERNAL_LINKS_PATH,
+) -> list[tuple[Finding, str | None]]:
+    existing = {
+        str(row.get("fingerprint")): row
+        for row in load_auto_internal_link_entries(path)
+        if row.get("fingerprint")
+    }
+    pending = []
+    for finding, issue_url in pairs:
+        entry = ((finding.payload or {}).get("auto_implementation") or {})
+        fingerprint = str(entry.get("fingerprint") or "")
+        if not fingerprint:
+            continue
+        current = existing.get(fingerprint)
+        if current and current.get("source_slug") == entry.get("source_slug") and current.get("target_slug") == entry.get("target_slug"):
+            continue
+        pending.append((finding, issue_url))
+    return pending
+
+
+def scaffold_auto_internal_links_pr(pairs: list[tuple[Finding, str | None]], dry_run: bool) -> str | None:
+    pending_pairs = pending_auto_internal_link_pairs(pairs)
+    if not pending_pairs:
+        return None
+    findings = [finding for finding, _ in pending_pairs]
+    branch = auto_internal_links_branch(findings)
+    existing = existing_pr_for_branch(branch, dry_run)
+    if existing:
+        return existing
+    if dry_run:
+        print(f"[dry-run] create batched auto implementation PR branch {branch} with {len(findings)} internal links")
+        return f"dry-run:auto-implementation-pr:{branch}"
+
+    rows = []
+    for finding, issue_url in pending_pairs:
+        entry = (finding.payload or {}).get("auto_implementation") or {}
+        rows.append(
+            f"- `{entry.get('source_slug')}` -> `{entry.get('target_slug')}` "
+            f"({issue_url or finding.fingerprint})"
+        )
+    pr_body = (
+        "## Auto Implementation\n"
+        "Adds approved internal links between existing guide pages. This PR is non-draft because it does not rewrite editorial copy.\n\n"
+        "## Links\n"
+        + "\n".join(rows)
+        + f"\n\n## Machine-owned file\n`{SEO_AUTO_INTERNAL_LINKS_PATH.relative_to(ROOT)}`\n"
+    )
+    base = base_branch()
+    if remote_branch_exists(branch, dry_run):
+        completed = run(auto_internal_link_pr_create_args(findings[0], branch, pr_body, base))
+        return completed.stdout.strip()
+
+    run(["git", "switch", "-c", branch])
+    try:
+        for finding, _ in pending_pairs:
+            upsert_auto_internal_link_entry((finding.payload or {}).get("auto_implementation") or {})
+        run(["python3", "src/build_unified_app.py"])
+        run(["python3", "scripts/verify_static_site.py", "--min-sitemap-urls", "65"])
+        run(["python3", "codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py"])
+        run(["git", "add", str(SEO_AUTO_INTERNAL_LINKS_PATH.relative_to(ROOT)), "artifacts"])
+        if run(["git", "diff", "--cached", "--quiet"], check=False).returncode == 0:
+            return None
+        run(["git", "commit", "-m", f"Auto-add {len(findings)} SEO internal links"])
+        run(["git", "push", "--set-upstream", "origin", branch])
+        completed = run(auto_internal_link_pr_create_args(findings[0], branch, pr_body, base))
+        return completed.stdout.strip()
+    finally:
+        run(["git", "switch", base], check=False)
 
 
 def scaffold_auto_internal_link_pr(finding: Finding, issue_url: str | None, dry_run: bool) -> str | None:
@@ -1097,21 +1175,25 @@ def main(argv: list[str]) -> int:
     issue_links = [create_or_update_issue(finding, issues, dry_run) for finding in findings]
     pr_links: list[str] = []
     auto_merged: list[str] = []
+    auto_internal_link_pairs: list[tuple[Finding, str | None]] = []
     for finding, issue_link in zip(findings, issue_links):
         pr_url = scaffold_landing_page_pr(finding, dry_run)
         if pr_url:
             pr_links.append(pr_url)
-        auto_pr_url = scaffold_auto_internal_link_pr(finding, issue_link, dry_run)
-        if auto_pr_url:
-            pr_links.append(auto_pr_url)
-            merge_url = maybe_auto_merge(auto_pr_url, finding, dry_run)
-            if merge_url:
-                auto_merged.append(merge_url)
+        if finding.auto_implementation_safe:
+            auto_internal_link_pairs.append((finding, issue_link))
             continue
         implementation_pr_url = scaffold_implementation_pr(finding, issue_link, dry_run)
         if implementation_pr_url:
             pr_links.append(implementation_pr_url)
         merge_url = maybe_auto_merge(pr_url, finding, dry_run)
+        if merge_url:
+            auto_merged.append(merge_url)
+    auto_pr_url = scaffold_auto_internal_links_pr(auto_internal_link_pairs, dry_run)
+    if auto_pr_url:
+        pr_links.append(auto_pr_url)
+        auto_finding = auto_internal_link_pairs[0][0]
+        merge_url = maybe_auto_merge(auto_pr_url, auto_finding, dry_run)
         if merge_url:
             auto_merged.append(merge_url)
     control_link = create_or_update_control_issue(report, findings, issue_links, pr_links, auto_merged, indexnow, dry_run)
