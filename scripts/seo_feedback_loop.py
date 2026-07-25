@@ -32,10 +32,14 @@ LABELS = {
     "content-refresh": "fbca04",
     "landing-page-candidate": "5319e7",
     "query-ctr-opportunity": "fbca04",
+    "implementation-queued": "5319e7",
+    "implemented-awaiting-google": "fbca04",
+    "validated-by-gsc": "0e8a16",
 }
 QUERY_CTR_MIN_IMPRESSIONS = 4
 QUERY_CTR_MAX_CTR = 0.01
 QUERY_CTR_MAX_POSITION = 20.0
+IMPLEMENTATION_PR_KINDS = {"query-ctr-opportunity", "low-ctr-opportunity", "near-ranking-opportunity"}
 
 
 @dataclass(frozen=True)
@@ -48,6 +52,7 @@ class Finding:
     fingerprint: str
     auto_merge_safe: bool = False
     draft_pr: bool = False
+    implementation_pr: bool = False
     payload: dict | None = None
 
 
@@ -292,6 +297,7 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                 severity="medium",
                 labels=("analytics-loop", "seo-opportunity", "content-refresh", "query-ctr-opportunity", "needs-human-review"),
                 fingerprint=stable_fingerprint("query-ctr-opportunity", f"{query}:{recommended_page}"),
+                implementation_pr=True,
                 payload={
                     **row,
                     "recommended_page": recommended_page,
@@ -314,6 +320,7 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                 severity="medium",
                 labels=("analytics-loop", "seo-opportunity", "content-refresh", "needs-human-review"),
                 fingerprint=stable_fingerprint("low-ctr-opportunity", page),
+                implementation_pr=True,
                 payload=row,
             )
         )
@@ -331,6 +338,7 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                 severity="medium",
                 labels=("analytics-loop", "seo-opportunity", "content-refresh", "needs-human-review"),
                 fingerprint=stable_fingerprint("near-ranking-opportunity", page),
+                implementation_pr=True,
                 payload=row,
             )
         )
@@ -370,6 +378,7 @@ def issue_body(finding: Finding) -> str:
 - Fingerprint: `{finding.fingerprint}`
 - Auto-merge safe: `{finding.auto_merge_safe}`
 - Draft PR candidate: `{finding.draft_pr}`
+- Implementation PR candidate: `{finding.implementation_pr}`
 
 ## Acceptance Criteria
 - The issue is either fixed in a linked PR or explicitly closed as not actionable.
@@ -548,6 +557,8 @@ def recommended_next_action(findings: list[Finding]) -> str:
         return "Use Search Console URL inspection for the homepage and priority guide pages, then request indexing where available."
     if "no-search-console-rows" in kinds:
         return "Continue daily monitoring; no content-growth action should be automated until query or page rows appear."
+    if kinds & IMPLEMENTATION_PR_KINDS:
+        return "Review implementation queue PRs for CTR, title, meta, FAQ, and internal-link changes."
     if findings:
         return "Review draft landing-page PRs and human-review issues."
     return "No action needed; continue monitoring."
@@ -645,6 +656,126 @@ def post_notification_comment(
         return "dry-run:notification-comment"
     run(["gh", "issue", "comment", control_link, "--body", body])
     return control_link
+
+
+def implementation_candidate_content(finding: Finding, issue_url: str | None) -> str:
+    payload = finding.payload or {}
+    query = payload.get("query") or payload.get("page") or finding.title
+    recommended_page = payload.get("recommended_page") or payload.get("page") or "Review the best matching page from the signal."
+    actions = payload.get("recommended_actions") or ctr_recommendations(str(query), str(recommended_page))
+    issue_line = issue_url or "Created or updated by the SEO feedback loop"
+    action_lines = "\n".join(f"- {action}" for action in actions)
+    payload_json = json.dumps(payload, indent=2, sort_keys=True)
+    return f"""# SEO Implementation Candidate: {finding.title}
+
+## Source Issue
+{issue_line}
+
+## Signal
+{finding.summary}
+
+## Target
+- Query or page: `{query}`
+- Recommended page: `{recommended_page}`
+- Kind: `{finding.kind}`
+- Severity: `{finding.severity}`
+
+## Proposed Implementation
+{action_lines}
+
+## Acceptance Criteria
+- Implement the approved title, meta, intro, FAQ, or internal-link updates in `src/build_unified_app.py`.
+- Regenerate static artifacts.
+- Run `python3 scripts/verify_static_site.py --min-sitemap-urls 65`.
+- Run `python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py`.
+- Leave this PR as draft unless a human approves the content changes.
+- After merge, keep the source issue open as `implemented-awaiting-google` until Search Console validates CTR, impressions, or position improvement.
+
+## Fingerprint
+`{finding.fingerprint}`
+
+## Raw Signal
+```json
+{payload_json}
+```
+"""
+
+
+def existing_pr_for_branch(branch: str, dry_run: bool) -> str | None:
+    if dry_run:
+        return None
+    completed = run(
+        ["gh", "pr", "list", "--head", branch, "--state", "open", "--json", "url", "--limit", "1"],
+        check=False,
+    )
+    if completed.returncode != 0:
+        return None
+    try:
+        rows = json.loads(completed.stdout or "[]")
+    except json.JSONDecodeError:
+        return None
+    if rows:
+        return rows[0].get("url")
+    return None
+
+
+def implementation_branch(finding: Finding) -> str:
+    payload = finding.payload or {}
+    key = str(payload.get("query") or payload.get("page") or finding.title)
+    kind = slugify(finding.kind.replace("-opportunity", ""))
+    fingerprint_suffix = finding.fingerprint.rsplit("-", 1)[-1]
+    return f"analytics/implementation-{kind}-{slugify(key)[:40]}-{fingerprint_suffix}"
+
+
+def scaffold_implementation_pr(finding: Finding, issue_url: str | None, dry_run: bool) -> str | None:
+    if not finding.implementation_pr or finding.kind not in IMPLEMENTATION_PR_KINDS:
+        return None
+    payload = finding.payload or {}
+    key = str(payload.get("query") or payload.get("page") or finding.title)
+    slug = slugify(key)
+    branch = implementation_branch(finding)
+    existing = existing_pr_for_branch(branch, dry_run)
+    if existing:
+        return existing
+    path = ROOT / "docs" / "seo-implementation-queue" / f"{slug}.md"
+    content = implementation_candidate_content(finding, issue_url)
+    if dry_run:
+        print(f"[dry-run] create implementation draft PR branch {branch} with {path.relative_to(ROOT)}")
+        return f"dry-run:implementation-pr:{branch}"
+
+    current = run(["git", "branch", "--show-current"]).stdout.strip()
+    run(["git", "switch", "-c", branch])
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(content, encoding="utf-8")
+        run(["git", "add", str(path.relative_to(ROOT))])
+        run(["git", "commit", "-m", f"Queue SEO implementation for {key[:48]}"])
+        run(["git", "push", "--set-upstream", "origin", branch])
+        pr_body = (
+            f"{issue_body(finding)}\n"
+            "## Implementation Queue\n"
+            f"- Source issue: {issue_url or 'n/a'}\n"
+            f"- Candidate file: `{path.relative_to(ROOT)}`\n"
+            "- Status: `implementation-queued`\n"
+            "- This PR is intentionally draft until a human approves content changes.\n"
+        )
+        completed = run(
+            [
+                "gh",
+                "pr",
+                "create",
+                "--draft",
+                "--title",
+                f"Queue SEO implementation: {finding.title}",
+                "--body",
+                pr_body,
+                "--label",
+                ",".join([*finding.labels, "implementation-queued"]),
+            ]
+        )
+        return completed.stdout.strip()
+    finally:
+        run(["git", "switch", current], check=False)
 
 
 def scaffold_landing_page_pr(finding: Finding, dry_run: bool) -> str | None:
@@ -757,10 +888,13 @@ def main(argv: list[str]) -> int:
     issue_links = [create_or_update_issue(finding, issues, dry_run) for finding in findings]
     pr_links: list[str] = []
     auto_merged: list[str] = []
-    for finding in findings:
+    for finding, issue_link in zip(findings, issue_links):
         pr_url = scaffold_landing_page_pr(finding, dry_run)
         if pr_url:
             pr_links.append(pr_url)
+        implementation_pr_url = scaffold_implementation_pr(finding, issue_link, dry_run)
+        if implementation_pr_url:
+            pr_links.append(implementation_pr_url)
         merge_url = maybe_auto_merge(pr_url, finding, dry_run)
         if merge_url:
             auto_merged.append(merge_url)
@@ -786,6 +920,7 @@ def main(argv: list[str]) -> int:
                 "fingerprint": finding.fingerprint,
                 "auto_merge_safe": finding.auto_merge_safe,
                 "draft_pr": finding.draft_pr,
+                "implementation_pr": finding.implementation_pr,
             }
             for finding in findings
         ],

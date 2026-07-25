@@ -44,12 +44,68 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertIn("50 impressions", finding.summary)
         self.assertIn("0 clicks", finding.summary)
         self.assertIn("needs-human-review", finding.labels)
+        self.assertTrue(finding.implementation_pr)
         self.assertEqual(
             "https://globalhomeatlas.com/thailand-villa-ownership-foreigners/",
             finding.payload["recommended_page"],
         )
         self.assertIn("title", finding.payload["recommended_actions"][0].lower())
         self.assertFalse(finding.auto_merge_safe)
+
+    def test_build_implementation_candidate_content_links_issue_and_actions(self) -> None:
+        finding = seo_feedback_loop.Finding(
+            kind="query-ctr-opportunity",
+            title="Improve query CTR for `best locations for vacation homes`",
+            summary="Query has impressions and weak CTR.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review"),
+            fingerprint="gha-query-ctr-opportunity-c6417e4c5792",
+            implementation_pr=True,
+            payload={
+                "query": "best locations for vacation homes",
+                "recommended_page": "https://globalhomeatlas.com/best-places-to-buy-vacation-home-abroad/",
+                "recommended_actions": [
+                    "Rewrite the title tag.",
+                    "Rewrite the meta description.",
+                ],
+            },
+        )
+
+        content = seo_feedback_loop.implementation_candidate_content(
+            finding,
+            issue_url="https://github.com/schlafen318/property-research-dashboard/issues/45",
+        )
+
+        self.assertIn("Implementation Candidate", content)
+        self.assertIn("best locations for vacation homes", content)
+        self.assertIn("https://globalhomeatlas.com/best-places-to-buy-vacation-home-abroad/", content)
+        self.assertIn("https://github.com/schlafen318/property-research-dashboard/issues/45", content)
+        self.assertIn("Rewrite the title tag.", content)
+        self.assertIn("Run `python3 scripts/verify_static_site.py --min-sitemap-urls 65`", content)
+        self.assertIn("gha-query-ctr-opportunity-c6417e4c5792", content)
+
+    def test_scaffold_implementation_pr_dry_run_returns_stable_queue_branch(self) -> None:
+        finding = seo_feedback_loop.Finding(
+            kind="query-ctr-opportunity",
+            title="Improve query CTR for `best locations for vacation homes`",
+            summary="Query has impressions and weak CTR.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review"),
+            fingerprint="gha-query-ctr-opportunity-c6417e4c5792",
+            implementation_pr=True,
+            payload={"query": "best locations for vacation homes"},
+        )
+
+        result = seo_feedback_loop.scaffold_implementation_pr(
+            finding,
+            issue_url="https://github.com/schlafen318/property-research-dashboard/issues/45",
+            dry_run=True,
+        )
+
+        self.assertEqual(
+            "dry-run:implementation-pr:analytics/implementation-query-ctr-best-locations-for-vacation-homes-c6417e4c5792",
+            result,
+        )
 
     def test_build_notification_comment_mentions_user_and_summarizes_run(self) -> None:
         findings = [
