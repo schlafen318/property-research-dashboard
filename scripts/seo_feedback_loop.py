@@ -31,7 +31,11 @@ LABELS = {
     "seo-goal-missed": "b60205",
     "content-refresh": "fbca04",
     "landing-page-candidate": "5319e7",
+    "query-ctr-opportunity": "fbca04",
 }
+QUERY_CTR_MIN_IMPRESSIONS = 4
+QUERY_CTR_MAX_CTR = 0.01
+QUERY_CTR_MAX_POSITION = 20.0
 
 
 @dataclass(frozen=True)
@@ -97,6 +101,31 @@ def existing_url_match(query: str, urls: list[str]) -> str | None:
             best_url = url
             best_score = score
     return best_url if best_score >= min(2, len(terms)) else None
+
+
+def best_url_match(query: str, urls: list[str]) -> tuple[str | None, int]:
+    terms = {part for part in re.findall(r"[a-z0-9]+", query.lower()) if len(part) > 2}
+    if not terms:
+        return None, 0
+    best_url = None
+    best_score = 0
+    for url in urls:
+        page_terms = set(re.findall(r"[a-z0-9]+", url.lower()))
+        score = len(terms & page_terms)
+        if score > best_score:
+            best_url = url
+            best_score = score
+    return best_url, best_score
+
+
+def ctr_recommendations(query: str, page: str | None) -> list[str]:
+    target = page.replace("https://globalhomeatlas.com", "") if page else "the best matching page"
+    return [
+        f"Rewrite the title tag to make `{query}` or its buyer intent visible near the front.",
+        "Rewrite the meta description with a concrete buyer promise, eligibility/risk cue, and destination-specific wording.",
+        f"Add one query-matched internal anchor pointing to `{target}` from the guide hub or a closely related guide.",
+        "Add or sharpen one FAQ that answers the exact query language without keyword stuffing.",
+    ]
 
 
 def classify(report: dict, tracking_ok: bool) -> list[Finding]:
@@ -237,6 +266,38 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                 labels=("analytics-loop", "no-search-console-rows", "seo-opportunity"),
                 fingerprint=stable_fingerprint("no-search-console-rows", str(report.get("site_url") or "globalhomeatlas")),
                 payload={"window": report.get("window"), "sitemap": sitemap.get("url")},
+            )
+        )
+
+    for row in sc.get("top_queries", []):
+        query = row.get("query", "")
+        impressions = int(row.get("impressions", 0) or 0)
+        ctr = float(row.get("ctr", 0) or 0)
+        position = float(row.get("position", 999) or 999)
+        if impressions < QUERY_CTR_MIN_IMPRESSIONS or ctr >= QUERY_CTR_MAX_CTR or position > QUERY_CTR_MAX_POSITION:
+            continue
+        recommended_page, match_score = best_url_match(query, urls)
+        if not recommended_page or match_score < 2:
+            continue
+        clicks = int(row.get("clicks", 0) or 0)
+        findings.append(
+            Finding(
+                kind="query-ctr-opportunity",
+                title=f"Improve query CTR for `{query}`",
+                summary=(
+                    f"Query `{query}` has {impressions} impressions, {clicks} clicks, "
+                    f"{ctr * 100:.2f}% CTR, and average position {position:.1f}. "
+                    f"Recommended page: {recommended_page}."
+                ),
+                severity="medium",
+                labels=("analytics-loop", "seo-opportunity", "content-refresh", "query-ctr-opportunity", "needs-human-review"),
+                fingerprint=stable_fingerprint("query-ctr-opportunity", f"{query}:{recommended_page}"),
+                payload={
+                    **row,
+                    "recommended_page": recommended_page,
+                    "match_score": match_score,
+                    "recommended_actions": ctr_recommendations(query, recommended_page),
+                },
             )
         )
 
