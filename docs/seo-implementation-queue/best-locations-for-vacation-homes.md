@@ -1,0 +1,49 @@
+# SEO Implementation Candidate: Improve query CTR for `best locations for vacation homes`
+
+## Source Issue
+https://github.com/schlafen318/property-research-dashboard/issues/45
+
+## Signal
+Query `best locations for vacation homes` has 36 impressions, 0 clicks, 0.00% CTR, and average position 10.4. Recommended page: https://globalhomeatlas.com/best-places-to-buy-property-abroad-for-retirement/.
+
+## Target
+- Query or page: `best locations for vacation homes`
+- Recommended page: `https://globalhomeatlas.com/best-places-to-buy-property-abroad-for-retirement/`
+- Kind: `query-ctr-opportunity`
+- Severity: `medium`
+
+## Proposed Implementation
+- Rewrite the title tag to make `best locations for vacation homes` or its buyer intent visible near the front.
+- Rewrite the meta description with a concrete buyer promise, eligibility/risk cue, and destination-specific wording.
+- Add one query-matched internal anchor pointing to `/best-places-to-buy-property-abroad-for-retirement/` from the guide hub or a closely related guide.
+- Add or sharpen one FAQ that answers the exact query language without keyword stuffing.
+
+## Acceptance Criteria
+- Implement the approved title, meta, intro, FAQ, or internal-link updates in `src/build_unified_app.py`.
+- Regenerate static artifacts.
+- Run `python3 scripts/verify_static_site.py --min-sitemap-urls 65`.
+- Run `python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py`.
+- Leave this PR as draft unless a human approves the content changes.
+- After merge, keep the source issue open as `implemented-awaiting-google` until Search Console validates CTR, impressions, or position improvement.
+
+## Fingerprint
+`gha-query-ctr-opportunity-c6417e4c5792`
+
+## Raw Signal
+```json
+{
+  "clicks": 0,
+  "ctr": 0,
+  "impressions": 36,
+  "match_score": 2,
+  "position": 10.36111111111111,
+  "query": "best locations for vacation homes",
+  "recommended_actions": [
+    "Rewrite the title tag to make `best locations for vacation homes` or its buyer intent visible near the front.",
+    "Rewrite the meta description with a concrete buyer promise, eligibility/risk cue, and destination-specific wording.",
+    "Add one query-matched internal anchor pointing to `/best-places-to-buy-property-abroad-for-retirement/` from the guide hub or a closely related guide.",
+    "Add or sharpen one FAQ that answers the exact query language without keyword stuffing."
+  ],
+  "recommended_page": "https://globalhomeatlas.com/best-places-to-buy-property-abroad-for-retirement/"
+}
+```
