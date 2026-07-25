@@ -228,23 +228,23 @@ SEO_PAGES = [
     },
     {
         "slug": "best-places-to-buy-vacation-home-abroad",
-        "title": "Best Countries and Places to Buy a Vacation Home Abroad | Global Home Atlas",
-        "description": "Compare the best countries, places, and locations to buy a vacation home abroad by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.",
-        "h1": "Best Countries and Places to Buy a Vacation Home Abroad",
+        "title": "Best Locations for Vacation Homes Abroad | Global Home Atlas",
+        "description": "Compare the best locations for vacation homes abroad by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.",
+        "h1": "Best Locations for Vacation Homes Abroad",
         "keyword": "best country to buy a vacation home",
         "theme": "vacation-home acquisition",
         "intent": "buyers who want personal use, repeatable travel demand, and a realistic path to offset carrying costs",
         "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "madeira", "costa-brava-girona", "lake-como", "crete", "phuket-koh-samui", "mallorca", "andermatt", "annecy"],
         "faqs": [
+            ("What are the best locations for vacation homes abroad?", "The strongest vacation-home locations combine repeat owner use, reliable access, clear ownership, manageable rental rules, defensible entry price, and resale demand beyond one buyer group."),
             ("What makes a strong overseas vacation-home market?", "Look for repeat visitation, airport access, year-round demand, clear local rental rules, and a resale market beyond foreign buyers."),
             ("Are island homes better investments?", "Not automatically. Islands can have scarcity and appeal, but also seasonality, maintenance friction, and regulatory limits."),
-            ("How should I use rental estimates?", "Treat rental estimates as underwriting context, then verify permits, net operating costs, occupancy, and local manager quality."),
         ],
     },
     {
         "slug": "best-countries-for-expats-to-buy-property",
         "title": "Best Countries for Expats to Buy Property | Global Home Atlas",
-        "description": "A global expat property buying guide comparing ownership rules, foreign-buyer practicality, lifestyle quality, value, and resale depth.",
+        "description": "Compare the best countries for expats to buy property by foreign-buyer practicality, ownership rules, lifestyle quality, value, and resale depth.",
         "h1": "Best Countries for Expats to Buy Property",
         "keyword": "best countries for expats to buy property",
         "theme": "expat ownership",
@@ -304,7 +304,7 @@ SEO_PAGES = [
     {
         "slug": "best-places-to-buy-a-second-home-abroad",
         "title": "Best Places to Buy a Second Home Abroad | Global Home Atlas",
-        "description": "Compare second-home destinations abroad by access, personal-use appeal, rental offset potential, ownership clarity, value discipline, and exit liquidity.",
+        "description": "Compare the best places to buy a second home abroad for family use, vacation-home optionality, rental offset, ownership clarity, and resale liquidity.",
         "h1": "Best Places to Buy a Second Home Abroad",
         "keyword": "best places to buy a second home abroad",
         "theme": "second-home shortlist",
@@ -409,7 +409,7 @@ SEO_PAGES = [
     {
         "slug": "best-places-to-buy-property-in-europe",
         "title": "Best Places to Buy Property in Europe | Global Home Atlas",
-        "description": "Compare the best places to buy property in Europe for lifestyle, retirement, rental resilience, value discipline, and long-term resale liquidity.",
+        "description": "Compare the best places to buy property in Europe for foreign buyers focused on lifestyle, retirement, rental resilience, value discipline, and resale liquidity.",
         "h1": "Best Places to Buy Property in Europe",
         "keyword": "best places to buy property in Europe",
         "theme": "Europe shortlist",
@@ -1679,9 +1679,9 @@ def destination_query_match_html(dest: dict, pages: list[dict]) -> str:
     if destination_id not in {"andermatt", "annecy"}:
         return ""
     if destination_id == "andermatt":
-        title = "Andermatt real estate: what to check before shortlisting"
+        title = "Andermatt property for foreign buyers: what to check before shortlisting"
         intro = (
-            "Andermatt real estate can screen well for scarcity, infrastructure, and Swiss resilience, "
+            "Andermatt real estate and property for foreign buyers can screen well for scarcity, infrastructure, and Swiss resilience, "
             "but the Atlas view starts with entry price, ownership access, carrying costs, and future buyer depth."
         )
         points = [
@@ -1691,9 +1691,9 @@ def destination_query_match_html(dest: dict, pages: list[dict]) -> str:
         ]
         related = ["best-places-to-buy-vacation-home-abroad", "foreign-property-investment-risks", "where-can-foreigners-buy-property"]
     else:
-        title = "Annecy vacation home: what to compare before buying"
+        title = "Annecy vacation home and second-home shortlist"
         intro = (
-            "An Annecy vacation home thesis depends on lake lifestyle, Geneva access, year-round use, "
+            "An Annecy vacation home or second-home thesis depends on lake lifestyle, Geneva access, year-round use, "
             "and whether the selected neighborhood can support both owner enjoyment and resale depth."
         )
         points = [
@@ -2789,13 +2789,13 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 {favicon_links_html()}
-  <title>Global Home Atlas | Find Your Best-Fit Overseas Property Market</title>
-  <meta name="description" content="Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan with independent Global Home Atlas research.">
+  <title>Global Property Markets for Buying Abroad | Global Home Atlas</title>
+  <meta name="description" content="Compare global property markets for buying property abroad, vacation homes, second homes, retirement, ownership constraints, budget, and exit plan.">
   <link rel="canonical" href="{SITE_URL}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{SITE_NAME}">
   <meta property="og:title" content="Global Home Atlas">
-  <meta property="og:description" content="Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan.">
+  <meta property="og:description" content="Compare global property markets for buying property abroad, vacation homes, second homes, retirement, ownership constraints, budget, and exit plan.">
   <meta property="og:url" content="{SITE_URL}">
   <meta name="twitter:card" content="summary_large_image">
 {analytics_head_tags()}

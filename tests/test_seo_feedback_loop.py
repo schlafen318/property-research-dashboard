@@ -250,10 +250,12 @@ class NotificationCommentTests(unittest.TestCase):
             ),
         ]
 
-        result = seo_feedback_loop.scaffold_auto_internal_links_pr(
-            [(findings[0], "https://github.com/schlafen318/property-research-dashboard/issues/1"), (findings[1], None)],
-            dry_run=True,
-        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            result = seo_feedback_loop.scaffold_auto_internal_links_pr(
+                [(findings[0], "https://github.com/schlafen318/property-research-dashboard/issues/1"), (findings[1], None)],
+                dry_run=True,
+                path=Path(tmpdir) / "seo_auto_internal_links.json",
+            )
 
         self.assertEqual(
             "dry-run:auto-implementation-pr:analytics/auto-internal-links-2-8ff9a393e8de",
