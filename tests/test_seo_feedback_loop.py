@@ -173,6 +173,26 @@ class NotificationCommentTests(unittest.TestCase):
             result,
         )
 
+    def test_implemented_awaiting_google_issue_skips_implementation_queue(self) -> None:
+        finding = seo_feedback_loop.Finding(
+            kind="query-ctr-opportunity",
+            title="Improve query CTR for `best locations for vacation homes`",
+            summary="Query has impressions and weak CTR.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review"),
+            fingerprint="gha-query-ctr-opportunity-c6417e4c5792",
+            implementation_pr=True,
+            payload={"query": "best locations for vacation homes"},
+        )
+        issues = [
+            {
+                "body": "Fingerprint\n`gha-query-ctr-opportunity-c6417e4c5792`",
+                "labels": [{"name": "implemented-awaiting-google"}],
+            }
+        ]
+
+        self.assertTrue(seo_feedback_loop.implemented_awaiting_google(finding, issues))
+
     def test_scaffold_auto_internal_link_pr_dry_run_returns_auto_merge_branch(self) -> None:
         finding = seo_feedback_loop.Finding(
             kind="near-ranking-opportunity",
