@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -83,6 +84,38 @@ def gh_json(args: list[str]) -> object:
     completed = run(["gh", *args])
     text = completed.stdout.strip()
     return json.loads(text) if text else None
+
+
+def is_transient_github_failure(completed: subprocess.CompletedProcess) -> bool:
+    text = f"{completed.stdout or ''}\n{completed.stderr or ''}".lower()
+    return completed.returncode != 0 and any(
+        marker in text
+        for marker in (
+            "502",
+            "503",
+            "504",
+            "gateway timeout",
+            "try resubmitting",
+            "temporarily unavailable",
+        )
+    )
+
+
+def gh_mutation(cmd: list[str], attempts: int = 3) -> subprocess.CompletedProcess:
+    completed = subprocess.CompletedProcess(cmd, 1)
+    for attempt in range(1, attempts + 1):
+        completed = run(cmd, check=False)
+        if completed.returncode == 0:
+            return completed
+        if attempt == attempts or not is_transient_github_failure(completed):
+            break
+        time.sleep(attempt * 2)
+    if completed.stdout:
+        print(completed.stdout, file=sys.stdout)
+    if completed.stderr:
+        print(completed.stderr, file=sys.stderr)
+    completed.check_returncode()
+    return completed
 
 
 def stable_fingerprint(kind: str, key: str) -> str:
@@ -690,9 +723,9 @@ def create_or_update_issue(finding: Finding, issues: list[dict], dry_run: bool) 
         print(f"[dry-run] {action}: {finding.title} [{finding.fingerprint}]")
         return existing.get("url", f"dry-run:{finding.fingerprint}") if existing else f"dry-run:{finding.fingerprint}"
     if existing:
-        run(["gh", "issue", "edit", str(existing["number"]), "--body", body, "--add-label", labels])
+        gh_mutation(["gh", "issue", "edit", str(existing["number"]), "--body", body, "--add-label", labels])
         return existing.get("url", f"issue:{existing['number']}")
-    completed = run(["gh", "issue", "create", "--title", finding.title, "--body", body, "--label", labels])
+    completed = gh_mutation(["gh", "issue", "create", "--title", finding.title, "--body", body, "--label", labels])
     return completed.stdout.strip()
 
 
@@ -713,9 +746,9 @@ def create_or_update_control_issue(
         return "dry-run:control-issue"
     labels = ",".join(CONTROL_LABELS)
     if existing:
-        run(["gh", "issue", "edit", str(existing["number"]), "--body", body, "--add-label", labels])
+        gh_mutation(["gh", "issue", "edit", str(existing["number"]), "--body", body, "--add-label", labels])
         return existing.get("url", f"issue:{existing['number']}")
-    completed = run(["gh", "issue", "create", "--title", CONTROL_ISSUE_TITLE, "--body", body, "--label", labels])
+    completed = gh_mutation(["gh", "issue", "create", "--title", CONTROL_ISSUE_TITLE, "--body", body, "--label", labels])
     return completed.stdout.strip()
 
 
@@ -744,7 +777,7 @@ def post_notification_comment(
     if dry_run:
         print(f"[dry-run] comment on control issue and mention {normalize_github_mention(notify_user)}")
         return "dry-run:notification-comment"
-    run(["gh", "issue", "comment", control_link, "--body", body])
+    gh_mutation(["gh", "issue", "comment", control_link, "--body", body])
     return control_link
 
 
