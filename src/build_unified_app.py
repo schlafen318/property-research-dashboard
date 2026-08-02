@@ -259,14 +259,14 @@ SEO_PAGES = [
     {
         "slug": "best-countries-to-buy-property-as-a-foreigner",
         "title": "Best Countries to Buy Property as a Foreigner | Global Home Atlas",
-        "description": "Compare countries and destinations for foreign property buyers using ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth.",
+        "description": "Compare where foreigners can buy property with ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth.",
         "h1": "Best Countries to Buy Property as a Foreigner",
         "keyword": "best countries to buy property as a foreigner",
         "theme": "foreign-buyer access",
         "intent": "foreign buyers comparing legal access, title clarity, transaction practicality, lifestyle quality, and resale depth before choosing markets for local diligence",
         "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "lake-como", "costa-brava-girona", "hakone-izu", "phuket-koh-samui"],
         "faqs": [
-            ("Which countries are best for foreigners to buy property?", "The best options are markets where foreign buyers can understand the title path, hire independent local counsel, fund the purchase cleanly, use the property realistically, and resell into a broad buyer pool."),
+            ("What are the best countries to buy property as a foreigner?", "The best options are markets where foreign buyers can understand the title path, hire independent local counsel, fund the purchase cleanly, use the property realistically, and resell into a broad buyer pool."),
             ("What legal risks should foreign buyers check first?", "Start with title structure, transfer process, taxes, permits, foreign ownership restrictions, financing access, rental rules, and whether the structure is simple enough to explain without relying on informal assurances."),
             ("Is freehold ownership always better than leasehold?", "Freehold can be cleaner, but the safer choice depends on enforceability, local rules, asset quality, liquidity, taxes, and whether the buyer understands the full structure before committing capital."),
         ],
@@ -408,7 +408,7 @@ SEO_PAGES = [
     },
     {
         "slug": "best-places-to-buy-property-in-europe",
-        "title": "Best Places to Buy Property in Europe | Global Home Atlas",
+        "title": "Best Places to Buy Property in Europe 2026 | Global Home Atlas",
         "description": "Compare the best places to buy property in Europe for foreign buyers focused on lifestyle, retirement, rental resilience, value discipline, and resale liquidity.",
         "h1": "Best Places to Buy Property in Europe",
         "keyword": "best places to buy property in Europe",
@@ -418,7 +418,7 @@ SEO_PAGES = [
         "faqs": [
             ("Where should foreign buyers start in Europe?", "Start with regions that combine livability, transport, healthcare, clear ownership, and a resale market broader than one nationality."),
             ("Is Europe better for lifestyle or yield?", "Europe is often strongest as a lifestyle and capital-preservation decision, while yield depends heavily on local rules and asset selection."),
-            ("How should I compare European property markets?", "Compare city access, healthcare, taxation, rental rules, seasonality, entry price, and resale depth at the regional level."),
+            ("How should I compare European property markets?", "To compare Europe property markets, start with city access, healthcare, taxation, rental rules, seasonality, entry price, and resale depth at the regional level."),
         ],
     },
     {
@@ -1681,7 +1681,7 @@ def destination_query_match_html(dest: dict, pages: list[dict]) -> str:
     if destination_id == "andermatt":
         title = "Andermatt property for foreign buyers: what to check before shortlisting"
         intro = (
-            "Andermatt real estate and property for foreign buyers can screen well for scarcity, infrastructure, and Swiss resilience, "
+            "Andermatt real estate and Swiss resort property for foreign buyers can screen well for scarcity, infrastructure, and Swiss resilience, "
             "but the Atlas view starts with entry price, ownership access, carrying costs, and future buyer depth."
         )
         points = [
@@ -1693,7 +1693,7 @@ def destination_query_match_html(dest: dict, pages: list[dict]) -> str:
     else:
         title = "Annecy vacation home and second-home shortlist"
         intro = (
-            "An Annecy vacation home or second-home thesis depends on lake lifestyle, Geneva access, year-round use, "
+            "An Annecy real estate, vacation home, or second-home thesis in the French Alps depends on lake lifestyle, Geneva access, year-round use, "
             "and whether the selected neighborhood can support both owner enjoyment and resale depth."
         )
         points = [
@@ -2789,13 +2789,13 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 {favicon_links_html()}
-  <title>Global Property Markets for Buying Abroad | Global Home Atlas</title>
-  <meta name="description" content="Compare global property markets for buying property abroad, vacation homes, second homes, retirement, ownership constraints, budget, and exit plan.">
+  <title>Best Places to Buy Property Abroad | Global Property Markets</title>
+  <meta name="description" content="Compare the best places to buy property abroad, including global property markets for buying property abroad, vacation homes, second homes, retirement, budget, and exit plan.">
   <link rel="canonical" href="{SITE_URL}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{SITE_NAME}">
   <meta property="og:title" content="Global Home Atlas">
-  <meta property="og:description" content="Compare global property markets for buying property abroad, vacation homes, second homes, retirement, ownership constraints, budget, and exit plan.">
+  <meta property="og:description" content="Compare the best places to buy property abroad, including global property markets for buying property abroad, vacation homes, second homes, retirement, budget, and exit plan.">
   <meta property="og:url" content="{SITE_URL}">
   <meta name="twitter:card" content="summary_large_image">
 {analytics_head_tags()}
