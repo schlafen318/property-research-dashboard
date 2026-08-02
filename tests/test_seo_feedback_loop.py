@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import tempfile
 import unittest
 from pathlib import Path
@@ -192,6 +193,41 @@ class NotificationCommentTests(unittest.TestCase):
         ]
 
         self.assertTrue(seo_feedback_loop.implemented_awaiting_google(finding, issues))
+
+    def test_create_or_update_issue_retries_transient_github_failure(self) -> None:
+        finding = seo_feedback_loop.Finding(
+            kind="seo-goal-missed",
+            title="Missed guide hub goal",
+            summary="Guide hub missed first impressions goal.",
+            severity="high",
+            labels=("analytics-loop", "needs-human-review"),
+            fingerprint="gha-seo-goal-missed-abc123",
+        )
+        issues = [
+            {
+                "number": 38,
+                "url": "https://github.com/schlafen318/property-research-dashboard/issues/38",
+                "body": "Fingerprint `gha-seo-goal-missed-abc123`",
+                "labels": [],
+            }
+        ]
+        calls = []
+        original_run = seo_feedback_loop.run
+
+        def flaky_run(cmd: list[str], *args, **kwargs):
+            calls.append(cmd)
+            if len(calls) == 1:
+                return subprocess.CompletedProcess(cmd, 1, "", "504 Gateway Timeout")
+            return subprocess.CompletedProcess(cmd, 0, "", "")
+
+        seo_feedback_loop.run = flaky_run
+        try:
+            result = seo_feedback_loop.create_or_update_issue(finding, issues, dry_run=False)
+        finally:
+            seo_feedback_loop.run = original_run
+
+        self.assertEqual("https://github.com/schlafen318/property-research-dashboard/issues/38", result)
+        self.assertEqual(2, len(calls))
 
     def test_scaffold_auto_internal_link_pr_dry_run_returns_auto_merge_branch(self) -> None:
         finding = seo_feedback_loop.Finding(
