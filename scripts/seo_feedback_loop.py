@@ -658,6 +658,22 @@ def find_issue_by_fingerprint(issues: list[dict], fingerprint: str) -> dict | No
     return None
 
 
+def issue_label_names(issue: dict | None) -> set[str]:
+    labels = (issue or {}).get("labels") or []
+    names = set()
+    for label in labels:
+        if isinstance(label, dict) and label.get("name"):
+            names.add(str(label["name"]))
+        elif isinstance(label, str):
+            names.add(label)
+    return names
+
+
+def implemented_awaiting_google(finding: Finding, issues: list[dict]) -> bool:
+    issue = find_issue_by_fingerprint(issues, finding.fingerprint)
+    return "implemented-awaiting-google" in issue_label_names(issue)
+
+
 def find_control_issue(issues: list[dict]) -> dict | None:
     for issue in issues:
         if issue.get("title") == CONTROL_ISSUE_TITLE:
@@ -1186,6 +1202,8 @@ def main(argv: list[str]) -> int:
             pr_links.append(pr_url)
         if finding.auto_implementation_safe:
             auto_internal_link_pairs.append((finding, issue_link))
+            continue
+        if implemented_awaiting_google(finding, issues):
             continue
         implementation_pr_url = scaffold_implementation_pr(finding, issue_link, dry_run)
         if implementation_pr_url:
