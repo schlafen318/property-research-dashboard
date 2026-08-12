@@ -36,6 +36,19 @@ def destinations() -> list[dict]:
 
 
 class SeoCtrContentTests(unittest.TestCase):
+    def test_build_rejects_stale_override_hash(self) -> None:
+        original_loader = build_unified_app.load_content_overrides
+        stale = content_override(
+            "https://globalhomeatlas.com/", title="New title", description="New description", intro="New intro"
+        )
+        stale["base_content_hash"] = "0" * 64
+        build_unified_app.load_content_overrides = lambda: [stale]
+        try:
+            with self.assertRaisesRegex(ValueError, "Stale SEO content base hash"):
+                build_unified_app.build()
+        finally:
+            build_unified_app.load_content_overrides = original_loader
+
     def test_seo_page_override_updates_visible_content_and_schema(self) -> None:
         page = seo_page("best-places-to-buy-property-in-europe")
         canonical = build_unified_app.page_url(page["slug"])

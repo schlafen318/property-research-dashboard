@@ -4,6 +4,7 @@ import json
 import re
 from copy import deepcopy
 from pathlib import Path
+from datetime import datetime
 from urllib.parse import urlparse
 
 
@@ -30,6 +31,15 @@ REQUIRED_TOP_LEVEL_FIELDS = {
     "content",
 }
 ALLOWED_LIFECYCLES = {"proposed", "active", "reverted"}
+SUPPORTED_GUIDE_SLUGS = {
+    "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-vacation-home-abroad",
+    "best-countries-for-expats-to-buy-property", "best-countries-to-buy-property-as-a-foreigner",
+    "buy-property-abroad", "buying-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad",
+    "overseas-property-investment", "foreign-property-investment-risks", "portugal-vs-spain-retirement-property",
+    "greece-vs-portugal-retirement-property", "japan-retirement-property-foreign-buyers",
+    "thailand-villa-ownership-foreigners", "best-places-to-buy-property-in-europe",
+    "where-can-foreigners-buy-property",
+}
 
 
 def _is_site_url(value: str) -> bool:
@@ -37,16 +47,41 @@ def _is_site_url(value: str) -> bool:
     return parsed.scheme == "https" and parsed.netloc == "globalhomeatlas.com" and not parsed.query and not parsed.fragment
 
 
+def _is_supported_target(value: str) -> bool:
+    parsed = urlparse(value)
+    path = parsed.path
+    if path == "/":
+        return True
+    if path.startswith("/countries/") or path.startswith("/destinations/"):
+        parts = [part for part in path.split("/") if part]
+        return len(parts) == 2 and (ROOT / "artifacts" / parts[0] / parts[1] / "index.html").exists()
+    return path.strip("/") in SUPPORTED_GUIDE_SLUGS
+
+
+def _valid_timestamp(value: object) -> bool:
+    if not isinstance(value, str):
+        return False
+    try:
+        datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return False
+    return True
+
+
 def validate_runtime_entry(entry: dict) -> None:
     target = entry.get("target_url")
     if not isinstance(target, str) or not _is_site_url(target):
         raise ValueError(f"Invalid SEO content target URL: {target}")
+    if not _is_supported_target(target):
+        raise ValueError(f"Unsupported SEO content target URL: {target}")
     if not re.fullmatch(r"gha-[a-z0-9-]+", str(entry.get("finding_fingerprint") or "")):
         raise ValueError(f"Invalid SEO content fingerprint: {target}")
     if not re.fullmatch(r"[a-f0-9]{64}", str(entry.get("base_content_hash") or "")):
         raise ValueError(f"Invalid SEO content hash: {target}")
     if entry.get("lifecycle") not in ALLOWED_LIFECYCLES:
         raise ValueError(f"Invalid SEO content lifecycle: {target}")
+    if not _valid_timestamp(entry.get("generated_at")) or not _valid_timestamp(entry.get("cooldown_until")):
+        raise ValueError(f"Invalid SEO content timestamp: {target}")
     if not isinstance(entry.get("signal"), dict):
         raise ValueError(f"Invalid SEO content signal: {target}")
     content = entry.get("content")

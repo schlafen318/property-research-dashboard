@@ -61,6 +61,27 @@ class ContextCollectionTests(unittest.TestCase):
             "guide",
             seo_content_generator.page_type_for_url("https://globalhomeatlas.com/buy-property-abroad/"),
         )
+        self.assertEqual(
+            "guide",
+            seo_content_generator.page_type_for_url("https://globalhomeatlas.com/where-can-foreigners-buy-property/"),
+        )
+        with self.assertRaisesRegex(ValueError, "not supported"):
+            seo_content_generator.page_type_for_url("https://globalhomeatlas.com/about/")
+
+    def test_homepage_lede_is_included_in_context_hash(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            page = root / "index.html"
+            page.write_text(
+                '<title>Atlas</title><meta name="description" content="Description">'
+                '<link rel="canonical" href="https://globalhomeatlas.com/">'
+                '<h1>Research property markets</h1><p class="lede">Visible homepage intro.</p>',
+                encoding="utf-8",
+            )
+            context = seo_content_generator.collect_target_context(
+                "https://globalhomeatlas.com/", ["https://globalhomeatlas.com/"], artifacts_root=root
+            )
+        self.assertEqual("Visible homepage intro.", context.intro)
 
 
 class ProposalValidationTests(unittest.TestCase):
@@ -128,6 +149,39 @@ class ProposalValidationTests(unittest.TestCase):
         self.assertTrue(any("hash" in error for error in errors))
         self.assertTrue(any("sitemap" in error for error in errors))
         self.assertTrue(any("FAQ" in error for error in errors))
+
+    def test_rejects_all_prohibited_claim_categories_deterministically(self) -> None:
+        claims = {
+            "legal": "This is legal for buyers.",
+            "tax": "Buyers receive a tax advantage.",
+            "visa": "This home includes a visa path.",
+            "ownership": "Foreign buyers may own any home.",
+            "price": "This is an affordable market.",
+            "yield": "The market provides strong yield.",
+            "return": "Buyers receive a strong return.",
+            "guarantee": "This is a guaranteed choice.",
+        }
+        for category, intro in claims.items():
+            with self.subTest(category=category):
+                errors = seo_content_generator.validate_proposal(self.proposal(intro=intro), self.context)
+                self.assertTrue(any(category in error for error in errors), errors)
+
+    def test_rejects_protected_claim_even_when_category_word_exists_in_source(self) -> None:
+        errors = seo_content_generator.validate_proposal(
+            self.proposal(intro="Buyers have unrestricted ownership rights."), self.context
+        )
+        self.assertTrue(any("ownership" in error for error in errors), errors)
+
+    def test_rejects_missing_evidence_new_entity_and_keyword_stuffing(self) -> None:
+        repeated = "Portugal property guide Portugal property guide Portugal property guide Portugal property guide"
+        proposal = self.proposal(
+            intro=f"Lisbon research. {repeated}",
+            source_fragments=[],
+        )
+        errors = seo_content_generator.validate_proposal(proposal, self.context)
+        self.assertTrue(any("source fragment" in error for error in errors))
+        self.assertTrue(any("capitalized entities" in error and "Lisbon" in error for error in errors))
+        self.assertTrue(any("repeats" in error for error in errors))
 
     def test_upsert_override_deduplicates_target_and_fingerprint(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -242,6 +296,16 @@ class OpenAIGenerationTests(unittest.TestCase):
             client=client,
             attempts=3,
             sleep_fn=sleeps.append,
+        )
+        self.assertEqual(self.context.target_url, proposal.target_url)
+        self.assertEqual([1], sleeps)
+
+    def test_retry_recognizes_openai_connection_exception_names_without_importing_sdk(self) -> None:
+        api_connection_error = type("APIConnectionError", (Exception,), {})
+        client = FakeClient([api_connection_error("temporary"), FakeResponse(self.valid_proposal)])
+        sleeps = []
+        proposal = seo_content_generator.generate_proposal_with_retry(
+            self.finding, self.context, client=client, attempts=2, sleep_fn=sleeps.append
         )
         self.assertEqual(self.context.target_url, proposal.target_url)
         self.assertEqual([1], sleeps)

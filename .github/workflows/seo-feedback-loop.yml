@@ -57,9 +57,6 @@ jobs:
       - name: Submit URLs to IndexNow
         run: python3 scripts/indexnow_submit.py --write --output output/seo/indexnow-latest.json --allow-failure
 
-      - name: Generate SEO status dashboard
-        run: python3 scripts/seo_status_dashboard.py --report output/seo/latest.json --indexnow-report output/seo/indexnow-latest.json --output artifacts/seo-status/index.html
-
       - name: Verify tracking coverage
         run: python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
 
@@ -69,7 +66,12 @@ jobs:
           SEO_CONTENT_MODEL: ${{ vars.SEO_CONTENT_MODEL || 'gpt-5.6' }}
         run: python3 scripts/seo_feedback_loop.py --apply --notify-user schlafen318 --summary-output output/seo/feedback-loop-summary.json
 
+      - name: Generate SEO status dashboard
+        if: always()
+        run: python3 scripts/seo_status_dashboard.py --report output/seo/latest.json --indexnow-report output/seo/indexnow-latest.json --output artifacts/seo-status/index.html
+
       - name: Send SEO notifications
+        if: always()
         env:
           SEO_NOTIFY_SMTP_HOST: ${{ secrets.SEO_NOTIFY_SMTP_HOST }}
           SEO_NOTIFY_SMTP_PORT: ${{ secrets.SEO_NOTIFY_SMTP_PORT }}
@@ -83,6 +85,7 @@ jobs:
         run: python3 scripts/seo_email_notification.py --feedback-summary output/seo/feedback-loop-summary.json
 
       - name: Commit SEO status dashboard
+        if: always()
         run: |
           git add artifacts/seo-status/index.html
           if git diff --cached --quiet; then

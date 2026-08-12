@@ -4,6 +4,7 @@ import json
 import os
 import re
 import shutil
+import sys
 import unicodedata
 from datetime import date
 from html import escape
@@ -14,6 +15,9 @@ try:
     from src.seo_content_overrides import apply_content_override, load_content_overrides
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from seo_content_overrides import apply_content_override, load_content_overrides
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.seo_content_generator import PageContextParser, content_hash
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -5830,6 +5834,51 @@ def build() -> Path:
     avg_score = sum(float(item.get("decision_score", 0) or 0) for item in destinations) / len(destinations)
     min_price = min(float(item.get("usd_per_m2", 0) or 0) for item in destinations)
     countries = len({item.get("country") for item in destinations if item.get("country")})
+    auto_internal_links = load_auto_internal_links()
+    for entry in content_overrides:
+        target = entry["target_url"]
+        if target == SITE_URL:
+            base_html = build_landing_page(destinations, SEO_PAGES, listings, countries, content_overrides=[])
+        elif target.startswith(f"{SITE_URL}countries/"):
+            slug = target.removeprefix(f"{SITE_URL}countries/").strip("/")
+            hub = next((item for item in COUNTRY_HUBS if item["slug"] == slug), None)
+            if hub is None:
+                raise ValueError(f"Unsupported SEO content target URL: {target}")
+            base_html = build_country_hub_page(hub, destinations, SEO_PAGES, content_overrides=[])
+        elif target.startswith(f"{SITE_URL}destinations/"):
+            slug = target.removeprefix(f"{SITE_URL}destinations/").strip("/")
+            dest = next((item for item in destinations if destination_slug(item) == slug), None)
+            if dest is None:
+                raise ValueError(f"Unsupported SEO content target URL: {target}")
+            base_html = build_destination_page(
+                dest, listings_by_dest.get(dest["id"], []), destinations, SEO_PAGES, content_overrides=[]
+            )
+        else:
+            slug = target.removeprefix(SITE_URL).strip("/")
+            page = next((item for item in SEO_PAGES if item["slug"] == slug), None)
+            if page is None:
+                raise ValueError(f"Unsupported SEO content target URL: {target}")
+            base_html = build_seo_page(
+                page, destinations, SEO_PAGES, auto_links=auto_internal_links, content_overrides=[]
+            )
+        parser = PageContextParser()
+        parser.feed(base_html)
+        allowed_hashes = {content_hash(
+            parser.values["title"], parser.values["description"], parser.values["h1"],
+            parser.values["intro"], tuple(parser.faqs),
+        )}
+        artifact_path = ARTIFACTS / target.removeprefix(SITE_URL).strip("/") / "index.html"
+        if target == SITE_URL:
+            artifact_path = ARTIFACTS / "index.html"
+        if artifact_path.exists():
+            prior_parser = PageContextParser()
+            prior_parser.feed(artifact_path.read_text(encoding="utf-8"))
+            allowed_hashes.add(content_hash(
+                prior_parser.values["title"], prior_parser.values["description"], prior_parser.values["h1"],
+                prior_parser.values["intro"], tuple(prior_parser.faqs),
+            ))
+        if entry["base_content_hash"] not in allowed_hashes:
+            raise ValueError(f"Stale SEO content base hash: {target}")
     categories = sorted({item.get("category") for item in destinations if item.get("category")})
     category_options = "\n".join(
         f'<option value="{escape(category)}">{escape(category)}</option>' for category in categories
@@ -7381,7 +7430,6 @@ def build() -> Path:
         clean_generated_html(build_report_library_page(destinations, SEO_PAGES)),
         encoding="utf-8",
     )
-    auto_internal_links = load_auto_internal_links()
     for page in SEO_PAGES:
         page_dir = ARTIFACTS / page["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)

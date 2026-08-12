@@ -8,7 +8,7 @@ from pathlib import Path
 from src import seo_content_overrides
 
 
-def valid_entry(target: str = "https://globalhomeatlas.com/example/") -> dict:
+def valid_entry(target: str = "https://globalhomeatlas.com/buy-property-abroad/") -> dict:
     return {
         "target_url": target,
         "finding_fingerprint": "gha-low-ctr-opportunity-abc123",
@@ -35,7 +35,7 @@ class ContentOverrideRuntimeTests(unittest.TestCase):
         base = {"title": "Old", "description": "Old description", "faqs": [("Old?", "Old answer.")]}
         result = seo_content_overrides.apply_content_override(
             base,
-            "https://globalhomeatlas.com/example/",
+            "https://globalhomeatlas.com/buy-property-abroad/",
             [valid_entry()],
         )
         self.assertEqual("New title", result["title"])
@@ -60,6 +60,20 @@ class ContentOverrideRuntimeTests(unittest.TestCase):
             path.write_text(json.dumps([valid_entry(), valid_entry()]), encoding="utf-8")
             with self.assertRaisesRegex(ValueError, "Duplicate"):
                 seo_content_overrides.load_content_overrides(path)
+
+    def test_loader_rejects_unsupported_target_and_malformed_timestamp(self) -> None:
+        unsupported = valid_entry("https://globalhomeatlas.com/about/")
+        fabricated_country = valid_entry("https://globalhomeatlas.com/countries/not-rendered/")
+        malformed = valid_entry()
+        malformed["generated_at"] = "not-a-date"
+        for entry, message in (
+            (unsupported, "Unsupported"), (fabricated_country, "Unsupported"), (malformed, "timestamp")
+        ):
+            with self.subTest(message=message), tempfile.TemporaryDirectory() as tmpdir:
+                path = Path(tmpdir) / "overrides.json"
+                path.write_text(json.dumps([entry]), encoding="utf-8")
+                with self.assertRaisesRegex(ValueError, message):
+                    seo_content_overrides.load_content_overrides(path)
 
 
 if __name__ == "__main__":

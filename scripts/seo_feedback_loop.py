@@ -9,7 +9,7 @@ import subprocess
 import sys
 import time
 from dataclasses import asdict, dataclass
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 try:
@@ -760,12 +760,25 @@ def select_generated_content_candidates(
     override_entries: list[dict],
     now: datetime,
     limit: int = 5,
+    merged_prs: list[dict] | None = None,
 ) -> list[tuple[Finding, str | None]]:
     cooldowns = {
         str(entry.get("target_url")): str(entry.get("cooldown_until") or "")
         for entry in override_entries
-        if entry.get("target_url")
+        if entry.get("target_url") and entry.get("lifecycle") == "active"
     }
+    for pr in merged_prs or []:
+        merged_at = pr.get("mergedAt")
+        if not merged_at:
+            continue
+        try:
+            merged_cooldown = datetime.fromisoformat(str(merged_at).replace("Z", "+00:00")) + timedelta(days=28)
+        except ValueError:
+            continue
+        for target in generated_content_pr_targets([pr]):
+            prior = cooldowns.get(target)
+            if not prior or datetime.fromisoformat(prior.replace("Z", "+00:00")) < merged_cooldown:
+                cooldowns[target] = merged_cooldown.isoformat()
     eligible = []
     for pair in pairs:
         finding, _ = pair
@@ -795,7 +808,17 @@ def select_generated_content_candidates(
             pair[0].fingerprint,
         )
     )
-    return eligible[:limit]
+    selected: list[tuple[Finding, str | None]] = []
+    selected_targets: set[str] = set()
+    for pair in eligible:
+        target = finding_target_url(pair[0])
+        if not target or target in selected_targets:
+            continue
+        selected.append(pair)
+        selected_targets.add(target)
+        if len(selected) == limit:
+            break
+    return selected
 
 
 def list_generated_content_prs(state: str) -> list[dict]:
@@ -1132,6 +1155,8 @@ def build_generated_content_pr_body(
         context = contexts[entry["target_url"]]
         content = entry["content"]
         before_after = {
+            "search_console_signal": entry.get("signal") or {},
+            "validator": "passed deterministic content policy and source-evidence checks",
             "before": {
                 "title": context.title,
                 "meta_description": context.meta_description,
@@ -1145,9 +1170,7 @@ def build_generated_content_pr_body(
             f"- Source issue: {issue_by_fingerprint.get(fingerprint) or 'n/a'}\n"
             f"- Fingerprint: `{fingerprint}`\n"
             f"- Model: `{entry['model']}`\n\n"
-            "```json\n"
-            f"{json.dumps(before_after, indent=2, ensure_ascii=False)}\n"
-            "```"
+            + "\n".join(f"    {line}" for line in json.dumps(before_after, indent=2, ensure_ascii=False).splitlines())
         )
     rejection_lines = [
         f"- `{item.fingerprint}` ({item.target_url}): {item.reason.replace(chr(10), ' ')}"
@@ -1428,45 +1451,73 @@ def scaffold_generated_content_pr(
         print(f"[dry-run] create generated content draft PR branch {branch} with {len(findings)} candidates")
         return GeneratedContentRun(f"dry-run:generated-content-pr:{branch}", 0, (), None)
 
-    contexts: dict[str, seo_content_generator.TargetPageContext] = {}
-    generation_candidates = []
     rejected: list[seo_content_generator.RejectedProposal] = []
-    for finding in findings:
-        target = finding_target_url(finding)
-        if not target:
-            rejected.append(seo_content_generator.RejectedProposal(finding.fingerprint, "", "Finding has no target URL"))
-            continue
-        try:
-            context = seo_content_generator.collect_target_context(target, sitemap_urls)
-        except ValueError as exc:
-            rejected.append(seo_content_generator.RejectedProposal(finding.fingerprint, target, str(exc)))
-            continue
-        contexts[target] = context
-        generation_candidates.append(
-            (
-                {
-                    "fingerprint": finding.fingerprint,
-                    "kind": finding.kind,
-                    "title": finding.title,
-                    "summary": finding.summary,
-                    "payload": finding.payload or {},
-                },
-                context,
-            )
-        )
-    generated = seo_content_generator.generate_batch(generation_candidates)
-    rejected.extend(generated.rejected)
-    if not generated.accepted:
-        return GeneratedContentRun(None, 0, tuple(rejected), generated.skipped_reason)
-
-    existing = existing_pr_for_branch(branch, dry_run=False)
-    if existing:
-        return GeneratedContentRun(existing, len(generated.accepted), tuple(rejected), generated.skipped_reason)
     base = base_branch()
-    pr_body = build_generated_content_pr_body(pairs, contexts, generated.accepted, tuple(rejected))
-    run(["git", "switch", "-c", branch])
+    branch_created = False
     try:
+        existing = existing_pr_for_branch(branch, dry_run=False)
+        if existing:
+            return GeneratedContentRun(existing, 0, (), "Recovered existing generated-content pull request")
+        if remote_branch_exists(branch, dry_run=False):
+            recovery_body = (
+                "## Generated SEO content recovery\n\n"
+                "This draft PR restores review for an already-pushed generated-content branch. "
+                "The committed override and rendered artifact diff are authoritative; no fresh model output "
+                "was used to describe the existing branch.\n\n"
+                + "\n".join(f"- Fingerprint: `{finding.fingerprint}`" for finding in findings)
+            )
+            completed = run(
+                generated_content_pr_create_args(branch, base, "Recover generated SEO content review", recovery_body)
+            )
+            return GeneratedContentRun(completed.stdout.strip(), 0, (), "Recovered pushed branch after PR creation failure")
+        contexts: dict[str, seo_content_generator.TargetPageContext] = {}
+        generation_candidates = []
+        for finding in findings:
+            target = finding_target_url(finding)
+            if not target:
+                rejected.append(seo_content_generator.RejectedProposal(finding.fingerprint, "", "Finding has no target URL"))
+                continue
+            try:
+                context = seo_content_generator.collect_target_context(target, sitemap_urls)
+            except ValueError as exc:
+                rejected.append(seo_content_generator.RejectedProposal(finding.fingerprint, target, str(exc)))
+                continue
+            contexts[target] = context
+            generation_candidates.append(
+                (
+                    {
+                        "fingerprint": finding.fingerprint,
+                        "kind": finding.kind,
+                        "title": finding.title,
+                        "summary": finding.summary,
+                        "payload": finding.payload or {},
+                    },
+                    context,
+                )
+            )
+        generated = seo_content_generator.generate_batch(generation_candidates)
+        rejected.extend(generated.rejected)
+        if not generated.accepted:
+            return GeneratedContentRun(None, 0, tuple(rejected), generated.skipped_reason)
+
+        verified_entries = []
         for entry in generated.accepted:
+            refreshed = seo_content_generator.collect_target_context(str(entry["target_url"]), sitemap_urls)
+            if refreshed.base_content_hash != entry["base_content_hash"]:
+                rejected.append(
+                    seo_content_generator.RejectedProposal(
+                        str(entry["finding_fingerprint"]), str(entry["target_url"]),
+                        "Base content changed during generation",
+                    )
+                )
+                continue
+            verified_entries.append(entry)
+        if not verified_entries:
+            return GeneratedContentRun(None, 0, tuple(rejected), "All generated content became stale before writing")
+        pr_body = build_generated_content_pr_body(pairs, contexts, tuple(verified_entries), tuple(rejected))
+        run(["git", "switch", "-c", branch])
+        branch_created = True
+        for entry in verified_entries:
             seo_content_generator.upsert_override_entry(entry)
         run(["python3", "src/build_unified_app.py"])
         run(["python3", "-m", "unittest", "discover", "tests"])
@@ -1486,19 +1537,26 @@ def scaffold_generated_content_pr(
         run(["git", "add", "data/seo_content_overrides.json", "artifacts"])
         if run(["git", "diff", "--cached", "--quiet"], check=False).returncode == 0:
             return GeneratedContentRun(None, 0, tuple(rejected), "Generated content produced no repository diff")
-        run(["git", "commit", "-m", f"Generate SEO content for {len(generated.accepted)} pages"])
+        run(["git", "commit", "-m", f"Generate SEO content for {len(verified_entries)} pages"])
         run(["git", "push", "--set-upstream", "origin", branch])
         completed = run(
             generated_content_pr_create_args(
                 branch,
                 base,
-                f"Generate SEO content for {len(generated.accepted)} pages",
+                f"Generate SEO content for {len(verified_entries)} pages",
                 pr_body,
             )
         )
-        return GeneratedContentRun(completed.stdout.strip(), len(generated.accepted), tuple(rejected), None)
+        return GeneratedContentRun(completed.stdout.strip(), len(verified_entries), tuple(rejected), None)
+    except Exception as exc:
+        return GeneratedContentRun(None, 0, tuple(rejected), f"Generated content workflow failed: {exc}")
     finally:
-        run(["git", "switch", base], check=False)
+        if branch_created:
+            run(
+                ["git", "restore", "--staged", "--worktree", "data/seo_content_overrides.json", "artifacts"],
+                check=False,
+            )
+            run(["git", "switch", base], check=False)
 
 
 def maybe_auto_merge(pr_url: str | None, finding: Finding, dry_run: bool) -> str | None:
@@ -1544,13 +1602,19 @@ def main(argv: list[str]) -> int:
 
     ensure_labels(dry_run)
     issues = list_issues() if not dry_run else []
-    open_generated_prs = list_generated_content_prs("open") if not dry_run else []
-    merged_generated_prs = list_generated_content_prs("merged") if not dry_run else []
-    reconciled_issue_count = reconcile_merged_generated_content_prs(
-        issues=issues,
-        prs=merged_generated_prs,
-        dry_run=dry_run,
-    )
+    generated_setup_error = None
+    try:
+        open_generated_prs = list_generated_content_prs("open") if not dry_run else []
+        merged_generated_prs = list_generated_content_prs("merged") if not dry_run else []
+        reconciled_issue_count = reconcile_merged_generated_content_prs(
+            issues=issues,
+            prs=merged_generated_prs,
+            dry_run=dry_run,
+        )
+    except Exception as exc:
+        open_generated_prs = []
+        reconciled_issue_count = 0
+        generated_setup_error = f"Generated content reconciliation failed: {exc}"
     issue_links = [create_or_update_issue(finding, issues, dry_run) for finding in findings]
     pr_links: list[str] = []
     auto_merged: list[str] = []
@@ -1570,19 +1634,26 @@ def main(argv: list[str]) -> int:
         merge_url = maybe_auto_merge(pr_url, finding, dry_run)
         if merge_url:
             auto_merged.append(merge_url)
-    selected_editorial_pairs = select_generated_content_candidates(
-        editorial_pairs,
-        issues=issues,
-        open_targets=generated_content_pr_targets(open_generated_prs),
-        override_entries=seo_content_generator.load_override_entries(),
-        now=datetime.now(timezone.utc),
-        limit=5,
-    )
-    generated_run = scaffold_generated_content_pr(
-        selected_editorial_pairs,
-        sitemap_urls=list((report.get("sitemap") or {}).get("urls") or []),
-        dry_run=dry_run,
-    )
+    if generated_setup_error:
+        generated_run = GeneratedContentRun(None, 0, (), generated_setup_error)
+    else:
+        try:
+            selected_editorial_pairs = select_generated_content_candidates(
+                editorial_pairs,
+                issues=issues,
+                open_targets=generated_content_pr_targets(open_generated_prs),
+                override_entries=seo_content_generator.load_override_entries(),
+                now=datetime.now(timezone.utc),
+                limit=5,
+                merged_prs=merged_generated_prs,
+            )
+            generated_run = scaffold_generated_content_pr(
+                selected_editorial_pairs,
+                sitemap_urls=list((report.get("sitemap") or {}).get("urls") or []),
+                dry_run=dry_run,
+            )
+        except Exception as exc:
+            generated_run = GeneratedContentRun(None, 0, (), f"Generated content orchestration failed: {exc}")
     if generated_run.pr_url:
         pr_links.append(generated_run.pr_url)
     auto_pr_url = scaffold_auto_internal_links_pr(auto_internal_link_pairs, dry_run)

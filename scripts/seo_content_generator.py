@@ -18,6 +18,33 @@ ARTIFACTS = ROOT / "artifacts"
 SEO_CONTENT_OVERRIDES_PATH = ROOT / "data" / "seo_content_overrides.json"
 POLICY_FLAG_NAMES = ("legal", "tax", "visa", "ownership", "price", "yield", "return", "guarantee")
 DEFAULT_MODEL = "gpt-5.6"
+SUPPORTED_GUIDE_SLUGS = {
+    "best-places-to-buy-property-abroad-for-retirement",
+    "best-places-to-buy-vacation-home-abroad",
+    "best-countries-for-expats-to-buy-property",
+    "best-countries-to-buy-property-as-a-foreigner",
+    "buy-property-abroad",
+    "buying-property-abroad-for-retirement",
+    "best-places-to-buy-a-second-home-abroad",
+    "overseas-property-investment",
+    "foreign-property-investment-risks",
+    "portugal-vs-spain-retirement-property",
+    "greece-vs-portugal-retirement-property",
+    "japan-retirement-property-foreign-buyers",
+    "thailand-villa-ownership-foreigners",
+    "best-places-to-buy-property-in-europe",
+    "where-can-foreigners-buy-property",
+}
+PROHIBITED_CLAIM_TERMS = {
+    "legal": ("legal", "lawful", "legally"),
+    "tax": ("tax", "taxes", "taxation"),
+    "visa": ("visa", "residency", "immigration"),
+    "ownership": ("ownership", "own", "owns", "owned", "freehold", "leasehold"),
+    "price": ("price", "priced", "cost", "affordable", "expensive"),
+    "yield": ("yield", "yields"),
+    "return": ("return", "returns", "profit", "appreciation"),
+    "guarantee": ("guarantee", "guaranteed", "certain", "risk-free"),
+}
 
 PROPOSAL_JSON_SCHEMA = {
     "type": "object",
@@ -131,7 +158,7 @@ class PageContextParser(HTMLParser):
             self.capture, self.buffer = "title", []
         elif tag == "h1" and not self.values["h1"]:
             self.capture, self.buffer = "h1", []
-        elif tag == "p" and ({"seo-lede", "page-lede"} & classes) and not self.values["intro"]:
+        elif tag == "p" and ({"seo-lede", "page-lede", "lede"} & classes) and not self.values["intro"]:
             self.capture, self.buffer = "intro", []
         elif self.in_faq and tag == "summary":
             self.capture, self.buffer = "faq_question", []
@@ -191,7 +218,10 @@ def page_type_for_url(target_url: str) -> str:
         return "country"
     if parsed.path.startswith("/destinations/"):
         return "destination"
-    return "guide"
+    slug = parsed.path.strip("/")
+    if slug in SUPPORTED_GUIDE_SLUGS:
+        return "guide"
+    raise ValueError(f"Target URL is not supported by the content renderer: {target_url}")
 
 
 def collect_target_context(
@@ -342,21 +372,46 @@ def validate_proposal(proposal: ContentProposal, context: TargetPageContext) -> 
     }
     if all(value is None or value.strip() in original_values for value in content_values):
         errors.append("Proposal does not make a material content change")
-    source_lower = _source_text(context).lower()
+    source_text = _source_text(context)
+    source_lower = source_text.lower()
+    if not proposal.source_fragments:
+        errors.append("Proposal must cite at least one source fragment")
     for fragment in proposal.source_fragments:
         if not fragment.strip() or fragment.lower() not in source_lower:
             errors.append(f"Source fragment is not present in page context: {fragment}")
     proposed_text = _proposal_text(proposal)
-    source_numbers = set(re.findall(r"(?:[$€£¥]\s*)?\d+(?:[.,]\d+)?%?", _source_text(context)))
+    source_numbers = set(re.findall(r"(?:[$€£¥]\s*)?\d+(?:[.,]\d+)?%?", source_text))
     proposed_numbers = set(re.findall(r"(?:[$€£¥]\s*)?\d+(?:[.,]\d+)?%?", proposed_text))
     if proposed_numbers - source_numbers:
         errors.append("Proposal introduces a number absent from source context")
     for name, flagged in proposal.policy_flags.items():
         if flagged:
             errors.append(f"Proposal policy flag is set: {name}")
-    for term in ("guarantee", "guaranteed", "return", "yield", "tax", "visa", "legal advice"):
-        if term in proposed_text.lower() and term not in source_lower:
-            errors.append(f"Proposal introduces prohibited claim language: {term}")
+    proposed_lower = proposed_text.lower()
+    for category, terms in PROHIBITED_CLAIM_TERMS.items():
+        introduced = [term for term in terms if re.search(rf"\b{re.escape(term)}\b", proposed_lower)]
+        if introduced:
+            errors.append(f"Proposal introduces prohibited {category} claim language: {introduced[0]}")
+
+    source_words = {word.lower() for word in re.findall(r"\b[A-Za-zÀ-ÖØ-öø-ÿ'-]{3,}\b", source_text)}
+    proposed_entities = set(re.findall(r"\b[A-Z][A-Za-zÀ-ÖØ-öø-ÿ'-]{2,}\b", proposed_text))
+    new_entities = sorted(
+        entity for entity in proposed_entities
+        if entity.lower() not in source_words
+        and entity not in {"Compare", "Explore", "Learn", "Discover", "This", "Global", "Home", "Atlas"}
+    )
+    if new_entities:
+        errors.append(f"Proposal introduces capitalized entities absent from source context: {', '.join(new_entities)}")
+
+    words = re.findall(r"[a-z0-9]+", proposed_lower)
+    repeated = {
+        " ".join(words[index:index + 3])
+        for index in range(max(0, len(words) - 2))
+        if words.count(words[index]) >= 4
+        and sum(1 for offset in range(max(0, len(words) - 2)) if words[offset:offset + 3] == words[index:index + 3]) >= 4
+    }
+    if repeated:
+        errors.append("Proposal repeats the same query phrase excessively")
     return errors
 
 
@@ -485,6 +540,8 @@ def generate_proposal(
 
 def _transient_api_error(exc: Exception) -> bool:
     if isinstance(exc, (ConnectionError, TimeoutError)):
+        return True
+    if exc.__class__.__name__ in {"APIConnectionError", "APITimeoutError"}:
         return True
     status_code = getattr(exc, "status_code", None)
     return status_code == 429 or (isinstance(status_code, int) and status_code >= 500)
