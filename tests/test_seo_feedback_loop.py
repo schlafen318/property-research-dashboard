@@ -602,6 +602,14 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertIn("new number", body)
         self.assertIn("pull/101", body)
 
+    def test_workflow_exposes_openai_only_to_feedback_step(self) -> None:
+        workflow = Path(".github/workflows/seo-feedback-loop.yml").read_text(encoding="utf-8")
+        self.assertIn('"openai>=2,<3"', workflow)
+        self.assertIn("OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}", workflow)
+        self.assertIn("SEO_CONTENT_MODEL: ${{ vars.SEO_CONTENT_MODEL || 'gpt-5.6' }}", workflow)
+        job_env = workflow.split("steps:", 1)[0]
+        self.assertNotIn("OPENAI_API_KEY", job_env)
+
 
 if __name__ == "__main__":
     unittest.main()

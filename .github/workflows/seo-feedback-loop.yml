@@ -34,10 +34,10 @@ jobs:
         with:
           python-version: "3.11"
 
-      - name: Install Google API dependencies
+      - name: Install API dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install google-api-python-client google-auth google-auth-httplib2
+          python -m pip install "google-api-python-client>=2,<3" "google-auth>=2,<3" "google-auth-httplib2>=0.2,<1" "openai>=2,<3"
 
       - name: Validate required secrets
         run: |
@@ -64,6 +64,9 @@ jobs:
         run: python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
 
       - name: Run feedback loop
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          SEO_CONTENT_MODEL: ${{ vars.SEO_CONTENT_MODEL || 'gpt-5.6' }}
         run: python3 scripts/seo_feedback_loop.py --apply --notify-user schlafen318 --summary-output output/seo/feedback-loop-summary.json
 
       - name: Send SEO notifications
