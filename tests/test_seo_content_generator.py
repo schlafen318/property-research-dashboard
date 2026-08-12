@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import tempfile
 import unittest
+import json
 from pathlib import Path
 
 from scripts import seo_content_generator
@@ -59,6 +60,95 @@ class ContextCollectionTests(unittest.TestCase):
             "guide",
             seo_content_generator.page_type_for_url("https://globalhomeatlas.com/buy-property-abroad/"),
         )
+
+
+class ProposalValidationTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.context = seo_content_generator.TargetPageContext(
+            target_url="https://globalhomeatlas.com/countries/portugal-property/",
+            page_type="country",
+            title="Portugal Property Guide",
+            meta_description="Compare Portugal property markets for foreign buyers and practical retirement planning.",
+            h1="Portugal Property Guide",
+            intro="Portugal is a retirement and second-home benchmark for foreign buyers.",
+            faqs=(),
+            sitemap_urls=(
+                "https://globalhomeatlas.com/countries/portugal-property/",
+                "https://globalhomeatlas.com/buy-property-abroad/",
+            ),
+            base_content_hash="a" * 64,
+        )
+
+    def proposal(self, **changes):
+        values = {
+            "finding_fingerprint": "gha-low-ctr-opportunity-abc123",
+            "target_url": self.context.target_url,
+            "base_content_hash": self.context.base_content_hash,
+            "title": "Portugal Property Guide for Foreign Buyers",
+            "meta_description": "Compare Portugal property markets for foreign buyers, retirement planning, and second-home research.",
+            "intro": "Compare Portugal as a retirement and second-home benchmark for foreign buyers.",
+            "faq_question": None,
+            "faq_answer": None,
+            "internal_link_target": "https://globalhomeatlas.com/buy-property-abroad/",
+            "internal_link_anchor": "buying property abroad guide",
+            "rationale": "Matches observed foreign-buyer query intent.",
+            "source_fragments": ["Portugal", "retirement and second-home benchmark"],
+            "policy_flags": {
+                "legal": False,
+                "tax": False,
+                "visa": False,
+                "ownership": False,
+                "price": False,
+                "yield": False,
+                "return": False,
+                "guarantee": False,
+            },
+        }
+        values.update(changes)
+        return seo_content_generator.proposal_from_dict(values)
+
+    def test_valid_proposal_has_no_errors(self) -> None:
+        self.assertEqual([], seo_content_generator.validate_proposal(self.proposal(), self.context))
+
+    def test_rejects_new_number_and_prohibited_claim(self) -> None:
+        proposal = self.proposal(intro="Portugal guarantees a 12% return for foreign buyers.")
+        errors = seo_content_generator.validate_proposal(proposal, self.context)
+        self.assertTrue(any("number" in error for error in errors))
+        self.assertTrue(any("guarantee" in error or "return" in error for error in errors))
+
+    def test_rejects_stale_hash_outside_link_and_country_faq(self) -> None:
+        proposal = self.proposal(
+            base_content_hash="b" * 64,
+            internal_link_target="https://example.com/",
+            faq_question="Is Portugal suitable?",
+            faq_answer="Compare Portugal carefully.",
+        )
+        errors = seo_content_generator.validate_proposal(proposal, self.context)
+        self.assertTrue(any("hash" in error for error in errors))
+        self.assertTrue(any("sitemap" in error for error in errors))
+        self.assertTrue(any("FAQ" in error for error in errors))
+
+    def test_upsert_override_deduplicates_target_and_fingerprint(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "overrides.json"
+            path.write_text(
+                json.dumps(
+                    [
+                        {"target_url": self.context.target_url, "finding_fingerprint": "old"},
+                        {"target_url": "https://globalhomeatlas.com/other/", "finding_fingerprint": "same"},
+                    ]
+                ),
+                encoding="utf-8",
+            )
+            entry = {
+                "target_url": self.context.target_url,
+                "finding_fingerprint": "same",
+                "content": {},
+            }
+            seo_content_generator.upsert_override_entry(entry, path=path)
+            rows = json.loads(path.read_text(encoding="utf-8"))
+
+        self.assertEqual([entry], rows)
 
 
 if __name__ == "__main__":
