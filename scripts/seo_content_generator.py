@@ -2,8 +2,12 @@ from __future__ import annotations
 
 import hashlib
 import json
+import os
 import re
+import time
+from dataclasses import asdict
 from dataclasses import dataclass
+from datetime import datetime, timedelta, timezone
 from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse
@@ -13,6 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = ROOT / "artifacts"
 SEO_CONTENT_OVERRIDES_PATH = ROOT / "data" / "seo_content_overrides.json"
 POLICY_FLAG_NAMES = ("legal", "tax", "visa", "ownership", "price", "yield", "return", "guarantee")
+DEFAULT_MODEL = "gpt-5.6"
 
 PROPOSAL_JSON_SCHEMA = {
     "type": "object",
@@ -83,6 +88,24 @@ class ContentProposal:
     rationale: str
     source_fragments: tuple[str, ...]
     policy_flags: dict[str, bool]
+
+
+@dataclass(frozen=True)
+class RejectedProposal:
+    fingerprint: str
+    target_url: str
+    reason: str
+
+
+@dataclass(frozen=True)
+class BatchGenerationResult:
+    accepted: tuple[dict, ...]
+    rejected: tuple[RejectedProposal, ...]
+    skipped_reason: str | None
+
+
+class GenerationFailure(RuntimeError):
+    pass
 
 
 class PageContextParser(HTMLParser):
@@ -387,3 +410,151 @@ def upsert_override_entry(entry: dict, path: Path = SEO_CONTENT_OVERRIDES_PATH) 
     rows.sort(key=lambda row: str(row.get("target_url") or ""))
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(rows, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def build_generation_input(finding: dict, context: TargetPageContext) -> list[dict]:
+    developer = (
+        "Revise only the supplied page content to improve match with the supplied Search Console signal. "
+        "Return null for fields that should remain unchanged. Never add facts, numbers, legal, tax, visa, "
+        "ownership, price, yield, return, or guarantee claims. Preserve research caveats. Set every policy "
+        "flag truthfully when the requested wording touches a prohibited category. Use source_fragments to "
+        "identify exact phrases in the supplied page context that support the rewrite."
+    )
+    context_payload = asdict(context)
+    context_payload["faqs"] = [list(pair) for pair in context.faqs]
+    context_payload["sitemap_urls"] = list(context.sitemap_urls)
+    user_payload = {"finding": finding, "page_context": context_payload}
+    return [
+        {"role": "developer", "content": developer},
+        {"role": "user", "content": json.dumps(user_payload, sort_keys=True)},
+    ]
+
+
+def openai_client():
+    from openai import OpenAI
+
+    return OpenAI()
+
+
+def _refusal_text(response) -> str | None:
+    for item in getattr(response, "output", []) or []:
+        contents = item.get("content", []) if isinstance(item, dict) else getattr(item, "content", [])
+        for content in contents or []:
+            content_type = content.get("type") if isinstance(content, dict) else getattr(content, "type", None)
+            if content_type == "refusal":
+                return content.get("refusal") if isinstance(content, dict) else getattr(content, "refusal", "refused")
+    return None
+
+
+def generate_proposal(
+    finding: dict,
+    context: TargetPageContext,
+    *,
+    client=None,
+    model: str | None = None,
+) -> ContentProposal:
+    active_client = client or openai_client()
+    active_model = model or os.environ.get("SEO_CONTENT_MODEL", DEFAULT_MODEL)
+    response = active_client.responses.create(
+        model=active_model,
+        input=build_generation_input(finding, context),
+        text={
+            "format": {
+                "type": "json_schema",
+                "name": "seo_content_proposal",
+                "strict": True,
+                "schema": PROPOSAL_JSON_SCHEMA,
+            }
+        },
+    )
+    refusal = _refusal_text(response)
+    if refusal:
+        raise GenerationFailure(f"OpenAI response was refused: {refusal}")
+    status = getattr(response, "status", None)
+    if status != "completed":
+        raise GenerationFailure(f"OpenAI response status: {status or 'unknown'}")
+    try:
+        payload = json.loads(response.output_text)
+    except (AttributeError, TypeError, json.JSONDecodeError) as exc:
+        raise GenerationFailure("OpenAI response was not valid structured JSON") from exc
+    try:
+        return proposal_from_dict(payload)
+    except ValueError as exc:
+        raise GenerationFailure(f"OpenAI response failed schema validation: {exc}") from exc
+
+
+def _transient_api_error(exc: Exception) -> bool:
+    if isinstance(exc, (ConnectionError, TimeoutError)):
+        return True
+    status_code = getattr(exc, "status_code", None)
+    return status_code == 429 or (isinstance(status_code, int) and status_code >= 500)
+
+
+def generate_proposal_with_retry(
+    finding: dict,
+    context: TargetPageContext,
+    *,
+    client=None,
+    model: str | None = None,
+    attempts: int = 3,
+    sleep_fn=time.sleep,
+) -> ContentProposal:
+    if attempts < 1:
+        raise ValueError("attempts must be positive")
+    for attempt in range(1, attempts + 1):
+        try:
+            return generate_proposal(finding, context, client=client, model=model)
+        except Exception as exc:
+            if attempt == attempts or not _transient_api_error(exc):
+                raise
+            sleep_fn(attempt)
+    raise GenerationFailure("OpenAI generation attempts exhausted")
+
+
+def generate_batch(
+    candidates: list[tuple[dict, TargetPageContext]],
+    *,
+    client=None,
+    model: str | None = None,
+    generated_at: str | None = None,
+) -> BatchGenerationResult:
+    if client is None and not os.environ.get("OPENAI_API_KEY"):
+        return BatchGenerationResult(accepted=(), rejected=(), skipped_reason="OPENAI_API_KEY is not configured")
+    active_model = model or os.environ.get("SEO_CONTENT_MODEL", DEFAULT_MODEL)
+    timestamp = generated_at or datetime.now(timezone.utc).isoformat()
+    generated_dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+    cooldown_until = (generated_dt + timedelta(days=28)).isoformat()
+    accepted: list[dict] = []
+    rejected: list[RejectedProposal] = []
+    for finding, context in candidates:
+        fingerprint = str(finding.get("fingerprint") or "")
+        try:
+            proposal = generate_proposal_with_retry(
+                finding,
+                context,
+                client=client,
+                model=active_model,
+            )
+            errors = validate_proposal(proposal, context)
+            if proposal.finding_fingerprint != fingerprint:
+                errors.append("Finding fingerprint does not match generation request")
+            if errors:
+                raise ValueError("; ".join(errors))
+            accepted.append(
+                override_entry(
+                    proposal,
+                    finding.get("payload") or {},
+                    generated_at=timestamp,
+                    model=active_model,
+                    cooldown_until=cooldown_until,
+                )
+            )
+        except Exception as exc:
+            rejected.append(
+                RejectedProposal(
+                    fingerprint=fingerprint,
+                    target_url=context.target_url,
+                    reason=str(exc),
+                )
+            )
+    return BatchGenerationResult(accepted=tuple(accepted), rejected=tuple(rejected), skipped_reason=None)

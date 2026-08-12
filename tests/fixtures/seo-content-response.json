@@ -1,0 +1,24 @@
+{
+  "finding_fingerprint": "gha-low-ctr-opportunity-fixture",
+  "target_url": "https://globalhomeatlas.com/countries/portugal-property/",
+  "base_content_hash": "__BASE_CONTENT_HASH__",
+  "title": "Portugal Property Markets for Foreign Buyers | Global Home Atlas",
+  "meta_description": null,
+  "intro": null,
+  "faq_question": null,
+  "faq_answer": null,
+  "internal_link_target": null,
+  "internal_link_anchor": null,
+  "rationale": "Matches the Portugal property markets signal.",
+  "source_fragments": ["Portugal", "property markets"],
+  "policy_flags": {
+    "legal": false,
+    "tax": false,
+    "visa": false,
+    "ownership": false,
+    "price": false,
+    "yield": false,
+    "return": false,
+    "guarantee": false
+  }
+}

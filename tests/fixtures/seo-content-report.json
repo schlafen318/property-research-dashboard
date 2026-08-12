@@ -1,0 +1,19 @@
+{
+  "sitemap": {
+    "urls": [
+      "https://globalhomeatlas.com/countries/portugal-property/",
+      "https://globalhomeatlas.com/buy-property-abroad/"
+    ]
+  },
+  "search_console": {
+    "low_ctr_pages": [
+      {
+        "page": "https://globalhomeatlas.com/countries/portugal-property/",
+        "clicks": 0,
+        "impressions": 40,
+        "ctr": 0.0,
+        "position": 8.0
+      }
+    ]
+  }
+}
