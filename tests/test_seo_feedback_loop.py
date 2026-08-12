@@ -578,6 +578,30 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertTrue(body.startswith("@schlafen318"))
         self.assertNotIn("@@schlafen318", body)
 
+    def test_control_issue_reports_generated_content_outcome(self) -> None:
+        body = seo_feedback_loop.control_issue_body(
+            report={},
+            findings=[],
+            issue_links=[],
+            pr_links=[],
+            auto_merged=[],
+            indexnow={},
+            generated_content={
+                "accepted_count": 2,
+                "rejected": [{
+                    "fingerprint": "gha-low-ctr-x",
+                    "target_url": "https://globalhomeatlas.com/x/",
+                    "reason": "new number",
+                }],
+                "skipped_reason": None,
+                "pr": "https://github.com/schlafen318/property-research-dashboard/pull/101",
+                "reconciled_issue_count": 1,
+            },
+        )
+        self.assertIn("Generated content accepted: `2`", body)
+        self.assertIn("new number", body)
+        self.assertIn("pull/101", body)
+
 
 if __name__ == "__main__":
     unittest.main()

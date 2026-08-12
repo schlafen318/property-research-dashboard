@@ -520,6 +520,7 @@ def control_issue_body(
     pr_links: list[str],
     auto_merged: list[str],
     indexnow: dict,
+    generated_content: dict | None = None,
 ) -> str:
     sitemap = report.get("sitemap", {})
     status = sitemap.get("status") or {}
@@ -573,6 +574,9 @@ def control_issue_body(
 ## Auto-Merged Fixes
 {chr(10).join(f'- {link}' for link in auto_merged) if auto_merged else '- None'}
 
+## Generated Content
+{format_generated_content(generated_content or {})}
+
 ## Recommended Next Action
 {recommended_next_action(findings)}
 """
@@ -591,6 +595,7 @@ def build_notification_comment(
     pr_links: list[str],
     auto_merged: list[str],
     control_link: str,
+    generated_content: dict | None = None,
 ) -> str:
     by_severity = {"high": 0, "medium": 0, "low": 0}
     for finding in findings:
@@ -608,12 +613,31 @@ def build_notification_comment(
 - Issues created or updated: `{len(issue_links)}`
 - Draft PRs opened: `{len(pr_links)}`
 - Auto-merged fixes: `{len(auto_merged)}`
+- Generated content accepted: `{(generated_content or {}).get('accepted_count', 0)}`
+- Generated content rejected: `{len((generated_content or {}).get('rejected', []))}`
+- Generated content draft: `{(generated_content or {}).get('pr') or 'none'}`
 
 ## Next Action
 {recommended_next_action(findings)}
 
 [Control issue]({control_link})
 """
+
+
+def format_generated_content(generated_content: dict) -> str:
+    rejected = generated_content.get("rejected") or []
+    lines = [
+        f"- Generated content accepted: `{generated_content.get('accepted_count', 0)}`",
+        f"- Generated content rejected: `{len(rejected)}`",
+        f"- Draft PR: `{generated_content.get('pr') or 'none'}`",
+        f"- Reconciled source issues: `{generated_content.get('reconciled_issue_count', 0)}`",
+    ]
+    if generated_content.get("skipped_reason"):
+        lines.append(f"- Skipped: {str(generated_content['skipped_reason']).replace(chr(10), ' ')}")
+    for item in rejected:
+        reason = str(item.get("reason") or "rejected").replace("\n", " ")
+        lines.append(f"- Rejection `{item.get('fingerprint', 'unknown')}`: {reason}")
+    return "\n".join(lines)
 
 
 def format_indexnow(indexnow: dict) -> str:
@@ -858,9 +882,18 @@ def create_or_update_control_issue(
     auto_merged: list[str],
     indexnow: dict,
     dry_run: bool,
+    generated_content: dict | None = None,
 ) -> str:
     issues = list_issues() if not dry_run else []
-    body = control_issue_body(report, findings, issue_links, pr_links, auto_merged, indexnow)
+    body = control_issue_body(
+        report,
+        findings,
+        issue_links,
+        pr_links,
+        auto_merged,
+        indexnow,
+        generated_content=generated_content,
+    )
     existing = find_control_issue(issues)
     if dry_run:
         print(f"[dry-run] update control issue with {len(findings)} findings")
@@ -883,6 +916,7 @@ def post_notification_comment(
     auto_merged: list[str],
     control_link: str,
     dry_run: bool,
+    generated_content: dict | None = None,
 ) -> str | None:
     if not notify_user:
         return None
@@ -894,6 +928,7 @@ def post_notification_comment(
         pr_links=pr_links,
         auto_merged=auto_merged,
         control_link=control_link,
+        generated_content=generated_content,
     )
     if dry_run:
         print(f"[dry-run] comment on control issue and mention {normalize_github_mention(notify_user)}")
@@ -1557,7 +1592,23 @@ def main(argv: list[str]) -> int:
         merge_url = maybe_auto_merge(auto_pr_url, auto_finding, dry_run)
         if merge_url:
             auto_merged.append(merge_url)
-    control_link = create_or_update_control_issue(report, findings, issue_links, pr_links, auto_merged, indexnow, dry_run)
+    generated_content = {
+        "accepted_count": generated_run.accepted_count,
+        "rejected": [asdict(item) for item in generated_run.rejected],
+        "skipped_reason": generated_run.skipped_reason,
+        "pr": generated_run.pr_url,
+        "reconciled_issue_count": reconciled_issue_count,
+    }
+    control_link = create_or_update_control_issue(
+        report,
+        findings,
+        issue_links,
+        pr_links,
+        auto_merged,
+        indexnow,
+        dry_run,
+        generated_content=generated_content,
+    )
     notification = post_notification_comment(
         notify_user=args.notify_user,
         report=report,
@@ -1567,6 +1618,7 @@ def main(argv: list[str]) -> int:
         auto_merged=auto_merged,
         control_link=control_link,
         dry_run=dry_run,
+        generated_content=generated_content,
     )
     summary = {
         "findings": [
@@ -1590,13 +1642,7 @@ def main(argv: list[str]) -> int:
         "prs": pr_links,
         "auto_merged_count": len(auto_merged),
         "auto_merged": auto_merged,
-        "generated_content": {
-            "accepted_count": generated_run.accepted_count,
-            "rejected": [asdict(item) for item in generated_run.rejected],
-            "skipped_reason": generated_run.skipped_reason,
-            "pr": generated_run.pr_url,
-            "reconciled_issue_count": reconciled_issue_count,
-        },
+        "generated_content": generated_content,
         "control": control_link,
         "notification": notification,
     }
