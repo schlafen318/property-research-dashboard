@@ -9,7 +9,97 @@ def seo_page(slug: str) -> dict:
     return next(page for page in build_unified_app.SEO_PAGES if page["slug"] == slug)
 
 
+def content_override(canonical: str, *, title: str, description: str, intro: str, faq=None) -> dict:
+    return {
+        "target_url": canonical,
+        "finding_fingerprint": "gha-low-ctr-opportunity-render",
+        "base_content_hash": "a" * 64,
+        "generated_at": "2026-08-12T00:00:00+00:00",
+        "model": "test-model",
+        "signal": {},
+        "lifecycle": "proposed",
+        "cooldown_until": "2026-09-09T00:00:00+00:00",
+        "content": {
+            "title": title,
+            "meta_description": description,
+            "intro": intro,
+            "faq_question": faq[0] if faq else None,
+            "faq_answer": faq[1] if faq else None,
+            "internal_link_target": "https://globalhomeatlas.com/guides/",
+            "internal_link_anchor": "global property buying guides",
+        },
+    }
+
+
+def destinations() -> list[dict]:
+    return [build_unified_app.consolidate_destination(item) for item in build_unified_app.load_json("destinations.json")]
+
+
 class SeoCtrContentTests(unittest.TestCase):
+    def test_seo_page_override_updates_visible_content_and_schema(self) -> None:
+        page = seo_page("best-places-to-buy-property-in-europe")
+        canonical = build_unified_app.page_url(page["slug"])
+        overrides = [
+            content_override(
+                canonical,
+                title="Europe Property Markets for Foreign Buyers | Global Home Atlas",
+                description="Compare Europe property markets for foreign buyers using lifestyle, ownership clarity, value, and resale depth.",
+                intro="Compare Europe property markets for foreign buyers before choosing destinations.",
+                faq=("How should buyers compare Europe?", "Compare access, ownership clarity, and resale depth."),
+            )
+        ]
+        html = build_unified_app.build_seo_page(
+            page,
+            destinations(),
+            build_unified_app.SEO_PAGES,
+            content_overrides=overrides,
+        )
+        self.assertIn("<title>Europe Property Markets for Foreign Buyers | Global Home Atlas</title>", html)
+        self.assertIn("Compare Europe property markets for foreign buyers before choosing destinations.", html)
+        self.assertIn("How should buyers compare Europe?", html)
+        self.assertIn('"@type":"FAQPage"', html)
+        self.assertIn("global property buying guides", html)
+
+    def test_home_country_and_destination_accept_overrides(self) -> None:
+        all_destinations = destinations()
+        homepage = build_unified_app.build_landing_page(
+            all_destinations,
+            build_unified_app.SEO_PAGES,
+            [],
+            10,
+            content_overrides=[content_override(
+                build_unified_app.SITE_URL,
+                title="Global Property Markets for International Buyers",
+                description="Compare global property markets for international buyers using lifestyle, ownership clarity, budget, and exit planning.",
+                intro="Compare international property markets with the Atlas decision framework.",
+            )],
+        )
+        country = build_unified_app.build_country_hub_page(
+            build_unified_app.COUNTRY_HUBS[0],
+            all_destinations,
+            build_unified_app.SEO_PAGES,
+            content_overrides=[content_override(
+                build_unified_app.country_url(build_unified_app.COUNTRY_HUBS[0]),
+                title="Spain Property Markets for Foreign Buyers | Global Home Atlas",
+                description="Compare Spain property markets for foreign buyers across lifestyle, ownership, retirement fit, and resale depth.",
+                intro="Compare Spain property markets before selecting a destination.",
+            )],
+        )
+        destination = build_unified_app.build_destination_page(
+            all_destinations[0],
+            [],
+            all_destinations,
+            build_unified_app.SEO_PAGES,
+            content_overrides=[content_override(
+                build_unified_app.destination_url(all_destinations[0]),
+                title="Destination Property Research for Global Buyers | Global Home Atlas",
+                description="Review destination property research for global buyers using lifestyle, ownership clarity, risk, and resale evidence.",
+                intro="Review this destination through the Atlas decision framework.",
+            )],
+        )
+        self.assertIn("Global Property Markets for International Buyers", homepage)
+        self.assertIn("Compare Spain property markets before selecting a destination.", country)
+        self.assertIn("Review this destination through the Atlas decision framework.", destination)
     def test_vacation_home_page_targets_location_query_intent(self) -> None:
         page = seo_page("best-places-to-buy-vacation-home-abroad")
         text = " ".join(
