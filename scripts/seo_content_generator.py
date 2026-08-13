@@ -333,6 +333,16 @@ def _proposal_text(proposal: ContentProposal) -> str:
 
 _ENTITY_TITLE_TOKEN = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’\-]{2,}|[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]{0,3}\.)"
 _ENTITY_CONNECTOR = r"(?:da|das|de|del|di|do|dos|du|la|le|van|von)"
+_ENTITY_SENTENCE_STARTERS = {
+    "compare",
+    "discover",
+    "explore",
+    "more",
+    "research",
+    "review",
+    "see",
+    "which",
+}
 
 
 def _capitalized_entity_phrases(text: str) -> set[str]:
@@ -346,9 +356,10 @@ def _entity_is_supported(entity: str, source_lower: str) -> bool:
         return True
 
     title_tokens = list(re.finditer(_ENTITY_TITLE_TOKEN, entity))
-    return any(
-        entity[token.start():].lower() in source_lower
-        for token in title_tokens[1:-1]
+    return bool(
+        len(title_tokens) > 2
+        and title_tokens[0].group().lower().rstrip(".") in _ENTITY_SENTENCE_STARTERS
+        and entity[title_tokens[1].start():].lower() in source_lower
     )
 
 

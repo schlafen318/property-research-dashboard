@@ -207,6 +207,17 @@ class ProposalValidationTests(unittest.TestCase):
 
         self.assertFalse(any("capitalized entities" in error for error in errors), errors)
 
+    def test_entity_validation_rejects_unsupported_name_before_supported_place(self) -> None:
+        context = replace(
+            self.context,
+            intro="Portugal and New York are comparison benchmarks for foreign buyers.",
+        )
+        proposal = self.proposal(intro="Donald Trump New York research is compared with Portugal.")
+
+        errors = seo_content_generator.validate_proposal(proposal, context)
+
+        self.assertTrue(any("capitalized entities" in error for error in errors), errors)
+
     def test_entity_validation_rejects_names_with_connectors_and_abbreviations(self) -> None:
         introductions = (
             "Explore the Costa del Sol market with Portugal.",
