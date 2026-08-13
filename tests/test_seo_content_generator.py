@@ -359,6 +359,13 @@ class OpenAIGenerationTests(unittest.TestCase):
         self.assertIn("70 to 165 characters", developer_message)
         self.assertIn("protected-topic language must be null", developer_message)
 
+    def test_generation_prompt_requires_page_text_citations_and_forbids_urls(self) -> None:
+        messages = seo_content_generator.build_generation_input(self.finding, self.context)
+        developer_message = messages[0]["content"]
+        self.assertIn("exact page-text excerpts", developer_message)
+        self.assertIn("must never contain URLs", developer_message)
+        self.assertIn("title, meta description, H1, intro, or FAQ", developer_message)
+
     def test_generate_proposal_rejects_incomplete_response(self) -> None:
         client = FakeClient([FakeResponse(self.valid_proposal, status="incomplete")])
         with self.assertRaisesRegex(seo_content_generator.GenerationFailure, "incomplete"):
