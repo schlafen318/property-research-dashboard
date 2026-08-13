@@ -1,1 +1,52 @@
-[]
+[
+  {
+    "base_content_hash": "a7f1c644fb9301d4b202ccac393e0a8192c49573ed79de3dbf2bbde509a416ad",
+    "content": {
+      "faq_answer": null,
+      "faq_question": null,
+      "internal_link_anchor": null,
+      "internal_link_target": null,
+      "intro": "Compare Portugal property markets across the Algarve, Cascais, and Madeira, with a research-led look at retirement fit, local character, and rental caveats.",
+      "meta_description": "Explore Portugal property markets in the Algarve, Cascais, and Madeira, with research-led comparisons of lifestyle fit and rental caveats.",
+      "title": "Portugal Property Guide: Algarve, Cascais & Madeira"
+    },
+    "cooldown_until": "2026-09-10T15:14:51.173992+00:00",
+    "finding_fingerprint": "gha-low-ctr-opportunity-feace349abc6",
+    "generated_at": "2026-08-13T15:14:51.173992+00:00",
+    "lifecycle": "proposed",
+    "model": "gpt-5.6-luna",
+    "signal": {
+      "clicks": 0,
+      "ctr": 0,
+      "impressions": 20,
+      "page": "https://globalhomeatlas.com/countries/portugal-property/",
+      "position": 34.5
+    },
+    "target_url": "https://globalhomeatlas.com/countries/portugal-property/"
+  },
+  {
+    "base_content_hash": "a723eb23a4b282d314ac5d834a375d5b635dbaacdd5651a097384ccf734fa265",
+    "content": {
+      "faq_answer": null,
+      "faq_question": null,
+      "internal_link_anchor": null,
+      "internal_link_target": null,
+      "intro": "Compare Spain property destinations from Valencia and Malaga to Costa Brava and Mallorca, with a focus on lifestyle and location.",
+      "meta_description": "Explore Spain property destinations from Valencia and Malaga to Costa Brava and Mallorca, with comparisons focused on lifestyle and location.",
+      "title": "Spain Property Destinations: Valencia, Malaga & More"
+    },
+    "cooldown_until": "2026-09-10T15:14:51.173992+00:00",
+    "finding_fingerprint": "gha-low-ctr-opportunity-4fc393af899c",
+    "generated_at": "2026-08-13T15:14:51.173992+00:00",
+    "lifecycle": "proposed",
+    "model": "gpt-5.6-luna",
+    "signal": {
+      "clicks": 0,
+      "ctr": 0,
+      "impressions": 29,
+      "page": "https://globalhomeatlas.com/countries/spain-property/",
+      "position": 36.793103448275865
+    },
+    "target_url": "https://globalhomeatlas.com/countries/spain-property/"
+  }
+]
