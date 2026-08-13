@@ -513,8 +513,9 @@ def build_generation_input(finding: dict, context: TargetPageContext) -> list[di
         + page_rules
         + "Return null for fields that should remain unchanged. Never add facts, numbers, legal, tax, visa, "
         "ownership, price, yield, return, or guarantee claims. Preserve research caveats. Set every policy "
-        "flag truthfully when the requested wording touches a prohibited category. Use source_fragments to "
-        "identify exact phrases in the supplied page context that support the rewrite."
+        "flag truthfully when the requested wording touches a prohibited category. source_fragments must be "
+        "exact page-text excerpts from the supplied title, meta description, H1, intro, or FAQ that support "
+        "the rewrite; source_fragments must never contain URLs, including sitemap or internal-link URLs."
     )
     context_payload = asdict(context)
     context_payload["faqs"] = [list(pair) for pair in context.faqs]
