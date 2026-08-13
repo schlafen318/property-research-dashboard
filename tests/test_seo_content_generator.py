@@ -420,10 +420,23 @@ class OpenAIGenerationTests(unittest.TestCase):
         fixtures = Path(__file__).parent / "fixtures"
         report = json.loads((fixtures / "seo-content-report.json").read_text(encoding="utf-8"))
         target = report["search_console"]["low_ctr_pages"][0]["page"]
-        context = seo_content_generator.collect_target_context(
-            target,
-            report["sitemap"]["urls"],
-        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            artifacts_root = Path(tmpdir)
+            page = artifacts_root / "countries" / "portugal-property" / "index.html"
+            page.parent.mkdir(parents=True)
+            page.write_text(
+                '<title>Portugal Property Guide | Global Home Atlas</title>'
+                '<meta name="description" content="Compare Portugal property markets for foreign buyers.">'
+                '<link rel="canonical" href="https://globalhomeatlas.com/countries/portugal-property/">'
+                '<h1>Portugal Property Guide</h1>'
+                '<p class="page-lede">Portugal property markets are a research benchmark.</p>',
+                encoding="utf-8",
+            )
+            context = seo_content_generator.collect_target_context(
+                target,
+                report["sitemap"]["urls"],
+                artifacts_root=artifacts_root,
+            )
         response = json.loads((fixtures / "seo-content-response.json").read_text(encoding="utf-8"))
         response["base_content_hash"] = context.base_content_hash
         finding = {
