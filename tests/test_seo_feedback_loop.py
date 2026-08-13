@@ -4,12 +4,217 @@ import json
 import subprocess
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts import seo_feedback_loop
 
 
 class NotificationCommentTests(unittest.TestCase):
+    def editorial_pair(
+        self,
+        *,
+        impressions: int,
+        position: float,
+        target: str,
+        suffix: str,
+        auto_implementation_safe: bool = False,
+    ):
+        finding = seo_feedback_loop.Finding(
+            kind="low-ctr-opportunity",
+            title=f"Improve CTR for {target}",
+            summary="Page has weak CTR.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review"),
+            fingerprint=f"gha-low-ctr-opportunity-{suffix}",
+            implementation_pr=True,
+            auto_implementation_safe=auto_implementation_safe,
+            payload={"page": target, "impressions": impressions, "position": position},
+        )
+        return finding, f"https://github.com/schlafen318/property-research-dashboard/issues/{impressions}"
+
+    def test_select_generated_content_candidates_prioritizes_and_caps_five(self) -> None:
+        pairs = [
+            self.editorial_pair(impressions=value, position=position, target=f"https://globalhomeatlas.com/p{index}/", suffix=str(index))
+            for index, (value, position) in enumerate([(10, 8), (80, 12), (30, 5), (60, 9), (50, 7), (40, 6)])
+        ]
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            pairs,
+            issues=[],
+            open_targets=set(),
+            override_entries=[],
+            now=datetime(2026, 8, 12, tzinfo=timezone.utc),
+            limit=5,
+        )
+        self.assertEqual(5, len(selected))
+        self.assertEqual(80, selected[0][0].payload["impressions"])
+
+    def test_selection_deduplicates_canonical_targets(self) -> None:
+        target = "https://globalhomeatlas.com/countries/portugal-property/"
+        pairs = [
+            self.editorial_pair(impressions=50 - index, position=5 + index, target=target, suffix=str(index))
+            for index in range(3)
+        ]
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            pairs, issues=[], open_targets=set(), override_entries=[], now=datetime(2026, 8, 12, tzinfo=timezone.utc)
+        )
+        self.assertEqual(1, len(selected))
+        self.assertEqual(50, selected[0][0].payload["impressions"])
+
+    def test_selection_skips_auto_open_implemented_and_cooldown_targets(self) -> None:
+        eligible = self.editorial_pair(impressions=25, position=8, target="https://globalhomeatlas.com/eligible/", suffix="eligible")
+        auto_link = self.editorial_pair(impressions=60, position=6, target="https://globalhomeatlas.com/auto/", suffix="auto", auto_implementation_safe=True)
+        open_pr = self.editorial_pair(impressions=55, position=6, target="https://globalhomeatlas.com/open/", suffix="open")
+        implemented = self.editorial_pair(impressions=50, position=6, target="https://globalhomeatlas.com/implemented/", suffix="implemented")
+        cooldown = self.editorial_pair(impressions=45, position=6, target="https://globalhomeatlas.com/cooldown/", suffix="cooldown")
+        issues = [{
+            "body": f"Fingerprint `{implemented[0].fingerprint}`",
+            "labels": [{"name": "implemented-awaiting-google"}],
+        }]
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            [eligible, auto_link, open_pr, implemented, cooldown],
+            issues=issues,
+            open_targets={"https://globalhomeatlas.com/open/"},
+            override_entries=[{
+                "target_url": "https://globalhomeatlas.com/cooldown/",
+                "lifecycle": "active",
+                "cooldown_until": "2026-09-01T00:00:00+00:00",
+            }],
+            now=datetime(2026, 8, 12, tzinfo=timezone.utc),
+            limit=5,
+        )
+        self.assertEqual([eligible], selected)
+
+    def test_selection_starts_cooldown_at_merge_time(self) -> None:
+        target = "https://globalhomeatlas.com/countries/portugal-property/"
+        pair = self.editorial_pair(impressions=50, position=5, target=target, suffix="merged")
+        body = f"### {target}\n"
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            [pair], issues=[], open_targets=set(), override_entries=[],
+            now=datetime(2026, 8, 20, tzinfo=timezone.utc),
+            merged_prs=[{"body": body, "mergedAt": "2026-08-12T00:00:00Z"}],
+        )
+        self.assertEqual([], selected)
+
+    def test_generated_content_pr_is_draft_and_never_auto_merge_safe(self) -> None:
+        args = seo_feedback_loop.generated_content_pr_create_args(
+            branch="analytics/generated-content-2-abc123",
+            base="main",
+            title="Generate SEO content for 2 pages",
+            body="body",
+        )
+        self.assertIn("--draft", args)
+        labels = args[args.index("--label") + 1]
+        self.assertIn("generated-content", labels)
+        self.assertIn("needs-human-review", labels)
+        self.assertNotIn("auto-merge-safe", labels)
+
+    def test_generated_pr_body_includes_signal_and_cannot_break_markdown_fence(self) -> None:
+        target = "https://globalhomeatlas.com/countries/portugal-property/"
+        pair = self.editorial_pair(impressions=40, position=8, target=target, suffix="body")
+        context = seo_feedback_loop.seo_content_generator.collect_target_context(target, [target])
+        entry = {
+            "target_url": target, "finding_fingerprint": pair[0].fingerprint,
+            "base_content_hash": context.base_content_hash, "generated_at": "2026-08-12T00:00:00+00:00",
+            "model": "test-model", "signal": {"query": "```unsafe", "impressions": 40},
+            "lifecycle": "proposed", "cooldown_until": "2026-09-09T00:00:00+00:00",
+            "content": {"title": "```unsafe", "meta_description": None, "intro": None,
+                        "faq_question": None, "faq_answer": None, "internal_link_target": None,
+                        "internal_link_anchor": None},
+        }
+        body = seo_feedback_loop.build_generated_content_pr_body([pair], {target: context}, (entry,), ())
+        self.assertIn('"search_console_signal"', body)
+        self.assertIn('"validator"', body)
+        self.assertNotIn("\n```json\n", body)
+
+    def test_generated_content_dry_run_returns_one_stable_batch_pr(self) -> None:
+        pairs = [
+            self.editorial_pair(impressions=40, position=8, target="https://globalhomeatlas.com/a/", suffix="a"),
+            self.editorial_pair(impressions=30, position=9, target="https://globalhomeatlas.com/b/", suffix="b"),
+        ]
+        result = seo_feedback_loop.scaffold_generated_content_pr(
+            pairs,
+            sitemap_urls=[pair[0].payload["page"] for pair in pairs],
+            dry_run=True,
+        )
+        self.assertTrue(result.pr_url.startswith("dry-run:generated-content-pr:analytics/generated-content-2-"))
+        self.assertEqual(0, result.accepted_count)
+
+    def test_reconcile_merged_generated_pr_marks_source_issue_once(self) -> None:
+        issue = {
+            "number": 95,
+            "body": "Fingerprint `gha-low-ctr-opportunity-portugal`",
+            "labels": [{"name": "implementation-queued"}],
+        }
+        prs = [{
+            "body": "### https://globalhomeatlas.com/countries/portugal-property/\n- Fingerprint: `gha-low-ctr-opportunity-portugal`",
+        }]
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            count = seo_feedback_loop.reconcile_merged_generated_content_prs(issues=[issue], prs=prs, dry_run=False)
+            issue["labels"] = [{"name": "implemented-awaiting-google"}]
+            second = seo_feedback_loop.reconcile_merged_generated_content_prs(issues=[issue], prs=prs, dry_run=False)
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, count)
+        self.assertEqual(0, second)
+        self.assertEqual(1, len(calls))
+        self.assertIn("implemented-awaiting-google", calls[0])
+
+    def test_generated_scaffold_reports_build_failure_without_raising(self) -> None:
+        target = "https://globalhomeatlas.com/countries/portugal-property/"
+        pair = self.editorial_pair(impressions=40, position=8, target=target, suffix="failure")
+        context = seo_feedback_loop.seo_content_generator.collect_target_context(target, [target])
+        entry = {
+            "target_url": target,
+            "finding_fingerprint": pair[0].fingerprint,
+            "base_content_hash": context.base_content_hash,
+            "generated_at": "2026-08-12T00:00:00+00:00",
+            "model": "test-model",
+            "signal": pair[0].payload,
+            "lifecycle": "proposed",
+            "cooldown_until": "2026-09-09T00:00:00+00:00",
+            "content": {
+                "title": "Portugal Property Markets for Foreign Buyers | Global Home Atlas",
+                "meta_description": None,
+                "intro": None,
+                "faq_question": None,
+                "faq_answer": None,
+                "internal_link_target": None,
+                "internal_link_anchor": None,
+            },
+        }
+        original_run = seo_feedback_loop.run
+        original_batch = seo_feedback_loop.seo_content_generator.generate_batch
+        original_upsert = seo_feedback_loop.seo_content_generator.upsert_override_entry
+
+        def fake_run(cmd, *, check=True, capture=True):
+            if cmd[:3] == ["gh", "pr", "list"]:
+                return subprocess.CompletedProcess(cmd, 0, "[]", "")
+            if cmd == ["git", "branch", "--show-current"]:
+                return subprocess.CompletedProcess(cmd, 0, "main\n", "")
+            if cmd[:4] == ["git", "ls-remote", "--exit-code", "--heads"]:
+                return subprocess.CompletedProcess(cmd, 2, "", "")
+            if cmd == ["python3", "src/build_unified_app.py"]:
+                raise RuntimeError("static build failed")
+            return subprocess.CompletedProcess(cmd, 0, "", "")
+
+        seo_feedback_loop.run = fake_run
+        seo_feedback_loop.seo_content_generator.generate_batch = lambda candidates: (
+            seo_feedback_loop.seo_content_generator.BatchGenerationResult((entry,), (), None)
+        )
+        seo_feedback_loop.seo_content_generator.upsert_override_entry = lambda item: None
+        try:
+            result = seo_feedback_loop.scaffold_generated_content_pr([pair], sitemap_urls=[target], dry_run=False)
+        finally:
+            seo_feedback_loop.run = original_run
+            seo_feedback_loop.seo_content_generator.generate_batch = original_batch
+            seo_feedback_loop.seo_content_generator.upsert_override_entry = original_upsert
+
+        self.assertIsNone(result.pr_url)
+        self.assertIn("static build failed", result.skipped_reason)
     def test_classify_creates_query_ctr_opportunity_for_zero_click_top_query(self) -> None:
         report = {
             "site_url": "https://globalhomeatlas.com",
@@ -467,6 +672,42 @@ class NotificationCommentTests(unittest.TestCase):
 
         self.assertTrue(body.startswith("@schlafen318"))
         self.assertNotIn("@@schlafen318", body)
+
+    def test_control_issue_reports_generated_content_outcome(self) -> None:
+        body = seo_feedback_loop.control_issue_body(
+            report={},
+            findings=[],
+            issue_links=[],
+            pr_links=[],
+            auto_merged=[],
+            indexnow={},
+            generated_content={
+                "accepted_count": 2,
+                "rejected": [{
+                    "fingerprint": "gha-low-ctr-x",
+                    "target_url": "https://globalhomeatlas.com/x/",
+                    "reason": "new number",
+                }],
+                "skipped_reason": None,
+                "pr": "https://github.com/schlafen318/property-research-dashboard/pull/101",
+                "reconciled_issue_count": 1,
+            },
+        )
+        self.assertIn("Generated content accepted: `2`", body)
+        self.assertIn("new number", body)
+        self.assertIn("pull/101", body)
+
+    def test_workflow_exposes_openai_only_to_feedback_step(self) -> None:
+        workflow = Path(".github/workflows/seo-feedback-loop.yml").read_text(encoding="utf-8")
+        self.assertIn('"openai>=2,<3"', workflow)
+        self.assertIn("OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}", workflow)
+        self.assertIn("SEO_CONTENT_MODEL: ${{ vars.SEO_CONTENT_MODEL || 'gpt-5.6' }}", workflow)
+        job_env = workflow.split("steps:", 1)[0]
+        self.assertNotIn("OPENAI_API_KEY", job_env)
+        self.assertLess(
+            workflow.index("- name: Run feedback loop"),
+            workflow.index("- name: Generate SEO status dashboard"),
+        )
 
 
 if __name__ == "__main__":

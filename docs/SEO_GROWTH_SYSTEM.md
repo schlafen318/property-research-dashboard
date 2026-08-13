@@ -12,8 +12,9 @@ low-risk fixes automatically, and reports the result back to the owner.
 - The workflow can also be started manually from GitHub Actions.
 - Low-risk internal-link fixes can be implemented, opened as PRs, and merged by
   the automation.
-- Higher-risk title, meta, FAQ, and editorial content changes are queued as
-  implementation PRs for review unless explicitly approved and implemented.
+- Qualified title, meta, intro, FAQ, and editorial-link changes are generated
+  into one consolidated draft PR. They never auto-merge and remain pending
+  until a human approves them.
 - Telegram and email notifications are optional. The workflow does not fail if
   notification secrets are missing.
 
@@ -33,8 +34,11 @@ Each run does this:
 8. Creates or updates deduplicated analytics issues.
 9. Opens implementation PRs where a code/content change is needed.
 10. Auto-implements approved low-risk internal links.
-11. Sends Telegram or email notifications when configured.
-12. Uploads the JSON and Markdown SEO reports as workflow artifacts.
+11. Generates schema-constrained editorial proposals for up to five existing
+    pages and validates them against the current page text.
+12. Opens one consolidated draft PR when generated proposals pass validation.
+13. Sends Telegram or email notifications when configured.
+14. Uploads the JSON and Markdown SEO reports as workflow artifacts.
 
 ## Inputs
 
@@ -68,6 +72,8 @@ The loop writes or updates:
 - deduplicated GitHub issues for each finding
 - draft implementation PRs for human-review changes
 - non-draft auto-implementation PRs for low-risk internal links
+- `data/seo_content_overrides.json` changes in consolidated generated-content
+  draft PRs
 
 `output/seo/` is ignored locally. GitHub uploads those reports as workflow
 artifacts after each run.
@@ -100,6 +106,26 @@ or buyer trust, including:
 
 Those findings become GitHub issues and draft implementation PRs labeled
 `implementation-queued`.
+
+## Generated Editorial Content
+
+Existing-page `query-ctr-opportunity`, `low-ctr-opportunity`, and
+non-deterministic `near-ranking-opportunity` findings can enter the generated
+content path. The system prioritizes impressions and ranking position, limits
+each run to five pages, and opens at most one `generated-content` draft PR.
+
+The OpenAI Responses API returns strict-schema content data only. The model has
+no repository tools and cannot edit Python, workflows, or generated HTML. A
+deterministic validator rejects stale page hashes, unknown URLs, unsupported
+links, new numbers, unsupported claim language, malformed fields, and legal,
+tax, visa, ownership, price, yield, return, or guarantee claims. Accepted data
+is written only to `data/seo_content_overrides.json`; the static builder applies
+recognized fields and rejects malformed entries.
+
+Generated editorial PRs always carry `needs-human-review` and never carry
+`auto-merge-safe`. After a generated PR merges, the next feedback run marks its
+source issues `implemented-awaiting-google`. The target remains on a 28-day
+cooldown while Search Console gathers evidence.
 
 ## Notifications
 
@@ -139,6 +165,23 @@ Required secret:
 GOOGLE_SEARCH_CONSOLE_TOKEN_JSON
 ```
 
+Required to enable generated editorial content:
+
+```text
+OPENAI_API_KEY
+```
+
+If this secret is missing, monitoring, issues, the status dashboard, and
+notifications continue normally; content generation is reported as skipped.
+
+Optional repository Actions variable:
+
+```text
+SEO_CONTENT_MODEL=gpt-5.6
+```
+
+When the variable is absent, the workflow uses `gpt-5.6`.
+
 Optional secrets:
 
 ```text
@@ -174,6 +217,18 @@ Run the feedback loop without making GitHub changes:
 python3 scripts/seo_feedback_loop.py --dry-run
 ```
 
+Run against the committed deterministic content fixture:
+
+```bash
+python3 scripts/seo_feedback_loop.py --dry-run \
+  --report tests/fixtures/seo-content-report.json \
+  --summary-output output/seo/feedback-loop-summary.json
+```
+
+For a live manual run, use the GitHub Actions `SEO feedback loop` workflow after
+adding `OPENAI_API_KEY`. Review the resulting generated-content draft PR before
+merging. The scheduled flow uses the same guarded path.
+
 Run static-site verification:
 
 ```bash
@@ -207,6 +262,16 @@ python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py
   can still be healthy even when notifications are skipped.
 - If auto-implementation PRs conflict, close superseded single-link PRs after a
   batched PR merges.
+- If generation reports a stale hash, allow the next run to recollect the page
+  after the competing content change merges.
+- If the OpenAI API refuses, times out, or returns invalid structured output,
+  the proposal is rejected and other candidates continue.
+- If generated content fails tests or the static build, no branch is pushed and
+  no draft PR is opened.
+- To revert an approved generated change, remove its entry from
+  `data/seo_content_overrides.json`, rebuild with
+  `python3 src/build_unified_app.py`, verify the static site, and merge the
+  removal through a normal PR.
 - If deployment fails after a merged SEO change, rerun `Deploy static dashboard`
   after confirming the static verification passes.
 
@@ -222,6 +287,6 @@ The system is operating end to end when:
 - findings become deduplicated issues or PRs
 - low-risk internal-link fixes can auto-implement
 - human-review changes are queued rather than silently published
+- generated editorial changes are consolidated, validated, and draft-only
 - Telegram or email notification succeeds when secrets are configured
 - the static deploy after merged changes succeeds
-

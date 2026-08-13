@@ -36,6 +36,12 @@ class SeoEmailNotificationTests(unittest.TestCase):
             "issue_count": 2,
             "pr_count": 1,
             "auto_merged_count": 0,
+            "generated_content": {
+                "accepted_count": 2,
+                "rejected": [{"reason": "stale hash"}],
+                "skipped_reason": None,
+                "pr": "https://github.com/example/pull/101",
+            },
         }
 
         body = seo_email_notification.build_email_body(
@@ -53,6 +59,9 @@ class SeoEmailNotificationTests(unittest.TestCase):
         self.assertIn("Medium severity: 1", body)
         self.assertIn("Issues created or updated: 2", body)
         self.assertIn("Draft PRs opened: 1", body)
+        self.assertIn("Generated content accepted: 2", body)
+        self.assertIn("stale hash", body)
+        self.assertIn("https://github.com/example/pull/101", body)
         self.assertIn("request indexing", body)
 
     def test_main_skips_cleanly_when_smtp_is_not_configured(self) -> None:
