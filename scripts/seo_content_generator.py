@@ -356,11 +356,15 @@ def _entity_is_supported(entity: str, source_lower: str) -> bool:
         return True
 
     title_tokens = list(re.finditer(_ENTITY_TITLE_TOKEN, entity))
-    return bool(
-        len(title_tokens) > 2
-        and title_tokens[0].group().lower().rstrip(".") in _ENTITY_SENTENCE_STARTERS
-        and entity[title_tokens[1].start():].lower() in source_lower
-    )
+    if (
+        len(title_tokens) < 2
+        or title_tokens[0].group().lower().rstrip(".") not in _ENTITY_SENTENCE_STARTERS
+    ):
+        return False
+
+    supported_suffix = entity[title_tokens[1].start():].lower()
+    supported_suffix = re.sub(r"['’]s$", "", supported_suffix)
+    return supported_suffix in source_lower
 
 
 def validate_proposal(proposal: ContentProposal, context: TargetPageContext) -> list[str]:
