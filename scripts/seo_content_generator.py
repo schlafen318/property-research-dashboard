@@ -331,6 +331,38 @@ def _proposal_text(proposal: ContentProposal) -> str:
     )
 
 
+_ENTITY_TITLE_TOKEN = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’\-]{2,}|[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]{0,3}\.)"
+_ENTITY_CONNECTOR = r"(?:da|das|de|del|di|do|dos|du|la|le|van|von)"
+_ENTITY_SENTENCE_STARTERS = {
+    "compare",
+    "discover",
+    "explore",
+    "more",
+    "research",
+    "review",
+    "see",
+    "which",
+}
+
+
+def _capitalized_entity_phrases(text: str) -> set[str]:
+    separator = rf"(?:[ \t]+(?:{_ENTITY_CONNECTOR}[ \t]+)?|[ \t]+[dl]['’])"
+    pattern = rf"(?<!\w){_ENTITY_TITLE_TOKEN}(?:{separator}{_ENTITY_TITLE_TOKEN})+"
+    return set(re.findall(pattern, text))
+
+
+def _entity_is_supported(entity: str, source_lower: str) -> bool:
+    if entity.lower() in source_lower:
+        return True
+
+    title_tokens = list(re.finditer(_ENTITY_TITLE_TOKEN, entity))
+    return bool(
+        len(title_tokens) > 2
+        and title_tokens[0].group().lower().rstrip(".") in _ENTITY_SENTENCE_STARTERS
+        and entity[title_tokens[1].start():].lower() in source_lower
+    )
+
+
 def validate_proposal(proposal: ContentProposal, context: TargetPageContext) -> list[str]:
     errors: list[str] = []
     if proposal.target_url != context.target_url:
@@ -393,12 +425,9 @@ def validate_proposal(proposal: ContentProposal, context: TargetPageContext) -> 
         if introduced:
             errors.append(f"Proposal introduces prohibited {category} claim language: {introduced[0]}")
 
-    source_words = {word.lower() for word in re.findall(r"\b[A-Za-zÀ-ÖØ-öø-ÿ'-]{3,}\b", source_text)}
-    proposed_entities = set(re.findall(r"\b[A-Z][A-Za-zÀ-ÖØ-öø-ÿ'-]{2,}\b", proposed_text))
     new_entities = sorted(
-        entity for entity in proposed_entities
-        if entity.lower() not in source_words
-        and entity not in {"Compare", "Explore", "Learn", "Discover", "This", "Global", "Home", "Atlas"}
+        entity for entity in _capitalized_entity_phrases(proposed_text)
+        if not _entity_is_supported(entity, source_lower)
     )
     if new_entities:
         errors.append(f"Proposal introduces capitalized entities absent from source context: {', '.join(new_entities)}")
@@ -468,9 +497,17 @@ def upsert_override_entry(entry: dict, path: Path = SEO_CONTENT_OVERRIDES_PATH) 
 
 
 def build_generation_input(finding: dict, context: TargetPageContext) -> list[dict]:
+    page_rules = (
+        f"This is a {context.page_type} page. "
+        + ("FAQ fields may be proposed when supported. " if context.page_type == "guide" else "FAQ fields must be null. ")
+        + "A proposed title must contain 30 to 65 characters. "
+        + "A proposed meta description must contain 70 to 165 characters. "
+        + "Any content field that would introduce protected-topic language must be null. "
+    )
     developer = (
         "Revise only the supplied page content to improve match with the supplied Search Console signal. "
-        "Return null for fields that should remain unchanged. Never add facts, numbers, legal, tax, visa, "
+        + page_rules
+        + "Return null for fields that should remain unchanged. Never add facts, numbers, legal, tax, visa, "
         "ownership, price, yield, return, or guarantee claims. Preserve research caveats. Set every policy "
         "flag truthfully when the requested wording touches a prohibited category. Use source_fragments to "
         "identify exact phrases in the supplied page context that support the rewrite."
