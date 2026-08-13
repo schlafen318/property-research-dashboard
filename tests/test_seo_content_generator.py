@@ -175,13 +175,25 @@ class ProposalValidationTests(unittest.TestCase):
     def test_rejects_missing_evidence_new_entity_and_keyword_stuffing(self) -> None:
         repeated = "Portugal property guide Portugal property guide Portugal property guide Portugal property guide"
         proposal = self.proposal(
-            intro=f"Lisbon research. {repeated}",
+            intro=f"Lisbon Market research. {repeated}",
             source_fragments=[],
         )
         errors = seo_content_generator.validate_proposal(proposal, self.context)
         self.assertTrue(any("source fragment" in error for error in errors))
-        self.assertTrue(any("capitalized entities" in error and "Lisbon" in error for error in errors))
+        self.assertTrue(any("capitalized entities" in error and "Lisbon Market" in error for error in errors))
         self.assertTrue(any("repeats" in error for error in errors))
+
+    def test_entity_validation_ignores_sentence_starts_but_rejects_new_proper_names(self) -> None:
+        ordinary = self.proposal(intro="More research helps buyers compare markets. Which market fits best?")
+        ordinary_errors = seo_content_generator.validate_proposal(ordinary, self.context)
+        self.assertFalse(any("capitalized entities" in error for error in ordinary_errors), ordinary_errors)
+
+        unsupported = self.proposal(intro="Compare New York research with Portugal.")
+        unsupported_errors = seo_content_generator.validate_proposal(unsupported, self.context)
+        self.assertTrue(
+            any("capitalized entities" in error and "New York" in error for error in unsupported_errors),
+            unsupported_errors,
+        )
 
     def test_upsert_override_deduplicates_target_and_fingerprint(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -281,6 +293,15 @@ class OpenAIGenerationTests(unittest.TestCase):
         self.assertTrue(request["text"]["format"]["strict"])
         self.assertEqual(seo_content_generator.PROPOSAL_JSON_SCHEMA, request["text"]["format"]["schema"])
         self.assertEqual(self.context.target_url, proposal.target_url)
+
+    def test_generation_prompt_is_page_aware_and_length_bounded(self) -> None:
+        messages = seo_content_generator.build_generation_input(self.finding, self.context)
+        developer_message = messages[0]["content"]
+        self.assertIn("country", developer_message)
+        self.assertIn("FAQ fields must be null", developer_message)
+        self.assertIn("30 to 65 characters", developer_message)
+        self.assertIn("70 to 165 characters", developer_message)
+        self.assertIn("protected-topic language must be null", developer_message)
 
     def test_generate_proposal_rejects_incomplete_response(self) -> None:
         client = FakeClient([FakeResponse(self.valid_proposal, status="incomplete")])
