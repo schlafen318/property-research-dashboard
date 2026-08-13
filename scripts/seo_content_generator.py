@@ -331,9 +331,25 @@ def _proposal_text(proposal: ContentProposal) -> str:
     )
 
 
+_ENTITY_TITLE_TOKEN = r"(?:[A-ZÀ-ÖØ-Þ][A-Za-zÀ-ÖØ-öø-ÿ'’\-]{2,}|[A-ZÀ-ÖØ-Þ][a-zà-öø-ÿ]{0,3}\.)"
+_ENTITY_CONNECTOR = r"(?:da|das|de|del|di|do|dos|du|la|le|van|von)"
+
+
 def _capitalized_entity_phrases(text: str) -> set[str]:
-    word = r"[A-Z][A-Za-zÀ-ÖØ-öø-ÿ'-]{2,}"
-    return set(re.findall(rf"\b{word}(?:[ \t]+{word})+\b", text))
+    separator = rf"(?:[ \t]+(?:{_ENTITY_CONNECTOR}[ \t]+)?|[ \t]+[dl]['’])"
+    pattern = rf"(?<!\w){_ENTITY_TITLE_TOKEN}(?:{separator}{_ENTITY_TITLE_TOKEN})+"
+    return set(re.findall(pattern, text))
+
+
+def _entity_is_supported(entity: str, source_lower: str) -> bool:
+    if entity.lower() in source_lower:
+        return True
+
+    title_tokens = list(re.finditer(_ENTITY_TITLE_TOKEN, entity))
+    return any(
+        entity[token.start():].lower() in source_lower
+        for token in title_tokens[1:-1]
+    )
 
 
 def validate_proposal(proposal: ContentProposal, context: TargetPageContext) -> list[str]:
@@ -400,7 +416,7 @@ def validate_proposal(proposal: ContentProposal, context: TargetPageContext) -> 
 
     new_entities = sorted(
         entity for entity in _capitalized_entity_phrases(proposed_text)
-        if entity.lower() not in source_lower
+        if not _entity_is_supported(entity, source_lower)
     )
     if new_entities:
         errors.append(f"Proposal introduces capitalized entities absent from source context: {', '.join(new_entities)}")

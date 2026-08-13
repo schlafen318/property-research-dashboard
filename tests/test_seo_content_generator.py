@@ -4,6 +4,7 @@ import tempfile
 import unittest
 import json
 import os
+from dataclasses import replace
 from pathlib import Path
 
 from scripts import seo_content_generator
@@ -194,6 +195,30 @@ class ProposalValidationTests(unittest.TestCase):
             any("capitalized entities" in error and "New York" in error for error in unsupported_errors),
             unsupported_errors,
         )
+
+    def test_entity_validation_accepts_supported_name_after_sentence_start_word(self) -> None:
+        context = replace(
+            self.context,
+            intro="Portugal and New York are comparison benchmarks for foreign buyers.",
+        )
+        proposal = self.proposal(intro="Compare New York with Portugal for foreign-buyer research.")
+
+        errors = seo_content_generator.validate_proposal(proposal, context)
+
+        self.assertFalse(any("capitalized entities" in error for error in errors), errors)
+
+    def test_entity_validation_rejects_names_with_connectors_and_abbreviations(self) -> None:
+        introductions = (
+            "Explore the Costa del Sol market with Portugal.",
+            "Research in Rio de Janeiro alongside Portugal.",
+            "Compare Côte d'Azur with Portugal.",
+            "Compare St. Moritz with Portugal.",
+        )
+
+        for intro in introductions:
+            with self.subTest(intro=intro):
+                errors = seo_content_generator.validate_proposal(self.proposal(intro=intro), self.context)
+                self.assertTrue(any("capitalized entities" in error for error in errors), errors)
 
     def test_upsert_override_deduplicates_target_and_fingerprint(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
