@@ -11,6 +11,157 @@ from scripts import seo_feedback_loop
 
 
 class NotificationCommentTests(unittest.TestCase):
+    def goal_issue(
+        self,
+        *,
+        number: int = 107,
+        state: str = "OPEN",
+        kind: str = "seo-goal-missed",
+        fingerprint: str = "gha-seo-goal-missed-indexing",
+        auto_closed: bool = False,
+        field: str = "index",
+    ) -> dict:
+        url = "https://globalhomeatlas.com/where-can-foreigners-buy-property/"
+        labels = [{"name": "analytics-loop"}, {"name": kind}]
+        if auto_closed:
+            labels.append({"name": "goal-status-auto-closed"})
+        prefix = "Indexing" if field == "index" else "First impressions"
+        return {
+            "number": number,
+            "title": f"{prefix} goal missed for {url}",
+            "state": state,
+            "body": (
+                "## Classification\n"
+                f"- Kind: `{kind}`\n"
+                f"- Fingerprint: `{fingerprint}`\n"
+            ),
+            "labels": labels,
+        }
+
+    def goal_report(self, *, index_status: str, impression_status: str = "met") -> dict:
+        return {
+            "goals": {
+                "page_goals": [
+                    {
+                        "url": "https://globalhomeatlas.com/where-can-foreigners-buy-property/",
+                        "index_status": index_status,
+                        "impression_status": impression_status,
+                        "index_evidence": (
+                            "search_console_impressions" if index_status == "met" else "inspection_unavailable"
+                        ),
+                    }
+                ]
+            }
+        }
+
+    def goal_finding(self) -> seo_feedback_loop.Finding:
+        return seo_feedback_loop.Finding(
+            kind="seo-goal-missed",
+            title=(
+                "Indexing goal missed for "
+                "https://globalhomeatlas.com/where-can-foreigners-buy-property/"
+            ),
+            summary="Indexing goal is missed.",
+            severity="high",
+            labels=("analytics-loop", "seo-goal-missed"),
+            fingerprint="gha-seo-goal-missed-indexing",
+        )
+
+    def test_met_goal_closes_open_automation_issue_as_completed(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="met"),
+                findings=[],
+                issues=[self.goal_issue()],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual({"closed": 1, "reopened": 0, "errors": []}, result)
+        self.assertEqual(
+            ["gh", "issue", "edit", "107", "--add-label", "goal-status-auto-closed"], calls[0]
+        )
+        self.assertEqual("close", calls[1][2])
+        self.assertIn("completed", calls[1])
+
+    def test_unknown_indexing_goal_retires_unproven_alert(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="unknown"),
+                findings=[],
+                issues=[self.goal_issue()],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, result["closed"])
+        self.assertIn("not planned", calls[1])
+
+    def test_recurring_goal_reopens_only_automation_closed_issue(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="missed"),
+                findings=[self.goal_finding()],
+                issues=[self.goal_issue(state="CLOSED", auto_closed=True)],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual({"closed": 0, "reopened": 1, "errors": []}, result)
+        self.assertEqual(["gh", "issue", "reopen", "107"], calls[0])
+        self.assertIn("--remove-label", calls[1])
+
+    def test_human_closed_goal_issue_stays_closed(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="missed"),
+                findings=[self.goal_finding()],
+                issues=[self.goal_issue(state="CLOSED")],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual({"closed": 0, "reopened": 0, "errors": []}, result)
+        self.assertEqual([], calls)
+
+    def test_goal_close_failure_rolls_back_provenance_and_continues(self) -> None:
+        first = self.goal_issue()
+        second = self.goal_issue(number=108, fingerprint="gha-seo-goal-missed-second")
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        def mutate(cmd, attempts=3):
+            calls.append(cmd)
+            if cmd[2] == "close" and "107" in cmd:
+                raise RuntimeError("close failed")
+        seo_feedback_loop.gh_mutation = mutate
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="met"),
+                findings=[],
+                issues=[first, second],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, result["closed"])
+        self.assertEqual(1, len(result["errors"]))
+        self.assertIn(
+            ["gh", "issue", "edit", "107", "--remove-label", "goal-status-auto-closed"], calls
+        )
+        self.assertTrue(any("108" in call and call[2] == "close" for call in calls))
+
     def opportunity_finding(self, suffix: str = "queenstown") -> seo_feedback_loop.Finding:
         return seo_feedback_loop.Finding(
             kind="near-ranking-opportunity",
@@ -1003,6 +1154,30 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertIn("Closed stale: `2`", body)
         self.assertIn("Reopened: `1`", body)
 
+    def test_control_and_notification_report_goal_reconciliation(self) -> None:
+        kwargs = {
+            "goal_issue_reconciliation": {"closed": 2, "reopened": 1},
+            "goal_issue_reconciliation_error": "Issue #107 failed",
+        }
+        control = seo_feedback_loop.control_issue_body(
+            report={}, findings=[], issue_links=[], pr_links=[], auto_merged=[], indexnow={}, **kwargs
+        )
+        notification = seo_feedback_loop.build_notification_comment(
+            notify_user="schlafen318",
+            report={},
+            findings=[],
+            issue_links=[],
+            pr_links=[],
+            auto_merged=[],
+            control_link="https://github.com/schlafen318/property-research-dashboard/issues/1",
+            **kwargs,
+        )
+
+        for body in (control, notification):
+            self.assertIn("Goal issues closed: `2`", body)
+            self.assertIn("Goal issues reopened: `1`", body)
+            self.assertIn("Issue #107 failed", body)
+
     def test_main_skips_stale_reconciliation_without_search_console(self) -> None:
         report = {
             "generated_at": "2026-08-14T00:00:00Z",
@@ -1039,6 +1214,47 @@ class NotificationCommentTests(unittest.TestCase):
             {"marked": 0, "closed": 0, "reopened": 0},
             summary["stale_issue_reconciliation"],
         )
+
+    def test_main_reconciles_goal_issues_before_updating_findings(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {"page_goals": []},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_reconcile = seo_feedback_loop.reconcile_goal_issues
+        calls = []
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        seo_feedback_loop.reconcile_goal_issues = lambda **kwargs: calls.append(kwargs) or {
+            "closed": 2,
+            "reopened": 1,
+            "errors": ["Issue #107 failed"],
+        }
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.reconcile_goal_issues = original_reconcile
+        self.assertEqual(1, len(calls))
+        self.assertEqual(report["goals"], calls[0]["report"]["goals"])
+        self.assertEqual({"closed": 2, "reopened": 1}, summary["goal_issue_reconciliation"])
+        self.assertEqual("Issue #107 failed", summary["goal_issue_reconciliation_error"])
 
     def test_main_reports_stale_reconciliation_and_contains_failures(self) -> None:
         report = {
