@@ -703,6 +703,66 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertFalse(finding.auto_merge_safe)
         self.assertFalse(finding.auto_implementation_safe)
 
+    def test_classify_marks_only_indexed_missed_impression_goals_for_recovery(self) -> None:
+        base = {
+            "launch_date": "2026-06-23",
+            "indexed_deadline": "2026-06-30",
+            "impressions_deadline": "2026-07-23",
+        }
+        eligible_url = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        goals = [
+            {
+                **base,
+                "url": eligible_url,
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"page": eligible_url, "impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/japan-property/",
+                "index_status": "missed",
+                "impression_status": "on_track",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/italy-property/",
+                "index_status": "met",
+                "impression_status": "at_risk",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/thailand-property/",
+                "index_status": "missed",
+                "impression_status": "missed",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/guides/",
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"impressions": 1},
+            },
+        ]
+        report = {
+            "sitemap": {"status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {"page_goals": goals},
+        }
+
+        findings = seo_feedback_loop.classify(report, tracking_ok=True)
+        recovery = [item for item in findings if (item.payload or {}).get("recovery_type") == "first-impression"]
+
+        self.assertEqual(1, len(recovery))
+        finding = recovery[0]
+        self.assertEqual(eligible_url, finding.payload["page"])
+        self.assertEqual("impression_status", finding.payload["goal_field"])
+        self.assertEqual(0, finding.payload["impressions"])
+        self.assertTrue(finding.implementation_pr)
+
     def test_classify_marks_near_ranking_internal_link_as_auto_safe(self) -> None:
         report = {
             "site_url": "https://globalhomeatlas.com",

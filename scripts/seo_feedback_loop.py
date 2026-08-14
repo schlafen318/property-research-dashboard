@@ -53,6 +53,7 @@ QUERY_CTR_MIN_IMPRESSIONS = 4
 QUERY_CTR_MAX_CTR = 0.01
 QUERY_CTR_MAX_POSITION = 20.0
 IMPLEMENTATION_PR_KINDS = {"query-ctr-opportunity", "low-ctr-opportunity", "near-ranking-opportunity"}
+GENERATED_CONTENT_KINDS = {*IMPLEMENTATION_PR_KINDS, "seo-goal-missed"}
 STALE_RECONCILIATION_KINDS = {*IMPLEMENTATION_PR_KINDS, "new-query-content-gap"}
 AUTO_IMPLEMENTATION_KINDS = {"near-ranking-opportunity"}
 AUTO_INTERNAL_LINK_SOURCE_SLUG = "buy-property-abroad"
@@ -79,6 +80,18 @@ class GeneratedContentRun:
     accepted_count: int
     rejected: tuple[seo_content_generator.RejectedProposal, ...]
     skipped_reason: str | None
+
+
+def is_first_impression_recovery(finding: Finding) -> bool:
+    payload = finding.payload or {}
+    analytics = payload.get("analytics") or {}
+    return (
+        finding.kind == "seo-goal-missed"
+        and payload.get("goal_field") == "impression_status"
+        and payload.get("recovery_type") == "first-impression"
+        and payload.get("index_status") == "met"
+        and int(analytics.get("impressions") or payload.get("impressions") or 0) == 0
+    )
 
 
 def run(cmd: list[str], *, check: bool = True, capture: bool = True) -> subprocess.CompletedProcess:
@@ -344,6 +357,23 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                 continue
             kind = "seo-goal-missed" if status_value == "missed" else "seo-goal-at-risk"
             severity = "high" if status_value == "missed" else "medium"
+            analytics = goal.get("analytics") or {}
+            recovery = (
+                field == "impression_status"
+                and status_value == "missed"
+                and goal.get("index_status") == "met"
+                and int(analytics.get("impressions") or 0) == 0
+            )
+            payload = dict(goal)
+            if recovery:
+                payload.update(
+                    {
+                        "goal_field": "impression_status",
+                        "recovery_type": "first-impression",
+                        "page": goal.get("url"),
+                        "impressions": 0,
+                    }
+                )
             findings.append(
                 Finding(
                     kind=kind,
@@ -357,7 +387,8 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                     severity=severity,
                     labels=("analytics-loop", kind, "seo-opportunity", "needs-human-review"),
                     fingerprint=stable_fingerprint(kind, f"{field}:{goal.get('url')}"),
-                    payload=goal,
+                    implementation_pr=recovery,
+                    payload=payload,
                 )
             )
 
