@@ -508,9 +508,19 @@ def build_generation_input(finding: dict, context: TargetPageContext) -> list[di
         + "A proposed meta description must contain 70 to 165 characters. "
         + "Any content field that would introduce protected-topic language must be null. "
     )
+    recovery_rules = ""
+    if (finding.get("payload") or {}).get("recovery_type") == "first-impression":
+        recovery_rules = (
+            "This is a first-impression recovery with no query row. Propose only one or two non-null content "
+            "field changes that sharpen the page intent already present in the supplied text. Across all proposed "
+            "fields, never repeat the same three-word phrase four or more times. Do not introduce a consecutive "
+            "multiword Title Case phrase unless that exact phrase already appears in the supplied page text; use "
+            "sentence case for generic wording. "
+        )
     developer = (
         "Revise only the supplied page content to improve match with the supplied Search Console signal. "
         + page_rules
+        + recovery_rules
         + "Return null for fields that should remain unchanged. Never add facts, numbers, legal, tax, visa, "
         "ownership, price, yield, return, or guarantee claims. Preserve research caveats. Set every policy "
         "flag truthfully when the requested wording touches a prohibited category. source_fragments must be "
