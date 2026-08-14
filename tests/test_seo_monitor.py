@@ -83,6 +83,7 @@ class IndexingEvidenceTests(unittest.TestCase):
         first = scorecard["page_goals"][0]
         self.assertEqual("met", first["index_status"])
         self.assertEqual("search_console_impressions", first["index_evidence"])
+        self.assertIn("search_console_impressions", seo_monitor.fmt_goal_scorecard(scorecard))
 
 
 if __name__ == "__main__":

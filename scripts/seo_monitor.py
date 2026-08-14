@@ -441,7 +441,7 @@ def fmt_goal_scorecard(scorecard: dict) -> str:
                     f"Index {goal['url']}",
                     goal["launch_date"],
                     goal["indexed_deadline"],
-                    inspection.get("coverage_state") or "n/a",
+                    goal.get("index_evidence") or inspection.get("coverage_state") or "n/a",
                     goal["index_status"],
                 ]
             )
