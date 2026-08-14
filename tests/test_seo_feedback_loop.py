@@ -1415,6 +1415,52 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertEqual({"closed": 2, "reopened": 1}, summary["goal_issue_reconciliation"])
         self.assertEqual("Issue #107 failed", summary["goal_issue_reconciliation_error"])
 
+    def test_main_routes_recovery_only_to_generated_content(self) -> None:
+        target = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [target], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {
+                "page_goals": [
+                    {
+                        "url": target,
+                        "launch_date": "2026-06-23",
+                        "indexed_deadline": "2026-06-30",
+                        "impressions_deadline": "2026-07-23",
+                        "index_status": "met",
+                        "impression_status": "missed",
+                        "analytics": {"page": target, "impressions": 0},
+                    }
+                ]
+            },
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_scaffold = seo_feedback_loop.scaffold_generated_content_pr
+        generated_targets = []
+
+        def capture(pairs, *, sitemap_urls, dry_run):
+            generated_targets.extend(seo_feedback_loop.finding_target_url(pair[0]) for pair in pairs)
+            return seo_feedback_loop.GeneratedContentRun("dry-run:recovery-pr", 0, (), None)
+
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        seo_feedback_loop.scaffold_generated_content_pr = capture
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(0, seo_feedback_loop.main(["--dry-run", "--report", str(report_path)]))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.scaffold_generated_content_pr = original_scaffold
+
+        self.assertEqual([target], generated_targets)
+
     def test_main_reports_stale_reconciliation_and_contains_failures(self) -> None:
         report = {
             "generated_at": "2026-08-14T00:00:00Z",

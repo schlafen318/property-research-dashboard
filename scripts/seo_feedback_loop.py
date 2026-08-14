@@ -1975,7 +1975,9 @@ def main(argv: list[str]) -> int:
             continue
         if implemented_awaiting_google(finding, issues):
             continue
-        if finding.kind in IMPLEMENTATION_PR_KINDS and finding.implementation_pr:
+        if finding.implementation_pr and (
+            finding.kind in IMPLEMENTATION_PR_KINDS or is_first_impression_recovery(finding)
+        ):
             editorial_pairs.append((finding, issue_link))
         merge_url = maybe_auto_merge(pr_url, finding, dry_run)
         if merge_url:
