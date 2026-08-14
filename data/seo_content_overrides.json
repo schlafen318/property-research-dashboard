@@ -61,6 +61,66 @@
     "target_url": "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
   },
   {
+    "base_content_hash": "54e2fb53d7ba7d6198bc389ac2bf890fe08e3235c7a1889e8dafd735f89428c5",
+    "content": {
+      "faq_answer": null,
+      "faq_question": null,
+      "internal_link_anchor": null,
+      "internal_link_target": null,
+      "intro": null,
+      "meta_description": null,
+      "title": "Italy property destinations and regional guide"
+    },
+    "cooldown_until": "2026-09-11T06:50:31.589419+00:00",
+    "finding_fingerprint": "gha-seo-goal-missed-87695536a50c",
+    "generated_at": "2026-08-14T06:50:31.589419+00:00",
+    "lifecycle": "proposed",
+    "model": "gpt-5.6-luna",
+    "signal": {
+      "analytics": {
+        "clicks": 0,
+        "ctr": 0,
+        "impressions": 0,
+        "page": "https://globalhomeatlas.com/countries/italy-property/",
+        "position": 0
+      },
+      "goal_field": "impression_status",
+      "impression_status": "missed",
+      "impressions": 0,
+      "impressions_at_risk_date": "2026-07-07",
+      "impressions_deadline": "2026-07-23",
+      "index_evidence": "url_inspection",
+      "index_status": "met",
+      "indexed_deadline": "2026-06-30",
+      "inspection": {
+        "coverage_state": "Submitted and indexed",
+        "google_canonical": "https://globalhomeatlas.com/countries/italy-property/",
+        "indexing_state": "INDEXING_ALLOWED",
+        "last_crawl_time": "2026-06-24T04:30:26Z",
+        "mobile_verdict": "VERDICT_UNSPECIFIED",
+        "ok": true,
+        "page_fetch_state": "SUCCESSFUL",
+        "referring_urls": [
+          "https://globalhomeatlas.com/sitemap.xml"
+        ],
+        "rich_results_verdict": "PASS",
+        "robots_txt_state": "ALLOWED",
+        "sitemap": [
+          "https://globalhomeatlas.com/sitemap.xml"
+        ],
+        "url": "https://globalhomeatlas.com/countries/italy-property/",
+        "user_canonical": "https://globalhomeatlas.com/countries/italy-property/",
+        "verdict": "PASS"
+      },
+      "launch_date": "2026-06-23",
+      "name": "Italy country hub",
+      "page": "https://globalhomeatlas.com/countries/italy-property/",
+      "recovery_type": "first-impression",
+      "url": "https://globalhomeatlas.com/countries/italy-property/"
+    },
+    "target_url": "https://globalhomeatlas.com/countries/italy-property/"
+  },
+  {
     "base_content_hash": "a7f1c644fb9301d4b202ccac393e0a8192c49573ed79de3dbf2bbde509a416ad",
     "content": {
       "faq_answer": null,
