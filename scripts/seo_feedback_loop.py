@@ -1069,7 +1069,8 @@ def select_generated_content_candidates(
         finding, _ = pair
         target = finding_target_url(finding)
         if (
-            finding.kind not in IMPLEMENTATION_PR_KINDS
+            finding.kind not in GENERATED_CONTENT_KINDS
+            or (finding.kind == "seo-goal-missed" and not is_first_impression_recovery(finding))
             or not finding.implementation_pr
             or finding.auto_implementation_safe
             or not target
@@ -1086,6 +1087,16 @@ def select_generated_content_candidates(
             if cooldown_time > now:
                 continue
         eligible.append(pair)
+    recovery = [pair for pair in eligible if is_first_impression_recovery(pair[0])]
+    if recovery:
+        recovery.sort(
+            key=lambda pair: (
+                "/countries/" in (finding_target_url(pair[0]) or ""),
+                finding_target_url(pair[0]) or "",
+                pair[0].fingerprint,
+            )
+        )
+        return recovery[:1]
     eligible.sort(
         key=lambda pair: (
             -int((pair[0].payload or {}).get("impressions", 0) or 0),

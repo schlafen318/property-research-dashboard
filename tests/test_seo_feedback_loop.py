@@ -466,6 +466,105 @@ class NotificationCommentTests(unittest.TestCase):
         )
         return finding, f"https://github.com/schlafen318/property-research-dashboard/issues/{impressions}"
 
+    def recovery_pair(self, *, target: str, suffix: str):
+        finding = seo_feedback_loop.Finding(
+            kind="seo-goal-missed",
+            title=f"First impressions goal missed for {target}",
+            summary="Indexed page has zero Search Console impressions after its deadline.",
+            severity="high",
+            labels=("analytics-loop", "seo-goal-missed", "needs-human-review"),
+            fingerprint=f"gha-seo-goal-missed-{suffix}",
+            implementation_pr=True,
+            payload={
+                "url": target,
+                "page": target,
+                "goal_field": "impression_status",
+                "recovery_type": "first-impression",
+                "index_status": "met",
+                "impression_status": "missed",
+                "impressions": 0,
+                "analytics": {"page": target, "impressions": 0},
+            },
+        )
+        return finding, f"https://github.com/schlafen318/property-research-dashboard/issues/{suffix}"
+
+    def test_recovery_selection_prefers_one_guide(self) -> None:
+        retirement = self.recovery_pair(
+            target="https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
+            suffix="retirement",
+        )
+        japan = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/japan-property/",
+            suffix="japan",
+        )
+        italy = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/italy-property/",
+            suffix="italy",
+        )
+        ordinary = self.editorial_pair(
+            impressions=80,
+            position=6,
+            target="https://globalhomeatlas.com/ordinary/",
+            suffix="ordinary",
+        )
+
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            [japan, ordinary, italy, retirement],
+            issues=[],
+            open_targets=set(),
+            override_entries=[],
+            now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual([retirement], selected)
+
+    def test_recovery_selection_preserves_suppression_controls(self) -> None:
+        retirement = self.recovery_pair(
+            target="https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
+            suffix="retirement",
+        )
+        japan = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/japan-property/",
+            suffix="japan",
+        )
+        target = retirement[0].payload["page"]
+        cases = (
+            {"open_targets": {target}},
+            {
+                "issues": [
+                    {
+                        "body": f"Fingerprint `{retirement[0].fingerprint}`",
+                        "labels": [{"name": "implemented-awaiting-google"}],
+                    }
+                ]
+            },
+            {
+                "override_entries": [
+                    {
+                        "target_url": target,
+                        "lifecycle": "active",
+                        "cooldown_until": "2026-09-11T00:00:00+00:00",
+                    }
+                ]
+            },
+            {
+                "merged_prs": [
+                    {"body": f"### {target}\n", "mergedAt": "2026-08-12T00:00:00Z"}
+                ]
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                selected = seo_feedback_loop.select_generated_content_candidates(
+                    [retirement, japan],
+                    issues=overrides.get("issues", []),
+                    open_targets=overrides.get("open_targets", set()),
+                    override_entries=overrides.get("override_entries", []),
+                    now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+                    merged_prs=overrides.get("merged_prs", []),
+                )
+                self.assertEqual([japan], selected)
+
     def test_select_generated_content_candidates_prioritizes_and_caps_five(self) -> None:
         pairs = [
             self.editorial_pair(impressions=value, position=position, target=f"https://globalhomeatlas.com/p{index}/", suffix=str(index))
