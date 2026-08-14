@@ -11,6 +11,288 @@ from scripts import seo_feedback_loop
 
 
 class NotificationCommentTests(unittest.TestCase):
+    def opportunity_finding(self, suffix: str = "queenstown") -> seo_feedback_loop.Finding:
+        return seo_feedback_loop.Finding(
+            kind="near-ranking-opportunity",
+            title="Push near-ranking page higher: /destinations/queenstown/",
+            summary="Page is ranking near page one.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review", "content-refresh"),
+            fingerprint=f"gha-near-ranking-opportunity-{suffix}",
+            implementation_pr=True,
+            payload={"page": "https://globalhomeatlas.com/destinations/queenstown/"},
+        )
+
+    def opportunity_issue(
+        self, *, stale: bool = False, auto_closed: bool = False, state: str = "OPEN", suffix: str = "queenstown"
+    ) -> dict:
+        labels = [{"name": "analytics-loop"}, {"name": "content-refresh"}]
+        if stale:
+            labels.append({"name": "stale-signal"})
+        if auto_closed:
+            labels.append({"name": "stale-signal-auto-closed"})
+        return {
+            "number": 92,
+            "title": "Push near-ranking page higher: /destinations/queenstown/",
+            "state": state,
+            "body": (
+                "## Classification\n"
+                "- Kind: `near-ranking-opportunity`\n"
+                f"- Fingerprint: `gha-near-ranking-opportunity-{suffix}`\n"
+            ),
+            "labels": labels,
+        }
+
+    def test_stale_opportunity_first_absence_marks_without_closing(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[self.opportunity_issue()], complete_kinds={"near-ranking-opportunity"}, dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 1, "closed": 0, "reopened": 0, "errors": []}, result)
+        self.assertEqual(
+            [["gh", "issue", "edit", "92", "--add-label", "stale-signal"]],
+            calls,
+        )
+
+    def test_stale_opportunity_second_absence_closes(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[self.opportunity_issue(stale=True)],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 1, "reopened": 0, "errors": []}, result)
+        self.assertEqual(["gh", "issue", "edit", "92", "--add-label", "stale-signal-auto-closed"], calls[0])
+        self.assertEqual("close", calls[1][2])
+        self.assertIn("not planned", calls[1])
+
+    def test_returning_stale_opportunity_reopens(self) -> None:
+        finding = self.opportunity_finding()
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[finding],
+                issues=[self.opportunity_issue(stale=True, auto_closed=True, state="CLOSED")],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 1, "errors": []}, result)
+        self.assertEqual(["gh", "issue", "reopen", "92"], calls[0])
+        self.assertIn("stale-signal", calls[1])
+        self.assertIn("stale-signal-auto-closed", calls[2])
+
+    def test_stale_reconciliation_skips_unavailable_protected_and_unmanaged_issues(self) -> None:
+        protected = self.opportunity_issue(stale=True)
+        protected["labels"].append({"name": "implemented-awaiting-google"})
+        unmanaged = self.opportunity_issue(stale=True, suffix="indexing")
+        unmanaged["body"] = unmanaged["body"].replace("near-ranking-opportunity", "seo-goal-missed")
+        manually_closed = self.opportunity_issue(state="CLOSED", suffix="manual")
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            unavailable = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[self.opportunity_issue()],
+                complete_kinds=set(),
+                dry_run=False,
+            )
+            skipped = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[protected, unmanaged, manually_closed],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0, "errors": []}, unavailable)
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0, "errors": []}, skipped)
+        self.assertEqual([], calls)
+
+    def test_returning_open_opportunity_clears_stale_marker_without_reopening(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[self.opportunity_finding()],
+                issues=[self.opportunity_issue(stale=True)],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0, "errors": []}, result)
+        self.assertEqual(
+            [["gh", "issue", "edit", "92", "--remove-label", "stale-signal"]],
+            calls,
+        )
+
+    def test_incomplete_kind_is_not_aged(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[self.opportunity_issue()], complete_kinds=set(), dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0, "errors": []}, result)
+        self.assertEqual([], calls)
+
+    def test_reconciliation_inputs_use_complete_full_dataset_not_display_rows(self) -> None:
+        page = "https://globalhomeatlas.com/destinations/queenstown/"
+        report = {
+            "site_url": "https://globalhomeatlas.com",
+            "sitemap": {"urls": [page], "status": {}, "indexing": {}},
+            "goals": {},
+            "search_console": {
+                "available": True,
+                "top_queries": [],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+                "reconciliation": {
+                    "query_complete": False,
+                    "page_complete": True,
+                    "query_ctr_queries": [],
+                    "low_ctr_pages": [],
+                    "near_ranking_pages": [
+                        {"page": page, "clicks": 0, "impressions": 30, "ctr": 0, "position": 18}
+                    ],
+                    "content_gap_queries": [],
+                },
+            },
+        }
+        findings, complete_kinds = seo_feedback_loop.stale_reconciliation_inputs(report, True)
+        self.assertIn("near-ranking-opportunity", {finding.kind for finding in findings})
+        self.assertIn("near-ranking-opportunity", complete_kinds)
+        self.assertNotIn("query-ctr-opportunity", complete_kinds)
+
+    def test_legacy_report_without_completeness_never_ages_issues(self) -> None:
+        report = {"search_console": {"available": True}, "sitemap": {"urls": []}, "goals": {}}
+        findings, complete_kinds = seo_feedback_loop.stale_reconciliation_inputs(report, True)
+        self.assertEqual([], findings)
+        self.assertEqual(set(), complete_kinds)
+
+    def test_human_closed_stale_issue_is_not_reopened(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[self.opportunity_finding()],
+                issues=[self.opportunity_issue(stale=True, state="CLOSED")],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(0, result["reopened"])
+        self.assertFalse(any(call[2] == "reopen" for call in calls))
+
+    def test_unowned_issue_is_not_reconciled(self) -> None:
+        issue = self.opportunity_issue()
+        issue["labels"] = [{"name": "content-refresh"}]
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[issue], complete_kinds={"near-ranking-opportunity"}, dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(0, result["marked"])
+        self.assertEqual([], calls)
+
+    def test_one_mutation_failure_does_not_block_later_issues(self) -> None:
+        first = self.opportunity_issue(suffix="first")
+        second = self.opportunity_issue(suffix="second")
+        second["number"] = 93
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        def mutate(cmd, attempts=3):
+            calls.append(cmd)
+            if "92" in cmd:
+                raise RuntimeError("first failed")
+        seo_feedback_loop.gh_mutation = mutate
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[first, second], complete_kinds={"near-ranking-opportunity"}, dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, result["marked"])
+        self.assertEqual(1, len(result["errors"]))
+        self.assertTrue(any("93" in call for call in calls))
+
+    def test_failed_close_rolls_back_auto_close_provenance(self) -> None:
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        def mutate(cmd, attempts=3):
+            calls.append(cmd)
+            if cmd[2] == "close":
+                raise RuntimeError("close failed")
+        seo_feedback_loop.gh_mutation = mutate
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[self.opportunity_issue(stale=True)],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(0, result["closed"])
+        self.assertEqual(1, len(result["errors"]))
+        self.assertEqual(
+            ["gh", "issue", "edit", "92", "--remove-label", "stale-signal-auto-closed"], calls[-1]
+        )
+
+    def test_reopen_count_remains_truthful_when_label_cleanup_fails(self) -> None:
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        def mutate(cmd, attempts=3):
+            calls.append(cmd)
+            if "--remove-label" in cmd:
+                raise RuntimeError("cleanup failed")
+        seo_feedback_loop.gh_mutation = mutate
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[self.opportunity_finding()],
+                issues=[self.opportunity_issue(stale=True, auto_closed=True, state="CLOSED")],
+                complete_kinds=set(),
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, result["reopened"])
+        self.assertEqual(2, len(result["errors"]))
+        self.assertEqual(["gh", "issue", "reopen", "92"], calls[0])
+
     def editorial_pair(
         self,
         *,
@@ -241,6 +523,14 @@ class NotificationCommentTests(unittest.TestCase):
                 "low_ctr_pages": [],
                 "near_ranking_pages": [],
                 "content_gap_queries": [],
+                "reconciliation": {
+                    "query_complete": True,
+                    "page_complete": True,
+                    "query_ctr_queries": [],
+                    "low_ctr_pages": [],
+                    "near_ranking_pages": [],
+                    "content_gap_queries": [],
+                },
             },
         }
 
@@ -696,6 +986,168 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertIn("Generated content accepted: `2`", body)
         self.assertIn("new number", body)
         self.assertIn("pull/101", body)
+
+    def test_control_issue_reports_stale_reconciliation(self) -> None:
+        body = seo_feedback_loop.control_issue_body(
+            report={},
+            findings=[],
+            issue_links=[],
+            pr_links=[],
+            auto_merged=[],
+            indexnow={},
+            stale_issue_reconciliation={"marked": 3, "closed": 2, "reopened": 1},
+        )
+
+        self.assertIn("Stale Opportunity Reconciliation", body)
+        self.assertIn("Marked stale: `3`", body)
+        self.assertIn("Closed stale: `2`", body)
+        self.assertIn("Reopened: `1`", body)
+
+    def test_main_skips_stale_reconciliation_without_search_console(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_reconcile = seo_feedback_loop.reconcile_stale_opportunity_issues
+        calls = []
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: calls.append(kwargs)
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                result = seo_feedback_loop.main(
+                    ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.reconcile_stale_opportunity_issues = original_reconcile
+
+        self.assertEqual(0, result)
+        self.assertEqual([], calls)
+        self.assertEqual(
+            {"marked": 0, "closed": 0, "reopened": 0},
+            summary["stale_issue_reconciliation"],
+        )
+
+    def test_main_reports_stale_reconciliation_and_contains_failures(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {
+                "available": True,
+                "top_queries": [],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+            },
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_reconcile = seo_feedback_loop.reconcile_stale_opportunity_issues
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: {
+                    "marked": 4,
+                    "closed": 2,
+                    "reopened": 1,
+                }
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+                self.assertEqual({"marked": 4, "closed": 2, "reopened": 1}, summary["stale_issue_reconciliation"])
+
+                seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: (_ for _ in ()).throw(
+                    RuntimeError("GitHub unavailable")
+                )
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                failed = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.reconcile_stale_opportunity_issues = original_reconcile
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0}, failed["stale_issue_reconciliation"])
+        self.assertIn("GitHub unavailable", failed["stale_issue_reconciliation_error"])
+
+    def test_main_dry_run_reports_real_stale_issue_counts_without_mutation(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {
+                "available": True,
+                "top_queries": [{"query": "unrelated query", "clicks": 0, "impressions": 1, "ctr": 0, "position": 50}],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+                "reconciliation": {
+                    "query_complete": True,
+                    "page_complete": True,
+                    "query_ctr_queries": [],
+                    "low_ctr_pages": [],
+                    "near_ranking_pages": [],
+                    "content_gap_queries": [],
+                },
+            },
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_mutation = seo_feedback_loop.gh_mutation
+        mutation_calls = []
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: [self.opportunity_issue()]
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: mutation_calls.append(cmd)
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.gh_mutation = original_mutation
+
+        self.assertEqual({"marked": 1, "closed": 0, "reopened": 0}, summary["stale_issue_reconciliation"])
+        self.assertEqual([], mutation_calls)
 
     def test_workflow_exposes_openai_only_to_feedback_step(self) -> None:
         workflow = Path(".github/workflows/seo-feedback-loop.yml").read_text(encoding="utf-8")
