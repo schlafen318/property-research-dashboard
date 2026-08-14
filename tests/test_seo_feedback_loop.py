@@ -466,6 +466,105 @@ class NotificationCommentTests(unittest.TestCase):
         )
         return finding, f"https://github.com/schlafen318/property-research-dashboard/issues/{impressions}"
 
+    def recovery_pair(self, *, target: str, suffix: str):
+        finding = seo_feedback_loop.Finding(
+            kind="seo-goal-missed",
+            title=f"First impressions goal missed for {target}",
+            summary="Indexed page has zero Search Console impressions after its deadline.",
+            severity="high",
+            labels=("analytics-loop", "seo-goal-missed", "needs-human-review"),
+            fingerprint=f"gha-seo-goal-missed-{suffix}",
+            implementation_pr=True,
+            payload={
+                "url": target,
+                "page": target,
+                "goal_field": "impression_status",
+                "recovery_type": "first-impression",
+                "index_status": "met",
+                "impression_status": "missed",
+                "impressions": 0,
+                "analytics": {"page": target, "impressions": 0},
+            },
+        )
+        return finding, f"https://github.com/schlafen318/property-research-dashboard/issues/{suffix}"
+
+    def test_recovery_selection_prefers_one_guide(self) -> None:
+        retirement = self.recovery_pair(
+            target="https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
+            suffix="retirement",
+        )
+        japan = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/japan-property/",
+            suffix="japan",
+        )
+        italy = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/italy-property/",
+            suffix="italy",
+        )
+        ordinary = self.editorial_pair(
+            impressions=80,
+            position=6,
+            target="https://globalhomeatlas.com/ordinary/",
+            suffix="ordinary",
+        )
+
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            [japan, ordinary, italy, retirement],
+            issues=[],
+            open_targets=set(),
+            override_entries=[],
+            now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual([retirement], selected)
+
+    def test_recovery_selection_preserves_suppression_controls(self) -> None:
+        retirement = self.recovery_pair(
+            target="https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
+            suffix="retirement",
+        )
+        japan = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/japan-property/",
+            suffix="japan",
+        )
+        target = retirement[0].payload["page"]
+        cases = (
+            {"open_targets": {target}},
+            {
+                "issues": [
+                    {
+                        "body": f"Fingerprint `{retirement[0].fingerprint}`",
+                        "labels": [{"name": "implemented-awaiting-google"}],
+                    }
+                ]
+            },
+            {
+                "override_entries": [
+                    {
+                        "target_url": target,
+                        "lifecycle": "active",
+                        "cooldown_until": "2026-09-11T00:00:00+00:00",
+                    }
+                ]
+            },
+            {
+                "merged_prs": [
+                    {"body": f"### {target}\n", "mergedAt": "2026-08-12T00:00:00Z"}
+                ]
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                selected = seo_feedback_loop.select_generated_content_candidates(
+                    [retirement, japan],
+                    issues=overrides.get("issues", []),
+                    open_targets=overrides.get("open_targets", set()),
+                    override_entries=overrides.get("override_entries", []),
+                    now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+                    merged_prs=overrides.get("merged_prs", []),
+                )
+                self.assertEqual([japan], selected)
+
     def test_select_generated_content_candidates_prioritizes_and_caps_five(self) -> None:
         pairs = [
             self.editorial_pair(impressions=value, position=position, target=f"https://globalhomeatlas.com/p{index}/", suffix=str(index))
@@ -702,6 +801,104 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertIn("title", finding.payload["recommended_actions"][0].lower())
         self.assertFalse(finding.auto_merge_safe)
         self.assertFalse(finding.auto_implementation_safe)
+
+    def test_classify_marks_only_indexed_missed_impression_goals_for_recovery(self) -> None:
+        base = {
+            "launch_date": "2026-06-23",
+            "indexed_deadline": "2026-06-30",
+            "impressions_deadline": "2026-07-23",
+        }
+        eligible_url = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        goals = [
+            {
+                **base,
+                "url": eligible_url,
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"page": eligible_url, "impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/japan-property/",
+                "index_status": "missed",
+                "impression_status": "on_track",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/italy-property/",
+                "index_status": "met",
+                "impression_status": "at_risk",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/thailand-property/",
+                "index_status": "missed",
+                "impression_status": "missed",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/guides/",
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"impressions": 1},
+            },
+        ]
+        report = {
+            "sitemap": {"urls": [eligible_url], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {"page_goals": goals},
+        }
+
+        findings = seo_feedback_loop.classify(report, tracking_ok=True)
+        recovery = [item for item in findings if (item.payload or {}).get("recovery_type") == "first-impression"]
+
+        self.assertEqual(1, len(recovery))
+        finding = recovery[0]
+        self.assertEqual(eligible_url, finding.payload["page"])
+        self.assertEqual("impression_status", finding.payload["goal_field"])
+        self.assertEqual(0, finding.payload["impressions"])
+        self.assertTrue(finding.implementation_pr)
+
+    def test_recovery_skips_unsupported_and_out_of_sitemap_targets_before_selection(self) -> None:
+        valid = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        unsupported = "https://globalhomeatlas.com/about/"
+        out_of_sitemap = "https://globalhomeatlas.com/best-countries-for-expats-to-buy-property/"
+
+        def goal(url: str) -> dict:
+            return {
+                "url": url,
+                "launch_date": "2026-06-23",
+                "indexed_deadline": "2026-06-30",
+                "impressions_deadline": "2026-07-23",
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"page": url, "impressions": 0},
+            }
+
+        report = {
+            "sitemap": {"urls": [unsupported, valid], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {"page_goals": [goal(unsupported), goal(out_of_sitemap), goal(valid)]},
+        }
+        findings = seo_feedback_loop.classify(report, tracking_ok=True)
+        pairs = [
+            (item, f"issue:{index}")
+            for index, item in enumerate(findings)
+            if item.implementation_pr
+        ]
+
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            pairs,
+            issues=[],
+            open_targets=set(),
+            override_entries=[],
+            now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual([valid], [seo_feedback_loop.finding_target_url(pair[0]) for pair in selected])
 
     def test_classify_marks_near_ranking_internal_link_as_auto_safe(self) -> None:
         report = {
@@ -1255,6 +1452,52 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertEqual(report["goals"], calls[0]["report"]["goals"])
         self.assertEqual({"closed": 2, "reopened": 1}, summary["goal_issue_reconciliation"])
         self.assertEqual("Issue #107 failed", summary["goal_issue_reconciliation_error"])
+
+    def test_main_routes_recovery_only_to_generated_content(self) -> None:
+        target = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [target], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {
+                "page_goals": [
+                    {
+                        "url": target,
+                        "launch_date": "2026-06-23",
+                        "indexed_deadline": "2026-06-30",
+                        "impressions_deadline": "2026-07-23",
+                        "index_status": "met",
+                        "impression_status": "missed",
+                        "analytics": {"page": target, "impressions": 0},
+                    }
+                ]
+            },
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_scaffold = seo_feedback_loop.scaffold_generated_content_pr
+        generated_targets = []
+
+        def capture(pairs, *, sitemap_urls, dry_run):
+            generated_targets.extend(seo_feedback_loop.finding_target_url(pair[0]) for pair in pairs)
+            return seo_feedback_loop.GeneratedContentRun("dry-run:recovery-pr", 0, (), None)
+
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        seo_feedback_loop.scaffold_generated_content_pr = capture
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(0, seo_feedback_loop.main(["--dry-run", "--report", str(report_path)]))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.scaffold_generated_content_pr = original_scaffold
+
+        self.assertEqual([target], generated_targets)
 
     def test_main_reports_stale_reconciliation_and_contains_failures(self) -> None:
         report = {
