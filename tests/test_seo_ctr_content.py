@@ -113,20 +113,28 @@ class SeoCtrContentTests(unittest.TestCase):
         self.assertIn("Global Property Markets for International Buyers", homepage)
         self.assertIn("Compare Spain property markets before selecting a destination.", country)
         self.assertIn("Review this destination through the Atlas decision framework.", destination)
-    def test_vacation_home_page_targets_location_query_intent(self) -> None:
+    def test_vacation_home_page_targets_exact_world_query(self) -> None:
         page = seo_page("best-places-to-buy-vacation-home-abroad")
-        text = " ".join(
-            [
-                page["title"],
-                page["description"],
-                page["h1"],
-                " ".join(question + " " + answer for question, answer in page["faqs"]),
-            ]
-        ).lower()
+        query = "best places to buy a vacation home in the world"
 
-        self.assertIn("vacation home", text)
-        self.assertIn("locations", text)
-        self.assertIn("best locations for vacation homes", text)
+        self.assertIn(query, page["title"].lower())
+        self.assertIn(query, page["description"].lower())
+        self.assertIn(query, page["h1"].lower())
+        self.assertIn(query, page["faqs"][0][0].lower())
+
+        html = build_unified_app.build_seo_page(
+            page,
+            destinations(),
+            build_unified_app.SEO_PAGES,
+        ).lower()
+        self.assertIn(f"<title>{query}</title>", html)
+        self.assertIn(
+            f'<meta name="description" content="compare the {query} by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.">',
+            html,
+        )
+        self.assertIn(f'<h1>{query}</h1>', html)
+        self.assertIn(f'<p class="seo-lede">compare the {query}', html)
+        self.assertIn(f'"name":"what are the {query}?"', html)
 
     def test_expats_and_europe_pages_have_buyer_specific_snippets(self) -> None:
         expat = seo_page("best-countries-for-expats-to-buy-property")
