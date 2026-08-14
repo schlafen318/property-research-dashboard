@@ -4,7 +4,7 @@
 
 **Goal:** Reconcile stale Search Console opportunity issues after two consecutive healthy reports and reopen automatically closed issues when their fingerprint returns.
 
-**Architecture:** Add one pure-selection layer around existing issue snapshots plus a mutation orchestrator that uses the established retrying GitHub boundary. Run it only when Search Console data is available, before current findings are updated, and expose marked/closed/reopened counts in the feedback summary.
+**Architecture:** Add a comprehensive Search Console reconciliation dataset with explicit completeness per query/page dimension, then place a pure-selection layer around existing issue snapshots plus a mutation orchestrator that uses the established retrying GitHub boundary. Run it before current findings are updated and expose marked/closed/reopened counts and per-issue errors in the feedback summary.
 
 **Tech Stack:** Python 3.11, `unittest`, GitHub CLI, GitHub Actions
 
@@ -29,8 +29,8 @@
 - Modify: `tests/test_seo_feedback_loop.py`
 
 **Interfaces:**
-- Consumes: `findings: list[Finding]`, `issues: list[dict]`, `search_console_available: bool`, and `dry_run: bool`.
-- Produces: `reconcile_stale_opportunity_issues(...) -> dict[str, int]` with `marked`, `closed`, and `reopened` counts.
+- Consumes: comprehensive `findings: list[Finding]`, `issues: list[dict]`, `complete_kinds: set[str]`, and `dry_run: bool`.
+- Produces: `reconcile_stale_opportunity_issues(...)` with `marked`, `closed`, and `reopened` counts plus per-issue `errors`.
 
 - [ ] **Step 1: Write failing lifecycle tests**
 
