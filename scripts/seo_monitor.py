@@ -382,7 +382,8 @@ def indexing_status_and_evidence(
         return "met", "url_inspection"
     if int(analytics.get("impressions") or 0) > 0:
         return "met", "search_console_impressions"
-    if inspection.get("ok") is not True:
+    verdict = inspection.get("verdict")
+    if inspection.get("ok") is not True or verdict in (None, "", "VERDICT_UNSPECIFIED"):
         return "unknown", "inspection_unavailable"
     return status_for_indexing(today, goal, inspection), "url_inspection_not_passed"
 

@@ -50,7 +50,13 @@ class IndexingEvidenceTests(unittest.TestCase):
         )
 
     def test_unavailable_inspection_without_impressions_is_unknown(self) -> None:
-        for inspection in ({}, {"ok": False, "error": "timeout"}):
+        for inspection in (
+            {},
+            {"ok": False, "error": "timeout"},
+            {"ok": True},
+            {"ok": True, "verdict": None},
+            {"ok": True, "verdict": "VERDICT_UNSPECIFIED"},
+        ):
             with self.subTest(inspection=inspection):
                 self.assertEqual(
                     ("unknown", "inspection_unavailable"),
