@@ -154,6 +154,9 @@ class DeployWorkflowTests(unittest.TestCase):
         receipt_step = notify_steps.split("      - name: Upload sitemap submission receipt\n", 1)[1]
 
         self.assertIn("needs: deploy", notify_job_header)
+        self.assertIn("permissions:\n      contents: read", notify_job_header)
+        self.assertNotIn("pages: write", notify_job_header)
+        self.assertNotIn("id-token: write", notify_job_header)
         self.assertIn("google-api-python-client", notify_steps)
         self.assertIn("python3 scripts/google_sitemap_submit.py", submission_step)
         self.assertIn("GOOGLE_SEARCH_CONSOLE_TOKEN_JSON: ${{ secrets.GOOGLE_SEARCH_CONSOLE_TOKEN_JSON }}", submission_step)
