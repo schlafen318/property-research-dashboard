@@ -27,25 +27,27 @@ Do not automatically reconcile indexing, sitemap, tracking, goal, control-center
 
 ## Lifecycle
 
-Add the label `stale-signal` to the managed label registry.
+Add `stale-signal` and the machine-only provenance label `stale-signal-auto-closed` to the managed label registry.
+
+The monitor requests up to 25,000 query rows and 25,000 page rows separately from the 25-row display lists. It records completeness per dimension. A response that reaches the limit is treated as truncated. Absence may advance stale state only for kinds whose source dimension is complete; a positive fingerprint may still clear or reopen stale state even in a truncated report.
 
 For each healthy applied run:
 
 1. Build the set of current fingerprints for the managed kinds.
 2. For each open managed issue whose fingerprint is absent:
    - first consecutive absence: add `stale-signal` and leave the issue open;
-   - second consecutive absence: close the issue as not planned and retain `stale-signal` as provenance.
+   - second consecutive absence: add `stale-signal-auto-closed`, then close the issue as not planned.
 3. For each current fingerprint:
    - remove `stale-signal` if the issue is still open;
-   - if an issue closed by this lifecycle returns, reopen it and remove `stale-signal` before updating its current body.
+   - if an issue carrying `stale-signal-auto-closed` returns, reopen it and remove both lifecycle labels before updating its current body.
 
-An unavailable Search Console report must perform no stale reconciliation. Dry runs report intended counts without GitHub mutations.
+An unavailable, legacy, or capped Search Console result must not advance stale absence for affected kinds. Issues without the `analytics-loop` ownership label are never reconciled. A human-closed issue that has only the first-warning label is never reopened. Dry runs report intended counts without GitHub mutations.
 
 ## Interfaces and Reporting
 
 Add a focused reconciliation function that consumes current `Finding` objects and the existing GitHub issue snapshots. It returns counts for marked, closed, and reopened issues. Include these counts in the feedback summary JSON and control-issue generated-content/status section so the lifecycle remains observable.
 
-GitHub mutations continue through the existing retrying `gh_mutation` boundary. A reconciliation error must not silently close issues; it should be reported and the rest of the feedback loop should continue without stale-state changes.
+GitHub mutations continue through the existing retrying `gh_mutation` boundary. Failures are isolated per issue, successful writes retain truthful counts, and later issues continue. If closing fails after the provenance label is added, the automation attempts to remove that label. All errors appear in the run summary.
 
 ## Testing
 
@@ -55,6 +57,10 @@ Use controlled issue snapshots and intercept only the GitHub mutation boundary. 
 - second absence closes as not planned and retains provenance;
 - a returning fingerprint clears the marker;
 - an automatically closed returning issue reopens;
+- a human-closed issue does not reopen;
+- capped or legacy reports never advance absence state;
+- a qualifying signal outside the 25 displayed rows remains active;
+- one failed GitHub mutation does not block later issues or erase successful counts;
 - `implemented-awaiting-google`, indexing/goal issues, and unavailable Search Console reports are skipped;
 - lifecycle counts appear in the run summary.
 

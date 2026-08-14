@@ -44,6 +44,7 @@ LABELS = {
     "implementation-queued": "5319e7",
     "implemented-awaiting-google": "fbca04",
     "stale-signal": "cfd3d7",
+    "stale-signal-auto-closed": "6e7781",
     "validated-by-gsc": "0e8a16",
     "generated-content": "5319e7",
 }
@@ -774,12 +775,10 @@ def reconcile_stale_opportunity_issues(
     *,
     findings: list[Finding],
     issues: list[dict],
-    search_console_available: bool,
+    complete_kinds: set[str],
     dry_run: bool,
-) -> dict[str, int]:
-    counts = {"marked": 0, "closed": 0, "reopened": 0}
-    if not search_console_available:
-        return counts
+) -> dict:
+    counts = {"marked": 0, "closed": 0, "reopened": 0, "errors": []}
 
     active_fingerprints = {
         finding.fingerprint for finding in findings if finding.kind in STALE_RECONCILIATION_KINDS
@@ -793,6 +792,7 @@ def reconcile_stale_opportunity_issues(
             kind not in STALE_RECONCILIATION_KINDS
             or not fingerprint
             or issue.get("title") == CONTROL_ISSUE_TITLE
+            or "analytics-loop" not in labels
             or "implemented-awaiting-google" in labels
         ):
             continue
@@ -802,36 +802,82 @@ def reconcile_stale_opportunity_issues(
             if "stale-signal" not in labels:
                 continue
             if state == "closed":
-                counts["reopened"] += 1
-                if not dry_run:
-                    gh_mutation(["gh", "issue", "reopen", number])
-            if not dry_run:
-                gh_mutation(["gh", "issue", "edit", number, "--remove-label", "stale-signal"])
+                if "stale-signal-auto-closed" not in labels:
+                    continue
+                try:
+                    if not dry_run:
+                        gh_mutation(["gh", "issue", "reopen", number])
+                    counts["reopened"] += 1
+                except Exception as exc:
+                    counts["errors"].append(f"Issue #{number} could not be reopened: {exc}")
+                    continue
+            for label in ("stale-signal", "stale-signal-auto-closed"):
+                if label not in labels:
+                    continue
+                try:
+                    if not dry_run:
+                        gh_mutation(["gh", "issue", "edit", number, "--remove-label", label])
+                except Exception as exc:
+                    counts["errors"].append(f"Issue #{number} could not remove {label}: {exc}")
             continue
 
-        if state != "open":
+        if state != "open" or kind not in complete_kinds:
             continue
         if "stale-signal" in labels:
-            counts["closed"] += 1
-            if not dry_run:
-                gh_mutation(
-                    [
-                        "gh",
-                        "issue",
-                        "close",
-                        number,
-                        "--reason",
-                        "not planned",
-                        "--comment",
-                        "Automatically closed after the opportunity fingerprint was absent from two consecutive healthy Search Console reports.",
-                    ]
-                )
+            provenance_added = False
+            try:
+                if not dry_run:
+                    gh_mutation(["gh", "issue", "edit", number, "--add-label", "stale-signal-auto-closed"])
+                provenance_added = True
+                if not dry_run:
+                    gh_mutation(
+                        [
+                            "gh",
+                            "issue",
+                            "close",
+                            number,
+                            "--reason",
+                            "not planned",
+                            "--comment",
+                            "Automatically closed after the opportunity fingerprint was absent from two consecutive complete Search Console reports.",
+                        ]
+                    )
+                counts["closed"] += 1
+            except Exception as exc:
+                counts["errors"].append(f"Issue #{number} could not be auto-closed: {exc}")
+                if provenance_added and not dry_run:
+                    try:
+                        gh_mutation(["gh", "issue", "edit", number, "--remove-label", "stale-signal-auto-closed"])
+                    except Exception as rollback_exc:
+                        counts["errors"].append(f"Issue #{number} provenance rollback failed: {rollback_exc}")
             continue
 
-        counts["marked"] += 1
-        if not dry_run:
-            gh_mutation(["gh", "issue", "edit", number, "--add-label", "stale-signal"])
+        try:
+            if not dry_run:
+                gh_mutation(["gh", "issue", "edit", number, "--add-label", "stale-signal"])
+            counts["marked"] += 1
+        except Exception as exc:
+            counts["errors"].append(f"Issue #{number} could not be marked stale: {exc}")
     return counts
+
+
+def stale_reconciliation_inputs(report: dict, tracking_ok: bool) -> tuple[list[Finding], set[str]]:
+    sc = report.get("search_console") or {}
+    reconciliation = sc.get("reconciliation") or {}
+    complete_kinds: set[str] = set()
+    if reconciliation.get("query_complete") is True:
+        complete_kinds.update({"query-ctr-opportunity", "new-query-content-gap"})
+    if reconciliation.get("page_complete") is True:
+        complete_kinds.update({"low-ctr-opportunity", "near-ranking-opportunity"})
+    lifecycle_sc = {
+        **sc,
+        "top_queries": reconciliation.get("query_ctr_queries", []),
+        "low_ctr_pages": reconciliation.get("low_ctr_pages", []),
+        "near_ranking_pages": reconciliation.get("near_ranking_pages", []),
+        "content_gap_queries": reconciliation.get("content_gap_queries", []),
+    }
+    lifecycle_report = {**report, "search_console": lifecycle_sc}
+    return [finding for finding in classify(lifecycle_report, tracking_ok) if finding.kind in STALE_RECONCILIATION_KINDS], complete_kinds
 
 
 def implemented_awaiting_google(finding: Finding, issues: list[dict]) -> bool:
@@ -1707,12 +1753,18 @@ def main(argv: list[str]) -> int:
     stale_issue_reconciliation_error = None
     if (report.get("search_console") or {}).get("available") is True:
         try:
-            stale_issue_reconciliation = reconcile_stale_opportunity_issues(
-                findings=findings,
+            lifecycle_findings, complete_kinds = stale_reconciliation_inputs(report, tracking_ok)
+            reconciliation_result = reconcile_stale_opportunity_issues(
+                findings=lifecycle_findings,
                 issues=issues,
-                search_console_available=True,
+                complete_kinds=complete_kinds,
                 dry_run=dry_run,
             )
+            stale_issue_reconciliation = {
+                key: int(reconciliation_result.get(key, 0)) for key in ("marked", "closed", "reopened")
+            }
+            if reconciliation_result.get("errors"):
+                stale_issue_reconciliation_error = "; ".join(reconciliation_result["errors"])
         except Exception as exc:
             stale_issue_reconciliation_error = f"Stale opportunity reconciliation failed: {exc}"
     generated_setup_error = None

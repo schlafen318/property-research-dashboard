@@ -16,6 +16,9 @@
 - A returning fingerprint removes `stale-signal`; an automatically closed returning issue is reopened.
 - Search Console unavailable means no reconciliation mutations.
 - All GitHub writes use the existing retrying `gh_mutation` boundary.
+- Only complete 25,000-row reconciliation result sets may prove absence; the 25-row display lists never do.
+- Reopening requires the dedicated `stale-signal-auto-closed` provenance label and `analytics-loop` ownership.
+- Mutation failures are isolated per issue and reported without erasing successful counts.
 
 ---
 

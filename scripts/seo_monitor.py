@@ -216,6 +216,11 @@ def search_analytics(service, site_url: str, start_date: str, end_date: str, dim
     return service.searchanalytics().query(siteUrl=site_url, body=body).execute().get("rows", [])
 
 
+def result_set_complete(rows: list[dict], row_limit: int) -> bool:
+    """A full response may be truncated, so only shorter responses prove completeness."""
+    return len(rows) < row_limit
+
+
 def page_analytics(service, site_url: str, start_date: str, end_date: str, page_url: str) -> dict:
     body = {
         "startDate": start_date,
@@ -511,6 +516,12 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
     low_ctr_rows: list[dict] = []
     near_ranking_rows: list[dict] = []
     content_gap_rows: list[dict] = []
+    reconciliation_query_rows: list[dict] = []
+    reconciliation_page_rows: list[dict] = []
+    reconciliation_low_ctr_rows: list[dict] = []
+    reconciliation_near_ranking_rows: list[dict] = []
+    reconciliation_content_gap_rows: list[dict] = []
+    query_ctr_rows: list[dict] = []
 
     lines = [
         f"# Global Home Atlas SEO Monitor - {today.isoformat()}",
@@ -547,8 +558,14 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
                 "",
             ]
         )
-        query_rows = search_analytics(service, args.site_url, start_date, end_date, ["query"], args.row_limit)
-        page_rows = search_analytics(service, args.site_url, start_date, end_date, ["page"], args.row_limit)
+        reconciliation_query_rows = search_analytics(
+            service, args.site_url, start_date, end_date, ["query"], args.reconciliation_row_limit
+        )
+        reconciliation_page_rows = search_analytics(
+            service, args.site_url, start_date, end_date, ["page"], args.reconciliation_row_limit
+        )
+        query_rows = reconciliation_query_rows[: args.row_limit]
+        page_rows = reconciliation_page_rows[: args.row_limit]
         low_ctr_rows = [
             row
             for row in page_rows
@@ -565,6 +582,30 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
             for row in query_rows
             if row.get("impressions", 0) >= args.content_gap_impressions
             and not any(page_matches_query(row.get("keys", [""])[0], url) for url in sitemap_urls)
+        ]
+        reconciliation_low_ctr_rows = [
+            row
+            for row in reconciliation_page_rows
+            if row.get("impressions", 0) >= args.low_ctr_impressions and row.get("ctr", 0) < args.low_ctr_threshold
+        ]
+        reconciliation_near_ranking_rows = [
+            row
+            for row in reconciliation_page_rows
+            if row.get("impressions", 0) >= args.near_ranking_impressions
+            and args.near_ranking_min_position <= row.get("position", 999) <= args.near_ranking_max_position
+        ]
+        reconciliation_content_gap_rows = [
+            row
+            for row in reconciliation_query_rows
+            if row.get("impressions", 0) >= args.content_gap_impressions
+            and not any(page_matches_query(row.get("keys", [""])[0], url) for url in sitemap_urls)
+        ]
+        query_ctr_rows = [
+            row
+            for row in reconciliation_query_rows
+            if row.get("impressions", 0) >= args.query_ctr_impressions
+            and row.get("ctr", 0) < args.query_ctr_threshold
+            and row.get("position", 999) <= args.query_ctr_max_position
         ]
         tracked_page_metrics = {
             goal["url"]: page_analytics(service, args.site_url, start_date, end_date, goal["url"])
@@ -651,6 +692,15 @@ def build_report(args: argparse.Namespace) -> tuple[str, dict, Path | None, Path
             "low_ctr_pages": [row_to_dict(row, ["page"]) for row in low_ctr_rows],
             "near_ranking_pages": [row_to_dict(row, ["page"]) for row in near_ranking_rows],
             "content_gap_queries": [row_to_dict(row, ["query"]) for row in content_gap_rows],
+            "reconciliation": {
+                "row_limit": args.reconciliation_row_limit,
+                "query_complete": result_set_complete(reconciliation_query_rows, args.reconciliation_row_limit),
+                "page_complete": result_set_complete(reconciliation_page_rows, args.reconciliation_row_limit),
+                "query_ctr_queries": [row_to_dict(row, ["query"]) for row in query_ctr_rows],
+                "low_ctr_pages": [row_to_dict(row, ["page"]) for row in reconciliation_low_ctr_rows],
+                "near_ranking_pages": [row_to_dict(row, ["page"]) for row in reconciliation_near_ranking_rows],
+                "content_gap_queries": [row_to_dict(row, ["query"]) for row in reconciliation_content_gap_rows],
+            },
         },
         "goals": goal_scorecard,
     }
@@ -677,6 +727,10 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--start-date")
     parser.add_argument("--end-date")
     parser.add_argument("--row-limit", type=int, default=25)
+    parser.add_argument("--reconciliation-row-limit", type=int, default=25000)
+    parser.add_argument("--query-ctr-impressions", type=int, default=4)
+    parser.add_argument("--query-ctr-threshold", type=float, default=0.01)
+    parser.add_argument("--query-ctr-max-position", type=float, default=20.0)
     parser.add_argument("--low-ctr-impressions", type=int, default=20)
     parser.add_argument("--low-ctr-threshold", type=float, default=0.01)
     parser.add_argument("--near-ranking-impressions", type=int, default=20)
