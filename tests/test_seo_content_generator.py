@@ -366,6 +366,25 @@ class OpenAIGenerationTests(unittest.TestCase):
         self.assertIn("must never contain URLs", developer_message)
         self.assertIn("title, meta description, H1, intro, or FAQ", developer_message)
 
+    def test_recovery_prompt_mirrors_repetition_and_entity_constraints(self) -> None:
+        finding = {
+            **self.finding,
+            "kind": "seo-goal-missed",
+            "payload": {
+                "page": self.context.target_url,
+                "recovery_type": "first-impression",
+                "impressions": 0,
+            },
+        }
+
+        messages = seo_content_generator.build_generation_input(finding, self.context)
+        developer_message = messages[0]["content"]
+
+        self.assertIn("one or two", developer_message)
+        self.assertIn("three-word phrase", developer_message)
+        self.assertIn("multiword Title Case", developer_message)
+        self.assertIn("already appears", developer_message)
+
     def test_generate_proposal_rejects_incomplete_response(self) -> None:
         client = FakeClient([FakeResponse(self.valid_proposal, status="incomplete")])
         with self.assertRaisesRegex(seo_content_generator.GenerationFailure, "incomplete"):
