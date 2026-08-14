@@ -372,6 +372,21 @@ def status_for_indexing(today: dt.date, goal: dict, inspection: dict) -> str:
     return "on_track"
 
 
+def indexing_status_and_evidence(
+    today: dt.date,
+    goal: dict,
+    inspection: dict,
+    analytics: dict,
+) -> tuple[str, str]:
+    if inspection.get("verdict") == "PASS":
+        return "met", "url_inspection"
+    if int(analytics.get("impressions") or 0) > 0:
+        return "met", "search_console_impressions"
+    if inspection.get("ok") is not True:
+        return "unknown", "inspection_unavailable"
+    return status_for_indexing(today, goal, inspection), "url_inspection_not_passed"
+
+
 def status_for_impressions(today: dt.date, goal: dict, analytics: dict) -> str:
     if int(analytics.get("impressions") or 0) > 0:
         return "met"
@@ -389,10 +404,12 @@ def build_goal_scorecard(today: dt.date, inspections: list[dict], page_metrics: 
     for goal in TRACKED_SEO_GOALS:
         inspection = inspection_by_url(inspections, goal["url"])
         analytics = page_metrics.get(goal["url"], {"page": goal["url"], "clicks": 0, "impressions": 0, "ctr": 0, "position": 0})
+        index_status, index_evidence = indexing_status_and_evidence(today, goal, inspection, analytics)
         page_goals.append(
             {
                 **goal,
-                "index_status": status_for_indexing(today, goal, inspection),
+                "index_status": index_status,
+                "index_evidence": index_evidence,
                 "impression_status": status_for_impressions(today, goal, analytics),
                 "inspection": inspection,
                 "analytics": analytics,
