@@ -11,6 +11,135 @@ from scripts import seo_feedback_loop
 
 
 class NotificationCommentTests(unittest.TestCase):
+    def opportunity_finding(self, suffix: str = "queenstown") -> seo_feedback_loop.Finding:
+        return seo_feedback_loop.Finding(
+            kind="near-ranking-opportunity",
+            title="Push near-ranking page higher: /destinations/queenstown/",
+            summary="Page is ranking near page one.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review", "content-refresh"),
+            fingerprint=f"gha-near-ranking-opportunity-{suffix}",
+            implementation_pr=True,
+            payload={"page": "https://globalhomeatlas.com/destinations/queenstown/"},
+        )
+
+    def opportunity_issue(self, *, stale: bool = False, state: str = "OPEN", suffix: str = "queenstown") -> dict:
+        labels = [{"name": "analytics-loop"}, {"name": "content-refresh"}]
+        if stale:
+            labels.append({"name": "stale-signal"})
+        return {
+            "number": 92,
+            "title": "Push near-ranking page higher: /destinations/queenstown/",
+            "state": state,
+            "body": (
+                "## Classification\n"
+                "- Kind: `near-ranking-opportunity`\n"
+                f"- Fingerprint: `gha-near-ranking-opportunity-{suffix}`\n"
+            ),
+            "labels": labels,
+        }
+
+    def test_stale_opportunity_first_absence_marks_without_closing(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[self.opportunity_issue()], search_console_available=True, dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 1, "closed": 0, "reopened": 0}, result)
+        self.assertEqual(
+            [["gh", "issue", "edit", "92", "--add-label", "stale-signal"]],
+            calls,
+        )
+
+    def test_stale_opportunity_second_absence_closes(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[self.opportunity_issue(stale=True)], search_console_available=True, dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 1, "reopened": 0}, result)
+        self.assertEqual("close", calls[0][2])
+        self.assertIn("not planned", calls[0])
+        self.assertNotIn("--remove-label", calls[0])
+
+    def test_returning_stale_opportunity_reopens(self) -> None:
+        finding = self.opportunity_finding()
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[finding],
+                issues=[self.opportunity_issue(stale=True, state="CLOSED")],
+                search_console_available=True,
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 1}, result)
+        self.assertEqual(["gh", "issue", "reopen", "92"], calls[0])
+        self.assertEqual(["gh", "issue", "edit", "92", "--remove-label", "stale-signal"], calls[1])
+
+    def test_stale_reconciliation_skips_unavailable_protected_and_unmanaged_issues(self) -> None:
+        protected = self.opportunity_issue(stale=True)
+        protected["labels"].append({"name": "implemented-awaiting-google"})
+        unmanaged = self.opportunity_issue(stale=True, suffix="indexing")
+        unmanaged["body"] = unmanaged["body"].replace("near-ranking-opportunity", "seo-goal-missed")
+        manually_closed = self.opportunity_issue(state="CLOSED", suffix="manual")
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            unavailable = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[self.opportunity_issue()],
+                search_console_available=False,
+                dry_run=False,
+            )
+            skipped = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[protected, unmanaged, manually_closed],
+                search_console_available=True,
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0}, unavailable)
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0}, skipped)
+        self.assertEqual([], calls)
+
+    def test_returning_open_opportunity_clears_stale_marker_without_reopening(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[self.opportunity_finding()],
+                issues=[self.opportunity_issue(stale=True)],
+                search_console_available=True,
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0}, result)
+        self.assertEqual(
+            [["gh", "issue", "edit", "92", "--remove-label", "stale-signal"]],
+            calls,
+        )
+
     def editorial_pair(
         self,
         *,

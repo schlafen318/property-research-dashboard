@@ -43,6 +43,7 @@ LABELS = {
     "query-ctr-opportunity": "fbca04",
     "implementation-queued": "5319e7",
     "implemented-awaiting-google": "fbca04",
+    "stale-signal": "cfd3d7",
     "validated-by-gsc": "0e8a16",
     "generated-content": "5319e7",
 }
@@ -50,6 +51,7 @@ QUERY_CTR_MIN_IMPRESSIONS = 4
 QUERY_CTR_MAX_CTR = 0.01
 QUERY_CTR_MAX_POSITION = 20.0
 IMPLEMENTATION_PR_KINDS = {"query-ctr-opportunity", "low-ctr-opportunity", "near-ranking-opportunity"}
+STALE_RECONCILIATION_KINDS = {*IMPLEMENTATION_PR_KINDS, "new-query-content-gap"}
 AUTO_IMPLEMENTATION_KINDS = {"near-ranking-opportunity"}
 AUTO_INTERNAL_LINK_SOURCE_SLUG = "buy-property-abroad"
 
@@ -739,6 +741,75 @@ def issue_label_names(issue: dict | None) -> set[str]:
         elif isinstance(label, str):
             names.add(label)
     return names
+
+
+def issue_machine_field(issue: dict, field: str) -> str | None:
+    match = re.search(rf"^- {re.escape(field)}: `([^`]+)`$", str(issue.get("body") or ""), re.MULTILINE)
+    return match.group(1) if match else None
+
+
+def reconcile_stale_opportunity_issues(
+    *,
+    findings: list[Finding],
+    issues: list[dict],
+    search_console_available: bool,
+    dry_run: bool,
+) -> dict[str, int]:
+    counts = {"marked": 0, "closed": 0, "reopened": 0}
+    if not search_console_available:
+        return counts
+
+    active_fingerprints = {
+        finding.fingerprint for finding in findings if finding.kind in STALE_RECONCILIATION_KINDS
+    }
+    for issue in issues:
+        kind = issue_machine_field(issue, "Kind")
+        fingerprint = issue_machine_field(issue, "Fingerprint")
+        labels = issue_label_names(issue)
+        state = str(issue.get("state") or "").lower()
+        if (
+            kind not in STALE_RECONCILIATION_KINDS
+            or not fingerprint
+            or issue.get("title") == CONTROL_ISSUE_TITLE
+            or "implemented-awaiting-google" in labels
+        ):
+            continue
+
+        number = str(issue["number"])
+        if fingerprint in active_fingerprints:
+            if "stale-signal" not in labels:
+                continue
+            if state == "closed":
+                counts["reopened"] += 1
+                if not dry_run:
+                    gh_mutation(["gh", "issue", "reopen", number])
+            if not dry_run:
+                gh_mutation(["gh", "issue", "edit", number, "--remove-label", "stale-signal"])
+            continue
+
+        if state != "open":
+            continue
+        if "stale-signal" in labels:
+            counts["closed"] += 1
+            if not dry_run:
+                gh_mutation(
+                    [
+                        "gh",
+                        "issue",
+                        "close",
+                        number,
+                        "--reason",
+                        "not planned",
+                        "--comment",
+                        "Automatically closed after the opportunity fingerprint was absent from two consecutive healthy Search Console reports.",
+                    ]
+                )
+            continue
+
+        counts["marked"] += 1
+        if not dry_run:
+            gh_mutation(["gh", "issue", "edit", number, "--add-label", "stale-signal"])
+    return counts
 
 
 def implemented_awaiting_google(finding: Finding, issues: list[dict]) -> bool:
