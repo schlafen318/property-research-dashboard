@@ -24,7 +24,7 @@ class GoogleSitemapSubmissionTests(unittest.TestCase):
                     google_sitemap_submit,
                     "submit_sitemap",
                     return_value={"ok": True, "sitemap": "https://globalhomeatlas.com/sitemap.xml"},
-                ),
+                ) as submit,
             ):
                 receipt = google_sitemap_submit.run_submission(
                     site_url="sc-domain:globalhomeatlas.com",
@@ -40,6 +40,11 @@ class GoogleSitemapSubmissionTests(unittest.TestCase):
         self.assertEqual("sc-domain:globalhomeatlas.com", receipt["site_url"])
         self.assertEqual("https://globalhomeatlas.com/sitemap.xml", receipt["sitemap"])
         self.assertRegex(receipt["submitted_at"], r"^\d{4}-\d{2}-\d{2}T")
+        submit.assert_called_once_with(
+            service,
+            "sc-domain:globalhomeatlas.com",
+            "https://globalhomeatlas.com/sitemap.xml",
+        )
 
     def test_missing_credentials_write_failure_without_loading_google(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -96,10 +101,36 @@ class GoogleSitemapSubmissionTests(unittest.TestCase):
         self.assertEqual("permission denied", receipt["error"])
 
     def test_main_exit_code_matches_receipt(self) -> None:
-        with patch.object(google_sitemap_submit, "run_submission", return_value={"ok": True}):
+        with (
+            patch.object(google_sitemap_submit, "run_submission", return_value={"ok": True}),
+            patch("builtins.print"),
+        ):
             self.assertEqual(0, google_sitemap_submit.main([]))
-        with patch.object(google_sitemap_submit, "run_submission", return_value={"ok": False}):
+        with (
+            patch.object(google_sitemap_submit, "run_submission", return_value={"ok": False}),
+            patch("builtins.print"),
+        ):
             self.assertEqual(1, google_sitemap_submit.main([]))
+
+
+class DeployWorkflowTests(unittest.TestCase):
+    def test_google_submission_runs_after_deploy_with_step_scoped_secret_and_receipt(self) -> None:
+        workflow = Path(".github/workflows/deploy-pages.yml").read_text(encoding="utf-8")
+        notify_job = workflow.split("\n  notify-google:\n", 1)[1]
+        notify_job_header, notify_steps = notify_job.split("    steps:\n", 1)
+        submission_step = notify_steps.split("      - name: Submit sitemap to Google Search Console\n", 1)[1]
+        submission_step = submission_step.split("      - name:", 1)[0]
+        receipt_step = notify_steps.split("      - name: Upload sitemap submission receipt\n", 1)[1]
+
+        self.assertIn("needs: deploy", notify_job_header)
+        self.assertIn("google-api-python-client", notify_steps)
+        self.assertIn("python3 scripts/google_sitemap_submit.py", submission_step)
+        self.assertIn("GOOGLE_SEARCH_CONSOLE_TOKEN_JSON: ${{ secrets.GOOGLE_SEARCH_CONSOLE_TOKEN_JSON }}", submission_step)
+        self.assertNotIn("GOOGLE_SEARCH_CONSOLE_TOKEN_JSON", workflow.split("jobs:", 1)[0])
+        self.assertNotIn("GOOGLE_SEARCH_CONSOLE_TOKEN_JSON", notify_job_header)
+        self.assertIn("if: always()", receipt_step)
+        self.assertIn("name: google-sitemap-submission", receipt_step)
+        self.assertIn("output/seo/google-sitemap-submission.json", receipt_step)
 
 
 if __name__ == "__main__":
