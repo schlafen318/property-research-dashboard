@@ -826,6 +826,160 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertIn("new number", body)
         self.assertIn("pull/101", body)
 
+    def test_control_issue_reports_stale_reconciliation(self) -> None:
+        body = seo_feedback_loop.control_issue_body(
+            report={},
+            findings=[],
+            issue_links=[],
+            pr_links=[],
+            auto_merged=[],
+            indexnow={},
+            stale_issue_reconciliation={"marked": 3, "closed": 2, "reopened": 1},
+        )
+
+        self.assertIn("Stale Opportunity Reconciliation", body)
+        self.assertIn("Marked stale: `3`", body)
+        self.assertIn("Closed stale: `2`", body)
+        self.assertIn("Reopened: `1`", body)
+
+    def test_main_skips_stale_reconciliation_without_search_console(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_reconcile = seo_feedback_loop.reconcile_stale_opportunity_issues
+        calls = []
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: calls.append(kwargs)
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                result = seo_feedback_loop.main(
+                    ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.reconcile_stale_opportunity_issues = original_reconcile
+
+        self.assertEqual(0, result)
+        self.assertEqual([], calls)
+        self.assertEqual(
+            {"marked": 0, "closed": 0, "reopened": 0},
+            summary["stale_issue_reconciliation"],
+        )
+
+    def test_main_reports_stale_reconciliation_and_contains_failures(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {
+                "available": True,
+                "top_queries": [],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+            },
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_reconcile = seo_feedback_loop.reconcile_stale_opportunity_issues
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: {
+                    "marked": 4,
+                    "closed": 2,
+                    "reopened": 1,
+                }
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+                self.assertEqual({"marked": 4, "closed": 2, "reopened": 1}, summary["stale_issue_reconciliation"])
+
+                seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: (_ for _ in ()).throw(
+                    RuntimeError("GitHub unavailable")
+                )
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                failed = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.reconcile_stale_opportunity_issues = original_reconcile
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0}, failed["stale_issue_reconciliation"])
+        self.assertIn("GitHub unavailable", failed["stale_issue_reconciliation_error"])
+
+    def test_main_dry_run_reports_real_stale_issue_counts_without_mutation(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {
+                "available": True,
+                "top_queries": [{"query": "unrelated query", "clicks": 0, "impressions": 1, "ctr": 0, "position": 50}],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+            },
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_mutation = seo_feedback_loop.gh_mutation
+        mutation_calls = []
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: [self.opportunity_issue()]
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: mutation_calls.append(cmd)
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.gh_mutation = original_mutation
+
+        self.assertEqual({"marked": 1, "closed": 0, "reopened": 0}, summary["stale_issue_reconciliation"])
+        self.assertEqual([], mutation_calls)
+
     def test_workflow_exposes_openai_only_to_feedback_step(self) -> None:
         workflow = Path(".github/workflows/seo-feedback-loop.yml").read_text(encoding="utf-8")
         self.assertIn('"openai>=2,<3"', workflow)

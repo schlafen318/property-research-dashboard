@@ -523,6 +523,8 @@ def control_issue_body(
     auto_merged: list[str],
     indexnow: dict,
     generated_content: dict | None = None,
+    stale_issue_reconciliation: dict[str, int] | None = None,
+    stale_issue_reconciliation_error: str | None = None,
 ) -> str:
     sitemap = report.get("sitemap", {})
     status = sitemap.get("status") or {}
@@ -579,6 +581,9 @@ def control_issue_body(
 ## Generated Content
 {format_generated_content(generated_content or {})}
 
+## Stale Opportunity Reconciliation
+{format_stale_issue_reconciliation(stale_issue_reconciliation or {}, stale_issue_reconciliation_error)}
+
 ## Recommended Next Action
 {recommended_next_action(findings)}
 """
@@ -598,6 +603,8 @@ def build_notification_comment(
     auto_merged: list[str],
     control_link: str,
     generated_content: dict | None = None,
+    stale_issue_reconciliation: dict[str, int] | None = None,
+    stale_issue_reconciliation_error: str | None = None,
 ) -> str:
     by_severity = {"high": 0, "medium": 0, "low": 0}
     for finding in findings:
@@ -618,6 +625,10 @@ def build_notification_comment(
 - Generated content accepted: `{(generated_content or {}).get('accepted_count', 0)}`
 - Generated content rejected: `{len((generated_content or {}).get('rejected', []))}`
 - Generated content draft: `{(generated_content or {}).get('pr') or 'none'}`
+- Opportunities marked stale: `{(stale_issue_reconciliation or {}).get('marked', 0)}`
+- Stale opportunities closed: `{(stale_issue_reconciliation or {}).get('closed', 0)}`
+- Stale opportunities reopened: `{(stale_issue_reconciliation or {}).get('reopened', 0)}`
+{f"- Stale reconciliation error: `{stale_issue_reconciliation_error}`" if stale_issue_reconciliation_error else ""}
 
 ## Next Action
 {recommended_next_action(findings)}
@@ -639,6 +650,17 @@ def format_generated_content(generated_content: dict) -> str:
     for item in rejected:
         reason = str(item.get("reason") or "rejected").replace("\n", " ")
         lines.append(f"- Rejection `{item.get('fingerprint', 'unknown')}`: {reason}")
+    return "\n".join(lines)
+
+
+def format_stale_issue_reconciliation(counts: dict[str, int], error: str | None = None) -> str:
+    lines = [
+        f"- Marked stale: `{counts.get('marked', 0)}`",
+        f"- Closed stale: `{counts.get('closed', 0)}`",
+        f"- Reopened: `{counts.get('reopened', 0)}`",
+    ]
+    if error:
+        lines.append(f"- Error: `{error.replace(chr(10), ' ')}`")
     return "\n".join(lines)
 
 
@@ -977,6 +999,8 @@ def create_or_update_control_issue(
     indexnow: dict,
     dry_run: bool,
     generated_content: dict | None = None,
+    stale_issue_reconciliation: dict[str, int] | None = None,
+    stale_issue_reconciliation_error: str | None = None,
 ) -> str:
     issues = list_issues() if not dry_run else []
     body = control_issue_body(
@@ -987,6 +1011,8 @@ def create_or_update_control_issue(
         auto_merged,
         indexnow,
         generated_content=generated_content,
+        stale_issue_reconciliation=stale_issue_reconciliation,
+        stale_issue_reconciliation_error=stale_issue_reconciliation_error,
     )
     existing = find_control_issue(issues)
     if dry_run:
@@ -1011,6 +1037,8 @@ def post_notification_comment(
     control_link: str,
     dry_run: bool,
     generated_content: dict | None = None,
+    stale_issue_reconciliation: dict[str, int] | None = None,
+    stale_issue_reconciliation_error: str | None = None,
 ) -> str | None:
     if not notify_user:
         return None
@@ -1023,6 +1051,8 @@ def post_notification_comment(
         auto_merged=auto_merged,
         control_link=control_link,
         generated_content=generated_content,
+        stale_issue_reconciliation=stale_issue_reconciliation,
+        stale_issue_reconciliation_error=stale_issue_reconciliation_error,
     )
     if dry_run:
         print(f"[dry-run] comment on control issue and mention {normalize_github_mention(notify_user)}")
@@ -1672,7 +1702,19 @@ def main(argv: list[str]) -> int:
     findings = classify(report, tracking_ok)
 
     ensure_labels(dry_run)
-    issues = list_issues() if not dry_run else []
+    issues = list_issues()
+    stale_issue_reconciliation = {"marked": 0, "closed": 0, "reopened": 0}
+    stale_issue_reconciliation_error = None
+    if (report.get("search_console") or {}).get("available") is True:
+        try:
+            stale_issue_reconciliation = reconcile_stale_opportunity_issues(
+                findings=findings,
+                issues=issues,
+                search_console_available=True,
+                dry_run=dry_run,
+            )
+        except Exception as exc:
+            stale_issue_reconciliation_error = f"Stale opportunity reconciliation failed: {exc}"
     generated_setup_error = None
     try:
         open_generated_prs = list_generated_content_prs("open") if not dry_run else []
@@ -1750,6 +1792,8 @@ def main(argv: list[str]) -> int:
         indexnow,
         dry_run,
         generated_content=generated_content,
+        stale_issue_reconciliation=stale_issue_reconciliation,
+        stale_issue_reconciliation_error=stale_issue_reconciliation_error,
     )
     notification = post_notification_comment(
         notify_user=args.notify_user,
@@ -1761,6 +1805,8 @@ def main(argv: list[str]) -> int:
         control_link=control_link,
         dry_run=dry_run,
         generated_content=generated_content,
+        stale_issue_reconciliation=stale_issue_reconciliation,
+        stale_issue_reconciliation_error=stale_issue_reconciliation_error,
     )
     summary = {
         "findings": [
@@ -1785,6 +1831,8 @@ def main(argv: list[str]) -> int:
         "auto_merged_count": len(auto_merged),
         "auto_merged": auto_merged,
         "generated_content": generated_content,
+        "stale_issue_reconciliation": stale_issue_reconciliation,
+        "stale_issue_reconciliation_error": stale_issue_reconciliation_error,
         "control": control_link,
         "notification": notification,
     }
