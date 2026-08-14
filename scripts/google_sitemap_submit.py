@@ -6,15 +6,19 @@ import json
 import sys
 from pathlib import Path
 
-from scripts.seo_monitor import (
-    DEFAULT_OUTPUT,
-    DEFAULT_SITE_URL,
-    DEFAULT_SITEMAP,
-    DEFAULT_TOKEN,
-    load_search_console,
-    submit_sitemap,
-    token_from_env,
-)
+if __package__:
+    from scripts import seo_monitor
+else:
+    import seo_monitor
+
+
+DEFAULT_OUTPUT = seo_monitor.DEFAULT_OUTPUT
+DEFAULT_SITE_URL = seo_monitor.DEFAULT_SITE_URL
+DEFAULT_SITEMAP = seo_monitor.DEFAULT_SITEMAP
+DEFAULT_TOKEN = seo_monitor.DEFAULT_TOKEN
+load_search_console = seo_monitor.load_search_console
+submit_sitemap = seo_monitor.submit_sitemap
+token_from_env = seo_monitor.token_from_env
 
 
 DEFAULT_RECEIPT = DEFAULT_OUTPUT / "google-sitemap-submission.json"

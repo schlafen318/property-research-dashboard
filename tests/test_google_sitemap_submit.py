@@ -1,6 +1,9 @@
 from __future__ import annotations
 
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -10,6 +13,34 @@ from scripts import google_sitemap_submit
 
 
 class GoogleSitemapSubmissionTests(unittest.TestCase):
+    def test_cli_runs_from_repository_root(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            output_path = root / "receipt.json"
+            env = dict(os.environ)
+            env.pop("GOOGLE_SEARCH_CONSOLE_TOKEN_JSON", None)
+            completed = subprocess.run(
+                [
+                    sys.executable,
+                    "scripts/google_sitemap_submit.py",
+                    "--token",
+                    str(root / "missing-token.json"),
+                    "--output",
+                    str(output_path),
+                ],
+                cwd=Path(__file__).resolve().parents[1],
+                env=env,
+                capture_output=True,
+                text=True,
+                check=False,
+            )
+
+            receipt = json.loads(output_path.read_text(encoding="utf-8"))
+
+        self.assertEqual(1, completed.returncode)
+        self.assertNotIn("ModuleNotFoundError", completed.stderr)
+        self.assertFalse(receipt["ok"])
+
     def test_success_writes_receipt(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             root = Path(tmpdir)
