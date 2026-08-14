@@ -847,7 +847,7 @@ class NotificationCommentTests(unittest.TestCase):
             },
         ]
         report = {
-            "sitemap": {"status": {}, "indexing": {}},
+            "sitemap": {"urls": [eligible_url], "status": {}, "indexing": {}},
             "search_console": {"available": False},
             "goals": {"page_goals": goals},
         }
@@ -861,6 +861,44 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertEqual("impression_status", finding.payload["goal_field"])
         self.assertEqual(0, finding.payload["impressions"])
         self.assertTrue(finding.implementation_pr)
+
+    def test_recovery_skips_unsupported_and_out_of_sitemap_targets_before_selection(self) -> None:
+        valid = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        unsupported = "https://globalhomeatlas.com/about/"
+        out_of_sitemap = "https://globalhomeatlas.com/best-countries-for-expats-to-buy-property/"
+
+        def goal(url: str) -> dict:
+            return {
+                "url": url,
+                "launch_date": "2026-06-23",
+                "indexed_deadline": "2026-06-30",
+                "impressions_deadline": "2026-07-23",
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"page": url, "impressions": 0},
+            }
+
+        report = {
+            "sitemap": {"urls": [unsupported, valid], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {"page_goals": [goal(unsupported), goal(out_of_sitemap), goal(valid)]},
+        }
+        findings = seo_feedback_loop.classify(report, tracking_ok=True)
+        pairs = [
+            (item, f"issue:{index}")
+            for index, item in enumerate(findings)
+            if item.implementation_pr
+        ]
+
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            pairs,
+            issues=[],
+            open_targets=set(),
+            override_entries=[],
+            now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual([valid], [seo_feedback_loop.finding_target_url(pair[0]) for pair in selected])
 
     def test_classify_marks_near_ranking_internal_link_as_auto_safe(self) -> None:
         report = {

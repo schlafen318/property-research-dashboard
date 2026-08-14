@@ -350,7 +350,13 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
 
     sc = report.get("search_console", {})
     goals = report.get("goals", {})
+    sitemap_urls = set(sitemap.get("urls") or [])
     for goal in goals.get("page_goals", []):
+        goal_url = str(goal.get("url") or "")
+        try:
+            recovery_page_type = seo_content_generator.page_type_for_url(goal_url)
+        except ValueError:
+            recovery_page_type = None
         for field, label in (("index_status", "Indexing"), ("impression_status", "First impressions")):
             status_value = goal.get(field)
             if status_value not in {"at_risk", "missed"}:
@@ -363,6 +369,8 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                 and status_value == "missed"
                 and goal.get("index_status") == "met"
                 and int(analytics.get("impressions") or 0) == 0
+                and goal_url in sitemap_urls
+                and recovery_page_type is not None
             )
             payload = dict(goal)
             if recovery:
@@ -370,7 +378,7 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                     {
                         "goal_field": "impression_status",
                         "recovery_type": "first-impression",
-                        "page": goal.get("url"),
+                        "page": goal_url,
                         "impressions": 0,
                     }
                 )
