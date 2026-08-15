@@ -61,7 +61,7 @@
     "target_url": "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
   },
   {
-    "base_content_hash": "54e2fb53d7ba7d6198bc389ac2bf890fe08e3235c7a1889e8dafd735f89428c5",
+    "base_content_hash": "1320177ae0b549b28a9b533ada91b0122ed18cfd20f0a792a4e78d7a2e90c8cb",
     "content": {
       "faq_answer": null,
       "faq_question": null,
@@ -69,11 +69,11 @@
       "internal_link_target": null,
       "intro": null,
       "meta_description": null,
-      "title": "Italy Property Destinations for Foreign Buyers"
+      "title": "Italy property guide: destinations for foreign buyers"
     },
-    "cooldown_until": "2026-09-11T06:50:31.589419+00:00",
+    "cooldown_until": "2026-09-12T02:22:00.233361+00:00",
     "finding_fingerprint": "gha-seo-goal-missed-87695536a50c",
-    "generated_at": "2026-08-14T06:50:31.589419+00:00",
+    "generated_at": "2026-08-15T02:22:00.233361+00:00",
     "lifecycle": "proposed",
     "model": "gpt-5.6-luna",
     "signal": {
