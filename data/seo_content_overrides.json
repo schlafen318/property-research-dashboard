@@ -121,6 +121,66 @@
     "target_url": "https://globalhomeatlas.com/countries/italy-property/"
   },
   {
+    "base_content_hash": "8c00bc06bc2ae06781a0a24934095f04dfdc26d72d436d268a517d906e595bf2",
+    "content": {
+      "faq_answer": null,
+      "faq_question": null,
+      "internal_link_anchor": null,
+      "internal_link_target": null,
+      "intro": null,
+      "meta_description": null,
+      "title": "Japan property destinations and buyer guide | Global Home Atlas"
+    },
+    "cooldown_until": "2026-09-12T03:24:12.399953+00:00",
+    "finding_fingerprint": "gha-seo-goal-missed-f1753e78e81b",
+    "generated_at": "2026-08-15T03:24:12.399953+00:00",
+    "lifecycle": "proposed",
+    "model": "gpt-5.6-luna",
+    "signal": {
+      "analytics": {
+        "clicks": 0,
+        "ctr": 0,
+        "impressions": 0,
+        "page": "https://globalhomeatlas.com/countries/japan-property/",
+        "position": 0
+      },
+      "goal_field": "impression_status",
+      "impression_status": "missed",
+      "impressions": 0,
+      "impressions_at_risk_date": "2026-07-07",
+      "impressions_deadline": "2026-07-23",
+      "index_evidence": "url_inspection",
+      "index_status": "met",
+      "indexed_deadline": "2026-06-30",
+      "inspection": {
+        "coverage_state": "Submitted and indexed",
+        "google_canonical": "https://globalhomeatlas.com/countries/japan-property/",
+        "indexing_state": "INDEXING_ALLOWED",
+        "last_crawl_time": "2026-06-24T06:13:46Z",
+        "mobile_verdict": "VERDICT_UNSPECIFIED",
+        "ok": true,
+        "page_fetch_state": "SUCCESSFUL",
+        "referring_urls": [
+          "https://globalhomeatlas.com/countries/portugal-property/"
+        ],
+        "rich_results_verdict": "PASS",
+        "robots_txt_state": "ALLOWED",
+        "sitemap": [
+          "https://globalhomeatlas.com/sitemap.xml"
+        ],
+        "url": "https://globalhomeatlas.com/countries/japan-property/",
+        "user_canonical": "https://globalhomeatlas.com/countries/japan-property/",
+        "verdict": "PASS"
+      },
+      "launch_date": "2026-06-23",
+      "name": "Japan country hub",
+      "page": "https://globalhomeatlas.com/countries/japan-property/",
+      "recovery_type": "first-impression",
+      "url": "https://globalhomeatlas.com/countries/japan-property/"
+    },
+    "target_url": "https://globalhomeatlas.com/countries/japan-property/"
+  },
+  {
     "base_content_hash": "a7f1c644fb9301d4b202ccac393e0a8192c49573ed79de3dbf2bbde509a416ad",
     "content": {
       "faq_answer": null,
