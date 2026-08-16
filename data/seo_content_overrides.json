@@ -169,5 +169,65 @@
       "position": 36.793103448275865
     },
     "target_url": "https://globalhomeatlas.com/countries/spain-property/"
+  },
+  {
+    "base_content_hash": "bb5aa7b11e61024ccd3ff60d3cb045ba6eb005ee549fb217503168e7d3763fa8",
+    "content": {
+      "faq_answer": null,
+      "faq_question": null,
+      "internal_link_anchor": null,
+      "internal_link_target": null,
+      "intro": null,
+      "meta_description": null,
+      "title": "Thailand property guide: Phuket and Koh Samui"
+    },
+    "cooldown_until": "2026-09-13T02:37:40.515215+00:00",
+    "finding_fingerprint": "gha-seo-goal-missed-738da562fccc",
+    "generated_at": "2026-08-16T02:37:40.515215+00:00",
+    "lifecycle": "proposed",
+    "model": "gpt-5.6-luna",
+    "signal": {
+      "analytics": {
+        "clicks": 0,
+        "ctr": 0,
+        "impressions": 0,
+        "page": "https://globalhomeatlas.com/countries/thailand-property/",
+        "position": 0
+      },
+      "goal_field": "impression_status",
+      "impression_status": "missed",
+      "impressions": 0,
+      "impressions_at_risk_date": "2026-07-07",
+      "impressions_deadline": "2026-07-23",
+      "index_evidence": "url_inspection",
+      "index_status": "met",
+      "indexed_deadline": "2026-06-30",
+      "inspection": {
+        "coverage_state": "Submitted and indexed",
+        "google_canonical": "https://globalhomeatlas.com/countries/thailand-property/",
+        "indexing_state": "INDEXING_ALLOWED",
+        "last_crawl_time": "2026-06-24T05:55:58Z",
+        "mobile_verdict": "VERDICT_UNSPECIFIED",
+        "ok": true,
+        "page_fetch_state": "SUCCESSFUL",
+        "referring_urls": [
+          "https://globalhomeatlas.com/sitemap.xml"
+        ],
+        "rich_results_verdict": "PASS",
+        "robots_txt_state": "ALLOWED",
+        "sitemap": [
+          "https://globalhomeatlas.com/sitemap.xml"
+        ],
+        "url": "https://globalhomeatlas.com/countries/thailand-property/",
+        "user_canonical": "https://globalhomeatlas.com/countries/thailand-property/",
+        "verdict": "PASS"
+      },
+      "launch_date": "2026-06-23",
+      "name": "Thailand country hub",
+      "page": "https://globalhomeatlas.com/countries/thailand-property/",
+      "recovery_type": "first-impression",
+      "url": "https://globalhomeatlas.com/countries/thailand-property/"
+    },
+    "target_url": "https://globalhomeatlas.com/countries/thailand-property/"
   }
 ]
