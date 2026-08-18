@@ -213,7 +213,9 @@ def build_html(report: dict, indexnow: dict) -> str:
     header {{ padding: 18px 0 46px; color: #fffdf8; background: linear-gradient(135deg, #10241f, #176b62 62%, #a77a35); }}
     nav {{ display: flex; justify-content: space-between; gap: 18px; align-items: center; margin-bottom: 54px; }}
     nav a {{ color: rgba(255, 253, 248, .88); font-weight: 850; text-decoration: none; }}
-    .brand {{ color: #fffdf8; font-weight: 950; }}
+    .brand {{ display: flex; align-items: center; color: #fffdf8; font-weight: 950; }}
+    .brand img {{ width: 174px; max-width: 48vw; height: auto; display: block; }}
+    .nav-links {{ display: flex; flex-wrap: wrap; gap: 18px; }}
     h1 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 82px); line-height: .96; letter-spacing: 0; }}
     .lede {{ max-width: 760px; color: rgba(255, 253, 248, .84); font-size: 18px; line-height: 1.6; }}
     main {{ margin-top: -28px; padding-bottom: 48px; }}
@@ -250,6 +252,8 @@ def build_html(report: dict, indexnow: dict) -> str:
     }}
     @media (max-width: 560px) {{
       .shell {{ width: min(100% - 28px, 1180px); }}
+      nav {{ display: grid; margin-bottom: 36px; }}
+      .nav-links {{ gap: 10px 14px; }}
       .summary {{ grid-template-columns: 1fr; }}
       section, aside {{ padding: 16px; }}
     }}
@@ -259,8 +263,14 @@ def build_html(report: dict, indexnow: dict) -> str:
   <header>
     <div class="shell">
       <nav aria-label="Primary">
-        <a class="brand" href="/">Global Home Atlas</a>
-        <a href="/guides/">Guides</a>
+        <a class="brand" href="/" aria-label="Global Home Atlas home"><img src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
+        <div class="nav-links">
+          <a href="/#market-finder">Find your fit</a>
+          <a href="/dashboard/">Destinations</a>
+          <a href="/guides/#country-selection">Countries</a>
+          <a href="/guides/">Guides</a>
+          <a href="/methodology/">Methodology</a>
+        </div>
       </nav>
       <p class="eyebrow">Operational SEO dashboard</p>
       <h1>SEO Indexing Status</h1>

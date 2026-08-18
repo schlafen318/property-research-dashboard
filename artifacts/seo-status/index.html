@@ -29,7 +29,9 @@
     header { padding: 18px 0 46px; color: #fffdf8; background: linear-gradient(135deg, #10241f, #176b62 62%, #a77a35); }
     nav { display: flex; justify-content: space-between; gap: 18px; align-items: center; margin-bottom: 54px; }
     nav a { color: rgba(255, 253, 248, .88); font-weight: 850; text-decoration: none; }
-    .brand { color: #fffdf8; font-weight: 950; }
+    .brand { display: flex; align-items: center; color: #fffdf8; font-weight: 950; }
+    .brand img { width: 174px; max-width: 48vw; height: auto; display: block; }
+    .nav-links { display: flex; flex-wrap: wrap; gap: 18px; }
     h1 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(40px, 7vw, 82px); line-height: .96; letter-spacing: 0; }
     .lede { max-width: 760px; color: rgba(255, 253, 248, .84); font-size: 18px; line-height: 1.6; }
     main { margin-top: -28px; padding-bottom: 48px; }
@@ -66,6 +68,8 @@
     }
     @media (max-width: 560px) {
       .shell { width: min(100% - 28px, 1180px); }
+      nav { display: grid; margin-bottom: 36px; }
+      .nav-links { gap: 10px 14px; }
       .summary { grid-template-columns: 1fr; }
       section, aside { padding: 16px; }
     }
@@ -75,8 +79,14 @@
   <header>
     <div class="shell">
       <nav aria-label="Primary">
-        <a class="brand" href="/">Global Home Atlas</a>
-        <a href="/guides/">Guides</a>
+        <a class="brand" href="/" aria-label="Global Home Atlas home"><img src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
+        <div class="nav-links">
+          <a href="/#market-finder">Find your fit</a>
+          <a href="/dashboard/">Destinations</a>
+          <a href="/guides/#country-selection">Countries</a>
+          <a href="/guides/">Guides</a>
+          <a href="/methodology/">Methodology</a>
+        </div>
       </nav>
       <p class="eyebrow">Operational SEO dashboard</p>
       <h1>SEO Indexing Status</h1>
@@ -86,7 +96,7 @@
   <main>
     <div class="shell">
       <section class="summary" aria-label="SEO status summary">
-        <div><span>Generated</span><strong>2026-08-18 03:28 UTC</strong></div>
+        <div><span>Generated</span><strong>2026-08-11 23:54 UTC</strong></div>
         <div><span>Sitemap URLs</span><strong>65</strong></div>
         <div><span>Tracked goals</span><strong>13</strong></div>
         <div><span>At risk</span><strong>4</strong></div>
@@ -104,8 +114,8 @@
               <td><a href="https://globalhomeatlas.com/countries/spain-property/">/countries/spain-property/</a><span>Spain country hub</span></td>
               <td><strong>Submitted and indexed</strong><span>PASS</span></td>
               <td><i class="pill good">Met</i><span>By 2026-06-30</span></td>
-              <td><i class="pill good">Met</i><span>33 impressions by 2026-07-23</span></td>
-              <td>0<span>CTR 0.00%, pos 36.7</span></td>
+              <td><i class="pill good">Met</i><span>25 impressions by 2026-07-23</span></td>
+              <td>0<span>CTR 0.00%, pos 37.2</span></td>
             </tr>
             
 
@@ -113,8 +123,8 @@
               <td><a href="https://globalhomeatlas.com/countries/portugal-property/">/countries/portugal-property/</a><span>Portugal country hub</span></td>
               <td><strong>Submitted and indexed</strong><span>PASS</span></td>
               <td><i class="pill good">Met</i><span>By 2026-06-30</span></td>
-              <td><i class="pill good">Met</i><span>19 impressions by 2026-07-23</span></td>
-              <td>0<span>CTR 0.00%, pos 37.4</span></td>
+              <td><i class="pill good">Met</i><span>20 impressions by 2026-07-23</span></td>
+              <td>0<span>CTR 0.00%, pos 34.5</span></td>
             </tr>
             
 
@@ -158,8 +168,8 @@
               <td><a href="https://globalhomeatlas.com/countries/switzerland-property/">/countries/switzerland-property/</a><span>Switzerland country hub</span></td>
               <td><strong>Submitted and indexed</strong><span>PASS</span></td>
               <td><i class="pill good">Met</i><span>By 2026-06-30</span></td>
-              <td><i class="pill good">Met</i><span>2 impressions by 2026-07-23</span></td>
-              <td>0<span>CTR 0.00%, pos 10.0</span></td>
+              <td><i class="pill good">Met</i><span>1 impressions by 2026-07-23</span></td>
+              <td>0<span>CTR 0.00%, pos 9.0</span></td>
             </tr>
             
 
@@ -167,8 +177,8 @@
               <td><a href="https://globalhomeatlas.com/guides/">/guides/</a><span>Buying guides hub</span></td>
               <td><strong>Submitted and indexed</strong><span>PASS</span></td>
               <td><i class="pill good">Met</i><span>By 2026-06-30</span></td>
-              <td><i class="pill good">Met</i><span>11 impressions by 2026-07-23</span></td>
-              <td>0<span>CTR 0.00%, pos 57.1</span></td>
+              <td><i class="pill good">Met</i><span>3 impressions by 2026-07-23</span></td>
+              <td>0<span>CTR 0.00%, pos 23.3</span></td>
             </tr>
             
 
@@ -176,8 +186,8 @@
               <td><a href="https://globalhomeatlas.com/best-countries-to-buy-property-as-a-foreigner/">/best-countries-to-buy-property-as-a-foreigner/</a><span>Foreign-buyer landing page</span></td>
               <td><strong>Submitted and indexed</strong><span>PASS</span></td>
               <td><i class="pill good">Met</i><span>By 2026-06-30</span></td>
-              <td><i class="pill good">Met</i><span>66 impressions by 2026-07-23</span></td>
-              <td>0<span>CTR 0.00%, pos 58.8</span></td>
+              <td><i class="pill good">Met</i><span>37 impressions by 2026-07-23</span></td>
+              <td>0<span>CTR 0.00%, pos 45.4</span></td>
             </tr>
             
 
@@ -194,8 +204,8 @@
               <td><a href="https://globalhomeatlas.com/best-places-to-buy-a-second-home-abroad/">/best-places-to-buy-a-second-home-abroad/</a><span>Second-home abroad landing page</span></td>
               <td><strong>Submitted and indexed</strong><span>PASS</span></td>
               <td><i class="pill good">Met</i><span>By 2026-06-30</span></td>
-              <td><i class="pill good">Met</i><span>55 impressions by 2026-07-23</span></td>
-              <td>1<span>CTR 1.82%, pos 32.9</span></td>
+              <td><i class="pill good">Met</i><span>38 impressions by 2026-07-23</span></td>
+              <td>0<span>CTR 0.00%, pos 32.4</span></td>
             </tr>
             
 
@@ -203,8 +213,8 @@
               <td><a href="https://globalhomeatlas.com/foreign-property-investment-risks/">/foreign-property-investment-risks/</a><span>Foreign property risks landing page</span></td>
               <td><strong>Submitted and indexed</strong><span>PASS</span></td>
               <td><i class="pill good">Met</i><span>By 2026-06-30</span></td>
-              <td><i class="pill good">Met</i><span>46 impressions by 2026-07-23</span></td>
-              <td>1<span>CTR 2.17%, pos 46.2</span></td>
+              <td><i class="pill good">Met</i><span>32 impressions by 2026-07-23</span></td>
+              <td>1<span>CTR 3.12%, pos 39.8</span></td>
             </tr>
             
 
@@ -212,8 +222,8 @@
               <td><a href="https://globalhomeatlas.com/where-can-foreigners-buy-property/">/where-can-foreigners-buy-property/</a><span>Where foreigners can buy landing page</span></td>
               <td><strong>Submitted and indexed</strong><span>PASS</span></td>
               <td><i class="pill good">Met</i><span>By 2026-06-30</span></td>
-              <td><i class="pill good">Met</i><span>33 impressions by 2026-07-23</span></td>
-              <td>1<span>CTR 3.03%, pos 16.2</span></td>
+              <td><i class="pill good">Met</i><span>22 impressions by 2026-07-23</span></td>
+              <td>0<span>CTR 0.00%, pos 12.0</span></td>
             </tr>
             </tbody>
               </table>
@@ -229,7 +239,7 @@
               <td><a href="https://globalhomeatlas.com/">/</a></td>
               <td>Submitted and indexed</td>
               <td><i class="pill good">PASS</i></td>
-              <td>2026-08-17T05:58:34Z</td>
+              <td>2026-08-02T08:08:32Z</td>
             </tr>
             
 
@@ -389,9 +399,9 @@
             <tr>
               <td>atlas global home</td>
               <td>0</td>
-              <td>4</td>
+              <td>3</td>
               <td>0.00%</td>
-              <td>7.0</td>
+              <td>7.3</td>
             </tr>
             
 
@@ -405,47 +415,47 @@
             
 
             <tr>
-              <td>average house price in queenstown new zealand</td>
+              <td>average house price queenstown new zealand 2026</td>
               <td>0</td>
               <td>1</td>
               <td>0.00%</td>
-              <td>37.0</td>
-            </tr>
-            
-
-            <tr>
-              <td>average house price queenstown</td>
-              <td>0</td>
-              <td>1</td>
-              <td>0.00%</td>
-              <td>28.0</td>
-            </tr>
-            
-
-            <tr>
-              <td>best countries to buy a house</td>
-              <td>0</td>
-              <td>1</td>
-              <td>0.00%</td>
-              <td>76.0</td>
+              <td>18.0</td>
             </tr>
             
 
             <tr>
               <td>best countries to buy property</td>
               <td>0</td>
-              <td>10</td>
+              <td>9</td>
               <td>0.00%</td>
-              <td>75.4</td>
+              <td>68.4</td>
             </tr>
             
 
             <tr>
-              <td>best country to buy a home</td>
+              <td>best country to buy a vacation home</td>
+              <td>0</td>
+              <td>5</td>
+              <td>0.00%</td>
+              <td>26.2</td>
+            </tr>
+            
+
+            <tr>
+              <td>best country to buy property</td>
+              <td>0</td>
+              <td>2</td>
+              <td>0.00%</td>
+              <td>80.0</td>
+            </tr>
+            
+
+            <tr>
+              <td>best country to buy real estate</td>
               <td>0</td>
               <td>1</td>
               <td>0.00%</td>
-              <td>55.0</td>
+              <td>57.0</td>
             </tr>
             </tbody>
               </table>
@@ -460,72 +470,72 @@
             <tr>
               <td>https://globalhomeatlas.com/best-countries-for-expats-to-buy-property/</td>
               <td>1</td>
-              <td>32</td>
-              <td>3.12%</td>
-              <td>31.5</td>
+              <td>38</td>
+              <td>2.63%</td>
+              <td>26.1</td>
             </tr>
             
 
             <tr>
-              <td>https://globalhomeatlas.com/best-places-to-buy-a-second-home-abroad/</td>
+              <td>https://globalhomeatlas.com/best-places-to-buy-property-abroad-for-retirement/</td>
               <td>1</td>
-              <td>55</td>
-              <td>1.82%</td>
-              <td>32.9</td>
+              <td>24</td>
+              <td>4.17%</td>
+              <td>39.8</td>
             </tr>
             
 
             <tr>
               <td>https://globalhomeatlas.com/foreign-property-investment-risks/</td>
               <td>1</td>
-              <td>46</td>
-              <td>2.17%</td>
-              <td>46.2</td>
-            </tr>
-            
-
-            <tr>
-              <td>https://globalhomeatlas.com/where-can-foreigners-buy-property/</td>
-              <td>1</td>
-              <td>33</td>
-              <td>3.03%</td>
-              <td>16.2</td>
+              <td>32</td>
+              <td>3.12%</td>
+              <td>39.8</td>
             </tr>
             
 
             <tr>
               <td>https://globalhomeatlas.com/</td>
               <td>0</td>
-              <td>26</td>
+              <td>31</td>
               <td>0.00%</td>
-              <td>6.3</td>
+              <td>6.9</td>
             </tr>
             
 
             <tr>
               <td>https://globalhomeatlas.com/best-countries-to-buy-property-as-a-foreigner/</td>
               <td>0</td>
-              <td>66</td>
+              <td>37</td>
               <td>0.00%</td>
-              <td>58.8</td>
+              <td>45.4</td>
             </tr>
             
 
             <tr>
-              <td>https://globalhomeatlas.com/best-places-to-buy-property-abroad-for-retirement/</td>
+              <td>https://globalhomeatlas.com/best-places-to-buy-a-second-home-abroad/</td>
               <td>0</td>
-              <td>27</td>
+              <td>38</td>
               <td>0.00%</td>
-              <td>41.7</td>
+              <td>32.4</td>
             </tr>
             
 
             <tr>
               <td>https://globalhomeatlas.com/best-places-to-buy-property-in-europe/</td>
               <td>0</td>
-              <td>53</td>
+              <td>37</td>
               <td>0.00%</td>
-              <td>49.5</td>
+              <td>51.6</td>
+            </tr>
+            
+
+            <tr>
+              <td>https://globalhomeatlas.com/best-places-to-buy-vacation-home-abroad/</td>
+              <td>0</td>
+              <td>27</td>
+              <td>0.00%</td>
+              <td>23.1</td>
             </tr>
             </tbody>
               </table>
@@ -545,7 +555,7 @@
             <h3>Sitemap</h3>
             <p>Submitted reported by Google: <strong>65</strong></p>
             <p>Indexed reported by Google: <strong>0</strong></p>
-            <p>Pending: <strong>True</strong></p>
+            <p>Pending: <strong>False</strong></p>
           </section>
           <section>
             <h3>IndexNow</h3>

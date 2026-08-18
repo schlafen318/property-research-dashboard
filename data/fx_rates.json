@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-06-21",
+  "as_of": "2026-07-22",
   "rates_to_usd": {
     "USD": 1.0,
     "JPY": 0.0061994395724,
@@ -9,7 +9,8 @@
     "CHF": 1.24288,
     "THB": 0.0303905,
     "IDR": 0.000056243,
-    "VND": 0.0000380084
+    "VND": 0.0000380084,
+    "AUD": 0.6997
   },
-  "source_note": "FX rates retrieved during the ChatGPT build conversation. Re-check before investment decisions."
+  "source_note": "Existing rates retain their prior research basis; AUD/USD uses the Reserve Bank of Australia daily rate published for 2026-07-22. Re-check all rates before investment decisions."
 }

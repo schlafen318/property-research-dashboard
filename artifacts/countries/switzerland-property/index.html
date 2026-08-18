@@ -18,7 +18,7 @@
   <meta property="og:url" content="https://globalhomeatlas.com/countries/switzerland-property/">
   <meta name="twitter:card" content="summary_large_image">
 
-  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"CollectionPage","name":"Switzerland Property Guide for Foreign Buyers","url":"https://globalhomeatlas.com/countries/switzerland-property/","description":"Compare Switzerland property options for foreign buyers, including Andermatt, Lake Lugano, Valais, and Vaud across ownership limits, liquidity, lifestyle, and entry price.","dateModified":"2026-08-18","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"},"mainEntity":{"@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"name":"Andermatt","url":"https://globalhomeatlas.com/destinations/andermatt/"},{"@type":"ListItem","position":2,"name":"Ticino / Lake Lugano","url":"https://globalhomeatlas.com/destinations/ticino-lake-lugano/"},{"@type":"ListItem","position":3,"name":"Swiss Valais / Vaud Alps","url":"https://globalhomeatlas.com/destinations/swiss-valais-vaud-alps/"}]}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Home Atlas","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Countries","item":"https://globalhomeatlas.com/guides/"},{"@type":"ListItem","position":3,"name":"Switzerland","item":"https://globalhomeatlas.com/countries/switzerland-property/"}]}]</script>
+  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"CollectionPage","name":"Switzerland Property Guide for Foreign Buyers","url":"https://globalhomeatlas.com/countries/switzerland-property/","description":"Compare Switzerland property options for foreign buyers, including Andermatt, Lake Lugano, Valais, and Vaud across ownership limits, liquidity, lifestyle, and entry price.","dateModified":"2026-08-19","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"},"mainEntity":{"@type":"ItemList","itemListElement":[{"@type":"ListItem","position":1,"name":"Andermatt","url":"https://globalhomeatlas.com/destinations/andermatt/"},{"@type":"ListItem","position":2,"name":"Ticino / Lake Lugano","url":"https://globalhomeatlas.com/destinations/ticino-lake-lugano/"},{"@type":"ListItem","position":3,"name":"Swiss Valais / Vaud Alps","url":"https://globalhomeatlas.com/destinations/swiss-valais-vaud-alps/"}]}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Home Atlas","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Countries","item":"https://globalhomeatlas.com/guides/"},{"@type":"ListItem","position":3,"name":"Switzerland","item":"https://globalhomeatlas.com/countries/switzerland-property/"}]}]</script>
 
   <style>
     :root {
@@ -47,17 +47,21 @@
     a { color: var(--teal); text-underline-offset: 3px; overflow-wrap: anywhere; }
     p, li { line-height: 1.65; }
     .page-shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .access-notice { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--terracotta); background: #f8ebe6; }
+    .access-notice strong { font-size: 14px; }
+    .access-notice p { margin: 4px 0 0; color: #59443d; font-size: 14px; }
     .page-hero {
       color: var(--ink);
       background:
         linear-gradient(90deg, rgba(255, 253, 247, .98) 0 42%, rgba(255, 253, 247, .74) 62%, rgba(199, 211, 194, .28)),
-        url("/assets/destination-dossier-coast.jpg");
+        var(--destination-hero-image, url("/assets/destination-dossier-coast.jpg"));
       background-size: cover;
       background-position: center;
       padding: 18px 0 58px;
     }
     .page-nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 70px; }
-    .page-brand { color: var(--ink); font-weight: 900; text-decoration: none; }
+    .page-brand { display: flex; align-items: center; color: var(--ink); font-weight: 900; text-decoration: none; }
+    .primary-brand-logo { width: 174px; max-width: 48vw; height: auto; display: block; }
     .page-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
     .page-nav-links a { color: rgba(36, 49, 45, .76); text-decoration: none; font-size: 13px; font-weight: 800; }
     .mobile-menu { display: none; position: relative; }
@@ -118,6 +122,7 @@
     .conversion-callout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; background: #eef4ec; }
     .conversion-callout h3 { margin: 0 0 6px; font-size: 22px; line-height: 1.12; }
     .page-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }
+    .destination-layout { grid-template-columns: minmax(0, 1fr); }
     .page-article { display: grid; gap: 24px; min-width: 0; }
     .page-section { min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
     .page-section h2 { margin: 0 0 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 4vw, 38px); line-height: 1.04; }
@@ -241,6 +246,41 @@
     .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
     .decision-panel__facts div { padding: 16px; }
     .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .market-summary {
+      display: grid;
+      grid-template-columns: minmax(220px, .75fr) minmax(0, 1.7fr);
+      gap: 24px;
+      margin-top: 18px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+    .market-summary h2 { margin: 0 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 28px; }
+    .market-summary p { margin: 0; color: #3f4d48; }
+    .market-summary__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; margin: 0; }
+    .market-summary__facts div { min-width: 0; }
+    .market-summary__facts dt { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .market-summary__facts dd { margin: 4px 0 0; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+    .destination-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 20px 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef4ec;
+    }
+    .destination-actions h2 { margin: 0 0 4px; font-size: 21px; }
+    .destination-actions p { margin: 0; color: var(--muted); }
+    .destination-actions nav { display: flex; flex-wrap: wrap; gap: 10px; }
+    .continue-research h2 { margin-bottom: 16px; }
+    .continue-research__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+    .continue-research h3 { margin: 0 0 8px; font-size: 15px; }
+    .continue-research nav { display: grid; gap: 7px; font-size: 14px; }
+    .destination-updated { margin: -8px 0 0; color: var(--muted); font-size: 13px; text-align: right; }
     .query-match-panel {
       display: grid;
       gap: 16px;
@@ -565,8 +605,9 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section, .query-match-panel__grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section, .query-match-panel__grid, .market-summary { grid-template-columns: repeat(2, 1fr); }
       .buyer-next-step__grid, .conversion-callout { grid-template-columns: 1fr; }
+      .continue-research__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .location-map-section .map-context-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 560px) {
@@ -576,7 +617,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li, .buyer-next-step, .buyer-next-step__grid article, .conversion-callout {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .market-summary, .market-summary__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li, .buyer-next-step, .buyer-next-step__grid article, .conversion-callout {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -586,7 +627,9 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list, .query-match-panel__grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .market-summary, .market-summary__facts, .location-map-section, .location-map-section .map-context-list, .query-match-panel__grid { grid-template-columns: 1fr; }
+      .continue-research__grid { grid-template-columns: 1fr; }
+      .destination-actions { align-items: flex-start; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -731,43 +774,36 @@
     <div class="page-shell">
 
       <nav class="page-nav" aria-label="Primary">
-        <a class="page-brand" href="/">Global Home Atlas</a>
+        <a class="page-brand" href="/" aria-label="Global Home Atlas home"><img class="primary-brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="page-nav-links">
-          <a href="/dashboard/#compare">Compare</a>
-          <a href="/guides/">Guides</a>
-          <a href="/#destination-index">Destinations</a>
-          <a href="/countries/spain-property/">Countries</a>
-          <a href="/reports/">Reports</a>
-          <a href="/methodology/">Methodology</a>
-          <a href="/shortlist-review/">Shortlist Review</a>
-          <a href="/contact/">Contact</a>
-
+          <a href="/#market-finder">Find your fit</a>
+<a href="/dashboard/">Destinations</a>
+<a href="/guides/#country-selection">Countries</a>
+<a href="/guides/">Guides</a>
+<a href="/methodology/">Methodology</a>
         </div>
         <details class="mobile-menu">
           <summary>Menu</summary>
           <nav aria-label="Mobile primary">
-            <a href="/dashboard/#compare">Compare</a>
-            <a href="/countries/spain-property/">Countries</a>
-            <a href="/#destination-index">Destinations</a>
-            <a href="/guides/">Guides</a>
-            <a href="/reports/">Reports</a>
-            <a href="/methodology/">Methodology</a>
-            <a href="/shortlist-review/">Shortlist Review</a>
-            <a href="/contact/">Contact</a>
+            <a href="/#market-finder">Find your fit</a>
+<a href="/dashboard/">Destinations</a>
+<a href="/guides/#country-selection">Countries</a>
+<a href="/guides/">Guides</a>
+<a href="/methodology/">Methodology</a>
           </nav>
         </details>
       </nav>
 
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">Switzerland country hub · updated 2026-08-18</p>
+          <p class="page-eyebrow">Switzerland country hub · updated 2026-08-19</p>
           <h1>Switzerland Property Guide for Foreign Buyers</h1>
           <p class="page-lede">Compare Switzerland property options for foreign buyers, including Andermatt, Lake Lugano, Valais, and Vaud across ownership limits, liquidity, lifestyle, and entry price.</p>
 
         </div>
         <aside class="page-hero-card">
-          <span>Markets compared</span><strong>3</strong>
-          <span>Average score</span><strong>3.42/5</strong>
+          <span>Destinations compared</span><strong>3</strong>
+          <span>Average score</span><strong>3.4/5</strong>
           <span>Top match</span><strong>Andermatt</strong>
         </aside>
       </div>
@@ -779,7 +815,7 @@
         <div><span>Country</span><strong>Switzerland</strong></div>
         <div><span>Destinations</span><strong>3</strong></div>
         <div><span>Decision model</span><strong>10 dimensions</strong></div>
-        <div><span>Updated</span><strong>2026-08-18</strong></div>
+        <div><span>Updated</span><strong>2026-08-19</strong></div>
       </section>
       <nav class="sticky-jump" aria-label="Page sections"><a href="#country-thesis">Thesis</a><a href="#buyer-fit">Buyer Fit</a><a href="#premium-brief">Brief</a><a href="#destination-comparison">Compare</a><a href="#risk-posture">Risk</a><a href="#related-guides">Guides</a></nav>
 
@@ -798,7 +834,7 @@
         <div>
           <span>Methodology</span>
           <strong>10-dimension destination score</strong>
-          <p>Markets are compared across lifestyle, access, ownership clarity, regulatory safety, yield realism, capital upside, retirement fit, liquidity, foreigner fit, and value entry.</p>
+          <p>Destinations are compared across lifestyle, access, ownership clarity, regulatory safety, yield realism, capital upside, retirement fit, liquidity, foreigner fit, and value entry.</p>
         </div>
         <div>
           <span>Research standard</span>
@@ -828,7 +864,7 @@
           <article>
             <span>Compare</span>
             <strong>Destination evidence</strong>
-            <p>Open the dashboard to compare Switzerland markets against the wider Atlas model.</p>
+            <p>Open the dashboard to compare Switzerland destinations against the wider Atlas model.</p>
             <a href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="Switzerland buyer next step">Open dashboard</a>
           </article>
           <article>
@@ -893,32 +929,32 @@
       <div class="cluster-map" aria-label="Destination cluster visual">
         <div class="cluster-map__grid">
         <div>
-          <span>#24</span>
+          <span>#29</span>
           <strong>Andermatt</strong>
-          <em>3.55/5</em>
+          <em>3.5/5</em>
         </div>
 
         <div>
-          <span>#28</span>
+          <span>#35</span>
           <strong>Ticino / Lake Lugano</strong>
-          <em>3.41/5</em>
+          <em>3.4/5</em>
         </div>
 
         <div>
-          <span>#30</span>
+          <span>#36</span>
           <strong>Swiss Valais / Vaud Alps</strong>
-          <em>3.30/5</em>
+          <em>3.3/5</em>
         </div></div>
       </div>
 
             <div class="mobile-comparison-cards" aria-label="Mobile destination comparison">
             <article class="comparison-card">
               <div class="comparison-card__head">
-                <span>#24</span>
+                <span>#29</span>
                 <h3><a href="/destinations/andermatt/">Andermatt</a></h3>
               </div>
               <dl>
-                <div><dt>Score</dt><dd>3.55/5</dd></div>
+                <div><dt>Score</dt><dd>3.5/5</dd></div>
                 <div><dt>Ownership</dt><dd>4.1/5</dd></div>
                 <div><dt>Retirement</dt><dd>4.6/5</dd></div>
                 <div><dt>Exit</dt><dd>3.7/5</dd></div>
@@ -927,11 +963,11 @@
             </article>
             <article class="comparison-card">
               <div class="comparison-card__head">
-                <span>#28</span>
+                <span>#35</span>
                 <h3><a href="/destinations/ticino-lake-lugano/">Ticino / Lake Lugano</a></h3>
               </div>
               <dl>
-                <div><dt>Score</dt><dd>3.41/5</dd></div>
+                <div><dt>Score</dt><dd>3.4/5</dd></div>
                 <div><dt>Ownership</dt><dd>2.8/5</dd></div>
                 <div><dt>Retirement</dt><dd>4.8/5</dd></div>
                 <div><dt>Exit</dt><dd>3.7/5</dd></div>
@@ -940,11 +976,11 @@
             </article>
             <article class="comparison-card">
               <div class="comparison-card__head">
-                <span>#30</span>
+                <span>#36</span>
                 <h3><a href="/destinations/swiss-valais-vaud-alps/">Swiss Valais / Vaud Alps</a></h3>
               </div>
               <dl>
-                <div><dt>Score</dt><dd>3.30/5</dd></div>
+                <div><dt>Score</dt><dd>3.3/5</dd></div>
                 <div><dt>Ownership</dt><dd>2.6/5</dd></div>
                 <div><dt>Retirement</dt><dd>4.8/5</dd></div>
                 <div><dt>Exit</dt><dd>3.7/5</dd></div>
@@ -967,7 +1003,7 @@
           <tbody>
             <tr>
               <td><strong><a href="/destinations/andermatt/">Andermatt</a></strong><br><span>Mountain</span></td>
-              <td>3.55/5</td>
+              <td>3.5/5</td>
               <td>4.1/5</td>
               <td>4.6/5</td>
               <td>3.7/5</td>
@@ -975,7 +1011,7 @@
             </tr>
             <tr>
               <td><strong><a href="/destinations/ticino-lake-lugano/">Ticino / Lake Lugano</a></strong><br><span>Mountain + Water</span></td>
-              <td>3.41/5</td>
+              <td>3.4/5</td>
               <td>2.8/5</td>
               <td>4.8/5</td>
               <td>3.7/5</td>
@@ -983,7 +1019,7 @@
             </tr>
             <tr>
               <td><strong><a href="/destinations/swiss-valais-vaud-alps/">Swiss Valais / Vaud Alps</a></strong><br><span>Mountain</span></td>
-              <td>3.30/5</td>
+              <td>3.3/5</td>
               <td>2.6/5</td>
               <td>4.8/5</td>
               <td>3.7/5</td>
@@ -1014,7 +1050,7 @@
           <summary>More resources</summary>
           <section class="page-aside-card">
             <h2>Use the Atlas</h2>
-            <p>Compare these markets against the full destination model and export a shortlist memo.</p>
+              <p>Compare these destinations against the full destination model and export a shortlist memo.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="Switzerland country hub">Open dashboard</a>
             <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="Switzerland country hub">Review my shortlist</a>
           </section>
