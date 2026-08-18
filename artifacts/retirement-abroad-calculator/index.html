@@ -1,0 +1,479 @@
+<!doctype html>
+<html lang="en">
+<head>
+
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
+  <link rel="manifest" href="/assets/site.webmanifest">
+  <title>Retirement Abroad Calculator: How Much Do You Need? | Global Home Atlas</title>
+  <meta name="description" content="Estimate how much you need to retire abroad, including destination living costs, inflation, pension and passive income, property costs, and required portfolio capital.">
+  <link rel="canonical" href="https://globalhomeatlas.com/retirement-abroad-calculator/">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Global Home Atlas">
+  <meta property="og:title" content="Retirement Abroad Calculator: How Much Do You Need? | Global Home Atlas">
+  <meta property="og:description" content="Estimate how much you need to retire abroad, including destination living costs, inflation, pension and passive income, property costs, and required portfolio capital.">
+  <meta property="og:url" content="https://globalhomeatlas.com/retirement-abroad-calculator/">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"WebPage","name":"Retirement Abroad Calculator","description":"Estimate how much you need to retire abroad, including destination living costs, inflation, pension and passive income, property costs, and required portfolio capital.","url":"https://globalhomeatlas.com/retirement-abroad-calculator/"},{"@context":"https://schema.org","@type":"WebApplication","name":"Retirement Abroad Calculator","url":"https://globalhomeatlas.com/retirement-abroad-calculator/","applicationCategory":"FinanceApplication","operatingSystem":"Any","isAccessibleForFree":true,"description":"Estimate how much you need to retire abroad, including destination living costs, inflation, pension and passive income, property costs, and required portfolio capital."},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Retirement Abroad Calculator","item":"https://globalhomeatlas.com/retirement-abroad-calculator/"}]},{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[{"@type":"Question","name":"How much do I need to retire abroad?","acceptedAnswer":{"@type":"Answer","text":"The answer depends on your destination, household, housing plan, retirement date, reliable outside income, and planning horizon. This calculator estimates annual spending first, then separates the liquid portfolio, property capital, and emergency reserve required."}},{"@type":"Question","name":"How does the calculator handle inflation?","acceptedAnswer":{"@type":"Answer","text":"It projects each expense from today's dollars to the first retirement year. Healthcare and property-related costs can use different assumptions from general living costs, while indexed income rises with inflation and fixed income does not."}},{"@type":"Question","name":"How are pensions and passive income treated?","acceptedAnswer":{"@type":"Answer","text":"After-tax pensions, annuities, existing net rental income, and other reliable non-portfolio income reduce the first-year funding gap. Each stream can be treated as inflation-linked or fixed."}},{"@type":"Question","name":"Does the result include buying a retirement property?","acceptedAnswer":{"@type":"Answer","text":"Yes, when you choose buy at retirement. Projected purchase price and acquisition costs appear separately from the liquid portfolio. Rent and already-own scenarios include recurring housing costs without adding a new purchase."}},{"@type":"Question","name":"Why are portfolio dividends and interest not subtracted as passive income?","acceptedAnswer":{"@type":"Answer","text":"Portfolio dividends and interest are part of the portfolio's total return and withdrawal, not outside income. Counting them separately would understate the portfolio required. The result shows an illustrative cash-income and asset-sale split without double-counting it."}}]}]</script>
+
+  <style>
+    :root { color: #24312d; background: #f5f1e9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#24312d; --muted:#66736c; --line:#d8d1c4; --paper:#fffdf7; --green:#315e50; }
+    * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
+    .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; } .calc-nav { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:18px 0; border-bottom:1px solid rgba(255,255,255,.18); } .calc-brand { color:#fff; text-decoration:none; font-weight:900; } .calc-nav-links { display:flex; flex-wrap:wrap; gap:16px; } .calc-nav-links a { color:#f5f1e9; text-decoration:none; font-size:14px; }
+    .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; }
+    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
+    .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-total { font-family:Georgia,serif; font-size:clamp(38px,6vw,58px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:20px 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
+    .content-section { padding:34px 0; border-top:1px solid var(--line); } .table-wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; background:var(--paper); } th,td { text-align:left; padding:12px; border-bottom:1px solid var(--line); white-space:nowrap; } th { white-space:normal; } .scenario-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; } .scenario-grid article { border-left:3px solid #bfa45f; padding-left:14px; } .faq details { padding:14px 0; border-bottom:1px solid var(--line); } .related { display:flex; flex-wrap:wrap; gap:16px; } footer { padding:30px 0; background:#243f37; color:#e2e8e4; } footer a { color:#fff; }
+    @media(max-width:780px) { .calculator-layout { grid-template-columns:1fr; } .result-panel { position:static; } .calc-nav-links { display:none; } .scenario-grid { grid-template-columns:1fr; } }
+    @media(max-width:520px) { .calc-shell { width:min(100% - 22px,1120px); } .field-grid,.result-grid { grid-template-columns:1fr; } h1 { overflow-wrap:anywhere; } th,td { padding:10px 8px; font-size:13px; } }
+  </style>
+</head>
+<body>
+  <header class="calc-hero"><div class="calc-shell">
+    <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/guides/">Guides</a><a href="/#destination-index">Destinations</a><a href="/methodology/">Methodology</a><a href="/shortlist-review/">Shortlist Review</a></div></nav>
+    <p class="eyebrow">International retirement planning tool</p><h1>Retirement Abroad Calculator</h1>
+    <p class="lede">Estimate comfortable destination spending in today's dollars, project it to retirement, subtract reliable pension and non-portfolio income, and separate the liquid portfolio, property capital, and reserve you may need.</p>
+  </div></header>
+  <main><div class="calc-shell">
+    <section class="calculator-layout" aria-label="Retirement calculator">
+      <form class="calc-panel" id="retirement-calculator" novalidate>
+        <fieldset><legend>Your retirement</legend><div class="field-grid">
+          <div class="field"><label for="ret-current-age">Current age</label><input id="ret-current-age" type="number" min="18" max="99" value="50" required></div>
+          <div class="field"><label for="ret-retirement-age">Planned retirement age</label><input id="ret-retirement-age" type="number" min="19" max="100" value="60" required></div>
+          <div class="field"><label for="ret-household">Household</label><select id="ret-household"><option value="single">Single retiree</option><option value="couple" selected>Retired couple</option></select></div>
+          <div class="field"><label for="ret-horizon">Retirement horizon (years)</label><input id="ret-horizon" type="number" min="1" max="60" value="30"></div>
+        </div></fieldset>
+        <fieldset><legend>Destination and housing</legend><div class="field-grid">
+          <div class="field"><label for="ret-destination">Destination</label><select id="ret-destination"><option value="fukuoka-itoshima">Fukuoka / Itoshima</option><option value="valencia">Valencia</option><option value="algarve-cascais">Algarve / Cascais</option><option value="madeira">Madeira</option><option value="crete">Crete</option><option value="hakone-izu">Hakone / Izu</option><option value="lake-como">Lake Como</option><option value="m-laga-costa-del-sol">Málaga / Costa del Sol</option></select></div>
+          <div class="field"><label for="ret-housing-plan">Housing plan</label><select id="ret-housing-plan"><option value="rent">Rent</option><option value="own">Already own</option><option value="buy" selected>Buy at retirement</option></select></div>
+          <div class="field"><label for="ret-spending">Annual spending today (USD)</label><input id="ret-spending" type="number" min="0" step="100" value="0"><p class="hint">Editable comfortable-lifestyle benchmark, including housing.</p></div>
+        </div></fieldset>
+        <fieldset><legend>Reliable after-tax income</legend><p class="hint">Use net amounts expected to continue in retirement. Do not include dividends from the portfolio being calculated.</p><div class="field-grid">
+          <div class="field"><label for="ret-pension">Annual pension (USD)</label><input id="ret-pension" type="number" min="0" step="100" value="24000"><label class="check"><input id="ret-pension-indexed" type="checkbox" checked> Inflation-linked</label></div>
+          <div class="field"><label for="ret-other-income">Other non-portfolio income (USD)</label><input id="ret-other-income" type="number" min="0" step="100" value="18000"><label class="check"><input id="ret-other-indexed" type="checkbox"> Inflation-linked</label></div>
+          <div class="field"><label for="ret-rental-income">Destination net rental income (USD)</label><input id="ret-rental-income" type="number" min="0" step="100" value="0"><label class="check"><input id="ret-rental-indexed" type="checkbox"> Inflation-linked</label></div>
+        </div></fieldset>
+        <fieldset><legend>Portfolio income illustration</legend><label for="ret-income-preset">Portfolio style</label><select id="ret-income-preset"><option value="income">Income-focused</option><option value="balanced" selected>Balanced</option><option value="growth">Growth-focused</option></select><p class="hint">Illustrates cash yield versus asset sales only. It does not change required portfolio capital.</p></fieldset>
+        <details class="assumptions"><summary>Advanced assumptions</summary><div class="field-grid">
+          <div class="field"><label for="ret-general-inflation">General inflation (%)</label><input id="ret-general-inflation" type="number" min="0" max="15" step="0.1"></div>
+          <div class="field"><label for="ret-healthcare-inflation">Healthcare inflation (%)</label><input id="ret-healthcare-inflation" type="number" min="0" max="15" step="0.1"></div>
+          <div class="field"><label for="ret-property-inflation">Property inflation (%)</label><input id="ret-property-inflation" type="number" min="0" max="15" step="0.1"></div>
+          <div class="field"><label for="ret-withdrawal-rate">Withdrawal rate override (%)</label><input id="ret-withdrawal-rate" type="number" min="3" max="4" step="0.05" placeholder="Guided by horizon"></div>
+          <div class="field"><label for="ret-cash-yield">Portfolio cash yield (%)</label><input id="ret-cash-yield" type="number" min="0" max="15" step="0.1" value="2"></div>
+          <div class="field"><label for="ret-reserve-months">Emergency reserve (months)</label><input id="ret-reserve-months" type="number" min="0" max="36" step="1" value="12"></div>
+        </div></details>
+        <div id="ret-errors" role="alert" tabindex="-1"></div><button class="primary" id="ret-calculate" type="submit">Calculate retirement capital</button>
+      </form>
+      <section class="calc-panel result-panel" id="ret-results" aria-live="polite" aria-atomic="true">
+        <h2>Your planning estimate</h2><p class="hint" id="ret-result-status">Complete the inputs and calculate.</p>
+        <div class="result-total" id="ret-total-capital">—</div><p>Combined capital in retirement-year USD</p>
+        <div class="result-grid"><div><span>Liquid portfolio</span><strong id="ret-liquid-portfolio">—</strong></div><div><span>Property capital</span><strong id="ret-property-capital">—</strong></div><div><span>Emergency reserve</span><strong id="ret-emergency-reserve">—</strong></div><div><span>Today's-dollar total</span><strong id="ret-today-total">—</strong></div><div><span>First-year spending</span><strong id="ret-first-expenses">—</strong></div><div><span>Outside income</span><strong id="ret-outside-income">—</strong></div><div><span>Funding gap</span><strong id="ret-funding-gap">—</strong></div><div><span>Planning withdrawal rate</span><strong id="ret-result-rate">—</strong></div><div><span>Portfolio cash income</span><strong id="ret-cash-income">—</strong></div><div><span>Illustrative asset sales</span><strong id="ret-asset-sales">—</strong></div></div>
+        <p class="hint" id="ret-result-assumptions">Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.</p>
+      </section>
+    </section>
+    <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> The benchmark and methodology below remain available, and you can use them as a starting point for adviser review.</p></noscript>
+    <section id="benchmarks" class="content-section"><h2>Retirement cost benchmarks by destination</h2><p>Comfortable but not luxury annual spending in today's USD, including rent. Edit the calculator benchmark to fit your own expected retirement expenses.</p><div class="table-wrap"><table><thead><tr><th>Destination</th><th>Single annual benchmark</th><th>Couple annual benchmark</th><th>Data confidence</th></tr></thead><tbody><tr><th scope="row">Fukuoka / Itoshima</th><td>$43,600</td><td>$66,200</td><td>medium-high</td></tr><tr><th scope="row">Valencia</th><td>$53,400</td><td>$79,800</td><td>medium-high</td></tr><tr><th scope="row">Algarve / Cascais</th><td>$52,700</td><td>$81,000</td><td>medium</td></tr><tr><th scope="row">Madeira</th><td>$55,600</td><td>$83,000</td><td>medium</td></tr><tr><th scope="row">Crete</th><td>$47,500</td><td>$72,800</td><td>medium</td></tr><tr><th scope="row">Hakone / Izu</th><td>$43,800</td><td>$67,100</td><td>medium</td></tr><tr><th scope="row">Lake Como</th><td>$57,700</td><td>$89,100</td><td>medium</td></tr><tr><th scope="row">Málaga / Costa del Sol</th><td>$54,100</td><td>$81,100</td><td>medium-high</td></tr></tbody></table></div></section>
+    <section class="content-section"><h2>How housing changes the answer</h2><div class="scenario-grid"><article><h3>Rent</h3><p>Includes recurring rent and omits acquisition capital.</p></article><article><h3>Already own</h3><p>Includes estimated owner costs and no new purchase.</p></article><article><h3>Buy at retirement</h3><p>Includes owner costs plus projected property price and acquisition costs as separate capital.</p></article></div></section>
+    <section id="methodology" class="content-section"><h2>How the calculation works</h2><p>Expenses are entered in today's money and projected category by category. Healthcare and housing can use different inflation rates. Indexed reliable income rises with inflation; fixed income remains nominal. The calculator subtracts outside income from first-year retirement spending, floors the funding gap at zero, and divides that gap by a guided 3.0%–4.0% withdrawal rate.</p><p><strong>Portfolio dividends and interest</strong> are part of the portfolio withdrawal, not a separate outside-income deduction. The cash-income and asset-sale figures explain the same withdrawal and are not added twice.</p><p>Property capital and an emergency reserve remain separate from the liquid portfolio. Exchange rates establish a current comparison baseline and are not forecasts.</p><h3>Sources and confidence</h3><p>Data reviewed 2026-08-18. Destination observations and documented country-level proxies are planning inputs, not precise quotes.</p><ul><li><a href="https://www.numbeo.com/cost-of-living/in/Fukuoka" rel="nofollow noopener">Fukuoka / Itoshima cost evidence</a> (May 2026) · medium-high confidence</li><li><a href="https://www.numbeo.com/cost-of-living/in/Valencia" rel="nofollow noopener">Valencia cost evidence</a> (July 2026) · medium-high confidence</li><li><a href="https://www.numbeo.com/cost-of-living/in/Algarve" rel="nofollow noopener">Algarve / Cascais cost evidence</a> (June 2026) · medium confidence</li><li><a href="https://www.numbeo.com/cost-of-living/in/Funchal" rel="nofollow noopener">Madeira cost evidence</a> (May 2026) · medium confidence</li><li><a href="https://www.numbeo.com/cost-of-living/in/Heraklion" rel="nofollow noopener">Crete cost evidence</a> (May 2026) · medium confidence</li><li><a href="https://www.numbeo.com/cost-of-living/country_result.jsp?country=Japan" rel="nofollow noopener">Hakone / Izu cost evidence</a> (June 2026) · medium confidence</li><li><a href="https://www.numbeo.com/cost-of-living/in/Como" rel="nofollow noopener">Lake Como cost evidence</a> (June 2026) · medium confidence</li><li><a href="https://www.numbeo.com/cost-of-living/in/Malaga" rel="nofollow noopener">Málaga / Costa del Sol cost evidence</a> (May 2026) · medium-high confidence</li></ul></section>
+    <section class="content-section"><h2>Related retirement research</h2><div class="related"><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Buying property abroad for retirement</a><a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Best places to buy abroad for retirement</a><a href="/methodology/">Research methodology</a><a href="/shortlist-review/" data-track="shortlist_review_click">Request a shortlist review</a></div></section>
+    <section class="content-section faq"><h2>Frequently asked questions</h2><details><summary>How much do I need to retire abroad?</summary><p>The answer depends on your destination, household, housing plan, retirement date, reliable outside income, and planning horizon. This calculator estimates annual spending first, then separates the liquid portfolio, property capital, and emergency reserve required.</p></details>
+<details><summary>How does the calculator handle inflation?</summary><p>It projects each expense from today&#x27;s dollars to the first retirement year. Healthcare and property-related costs can use different assumptions from general living costs, while indexed income rises with inflation and fixed income does not.</p></details>
+<details><summary>How are pensions and passive income treated?</summary><p>After-tax pensions, annuities, existing net rental income, and other reliable non-portfolio income reduce the first-year funding gap. Each stream can be treated as inflation-linked or fixed.</p></details>
+<details><summary>Does the result include buying a retirement property?</summary><p>Yes, when you choose buy at retirement. Projected purchase price and acquisition costs appear separately from the liquid portfolio. Rent and already-own scenarios include recurring housing costs without adding a new purchase.</p></details>
+<details><summary>Why are portfolio dividends and interest not subtracted as passive income?</summary><p>Portfolio dividends and interest are part of the portfolio&#x27;s total return and withdrawal, not outside income. Counting them separately would understate the portfolio required. The result shows an illustrative cash-income and asset-sale split without double-counting it.</p></details></section>
+  </div></main>
+  <footer><div class="calc-shell">Global Home Atlas · Research for overseas property and long-stay decisions · <a href="/contact/">Contact</a></div></footer>
+  <script id="retirement-destination-data" type="application/json">{"as_of":"2026-08-18","currency":"USD","destinations":[{"destination_id":"fukuoka-itoshima","display_currency":"JPY","fx_to_usd":0.006199,"inflation":{"general":0.02,"healthcare":0.035,"property":0.02},"profiles":{"single":{"categories_usd":{"food_household":7200,"utilities_communications":3600,"private_healthcare":3000,"transport":3600,"dining_leisure":6000,"travel":6000,"visa_admin":1000,"contingency":3600},"annual_rent_usd":9600,"annual_owner_costs_usd":5000},"couple":{"categories_usd":{"food_household":10800,"utilities_communications":4200,"private_healthcare":6000,"transport":4800,"dining_leisure":9000,"travel":9000,"visa_admin":1400,"contingency":5400},"annual_rent_usd":15600,"annual_owner_costs_usd":5000}},"property":{"representative_price_usd":216360,"acquisition_cost_rate":0.08,"price_basis":"Median of three representative Fukuoka / Itoshima listing snapshots captured by Global Home Atlas."},"confidence":{"overall":"medium-high","proxy_categories":["private_healthcare","visa_admin","inflation"]},"sources":[{"name":"Numbeo — Fukuoka cost of living","url":"https://www.numbeo.com/cost-of-living/in/Fukuoka","metric_supported":"Rent, utilities, transport, dining and local cost benchmarks","source_date":"May 2026","accessed_on":"2026-08-18","notes":"City-level crowdsourced observations; Itoshima housing may differ."},{"name":"Statistics Bureau of Japan — Consumer Price Index","url":"https://www.stat.go.jp/english/data/cpi/index.html","metric_supported":"General inflation assumption","source_date":"2026","accessed_on":"2026-08-18","notes":"National proxy used for scenario inflation, not a forecast."},{"name":"RealEstate.co.jp — Itoshima properties","url":"https://realestate.co.jp/en/forsale/fukuoka/itoshima-shi","metric_supported":"Representative property acquisition benchmark","source_date":"2026","accessed_on":"2026-08-18","notes":"Listing evidence changes; verify before underwriting."}],"name":"Fukuoka / Itoshima"},{"destination_id":"valencia","display_currency":"EUR","fx_to_usd":1.14784,"inflation":{"general":0.025,"healthcare":0.045,"property":0.025},"profiles":{"single":{"categories_usd":{"food_household":7200,"utilities_communications":3000,"private_healthcare":3600,"transport":3600,"dining_leisure":7200,"travel":7200,"visa_admin":1200,"contingency":4200},"annual_rent_usd":16200,"annual_owner_costs_usd":8500},"couple":{"categories_usd":{"food_household":10800,"utilities_communications":3600,"private_healthcare":7200,"transport":4800,"dining_leisure":10800,"travel":10800,"visa_admin":1600,"contingency":6200},"annual_rent_usd":24000,"annual_owner_costs_usd":8500}},"property":{"representative_price_usd":457988,"acquisition_cost_rate":0.12,"price_basis":"Median of three representative Valencia listing snapshots captured by Global Home Atlas."},"confidence":{"overall":"medium-high","proxy_categories":["private_healthcare","visa_admin","inflation"]},"sources":[{"name":"Numbeo — Valencia cost of living","url":"https://www.numbeo.com/cost-of-living/in/Valencia","metric_supported":"Rent, groceries, utilities, transport and dining benchmarks","source_date":"July 2026","accessed_on":"2026-08-18","notes":"City-level crowdsourced observations."},{"name":"Spain National Statistics Institute — CPI","url":"https://www.ine.es/en/index.htm","metric_supported":"General inflation assumption","source_date":"2026","accessed_on":"2026-08-18","notes":"National proxy used for scenario inflation, not a forecast."},{"name":"HomeEspaña — Valencia property","url":"https://www.homeespana.com/property-for-sale/valencia/","metric_supported":"Representative property acquisition benchmark","source_date":"2026","accessed_on":"2026-08-18","notes":"Listing evidence changes; verify before underwriting."}],"name":"Valencia"},{"destination_id":"algarve-cascais","display_currency":"EUR","fx_to_usd":1.14784,"inflation":{"general":0.025,"healthcare":0.045,"property":0.03},"profiles":{"single":{"categories_usd":{"food_household":6900,"utilities_communications":3100,"private_healthcare":3600,"transport":4800,"dining_leisure":7200,"travel":7200,"visa_admin":1200,"contingency":4200},"annual_rent_usd":14500,"annual_owner_costs_usd":18000},"couple":{"categories_usd":{"food_household":10400,"utilities_communications":3700,"private_healthcare":7200,"transport":7200,"dining_leisure":10800,"travel":10800,"visa_admin":1600,"contingency":6300},"annual_rent_usd":23000,"annual_owner_costs_usd":18000}},"property":{"representative_price_usd":1136362,"acquisition_cost_rate":0.09,"price_basis":"Median of three representative Algarve / Cascais listing snapshots captured by Global Home Atlas."},"confidence":{"overall":"medium","proxy_categories":["private_healthcare","visa_admin","inflation","owner_costs"]},"sources":[{"name":"Numbeo — Algarve cost of living","url":"https://www.numbeo.com/cost-of-living/in/Algarve","metric_supported":"Algarve rent and local cost benchmarks","source_date":"June 2026","accessed_on":"2026-08-18","notes":"Regional crowdsourced observations; Cascais is generally more expensive."},{"name":"Statistics Portugal — CPI","url":"https://www.ine.pt/xportal/xmain?xpgid=ine_main&xpid=INE&xlang=en","metric_supported":"General inflation assumption","source_date":"2026","accessed_on":"2026-08-18","notes":"National proxy used for scenario inflation, not a forecast."},{"name":"Idealista — Algarve property","url":"https://www.idealista.pt/en/geo/comprar-casas/algarve/","metric_supported":"Representative property acquisition benchmark","source_date":"2026","accessed_on":"2026-08-18","notes":"Mixes submarkets; verify property-specific costs."}],"name":"Algarve / Cascais"},{"destination_id":"madeira","display_currency":"EUR","fx_to_usd":1.14784,"inflation":{"general":0.025,"healthcare":0.045,"property":0.03},"profiles":{"single":{"categories_usd":{"food_household":6600,"utilities_communications":3000,"private_healthcare":3600,"transport":5400,"dining_leisure":6600,"travel":7200,"visa_admin":1200,"contingency":4000},"annual_rent_usd":18000,"annual_owner_costs_usd":13000},"couple":{"categories_usd":{"food_household":9800,"utilities_communications":3600,"private_healthcare":7200,"transport":7200,"dining_leisure":9800,"travel":10800,"visa_admin":1600,"contingency":6000},"annual_rent_usd":27000,"annual_owner_costs_usd":13000}},"property":{"representative_price_usd":803488,"acquisition_cost_rate":0.09,"price_basis":"Median of three representative Madeira listing snapshots captured by Global Home Atlas."},"confidence":{"overall":"medium","proxy_categories":["private_healthcare","visa_admin","inflation","owner_costs"]},"sources":[{"name":"Numbeo — Funchal cost of living","url":"https://www.numbeo.com/cost-of-living/in/Funchal","metric_supported":"Rent, groceries, utilities, transport and dining benchmarks","source_date":"May 2026","accessed_on":"2026-08-18","notes":"City-level crowdsourced observations; island micro-markets vary."},{"name":"Statistics Portugal — CPI","url":"https://www.ine.pt/xportal/xmain?xpgid=ine_main&xpid=INE&xlang=en","metric_supported":"General inflation assumption","source_date":"2026","accessed_on":"2026-08-18","notes":"National proxy used for scenario inflation, not a forecast."},{"name":"Mer et Demeures — Madeira property","url":"https://www.meretdemeures.com/en/property/europe/portugal/madeira/sea%2Bview-property-for%2Bsale-funchal/","metric_supported":"Representative property acquisition benchmark","source_date":"2026","accessed_on":"2026-08-18","notes":"Lifestyle listing evidence; verify current availability."}],"name":"Madeira"},{"destination_id":"crete","display_currency":"EUR","fx_to_usd":1.14784,"inflation":{"general":0.03,"healthcare":0.05,"property":0.03},"profiles":{"single":{"categories_usd":{"food_household":6500,"utilities_communications":3400,"private_healthcare":4200,"transport":5400,"dining_leisure":6600,"travel":7200,"visa_admin":1200,"contingency":4000},"annual_rent_usd":9000,"annual_owner_costs_usd":22000},"couple":{"categories_usd":{"food_household":9800,"utilities_communications":4200,"private_healthcare":8400,"transport":7200,"dining_leisure":9800,"travel":10800,"visa_admin":1600,"contingency":6000},"annual_rent_usd":15000,"annual_owner_costs_usd":22000}},"property":{"representative_price_usd":1687325,"acquisition_cost_rate":0.1,"price_basis":"Median of three representative Crete listing snapshots captured by Global Home Atlas; this sample skews toward villas and hospitality property."},"confidence":{"overall":"medium","proxy_categories":["private_healthcare","visa_admin","inflation","owner_costs","property"]},"sources":[{"name":"Numbeo — Heraklion cost of living","url":"https://www.numbeo.com/cost-of-living/in/Heraklion","metric_supported":"Crete urban rent and local cost proxy","source_date":"May 2026","accessed_on":"2026-08-18","notes":"Heraklion proxy; resort and rural costs vary materially."},{"name":"Hellenic Statistical Authority — CPI","url":"https://www.statistics.gr/en/statistics/-/publication/DKT87/-","metric_supported":"General inflation assumption","source_date":"2026","accessed_on":"2026-08-18","notes":"National proxy used for scenario inflation, not a forecast."},{"name":"Crete Island Real Estate","url":"https://crete-island.net/","metric_supported":"Representative property acquisition benchmark","source_date":"2026","accessed_on":"2026-08-18","notes":"Listing sample is not a market median."}],"name":"Crete"},{"destination_id":"hakone-izu","display_currency":"JPY","fx_to_usd":0.006199,"inflation":{"general":0.02,"healthcare":0.035,"property":0.02},"profiles":{"single":{"categories_usd":{"food_household":6600,"utilities_communications":3600,"private_healthcare":3600,"transport":6000,"dining_leisure":4800,"travel":6000,"visa_admin":1200,"contingency":3600},"annual_rent_usd":8400,"annual_owner_costs_usd":3500},"couple":{"categories_usd":{"food_household":10000,"utilities_communications":4200,"private_healthcare":7200,"transport":8400,"dining_leisure":7200,"travel":9000,"visa_admin":1600,"contingency":5500},"annual_rent_usd":14000,"annual_owner_costs_usd":3500}},"property":{"representative_price_usd":48356,"acquisition_cost_rate":0.08,"price_basis":"Median of three representative Izu akiya listing snapshots captured by Global Home Atlas; renovation risk is not included."},"confidence":{"overall":"medium","proxy_categories":["food_household","utilities_communications","private_healthcare","dining_leisure","rent","visa_admin","inflation","property"]},"sources":[{"name":"Numbeo — Japan cost of living","url":"https://www.numbeo.com/cost-of-living/country_result.jsp?country=Japan","metric_supported":"National cost and rent proxy for Hakone / Izu","source_date":"June 2026","accessed_on":"2026-08-18","notes":"Destination-level observations are thin; transport allowance is increased for car dependence."},{"name":"Statistics Bureau of Japan — Consumer Price Index","url":"https://www.stat.go.jp/english/data/cpi/index.html","metric_supported":"General inflation assumption","source_date":"2026","accessed_on":"2026-08-18","notes":"National proxy used for scenario inflation, not a forecast."},{"name":"Akiya Japan — Izu","url":"https://www.akiyajapan.com/city/izu-7","metric_supported":"Representative property acquisition benchmark","source_date":"2026","accessed_on":"2026-08-18","notes":"Low purchase price may imply renovation, access and liquidity costs."}],"name":"Hakone / Izu"},{"destination_id":"lake-como","display_currency":"EUR","fx_to_usd":1.14784,"inflation":{"general":0.02,"healthcare":0.045,"property":0.02},"profiles":{"single":{"categories_usd":{"food_household":8000,"utilities_communications":3600,"private_healthcare":4800,"transport":5400,"dining_leisure":9000,"travel":8400,"visa_admin":1200,"contingency":4800},"annual_rent_usd":12500,"annual_owner_costs_usd":10000},"couple":{"categories_usd":{"food_household":12000,"utilities_communications":4400,"private_healthcare":9600,"transport":7200,"dining_leisure":13500,"travel":12600,"visa_admin":1600,"contingency":7200},"annual_rent_usd":21000,"annual_owner_costs_usd":10000}},"property":{"representative_price_usd":596877,"acquisition_cost_rate":0.12,"price_basis":"Median of three representative Lake Como listing snapshots captured by Global Home Atlas."},"confidence":{"overall":"medium","proxy_categories":["private_healthcare","visa_admin","inflation","owner_costs"]},"sources":[{"name":"Numbeo — Como cost of living","url":"https://www.numbeo.com/cost-of-living/in/Como","metric_supported":"Rent, groceries, utilities, transport and dining benchmarks","source_date":"June 2026","accessed_on":"2026-08-18","notes":"Como city observations; prime lake villages vary materially."},{"name":"Italian National Institute of Statistics — Consumer prices","url":"https://www.istat.it/en/price/","metric_supported":"General inflation assumption","source_date":"2026","accessed_on":"2026-08-18","notes":"National proxy used for scenario inflation, not a forecast."},{"name":"Lake Como Properties","url":"https://lake-como-properties.com/","metric_supported":"Representative property acquisition benchmark","source_date":"2026","accessed_on":"2026-08-18","notes":"Listing evidence changes; verify property condition and local taxes."}],"name":"Lake Como"},{"destination_id":"m-laga-costa-del-sol","display_currency":"EUR","fx_to_usd":1.14784,"inflation":{"general":0.025,"healthcare":0.045,"property":0.025},"profiles":{"single":{"categories_usd":{"food_household":7000,"utilities_communications":3000,"private_healthcare":3600,"transport":4200,"dining_leisure":7200,"travel":7200,"visa_admin":1200,"contingency":4400},"annual_rent_usd":16300,"annual_owner_costs_usd":12000},"couple":{"categories_usd":{"food_household":10500,"utilities_communications":3600,"private_healthcare":7200,"transport":6000,"dining_leisure":10800,"travel":10800,"visa_admin":1600,"contingency":6600},"annual_rent_usd":24000,"annual_owner_costs_usd":12000}},"property":{"representative_price_usd":688704,"acquisition_cost_rate":0.12,"price_basis":"Median of three representative Málaga / Costa del Sol listing snapshots captured by Global Home Atlas."},"confidence":{"overall":"medium-high","proxy_categories":["private_healthcare","visa_admin","inflation","owner_costs"]},"sources":[{"name":"Numbeo — Málaga cost of living","url":"https://www.numbeo.com/cost-of-living/in/Malaga","metric_supported":"Rent, groceries, utilities, transport and dining benchmarks","source_date":"May 2026","accessed_on":"2026-08-18","notes":"City-level observations; resort and prime coastal rents vary."},{"name":"Spain National Statistics Institute — CPI","url":"https://www.ine.es/en/index.htm","metric_supported":"General inflation assumption","source_date":"2026","accessed_on":"2026-08-18","notes":"National proxy used for scenario inflation, not a forecast."},{"name":"Spain-Real.Estate — Costa del Sol","url":"https://spain-real.estate/","metric_supported":"Representative property acquisition benchmark","source_date":"2026","accessed_on":"2026-08-18","notes":"Listing evidence changes; luxury examples can skew the sample."}],"name":"Málaga / Costa del Sol"}]}</script>
+  <script>(function (root, factory) {
+  const api = factory();
+  if (typeof module === "object" && module.exports) module.exports = api;
+  if (root) root.GHARetirementCalculator = api;
+})(typeof window !== "undefined" ? window : null, function () {
+  "use strict";
+
+  const HOUSING_PLANS = new Set(["rent", "own", "buy"]);
+
+  function finiteNonNegative(value, label) {
+    const number = Number(value);
+    if (!Number.isFinite(number) || number < 0) {
+      throw new Error(label + " must be a finite non-negative number");
+    }
+    return number;
+  }
+
+  function boundedRate(value, label, maximum) {
+    const rate = finiteNonNegative(value, label);
+    if (rate > maximum) throw new Error(label + " exceeds the allowed range");
+    return rate;
+  }
+
+  function guidedWithdrawalRate(horizonYears) {
+    const horizon = finiteNonNegative(horizonYears, "Retirement horizon");
+    if (horizon === 0) throw new Error("Retirement horizon must be positive");
+    if (horizon <= 25) return 0.04;
+    if (horizon <= 30) return 0.035;
+    if (horizon <= 35) return 0.0325;
+    return 0.03;
+  }
+
+  function project(value, rate, years) {
+    return value * Math.pow(1 + rate, years);
+  }
+
+  function calculateRetirement(input) {
+    if (!input || typeof input !== "object") throw new Error("Calculator input is required");
+
+    const currentAge = finiteNonNegative(input.currentAge, "Current age");
+    const retirementAge = finiteNonNegative(input.retirementAge, "Retirement age");
+    const yearsToRetirement = retirementAge - currentAge;
+    if (yearsToRetirement <= 0) throw new Error("Retirement age must exceed current age");
+
+    const horizonYears = finiteNonNegative(input.horizonYears, "Retirement horizon");
+    const generalInflation = boundedRate(input.generalInflation, "General inflation", 0.15);
+    const propertyInflation = boundedRate(input.propertyInflation, "Property inflation", 0.15);
+    const acquisitionCostRate = boundedRate(input.acquisitionCostRate, "Acquisition cost rate", 0.25);
+    const emergencyReserveMonths = finiteNonNegative(input.emergencyReserveMonths, "Emergency reserve months");
+    const portfolioCashYield = boundedRate(input.portfolioCashYield, "Portfolio cash yield", 0.15);
+
+    if (!HOUSING_PLANS.has(input.housingPlan)) throw new Error("Housing plan must be rent, own, or buy");
+    if (!Array.isArray(input.expenseCategories) || input.expenseCategories.length === 0) {
+      throw new Error("At least one expense category is required");
+    }
+    if (!Array.isArray(input.incomeStreams)) throw new Error("Income streams must be an array");
+
+    const firstYearExpenses = input.expenseCategories.reduce(function (total, category) {
+      const amount = finiteNonNegative(category.amount, "Expense amount");
+      const rate = boundedRate(category.inflationRate, "Expense inflation", 0.15);
+      return total + project(amount, rate, yearsToRetirement);
+    }, 0);
+
+    const outsideIncome = input.incomeStreams.reduce(function (total, stream) {
+      const amount = finiteNonNegative(stream.amount, "Income amount");
+      const rate = boundedRate(stream.inflationRate, "Income inflation", 0.15);
+      return total + (stream.indexed ? project(amount, rate, yearsToRetirement) : amount);
+    }, 0);
+
+    let withdrawalRate = guidedWithdrawalRate(horizonYears);
+    if (input.withdrawalRateOverride !== undefined && input.withdrawalRateOverride !== null) {
+      withdrawalRate = Number(input.withdrawalRateOverride);
+      if (!Number.isFinite(withdrawalRate) || withdrawalRate < 0.03 || withdrawalRate > 0.04) {
+        throw new Error("Withdrawal rate override must be between 3% and 4%");
+      }
+    }
+
+    const fundingGap = Math.max(0, firstYearExpenses - outsideIncome);
+    const liquidPortfolio = fundingGap / withdrawalRate;
+    const propertyPrice = finiteNonNegative(input.propertyPrice, "Property price");
+    const propertyCapital = input.housingPlan === "buy"
+      ? project(propertyPrice, propertyInflation, yearsToRetirement) * (1 + acquisitionCostRate)
+      : 0;
+    const emergencyReserve = firstYearExpenses / 12 * emergencyReserveMonths;
+    const totalCapital = liquidPortfolio + propertyCapital + emergencyReserve;
+    const portfolioCashIncome = Math.min(fundingGap, liquidPortfolio * portfolioCashYield);
+    const assetSales = Math.max(0, fundingGap - portfolioCashIncome);
+    const todayDollarTotal = totalCapital / Math.pow(1 + generalInflation, yearsToRetirement);
+
+    return {
+      yearsToRetirement: yearsToRetirement,
+      firstYearExpenses: firstYearExpenses,
+      outsideIncome: outsideIncome,
+      fundingGap: fundingGap,
+      withdrawalRate: withdrawalRate,
+      liquidPortfolio: liquidPortfolio,
+      propertyCapital: propertyCapital,
+      emergencyReserve: emergencyReserve,
+      totalCapital: totalCapital,
+      portfolioCashIncome: portfolioCashIncome,
+      assetSales: assetSales,
+      todayDollarTotal: todayDollarTotal,
+    };
+  }
+
+  return {
+    guidedWithdrawalRate: guidedWithdrawalRate,
+    calculateRetirement: calculateRetirement,
+  };
+});
+</script>
+  <script>(function (root) {
+  "use strict";
+
+  const money = new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  });
+  const presetYields = { "income": 0.03, "balanced": 0.02, "growth": 0.01 };
+
+  function initRetirementCalculator(rootId, payload) {
+    const form = document.getElementById(rootId);
+    const engine = root.GHARetirementCalculator;
+    if (!form || !engine || !payload || !Array.isArray(payload.destinations)) return;
+
+    const byId = Object.fromEntries(payload.destinations.map(function (item) {
+      return [item.destination_id, item];
+    }));
+    const el = function (id) { return document.getElementById(id); };
+    const number = function (id) { return Number(el(id).value); };
+    const rate = function (id) { return number(id) / 100; };
+    let benchmarkValue = 0;
+
+    function selectedRecord() {
+      return byId[el("ret-destination").value];
+    }
+
+    function housingAmount(profile, plan) {
+      return plan === "rent" ? profile.annual_rent_usd : profile.annual_owner_costs_usd;
+    }
+
+    function syncDestinationDefaults() {
+      const record = selectedRecord();
+      if (!record) return;
+      const profile = record.profiles[el("ret-household").value];
+      const plan = el("ret-housing-plan").value;
+      benchmarkValue = Object.values(profile.categories_usd).reduce(function (total, value) {
+        return total + Number(value);
+      }, 0) + Number(housingAmount(profile, plan));
+      el("ret-spending").value = String(Math.round(benchmarkValue));
+      el("ret-general-inflation").value = String(record.inflation.general * 100);
+      el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
+      el("ret-property-inflation").value = String(record.inflation.property * 100);
+    }
+
+    function expenseCategories(record, profile, plan) {
+      const generalRate = rate("ret-general-inflation");
+      const healthcareRate = rate("ret-healthcare-inflation");
+      const propertyRate = rate("ret-property-inflation");
+      const scale = benchmarkValue > 0 ? number("ret-spending") / benchmarkValue : 1;
+      const categories = Object.entries(profile.categories_usd).map(function (entry) {
+        return {
+          amount: Number(entry[1]) * scale,
+          inflationRate: entry[0] === "private_healthcare" ? healthcareRate : generalRate,
+        };
+      });
+      categories.push({
+        amount: Number(housingAmount(profile, plan)) * scale,
+        inflationRate: plan === "rent" ? generalRate : propertyRate,
+      });
+      return categories;
+    }
+
+    function calculatorInput() {
+      const record = selectedRecord();
+      if (!record) throw new Error("Choose a destination with available cost data");
+      const household = el("ret-household").value;
+      const profile = record.profiles[household];
+      const plan = el("ret-housing-plan").value;
+      const generalRate = rate("ret-general-inflation");
+      const override = el("ret-withdrawal-rate").value.trim();
+      const input = {
+        currentAge: number("ret-current-age"),
+        retirementAge: number("ret-retirement-age"),
+        horizonYears: number("ret-horizon"),
+        expenseCategories: expenseCategories(record, profile, plan),
+        incomeStreams: [
+          { amount: number("ret-pension"), indexed: el("ret-pension-indexed").checked, inflationRate: generalRate },
+          { amount: number("ret-other-income"), indexed: el("ret-other-indexed").checked, inflationRate: generalRate },
+          { amount: number("ret-rental-income"), indexed: el("ret-rental-indexed").checked, inflationRate: generalRate },
+        ],
+        housingPlan: plan,
+        propertyPrice: Number(record.property.representative_price_usd),
+        propertyInflation: rate("ret-property-inflation"),
+        acquisitionCostRate: Number(record.property.acquisition_cost_rate),
+        generalInflation: generalRate,
+        emergencyReserveMonths: number("ret-reserve-months"),
+        portfolioCashYield: rate("ret-cash-yield"),
+      };
+      if (override !== "") input.withdrawalRateOverride = Number(override) / 100;
+      return input;
+    }
+
+    function setMoney(id, value) {
+      el(id).textContent = money.format(value);
+    }
+
+    function horizonBand(years) {
+      if (years <= 25) return "up_to_25";
+      if (years <= 30) return "26_to_30";
+      if (years <= 35) return "31_to_35";
+      return "over_35";
+    }
+
+    function trackingContext() {
+      return {
+        destination_id: el("ret-destination").value,
+        household_type: el("ret-household").value,
+        housing_plan: el("ret-housing-plan").value,
+        horizon_band: horizonBand(number("ret-horizon")),
+        portfolio_style: el("ret-income-preset").value,
+      };
+    }
+
+    function track(name) {
+      if (root.GHA && typeof root.GHA.track === "function") root.GHA.track(name, trackingContext());
+    }
+
+    function render(result) {
+      const record = selectedRecord();
+      setMoney("ret-total-capital", result.totalCapital);
+      setMoney("ret-liquid-portfolio", result.liquidPortfolio);
+      setMoney("ret-property-capital", result.propertyCapital);
+      setMoney("ret-emergency-reserve", result.emergencyReserve);
+      setMoney("ret-today-total", result.todayDollarTotal);
+      setMoney("ret-first-expenses", result.firstYearExpenses);
+      setMoney("ret-outside-income", result.outsideIncome);
+      setMoney("ret-funding-gap", result.fundingGap);
+      setMoney("ret-cash-income", result.portfolioCashIncome);
+      setMoney("ret-asset-sales", result.assetSales);
+      el("ret-result-rate").textContent = (result.withdrawalRate * 100).toFixed(2).replace(/\.00$/, "") + "%";
+      el("ret-result-status").textContent = record.name + " · " + el("ret-household").selectedOptions[0].textContent + " · " + result.yearsToRetirement + " years to retirement";
+      const lowerRate = Math.max(0.03, result.withdrawalRate - 0.005);
+      const upperRate = Math.min(0.04, result.withdrawalRate + 0.005);
+      el("ret-result-assumptions").textContent =
+        "Data " + payload.as_of + " · " + record.confidence.overall + " confidence · " +
+        "rate sensitivity " + (lowerRate * 100).toFixed(2) + "%–" + (upperRate * 100).toFixed(2) +
+        "%. Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.";
+    }
+
+    function firstInvalidField() {
+      const controls = Array.from(form.querySelectorAll("input[type=number]"));
+      return controls.find(function (control) {
+        return control.value === "" && control.id !== "ret-withdrawal-rate" || !control.checkValidity();
+      });
+    }
+
+    function calculate(event) {
+      if (event) event.preventDefault();
+      const errors = el("ret-errors");
+      errors.textContent = "";
+      const invalid = firstInvalidField();
+      if (invalid) {
+        errors.textContent = "Check the highlighted numeric input and try again.";
+        invalid.focus();
+        return;
+      }
+      try {
+        render(engine.calculateRetirement(calculatorInput()));
+        track("retirement_calculator_calculate");
+      } catch (error) {
+        errors.textContent = error instanceof Error ? error.message : "Unable to calculate this scenario.";
+        errors.focus();
+      }
+    }
+
+    ["ret-destination", "ret-household", "ret-housing-plan"].forEach(function (id) {
+      el(id).addEventListener("change", function () {
+        syncDestinationDefaults();
+        if (id === "ret-destination") track("retirement_calculator_destination_change");
+      });
+    });
+    el("ret-income-preset").addEventListener("change", function () {
+      el("ret-cash-yield").value = String(presetYields[this.value] * 100);
+    });
+    form.addEventListener("submit", calculate);
+    syncDestinationDefaults();
+    track("retirement_calculator_open");
+  }
+
+  root.GHARetirementCalculatorUI = { initRetirementCalculator: initRetirementCalculator };
+})(window);
+</script>
+  <script>if(window.GHARetirementCalculatorUI){window.GHARetirementCalculatorUI.initRetirementCalculator("retirement-calculator",JSON.parse(document.getElementById("retirement-destination-data").textContent));}</script>
+
+  <script>
+    (function () {
+      const measurementReady = Boolean("");
+      const sessionKey = "gha_session_id";
+      const eventKey = "gha_event_queue";
+      function sessionId() {
+        let id = localStorage.getItem(sessionKey);
+        if (!id) {
+          id = String(Date.now()) + "-" + Math.random().toString(16).slice(2);
+          localStorage.setItem(sessionKey, id);
+        }
+        return id;
+      }
+      function pushLocal(eventName, params) {
+        try {
+          const queue = JSON.parse(localStorage.getItem(eventKey) || "[]");
+          queue.push({
+            event: eventName,
+            params: params,
+            path: location.pathname,
+            title: document.title,
+            session_id: sessionId(),
+            timestamp: new Date().toISOString()
+          });
+          localStorage.setItem(eventKey, JSON.stringify(queue.slice(-100)));
+        } catch (error) {}
+      }
+      function track(eventName, params) {
+        const payload = Object.assign({
+          page_path: location.pathname,
+          page_title: document.title
+        }, params || {});
+        pushLocal(eventName, payload);
+        if (measurementReady && typeof window.gtag === "function") {
+          window.gtag("event", eventName, payload);
+        }
+      }
+      window.GHA = Object.assign(window.GHA || {}, { track });
+      document.addEventListener("click", function (event) {
+        const target = event.target.closest("a, button");
+        if (!target) return;
+        const explicit = target.getAttribute("data-track");
+        const href = target.getAttribute("href") || "";
+        if (explicit) {
+          track(explicit, {
+            label: target.getAttribute("data-track-label") || target.textContent.trim(),
+            href: href
+          });
+          return;
+        }
+        if (href.startsWith("/destinations/")) track("destination_click", { href });
+        else if (href === "/dashboard/#destinations" || href === "/#destinations" || href === "#destinations") track("dashboard_open", { href });
+        else if (href.startsWith("/") && !href.startsWith("/#")) track("internal_page_click", { href });
+        else if (href.startsWith("http") && !href.includes(location.hostname)) track("outbound_click", { href });
+        else if (href.startsWith("mailto:")) track("contact_click", { href });
+      });
+      document.addEventListener("submit", function (event) {
+        const form = event.target.closest("#custom-shortlist-form");
+        if (!form) return;
+        event.preventDefault();
+        const data = new FormData(form);
+        const lines = [
+          "Global Home Atlas shortlist review request",
+          "",
+          "Name: " + (data.get("name") || ""),
+          "Email: " + (data.get("email") || ""),
+          "Budget: " + (data.get("budget") || ""),
+          "Target regions: " + (data.get("regions") || ""),
+          "Primary goal: " + (data.get("goal") || ""),
+          "Citizenship / residency: " + (data.get("citizenship") || ""),
+          "Rental expectations: " + (data.get("rental_expectations") || ""),
+          "Risk tolerance: " + (data.get("risk_tolerance") || ""),
+          "Holding period: " + (data.get("holding_period") || ""),
+          "Timing: " + (data.get("timing") || ""),
+          "Adviser needs: " + (data.get("adviser_needs") || ""),
+          "Saved shortlist: " + (data.get("saved_shortlist") || ""),
+          "Notes: " + (data.get("notes") || "")
+        ];
+        track("custom_shortlist_submit", {
+          budget: data.get("budget") || "",
+          regions: data.get("regions") || "",
+          goal: data.get("goal") || "",
+          risk_tolerance: data.get("risk_tolerance") || "",
+          timing: data.get("timing") || "",
+          adviser_needs: data.get("adviser_needs") || "",
+          saved_shortlist: data.get("saved_shortlist") || ""
+        });
+        location.href = "mailto:hello@globalhomeatlas.com?subject=" + encodeURIComponent("Global Home Atlas Shortlist Review") + "&body=" + encodeURIComponent(lines.join("\n"));
+      });
+    })();
+  </script>
+
+</body></html>
