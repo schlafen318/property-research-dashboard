@@ -88,6 +88,16 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         result = calculate(payload)
         self.assertAlmostEqual(27355.371900826444, result["liquidPortfolio"], places=6)
 
+    def test_retirement_capital_is_discounted_to_investment_needed_today(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update({"currentAge": 50, "retirementAge": 60, "expectedPortfolioReturn": 0.05})
+        result = calculate(payload)
+        expected_today = result["retirementCapital"] / 1.05**10
+        self.assertAlmostEqual(expected_today, result["investmentNeededToday"], places=6)
+        self.assertEqual(0, result["homePurchaseNeededToday"])
+        self.assertAlmostEqual(expected_today, result["totalNeededToday"], places=6)
+        self.assertEqual(result["retirementCapital"], result["totalCapitalAtRetirement"])
+
     def test_inflation_projects_every_retirement_year(self) -> None:
         payload = level_cash_flow_payload()
         payload.update(
@@ -144,6 +154,12 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertEqual(550000, result["propertyCapital"])
         self.assertEqual("today", result["propertyTiming"])
         self.assertIsNone(result["combinedRetirementCapital"])
+        self.assertEqual(550000, result["homePurchaseNeededToday"])
+        self.assertEqual(result["retirementCapital"], result["totalCapitalAtRetirement"])
+        self.assertEqual(
+            result["investmentNeededToday"] + 550000,
+            result["totalNeededToday"],
+        )
         self.assertNotIn("totalCapital", result)
         self.assertNotIn("todayDollarTotal", result)
 
@@ -163,6 +179,13 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertAlmostEqual(665500, result["propertyCapital"], places=6)
         self.assertEqual("retirement", result["propertyTiming"])
         self.assertAlmostEqual(result["retirementCapital"] + 665500, result["combinedRetirementCapital"], places=6)
+        self.assertEqual(0, result["homePurchaseNeededToday"])
+        self.assertAlmostEqual(result["combinedRetirementCapital"], result["totalCapitalAtRetirement"], places=6)
+        self.assertAlmostEqual(
+            result["combinedRetirementCapital"],
+            result["investmentNeededToday"],
+            places=6,
+        )
 
     def test_rent_and_already_own_do_not_add_property_capital(self) -> None:
         for plan in ("rent", "own"):

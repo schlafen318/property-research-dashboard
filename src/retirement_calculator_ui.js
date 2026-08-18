@@ -153,14 +153,13 @@
 
     function render(result) {
       const record = selectedRecord();
-      const headline = result.propertyTiming === "retirement"
-        ? result.combinedRetirementCapital
-        : result.retirementCapital;
-      setMoney("ret-total-capital", headline);
+      setMoney("ret-total-today", result.totalNeededToday);
+      setMoney("ret-invest-today", result.investmentNeededToday);
+      setMoney("ret-home-today", result.homePurchaseNeededToday);
+      setMoney("ret-total-retirement", result.totalCapitalAtRetirement);
       setMoney("ret-liquid-portfolio", result.liquidPortfolio);
-      setMoney("ret-property-capital", result.propertyCapital);
+      setMoney("ret-property-retirement", result.propertyTiming === "retirement" ? result.propertyCapital : 0);
       setMoney("ret-emergency-reserve", result.emergencyReserve);
-      setMoney("ret-today-total", result.todayDollarRetirementCapital);
       setMoney("ret-first-expenses", result.firstYearExpenses);
       setMoney("ret-outside-income", result.outsideIncome);
       setMoney("ret-funding-gap", result.fundingGap);
@@ -168,14 +167,12 @@
       el("ret-result-implied-withdrawal").textContent = result.impliedFirstYearWithdrawal === null
         ? "—"
         : (result.impliedFirstYearWithdrawal * 100).toFixed(2) + "%";
-      el("ret-headline-label").textContent = result.propertyTiming === "retirement"
-        ? "Combined capital at retirement"
-        : "Retirement capital needed at retirement";
-      el("ret-property-label").textContent = result.propertyTiming === "today"
+      el("ret-home-today-label").textContent = result.propertyTiming === "today"
         ? "Home purchase needed now"
-        : result.propertyTiming === "retirement"
-          ? "Home purchase at retirement"
-          : "No property purchase";
+        : "No home purchase today";
+      el("ret-property-retirement-label").textContent = result.propertyTiming === "retirement"
+        ? "Home purchase at retirement"
+        : "No home purchase at retirement";
       el("ret-result-status").textContent = record.name + " · " + el("ret-household").selectedOptions[0].textContent + " · " + result.yearsToRetirement + " years to retirement";
       el("ret-result-assumptions").textContent =
         "Data " + payload.as_of + " · " + record.confidence.overall + " confidence · " +
