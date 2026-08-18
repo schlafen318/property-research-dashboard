@@ -126,6 +126,8 @@ def build_email_body(
     search_console = report.get("search_console") or {}
     findings = summary_findings(summary)
     counts = severity_counts(findings)
+    generated_content = summary.get("generated_content") or {}
+    generated_rejected = generated_content.get("rejected") or []
     window = report.get("window") or {}
     window_label = f"{window.get('start_date', 'n/a')} to {window.get('end_date', 'n/a')}"
     lines = [
@@ -154,6 +156,14 @@ def build_email_body(
         f"- Issues created or updated: {summary.get('issue_count', len(summary.get('issues', [])))}",
         f"- Draft PRs opened: {summary.get('pr_count', len(summary.get('prs', [])))}",
         f"- Auto-merged fixes: {summary.get('auto_merged_count', len(summary.get('auto_merged', [])))}",
+        f"- Generated content accepted: {generated_content.get('accepted_count', 0)}",
+        f"- Generated content rejected: {len(generated_rejected)}",
+        f"- Generated content draft: {generated_content.get('pr') or 'none'}",
+        f"- Generated content skipped: {generated_content.get('skipped_reason') or 'no'}",
+        *[
+            f"- Generated rejection: {str(item.get('reason') or 'rejected').replace(chr(10), ' ')}"
+            for item in generated_rejected
+        ],
         "",
         "Next action",
         recommended_next_action(findings),
@@ -177,6 +187,7 @@ def build_telegram_message(
     indexing = sitemap.get("indexing") or {}
     findings = summary_findings(summary)
     counts = severity_counts(findings)
+    generated_content = summary.get("generated_content") or {}
     generated = str(report.get("generated_at") or "n/a")
     window = report.get("window") or {}
     window_label = f"{window.get('start_date', 'n/a')} to {window.get('end_date', 'n/a')}"
@@ -192,6 +203,8 @@ def build_telegram_message(
         f"Issues updated: {summary.get('issue_count', len(summary.get('issues', [])))}",
         f"Draft PRs: {summary.get('pr_count', len(summary.get('prs', [])))}",
         f"Auto-merged: {summary.get('auto_merged_count', len(summary.get('auto_merged', [])))}",
+        f"Generated content: {generated_content.get('accepted_count', 0)} accepted, {len(generated_content.get('rejected') or [])} rejected",
+        f"Generated draft: {generated_content.get('pr') or 'none'}",
         f"IndexNow: {indexnow_summary(indexnow)}",
         "",
         f"Next: {recommended_next_action(findings)}",

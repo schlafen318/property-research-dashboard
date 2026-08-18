@@ -4,12 +4,749 @@ import json
 import subprocess
 import tempfile
 import unittest
+from datetime import datetime, timezone
 from pathlib import Path
 
 from scripts import seo_feedback_loop
 
 
 class NotificationCommentTests(unittest.TestCase):
+    def goal_issue(
+        self,
+        *,
+        number: int = 107,
+        state: str = "OPEN",
+        kind: str = "seo-goal-missed",
+        fingerprint: str = "gha-seo-goal-missed-indexing",
+        auto_closed: bool = False,
+        field: str = "index",
+    ) -> dict:
+        url = "https://globalhomeatlas.com/where-can-foreigners-buy-property/"
+        labels = [{"name": "analytics-loop"}, {"name": kind}]
+        if auto_closed:
+            labels.append({"name": "goal-status-auto-closed"})
+        prefix = "Indexing" if field == "index" else "First impressions"
+        return {
+            "number": number,
+            "title": f"{prefix} goal missed for {url}",
+            "state": state,
+            "body": (
+                "## Classification\n"
+                f"- Kind: `{kind}`\n"
+                f"- Fingerprint: `{fingerprint}`\n"
+            ),
+            "labels": labels,
+        }
+
+    def goal_report(self, *, index_status: str, impression_status: str = "met") -> dict:
+        return {
+            "goals": {
+                "page_goals": [
+                    {
+                        "url": "https://globalhomeatlas.com/where-can-foreigners-buy-property/",
+                        "index_status": index_status,
+                        "impression_status": impression_status,
+                        "index_evidence": (
+                            "search_console_impressions" if index_status == "met" else "inspection_unavailable"
+                        ),
+                    }
+                ]
+            }
+        }
+
+    def goal_finding(self) -> seo_feedback_loop.Finding:
+        return seo_feedback_loop.Finding(
+            kind="seo-goal-missed",
+            title=(
+                "Indexing goal missed for "
+                "https://globalhomeatlas.com/where-can-foreigners-buy-property/"
+            ),
+            summary="Indexing goal is missed.",
+            severity="high",
+            labels=("analytics-loop", "seo-goal-missed"),
+            fingerprint="gha-seo-goal-missed-indexing",
+        )
+
+    def test_met_goal_closes_open_automation_issue_as_completed(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="met"),
+                findings=[],
+                issues=[self.goal_issue()],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual({"closed": 1, "reopened": 0, "errors": []}, result)
+        self.assertEqual(
+            ["gh", "issue", "edit", "107", "--add-label", "goal-status-auto-closed"], calls[0]
+        )
+        self.assertEqual("close", calls[1][2])
+        self.assertIn("completed", calls[1])
+
+    def test_unknown_indexing_goal_retires_unproven_alert(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="unknown"),
+                findings=[],
+                issues=[self.goal_issue()],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, result["closed"])
+        self.assertIn("not planned", calls[1])
+
+    def test_recurring_goal_reopens_only_automation_closed_issue(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="missed"),
+                findings=[self.goal_finding()],
+                issues=[self.goal_issue(state="CLOSED", auto_closed=True)],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual({"closed": 0, "reopened": 1, "errors": []}, result)
+        self.assertEqual(["gh", "issue", "reopen", "107"], calls[0])
+        self.assertIn("--remove-label", calls[1])
+
+    def test_human_closed_goal_issue_stays_closed(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="missed"),
+                findings=[self.goal_finding()],
+                issues=[self.goal_issue(state="CLOSED")],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual({"closed": 0, "reopened": 0, "errors": []}, result)
+        self.assertEqual([], calls)
+
+    def test_goal_close_failure_rolls_back_provenance_and_continues(self) -> None:
+        first = self.goal_issue()
+        second = self.goal_issue(number=108, fingerprint="gha-seo-goal-missed-second")
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        def mutate(cmd, attempts=3):
+            calls.append(cmd)
+            if cmd[2] == "close" and "107" in cmd:
+                raise RuntimeError("close failed")
+        seo_feedback_loop.gh_mutation = mutate
+        try:
+            result = seo_feedback_loop.reconcile_goal_issues(
+                report=self.goal_report(index_status="met"),
+                findings=[],
+                issues=[first, second],
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, result["closed"])
+        self.assertEqual(1, len(result["errors"]))
+        self.assertIn(
+            ["gh", "issue", "edit", "107", "--remove-label", "goal-status-auto-closed"], calls
+        )
+        self.assertTrue(any("108" in call and call[2] == "close" for call in calls))
+
+    def opportunity_finding(self, suffix: str = "queenstown") -> seo_feedback_loop.Finding:
+        return seo_feedback_loop.Finding(
+            kind="near-ranking-opportunity",
+            title="Push near-ranking page higher: /destinations/queenstown/",
+            summary="Page is ranking near page one.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review", "content-refresh"),
+            fingerprint=f"gha-near-ranking-opportunity-{suffix}",
+            implementation_pr=True,
+            payload={"page": "https://globalhomeatlas.com/destinations/queenstown/"},
+        )
+
+    def opportunity_issue(
+        self, *, stale: bool = False, auto_closed: bool = False, state: str = "OPEN", suffix: str = "queenstown"
+    ) -> dict:
+        labels = [{"name": "analytics-loop"}, {"name": "content-refresh"}]
+        if stale:
+            labels.append({"name": "stale-signal"})
+        if auto_closed:
+            labels.append({"name": "stale-signal-auto-closed"})
+        return {
+            "number": 92,
+            "title": "Push near-ranking page higher: /destinations/queenstown/",
+            "state": state,
+            "body": (
+                "## Classification\n"
+                "- Kind: `near-ranking-opportunity`\n"
+                f"- Fingerprint: `gha-near-ranking-opportunity-{suffix}`\n"
+            ),
+            "labels": labels,
+        }
+
+    def test_stale_opportunity_first_absence_marks_without_closing(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[self.opportunity_issue()], complete_kinds={"near-ranking-opportunity"}, dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 1, "closed": 0, "reopened": 0, "errors": []}, result)
+        self.assertEqual(
+            [["gh", "issue", "edit", "92", "--add-label", "stale-signal"]],
+            calls,
+        )
+
+    def test_stale_opportunity_second_absence_closes(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[self.opportunity_issue(stale=True)],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 1, "reopened": 0, "errors": []}, result)
+        self.assertEqual(["gh", "issue", "edit", "92", "--add-label", "stale-signal-auto-closed"], calls[0])
+        self.assertEqual("close", calls[1][2])
+        self.assertIn("not planned", calls[1])
+
+    def test_returning_stale_opportunity_reopens(self) -> None:
+        finding = self.opportunity_finding()
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[finding],
+                issues=[self.opportunity_issue(stale=True, auto_closed=True, state="CLOSED")],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 1, "errors": []}, result)
+        self.assertEqual(["gh", "issue", "reopen", "92"], calls[0])
+        self.assertIn("stale-signal", calls[1])
+        self.assertIn("stale-signal-auto-closed", calls[2])
+
+    def test_stale_reconciliation_skips_unavailable_protected_and_unmanaged_issues(self) -> None:
+        protected = self.opportunity_issue(stale=True)
+        protected["labels"].append({"name": "implemented-awaiting-google"})
+        unmanaged = self.opportunity_issue(stale=True, suffix="indexing")
+        unmanaged["body"] = unmanaged["body"].replace("near-ranking-opportunity", "seo-goal-missed")
+        manually_closed = self.opportunity_issue(state="CLOSED", suffix="manual")
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            unavailable = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[self.opportunity_issue()],
+                complete_kinds=set(),
+                dry_run=False,
+            )
+            skipped = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[protected, unmanaged, manually_closed],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0, "errors": []}, unavailable)
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0, "errors": []}, skipped)
+        self.assertEqual([], calls)
+
+    def test_returning_open_opportunity_clears_stale_marker_without_reopening(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[self.opportunity_finding()],
+                issues=[self.opportunity_issue(stale=True)],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0, "errors": []}, result)
+        self.assertEqual(
+            [["gh", "issue", "edit", "92", "--remove-label", "stale-signal"]],
+            calls,
+        )
+
+    def test_incomplete_kind_is_not_aged(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[self.opportunity_issue()], complete_kinds=set(), dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0, "errors": []}, result)
+        self.assertEqual([], calls)
+
+    def test_reconciliation_inputs_use_complete_full_dataset_not_display_rows(self) -> None:
+        page = "https://globalhomeatlas.com/destinations/queenstown/"
+        report = {
+            "site_url": "https://globalhomeatlas.com",
+            "sitemap": {"urls": [page], "status": {}, "indexing": {}},
+            "goals": {},
+            "search_console": {
+                "available": True,
+                "top_queries": [],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+                "reconciliation": {
+                    "query_complete": False,
+                    "page_complete": True,
+                    "query_ctr_queries": [],
+                    "low_ctr_pages": [],
+                    "near_ranking_pages": [
+                        {"page": page, "clicks": 0, "impressions": 30, "ctr": 0, "position": 18}
+                    ],
+                    "content_gap_queries": [],
+                },
+            },
+        }
+        findings, complete_kinds = seo_feedback_loop.stale_reconciliation_inputs(report, True)
+        self.assertIn("near-ranking-opportunity", {finding.kind for finding in findings})
+        self.assertIn("near-ranking-opportunity", complete_kinds)
+        self.assertNotIn("query-ctr-opportunity", complete_kinds)
+
+    def test_legacy_report_without_completeness_never_ages_issues(self) -> None:
+        report = {"search_console": {"available": True}, "sitemap": {"urls": []}, "goals": {}}
+        findings, complete_kinds = seo_feedback_loop.stale_reconciliation_inputs(report, True)
+        self.assertEqual([], findings)
+        self.assertEqual(set(), complete_kinds)
+
+    def test_human_closed_stale_issue_is_not_reopened(self) -> None:
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[self.opportunity_finding()],
+                issues=[self.opportunity_issue(stale=True, state="CLOSED")],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(0, result["reopened"])
+        self.assertFalse(any(call[2] == "reopen" for call in calls))
+
+    def test_unowned_issue_is_not_reconciled(self) -> None:
+        issue = self.opportunity_issue()
+        issue["labels"] = [{"name": "content-refresh"}]
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[issue], complete_kinds={"near-ranking-opportunity"}, dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(0, result["marked"])
+        self.assertEqual([], calls)
+
+    def test_one_mutation_failure_does_not_block_later_issues(self) -> None:
+        first = self.opportunity_issue(suffix="first")
+        second = self.opportunity_issue(suffix="second")
+        second["number"] = 93
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        def mutate(cmd, attempts=3):
+            calls.append(cmd)
+            if "92" in cmd:
+                raise RuntimeError("first failed")
+        seo_feedback_loop.gh_mutation = mutate
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[], issues=[first, second], complete_kinds={"near-ranking-opportunity"}, dry_run=False
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, result["marked"])
+        self.assertEqual(1, len(result["errors"]))
+        self.assertTrue(any("93" in call for call in calls))
+
+    def test_failed_close_rolls_back_auto_close_provenance(self) -> None:
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        def mutate(cmd, attempts=3):
+            calls.append(cmd)
+            if cmd[2] == "close":
+                raise RuntimeError("close failed")
+        seo_feedback_loop.gh_mutation = mutate
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[],
+                issues=[self.opportunity_issue(stale=True)],
+                complete_kinds={"near-ranking-opportunity"},
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(0, result["closed"])
+        self.assertEqual(1, len(result["errors"]))
+        self.assertEqual(
+            ["gh", "issue", "edit", "92", "--remove-label", "stale-signal-auto-closed"], calls[-1]
+        )
+
+    def test_reopen_count_remains_truthful_when_label_cleanup_fails(self) -> None:
+        original = seo_feedback_loop.gh_mutation
+        calls = []
+        def mutate(cmd, attempts=3):
+            calls.append(cmd)
+            if "--remove-label" in cmd:
+                raise RuntimeError("cleanup failed")
+        seo_feedback_loop.gh_mutation = mutate
+        try:
+            result = seo_feedback_loop.reconcile_stale_opportunity_issues(
+                findings=[self.opportunity_finding()],
+                issues=[self.opportunity_issue(stale=True, auto_closed=True, state="CLOSED")],
+                complete_kinds=set(),
+                dry_run=False,
+            )
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, result["reopened"])
+        self.assertEqual(2, len(result["errors"]))
+        self.assertEqual(["gh", "issue", "reopen", "92"], calls[0])
+
+    def editorial_pair(
+        self,
+        *,
+        impressions: int,
+        position: float,
+        target: str,
+        suffix: str,
+        auto_implementation_safe: bool = False,
+    ):
+        finding = seo_feedback_loop.Finding(
+            kind="low-ctr-opportunity",
+            title=f"Improve CTR for {target}",
+            summary="Page has weak CTR.",
+            severity="medium",
+            labels=("analytics-loop", "needs-human-review"),
+            fingerprint=f"gha-low-ctr-opportunity-{suffix}",
+            implementation_pr=True,
+            auto_implementation_safe=auto_implementation_safe,
+            payload={"page": target, "impressions": impressions, "position": position},
+        )
+        return finding, f"https://github.com/schlafen318/property-research-dashboard/issues/{impressions}"
+
+    def recovery_pair(self, *, target: str, suffix: str):
+        finding = seo_feedback_loop.Finding(
+            kind="seo-goal-missed",
+            title=f"First impressions goal missed for {target}",
+            summary="Indexed page has zero Search Console impressions after its deadline.",
+            severity="high",
+            labels=("analytics-loop", "seo-goal-missed", "needs-human-review"),
+            fingerprint=f"gha-seo-goal-missed-{suffix}",
+            implementation_pr=True,
+            payload={
+                "url": target,
+                "page": target,
+                "goal_field": "impression_status",
+                "recovery_type": "first-impression",
+                "index_status": "met",
+                "impression_status": "missed",
+                "impressions": 0,
+                "analytics": {"page": target, "impressions": 0},
+            },
+        )
+        return finding, f"https://github.com/schlafen318/property-research-dashboard/issues/{suffix}"
+
+    def test_recovery_selection_prefers_one_guide(self) -> None:
+        retirement = self.recovery_pair(
+            target="https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
+            suffix="retirement",
+        )
+        japan = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/japan-property/",
+            suffix="japan",
+        )
+        italy = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/italy-property/",
+            suffix="italy",
+        )
+        ordinary = self.editorial_pair(
+            impressions=80,
+            position=6,
+            target="https://globalhomeatlas.com/ordinary/",
+            suffix="ordinary",
+        )
+
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            [japan, ordinary, italy, retirement],
+            issues=[],
+            open_targets=set(),
+            override_entries=[],
+            now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual([retirement], selected)
+
+    def test_recovery_selection_preserves_suppression_controls(self) -> None:
+        retirement = self.recovery_pair(
+            target="https://globalhomeatlas.com/buying-property-abroad-for-retirement/",
+            suffix="retirement",
+        )
+        japan = self.recovery_pair(
+            target="https://globalhomeatlas.com/countries/japan-property/",
+            suffix="japan",
+        )
+        target = retirement[0].payload["page"]
+        cases = (
+            {"open_targets": {target}},
+            {
+                "issues": [
+                    {
+                        "body": f"Fingerprint `{retirement[0].fingerprint}`",
+                        "labels": [{"name": "implemented-awaiting-google"}],
+                    }
+                ]
+            },
+            {
+                "override_entries": [
+                    {
+                        "target_url": target,
+                        "lifecycle": "active",
+                        "cooldown_until": "2026-09-11T00:00:00+00:00",
+                    }
+                ]
+            },
+            {
+                "merged_prs": [
+                    {"body": f"### {target}\n", "mergedAt": "2026-08-12T00:00:00Z"}
+                ]
+            },
+        )
+        for overrides in cases:
+            with self.subTest(overrides=overrides):
+                selected = seo_feedback_loop.select_generated_content_candidates(
+                    [retirement, japan],
+                    issues=overrides.get("issues", []),
+                    open_targets=overrides.get("open_targets", set()),
+                    override_entries=overrides.get("override_entries", []),
+                    now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+                    merged_prs=overrides.get("merged_prs", []),
+                )
+                self.assertEqual([japan], selected)
+
+    def test_select_generated_content_candidates_prioritizes_and_caps_five(self) -> None:
+        pairs = [
+            self.editorial_pair(impressions=value, position=position, target=f"https://globalhomeatlas.com/p{index}/", suffix=str(index))
+            for index, (value, position) in enumerate([(10, 8), (80, 12), (30, 5), (60, 9), (50, 7), (40, 6)])
+        ]
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            pairs,
+            issues=[],
+            open_targets=set(),
+            override_entries=[],
+            now=datetime(2026, 8, 12, tzinfo=timezone.utc),
+            limit=5,
+        )
+        self.assertEqual(5, len(selected))
+        self.assertEqual(80, selected[0][0].payload["impressions"])
+
+    def test_selection_deduplicates_canonical_targets(self) -> None:
+        target = "https://globalhomeatlas.com/countries/portugal-property/"
+        pairs = [
+            self.editorial_pair(impressions=50 - index, position=5 + index, target=target, suffix=str(index))
+            for index in range(3)
+        ]
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            pairs, issues=[], open_targets=set(), override_entries=[], now=datetime(2026, 8, 12, tzinfo=timezone.utc)
+        )
+        self.assertEqual(1, len(selected))
+        self.assertEqual(50, selected[0][0].payload["impressions"])
+
+    def test_selection_skips_auto_open_implemented_and_cooldown_targets(self) -> None:
+        eligible = self.editorial_pair(impressions=25, position=8, target="https://globalhomeatlas.com/eligible/", suffix="eligible")
+        auto_link = self.editorial_pair(impressions=60, position=6, target="https://globalhomeatlas.com/auto/", suffix="auto", auto_implementation_safe=True)
+        open_pr = self.editorial_pair(impressions=55, position=6, target="https://globalhomeatlas.com/open/", suffix="open")
+        implemented = self.editorial_pair(impressions=50, position=6, target="https://globalhomeatlas.com/implemented/", suffix="implemented")
+        cooldown = self.editorial_pair(impressions=45, position=6, target="https://globalhomeatlas.com/cooldown/", suffix="cooldown")
+        issues = [{
+            "body": f"Fingerprint `{implemented[0].fingerprint}`",
+            "labels": [{"name": "implemented-awaiting-google"}],
+        }]
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            [eligible, auto_link, open_pr, implemented, cooldown],
+            issues=issues,
+            open_targets={"https://globalhomeatlas.com/open/"},
+            override_entries=[{
+                "target_url": "https://globalhomeatlas.com/cooldown/",
+                "lifecycle": "active",
+                "cooldown_until": "2026-09-01T00:00:00+00:00",
+            }],
+            now=datetime(2026, 8, 12, tzinfo=timezone.utc),
+            limit=5,
+        )
+        self.assertEqual([eligible], selected)
+
+    def test_selection_starts_cooldown_at_merge_time(self) -> None:
+        target = "https://globalhomeatlas.com/countries/portugal-property/"
+        pair = self.editorial_pair(impressions=50, position=5, target=target, suffix="merged")
+        body = f"### {target}\n"
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            [pair], issues=[], open_targets=set(), override_entries=[],
+            now=datetime(2026, 8, 20, tzinfo=timezone.utc),
+            merged_prs=[{"body": body, "mergedAt": "2026-08-12T00:00:00Z"}],
+        )
+        self.assertEqual([], selected)
+
+    def test_generated_content_pr_is_draft_and_never_auto_merge_safe(self) -> None:
+        args = seo_feedback_loop.generated_content_pr_create_args(
+            branch="analytics/generated-content-2-abc123",
+            base="main",
+            title="Generate SEO content for 2 pages",
+            body="body",
+        )
+        self.assertIn("--draft", args)
+        labels = args[args.index("--label") + 1]
+        self.assertIn("generated-content", labels)
+        self.assertIn("needs-human-review", labels)
+        self.assertNotIn("auto-merge-safe", labels)
+
+    def test_generated_pr_body_includes_signal_and_cannot_break_markdown_fence(self) -> None:
+        target = "https://globalhomeatlas.com/countries/portugal-property/"
+        pair = self.editorial_pair(impressions=40, position=8, target=target, suffix="body")
+        context = seo_feedback_loop.seo_content_generator.collect_target_context(target, [target])
+        entry = {
+            "target_url": target, "finding_fingerprint": pair[0].fingerprint,
+            "base_content_hash": context.base_content_hash, "generated_at": "2026-08-12T00:00:00+00:00",
+            "model": "test-model", "signal": {"query": "```unsafe", "impressions": 40},
+            "lifecycle": "proposed", "cooldown_until": "2026-09-09T00:00:00+00:00",
+            "content": {"title": "```unsafe", "meta_description": None, "intro": None,
+                        "faq_question": None, "faq_answer": None, "internal_link_target": None,
+                        "internal_link_anchor": None},
+        }
+        body = seo_feedback_loop.build_generated_content_pr_body([pair], {target: context}, (entry,), ())
+        self.assertIn('"search_console_signal"', body)
+        self.assertIn('"validator"', body)
+        self.assertNotIn("\n```json\n", body)
+
+    def test_generated_content_dry_run_returns_one_stable_batch_pr(self) -> None:
+        pairs = [
+            self.editorial_pair(impressions=40, position=8, target="https://globalhomeatlas.com/a/", suffix="a"),
+            self.editorial_pair(impressions=30, position=9, target="https://globalhomeatlas.com/b/", suffix="b"),
+        ]
+        result = seo_feedback_loop.scaffold_generated_content_pr(
+            pairs,
+            sitemap_urls=[pair[0].payload["page"] for pair in pairs],
+            dry_run=True,
+        )
+        self.assertTrue(result.pr_url.startswith("dry-run:generated-content-pr:analytics/generated-content-2-"))
+        self.assertEqual(0, result.accepted_count)
+
+    def test_reconcile_merged_generated_pr_marks_source_issue_once(self) -> None:
+        issue = {
+            "number": 95,
+            "body": "Fingerprint `gha-low-ctr-opportunity-portugal`",
+            "labels": [{"name": "implementation-queued"}],
+        }
+        prs = [{
+            "body": "### https://globalhomeatlas.com/countries/portugal-property/\n- Fingerprint: `gha-low-ctr-opportunity-portugal`",
+        }]
+        calls = []
+        original = seo_feedback_loop.gh_mutation
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: calls.append(cmd)
+        try:
+            count = seo_feedback_loop.reconcile_merged_generated_content_prs(issues=[issue], prs=prs, dry_run=False)
+            issue["labels"] = [{"name": "implemented-awaiting-google"}]
+            second = seo_feedback_loop.reconcile_merged_generated_content_prs(issues=[issue], prs=prs, dry_run=False)
+        finally:
+            seo_feedback_loop.gh_mutation = original
+        self.assertEqual(1, count)
+        self.assertEqual(0, second)
+        self.assertEqual(1, len(calls))
+        self.assertIn("implemented-awaiting-google", calls[0])
+
+    def test_generated_scaffold_reports_build_failure_without_raising(self) -> None:
+        target = "https://globalhomeatlas.com/countries/portugal-property/"
+        pair = self.editorial_pair(impressions=40, position=8, target=target, suffix="failure")
+        context = seo_feedback_loop.seo_content_generator.collect_target_context(target, [target])
+        entry = {
+            "target_url": target,
+            "finding_fingerprint": pair[0].fingerprint,
+            "base_content_hash": context.base_content_hash,
+            "generated_at": "2026-08-12T00:00:00+00:00",
+            "model": "test-model",
+            "signal": pair[0].payload,
+            "lifecycle": "proposed",
+            "cooldown_until": "2026-09-09T00:00:00+00:00",
+            "content": {
+                "title": "Portugal Property Markets for Foreign Buyers | Global Home Atlas",
+                "meta_description": None,
+                "intro": None,
+                "faq_question": None,
+                "faq_answer": None,
+                "internal_link_target": None,
+                "internal_link_anchor": None,
+            },
+        }
+        original_run = seo_feedback_loop.run
+        original_batch = seo_feedback_loop.seo_content_generator.generate_batch
+        original_upsert = seo_feedback_loop.seo_content_generator.upsert_override_entry
+
+        def fake_run(cmd, *, check=True, capture=True):
+            if cmd[:3] == ["gh", "pr", "list"]:
+                return subprocess.CompletedProcess(cmd, 0, "[]", "")
+            if cmd == ["git", "branch", "--show-current"]:
+                return subprocess.CompletedProcess(cmd, 0, "main\n", "")
+            if cmd[:4] == ["git", "ls-remote", "--exit-code", "--heads"]:
+                return subprocess.CompletedProcess(cmd, 2, "", "")
+            if cmd == ["python3", "src/build_unified_app.py"]:
+                raise RuntimeError("static build failed")
+            return subprocess.CompletedProcess(cmd, 0, "", "")
+
+        seo_feedback_loop.run = fake_run
+        seo_feedback_loop.seo_content_generator.generate_batch = lambda candidates: (
+            seo_feedback_loop.seo_content_generator.BatchGenerationResult((entry,), (), None)
+        )
+        seo_feedback_loop.seo_content_generator.upsert_override_entry = lambda item: None
+        try:
+            result = seo_feedback_loop.scaffold_generated_content_pr([pair], sitemap_urls=[target], dry_run=False)
+        finally:
+            seo_feedback_loop.run = original_run
+            seo_feedback_loop.seo_content_generator.generate_batch = original_batch
+            seo_feedback_loop.seo_content_generator.upsert_override_entry = original_upsert
+
+        self.assertIsNone(result.pr_url)
+        self.assertIn("static build failed", result.skipped_reason)
     def test_classify_creates_query_ctr_opportunity_for_zero_click_top_query(self) -> None:
         report = {
             "site_url": "https://globalhomeatlas.com",
@@ -36,6 +773,14 @@ class NotificationCommentTests(unittest.TestCase):
                 "low_ctr_pages": [],
                 "near_ranking_pages": [],
                 "content_gap_queries": [],
+                "reconciliation": {
+                    "query_complete": True,
+                    "page_complete": True,
+                    "query_ctr_queries": [],
+                    "low_ctr_pages": [],
+                    "near_ranking_pages": [],
+                    "content_gap_queries": [],
+                },
             },
         }
 
@@ -56,6 +801,104 @@ class NotificationCommentTests(unittest.TestCase):
         self.assertIn("title", finding.payload["recommended_actions"][0].lower())
         self.assertFalse(finding.auto_merge_safe)
         self.assertFalse(finding.auto_implementation_safe)
+
+    def test_classify_marks_only_indexed_missed_impression_goals_for_recovery(self) -> None:
+        base = {
+            "launch_date": "2026-06-23",
+            "indexed_deadline": "2026-06-30",
+            "impressions_deadline": "2026-07-23",
+        }
+        eligible_url = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        goals = [
+            {
+                **base,
+                "url": eligible_url,
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"page": eligible_url, "impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/japan-property/",
+                "index_status": "missed",
+                "impression_status": "on_track",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/italy-property/",
+                "index_status": "met",
+                "impression_status": "at_risk",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/countries/thailand-property/",
+                "index_status": "missed",
+                "impression_status": "missed",
+                "analytics": {"impressions": 0},
+            },
+            {
+                **base,
+                "url": "https://globalhomeatlas.com/guides/",
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"impressions": 1},
+            },
+        ]
+        report = {
+            "sitemap": {"urls": [eligible_url], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {"page_goals": goals},
+        }
+
+        findings = seo_feedback_loop.classify(report, tracking_ok=True)
+        recovery = [item for item in findings if (item.payload or {}).get("recovery_type") == "first-impression"]
+
+        self.assertEqual(1, len(recovery))
+        finding = recovery[0]
+        self.assertEqual(eligible_url, finding.payload["page"])
+        self.assertEqual("impression_status", finding.payload["goal_field"])
+        self.assertEqual(0, finding.payload["impressions"])
+        self.assertTrue(finding.implementation_pr)
+
+    def test_recovery_skips_unsupported_and_out_of_sitemap_targets_before_selection(self) -> None:
+        valid = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        unsupported = "https://globalhomeatlas.com/about/"
+        out_of_sitemap = "https://globalhomeatlas.com/best-countries-for-expats-to-buy-property/"
+
+        def goal(url: str) -> dict:
+            return {
+                "url": url,
+                "launch_date": "2026-06-23",
+                "indexed_deadline": "2026-06-30",
+                "impressions_deadline": "2026-07-23",
+                "index_status": "met",
+                "impression_status": "missed",
+                "analytics": {"page": url, "impressions": 0},
+            }
+
+        report = {
+            "sitemap": {"urls": [unsupported, valid], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {"page_goals": [goal(unsupported), goal(out_of_sitemap), goal(valid)]},
+        }
+        findings = seo_feedback_loop.classify(report, tracking_ok=True)
+        pairs = [
+            (item, f"issue:{index}")
+            for index, item in enumerate(findings)
+            if item.implementation_pr
+        ]
+
+        selected = seo_feedback_loop.select_generated_content_candidates(
+            pairs,
+            issues=[],
+            open_targets=set(),
+            override_entries=[],
+            now=datetime(2026, 8, 14, tzinfo=timezone.utc),
+        )
+
+        self.assertEqual([valid], [seo_feedback_loop.finding_target_url(pair[0]) for pair in selected])
 
     def test_classify_marks_near_ranking_internal_link_as_auto_safe(self) -> None:
         report = {
@@ -467,6 +1310,315 @@ class NotificationCommentTests(unittest.TestCase):
 
         self.assertTrue(body.startswith("@schlafen318"))
         self.assertNotIn("@@schlafen318", body)
+
+    def test_control_issue_reports_generated_content_outcome(self) -> None:
+        body = seo_feedback_loop.control_issue_body(
+            report={},
+            findings=[],
+            issue_links=[],
+            pr_links=[],
+            auto_merged=[],
+            indexnow={},
+            generated_content={
+                "accepted_count": 2,
+                "rejected": [{
+                    "fingerprint": "gha-low-ctr-x",
+                    "target_url": "https://globalhomeatlas.com/x/",
+                    "reason": "new number",
+                }],
+                "skipped_reason": None,
+                "pr": "https://github.com/schlafen318/property-research-dashboard/pull/101",
+                "reconciled_issue_count": 1,
+            },
+        )
+        self.assertIn("Generated content accepted: `2`", body)
+        self.assertIn("new number", body)
+        self.assertIn("pull/101", body)
+
+    def test_control_issue_reports_stale_reconciliation(self) -> None:
+        body = seo_feedback_loop.control_issue_body(
+            report={},
+            findings=[],
+            issue_links=[],
+            pr_links=[],
+            auto_merged=[],
+            indexnow={},
+            stale_issue_reconciliation={"marked": 3, "closed": 2, "reopened": 1},
+        )
+
+        self.assertIn("Stale Opportunity Reconciliation", body)
+        self.assertIn("Marked stale: `3`", body)
+        self.assertIn("Closed stale: `2`", body)
+        self.assertIn("Reopened: `1`", body)
+
+    def test_control_and_notification_report_goal_reconciliation(self) -> None:
+        kwargs = {
+            "goal_issue_reconciliation": {"closed": 2, "reopened": 1},
+            "goal_issue_reconciliation_error": "Issue #107 failed",
+        }
+        control = seo_feedback_loop.control_issue_body(
+            report={}, findings=[], issue_links=[], pr_links=[], auto_merged=[], indexnow={}, **kwargs
+        )
+        notification = seo_feedback_loop.build_notification_comment(
+            notify_user="schlafen318",
+            report={},
+            findings=[],
+            issue_links=[],
+            pr_links=[],
+            auto_merged=[],
+            control_link="https://github.com/schlafen318/property-research-dashboard/issues/1",
+            **kwargs,
+        )
+
+        for body in (control, notification):
+            self.assertIn("Goal issues closed: `2`", body)
+            self.assertIn("Goal issues reopened: `1`", body)
+            self.assertIn("Issue #107 failed", body)
+
+    def test_main_skips_stale_reconciliation_without_search_console(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_reconcile = seo_feedback_loop.reconcile_stale_opportunity_issues
+        calls = []
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: calls.append(kwargs)
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                result = seo_feedback_loop.main(
+                    ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.reconcile_stale_opportunity_issues = original_reconcile
+
+        self.assertEqual(0, result)
+        self.assertEqual([], calls)
+        self.assertEqual(
+            {"marked": 0, "closed": 0, "reopened": 0},
+            summary["stale_issue_reconciliation"],
+        )
+
+    def test_main_reconciles_goal_issues_before_updating_findings(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {"page_goals": []},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_reconcile = seo_feedback_loop.reconcile_goal_issues
+        calls = []
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        seo_feedback_loop.reconcile_goal_issues = lambda **kwargs: calls.append(kwargs) or {
+            "closed": 2,
+            "reopened": 1,
+            "errors": ["Issue #107 failed"],
+        }
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.reconcile_goal_issues = original_reconcile
+        self.assertEqual(1, len(calls))
+        self.assertEqual(report["goals"], calls[0]["report"]["goals"])
+        self.assertEqual({"closed": 2, "reopened": 1}, summary["goal_issue_reconciliation"])
+        self.assertEqual("Issue #107 failed", summary["goal_issue_reconciliation_error"])
+
+    def test_main_routes_recovery_only_to_generated_content(self) -> None:
+        target = "https://globalhomeatlas.com/buying-property-abroad-for-retirement/"
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [target], "status": {}, "indexing": {}},
+            "search_console": {"available": False},
+            "goals": {
+                "page_goals": [
+                    {
+                        "url": target,
+                        "launch_date": "2026-06-23",
+                        "indexed_deadline": "2026-06-30",
+                        "impressions_deadline": "2026-07-23",
+                        "index_status": "met",
+                        "impression_status": "missed",
+                        "analytics": {"page": target, "impressions": 0},
+                    }
+                ]
+            },
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_scaffold = seo_feedback_loop.scaffold_generated_content_pr
+        generated_targets = []
+
+        def capture(pairs, *, sitemap_urls, dry_run):
+            generated_targets.extend(seo_feedback_loop.finding_target_url(pair[0]) for pair in pairs)
+            return seo_feedback_loop.GeneratedContentRun("dry-run:recovery-pr", 0, (), None)
+
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        seo_feedback_loop.scaffold_generated_content_pr = capture
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(0, seo_feedback_loop.main(["--dry-run", "--report", str(report_path)]))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.scaffold_generated_content_pr = original_scaffold
+
+        self.assertEqual([target], generated_targets)
+
+    def test_main_reports_stale_reconciliation_and_contains_failures(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {
+                "available": True,
+                "top_queries": [],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+            },
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_reconcile = seo_feedback_loop.reconcile_stale_opportunity_issues
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: []
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: {
+                    "marked": 4,
+                    "closed": 2,
+                    "reopened": 1,
+                }
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+                self.assertEqual({"marked": 4, "closed": 2, "reopened": 1}, summary["stale_issue_reconciliation"])
+
+                seo_feedback_loop.reconcile_stale_opportunity_issues = lambda **kwargs: (_ for _ in ()).throw(
+                    RuntimeError("GitHub unavailable")
+                )
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                failed = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.reconcile_stale_opportunity_issues = original_reconcile
+
+        self.assertEqual({"marked": 0, "closed": 0, "reopened": 0}, failed["stale_issue_reconciliation"])
+        self.assertIn("GitHub unavailable", failed["stale_issue_reconciliation_error"])
+
+    def test_main_dry_run_reports_real_stale_issue_counts_without_mutation(self) -> None:
+        report = {
+            "generated_at": "2026-08-14T00:00:00Z",
+            "site_url": "https://globalhomeatlas.com",
+            "window": {"start_date": "2026-07-17", "end_date": "2026-08-13"},
+            "sitemap": {"urls": [], "status": {}, "indexing": {}},
+            "search_console": {
+                "available": True,
+                "top_queries": [{"query": "unrelated query", "clicks": 0, "impressions": 1, "ctr": 0, "position": 50}],
+                "top_pages": [],
+                "low_ctr_pages": [],
+                "near_ranking_pages": [],
+                "content_gap_queries": [],
+                "reconciliation": {
+                    "query_complete": True,
+                    "page_complete": True,
+                    "query_ctr_queries": [],
+                    "low_ctr_pages": [],
+                    "near_ranking_pages": [],
+                    "content_gap_queries": [],
+                },
+            },
+            "goals": {},
+        }
+        original_tracking = seo_feedback_loop.tracking_status
+        original_list_issues = seo_feedback_loop.list_issues
+        original_mutation = seo_feedback_loop.gh_mutation
+        mutation_calls = []
+        seo_feedback_loop.tracking_status = lambda: True
+        seo_feedback_loop.list_issues = lambda: [self.opportunity_issue()]
+        seo_feedback_loop.gh_mutation = lambda cmd, attempts=3: mutation_calls.append(cmd)
+        try:
+            with tempfile.TemporaryDirectory() as tmpdir:
+                report_path = Path(tmpdir) / "report.json"
+                summary_path = Path(tmpdir) / "summary.json"
+                report_path.write_text(json.dumps(report), encoding="utf-8")
+                self.assertEqual(
+                    0,
+                    seo_feedback_loop.main(
+                        ["--dry-run", "--report", str(report_path), "--summary-output", str(summary_path)]
+                    ),
+                )
+                summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        finally:
+            seo_feedback_loop.tracking_status = original_tracking
+            seo_feedback_loop.list_issues = original_list_issues
+            seo_feedback_loop.gh_mutation = original_mutation
+
+        self.assertEqual({"marked": 1, "closed": 0, "reopened": 0}, summary["stale_issue_reconciliation"])
+        self.assertEqual([], mutation_calls)
+
+    def test_workflow_exposes_openai_only_to_feedback_step(self) -> None:
+        workflow = Path(".github/workflows/seo-feedback-loop.yml").read_text(encoding="utf-8")
+        self.assertIn('"openai>=2,<3"', workflow)
+        self.assertIn("OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}", workflow)
+        self.assertIn("SEO_CONTENT_MODEL: ${{ vars.SEO_CONTENT_MODEL || 'gpt-5.6' }}", workflow)
+        job_env = workflow.split("steps:", 1)[0]
+        self.assertNotIn("OPENAI_API_KEY", job_env)
+        self.assertLess(
+            workflow.index("- name: Run feedback loop"),
+            workflow.index("- name: Generate SEO status dashboard"),
+        )
 
 
 if __name__ == "__main__":

@@ -4,10 +4,20 @@ import json
 import os
 import re
 import shutil
+import sys
 import unicodedata
 from datetime import date
 from html import escape
 from pathlib import Path
+from urllib.parse import urlparse
+
+try:
+    from src.seo_content_overrides import apply_content_override, load_content_overrides
+except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
+    from seo_content_overrides import apply_content_override, load_content_overrides
+
+sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
+from scripts.seo_content_generator import PageContextParser, content_hash
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data"
@@ -238,15 +248,15 @@ SEO_PAGES = [
     },
     {
         "slug": "best-places-to-buy-vacation-home-abroad",
-        "title": "Best Locations for Vacation Homes Abroad | Global Home Atlas",
-        "description": "Compare the best locations for vacation homes abroad by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.",
-        "h1": "Best Locations for Vacation Homes Abroad",
+        "title": "Best Places to Buy a Vacation Home in the World",
+        "description": "Compare the best places to buy a vacation home in the world by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.",
+        "h1": "Best Places to Buy a Vacation Home in the World",
         "keyword": "best country to buy a vacation home",
         "theme": "vacation-home acquisition",
         "intent": "buyers who want personal use, repeatable travel demand, and a realistic path to offset carrying costs",
         "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "madeira", "costa-brava-girona", "lake-como", "crete", "phuket-koh-samui", "mallorca", "andermatt", "annecy"],
         "faqs": [
-            ("What are the best locations for vacation homes abroad?", "The strongest vacation-home locations combine repeat owner use, reliable access, clear ownership, manageable rental rules, defensible entry price, and resale demand beyond one buyer group."),
+            ("What are the best places to buy a vacation home in the world?", "The strongest vacation-home locations combine repeat owner use, reliable access, clear ownership, manageable rental rules, defensible entry price, and resale demand beyond one buyer group."),
             ("What makes a strong overseas vacation-home market?", "Look for repeat visitation, airport access, year-round demand, clear local rental rules, and a resale market beyond foreign buyers."),
             ("Are island homes better investments?", "Not automatically. Islands can have scarcity and appeal, but also seasonality, maintenance friction, and regulatory limits."),
         ],
@@ -2802,21 +2812,48 @@ def build_landing_trust_cards() -> str:
     )
 
 
-def build_landing_page(destinations: list[dict], pages: list[dict], listings: list[dict], countries: int) -> str:
+def generated_internal_link_html(content: dict) -> str:
+    link = content.get("generated_internal_link")
+    if not link:
+        return ""
+    path = urlparse(link["target"]).path or "/"
+    return (
+        '<p class="generated-seo-link">Continue with '
+        f'<a href="{escape(path)}">{escape(link["anchor"])}</a>.</p>'
+    )
+
+
+def build_landing_page(
+    destinations: list[dict],
+    pages: list[dict],
+    listings: list[dict],
+    countries: int,
+    content_overrides: list[dict] | None = None,
+) -> str:
     generated = date.today().isoformat()
+    content = apply_content_override(
+        {
+            "title": "Best Places to Buy Property Abroad | Global Property Markets",
+            "description": "Compare the best places to buy property abroad, including global property markets for buying property abroad, vacation homes, second homes, retirement, budget, and exit plan.",
+            "generated_intro": "Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan.",
+        },
+        SITE_URL,
+        content_overrides or [],
+    )
+    generated_link = generated_internal_link_html(content)
     return f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 {favicon_links_html()}
-  <title>Best Places to Buy Property Abroad | Global Property Markets</title>
-  <meta name="description" content="Compare the best places to buy property abroad, including global property markets for buying property abroad, vacation homes, second homes, retirement, budget, and exit plan.">
+  <title>{escape(content["title"])}</title>
+  <meta name="description" content="{escape(content["description"])}">
   <link rel="canonical" href="{SITE_URL}">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="{SITE_NAME}">
   <meta property="og:title" content="Global Home Atlas">
-  <meta property="og:description" content="Compare the best places to buy property abroad, including global property markets for buying property abroad, vacation homes, second homes, retirement, budget, and exit plan.">
+  <meta property="og:description" content="{escape(content["description"])}">
   <meta property="og:url" content="{SITE_URL}">
   <meta name="twitter:card" content="summary_large_image">
 {analytics_head_tags()}
@@ -3051,7 +3088,8 @@ def build_landing_page(destinations: list[dict], pages: list[dict], listings: li
       <div>
         <p class="eyebrow">Global mobility and property intelligence</p>
         <h1>Global Home Atlas</h1>
-        <p class="lede">Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan.</p>
+        <p class="lede">{escape(content["generated_intro"])}</p>
+        {generated_link}
         <p class="hero-proof"><i aria-hidden="true">✓</i> Independent research. Not paid placement.</p>
         <div class="hero-actions">
           <a class="primary-action" href="#market-finder" data-track="homepage_start_click" data-track-label="hero">Find my best-fit markets</a>
@@ -4112,9 +4150,15 @@ def country_guide_links(hub: dict, pages: list[dict]) -> str:
     return "\n".join(links)
 
 
-def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict]) -> str:
-    selected = destinations_for_ids(hub["destination_ids"], destinations)
+def build_country_hub_page(
+    hub: dict,
+    destinations: list[dict],
+    pages: list[dict],
+    content_overrides: list[dict] | None = None,
+) -> str:
     canonical = country_url(hub)
+    hub = apply_content_override(hub, canonical, content_overrides or [])
+    selected = destinations_for_ids(hub["destination_ids"], destinations)
     updated = date.today().isoformat()
     avg_score = sum(float(dest.get("decision_score", 0) or 0) for dest in selected) / max(1, len(selected))
     best = selected[0] if selected else destinations[0]
@@ -4127,6 +4171,8 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
         if retirement_ids.intersection(hub["destination_ids"])
         else ""
     )
+    intro = hub.get("generated_intro") or hub["description"]
+    generated_link = generated_internal_link_html(hub)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -4142,7 +4188,8 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
         <div>
           <p class="page-eyebrow">{escape(hub["country"])} country hub · updated {updated}</p>
           <h1>{escape(hub["h1"])}</h1>
-          <p class="page-lede">{escape(hub["description"])}</p>
+          <p class="page-lede">{escape(intro)}</p>
+          {generated_link}
         </div>
         <aside class="page-hero-card">
           <span>Markets compared</span><strong>{len(selected)}</strong>
@@ -4263,15 +4310,24 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
 """
 
 
-def build_seo_page(page: dict, destinations: list[dict], pages: list[dict], auto_links: list[dict] | None = None) -> str:
-    selected = destinations_for_page(page, destinations)
+def build_seo_page(
+    page: dict,
+    destinations: list[dict],
+    pages: list[dict],
+    auto_links: list[dict] | None = None,
+    content_overrides: list[dict] | None = None,
+) -> str:
     canonical = page_url(page["slug"])
+    page = apply_content_override(page, canonical, content_overrides or [])
+    selected = destinations_for_page(page, destinations)
     top = selected[0]
     runner_up = selected[1] if len(selected) > 1 else selected[0]
     related_links = seo_guide_links(pages, page["slug"], limit=5)
     contextual_links = contextual_related_guides(page, pages, auto_links=auto_links)
     title = page["title"]
     description = page["description"]
+    intro = page.get("generated_intro") or description
+    generated_link = generated_internal_link_html(page)
     updated = date.today().isoformat()
     country_count = len({item.get("country") for item in selected if item.get("country")})
     retirement_callout = (
@@ -4424,7 +4480,8 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict], auto
         <div>
           <p class="seo-eyebrow">{escape(page["theme"])} · updated {updated}</p>
           <h1>{escape(page["h1"])}</h1>
-          <p class="seo-lede">{escape(description)} This guide is written for {escape(page["intent"])}.</p>
+          <p class="seo-lede">{escape(intro)} This guide is written for {escape(page["intent"])}.</p>
+          {generated_link}
           <div class="seo-actions">
           <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a>
           <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare markets</a>
@@ -5245,15 +5302,23 @@ def shared_content_css() -> str:
 """
 
 
-def schema_for_destination(dest: dict, canonical: str) -> list[dict]:
+def schema_for_destination(
+    dest: dict,
+    canonical: str,
+    *,
+    title: str | None = None,
+    description: str | None = None,
+) -> list[dict]:
+    effective_title = title or f"{dest['name']} Property Research"
+    effective_description = description or f"{dest['name']} property research for global buyers, including ownership clarity, retirement fit, rental context, risks, and destination score."
     return [
         *global_schema_entities(),
         {
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": f"{dest['name']} Property Research",
+            "name": effective_title,
             "url": canonical,
-            "description": f"{dest['name']} property research for global buyers, including ownership clarity, retirement fit, rental context, risks, and destination score.",
+            "description": effective_description,
             "dateModified": date.today().isoformat(),
             "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
         },
@@ -5269,7 +5334,13 @@ def schema_for_destination(dest: dict, canonical: str) -> list[dict]:
     ]
 
 
-def build_destination_page(dest: dict, listings: list[dict], destinations: list[dict], pages: list[dict]) -> str:
+def build_destination_page(
+    dest: dict,
+    listings: list[dict],
+    destinations: list[dict],
+    pages: list[dict],
+    content_overrides: list[dict] | None = None,
+) -> str:
     slug = destination_slug(dest)
     canonical = destination_url(dest)
     title = f"{dest['name']} Property Research | Global Home Atlas"
@@ -5277,6 +5348,19 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         f"{dest['name']} property research for global buyers: ownership clarity, retirement fit, "
         f"rental income context, USD/m2 benchmark, risks, and long-term lifestyle thesis."
     )
+    content = apply_content_override(
+        {
+            "title": title,
+            "description": description,
+            "generated_intro": dest.get("panel_summary") or "",
+        },
+        canonical,
+        content_overrides or [],
+    )
+    title = content["title"]
+    description = content["description"]
+    intro = content["generated_intro"]
+    generated_link = generated_internal_link_html(content)
     peer_destinations = [
         item
         for item in destinations
@@ -5318,7 +5402,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
     return f"""<!doctype html>
 <html lang="en">
 <head>
-{head_html(title, description, canonical, schema_for_destination(dest, canonical))}
+{head_html(title, description, canonical, schema_for_destination(dest, canonical, title=title, description=description))}
   <style>{shared_content_css()}</style>
 </head>
 <body class="has-mobile-actions">
@@ -5329,7 +5413,8 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         <div>
           <p class="page-eyebrow">{escape(dest.get("category") or "Destination")} · {escape(dest.get("country") or "")} · updated {date.today().isoformat()}</p>
           <h1>{escape(dest["name"])} Property Research</h1>
-          <p class="page-lede">{escape(dest.get("panel_summary") or "")}</p>
+          <p class="page-lede">{escape(intro)}</p>
+          {generated_link}
         </div>
         <aside class="page-hero-card">
           <span>Global rank</span><strong>#{dest["rank"]}</strong>
@@ -6001,6 +6086,7 @@ def build_brand_mockups_page() -> str:
 
 
 def build() -> Path:
+    content_overrides = load_content_overrides()
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = sorted(destinations, key=lambda item: item["rank"])
     retirement_costs = load_retirement_costs()
@@ -6022,6 +6108,51 @@ def build() -> Path:
     avg_score = sum(float(item.get("decision_score", 0) or 0) for item in destinations) / len(destinations)
     min_price = min(float(item.get("usd_per_m2", 0) or 0) for item in destinations)
     countries = len({item.get("country") for item in destinations if item.get("country")})
+    auto_internal_links = load_auto_internal_links()
+    for entry in content_overrides:
+        target = entry["target_url"]
+        if target == SITE_URL:
+            base_html = build_landing_page(destinations, SEO_PAGES, listings, countries, content_overrides=[])
+        elif target.startswith(f"{SITE_URL}countries/"):
+            slug = target.removeprefix(f"{SITE_URL}countries/").strip("/")
+            hub = next((item for item in COUNTRY_HUBS if item["slug"] == slug), None)
+            if hub is None:
+                raise ValueError(f"Unsupported SEO content target URL: {target}")
+            base_html = build_country_hub_page(hub, destinations, SEO_PAGES, content_overrides=[])
+        elif target.startswith(f"{SITE_URL}destinations/"):
+            slug = target.removeprefix(f"{SITE_URL}destinations/").strip("/")
+            dest = next((item for item in destinations if destination_slug(item) == slug), None)
+            if dest is None:
+                raise ValueError(f"Unsupported SEO content target URL: {target}")
+            base_html = build_destination_page(
+                dest, listings_by_dest.get(dest["id"], []), destinations, SEO_PAGES, content_overrides=[]
+            )
+        else:
+            slug = target.removeprefix(SITE_URL).strip("/")
+            page = next((item for item in SEO_PAGES if item["slug"] == slug), None)
+            if page is None:
+                raise ValueError(f"Unsupported SEO content target URL: {target}")
+            base_html = build_seo_page(
+                page, destinations, SEO_PAGES, auto_links=auto_internal_links, content_overrides=[]
+            )
+        parser = PageContextParser()
+        parser.feed(base_html)
+        allowed_hashes = {content_hash(
+            parser.values["title"], parser.values["description"], parser.values["h1"],
+            parser.values["intro"], tuple(parser.faqs),
+        )}
+        artifact_path = ARTIFACTS / target.removeprefix(SITE_URL).strip("/") / "index.html"
+        if target == SITE_URL:
+            artifact_path = ARTIFACTS / "index.html"
+        if artifact_path.exists():
+            prior_parser = PageContextParser()
+            prior_parser.feed(artifact_path.read_text(encoding="utf-8"))
+            allowed_hashes.add(content_hash(
+                prior_parser.values["title"], prior_parser.values["description"], prior_parser.values["h1"],
+                prior_parser.values["intro"], tuple(prior_parser.faqs),
+            ))
+        if entry["base_content_hash"] not in allowed_hashes:
+            raise ValueError(f"Stale SEO content base hash: {target}")
     categories = sorted({item.get("category") for item in destinations if item.get("category")})
     category_options = "\n".join(
         f'<option value="{escape(category)}">{escape(category)}</option>' for category in categories
@@ -7535,7 +7666,15 @@ def build() -> Path:
     sitemap = ARTIFACTS / "sitemap.xml"
     indexnow_key_file = ARTIFACTS / f"{INDEXNOW_KEY}.txt"
     dashboard_html = clean_generated_html(html)
-    landing_html = clean_generated_html(build_landing_page(destinations, SEO_PAGES, listings, countries))
+    landing_html = clean_generated_html(
+        build_landing_page(
+            destinations,
+            SEO_PAGES,
+            listings,
+            countries,
+            content_overrides=content_overrides,
+        )
+    )
     out.write_text(dashboard_html, encoding="utf-8")
     index.write_text(landing_html, encoding="utf-8")
     dashboard_dir.mkdir(parents=True, exist_ok=True)
@@ -7571,12 +7710,19 @@ def build() -> Path:
         clean_generated_html(build_report_library_page(destinations, SEO_PAGES)),
         encoding="utf-8",
     )
-    auto_internal_links = load_auto_internal_links()
     for page in SEO_PAGES:
         page_dir = ARTIFACTS / page["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
         (page_dir / "index.html").write_text(
-            clean_generated_html(build_seo_page(page, destinations, SEO_PAGES, auto_links=auto_internal_links)),
+            clean_generated_html(
+                build_seo_page(
+                    page,
+                    destinations,
+                    SEO_PAGES,
+                    auto_links=auto_internal_links,
+                    content_overrides=content_overrides,
+                )
+            ),
             encoding="utf-8",
         )
     destinations_dir = ARTIFACTS / "destinations"
@@ -7585,7 +7731,15 @@ def build() -> Path:
         page_dir = destinations_dir / destination_slug(dest)
         page_dir.mkdir(parents=True, exist_ok=True)
         (page_dir / "index.html").write_text(
-            clean_generated_html(build_destination_page(dest, listings_by_dest.get(dest["id"], []), destinations, SEO_PAGES)),
+            clean_generated_html(
+                build_destination_page(
+                    dest,
+                    listings_by_dest.get(dest["id"], []),
+                    destinations,
+                    SEO_PAGES,
+                    content_overrides=content_overrides,
+                )
+            ),
             encoding="utf-8",
         )
     countries_dir = ARTIFACTS / "countries"
@@ -7594,7 +7748,14 @@ def build() -> Path:
         page_dir = countries_dir / hub["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
         (page_dir / "index.html").write_text(
-            clean_generated_html(build_country_hub_page(hub, destinations, SEO_PAGES)),
+            clean_generated_html(
+                build_country_hub_page(
+                    hub,
+                    destinations,
+                    SEO_PAGES,
+                    content_overrides=content_overrides,
+                )
+            ),
             encoding="utf-8",
         )
     for page in TRUST_PAGES:

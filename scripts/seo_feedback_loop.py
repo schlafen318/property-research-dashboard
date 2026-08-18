@@ -8,8 +8,14 @@ import re
 import subprocess
 import sys
 import time
-from dataclasses import dataclass
+from dataclasses import asdict, dataclass
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+try:
+    from scripts import seo_content_generator
+except ImportError:  # Direct execution: python3 scripts/seo_feedback_loop.py
+    import seo_content_generator
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -37,12 +43,18 @@ LABELS = {
     "query-ctr-opportunity": "fbca04",
     "implementation-queued": "5319e7",
     "implemented-awaiting-google": "fbca04",
+    "stale-signal": "cfd3d7",
+    "stale-signal-auto-closed": "6e7781",
+    "goal-status-auto-closed": "6e7781",
     "validated-by-gsc": "0e8a16",
+    "generated-content": "5319e7",
 }
 QUERY_CTR_MIN_IMPRESSIONS = 4
 QUERY_CTR_MAX_CTR = 0.01
 QUERY_CTR_MAX_POSITION = 20.0
 IMPLEMENTATION_PR_KINDS = {"query-ctr-opportunity", "low-ctr-opportunity", "near-ranking-opportunity"}
+GENERATED_CONTENT_KINDS = {*IMPLEMENTATION_PR_KINDS, "seo-goal-missed"}
+STALE_RECONCILIATION_KINDS = {*IMPLEMENTATION_PR_KINDS, "new-query-content-gap"}
 AUTO_IMPLEMENTATION_KINDS = {"near-ranking-opportunity"}
 AUTO_INTERNAL_LINK_SOURCE_SLUG = "buy-property-abroad"
 
@@ -60,6 +72,26 @@ class Finding:
     implementation_pr: bool = False
     auto_implementation_safe: bool = False
     payload: dict | None = None
+
+
+@dataclass(frozen=True)
+class GeneratedContentRun:
+    pr_url: str | None
+    accepted_count: int
+    rejected: tuple[seo_content_generator.RejectedProposal, ...]
+    skipped_reason: str | None
+
+
+def is_first_impression_recovery(finding: Finding) -> bool:
+    payload = finding.payload or {}
+    analytics = payload.get("analytics") or {}
+    return (
+        finding.kind == "seo-goal-missed"
+        and payload.get("goal_field") == "impression_status"
+        and payload.get("recovery_type") == "first-impression"
+        and payload.get("index_status") == "met"
+        and int(analytics.get("impressions") or payload.get("impressions") or 0) == 0
+    )
 
 
 def run(cmd: list[str], *, check: bool = True, capture: bool = True) -> subprocess.CompletedProcess:
@@ -318,13 +350,38 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
 
     sc = report.get("search_console", {})
     goals = report.get("goals", {})
+    sitemap_urls = set(sitemap.get("urls") or [])
     for goal in goals.get("page_goals", []):
+        goal_url = str(goal.get("url") or "")
+        try:
+            recovery_page_type = seo_content_generator.page_type_for_url(goal_url)
+        except ValueError:
+            recovery_page_type = None
         for field, label in (("index_status", "Indexing"), ("impression_status", "First impressions")):
             status_value = goal.get(field)
             if status_value not in {"at_risk", "missed"}:
                 continue
             kind = "seo-goal-missed" if status_value == "missed" else "seo-goal-at-risk"
             severity = "high" if status_value == "missed" else "medium"
+            analytics = goal.get("analytics") or {}
+            recovery = (
+                field == "impression_status"
+                and status_value == "missed"
+                and goal.get("index_status") == "met"
+                and int(analytics.get("impressions") or 0) == 0
+                and goal_url in sitemap_urls
+                and recovery_page_type is not None
+            )
+            payload = dict(goal)
+            if recovery:
+                payload.update(
+                    {
+                        "goal_field": "impression_status",
+                        "recovery_type": "first-impression",
+                        "page": goal_url,
+                        "impressions": 0,
+                    }
+                )
             findings.append(
                 Finding(
                     kind=kind,
@@ -338,7 +395,8 @@ def classify(report: dict, tracking_ok: bool) -> list[Finding]:
                     severity=severity,
                     labels=("analytics-loop", kind, "seo-opportunity", "needs-human-review"),
                     fingerprint=stable_fingerprint(kind, f"{field}:{goal.get('url')}"),
-                    payload=goal,
+                    implementation_pr=recovery,
+                    payload=payload,
                 )
             )
 
@@ -505,6 +563,11 @@ def control_issue_body(
     pr_links: list[str],
     auto_merged: list[str],
     indexnow: dict,
+    generated_content: dict | None = None,
+    stale_issue_reconciliation: dict[str, int] | None = None,
+    stale_issue_reconciliation_error: str | None = None,
+    goal_issue_reconciliation: dict[str, int] | None = None,
+    goal_issue_reconciliation_error: str | None = None,
 ) -> str:
     sitemap = report.get("sitemap", {})
     status = sitemap.get("status") or {}
@@ -558,6 +621,15 @@ def control_issue_body(
 ## Auto-Merged Fixes
 {chr(10).join(f'- {link}' for link in auto_merged) if auto_merged else '- None'}
 
+## Generated Content
+{format_generated_content(generated_content or {})}
+
+## Stale Opportunity Reconciliation
+{format_stale_issue_reconciliation(stale_issue_reconciliation or {}, stale_issue_reconciliation_error)}
+
+## Goal Issue Reconciliation
+{format_goal_issue_reconciliation(goal_issue_reconciliation or {}, goal_issue_reconciliation_error)}
+
 ## Recommended Next Action
 {recommended_next_action(findings)}
 """
@@ -576,6 +648,11 @@ def build_notification_comment(
     pr_links: list[str],
     auto_merged: list[str],
     control_link: str,
+    generated_content: dict | None = None,
+    stale_issue_reconciliation: dict[str, int] | None = None,
+    stale_issue_reconciliation_error: str | None = None,
+    goal_issue_reconciliation: dict[str, int] | None = None,
+    goal_issue_reconciliation_error: str | None = None,
 ) -> str:
     by_severity = {"high": 0, "medium": 0, "low": 0}
     for finding in findings:
@@ -593,12 +670,59 @@ def build_notification_comment(
 - Issues created or updated: `{len(issue_links)}`
 - Draft PRs opened: `{len(pr_links)}`
 - Auto-merged fixes: `{len(auto_merged)}`
+- Generated content accepted: `{(generated_content or {}).get('accepted_count', 0)}`
+- Generated content rejected: `{len((generated_content or {}).get('rejected', []))}`
+- Generated content draft: `{(generated_content or {}).get('pr') or 'none'}`
+- Opportunities marked stale: `{(stale_issue_reconciliation or {}).get('marked', 0)}`
+- Stale opportunities closed: `{(stale_issue_reconciliation or {}).get('closed', 0)}`
+- Stale opportunities reopened: `{(stale_issue_reconciliation or {}).get('reopened', 0)}`
+{f"- Stale reconciliation error: `{stale_issue_reconciliation_error}`" if stale_issue_reconciliation_error else ""}
+- Goal issues closed: `{(goal_issue_reconciliation or {}).get('closed', 0)}`
+- Goal issues reopened: `{(goal_issue_reconciliation or {}).get('reopened', 0)}`
+{f"- Goal reconciliation error: `{goal_issue_reconciliation_error}`" if goal_issue_reconciliation_error else ""}
 
 ## Next Action
 {recommended_next_action(findings)}
 
 [Control issue]({control_link})
 """
+
+
+def format_generated_content(generated_content: dict) -> str:
+    rejected = generated_content.get("rejected") or []
+    lines = [
+        f"- Generated content accepted: `{generated_content.get('accepted_count', 0)}`",
+        f"- Generated content rejected: `{len(rejected)}`",
+        f"- Draft PR: `{generated_content.get('pr') or 'none'}`",
+        f"- Reconciled source issues: `{generated_content.get('reconciled_issue_count', 0)}`",
+    ]
+    if generated_content.get("skipped_reason"):
+        lines.append(f"- Skipped: {str(generated_content['skipped_reason']).replace(chr(10), ' ')}")
+    for item in rejected:
+        reason = str(item.get("reason") or "rejected").replace("\n", " ")
+        lines.append(f"- Rejection `{item.get('fingerprint', 'unknown')}`: {reason}")
+    return "\n".join(lines)
+
+
+def format_stale_issue_reconciliation(counts: dict[str, int], error: str | None = None) -> str:
+    lines = [
+        f"- Marked stale: `{counts.get('marked', 0)}`",
+        f"- Closed stale: `{counts.get('closed', 0)}`",
+        f"- Reopened: `{counts.get('reopened', 0)}`",
+    ]
+    if error:
+        lines.append(f"- Error: `{error.replace(chr(10), ' ')}`")
+    return "\n".join(lines)
+
+
+def format_goal_issue_reconciliation(counts: dict[str, int], error: str | None = None) -> str:
+    lines = [
+        f"- Goal issues closed: `{counts.get('closed', 0)}`",
+        f"- Goal issues reopened: `{counts.get('reopened', 0)}`",
+    ]
+    if error:
+        lines.append(f"- Error: `{error.replace(chr(10), ' ')}`")
+    return "\n".join(lines)
 
 
 def format_indexnow(indexnow: dict) -> str:
@@ -629,7 +753,7 @@ def format_goal_scorecard(goals: dict) -> str:
             [
                 f"- Page: `{goal.get('url')}`",
                 f"  - Launch date: `{goal.get('launch_date')}`",
-                f"  - Indexed by: `{goal.get('indexed_deadline')}`; status `{goal.get('index_status')}`; signal `{inspection.get('coverage_state') or 'n/a'}`",
+                f"  - Indexed by: `{goal.get('indexed_deadline')}`; status `{goal.get('index_status')}`; signal `{goal.get('index_evidence') or inspection.get('coverage_state') or 'n/a'}`",
                 f"  - First impressions by: `{goal.get('impressions_deadline')}`; status `{goal.get('impression_status')}`; impressions `{analytics.get('impressions', 0)}`",
             ]
         )
@@ -702,9 +826,357 @@ def issue_label_names(issue: dict | None) -> set[str]:
     return names
 
 
+def issue_machine_field(issue: dict, field: str) -> str | None:
+    match = re.search(rf"^- {re.escape(field)}: `([^`]+)`$", str(issue.get("body") or ""), re.MULTILINE)
+    return match.group(1) if match else None
+
+
+def goal_issue_key(issue: dict) -> tuple[str, str] | None:
+    title = str(issue.get("title") or "")
+    if title.startswith("Indexing goal "):
+        field = "index_status"
+    elif title.startswith("First impressions goal "):
+        field = "impression_status"
+    else:
+        return None
+    _, separator, target_url = title.partition(" for ")
+    return (field, target_url) if separator and target_url else None
+
+
+def reconcile_goal_issues(
+    *,
+    report: dict,
+    findings: list[Finding],
+    issues: list[dict],
+    dry_run: bool,
+) -> dict:
+    result = {"closed": 0, "reopened": 0, "errors": []}
+    goal_statuses = {
+        (field, str(goal.get("url") or "")): str(goal.get(field) or "")
+        for goal in (report.get("goals") or {}).get("page_goals", [])
+        for field in ("index_status", "impression_status")
+        if goal.get("url")
+    }
+    active_fingerprints = {
+        finding.fingerprint
+        for finding in findings
+        if finding.kind in {"seo-goal-at-risk", "seo-goal-missed"}
+    }
+
+    for issue in issues:
+        kind = issue_machine_field(issue, "Kind")
+        fingerprint = issue_machine_field(issue, "Fingerprint")
+        labels = issue_label_names(issue)
+        state = str(issue.get("state") or "").lower()
+        key = goal_issue_key(issue)
+        if (
+            kind not in {"seo-goal-at-risk", "seo-goal-missed"}
+            or not fingerprint
+            or not key
+            or "analytics-loop" not in labels
+        ):
+            continue
+
+        number = str(issue["number"])
+        if fingerprint in active_fingerprints and state == "closed":
+            if "goal-status-auto-closed" not in labels:
+                continue
+            try:
+                if not dry_run:
+                    gh_mutation(["gh", "issue", "reopen", number])
+                result["reopened"] += 1
+            except Exception as exc:
+                result["errors"].append(f"Issue #{number} could not be reopened: {exc}")
+                continue
+            try:
+                if not dry_run:
+                    gh_mutation(["gh", "issue", "edit", number, "--remove-label", "goal-status-auto-closed"])
+            except Exception as exc:
+                result["errors"].append(f"Issue #{number} could not remove goal close provenance: {exc}")
+            continue
+
+        status = goal_statuses.get(key)
+        should_close = status == "met" or (key[0] == "index_status" and status == "unknown")
+        if state != "open" or not should_close:
+            continue
+
+        provenance_added = "goal-status-auto-closed" not in labels
+        try:
+            if provenance_added and not dry_run:
+                gh_mutation(["gh", "issue", "edit", number, "--add-label", "goal-status-auto-closed"])
+            reason = "completed" if status == "met" else "not planned"
+            comment = (
+                "Automatically closed because current Search Console evidence satisfies this goal."
+                if status == "met"
+                else "Automatically closed because URL Inspection is unavailable and the current report does not prove an indexing failure."
+            )
+            if not dry_run:
+                gh_mutation(
+                    ["gh", "issue", "close", number, "--reason", reason, "--comment", comment]
+                )
+            result["closed"] += 1
+        except Exception as exc:
+            result["errors"].append(f"Issue #{number} could not be auto-closed: {exc}")
+            if provenance_added and not dry_run:
+                try:
+                    gh_mutation(["gh", "issue", "edit", number, "--remove-label", "goal-status-auto-closed"])
+                except Exception as rollback_exc:
+                    result["errors"].append(f"Issue #{number} provenance rollback failed: {rollback_exc}")
+    return result
+
+
+def reconcile_stale_opportunity_issues(
+    *,
+    findings: list[Finding],
+    issues: list[dict],
+    complete_kinds: set[str],
+    dry_run: bool,
+) -> dict:
+    counts = {"marked": 0, "closed": 0, "reopened": 0, "errors": []}
+
+    active_fingerprints = {
+        finding.fingerprint for finding in findings if finding.kind in STALE_RECONCILIATION_KINDS
+    }
+    for issue in issues:
+        kind = issue_machine_field(issue, "Kind")
+        fingerprint = issue_machine_field(issue, "Fingerprint")
+        labels = issue_label_names(issue)
+        state = str(issue.get("state") or "").lower()
+        if (
+            kind not in STALE_RECONCILIATION_KINDS
+            or not fingerprint
+            or issue.get("title") == CONTROL_ISSUE_TITLE
+            or "analytics-loop" not in labels
+            or "implemented-awaiting-google" in labels
+        ):
+            continue
+
+        number = str(issue["number"])
+        if fingerprint in active_fingerprints:
+            if "stale-signal" not in labels:
+                continue
+            if state == "closed":
+                if "stale-signal-auto-closed" not in labels:
+                    continue
+                try:
+                    if not dry_run:
+                        gh_mutation(["gh", "issue", "reopen", number])
+                    counts["reopened"] += 1
+                except Exception as exc:
+                    counts["errors"].append(f"Issue #{number} could not be reopened: {exc}")
+                    continue
+            for label in ("stale-signal", "stale-signal-auto-closed"):
+                if label not in labels:
+                    continue
+                try:
+                    if not dry_run:
+                        gh_mutation(["gh", "issue", "edit", number, "--remove-label", label])
+                except Exception as exc:
+                    counts["errors"].append(f"Issue #{number} could not remove {label}: {exc}")
+            continue
+
+        if state != "open" or kind not in complete_kinds:
+            continue
+        if "stale-signal" in labels:
+            provenance_added = False
+            try:
+                if not dry_run:
+                    gh_mutation(["gh", "issue", "edit", number, "--add-label", "stale-signal-auto-closed"])
+                provenance_added = True
+                if not dry_run:
+                    gh_mutation(
+                        [
+                            "gh",
+                            "issue",
+                            "close",
+                            number,
+                            "--reason",
+                            "not planned",
+                            "--comment",
+                            "Automatically closed after the opportunity fingerprint was absent from two consecutive complete Search Console reports.",
+                        ]
+                    )
+                counts["closed"] += 1
+            except Exception as exc:
+                counts["errors"].append(f"Issue #{number} could not be auto-closed: {exc}")
+                if provenance_added and not dry_run:
+                    try:
+                        gh_mutation(["gh", "issue", "edit", number, "--remove-label", "stale-signal-auto-closed"])
+                    except Exception as rollback_exc:
+                        counts["errors"].append(f"Issue #{number} provenance rollback failed: {rollback_exc}")
+            continue
+
+        try:
+            if not dry_run:
+                gh_mutation(["gh", "issue", "edit", number, "--add-label", "stale-signal"])
+            counts["marked"] += 1
+        except Exception as exc:
+            counts["errors"].append(f"Issue #{number} could not be marked stale: {exc}")
+    return counts
+
+
+def stale_reconciliation_inputs(report: dict, tracking_ok: bool) -> tuple[list[Finding], set[str]]:
+    sc = report.get("search_console") or {}
+    reconciliation = sc.get("reconciliation") or {}
+    complete_kinds: set[str] = set()
+    if reconciliation.get("query_complete") is True:
+        complete_kinds.update({"query-ctr-opportunity", "new-query-content-gap"})
+    if reconciliation.get("page_complete") is True:
+        complete_kinds.update({"low-ctr-opportunity", "near-ranking-opportunity"})
+    lifecycle_sc = {
+        **sc,
+        "top_queries": reconciliation.get("query_ctr_queries", []),
+        "low_ctr_pages": reconciliation.get("low_ctr_pages", []),
+        "near_ranking_pages": reconciliation.get("near_ranking_pages", []),
+        "content_gap_queries": reconciliation.get("content_gap_queries", []),
+    }
+    lifecycle_report = {**report, "search_console": lifecycle_sc}
+    return [finding for finding in classify(lifecycle_report, tracking_ok) if finding.kind in STALE_RECONCILIATION_KINDS], complete_kinds
+
+
 def implemented_awaiting_google(finding: Finding, issues: list[dict]) -> bool:
     issue = find_issue_by_fingerprint(issues, finding.fingerprint)
     return "implemented-awaiting-google" in issue_label_names(issue)
+
+
+def finding_target_url(finding: Finding) -> str | None:
+    payload = finding.payload or {}
+    value = payload.get("recommended_page") or payload.get("page")
+    return str(value) if value else None
+
+
+def select_generated_content_candidates(
+    pairs: list[tuple[Finding, str | None]],
+    *,
+    issues: list[dict],
+    open_targets: set[str],
+    override_entries: list[dict],
+    now: datetime,
+    limit: int = 5,
+    merged_prs: list[dict] | None = None,
+) -> list[tuple[Finding, str | None]]:
+    cooldowns = {
+        str(entry.get("target_url")): str(entry.get("cooldown_until") or "")
+        for entry in override_entries
+        if entry.get("target_url") and entry.get("lifecycle") == "active"
+    }
+    for pr in merged_prs or []:
+        merged_at = pr.get("mergedAt")
+        if not merged_at:
+            continue
+        try:
+            merged_cooldown = datetime.fromisoformat(str(merged_at).replace("Z", "+00:00")) + timedelta(days=28)
+        except ValueError:
+            continue
+        for target in generated_content_pr_targets([pr]):
+            prior = cooldowns.get(target)
+            if not prior or datetime.fromisoformat(prior.replace("Z", "+00:00")) < merged_cooldown:
+                cooldowns[target] = merged_cooldown.isoformat()
+    eligible = []
+    for pair in pairs:
+        finding, _ = pair
+        target = finding_target_url(finding)
+        if (
+            finding.kind not in GENERATED_CONTENT_KINDS
+            or (finding.kind == "seo-goal-missed" and not is_first_impression_recovery(finding))
+            or not finding.implementation_pr
+            or finding.auto_implementation_safe
+            or not target
+            or target in open_targets
+            or implemented_awaiting_google(finding, issues)
+        ):
+            continue
+        cooldown = cooldowns.get(target)
+        if cooldown:
+            try:
+                cooldown_time = datetime.fromisoformat(cooldown.replace("Z", "+00:00"))
+            except ValueError:
+                cooldown_time = now
+            if cooldown_time > now:
+                continue
+        eligible.append(pair)
+    recovery = [pair for pair in eligible if is_first_impression_recovery(pair[0])]
+    if recovery:
+        recovery.sort(
+            key=lambda pair: (
+                "/countries/" in (finding_target_url(pair[0]) or ""),
+                finding_target_url(pair[0]) or "",
+                pair[0].fingerprint,
+            )
+        )
+        return recovery[:1]
+    eligible.sort(
+        key=lambda pair: (
+            -int((pair[0].payload or {}).get("impressions", 0) or 0),
+            float((pair[0].payload or {}).get("position", 999) or 999),
+            pair[0].fingerprint,
+        )
+    )
+    selected: list[tuple[Finding, str | None]] = []
+    selected_targets: set[str] = set()
+    for pair in eligible:
+        target = finding_target_url(pair[0])
+        if not target or target in selected_targets:
+            continue
+        selected.append(pair)
+        selected_targets.add(target)
+        if len(selected) == limit:
+            break
+    return selected
+
+
+def list_generated_content_prs(state: str) -> list[dict]:
+    result = gh_json(
+        [
+            "pr",
+            "list",
+            "--repo",
+            github_repository(),
+            "--label",
+            "generated-content",
+            "--state",
+            state,
+            "--limit",
+            "100",
+            "--json",
+            "url,body,mergedAt",
+        ]
+    )
+    return result if isinstance(result, list) else []
+
+
+def generated_content_pr_targets(prs: list[dict]) -> set[str]:
+    targets: set[str] = set()
+    for pr in prs:
+        for match in re.findall(r"^### (https://globalhomeatlas\.com/[^\s]*)$", str(pr.get("body") or ""), re.MULTILINE):
+            targets.add(match)
+    return targets
+
+
+def reconcile_merged_generated_content_prs(*, issues: list[dict], prs: list[dict], dry_run: bool) -> int:
+    fingerprints = set()
+    for pr in prs:
+        fingerprints.update(re.findall(r"^- Fingerprint: `(gha-[a-z0-9-]+)`$", str(pr.get("body") or ""), re.MULTILINE))
+    reconciled = 0
+    for fingerprint in sorted(fingerprints):
+        issue = find_issue_by_fingerprint(issues, fingerprint)
+        if not issue or "implemented-awaiting-google" in issue_label_names(issue):
+            continue
+        reconciled += 1
+        if dry_run:
+            continue
+        cmd = [
+            "gh",
+            "issue",
+            "edit",
+            str(issue["number"]),
+            "--add-label",
+            "implemented-awaiting-google",
+        ]
+        if "implementation-queued" in issue_label_names(issue):
+            cmd.extend(["--remove-label", "implementation-queued"])
+        gh_mutation(cmd)
+    return reconciled
 
 
 def find_control_issue(issues: list[dict]) -> dict | None:
@@ -737,9 +1209,26 @@ def create_or_update_control_issue(
     auto_merged: list[str],
     indexnow: dict,
     dry_run: bool,
+    generated_content: dict | None = None,
+    stale_issue_reconciliation: dict[str, int] | None = None,
+    stale_issue_reconciliation_error: str | None = None,
+    goal_issue_reconciliation: dict[str, int] | None = None,
+    goal_issue_reconciliation_error: str | None = None,
 ) -> str:
     issues = list_issues() if not dry_run else []
-    body = control_issue_body(report, findings, issue_links, pr_links, auto_merged, indexnow)
+    body = control_issue_body(
+        report,
+        findings,
+        issue_links,
+        pr_links,
+        auto_merged,
+        indexnow,
+        generated_content=generated_content,
+        stale_issue_reconciliation=stale_issue_reconciliation,
+        stale_issue_reconciliation_error=stale_issue_reconciliation_error,
+        goal_issue_reconciliation=goal_issue_reconciliation,
+        goal_issue_reconciliation_error=goal_issue_reconciliation_error,
+    )
     existing = find_control_issue(issues)
     if dry_run:
         print(f"[dry-run] update control issue with {len(findings)} findings")
@@ -762,6 +1251,11 @@ def post_notification_comment(
     auto_merged: list[str],
     control_link: str,
     dry_run: bool,
+    generated_content: dict | None = None,
+    stale_issue_reconciliation: dict[str, int] | None = None,
+    stale_issue_reconciliation_error: str | None = None,
+    goal_issue_reconciliation: dict[str, int] | None = None,
+    goal_issue_reconciliation_error: str | None = None,
 ) -> str | None:
     if not notify_user:
         return None
@@ -773,6 +1267,11 @@ def post_notification_comment(
         pr_links=pr_links,
         auto_merged=auto_merged,
         control_link=control_link,
+        generated_content=generated_content,
+        stale_issue_reconciliation=stale_issue_reconciliation,
+        stale_issue_reconciliation_error=stale_issue_reconciliation_error,
+        goal_issue_reconciliation=goal_issue_reconciliation,
+        goal_issue_reconciliation_error=goal_issue_reconciliation_error,
     )
     if dry_run:
         print(f"[dry-run] comment on control issue and mention {normalize_github_mention(notify_user)}")
@@ -884,6 +1383,12 @@ def auto_internal_links_branch(findings: list[Finding]) -> str:
     return f"analytics/auto-internal-links-{len(findings)}-{digest}"
 
 
+def generated_content_branch(findings: list[Finding]) -> str:
+    fingerprints = sorted(finding.fingerprint for finding in findings)
+    digest = hashlib.sha1(f"generated-content:{'|'.join(fingerprints)}".encode("utf-8")).hexdigest()[:12]
+    return f"analytics/generated-content-{len(findings)}-{digest}"
+
+
 def github_repository() -> str:
     return os.environ.get("GITHUB_REPOSITORY", "schlafen318/property-research-dashboard")
 
@@ -934,6 +1439,76 @@ def auto_internal_link_pr_create_args(finding: Finding, branch: str, pr_body: st
         "--label",
         ",".join([*finding.labels, "implementation-queued"]),
     ]
+
+
+def generated_content_pr_create_args(branch: str, base: str, title: str, body: str) -> list[str]:
+    return [
+        "gh",
+        "pr",
+        "create",
+        "--repo",
+        github_repository(),
+        "--base",
+        base,
+        "--head",
+        branch,
+        "--draft",
+        "--title",
+        title,
+        "--body",
+        body,
+        "--label",
+        "analytics-loop,seo-opportunity,implementation-queued,generated-content,needs-human-review",
+    ]
+
+
+def build_generated_content_pr_body(
+    pairs: list[tuple[Finding, str | None]],
+    contexts: dict[str, seo_content_generator.TargetPageContext],
+    entries: tuple[dict, ...],
+    rejected: tuple[seo_content_generator.RejectedProposal, ...],
+) -> str:
+    issue_by_fingerprint = {finding.fingerprint: issue_url for finding, issue_url in pairs}
+    entry_sections = []
+    for entry in entries:
+        fingerprint = str(entry["finding_fingerprint"])
+        context = contexts[entry["target_url"]]
+        content = entry["content"]
+        before_after = {
+            "search_console_signal": entry.get("signal") or {},
+            "validator": "passed deterministic content policy and source-evidence checks",
+            "before": {
+                "title": context.title,
+                "meta_description": context.meta_description,
+                "intro": context.intro,
+                "faqs": context.faqs,
+            },
+            "after": content,
+        }
+        entry_sections.append(
+            f"### {entry['target_url']}\n"
+            f"- Source issue: {issue_by_fingerprint.get(fingerprint) or 'n/a'}\n"
+            f"- Fingerprint: `{fingerprint}`\n"
+            f"- Model: `{entry['model']}`\n\n"
+            + "\n".join(f"    {line}" for line in json.dumps(before_after, indent=2, ensure_ascii=False).splitlines())
+        )
+    rejection_lines = [
+        f"- `{item.fingerprint}` ({item.target_url}): {item.reason.replace(chr(10), ' ')}"
+        for item in rejected
+    ]
+    return (
+        "## Generated SEO Content\n"
+        "This draft applies schema-constrained copy changes from Search Console findings. "
+        "It cannot auto-merge and requires human review. No new factual claims are permitted.\n\n"
+        + "\n\n".join(entry_sections)
+        + "\n\n## Rejected proposals\n"
+        + ("\n".join(rejection_lines) if rejection_lines else "- None")
+        + "\n\n## Verification\n"
+        "- `python3 -m unittest discover tests`\n"
+        "- `python3 -m py_compile src/build_unified_app.py src/seo_content_overrides.py scripts/seo_content_generator.py scripts/seo_feedback_loop.py`\n"
+        "- `python3 scripts/verify_static_site.py --min-sitemap-urls 65`\n"
+        "- `python3 codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py`\n"
+    )
 
 
 def load_auto_internal_link_entries(path: Path = SEO_AUTO_INTERNAL_LINKS_PATH) -> list[dict]:
@@ -1182,6 +1757,128 @@ def scaffold_landing_page_pr(finding: Finding, dry_run: bool) -> str | None:
         run(["git", "switch", current], check=False)
 
 
+def scaffold_generated_content_pr(
+    pairs: list[tuple[Finding, str | None]],
+    *,
+    sitemap_urls: list[str],
+    dry_run: bool,
+) -> GeneratedContentRun:
+    if not pairs:
+        return GeneratedContentRun(None, 0, (), None)
+    findings = [finding for finding, _ in pairs]
+    branch = generated_content_branch(findings)
+    if dry_run:
+        print(f"[dry-run] create generated content draft PR branch {branch} with {len(findings)} candidates")
+        return GeneratedContentRun(f"dry-run:generated-content-pr:{branch}", 0, (), None)
+
+    rejected: list[seo_content_generator.RejectedProposal] = []
+    base = base_branch()
+    branch_created = False
+    try:
+        existing = existing_pr_for_branch(branch, dry_run=False)
+        if existing:
+            return GeneratedContentRun(existing, 0, (), "Recovered existing generated-content pull request")
+        if remote_branch_exists(branch, dry_run=False):
+            recovery_body = (
+                "## Generated SEO content recovery\n\n"
+                "This draft PR restores review for an already-pushed generated-content branch. "
+                "The committed override and rendered artifact diff are authoritative; no fresh model output "
+                "was used to describe the existing branch.\n\n"
+                + "\n".join(f"- Fingerprint: `{finding.fingerprint}`" for finding in findings)
+            )
+            completed = run(
+                generated_content_pr_create_args(branch, base, "Recover generated SEO content review", recovery_body)
+            )
+            return GeneratedContentRun(completed.stdout.strip(), 0, (), "Recovered pushed branch after PR creation failure")
+        contexts: dict[str, seo_content_generator.TargetPageContext] = {}
+        generation_candidates = []
+        for finding in findings:
+            target = finding_target_url(finding)
+            if not target:
+                rejected.append(seo_content_generator.RejectedProposal(finding.fingerprint, "", "Finding has no target URL"))
+                continue
+            try:
+                context = seo_content_generator.collect_target_context(target, sitemap_urls)
+            except ValueError as exc:
+                rejected.append(seo_content_generator.RejectedProposal(finding.fingerprint, target, str(exc)))
+                continue
+            contexts[target] = context
+            generation_candidates.append(
+                (
+                    {
+                        "fingerprint": finding.fingerprint,
+                        "kind": finding.kind,
+                        "title": finding.title,
+                        "summary": finding.summary,
+                        "payload": finding.payload or {},
+                    },
+                    context,
+                )
+            )
+        generated = seo_content_generator.generate_batch(generation_candidates)
+        rejected.extend(generated.rejected)
+        if not generated.accepted:
+            return GeneratedContentRun(None, 0, tuple(rejected), generated.skipped_reason)
+
+        verified_entries = []
+        for entry in generated.accepted:
+            refreshed = seo_content_generator.collect_target_context(str(entry["target_url"]), sitemap_urls)
+            if refreshed.base_content_hash != entry["base_content_hash"]:
+                rejected.append(
+                    seo_content_generator.RejectedProposal(
+                        str(entry["finding_fingerprint"]), str(entry["target_url"]),
+                        "Base content changed during generation",
+                    )
+                )
+                continue
+            verified_entries.append(entry)
+        if not verified_entries:
+            return GeneratedContentRun(None, 0, tuple(rejected), "All generated content became stale before writing")
+        pr_body = build_generated_content_pr_body(pairs, contexts, tuple(verified_entries), tuple(rejected))
+        run(["git", "switch", "-c", branch])
+        branch_created = True
+        for entry in verified_entries:
+            seo_content_generator.upsert_override_entry(entry)
+        run(["python3", "src/build_unified_app.py"])
+        run(["python3", "-m", "unittest", "discover", "tests"])
+        run(
+            [
+                "python3",
+                "-m",
+                "py_compile",
+                "src/build_unified_app.py",
+                "src/seo_content_overrides.py",
+                "scripts/seo_content_generator.py",
+                "scripts/seo_feedback_loop.py",
+            ]
+        )
+        run(["python3", "scripts/verify_static_site.py", "--min-sitemap-urls", "65"])
+        run(["python3", "codex-skills/global-home-atlas-analytics/scripts/verify_tracking.py"])
+        run(["git", "add", "data/seo_content_overrides.json", "artifacts"])
+        if run(["git", "diff", "--cached", "--quiet"], check=False).returncode == 0:
+            return GeneratedContentRun(None, 0, tuple(rejected), "Generated content produced no repository diff")
+        run(["git", "commit", "-m", f"Generate SEO content for {len(verified_entries)} pages"])
+        run(["git", "push", "--set-upstream", "origin", branch])
+        completed = run(
+            generated_content_pr_create_args(
+                branch,
+                base,
+                f"Generate SEO content for {len(verified_entries)} pages",
+                pr_body,
+            )
+        )
+        return GeneratedContentRun(completed.stdout.strip(), len(verified_entries), tuple(rejected), None)
+    except Exception as exc:
+        return GeneratedContentRun(None, 0, tuple(rejected), f"Generated content workflow failed: {exc}")
+    finally:
+        if branch_created:
+            run(
+                ["git", "restore", "--staged", "--worktree", "data/seo_content_overrides.json", "artifacts"],
+                check=False,
+            )
+            run(["git", "switch", base], check=False)
+
+
 def maybe_auto_merge(pr_url: str | None, finding: Finding, dry_run: bool) -> str | None:
     if not pr_url or not finding.auto_merge_safe:
         return None
@@ -1224,11 +1921,59 @@ def main(argv: list[str]) -> int:
     findings = classify(report, tracking_ok)
 
     ensure_labels(dry_run)
-    issues = list_issues() if not dry_run else []
+    issues = list_issues()
+    stale_issue_reconciliation = {"marked": 0, "closed": 0, "reopened": 0}
+    stale_issue_reconciliation_error = None
+    if (report.get("search_console") or {}).get("available") is True:
+        try:
+            lifecycle_findings, complete_kinds = stale_reconciliation_inputs(report, tracking_ok)
+            reconciliation_result = reconcile_stale_opportunity_issues(
+                findings=lifecycle_findings,
+                issues=issues,
+                complete_kinds=complete_kinds,
+                dry_run=dry_run,
+            )
+            stale_issue_reconciliation = {
+                key: int(reconciliation_result.get(key, 0)) for key in ("marked", "closed", "reopened")
+            }
+            if reconciliation_result.get("errors"):
+                stale_issue_reconciliation_error = "; ".join(reconciliation_result["errors"])
+        except Exception as exc:
+            stale_issue_reconciliation_error = f"Stale opportunity reconciliation failed: {exc}"
+    goal_issue_reconciliation = {"closed": 0, "reopened": 0}
+    goal_issue_reconciliation_error = None
+    try:
+        goal_result = reconcile_goal_issues(
+            report=report,
+            findings=findings,
+            issues=issues,
+            dry_run=dry_run,
+        )
+        goal_issue_reconciliation = {
+            key: int(goal_result.get(key, 0)) for key in ("closed", "reopened")
+        }
+        if goal_result.get("errors"):
+            goal_issue_reconciliation_error = "; ".join(goal_result["errors"])
+    except Exception as exc:
+        goal_issue_reconciliation_error = f"Goal issue reconciliation failed: {exc}"
+    generated_setup_error = None
+    try:
+        open_generated_prs = list_generated_content_prs("open") if not dry_run else []
+        merged_generated_prs = list_generated_content_prs("merged") if not dry_run else []
+        reconciled_issue_count = reconcile_merged_generated_content_prs(
+            issues=issues,
+            prs=merged_generated_prs,
+            dry_run=dry_run,
+        )
+    except Exception as exc:
+        open_generated_prs = []
+        reconciled_issue_count = 0
+        generated_setup_error = f"Generated content reconciliation failed: {exc}"
     issue_links = [create_or_update_issue(finding, issues, dry_run) for finding in findings]
     pr_links: list[str] = []
     auto_merged: list[str] = []
     auto_internal_link_pairs: list[tuple[Finding, str | None]] = []
+    editorial_pairs: list[tuple[Finding, str | None]] = []
     for finding, issue_link in zip(findings, issue_links):
         pr_url = scaffold_landing_page_pr(finding, dry_run)
         if pr_url:
@@ -1238,12 +1983,35 @@ def main(argv: list[str]) -> int:
             continue
         if implemented_awaiting_google(finding, issues):
             continue
-        implementation_pr_url = scaffold_implementation_pr(finding, issue_link, dry_run)
-        if implementation_pr_url:
-            pr_links.append(implementation_pr_url)
+        if finding.implementation_pr and (
+            finding.kind in IMPLEMENTATION_PR_KINDS or is_first_impression_recovery(finding)
+        ):
+            editorial_pairs.append((finding, issue_link))
         merge_url = maybe_auto_merge(pr_url, finding, dry_run)
         if merge_url:
             auto_merged.append(merge_url)
+    if generated_setup_error:
+        generated_run = GeneratedContentRun(None, 0, (), generated_setup_error)
+    else:
+        try:
+            selected_editorial_pairs = select_generated_content_candidates(
+                editorial_pairs,
+                issues=issues,
+                open_targets=generated_content_pr_targets(open_generated_prs),
+                override_entries=seo_content_generator.load_override_entries(),
+                now=datetime.now(timezone.utc),
+                limit=5,
+                merged_prs=merged_generated_prs,
+            )
+            generated_run = scaffold_generated_content_pr(
+                selected_editorial_pairs,
+                sitemap_urls=list((report.get("sitemap") or {}).get("urls") or []),
+                dry_run=dry_run,
+            )
+        except Exception as exc:
+            generated_run = GeneratedContentRun(None, 0, (), f"Generated content orchestration failed: {exc}")
+    if generated_run.pr_url:
+        pr_links.append(generated_run.pr_url)
     auto_pr_url = scaffold_auto_internal_links_pr(auto_internal_link_pairs, dry_run)
     if auto_pr_url:
         pr_links.append(auto_pr_url)
@@ -1251,7 +2019,27 @@ def main(argv: list[str]) -> int:
         merge_url = maybe_auto_merge(auto_pr_url, auto_finding, dry_run)
         if merge_url:
             auto_merged.append(merge_url)
-    control_link = create_or_update_control_issue(report, findings, issue_links, pr_links, auto_merged, indexnow, dry_run)
+    generated_content = {
+        "accepted_count": generated_run.accepted_count,
+        "rejected": [asdict(item) for item in generated_run.rejected],
+        "skipped_reason": generated_run.skipped_reason,
+        "pr": generated_run.pr_url,
+        "reconciled_issue_count": reconciled_issue_count,
+    }
+    control_link = create_or_update_control_issue(
+        report,
+        findings,
+        issue_links,
+        pr_links,
+        auto_merged,
+        indexnow,
+        dry_run,
+        generated_content=generated_content,
+        stale_issue_reconciliation=stale_issue_reconciliation,
+        stale_issue_reconciliation_error=stale_issue_reconciliation_error,
+        goal_issue_reconciliation=goal_issue_reconciliation,
+        goal_issue_reconciliation_error=goal_issue_reconciliation_error,
+    )
     notification = post_notification_comment(
         notify_user=args.notify_user,
         report=report,
@@ -1261,6 +2049,11 @@ def main(argv: list[str]) -> int:
         auto_merged=auto_merged,
         control_link=control_link,
         dry_run=dry_run,
+        generated_content=generated_content,
+        stale_issue_reconciliation=stale_issue_reconciliation,
+        stale_issue_reconciliation_error=stale_issue_reconciliation_error,
+        goal_issue_reconciliation=goal_issue_reconciliation,
+        goal_issue_reconciliation_error=goal_issue_reconciliation_error,
     )
     summary = {
         "findings": [
@@ -1284,6 +2077,11 @@ def main(argv: list[str]) -> int:
         "prs": pr_links,
         "auto_merged_count": len(auto_merged),
         "auto_merged": auto_merged,
+        "generated_content": generated_content,
+        "stale_issue_reconciliation": stale_issue_reconciliation,
+        "stale_issue_reconciliation_error": stale_issue_reconciliation_error,
+        "goal_issue_reconciliation": goal_issue_reconciliation,
+        "goal_issue_reconciliation_error": goal_issue_reconciliation_error,
         "control": control_link,
         "notification": notification,
     }
