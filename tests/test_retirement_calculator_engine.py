@@ -88,6 +88,14 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         result = calculate(payload)
         self.assertAlmostEqual(27355.371900826444, result["liquidPortfolio"], places=6)
 
+    def test_net_return_after_withdrawal_subtracts_first_year_withdrawal_rate(self) -> None:
+        payload = level_cash_flow_payload()
+        payload["expectedPortfolioReturn"] = 0.05
+        result = calculate(payload)
+        expected = result["expectedPortfolioReturn"] - result["impliedFirstYearWithdrawal"]
+        self.assertAlmostEqual(expected, result["netReturnAfterWithdrawal"], places=8)
+        self.assertLess(result["netReturnAfterWithdrawal"], 0)
+
     def test_retirement_capital_is_discounted_to_investment_needed_today(self) -> None:
         payload = level_cash_flow_payload()
         payload.update({"currentAge": 50, "retirementAge": 60, "expectedPortfolioReturn": 0.05})
@@ -203,6 +211,7 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertEqual(0, result["fundingGap"])
         self.assertEqual(0, result["liquidPortfolio"])
         self.assertIsNone(result["impliedFirstYearWithdrawal"])
+        self.assertIsNone(result["netReturnAfterWithdrawal"])
 
     def test_expected_return_is_required_and_bounded(self) -> None:
         for value in (None, -0.051, 0.151):

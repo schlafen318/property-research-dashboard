@@ -121,6 +121,9 @@
     const homePurchaseNeededToday = propertyTiming === "today" ? propertyCapital : 0;
     const totalNeededToday = investmentNeededToday + homePurchaseNeededToday;
     const impliedFirstYearWithdrawal = liquidPortfolio > 0 ? fundingGap / liquidPortfolio : null;
+    const netReturnAfterWithdrawal = impliedFirstYearWithdrawal === null
+      ? null
+      : expectedPortfolioReturn - impliedFirstYearWithdrawal;
     const todayDollarRetirementCapital = retirementCapital / Math.pow(1 + generalInflation, yearsToRetirement);
 
     return {
@@ -141,6 +144,7 @@
       homePurchaseNeededToday: homePurchaseNeededToday,
       totalNeededToday: totalNeededToday,
       impliedFirstYearWithdrawal: impliedFirstYearWithdrawal,
+      netReturnAfterWithdrawal: netReturnAfterWithdrawal,
       todayDollarRetirementCapital: todayDollarRetirementCapital,
     };
   }
