@@ -71,7 +71,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-pension",
             "ret-other-income",
             "ret-rental-income",
-            "ret-income-preset",
+            "ret-expected-return",
             "ret-calculate",
         }
         self.assertTrue(expected_controls.issubset(parser.control_ids))
@@ -81,7 +81,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
 
     def test_housing_inputs_match_how_retirees_plan(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
-        self.assertIn('for="ret-monthly-spending">Monthly spending today (USD)</label>', form)
+        self.assertIn('for="ret-monthly-spending">Monthly retirement living expenses (today\'s USD)</label>', form)
         self.assertIn('id="ret-monthly-spending" type="number" min="0" step="1"', form)
         self.assertIn('for="ret-property-budget">Home purchase budget today (USD)</label>', form)
         self.assertIn('id="ret-property-budget" type="number" min="0" step="1"', form)
@@ -90,6 +90,23 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Leave at $0 when your destination home is for your own use", form)
         self.assertNotIn("Annual spending today (USD)", form)
         self.assertNotIn("Destination net rental income", form)
+
+    def test_personalized_form_uses_cash_flow_inputs(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        self.assertIn("Monthly retirement living expenses (today's USD)", form)
+        self.assertIn('<option value="buy_now">Buy now</option>', form)
+        self.assertIn('<option value="buy_retirement" selected>Buy at retirement</option>', form)
+        self.assertIn("Expected annual portfolio return after fees (%)", form)
+        self.assertIn('id="ret-expected-return" type="number" min="-5" max="15" step="0.1" required', form)
+        for removed in ("ret-withdrawal-rate", "ret-income-preset", "ret-cash-yield"):
+            self.assertNotIn(f'id="{removed}"', form)
+
+    def test_results_remove_cash_yield_breakdown(self) -> None:
+        results = self.html.split('id="ret-results"', 1)[1].split("</section>", 1)[0]
+        for element_id in ("ret-headline-label", "ret-property-label", "ret-result-return", "ret-result-implied-withdrawal"):
+            self.assertIn(f'id="{element_id}"', results)
+        self.assertNotIn('id="ret-cash-income"', results)
+        self.assertNotIn('id="ret-asset-sales"', results)
 
     def test_static_benchmarks_and_methodology_do_not_depend_on_javascript(self) -> None:
         self.assertIn('<section id="benchmarks"', self.html)
@@ -100,6 +117,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Emergency reserve", self.html)
         self.assertIn("Required retirement capital", self.html)
         self.assertIn("Property capital", self.html)
+        self.assertIn("This standardized table is separate from the personalized cash-flow calculator above.", self.html)
 
     def test_calculator_contains_all_thirty_destination_options(self) -> None:
         select = self.html.split('id="ret-destination"', 1)[1].split("</select>", 1)[0]
@@ -141,14 +159,15 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-general-inflation",
             "ret-healthcare-inflation",
             "ret-property-inflation",
-            "ret-withdrawal-rate",
-            "ret-cash-yield",
+            "ret-expected-return",
             "ret-reserve-months",
             "ret-errors",
             "ret-total-capital",
             "ret-liquid-portfolio",
             "ret-property-capital",
             "ret-emergency-reserve",
+            "ret-result-return",
+            "ret-result-implied-withdrawal",
             "ret-result-assumptions",
         }
         for element_id in required_ids:
