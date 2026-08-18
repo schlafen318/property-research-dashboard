@@ -146,21 +146,36 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         select = self.html.split('id="ret-destination"', 1)[1].split("</select>", 1)[0]
         self.assertEqual(30, select.count("<option"))
 
-    def test_benchmarks_show_ten_rows_then_expand_twenty(self) -> None:
+    def test_benchmarks_offer_one_household_view_at_a_time(self) -> None:
         section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
-        visible = section.split('<details class="benchmark-more">', 1)[0]
-        expandable = section.split('<details class="benchmark-more">', 1)[1]
-        self.assertEqual(10, visible.count('class="benchmark-row"'))
-        self.assertEqual(20, expandable.count('class="benchmark-row"'))
-        self.assertIn("View ranks 11–30", expandable)
+        selector = section.split('id="ret-benchmark-household"', 1)[1].split("</select>", 1)[0]
+        self.assertIn('<option value="couple" selected>Couple</option>', selector)
+        self.assertIn('<option value="single">Single</option>', selector)
+        self.assertIn('data-benchmark-panel="couple"', section)
+        self.assertIn('data-benchmark-panel="single" hidden', section)
+        self.assertNotIn('<span>Single ', section)
+        self.assertNotIn('<span>Couple ', section)
+
+    def test_each_household_benchmark_shows_ten_rows_then_expands_twenty(self) -> None:
+        section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
+        for household, next_household in (("couple", "single"), ("single", None)):
+            panel = section.split(f'data-benchmark-panel="{household}"', 1)[1]
+            if next_household:
+                panel = panel.split(f'data-benchmark-panel="{next_household}"', 1)[0]
+            visible = panel.split('<details class="benchmark-more">', 1)[0]
+            expandable = panel.split('<details class="benchmark-more">', 1)[1]
+            self.assertEqual(10, visible.count('class="benchmark-row"'))
+            self.assertEqual(20, expandable.count('class="benchmark-row"'))
+            self.assertIn("View ranks 11–30", expandable)
 
     def test_capital_table_uses_guided_methodology_and_ranks_by_couple_requirement(self) -> None:
         section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
         self.assertIn("3.5% guided withdrawal rate", section)
         self.assertIn("12 months of expenses", section)
         self.assertIn("no pension or outside passive income", section.lower())
-        self.assertIn("$2,359,800", section)
-        self.assertIn("$512,947", section)
+        couple_panel = section.split('data-benchmark-panel="couple"', 1)[1].split('data-benchmark-panel="single"', 1)[0]
+        self.assertIn("$2,359,800", couple_panel)
+        self.assertIn("$512,947", couple_panel)
         ordered_names = [
             "Fukuoka / Itoshima",
             "Hakone / Izu",
@@ -171,7 +186,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "Madeira",
             "Lake Como",
         ]
-        positions = [section.index(name) for name in ordered_names]
+        positions = [couple_panel.index(name) for name in ordered_names]
         self.assertEqual(sorted(positions), positions)
 
     def test_interactive_contract_and_result_targets_are_embedded(self) -> None:
@@ -200,6 +215,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         for element_id in required_ids:
             self.assertIn(f'id="{element_id}"', self.html)
         self.assertIn("GHARetirementCalculatorUI.initRetirementCalculator", self.html)
+        self.assertIn('GHARetirementCalculatorUI.initRetirementBenchmarkTable("ret-benchmark-household")', self.html)
         self.assertLess(self.html.index("window.GHA ="), self.html.index("GHARetirementCalculatorUI.initRetirementCalculator"))
 
     def test_ui_module_does_not_persist_or_transmit_financial_inputs(self) -> None:
