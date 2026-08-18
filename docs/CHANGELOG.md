@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-08-18 — Sortable retirement ranking
+
+- Made every ranking column sortable across all 30 destinations while retaining the 10-row preview and 20-row expansion.
+- Replaced technical table labels with plain-language titles and clarified that the home purchase estimate does not affect cost rank.
+- Simplified the hero actions, removed redundant update metadata, and moved detailed cost sources into an expandable disclosure.
+
 ## 2026-08-18 — All-destination retirement ranking
 
 - Expanded the source-audited retirement cost model from eight destinations to all 30 destinations currently covered by Global Home Atlas.

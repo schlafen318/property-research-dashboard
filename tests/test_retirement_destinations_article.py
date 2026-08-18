@@ -69,7 +69,7 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         expandable = ranking.split('<details class="ranking-more">', 1)[1]
         self.assertEqual(10, visible.count('class="ranking-row"'))
         self.assertEqual(20, expandable.count('class="ranking-row"'))
-        self.assertIn("View ranks 11–30", expandable)
+        self.assertIn("View 20 more destinations", expandable)
         self.assertIn("</details>", expandable)
 
     def test_every_destination_is_ranked_once_and_only_top_ten_have_notes(self) -> None:
@@ -99,9 +99,9 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         self.assertEqual(sorted(positions), positions)
         for expected_value in ("$1,957,629", "$1,984,243", "$2,634,814"):
             self.assertIn(expected_value, table)
-        self.assertIn("Country", table)
-        self.assertIn("Required retirement capital", table)
-        self.assertIn("Property capital", table)
+        self.assertIn("Destination", table)
+        self.assertIn("Savings needed", table)
+        self.assertIn("Home purchase estimate", table)
 
     def test_methodology_defines_the_cost_rank_without_claiming_lifestyle_rank(self) -> None:
         self.assertIn("couple renting", self.html.lower())
@@ -128,11 +128,41 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
     def test_primary_ranking_table_focuses_on_decision_relevant_numbers(self) -> None:
         marker = 'id="ranking"'
         table = self.html.split(marker, 1)[1].split("</table>", 1)[0]
-        self.assertIn("Annual spending", table)
-        self.assertIn("Required retirement capital", table)
-        self.assertIn("Property capital", table)
+        self.assertIn("Annual cost", table)
+        self.assertIn("Savings needed", table)
+        self.assertIn("Home purchase estimate", table)
         self.assertNotIn("<th>Liquid portfolio</th>", table)
         self.assertNotIn("<th>Emergency reserve</th>", table)
+
+    def test_ranking_headers_are_sortable_and_use_plain_language(self) -> None:
+        ranking = self.html.split('id="ranking"', 1)[1].split("</section>", 1)[0]
+        for key, label in (
+            ("rank", "Cost rank"),
+            ("name", "Destination"),
+            ("annual", "Annual cost"),
+            ("savings", "Savings needed"),
+            ("property", "Home purchase estimate"),
+        ):
+            self.assertIn(f'data-sort-key="{key}"', ranking)
+            self.assertIn(f'>{label}<', ranking)
+        self.assertNotIn("Required retirement capital", ranking)
+        self.assertNotIn("Property capital", ranking)
+
+    def test_hero_actions_are_separate_and_redundant_eyebrow_is_removed(self) -> None:
+        hero = self.html.split('<header class="page-hero">', 1)[1].split("</header>", 1)[0]
+        self.assertNotIn('class="page-eyebrow"', hero)
+        self.assertIn('class="page-button"', hero)
+        self.assertIn('class="page-button page-button-secondary"', hero)
+        self.assertIn("Calculate your plan", hero)
+        self.assertIn("View rankings", hero)
+
+    def test_sources_are_available_in_a_low_prominence_disclosure(self) -> None:
+        methodology = self.html.split('id="methodology"', 1)[1].split("</section>", 1)[0]
+        self.assertNotIn("<h3>Cost evidence</h3>", methodology)
+        self.assertIn('<details class="source-more">', methodology)
+        self.assertIn("<summary>Sources and data notes</summary>", methodology)
+        sources = methodology.split('<details class="source-more">', 1)[1].split("</details>", 1)[0]
+        self.assertEqual(30, sources.count("<li>"))
 
     def test_two_accessible_infographics_have_downloadable_pngs(self) -> None:
         for asset_name in ASSET_NAMES:
