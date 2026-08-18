@@ -90,6 +90,27 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         self.assertIn("does not rank lifestyle quality", self.html.lower())
         self.assertIn("Data reviewed 2026-08-18", self.html)
 
+    def test_article_uses_a_single_reading_flow_without_duplicate_metric_panels(self) -> None:
+        self.assertIn(
+            '<nav class="article-toc" aria-label="In this article">',
+            self.html,
+        )
+        self.assertIn('class="article-callout"', self.html)
+        self.assertIn('class="destination-notes"', self.html)
+        self.assertNotIn('class="article-summary"', self.html)
+        self.assertNotIn('class="article-aside"', self.html)
+        self.assertNotIn('class="rank-card"', self.html)
+        self.assertNotIn("<dl>", self.html)
+
+    def test_primary_ranking_table_focuses_on_decision_relevant_numbers(self) -> None:
+        marker = 'id="ranking"'
+        table = self.html.split(marker, 1)[1].split("</table>", 1)[0]
+        self.assertIn("Annual spending", table)
+        self.assertIn("Required retirement capital", table)
+        self.assertIn("Property capital", table)
+        self.assertNotIn("<th>Liquid portfolio</th>", table)
+        self.assertNotIn("<th>Emergency reserve</th>", table)
+
     def test_two_accessible_infographics_have_downloadable_pngs(self) -> None:
         for asset_name in ASSET_NAMES:
             with self.subTest(asset_name=asset_name):
