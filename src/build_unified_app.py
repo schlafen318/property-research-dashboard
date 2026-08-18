@@ -3734,6 +3734,14 @@ def retirement_destination_rankings(destinations: list[dict], retirement_payload
     return rankings
 
 
+def split_rankings(
+    rankings: list[dict], visible_count: int = 10
+) -> tuple[list[dict], list[dict]]:
+    if visible_count < 1:
+        raise ValueError("visible_count must be positive")
+    return rankings[:visible_count], rankings[visible_count:]
+
+
 def retirement_calculator_callout(css_class: str) -> str:
     return f"""
       <section class="{escape(css_class)}">
