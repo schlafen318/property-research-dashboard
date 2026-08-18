@@ -45,28 +45,90 @@ def base_payload() -> dict:
         "acquisitionCostRate": 0.1,
         "generalInflation": 0.026,
         "emergencyReserveMonths": 12,
-        "portfolioCashYield": 0.02,
+        "expectedPortfolioReturn": 0.05,
+    }
+
+
+def level_cash_flow_payload() -> dict:
+    return {
+        "currentAge": 59,
+        "retirementAge": 60,
+        "horizonYears": 3,
+        "expenseCategories": [{"amount": 12000, "inflationRate": 0}],
+        "incomeStreams": [{"amount": 2000, "indexed": False, "inflationRate": 0}],
+        "housingPlan": "rent",
+        "propertyPrice": 0,
+        "propertyInflation": 0,
+        "acquisitionCostRate": 0,
+        "generalInflation": 0,
+        "emergencyReserveMonths": 0,
+        "expectedPortfolioReturn": 0,
     }
 
 
 class RetirementCalculatorEngineTests(unittest.TestCase):
-    def test_guided_withdrawal_rate_tiers(self) -> None:
-        expected = {25: 0.04, 26: 0.035, 30: 0.035, 31: 0.0325, 35: 0.0325, 36: 0.03}
-        for horizon, rate in expected.items():
-            self.assertEqual(rate, run_engine("guidedWithdrawalRate", horizon))
-
     def test_projects_expenses_and_indexed_income(self) -> None:
         result = calculate(base_payload())
         factor = 1.026**10
         self.assertAlmostEqual(100000 * factor, result["firstYearExpenses"], places=4)
         self.assertAlmostEqual(20000 * factor + 10000, result["outsideIncome"], places=4)
         self.assertAlmostEqual(result["firstYearExpenses"] - result["outsideIncome"], result["fundingGap"], places=4)
-        self.assertEqual(0.035, result["withdrawalRate"])
+        self.assertEqual(0.05, result["expectedPortfolioReturn"])
 
-    def test_portfolio_income_is_part_of_the_withdrawal(self) -> None:
-        result = calculate(base_payload())
-        self.assertAlmostEqual(result["fundingGap"], result["portfolioCashIncome"] + result["assetSales"], places=4)
-        self.assertAlmostEqual(result["fundingGap"] / 0.035, result["liquidPortfolio"], places=4)
+    def test_zero_return_sums_annual_funding_gaps(self) -> None:
+        result = calculate(level_cash_flow_payload())
+        self.assertEqual([10000, 10000, 10000], result["annualFundingGaps"])
+        self.assertEqual(30000, result["liquidPortfolio"])
+        self.assertEqual(30000, result["retirementCapital"])
+        self.assertAlmostEqual(1 / 3, result["impliedFirstYearWithdrawal"], places=8)
+
+    def test_higher_return_reduces_required_capital(self) -> None:
+        payload = level_cash_flow_payload()
+        payload["expectedPortfolioReturn"] = 0.10
+        result = calculate(payload)
+        self.assertAlmostEqual(27355.371900826444, result["liquidPortfolio"], places=6)
+
+    def test_inflation_projects_every_retirement_year(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "horizonYears": 2,
+                "expenseCategories": [{"amount": 12000, "inflationRate": 0.10}],
+                "incomeStreams": [],
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual([13200, 14520], result["annualFundingGaps"])
+        self.assertEqual(27720, result["liquidPortfolio"])
+
+    def test_fixed_and_indexed_income_follow_different_paths(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "horizonYears": 2,
+                "expenseCategories": [{"amount": 10000, "inflationRate": 0}],
+                "incomeStreams": [
+                    {"amount": 1000, "indexed": True, "inflationRate": 0.10},
+                    {"amount": 1000, "indexed": False, "inflationRate": 0.10},
+                ],
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual([7900, 7790], result["annualFundingGaps"])
+        self.assertEqual(15690, result["liquidPortfolio"])
+
+    def test_each_annual_gap_floors_at_zero_independently(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "horizonYears": 2,
+                "expenseCategories": [{"amount": 10000, "inflationRate": 0.10}],
+                "incomeStreams": [{"amount": 11500, "indexed": False, "inflationRate": 0}],
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual([0, 600], result["annualFundingGaps"])
+        self.assertEqual(600, result["liquidPortfolio"])
 
     def test_property_capital_only_applies_to_buy(self) -> None:
         rent_result = calculate(base_payload())
@@ -83,14 +145,17 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         result = calculate(payload)
         self.assertEqual(0, result["fundingGap"])
         self.assertEqual(0, result["liquidPortfolio"])
-        self.assertEqual(0, result["assetSales"])
+        self.assertIsNone(result["impliedFirstYearWithdrawal"])
 
-    def test_override_and_invalid_inputs(self) -> None:
-        payload = base_payload()
-        payload["withdrawalRateOverride"] = 0.04
-        self.assertEqual(0.04, calculate(payload)["withdrawalRate"])
+    def test_expected_return_is_required_and_bounded(self) -> None:
+        for value in (None, -0.051, 0.151):
+            invalid = level_cash_flow_payload()
+            invalid["expectedPortfolioReturn"] = value
+            with self.assertRaises(subprocess.CalledProcessError):
+                calculate(invalid)
 
-        for key, value in (("retirementAge", 49), ("generalInflation", -0.01), ("withdrawalRateOverride", 0.05)):
+    def test_invalid_age_and_inflation_inputs(self) -> None:
+        for key, value in (("retirementAge", 49), ("generalInflation", -0.01)):
             invalid = base_payload()
             invalid[key] = value
             with self.assertRaises(subprocess.CalledProcessError):

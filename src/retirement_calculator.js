@@ -21,17 +21,40 @@
     return rate;
   }
 
-  function guidedWithdrawalRate(horizonYears) {
-    const horizon = finiteNonNegative(horizonYears, "Retirement horizon");
-    if (horizon === 0) throw new Error("Retirement horizon must be positive");
-    if (horizon <= 25) return 0.04;
-    if (horizon <= 30) return 0.035;
-    if (horizon <= 35) return 0.0325;
-    return 0.03;
-  }
-
   function project(value, rate, years) {
     return value * Math.pow(1 + rate, years);
+  }
+
+  function normalizeFloatingPoint(value) {
+    const nearestInteger = Math.round(value);
+    return Math.abs(value - nearestInteger) < 1e-9 ? nearestInteger : value;
+  }
+
+  function boundedExpectedReturn(value) {
+    if (value === null || value === undefined || value === "") {
+      throw new Error("Expected portfolio return is required");
+    }
+    const rate = Number(value);
+    if (!Number.isFinite(rate) || rate < -0.05 || rate > 0.15) {
+      throw new Error("Expected portfolio return must be between -5% and 15%");
+    }
+    return rate;
+  }
+
+  function projectedExpenseTotal(categories, years) {
+    return categories.reduce(function (total, category) {
+      const amount = finiteNonNegative(category.amount, "Expense amount");
+      const inflation = boundedRate(category.inflationRate, "Expense inflation", 0.15);
+      return total + project(amount, inflation, years);
+    }, 0);
+  }
+
+  function projectedIncomeTotal(streams, years) {
+    return streams.reduce(function (total, stream) {
+      const amount = finiteNonNegative(stream.amount, "Income amount");
+      const inflation = boundedRate(stream.inflationRate, "Income inflation", 0.15);
+      return total + (stream.indexed ? project(amount, inflation, years) : amount);
+    }, 0);
   }
 
   function calculateRetirement(input) {
@@ -43,11 +66,12 @@
     if (yearsToRetirement <= 0) throw new Error("Retirement age must exceed current age");
 
     const horizonYears = finiteNonNegative(input.horizonYears, "Retirement horizon");
+    if (horizonYears === 0) throw new Error("Retirement horizon must be positive");
     const generalInflation = boundedRate(input.generalInflation, "General inflation", 0.15);
     const propertyInflation = boundedRate(input.propertyInflation, "Property inflation", 0.15);
     const acquisitionCostRate = boundedRate(input.acquisitionCostRate, "Acquisition cost rate", 0.25);
     const emergencyReserveMonths = finiteNonNegative(input.emergencyReserveMonths, "Emergency reserve months");
-    const portfolioCashYield = boundedRate(input.portfolioCashYield, "Portfolio cash yield", 0.15);
+    const expectedPortfolioReturn = boundedExpectedReturn(input.expectedPortfolioReturn);
 
     if (!HOUSING_PLANS.has(input.housingPlan)) throw new Error("Housing plan must be rent, own, or buy");
     if (!Array.isArray(input.expenseCategories) || input.expenseCategories.length === 0) {
@@ -55,36 +79,33 @@
     }
     if (!Array.isArray(input.incomeStreams)) throw new Error("Income streams must be an array");
 
-    const firstYearExpenses = input.expenseCategories.reduce(function (total, category) {
-      const amount = finiteNonNegative(category.amount, "Expense amount");
-      const rate = boundedRate(category.inflationRate, "Expense inflation", 0.15);
-      return total + project(amount, rate, yearsToRetirement);
-    }, 0);
-
-    const outsideIncome = input.incomeStreams.reduce(function (total, stream) {
-      const amount = finiteNonNegative(stream.amount, "Income amount");
-      const rate = boundedRate(stream.inflationRate, "Income inflation", 0.15);
-      return total + (stream.indexed ? project(amount, rate, yearsToRetirement) : amount);
-    }, 0);
-
-    let withdrawalRate = guidedWithdrawalRate(horizonYears);
-    if (input.withdrawalRateOverride !== undefined && input.withdrawalRateOverride !== null) {
-      withdrawalRate = Number(input.withdrawalRateOverride);
-      if (!Number.isFinite(withdrawalRate) || withdrawalRate < 0.03 || withdrawalRate > 0.04) {
-        throw new Error("Withdrawal rate override must be between 3% and 4%");
+    const annualFundingGaps = [];
+    let firstYearExpenses = 0;
+    let outsideIncome = 0;
+    for (let year = 0; year < horizonYears; year += 1) {
+      const projectionYears = yearsToRetirement + year;
+      const expenses = projectedExpenseTotal(input.expenseCategories, projectionYears);
+      const income = projectedIncomeTotal(input.incomeStreams, projectionYears);
+      if (year === 0) {
+        firstYearExpenses = expenses;
+        outsideIncome = income;
       }
+      annualFundingGaps.push(normalizeFloatingPoint(Math.max(0, expenses - income)));
     }
 
-    const fundingGap = Math.max(0, firstYearExpenses - outsideIncome);
-    const liquidPortfolio = fundingGap / withdrawalRate;
+    const liquidPortfolio = annualFundingGaps.reduce(function (total, gap, year) {
+      return total + gap / Math.pow(1 + expectedPortfolioReturn, year);
+    }, 0);
+    const fundingGap = annualFundingGaps[0] || 0;
     const propertyPrice = finiteNonNegative(input.propertyPrice, "Property price");
     const propertyCapital = input.housingPlan === "buy"
       ? project(propertyPrice, propertyInflation, yearsToRetirement) * (1 + acquisitionCostRate)
       : 0;
     const emergencyReserve = firstYearExpenses / 12 * emergencyReserveMonths;
-    const totalCapital = liquidPortfolio + propertyCapital + emergencyReserve;
-    const portfolioCashIncome = Math.min(fundingGap, liquidPortfolio * portfolioCashYield);
-    const assetSales = Math.max(0, fundingGap - portfolioCashIncome);
+    const retirementCapital = liquidPortfolio + emergencyReserve;
+    const totalCapital = retirementCapital + propertyCapital;
+    const impliedFirstYearWithdrawal = liquidPortfolio > 0 ? fundingGap / liquidPortfolio : null;
+    const todayDollarRetirementCapital = retirementCapital / Math.pow(1 + generalInflation, yearsToRetirement);
     const todayDollarTotal = totalCapital / Math.pow(1 + generalInflation, yearsToRetirement);
 
     return {
@@ -92,19 +113,20 @@
       firstYearExpenses: firstYearExpenses,
       outsideIncome: outsideIncome,
       fundingGap: fundingGap,
-      withdrawalRate: withdrawalRate,
+      annualFundingGaps: annualFundingGaps,
+      expectedPortfolioReturn: expectedPortfolioReturn,
       liquidPortfolio: liquidPortfolio,
       propertyCapital: propertyCapital,
       emergencyReserve: emergencyReserve,
+      retirementCapital: retirementCapital,
       totalCapital: totalCapital,
-      portfolioCashIncome: portfolioCashIncome,
-      assetSales: assetSales,
+      impliedFirstYearWithdrawal: impliedFirstYearWithdrawal,
+      todayDollarRetirementCapital: todayDollarRetirementCapital,
       todayDollarTotal: todayDollarTotal,
     };
   }
 
   return {
-    guidedWithdrawalRate: guidedWithdrawalRate,
     calculateRetirement: calculateRetirement,
   };
 });
