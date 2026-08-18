@@ -81,9 +81,32 @@ class RetirementCalculatorPageTests(unittest.TestCase):
     def test_static_benchmarks_and_methodology_do_not_depend_on_javascript(self) -> None:
         self.assertIn('<section id="benchmarks"', self.html)
         self.assertIn('<section id="methodology"', self.html)
-        self.assertIn("Single annual benchmark", self.html)
-        self.assertIn("Couple annual benchmark", self.html)
-        self.assertIn("Data confidence", self.html)
+        self.assertIn("How much capital do you need to retire abroad?", self.html)
+        self.assertIn("Annual spending", self.html)
+        self.assertIn("Liquid portfolio", self.html)
+        self.assertIn("Emergency reserve", self.html)
+        self.assertIn("Required retirement capital", self.html)
+        self.assertIn("Property capital", self.html)
+
+    def test_capital_table_uses_guided_methodology_and_ranks_by_couple_requirement(self) -> None:
+        section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
+        self.assertIn("3.5% guided withdrawal rate", section)
+        self.assertIn("12 months of expenses", section)
+        self.assertIn("no pension or outside passive income", section.lower())
+        self.assertIn("$2,359,800", section)
+        self.assertIn("$512,947", section)
+        ordered_names = [
+            "Fukuoka / Itoshima",
+            "Hakone / Izu",
+            "Crete",
+            "Valencia",
+            "Algarve / Cascais",
+            "Málaga / Costa del Sol",
+            "Madeira",
+            "Lake Como",
+        ]
+        positions = [section.index(name) for name in ordered_names]
+        self.assertEqual(sorted(positions), positions)
 
     def test_interactive_contract_and_result_targets_are_embedded(self) -> None:
         required_ids = {

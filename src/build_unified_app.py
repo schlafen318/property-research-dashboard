@@ -3552,6 +3552,22 @@ def retirement_benchmark_total(record: dict, household: str) -> float:
     return sum(float(value) for value in profile["categories_usd"].values()) + float(profile["annual_rent_usd"])
 
 
+def retirement_capital_requirement(record: dict, household: str) -> dict[str, float]:
+    annual_spending = retirement_benchmark_total(record, household)
+    liquid_portfolio = annual_spending / 0.035
+    emergency_reserve = annual_spending
+    property_capital = float(record["property"]["representative_price_usd"]) * (
+        1 + float(record["property"]["acquisition_cost_rate"])
+    )
+    return {
+        "annual_spending": annual_spending,
+        "liquid_portfolio": liquid_portfolio,
+        "emergency_reserve": emergency_reserve,
+        "required_capital": liquid_portfolio + emergency_reserve,
+        "property_capital": property_capital,
+    }
+
+
 def retirement_calculator_callout(css_class: str) -> str:
     return f"""
       <section class="{escape(css_class)}">
@@ -3567,7 +3583,6 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
     names = {item["id"]: item["name"] for item in destinations}
     records = retirement_payload["destinations"]
     browser_records = []
-    benchmark_rows = []
     options = []
     source_links = []
     for record in records:
@@ -3575,16 +3590,26 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         item["name"] = names.get(record["destination_id"], record["destination_id"].replace("-", " ").title())
         browser_records.append(item)
         options.append(f'<option value="{escape(item["destination_id"])}">{escape(item["name"])}</option>')
-        benchmark_rows.append(
-            f'<tr><th scope="row">{escape(item["name"])}</th>'
-            f'<td>{money(retirement_benchmark_total(item, "single"))}</td>'
-            f'<td>{money(retirement_benchmark_total(item, "couple"))}</td>'
-            f'<td>{escape(item["confidence"]["overall"])}</td></tr>'
-        )
         first_source = item["sources"][0]
         source_links.append(
             f'<li><a href="{escape(first_source["url"])}" rel="nofollow noopener">{escape(item["name"])} cost evidence</a> '
             f'({escape(first_source["source_date"])}) · {escape(item["confidence"]["overall"])} confidence</li>'
+        )
+    ranked_records = sorted(
+        browser_records,
+        key=lambda item: retirement_capital_requirement(item, "couple")["required_capital"],
+    )
+    benchmark_rows = []
+    for rank, item in enumerate(ranked_records, start=1):
+        single = retirement_capital_requirement(item, "single")
+        couple = retirement_capital_requirement(item, "couple")
+        benchmark_rows.append(
+            f'<tr><td>{rank}</td><th scope="row">{escape(item["name"])}</th>'
+            f'<td><span>Single {money(single["annual_spending"])}</span><br><span>Couple {money(couple["annual_spending"])}</span></td>'
+            f'<td><span>Single {money(single["liquid_portfolio"])}</span><br><span>Couple {money(couple["liquid_portfolio"])}</span></td>'
+            f'<td><span>Single {money(single["emergency_reserve"])}</span><br><span>Couple {money(couple["emergency_reserve"])}</span></td>'
+            f'<td><strong>Single {money(single["required_capital"])}</strong><br><strong>Couple {money(couple["required_capital"])}</strong></td>'
+            f'<td>{money(single["property_capital"])}</td></tr>'
         )
     faq_html = "\n".join(
         f'<details><summary>{escape(question)}</summary><p>{escape(answer)}</p></details>'
@@ -3608,7 +3633,7 @@ __HEAD__
     .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; }
     main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
     .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-total { font-family:Georgia,serif; font-size:clamp(38px,6vw,58px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:20px 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
-    .content-section { padding:34px 0; border-top:1px solid var(--line); } .table-wrap { overflow-x:auto; } table { width:100%; border-collapse:collapse; background:var(--paper); } th,td { text-align:left; padding:12px; border-bottom:1px solid var(--line); white-space:nowrap; } th { white-space:normal; } .scenario-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; } .scenario-grid article { border-left:3px solid #bfa45f; padding-left:14px; } .faq details { padding:14px 0; border-bottom:1px solid var(--line); } .related { display:flex; flex-wrap:wrap; gap:16px; } footer { padding:30px 0; background:#243f37; color:#e2e8e4; } footer a { color:#fff; }
+    .content-section { padding:34px 0; border-top:1px solid var(--line); } .table-wrap { overflow-x:auto; } table { width:100%; min-width:1080px; border-collapse:collapse; background:var(--paper); } caption { padding:12px; text-align:left; color:var(--muted); font-weight:750; } th,td { text-align:left; padding:12px; border-bottom:1px solid var(--line); white-space:nowrap; } th { white-space:normal; } .scenario-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; } .scenario-grid article { border-left:3px solid #bfa45f; padding-left:14px; } .faq details { padding:14px 0; border-bottom:1px solid var(--line); } .related { display:flex; flex-wrap:wrap; gap:16px; } footer { padding:30px 0; background:#243f37; color:#e2e8e4; } footer a { color:#fff; }
     @media(max-width:780px) { .calculator-layout { grid-template-columns:1fr; } .result-panel { position:static; } .calc-nav-links { display:none; } .scenario-grid { grid-template-columns:1fr; } }
     @media(max-width:520px) { .calc-shell { width:min(100% - 22px,1120px); } .field-grid,.result-grid { grid-template-columns:1fr; } h1 { overflow-wrap:anywhere; } th,td { padding:10px 8px; font-size:13px; } }
   </style>
@@ -3657,7 +3682,7 @@ __HEAD__
       </section>
     </section>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> The benchmark and methodology below remain available, and you can use them as a starting point for adviser review.</p></noscript>
-    <section id="benchmarks" class="content-section"><h2>Retirement cost benchmarks by destination</h2><p>Comfortable but not luxury annual spending in today's USD, including rent. Edit the calculator benchmark to fit your own expected retirement expenses.</p><div class="table-wrap"><table><thead><tr><th>Destination</th><th>Single annual benchmark</th><th>Couple annual benchmark</th><th>Data confidence</th></tr></thead><tbody>__ROWS__</tbody></table></div></section>
+    <section id="benchmarks" class="content-section"><h2>How much capital do you need to retire abroad?</h2><p><strong>Retirement cost benchmarks by destination.</strong> This international retirement comparison ranks destinations by the capital a couple would need under one consistent scenario: retirement begins today, renting, a 30-year horizon with a 3.5% guided withdrawal rate, 12 months of expenses in reserve, and no pension or outside passive income. Single-retiree figures use the same assumptions.</p><p>Property capital is shown separately as today's representative purchase price plus acquisition costs and does not affect the ranking. Use the <a href="#retirement-calculator">retirement abroad calculator</a> to subtract your pension and passive income, plan a future retirement date, or compare renting, owning, and buying.</p><div class="table-wrap"><table><caption>Required retirement capital by destination in today's USD</caption><thead><tr><th>Rank</th><th>Destination</th><th>Annual spending</th><th>Liquid portfolio</th><th>Emergency reserve</th><th>Required retirement capital</th><th>Property capital</th></tr></thead><tbody>__ROWS__</tbody></table></div></section>
     <section class="content-section"><h2>How housing changes the answer</h2><div class="scenario-grid"><article><h3>Rent</h3><p>Includes recurring rent and omits acquisition capital.</p></article><article><h3>Already own</h3><p>Includes estimated owner costs and no new purchase.</p></article><article><h3>Buy at retirement</h3><p>Includes owner costs plus projected property price and acquisition costs as separate capital.</p></article></div></section>
     <section id="methodology" class="content-section"><h2>How the calculation works</h2><p>Expenses are entered in today's money and projected category by category. Healthcare and housing can use different inflation rates. Indexed reliable income rises with inflation; fixed income remains nominal. The calculator subtracts outside income from first-year retirement spending, floors the funding gap at zero, and divides that gap by a guided 3.0%–4.0% withdrawal rate.</p><p><strong>Portfolio dividends and interest</strong> are part of the portfolio withdrawal, not a separate outside-income deduction. The cash-income and asset-sale figures explain the same withdrawal and are not added twice.</p><p>Property capital and an emergency reserve remain separate from the liquid portfolio. Exchange rates establish a current comparison baseline and are not forecasts.</p><h3>Sources and confidence</h3><p>Data reviewed __AS_OF__. Destination observations and documented country-level proxies are planning inputs, not precise quotes.</p><ul>__SOURCES__</ul></section>
     <section class="content-section"><h2>Related retirement research</h2><div class="related"><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Buying property abroad for retirement</a><a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Best places to buy abroad for retirement</a><a href="/methodology/">Research methodology</a><a href="/shortlist-review/" data-track="shortlist_review_click">Request a shortlist review</a></div></section>

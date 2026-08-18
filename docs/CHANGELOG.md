@@ -6,6 +6,7 @@
 - Added source-audited cost, inflation, housing, property, acquisition-cost, and confidence inputs with transparent methodology and citations.
 - Added client-side projections for retirement expenses, reliable outside income, liquid portfolio capital, property capital, and emergency reserves without persisting raw financial inputs.
 - Linked the calculator from the retirement guide hub, retirement guides, and covered country and destination pages.
+- Added an SEO-focused capital comparison ranking all eight destinations under consistent rent, reserve, income, and withdrawal-rate assumptions, with property capital shown separately.
 
 ## Production publish setup
 
