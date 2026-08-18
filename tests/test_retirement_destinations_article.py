@@ -1,10 +1,13 @@
 from __future__ import annotations
 
+import json
 import re
 import struct
 import subprocess
 import unittest
 from pathlib import Path
+
+from src.build_unified_app import destination_slug
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -47,16 +50,36 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
             self.html,
         )
         self.assertIn(
-            '<meta name="description" content="Compare eight retirement destinations by required capital, annual spending, portfolio needs, reserves, and optional property costs using one methodology.">',
+            '<meta name="description" content="Compare all 30 Global Home Atlas retirement destinations by required capital, annual spending, reserves, and optional property costs using one methodology.">',
             self.html,
         )
         self.assertIn(
-            "<h1>8 Retirement Destinations Ranked by How Much You Need</h1>",
+            "<h1>30 Retirement Destinations Ranked by How Much You Need</h1>",
             self.html,
         )
         self.assertIn('"@type":"Article"', self.compact_html)
         self.assertIn('"@type":"FAQPage"', self.compact_html)
+        self.assertIn('"@type":"ItemList"', self.compact_html)
+        self.assertIn('"numberOfItems":30', self.compact_html)
         self.assertIn('"@type":"ImageObject"', self.compact_html)
+
+    def test_ranking_shows_top_ten_then_expands_ranks_eleven_to_thirty(self) -> None:
+        ranking = self.html.split('id="ranking"', 1)[1].split("</section>", 1)[0]
+        visible = ranking.split('<details class="ranking-more">', 1)[0]
+        expandable = ranking.split('<details class="ranking-more">', 1)[1]
+        self.assertEqual(10, visible.count('class="ranking-row"'))
+        self.assertEqual(20, expandable.count('class="ranking-row"'))
+        self.assertIn("View ranks 11–30", expandable)
+        self.assertIn("</details>", expandable)
+
+    def test_every_destination_is_ranked_once_and_only_top_ten_have_notes(self) -> None:
+        destinations = json.loads((ROOT / "data" / "destinations.json").read_text(encoding="utf-8"))
+        ranking = self.html.split('id="ranking"', 1)[1].split("</section>", 1)[0]
+        for destination in destinations:
+            href = f'href="/destinations/{destination_slug(destination)}/"'
+            self.assertEqual(1, ranking.count(href), destination["id"])
+        notes = self.html.split('class="destination-notes"', 1)[1].split("</ol>", 1)[0]
+        self.assertEqual(10, notes.count("<li>"))
 
     def test_table_ranks_destinations_by_couple_required_capital(self) -> None:
         marker = 'id="ranking"'
@@ -151,8 +174,8 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         homepage = (ROOT / "artifacts" / "index.html").read_text(encoding="utf-8")
         article_link = (
             f'<a href="/{SLUG}/" data-track="guide_click" '
-            'data-track-label="landing 8 Retirement Destinations Ranked by How Much You Need">'
-            '8 Retirement Destinations Ranked by How Much You Need</a>'
+            'data-track-label="landing 30 Retirement Destinations Ranked by How Much You Need">'
+            '30 Retirement Destinations Ranked by How Much You Need</a>'
         )
         self.assertIn(article_link, homepage)
         self.assertEqual(1, homepage.count(f'href="/{SLUG}/"'))

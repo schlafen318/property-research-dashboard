@@ -59,10 +59,10 @@ RETIREMENT_CALCULATOR_DESCRIPTION = (
 )
 RETIREMENT_DESTINATIONS_SLUG = "retirement-destinations-ranked-by-cost"
 RETIREMENT_DESTINATIONS_TITLE = "Retirement Destinations Ranked by Cost (2026) | Global Home Atlas"
-RETIREMENT_DESTINATIONS_H1 = "8 Retirement Destinations Ranked by How Much You Need"
+RETIREMENT_DESTINATIONS_H1 = "30 Retirement Destinations Ranked by How Much You Need"
 RETIREMENT_DESTINATIONS_DESCRIPTION = (
-    "Compare eight retirement destinations by required capital, annual spending, portfolio "
-    "needs, reserves, and optional property costs using one methodology."
+    "Compare all 30 Global Home Atlas retirement destinations by required capital, "
+    "annual spending, reserves, and optional property costs using one methodology."
 )
 RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
 RETIREMENT_ENGINE_PATH = ROOT / "src" / "retirement_calculator.js"
@@ -3619,7 +3619,7 @@ def schema_for_retirement_calculator(canonical: str) -> list[dict]:
 RETIREMENT_DESTINATIONS_FAQS = [
     (
         "What is the lowest-cost retirement destination in this comparison?",
-        "Fukuoka / Itoshima has the lowest required retirement capital under this article's standard couple-renting scenario. The comparison covers eight selected destinations, not every place retirees could choose.",
+        "Da Nang / Hoi An has the lowest required retirement capital under this article's standard couple-renting scenario. The comparison covers all 30 destinations currently covered by Global Home Atlas, not every place retirees could choose.",
     ),
     (
         "Why rank retirement destinations instead of countries?",
@@ -3636,7 +3636,9 @@ RETIREMENT_DESTINATIONS_FAQS = [
 ]
 
 
-def schema_for_retirement_destinations_article(canonical: str) -> list[dict]:
+def schema_for_retirement_destinations_article(
+    canonical: str, rankings: list[dict]
+) -> list[dict]:
     images = [
         f"{SITE_URL}assets/retirement-destinations-required-capital.png",
         f"{SITE_URL}assets/retirement-destinations-capital-breakdown.png",
@@ -3692,6 +3694,24 @@ def schema_for_retirement_destinations_article(canonical: str) -> list[dict]:
                     "acceptedAnswer": {"@type": "Answer", "text": answer},
                 }
                 for question, answer in RETIREMENT_DESTINATIONS_FAQS
+            ],
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Retirement destinations ranked by required capital",
+            "numberOfItems": len(rankings),
+            "itemListOrder": "https://schema.org/ItemListOrderAscending",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": position,
+                    "name": item["destination"]["name"],
+                    "url": page_url(
+                        f'destinations/{destination_slug(item["destination"])}'
+                    ),
+                }
+                for position, item in enumerate(rankings, start=1)
             ],
         },
     ]
@@ -3889,6 +3909,7 @@ __ANALYTICS__
 def build_retirement_destinations_article(destinations: list[dict], retirement_payload: dict) -> str:
     canonical = page_url(RETIREMENT_DESTINATIONS_SLUG)
     rankings = retirement_destination_rankings(destinations, retirement_payload)
+    visible_rankings, expandable_rankings = split_rankings(rankings)
     table_rows = []
     destination_notes = []
     source_links = []
@@ -3899,7 +3920,7 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
         slug = destination_slug(destination)
         table_rows.append(
             f"""
-            <tr>
+            <tr class="ranking-row">
               <td>{rank}</td>
               <th scope="row"><a href="/destinations/{escape(slug)}/">{escape(destination["name"])}</a><br><span>{escape(destination.get("country") or "")}</span></th>
               <td>{money(metrics["annual_spending"])}</td>
@@ -3922,13 +3943,18 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
             f'— {escape(first_source["metric_supported"])} ({escape(first_source["source_date"])})</li>'
         )
 
+    visible_rows = "".join(table_rows[: len(visible_rankings)])
+    expandable_rows = "".join(table_rows[len(visible_rankings) :])
+    top_destination_notes = "".join(destination_notes[: len(visible_rankings)])
     lowest = rankings[0]["metrics"]["required_capital"]
     highest = rankings[-1]["metrics"]["required_capital"]
+    lowest_name = rankings[0]["destination"]["name"]
+    highest_name = rankings[-1]["destination"]["name"]
     faq_html = build_faq_html(RETIREMENT_DESTINATIONS_FAQS)
     html = f"""<!doctype html>
 <html lang="en">
 <head>
-{head_html(RETIREMENT_DESTINATIONS_TITLE, RETIREMENT_DESTINATIONS_DESCRIPTION, canonical, schema_for_retirement_destinations_article(canonical))}
+{head_html(RETIREMENT_DESTINATIONS_TITLE, RETIREMENT_DESTINATIONS_DESCRIPTION, canonical, schema_for_retirement_destinations_article(canonical, rankings))}
   <meta property="og:image" content="{SITE_URL}assets/retirement-destinations-required-capital.png">
   <meta property="og:image:width" content="1600">
   <meta property="og:image:height" content="900">
@@ -3956,6 +3982,10 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
     th, td {{ padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }}
     thead th {{ color: var(--muted); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }}
     tbody th span {{ color: var(--muted); font-weight: 600; }}
+    .ranking-more {{ margin-top: 18px; }}
+    .ranking-more > summary {{ display: inline-block; padding: 8px 0; color: var(--teal); font-weight: 850; cursor: pointer; }}
+    .ranking-more > summary:focus-visible {{ outline: 3px solid var(--gold); outline-offset: 4px; }}
+    .ranking-more .table-wrap {{ margin-top: 10px; }}
     .infographic {{ margin: 18px 0 0; }}
     .infographic img {{ display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }}
     .infographic figcaption {{ margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.5; }}
@@ -3983,7 +4013,7 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
         <div>
           <p class="page-eyebrow">Retirement cost comparison · updated {escape(retirement_payload["as_of"])}</p>
           <h1>{RETIREMENT_DESTINATIONS_H1}</h1>
-          <p class="page-lede">Eight international retirement destinations compared under one transparent scenario. The rank answers a narrow financial question—how much capital a couple renting would need—not which place offers the best life.</p>
+          <p class="page-lede">All 30 Global Home Atlas retirement destinations compared under one transparent scenario. The rank answers a narrow financial question—how much capital a couple renting would need—not which place offers the best life.</p>
           <div class="page-actions"><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article hero">Calculate your own plan</a><a class="text-action" href="#ranking">See the ranking</a></div>
         </div>
       </div>
@@ -3994,14 +4024,15 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
       <nav class="article-toc" aria-label="In this article"><span>In this article</span><a href="#ranking">Ranking</a><a href="#components">What drives the cost</a><a href="#destinations">Destination notes</a><a href="#methodology">Methodology</a><a href="#faq">FAQ</a></nav>
       <div class="article-layout">
         <article class="article-body">
-          <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among these eight selected destinations, Fukuoka / Itoshima has the lowest modeled requirement at <strong>{money(lowest)}</strong>, while Lake Como has the highest at <strong>{money(highest)}</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It is a comparable view of destinations already covered by Global Home Atlas, using the same researched cost inputs as our retirement planning model.</p><aside class="article-callout"><div><strong>Make the estimate personal</strong><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p></div><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article callout">Open calculator</a></aside></section>
-          <section class="article-section" id="ranking"><h2>Retirement destinations ranked by required capital</h2><p>Each row uses today's USD and the same assumptions. Representative property capital is informative only and does not affect rank.</p><div class="table-wrap"><table><caption>Required retirement capital for a couple renting</caption><thead><tr><th>Rank</th><th>Destination / Country</th><th>Annual spending</th><th>Required retirement capital</th><th>Property capital</th></tr></thead><tbody>{''.join(table_rows)}</tbody></table></div>
+          <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among the 30 destinations, {escape(lowest_name)} has the lowest modeled requirement at <strong>{money(lowest)}</strong>, while {escape(highest_name)} has the highest at <strong>{money(highest)}</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It is a comparable view of every destination currently covered by Global Home Atlas, using the same researched cost inputs as our retirement planning model.</p><aside class="article-callout"><div><strong>Make the estimate personal</strong><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p></div><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article callout">Open calculator</a></aside></section>
+          <section class="article-section" id="ranking"><h2>Retirement destinations ranked by required capital</h2><p>Each row uses today's USD and the same assumptions. Representative property capital is informative only and does not affect rank.</p><div class="table-wrap"><table><caption>Required retirement capital for a couple renting</caption><thead><tr><th>Rank</th><th>Destination / Country</th><th>Annual spending</th><th>Required retirement capital</th><th>Property capital</th></tr></thead><tbody>{visible_rows}</tbody></table></div>
+            <details class="ranking-more"><summary>View ranks 11–30</summary><div class="table-wrap"><table><caption>Retirement destinations ranked 11–30</caption><thead><tr><th>Rank</th><th>Destination / Country</th><th>Annual spending</th><th>Required retirement capital</th><th>Property capital</th></tr></thead><tbody>{expandable_rows}</tbody></table></div></details>
             <figure class="infographic"><img src="/assets/retirement-destinations-required-capital.png" width="1600" height="900" alt="Eight retirement destinations ranked from lowest to highest required capital for a couple renting" loading="eager"><figcaption>Required capital combines the liquid portfolio and 12-month reserve. Property is excluded from rank.</figcaption><a class="download-link" href="/assets/retirement-destinations-required-capital.png" download data-track="infographic_download" data-track-label="required retirement capital ranking">Download this infographic as PNG</a></figure>
           </section>
           <section class="article-section" id="components"><h2>Why the capital figures differ</h2><p>Required liquid portfolio capital magnifies differences in annual spending: at a 3.5% withdrawal rate, every additional $10,000 of first-year spending adds about $285,700 to the modeled portfolio. The emergency reserve then adds another year of expenses.</p><p>Property capital tells a different story. It combines the representative purchase price with estimated acquisition costs and can be much higher—or much lower—than the cost rank suggests. It is shown separately because buying is optional and listing samples are not market-wide medians.</p>
             <figure class="infographic"><img src="/assets/retirement-destinations-capital-breakdown.png" width="1600" height="900" alt="Annual spending, liquid portfolio, emergency reserve, and optional property capital across eight retirement destinations" loading="lazy"><figcaption>Living-cost funding and optional property acquisition are separate decisions. All figures are today's USD.</figcaption><a class="download-link" href="/assets/retirement-destinations-capital-breakdown.png" download data-track="infographic_download" data-track-label="retirement capital breakdown">Download the capital breakdown as PNG</a></figure>
           </section>
-          <section class="article-section" id="destinations"><h2>What to know about each destination</h2><p>The cost rank is a starting point, not a recommendation. Visa eligibility, taxes, healthcare access, language, neighborhood choice, climate, ownership rules, and resale depth require separate review.</p><ol class="destination-notes">{''.join(destination_notes)}</ol></section>
+          <section class="article-section" id="destinations"><h2>What to know about the top 10</h2><p>The cost rank is a starting point, not a recommendation. Visa eligibility, taxes, healthcare access, language, neighborhood choice, climate, ownership rules, and resale depth require separate review.</p><ol class="destination-notes">{top_destination_notes}</ol></section>
           <section class="article-section" id="destinations-not-countries"><h2>Destinations, not countries</h2><p>Country averages hide the decision retirees actually make. Valencia and Málaga share Spain's national framework, while Fukuoka / Itoshima and Hakone / Izu share Japan's, but housing, transport, access, and daily routines differ locally. We therefore rank destinations and keep the country visible as legal, tax, visa, and healthcare context.</p><p>The ranking does not rank lifestyle quality. A higher-cost destination may be the better personal fit, and a lower-cost destination can carry trade-offs that matter more than the savings.</p></section>
           <section class="article-section" id="methodology"><h2>Methodology and assumptions</h2><p>The ranking models a couple renting, with retirement starting today. It is designed for comparison rather than personal advice.</p><ul class="method-list"><li>30-year retirement horizon.</li><li>3.5% withdrawal rate.</li><li>12 months of expenses held as an emergency reserve.</li><li>No pension or other passive income.</li><li>Comfortable, not luxury, destination budgets in today's USD.</li><li>Liquid portfolio equals annual spending divided by 3.5%.</li><li>Required retirement capital equals liquid portfolio plus the reserve.</li><li>Property capital equals representative purchase price plus acquisition costs and is excluded from rank.</li></ul><p>Portfolio dividends and interest are already part of the portfolio withdrawal and must not be subtracted again as passive income. Reliable after-tax pension, annuity, business, or net rental income can reduce your personal funding gap in the <a href="/{RETIREMENT_CALCULATOR_SLUG}/">calculator</a>.</p><p>See the full <a href="/methodology/">research methodology</a>. Data reviewed {escape(retirement_payload["as_of"])}.</p><h3>Cost evidence</h3><ul class="source-list">{''.join(source_links)}</ul></section>
           <section class="article-section"><h2>Use the ranking without over-reading it</h2><p>Start with the cost range, then test a personal scenario. Change household spending, retirement date, pension and passive income, housing plan, inflation, and planning horizon before comparing property. A financially viable location can still fail on residency, tax, healthcare, or day-to-day fit.</p><p>Continue with <a href="/best-places-to-buy-property-abroad-for-retirement/">the retirement property destination guide</a>, then open destination dossiers and consult qualified local legal, tax, immigration, healthcare, and financial advisers before acting.</p><nav class="article-related" aria-label="Related research"><a href="/buying-property-abroad-for-retirement/">Buying abroad for retirement</a><a href="/guides/">All guides</a><a href="/methodology/">Research methodology</a></nav></section>
