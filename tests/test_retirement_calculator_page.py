@@ -88,6 +88,18 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Required retirement capital", self.html)
         self.assertIn("Property capital", self.html)
 
+    def test_calculator_contains_all_thirty_destination_options(self) -> None:
+        select = self.html.split('id="ret-destination"', 1)[1].split("</select>", 1)[0]
+        self.assertEqual(30, select.count("<option"))
+
+    def test_benchmarks_show_ten_rows_then_expand_twenty(self) -> None:
+        section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
+        visible = section.split('<details class="benchmark-more">', 1)[0]
+        expandable = section.split('<details class="benchmark-more">', 1)[1]
+        self.assertEqual(10, visible.count('class="benchmark-row"'))
+        self.assertEqual(20, expandable.count('class="benchmark-row"'))
+        self.assertIn("View ranks 11–30", expandable)
+
     def test_capital_table_uses_guided_methodology_and_ranks_by_couple_requirement(self) -> None:
         section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
         self.assertIn("3.5% guided withdrawal rate", section)
