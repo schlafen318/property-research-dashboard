@@ -66,6 +66,10 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertFalse(run_ui("isNegativeRate", 0))
         self.assertFalse(run_ui("isNegativeRate", 0.001))
 
+    def test_benchmark_panel_is_hidden_when_household_does_not_match(self) -> None:
+        self.assertFalse(run_ui("isBenchmarkPanelHidden", {"panel": "couple", "selected": "couple"}))
+        self.assertTrue(run_ui("isBenchmarkPanelHidden", {"panel": "single", "selected": "couple"}))
+
     def test_housing_guidance_distinguishes_rent_owner_costs_and_purchase_budget(self) -> None:
         self.assertEqual(
             "Monthly retirement living expenses, including rent.",

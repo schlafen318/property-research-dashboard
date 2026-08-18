@@ -49,6 +49,29 @@
     return Number(value) < 0;
   }
 
+  function isBenchmarkPanelHidden(input) {
+    return input.panel !== input.selected;
+  }
+
+  function initRetirementBenchmarkTable(selectId) {
+    if (!root) return;
+    const select = document.getElementById(selectId);
+    const panels = Array.from(document.querySelectorAll("[data-benchmark-panel]"));
+    if (!select || panels.length === 0) return;
+
+    function syncPanels() {
+      panels.forEach(function (panel) {
+        panel.hidden = isBenchmarkPanelHidden({
+          panel: panel.dataset.benchmarkPanel,
+          selected: select.value,
+        });
+      });
+    }
+
+    select.addEventListener("change", syncPanels);
+    syncPanels();
+  }
+
   function initRetirementCalculator(rootId, payload) {
     if (!root) return;
     const form = document.getElementById(rootId);
@@ -235,6 +258,8 @@
     housingGuidance: housingGuidance,
     isInvalidNumericControl: isInvalidNumericControl,
     isNegativeRate: isNegativeRate,
+    isBenchmarkPanelHidden: isBenchmarkPanelHidden,
+    initRetirementBenchmarkTable: initRetirementBenchmarkTable,
     initRetirementCalculator: initRetirementCalculator,
   };
 });

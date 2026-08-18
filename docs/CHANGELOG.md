@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-08-19 — Household-specific retirement benchmarks
+
+- Replaced repeated single-and-couple values in every benchmark cell with one household selector.
+- Kept Couple as the default view and added a Single option that updates all displayed figures.
+- Ranked the complete top-10 and expandable ranks 11–30 separately for each household type.
+
 ## 2026-08-18 — Retirement target and net return emphasis
 
 - Moved the retirement capital target above today's allocation so the primary planning goal appears first.
