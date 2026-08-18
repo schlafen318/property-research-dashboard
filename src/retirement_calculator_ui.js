@@ -53,11 +53,31 @@
     return input.panel !== input.selected;
   }
 
-  function initRetirementBenchmarkTable(selectId) {
+  function partitionBenchmarkRows(input) {
+    const matching = input.rows.filter(function (row) {
+      return input.selectedContinent === "all" || row.continent === input.selectedContinent;
+    });
+    const excluded = input.rows.filter(function (row) {
+      return input.selectedContinent !== "all" && row.continent !== input.selectedContinent;
+    });
+    const visibleCount = input.visibleCount || 10;
+    return {
+      visible: matching.slice(0, visibleCount),
+      expandable: matching.slice(visibleCount),
+      excluded: excluded,
+    };
+  }
+
+  function initRetirementBenchmarkTable(selectId, continentSelectId) {
     if (!root) return;
     const select = document.getElementById(selectId);
+    const continentSelect = document.getElementById(continentSelectId);
     const panels = Array.from(document.querySelectorAll("[data-benchmark-panel]"));
     if (!select || panels.length === 0) return;
+    const panelRows = new Map();
+    panels.forEach(function (panel) {
+      panelRows.set(panel, Array.from(panel.querySelectorAll(".benchmark-row")));
+    });
 
     function syncPanels() {
       panels.forEach(function (panel) {
@@ -65,10 +85,36 @@
           panel: panel.dataset.benchmarkPanel,
           selected: select.value,
         });
+        const partition = partitionBenchmarkRows({
+          rows: panelRows.get(panel).map(function (row) {
+            return { row: row, continent: row.dataset.continent };
+          }),
+          selectedContinent: continentSelect ? continentSelect.value : "all",
+          visibleCount: 10,
+        });
+        const visibleBody = panel.querySelector("[data-benchmark-visible]");
+        const expandableBody = panel.querySelector("[data-benchmark-expandable]");
+        const more = panel.querySelector("[data-benchmark-more]");
+        const summary = panel.querySelector("[data-benchmark-summary]");
+        partition.excluded.forEach(function (item) { item.row.hidden = true; });
+        partition.visible.forEach(function (item) {
+          item.row.hidden = false;
+          visibleBody.appendChild(item.row);
+        });
+        partition.expandable.forEach(function (item) {
+          item.row.hidden = false;
+          expandableBody.appendChild(item.row);
+        });
+        more.hidden = partition.expandable.length === 0;
+        more.open = false;
+        summary.textContent = continentSelect && continentSelect.value !== "all"
+          ? "View remaining " + partition.expandable.length + " destinations"
+          : "View ranks 11–30";
       });
     }
 
     select.addEventListener("change", syncPanels);
+    if (continentSelect) continentSelect.addEventListener("change", syncPanels);
     syncPanels();
   }
 
@@ -259,6 +305,7 @@
     isInvalidNumericControl: isInvalidNumericControl,
     isNegativeRate: isNegativeRate,
     isBenchmarkPanelHidden: isBenchmarkPanelHidden,
+    partitionBenchmarkRows: partitionBenchmarkRows,
     initRetirementBenchmarkTable: initRetirementBenchmarkTable,
     initRetirementCalculator: initRetirementCalculator,
   };

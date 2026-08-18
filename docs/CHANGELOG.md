@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-08-19 — Continent filter for retirement benchmarks
+
+- Added an All continents, Asia, Europe, North America, and Oceania filter beside the household selector.
+- Re-forms the visible top 10 for the selected continent while preserving each destination's global household rank.
+- Keeps any additional matching destinations in the existing expandable section.
+
 ## 2026-08-19 — Household-specific retirement benchmarks
 
 - Replaced repeated single-and-couple values in every benchmark cell with one household selector.

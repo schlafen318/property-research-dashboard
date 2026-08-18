@@ -156,14 +156,22 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertNotIn('<span>Single ', section)
         self.assertNotIn('<span>Couple ', section)
 
+    def test_benchmarks_offer_continent_filtering(self) -> None:
+        section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
+        selector = section.split('id="ret-benchmark-continent"', 1)[1].split("</select>", 1)[0]
+        self.assertIn('<option value="all" selected>All continents</option>', selector)
+        for continent in ("Asia", "Europe", "North America", "Oceania"):
+            self.assertIn(f'<option value="{continent.lower().replace(" ", "-")}">{continent}</option>', selector)
+            self.assertIn(f'data-continent="{continent.lower().replace(" ", "-")}"', section)
+
     def test_each_household_benchmark_shows_ten_rows_then_expands_twenty(self) -> None:
         section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
         for household, next_household in (("couple", "single"), ("single", None)):
             panel = section.split(f'data-benchmark-panel="{household}"', 1)[1]
             if next_household:
                 panel = panel.split(f'data-benchmark-panel="{next_household}"', 1)[0]
-            visible = panel.split('<details class="benchmark-more">', 1)[0]
-            expandable = panel.split('<details class="benchmark-more">', 1)[1]
+            visible = panel.split('<details class="benchmark-more"', 1)[0]
+            expandable = panel.split('<details class="benchmark-more"', 1)[1]
             self.assertEqual(10, visible.count('class="benchmark-row"'))
             self.assertEqual(20, expandable.count('class="benchmark-row"'))
             self.assertIn("View ranks 11–30", expandable)
@@ -215,7 +223,10 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         for element_id in required_ids:
             self.assertIn(f'id="{element_id}"', self.html)
         self.assertIn("GHARetirementCalculatorUI.initRetirementCalculator", self.html)
-        self.assertIn('GHARetirementCalculatorUI.initRetirementBenchmarkTable("ret-benchmark-household")', self.html)
+        self.assertIn(
+            'GHARetirementCalculatorUI.initRetirementBenchmarkTable("ret-benchmark-household","ret-benchmark-continent")',
+            self.html,
+        )
         self.assertLess(self.html.index("window.GHA ="), self.html.index("GHARetirementCalculatorUI.initRetirementCalculator"))
 
     def test_ui_module_does_not_persist_or_transmit_financial_inputs(self) -> None:
