@@ -144,6 +144,8 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertEqual(550000, result["propertyCapital"])
         self.assertEqual("today", result["propertyTiming"])
         self.assertIsNone(result["combinedRetirementCapital"])
+        self.assertNotIn("totalCapital", result)
+        self.assertNotIn("todayDollarTotal", result)
 
     def test_buy_at_retirement_projects_property(self) -> None:
         payload = level_cash_flow_payload()

@@ -114,10 +114,8 @@
       propertyTiming = "retirement";
       combinedRetirementCapital = retirementCapital + propertyCapital;
     }
-    const totalCapital = combinedRetirementCapital === null ? retirementCapital : combinedRetirementCapital;
     const impliedFirstYearWithdrawal = liquidPortfolio > 0 ? fundingGap / liquidPortfolio : null;
     const todayDollarRetirementCapital = retirementCapital / Math.pow(1 + generalInflation, yearsToRetirement);
-    const todayDollarTotal = totalCapital / Math.pow(1 + generalInflation, yearsToRetirement);
 
     return {
       yearsToRetirement: yearsToRetirement,
@@ -132,10 +130,8 @@
       emergencyReserve: emergencyReserve,
       retirementCapital: retirementCapital,
       combinedRetirementCapital: combinedRetirementCapital,
-      totalCapital: totalCapital,
       impliedFirstYearWithdrawal: impliedFirstYearWithdrawal,
       todayDollarRetirementCapital: todayDollarRetirementCapital,
-      todayDollarTotal: todayDollarTotal,
     };
   }
 

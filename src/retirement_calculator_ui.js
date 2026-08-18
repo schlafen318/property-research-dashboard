@@ -39,6 +39,12 @@
     return "Monthly retirement living expenses after purchase, including owner running costs but not the home purchase at retirement.";
   }
 
+  function isInvalidNumericControl(control) {
+    if (control.disabled) return false;
+    const valid = typeof control.checkValidity === "function" ? control.checkValidity() : control.valid !== false;
+    return control.value === "" || !valid;
+  }
+
   function initRetirementCalculator(rootId, payload) {
     if (!root) return;
     const form = document.getElementById(rootId);
@@ -179,9 +185,7 @@
 
     function firstInvalidField() {
       const controls = Array.from(form.querySelectorAll("input[type=number]"));
-      return controls.find(function (control) {
-        return control.value === "" || !control.checkValidity();
-      });
+      return controls.find(isInvalidNumericControl);
     }
 
     function calculate(event) {
@@ -219,6 +223,7 @@
     annualBenchmark: annualBenchmark,
     usesPropertyBudget: usesPropertyBudget,
     housingGuidance: housingGuidance,
+    isInvalidNumericControl: isInvalidNumericControl,
     initRetirementCalculator: initRetirementCalculator,
   };
 });

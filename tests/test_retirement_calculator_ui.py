@@ -47,6 +47,20 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertTrue(run_ui("usesPropertyBudget", "buy_now"))
         self.assertTrue(run_ui("usesPropertyBudget", "buy_retirement"))
 
+    def test_disabled_hidden_number_does_not_block_calculation(self) -> None:
+        self.assertFalse(
+            run_ui(
+                "isInvalidNumericControl",
+                {"disabled": True, "value": "", "valid": False},
+            )
+        )
+        self.assertTrue(
+            run_ui(
+                "isInvalidNumericControl",
+                {"disabled": False, "value": "", "valid": False},
+            )
+        )
+
     def test_housing_guidance_distinguishes_rent_owner_costs_and_purchase_budget(self) -> None:
         self.assertEqual(
             "Monthly retirement living expenses, including rent.",
