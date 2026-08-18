@@ -70,6 +70,28 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertFalse(run_ui("isBenchmarkPanelHidden", {"panel": "couple", "selected": "couple"}))
         self.assertTrue(run_ui("isBenchmarkPanelHidden", {"panel": "single", "selected": "couple"}))
 
+    def test_benchmark_rows_are_partitioned_by_continent(self) -> None:
+        rows = [
+            {"id": f"europe-{index}", "continent": "europe"}
+            for index in range(12)
+        ] + [{"id": "asia-1", "continent": "asia"}]
+        result = run_ui(
+            "partitionBenchmarkRows",
+            {"rows": rows, "selectedContinent": "europe", "visibleCount": 10},
+        )
+        self.assertEqual([f"europe-{index}" for index in range(10)], [row["id"] for row in result["visible"]])
+        self.assertEqual(["europe-10", "europe-11"], [row["id"] for row in result["expandable"]])
+        self.assertEqual(["asia-1"], [row["id"] for row in result["excluded"]])
+
+    def test_all_continents_preserves_the_full_benchmark_order(self) -> None:
+        rows = [{"id": str(index), "continent": "europe"} for index in range(11)]
+        result = run_ui(
+            "partitionBenchmarkRows",
+            {"rows": rows, "selectedContinent": "all", "visibleCount": 10},
+        )
+        self.assertEqual([str(index) for index in range(10)], [row["id"] for row in result["visible"]])
+        self.assertEqual(["10"], [row["id"] for row in result["expandable"]])
+
     def test_housing_guidance_distinguishes_rent_owner_costs_and_purchase_budget(self) -> None:
         self.assertEqual(
             "Monthly retirement living expenses, including rent.",
