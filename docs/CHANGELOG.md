@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-18 — Retirement results by planning date
+
+- Split the calculator estimate into what must be allocated today, what is needed at retirement, and first-retirement-year cash flow.
+- Added the investment required today by discounting total retirement capital at the user's expected portfolio return.
+- Kept a buy-now home purchase separate from the investment amount, while including a buy-at-retirement home in the future capital target.
+- Renamed and explained the first-year portfolio withdrawal as funding gap divided by liquid portfolio, explicitly distinguishing it from a recommended safe withdrawal rate.
+
 ## 2026-08-18 — Personalized retirement cash-flow model
 
 - Replaced the calculator's preset withdrawal-rate method with annual expense and reliable-income cash flows discounted by a required user-entered portfolio return after fees.

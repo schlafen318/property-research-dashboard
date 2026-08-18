@@ -102,11 +102,29 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             self.assertNotIn(f'id="{removed}"', form)
 
     def test_results_remove_cash_yield_breakdown(self) -> None:
-        results = self.html.split('id="ret-results"', 1)[1].split("</section>", 1)[0]
-        for element_id in ("ret-headline-label", "ret-property-label", "ret-result-return", "ret-result-implied-withdrawal"):
+        results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
+        for element_id in (
+            "ret-today-section",
+            "ret-total-today",
+            "ret-invest-today",
+            "ret-home-today",
+            "ret-retirement-section",
+            "ret-total-retirement",
+            "ret-property-retirement",
+            "ret-first-year-section",
+            "ret-result-return",
+            "ret-result-implied-withdrawal",
+            "ret-withdrawal-explanation",
+        ):
             self.assertIn(f'id="{element_id}"', results)
+        self.assertIn("What you need today", results)
+        self.assertIn("What you need at retirement", results)
+        self.assertIn("First retirement year", results)
+        self.assertIn("First-year funding gap ÷ liquid portfolio", results)
+        self.assertIn("not a recommended safe withdrawal rate", results)
         self.assertNotIn('id="ret-cash-income"', results)
         self.assertNotIn('id="ret-asset-sales"', results)
+        self.assertNotIn('id="ret-today-total"', results)
 
     def test_static_benchmarks_and_methodology_do_not_depend_on_javascript(self) -> None:
         self.assertIn('<section id="benchmarks"', self.html)
@@ -162,9 +180,12 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-expected-return",
             "ret-reserve-months",
             "ret-errors",
-            "ret-total-capital",
+            "ret-total-today",
+            "ret-invest-today",
+            "ret-home-today",
+            "ret-total-retirement",
             "ret-liquid-portfolio",
-            "ret-property-capital",
+            "ret-property-retirement",
             "ret-emergency-reserve",
             "ret-result-return",
             "ret-result-implied-withdrawal",
