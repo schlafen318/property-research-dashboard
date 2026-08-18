@@ -2795,6 +2795,7 @@ def build_landing_country_tiles() -> str:
 
 def build_landing_guide_preview(pages: list[dict]) -> str:
     wanted = [
+        RETIREMENT_DESTINATIONS_SLUG,
         "best-places-to-buy-property-abroad-for-retirement",
         "best-countries-to-buy-property-as-a-foreigner",
         "best-places-to-buy-a-second-home-abroad",
@@ -2802,7 +2803,10 @@ def build_landing_guide_preview(pages: list[dict]) -> str:
         "best-places-to-buy-property-in-europe",
         "where-can-foreigners-buy-property",
     ]
-    by_slug = {page["slug"]: page for page in pages}
+    by_slug = {
+        page["slug"]: page
+        for page in [RETIREMENT_DESTINATIONS_PAGE, *pages]
+    }
     cards = []
     for slug in wanted:
         page = by_slug.get(slug)
