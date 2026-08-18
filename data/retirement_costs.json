@@ -1,0 +1,143 @@
+{
+  "as_of": "2026-08-18",
+  "currency": "USD",
+  "methodology_note": "Comfortable but not luxury annual budgets modeled from current city cost and rent observations, private-health allowances, recurring travel, and contingency. Property prices use the median of three representative listings already captured by Global Home Atlas. Values are planning estimates, not personal financial advice.",
+  "destinations": [
+    {
+      "destination_id": "fukuoka-itoshima",
+      "display_currency": "JPY",
+      "fx_to_usd": 0.006199,
+      "inflation": {"general": 0.02, "healthcare": 0.035, "property": 0.02},
+      "profiles": {
+        "single": {"categories_usd": {"food_household": 7200, "utilities_communications": 3600, "private_healthcare": 3000, "transport": 3600, "dining_leisure": 6000, "travel": 6000, "visa_admin": 1000, "contingency": 3600}, "annual_rent_usd": 9600, "annual_owner_costs_usd": 5000},
+        "couple": {"categories_usd": {"food_household": 10800, "utilities_communications": 4200, "private_healthcare": 6000, "transport": 4800, "dining_leisure": 9000, "travel": 9000, "visa_admin": 1400, "contingency": 5400}, "annual_rent_usd": 15600, "annual_owner_costs_usd": 5000}
+      },
+      "property": {"representative_price_usd": 216360, "acquisition_cost_rate": 0.08, "price_basis": "Median of three representative Fukuoka / Itoshima listing snapshots captured by Global Home Atlas."},
+      "confidence": {"overall": "medium-high", "proxy_categories": ["private_healthcare", "visa_admin", "inflation"]},
+      "sources": [
+        {"name": "Numbeo — Fukuoka cost of living", "url": "https://www.numbeo.com/cost-of-living/in/Fukuoka", "metric_supported": "Rent, utilities, transport, dining and local cost benchmarks", "source_date": "May 2026", "accessed_on": "2026-08-18", "notes": "City-level crowdsourced observations; Itoshima housing may differ."},
+        {"name": "Statistics Bureau of Japan — Consumer Price Index", "url": "https://www.stat.go.jp/english/data/cpi/index.html", "metric_supported": "General inflation assumption", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "National proxy used for scenario inflation, not a forecast."},
+        {"name": "RealEstate.co.jp — Itoshima properties", "url": "https://realestate.co.jp/en/forsale/fukuoka/itoshima-shi", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "Listing evidence changes; verify before underwriting."}
+      ]
+    },
+    {
+      "destination_id": "valencia",
+      "display_currency": "EUR",
+      "fx_to_usd": 1.14784,
+      "inflation": {"general": 0.025, "healthcare": 0.045, "property": 0.025},
+      "profiles": {
+        "single": {"categories_usd": {"food_household": 7200, "utilities_communications": 3000, "private_healthcare": 3600, "transport": 3600, "dining_leisure": 7200, "travel": 7200, "visa_admin": 1200, "contingency": 4200}, "annual_rent_usd": 16200, "annual_owner_costs_usd": 8500},
+        "couple": {"categories_usd": {"food_household": 10800, "utilities_communications": 3600, "private_healthcare": 7200, "transport": 4800, "dining_leisure": 10800, "travel": 10800, "visa_admin": 1600, "contingency": 6200}, "annual_rent_usd": 24000, "annual_owner_costs_usd": 8500}
+      },
+      "property": {"representative_price_usd": 457988, "acquisition_cost_rate": 0.12, "price_basis": "Median of three representative Valencia listing snapshots captured by Global Home Atlas."},
+      "confidence": {"overall": "medium-high", "proxy_categories": ["private_healthcare", "visa_admin", "inflation"]},
+      "sources": [
+        {"name": "Numbeo — Valencia cost of living", "url": "https://www.numbeo.com/cost-of-living/in/Valencia", "metric_supported": "Rent, groceries, utilities, transport and dining benchmarks", "source_date": "July 2026", "accessed_on": "2026-08-18", "notes": "City-level crowdsourced observations."},
+        {"name": "Spain National Statistics Institute — CPI", "url": "https://www.ine.es/en/index.htm", "metric_supported": "General inflation assumption", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "National proxy used for scenario inflation, not a forecast."},
+        {"name": "HomeEspaña — Valencia property", "url": "https://www.homeespana.com/property-for-sale/valencia/", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "Listing evidence changes; verify before underwriting."}
+      ]
+    },
+    {
+      "destination_id": "algarve-cascais",
+      "display_currency": "EUR",
+      "fx_to_usd": 1.14784,
+      "inflation": {"general": 0.025, "healthcare": 0.045, "property": 0.03},
+      "profiles": {
+        "single": {"categories_usd": {"food_household": 6900, "utilities_communications": 3100, "private_healthcare": 3600, "transport": 4800, "dining_leisure": 7200, "travel": 7200, "visa_admin": 1200, "contingency": 4200}, "annual_rent_usd": 14500, "annual_owner_costs_usd": 18000},
+        "couple": {"categories_usd": {"food_household": 10400, "utilities_communications": 3700, "private_healthcare": 7200, "transport": 7200, "dining_leisure": 10800, "travel": 10800, "visa_admin": 1600, "contingency": 6300}, "annual_rent_usd": 23000, "annual_owner_costs_usd": 18000}
+      },
+      "property": {"representative_price_usd": 1136362, "acquisition_cost_rate": 0.09, "price_basis": "Median of three representative Algarve / Cascais listing snapshots captured by Global Home Atlas."},
+      "confidence": {"overall": "medium", "proxy_categories": ["private_healthcare", "visa_admin", "inflation", "owner_costs"]},
+      "sources": [
+        {"name": "Numbeo — Algarve cost of living", "url": "https://www.numbeo.com/cost-of-living/in/Algarve", "metric_supported": "Algarve rent and local cost benchmarks", "source_date": "June 2026", "accessed_on": "2026-08-18", "notes": "Regional crowdsourced observations; Cascais is generally more expensive."},
+        {"name": "Statistics Portugal — CPI", "url": "https://www.ine.pt/xportal/xmain?xpgid=ine_main&xpid=INE&xlang=en", "metric_supported": "General inflation assumption", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "National proxy used for scenario inflation, not a forecast."},
+        {"name": "Idealista — Algarve property", "url": "https://www.idealista.pt/en/geo/comprar-casas/algarve/", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "Mixes submarkets; verify property-specific costs."}
+      ]
+    },
+    {
+      "destination_id": "madeira",
+      "display_currency": "EUR",
+      "fx_to_usd": 1.14784,
+      "inflation": {"general": 0.025, "healthcare": 0.045, "property": 0.03},
+      "profiles": {
+        "single": {"categories_usd": {"food_household": 6600, "utilities_communications": 3000, "private_healthcare": 3600, "transport": 5400, "dining_leisure": 6600, "travel": 7200, "visa_admin": 1200, "contingency": 4000}, "annual_rent_usd": 18000, "annual_owner_costs_usd": 13000},
+        "couple": {"categories_usd": {"food_household": 9800, "utilities_communications": 3600, "private_healthcare": 7200, "transport": 7200, "dining_leisure": 9800, "travel": 10800, "visa_admin": 1600, "contingency": 6000}, "annual_rent_usd": 27000, "annual_owner_costs_usd": 13000}
+      },
+      "property": {"representative_price_usd": 803488, "acquisition_cost_rate": 0.09, "price_basis": "Median of three representative Madeira listing snapshots captured by Global Home Atlas."},
+      "confidence": {"overall": "medium", "proxy_categories": ["private_healthcare", "visa_admin", "inflation", "owner_costs"]},
+      "sources": [
+        {"name": "Numbeo — Funchal cost of living", "url": "https://www.numbeo.com/cost-of-living/in/Funchal", "metric_supported": "Rent, groceries, utilities, transport and dining benchmarks", "source_date": "May 2026", "accessed_on": "2026-08-18", "notes": "City-level crowdsourced observations; island micro-markets vary."},
+        {"name": "Statistics Portugal — CPI", "url": "https://www.ine.pt/xportal/xmain?xpgid=ine_main&xpid=INE&xlang=en", "metric_supported": "General inflation assumption", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "National proxy used for scenario inflation, not a forecast."},
+        {"name": "Mer et Demeures — Madeira property", "url": "https://www.meretdemeures.com/en/property/europe/portugal/madeira/sea%2Bview-property-for%2Bsale-funchal/", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "Lifestyle listing evidence; verify current availability."}
+      ]
+    },
+    {
+      "destination_id": "crete",
+      "display_currency": "EUR",
+      "fx_to_usd": 1.14784,
+      "inflation": {"general": 0.03, "healthcare": 0.05, "property": 0.03},
+      "profiles": {
+        "single": {"categories_usd": {"food_household": 6500, "utilities_communications": 3400, "private_healthcare": 4200, "transport": 5400, "dining_leisure": 6600, "travel": 7200, "visa_admin": 1200, "contingency": 4000}, "annual_rent_usd": 9000, "annual_owner_costs_usd": 22000},
+        "couple": {"categories_usd": {"food_household": 9800, "utilities_communications": 4200, "private_healthcare": 8400, "transport": 7200, "dining_leisure": 9800, "travel": 10800, "visa_admin": 1600, "contingency": 6000}, "annual_rent_usd": 15000, "annual_owner_costs_usd": 22000}
+      },
+      "property": {"representative_price_usd": 1687325, "acquisition_cost_rate": 0.1, "price_basis": "Median of three representative Crete listing snapshots captured by Global Home Atlas; this sample skews toward villas and hospitality property."},
+      "confidence": {"overall": "medium", "proxy_categories": ["private_healthcare", "visa_admin", "inflation", "owner_costs", "property"]},
+      "sources": [
+        {"name": "Numbeo — Heraklion cost of living", "url": "https://www.numbeo.com/cost-of-living/in/Heraklion", "metric_supported": "Crete urban rent and local cost proxy", "source_date": "May 2026", "accessed_on": "2026-08-18", "notes": "Heraklion proxy; resort and rural costs vary materially."},
+        {"name": "Hellenic Statistical Authority — CPI", "url": "https://www.statistics.gr/en/statistics/-/publication/DKT87/-", "metric_supported": "General inflation assumption", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "National proxy used for scenario inflation, not a forecast."},
+        {"name": "Crete Island Real Estate", "url": "https://crete-island.net/", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "Listing sample is not a market median."}
+      ]
+    },
+    {
+      "destination_id": "hakone-izu",
+      "display_currency": "JPY",
+      "fx_to_usd": 0.006199,
+      "inflation": {"general": 0.02, "healthcare": 0.035, "property": 0.02},
+      "profiles": {
+        "single": {"categories_usd": {"food_household": 6600, "utilities_communications": 3600, "private_healthcare": 3600, "transport": 6000, "dining_leisure": 4800, "travel": 6000, "visa_admin": 1200, "contingency": 3600}, "annual_rent_usd": 8400, "annual_owner_costs_usd": 3500},
+        "couple": {"categories_usd": {"food_household": 10000, "utilities_communications": 4200, "private_healthcare": 7200, "transport": 8400, "dining_leisure": 7200, "travel": 9000, "visa_admin": 1600, "contingency": 5500}, "annual_rent_usd": 14000, "annual_owner_costs_usd": 3500}
+      },
+      "property": {"representative_price_usd": 48356, "acquisition_cost_rate": 0.08, "price_basis": "Median of three representative Izu akiya listing snapshots captured by Global Home Atlas; renovation risk is not included."},
+      "confidence": {"overall": "medium", "proxy_categories": ["food_household", "utilities_communications", "private_healthcare", "dining_leisure", "rent", "visa_admin", "inflation", "property"]},
+      "sources": [
+        {"name": "Numbeo — Japan cost of living", "url": "https://www.numbeo.com/cost-of-living/country_result.jsp?country=Japan", "metric_supported": "National cost and rent proxy for Hakone / Izu", "source_date": "June 2026", "accessed_on": "2026-08-18", "notes": "Destination-level observations are thin; transport allowance is increased for car dependence."},
+        {"name": "Statistics Bureau of Japan — Consumer Price Index", "url": "https://www.stat.go.jp/english/data/cpi/index.html", "metric_supported": "General inflation assumption", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "National proxy used for scenario inflation, not a forecast."},
+        {"name": "Akiya Japan — Izu", "url": "https://www.akiyajapan.com/city/izu-7", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "Low purchase price may imply renovation, access and liquidity costs."}
+      ]
+    },
+    {
+      "destination_id": "lake-como",
+      "display_currency": "EUR",
+      "fx_to_usd": 1.14784,
+      "inflation": {"general": 0.02, "healthcare": 0.045, "property": 0.02},
+      "profiles": {
+        "single": {"categories_usd": {"food_household": 8000, "utilities_communications": 3600, "private_healthcare": 4800, "transport": 5400, "dining_leisure": 9000, "travel": 8400, "visa_admin": 1200, "contingency": 4800}, "annual_rent_usd": 12500, "annual_owner_costs_usd": 10000},
+        "couple": {"categories_usd": {"food_household": 12000, "utilities_communications": 4400, "private_healthcare": 9600, "transport": 7200, "dining_leisure": 13500, "travel": 12600, "visa_admin": 1600, "contingency": 7200}, "annual_rent_usd": 21000, "annual_owner_costs_usd": 10000}
+      },
+      "property": {"representative_price_usd": 596877, "acquisition_cost_rate": 0.12, "price_basis": "Median of three representative Lake Como listing snapshots captured by Global Home Atlas."},
+      "confidence": {"overall": "medium", "proxy_categories": ["private_healthcare", "visa_admin", "inflation", "owner_costs"]},
+      "sources": [
+        {"name": "Numbeo — Como cost of living", "url": "https://www.numbeo.com/cost-of-living/in/Como", "metric_supported": "Rent, groceries, utilities, transport and dining benchmarks", "source_date": "June 2026", "accessed_on": "2026-08-18", "notes": "Como city observations; prime lake villages vary materially."},
+        {"name": "Italian National Institute of Statistics — Consumer prices", "url": "https://www.istat.it/en/price/", "metric_supported": "General inflation assumption", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "National proxy used for scenario inflation, not a forecast."},
+        {"name": "Lake Como Properties", "url": "https://lake-como-properties.com/", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "Listing evidence changes; verify property condition and local taxes."}
+      ]
+    },
+    {
+      "destination_id": "m-laga-costa-del-sol",
+      "display_currency": "EUR",
+      "fx_to_usd": 1.14784,
+      "inflation": {"general": 0.025, "healthcare": 0.045, "property": 0.025},
+      "profiles": {
+        "single": {"categories_usd": {"food_household": 7000, "utilities_communications": 3000, "private_healthcare": 3600, "transport": 4200, "dining_leisure": 7200, "travel": 7200, "visa_admin": 1200, "contingency": 4400}, "annual_rent_usd": 16300, "annual_owner_costs_usd": 12000},
+        "couple": {"categories_usd": {"food_household": 10500, "utilities_communications": 3600, "private_healthcare": 7200, "transport": 6000, "dining_leisure": 10800, "travel": 10800, "visa_admin": 1600, "contingency": 6600}, "annual_rent_usd": 24000, "annual_owner_costs_usd": 12000}
+      },
+      "property": {"representative_price_usd": 688704, "acquisition_cost_rate": 0.12, "price_basis": "Median of three representative Málaga / Costa del Sol listing snapshots captured by Global Home Atlas."},
+      "confidence": {"overall": "medium-high", "proxy_categories": ["private_healthcare", "visa_admin", "inflation", "owner_costs"]},
+      "sources": [
+        {"name": "Numbeo — Málaga cost of living", "url": "https://www.numbeo.com/cost-of-living/in/Malaga", "metric_supported": "Rent, groceries, utilities, transport and dining benchmarks", "source_date": "May 2026", "accessed_on": "2026-08-18", "notes": "City-level observations; resort and prime coastal rents vary."},
+        {"name": "Spain National Statistics Institute — CPI", "url": "https://www.ine.es/en/index.htm", "metric_supported": "General inflation assumption", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "National proxy used for scenario inflation, not a forecast."},
+        {"name": "Spain-Real.Estate — Costa del Sol", "url": "https://spain-real.estate/", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026", "accessed_on": "2026-08-18", "notes": "Listing evidence changes; luxury examples can skew the sample."}
+      ]
+    }
+  ]
+}
