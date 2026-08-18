@@ -65,8 +65,9 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-horizon",
             "ret-household",
             "ret-destination",
-            "ret-spending",
+            "ret-monthly-spending",
             "ret-housing-plan",
+            "ret-property-budget",
             "ret-pension",
             "ret-other-income",
             "ret-rental-income",
@@ -77,6 +78,18 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertTrue(expected_controls - {"ret-calculate"} <= parser.label_targets)
         self.assertEqual(1, parser.live_regions)
         self.assertGreaterEqual(parser.noscript_sections, 1)
+
+    def test_housing_inputs_match_how_retirees_plan(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        self.assertIn('for="ret-monthly-spending">Monthly spending today (USD)</label>', form)
+        self.assertIn('id="ret-monthly-spending" type="number" min="0" step="1"', form)
+        self.assertIn('for="ret-property-budget">Home purchase budget today (USD)</label>', form)
+        self.assertIn('id="ret-property-budget" type="number" min="0" step="1"', form)
+        self.assertIn('id="ret-housing-guidance"', form)
+        self.assertIn('for="ret-rental-income">Other net rental income (annual USD)</label>', form)
+        self.assertIn("Leave at $0 when your destination home is for your own use", form)
+        self.assertNotIn("Annual spending today (USD)", form)
+        self.assertNotIn("Destination net rental income", form)
 
     def test_static_benchmarks_and_methodology_do_not_depend_on_javascript(self) -> None:
         self.assertIn('<section id="benchmarks"', self.html)
