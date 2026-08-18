@@ -7,16 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA_PATH = ROOT / "data" / "retirement_costs.json"
-EXPECTED_IDS = {
-    "fukuoka-itoshima",
-    "valencia",
-    "algarve-cascais",
-    "madeira",
-    "crete",
-    "hakone-izu",
-    "lake-como",
-    "m-laga-costa-del-sol",
-}
+DESTINATIONS_PATH = ROOT / "data" / "destinations.json"
 CORE_CATEGORIES = {
     "food_household",
     "utilities_communications",
@@ -35,9 +26,14 @@ class RetirementCostDataTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.payload = json.loads(DATA_PATH.read_text(encoding="utf-8"))
         cls.records = {item["destination_id"]: item for item in cls.payload["destinations"]}
+        cls.expected_ids = {
+            item["id"]
+            for item in json.loads(DESTINATIONS_PATH.read_text(encoding="utf-8"))
+        }
 
     def test_release_destination_set_is_complete(self) -> None:
-        self.assertEqual(EXPECTED_IDS, set(self.records))
+        self.assertEqual(30, len(self.expected_ids))
+        self.assertEqual(self.expected_ids, set(self.records))
 
     def test_profiles_have_positive_single_and_couple_costs(self) -> None:
         for record in self.records.values():
@@ -69,12 +65,14 @@ class RetirementCostDataTests(unittest.TestCase):
     def test_every_record_has_dated_metric_sources(self) -> None:
         for record in self.records.values():
             self.assertGreaterEqual(len(record["sources"]), 3)
+            self.assertTrue(record["property"]["price_basis"].strip())
             for source in record["sources"]:
-                self.assertTrue(source["name"])
+                self.assertTrue(source["name"].strip())
                 self.assertTrue(source["url"].startswith("https://"))
-                self.assertTrue(source["metric_supported"])
-                self.assertTrue(source["source_date"])
+                self.assertTrue(source["metric_supported"].strip())
+                self.assertTrue(source["source_date"].strip())
                 self.assertRegex(source["accessed_on"], r"^\d{4}-\d{2}-\d{2}$")
+                self.assertTrue(source["notes"].strip())
 
 
 if __name__ == "__main__":
