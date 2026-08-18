@@ -3094,6 +3094,7 @@ def build_landing_page(
         <div class="hero-actions">
           <a class="primary-action" href="#market-finder" data-track="homepage_start_click" data-track-label="hero">Find my best-fit markets</a>
           <a class="text-action" href="#countries" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
+          <a class="text-action" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="hero">Calculate retirement needs</a>
           <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
         </div>
       </div>
