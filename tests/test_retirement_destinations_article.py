@@ -146,13 +146,14 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
                 self.assertIn(f'src="/assets/{asset_name}"', self.html)
                 self.assertIn(f'href="/assets/{asset_name}" download', self.html)
         self.assertIn(
-            'alt="Eight retirement destinations ranked from lowest to highest required capital for a couple renting"',
+            'alt="Lowest-cost 10 of 30 retirement destinations ranked by required capital for a couple renting"',
             self.html,
         )
         self.assertIn(
-            'alt="Annual spending, liquid portfolio, emergency reserve, and optional property capital across eight retirement destinations"',
+            'alt="Capital breakdown for the lowest-cost 10 of 30 retirement destinations"',
             self.html,
         )
+        self.assertIn("lowest-cost 10 of 30", self.html.lower())
 
     def test_article_is_connected_to_the_retirement_content_cluster(self) -> None:
         for href in (
