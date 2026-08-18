@@ -150,6 +150,16 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             with self.subTest(route=route):
                 self.assertIn('/retirement-abroad-calculator/', route.read_text(encoding="utf-8"))
 
+    def test_homepage_hero_links_to_retirement_calculator_once(self) -> None:
+        homepage = (ROOT / "artifacts" / "index.html").read_text(encoding="utf-8")
+        calculator_link = (
+            '<a class="text-action" href="/retirement-abroad-calculator/" '
+            'data-track="retirement_calculator_open" data-track-label="hero">'
+            'Calculate retirement needs</a>'
+        )
+        self.assertIn(calculator_link, homepage)
+        self.assertEqual(1, homepage.count('href="/retirement-abroad-calculator/"'))
+
     def test_sitemap_contains_one_calculator_url(self) -> None:
         sitemap = (ROOT / "artifacts" / "sitemap.xml").read_text(encoding="utf-8")
         self.assertEqual(
