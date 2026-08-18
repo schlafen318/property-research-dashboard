@@ -881,12 +881,14 @@
       <section class="filter-bar" aria-label="Destination filters">
         <form class="toolbar" id="toolbar">
           <div class="field field--search"><label for="search">Search</label><input id="search" type="search" placeholder="Destination or country" aria-label="Search destination or country"></div>
-          <div class="field"><label for="category">Location type</label><select id="category" aria-label="Filter by location type"><option value="all">All location types</option><option value="City">City</option>
-<option value="Mountain">Mountain</option>
-<option value="Mountain + Water">Mountain + Water</option>
-<option value="Water">Water</option></select></div>
+          <div class="field"><label for="category">Location type</label><select id="category" aria-label="Filter by location type"><option value="all">All location types</option>
+      <option value="city">City</option>
+      <option value="coast-island">Coast / island</option>
+      <option value="mountain">Mountain</option>
+      <option value="lake">Lake</option>
+    </select></div>
           <div class="field"><label for="sort">Sort by</label><select id="sort" aria-label="Sort destinations"><option value="rank">Rank</option><option value="name">Destination name</option><option value="score">Overall rating</option><option value="price">Lowest price</option><option value="yield">Expected net yield</option><option value="ownership">Ownership clarity</option><option value="access">Buyer access</option><option value="retirement">Retirement</option></select></div>
-          <div class="field"><label for="buyerGoal">Buying goal</label><select id="buyerGoal"><option value="all">All goals</option><option value="shortlist">Top rated</option><option value="ownership">Clear ownership</option><option value="retirement">Retirement</option></select></div>
+          <div class="field"><label for="buyerGoal">Buying goal</label><select id="buyerGoal"><option value="all">Overall fit</option><option value="retirement">Retirement / lifestyle</option><option value="second-home">Second home</option><option value="investment">Investment-led</option><option value="ownership">Clear ownership</option></select></div>
         </form>
       </section>
 
@@ -916,21 +918,24 @@
         data-name="fukuoka / itoshima"
         data-country="japan"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="4.27"
         data-price="2620.0"
         data-yield="3.9"
         data-ownership="5.0"
         data-retirement="4.6"
+        data-goal-retirement="4.56"
+        data-goal-second-home="4.48"
+        data-goal-investment="3.99"
+        data-goal-ownership="4.3"
         data-access="available"
-        data-shortlist="yes"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="fukuoka-itoshima" aria-label="Select Fukuoka / Itoshima for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#1</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a></h3>
-            <p>Japan · Water</p>
+            <p>Japan · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>4.3</strong></div>
@@ -946,21 +951,24 @@
         data-name="dubai"
         data-country="united arab emirates"
         data-category="City"
+        data-location-types="city coast-island"
         data-score="4.18"
         data-price="5400.0"
         data-yield="5.0"
         data-ownership="4.2"
         data-retirement="3.6"
+        data-goal-retirement="4.28"
+        data-goal-second-home="4.42"
+        data-goal-investment="4.04"
+        data-goal-ownership="4.21"
         data-access="available"
-        data-shortlist="yes"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="dubai" aria-label="Select Dubai for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#2</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/dubai/">Dubai</a></h3>
-            <p>United Arab Emirates · City</p>
+            <p>United Arab Emirates · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>4.2</strong></div>
@@ -976,21 +984,24 @@
         data-name="valencia"
         data-country="spain"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="4.09"
         data-price="3840.0"
         data-yield="3.9"
         data-ownership="4.6"
         data-retirement="4.8"
+        data-goal-retirement="4.42"
+        data-goal-second-home="4.31"
+        data-goal-investment="3.92"
+        data-goal-ownership="3.87"
         data-access="available"
-        data-shortlist="yes"
-        data-top-retirement="yes"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="valencia" aria-label="Select Valencia for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#3</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/valencia/">Valencia</a></h3>
-            <p>Spain · Water</p>
+            <p>Spain · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>4.1</strong></div>
@@ -1006,21 +1017,24 @@
         data-name="algarve / cascais"
         data-country="portugal"
         data-category="Water"
+        data-location-types="coast-island"
         data-score="4.06"
         data-price="4600.0"
         data-yield="3.75"
         data-ownership="4.7"
         data-retirement="4.8"
+        data-goal-retirement="4.41"
+        data-goal-second-home="4.25"
+        data-goal-investment="3.75"
+        data-goal-ownership="4.08"
         data-access="available"
-        data-shortlist="yes"
-        data-top-retirement="yes"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="algarve-cascais" aria-label="Select Algarve / Cascais for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#4</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/algarve-cascais/">Algarve / Cascais</a></h3>
-            <p>Portugal · Water</p>
+            <p>Portugal · coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>4.1</strong></div>
@@ -1036,21 +1050,24 @@
         data-name="málaga / costa del sol"
         data-country="spain"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="4.03"
         data-price="5600.0"
         data-yield="4.0"
         data-ownership="4.5"
         data-retirement="4.7"
+        data-goal-retirement="4.44"
+        data-goal-second-home="4.4"
+        data-goal-investment="3.82"
+        data-goal-ownership="3.79"
         data-access="available"
-        data-shortlist="yes"
-        data-top-retirement="yes"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="m-laga-costa-del-sol" aria-label="Select Málaga / Costa del Sol for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#5</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a></h3>
-            <p>Spain · Water</p>
+            <p>Spain · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>4.0</strong></div>
@@ -1066,21 +1083,24 @@
         data-name="lake como"
         data-country="italy"
         data-category="Mountain + Water"
+        data-location-types="mountain lake"
         data-score="3.96"
         data-price="4650.0"
         data-yield="2.9"
         data-ownership="4.6"
         data-retirement="4.6"
+        data-goal-retirement="4.45"
+        data-goal-second-home="4.35"
+        data-goal-investment="3.51"
+        data-goal-ownership="3.9"
         data-access="available"
-        data-shortlist="yes"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="lake-como" aria-label="Select Lake Como for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#6</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/lake-como/">Lake Como</a></h3>
-            <p>Italy · Mountain + Water</p>
+            <p>Italy · Mountain, lake</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>4.0</strong></div>
@@ -1096,21 +1116,24 @@
         data-name="hakone / izu"
         data-country="japan"
         data-category="Mountain + Water"
+        data-location-types="mountain lake"
         data-score="3.95"
         data-price="3000.0"
         data-yield="3.25"
         data-ownership="5.0"
         data-retirement="4.1"
+        data-goal-retirement="4.31"
+        data-goal-second-home="4.24"
+        data-goal-investment="3.43"
+        data-goal-ownership="4.2"
         data-access="available"
-        data-shortlist="yes"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="hakone-izu" aria-label="Select Hakone / Izu for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#7</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/hakone-izu/">Hakone / Izu</a></h3>
-            <p>Japan · Mountain + Water</p>
+            <p>Japan · Mountain, lake</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>4.0</strong></div>
@@ -1126,21 +1149,24 @@
         data-name="madeira"
         data-country="portugal"
         data-category="Water"
+        data-location-types="coast-island"
         data-score="3.91"
         data-price="4000.0"
         data-yield="4.0"
         data-ownership="4.7"
         data-retirement="4.6"
+        data-goal-retirement="4.2"
+        data-goal-second-home="3.97"
+        data-goal-investment="3.66"
+        data-goal-ownership="3.99"
         data-access="available"
-        data-shortlist="yes"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="madeira" aria-label="Select Madeira for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#8</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/madeira/">Madeira</a></h3>
-            <p>Portugal · Water</p>
+            <p>Portugal · coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.9</strong></div>
@@ -1156,21 +1182,24 @@
         data-name="miami / fort lauderdale"
         data-country="united states"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="3.9"
         data-price="8600.0"
         data-yield="3.25"
         data-ownership="4.4"
         data-retirement="4.0"
+        data-goal-retirement="4.29"
+        data-goal-second-home="4.53"
+        data-goal-investment="3.61"
+        data-goal-ownership="3.84"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="miami-fort-lauderdale" aria-label="Select Miami / Fort Lauderdale for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#9</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/miami-fort-lauderdale/">Miami / Fort Lauderdale</a></h3>
-            <p>United States · Water</p>
+            <p>United States · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.9</strong></div>
@@ -1186,14 +1215,17 @@
         data-name="hakuba"
         data-country="japan"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.86"
         data-price="6700.0"
         data-yield="4.25"
         data-ownership="5.0"
         data-retirement="3.4"
+        data-goal-retirement="3.96"
+        data-goal-second-home="4.04"
+        data-goal-investment="3.73"
+        data-goal-ownership="4.18"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="hakuba" aria-label="Select Hakuba for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1216,21 +1248,24 @@
         data-name="costa brava / girona"
         data-country="spain"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="3.85"
         data-price="4600.0"
         data-yield="3.35"
         data-ownership="4.5"
         data-retirement="4.3"
+        data-goal-retirement="4.26"
+        data-goal-second-home="4.15"
+        data-goal-investment="3.58"
+        data-goal-ownership="3.65"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="costa-brava-girona" aria-label="Select Costa Brava / Girona for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#11</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/costa-brava-girona/">Costa Brava / Girona</a></h3>
-            <p>Spain · Water</p>
+            <p>Spain · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.9</strong></div>
@@ -1246,14 +1281,17 @@
         data-name="park city / deer valley"
         data-country="united states"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.83"
         data-price="14000.0"
         data-yield="3.25"
         data-ownership="5.0"
         data-retirement="3.5"
+        data-goal-retirement="4.2"
+        data-goal-second-home="4.35"
+        data-goal-investment="3.34"
+        data-goal-ownership="4.28"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="park-city-deer-valley" aria-label="Select Park City / Deer Valley for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1276,21 +1314,24 @@
         data-name="crete"
         data-country="greece"
         data-category="Water"
+        data-location-types="coast-island"
         data-score="3.81"
         data-price="2960.0"
         data-yield="3.9"
         data-ownership="4.4"
         data-retirement="4.3"
+        data-goal-retirement="4.03"
+        data-goal-second-home="3.89"
+        data-goal-investment="3.63"
+        data-goal-ownership="3.74"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="crete" aria-label="Select Crete for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#13</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/crete/">Crete</a></h3>
-            <p>Greece · Water</p>
+            <p>Greece · coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.8</strong></div>
@@ -1306,14 +1347,17 @@
         data-name="niseko"
         data-country="japan"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.79"
         data-price="14644.0"
         data-yield="5.0"
         data-ownership="5.0"
         data-retirement="3.4"
+        data-goal-retirement="4.09"
+        data-goal-second-home="4.24"
+        data-goal-investment="3.52"
+        data-goal-ownership="4.28"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="niseko" aria-label="Select Niseko for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1336,21 +1380,24 @@
         data-name="annecy"
         data-country="france"
         data-category="Mountain + Water"
+        data-location-types="city mountain lake"
         data-score="3.77"
         data-price="8720.0"
         data-yield="3.0"
         data-ownership="4.5"
         data-retirement="4.7"
+        data-goal-retirement="4.48"
+        data-goal-second-home="4.31"
+        data-goal-investment="3.25"
+        data-goal-ownership="3.71"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="yes"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="annecy" aria-label="Select Annecy for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#15</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/annecy/">Annecy</a></h3>
-            <p>France · Mountain + Water</p>
+            <p>France · City, Mountain, lake</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.8</strong></div>
@@ -1366,21 +1413,24 @@
         data-name="mallorca"
         data-country="spain"
         data-category="Water"
+        data-location-types="coast-island"
         data-score="3.77"
         data-price="6100.0"
         data-yield="3.25"
         data-ownership="4.3"
         data-retirement="4.5"
+        data-goal-retirement="4.29"
+        data-goal-second-home="4.18"
+        data-goal-investment="3.56"
+        data-goal-ownership="3.4"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="mallorca" aria-label="Select Mallorca for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#16</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/mallorca/">Mallorca</a></h3>
-            <p>Spain · Water</p>
+            <p>Spain · coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.8</strong></div>
@@ -1396,21 +1446,24 @@
         data-name="croatia / istria-dalmatia"
         data-country="croatia"
         data-category="Water"
+        data-location-types="coast-island"
         data-score="3.74"
         data-price="4700.0"
         data-yield="3.9"
         data-ownership="4.4"
         data-retirement="4.1"
+        data-goal-retirement="3.96"
+        data-goal-second-home="3.85"
+        data-goal-investment="3.56"
+        data-goal-ownership="3.69"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="croatia-istria-dalmatia" aria-label="Select Croatia / Istria-Dalmatia for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#17</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/croatia-istria-dalmatia/">Croatia / Istria-Dalmatia</a></h3>
-            <p>Croatia · Water</p>
+            <p>Croatia · coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.7</strong></div>
@@ -1426,21 +1479,24 @@
         data-name="queenstown"
         data-country="new zealand"
         data-category="Mountain + Water"
+        data-location-types="mountain lake"
         data-score="3.7"
         data-price="4200.0"
         data-yield="3.5"
         data-ownership="2.3"
         data-retirement="4.1"
+        data-goal-retirement="4.22"
+        data-goal-second-home="3.82"
+        data-goal-investment="3.83"
+        data-goal-ownership="3.0"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="queenstown" aria-label="Select Queenstown for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#18</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/queenstown/">Queenstown</a></h3>
-            <p>New Zealand · Mountain + Water</p>
+            <p>New Zealand · Mountain, lake</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.7</strong></div>
@@ -1456,21 +1512,24 @@
         data-name="los angeles / orange county"
         data-country="united states"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="3.69"
         data-price="10500.0"
         data-yield="2.75"
         data-ownership="4.4"
         data-retirement="3.8"
+        data-goal-retirement="4.25"
+        data-goal-second-home="4.61"
+        data-goal-investment="3.26"
+        data-goal-ownership="3.58"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="los-angeles-orange-county" aria-label="Select Los Angeles / Orange County for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#19</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/los-angeles-orange-county/">Los Angeles / Orange County</a></h3>
-            <p>United States · Water</p>
+            <p>United States · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.7</strong></div>
@@ -1486,21 +1545,24 @@
         data-name="phuket / koh samui"
         data-country="thailand"
         data-category="Water"
+        data-location-types="coast-island"
         data-score="3.67"
         data-price="2900.0"
         data-yield="4.5"
         data-ownership="2.0"
         data-retirement="4.1"
+        data-goal-retirement="4.2"
+        data-goal-second-home="3.83"
+        data-goal-investment="3.83"
+        data-goal-ownership="2.87"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="phuket-koh-samui" aria-label="Select Phuket / Koh Samui for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#20</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/phuket-koh-samui/">Phuket / Koh Samui</a></h3>
-            <p>Thailand · Water</p>
+            <p>Thailand · coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.7</strong></div>
@@ -1516,21 +1578,24 @@
         data-name="vancouver island / victoria"
         data-country="canada"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="3.66"
         data-price="6800.0"
         data-yield="3.15"
         data-ownership="4.3"
         data-retirement="4.5"
+        data-goal-retirement="4.29"
+        data-goal-second-home="4.01"
+        data-goal-investment="3.19"
+        data-goal-ownership="3.85"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="vancouver-island-victoria" aria-label="Select Vancouver Island / Victoria for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#21</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/vancouver-island-victoria/">Vancouver Island / Victoria</a></h3>
-            <p>Canada · Water</p>
+            <p>Canada · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.7</strong></div>
@@ -1546,21 +1611,24 @@
         data-name="lake tahoe"
         data-country="united states"
         data-category="Mountain + Water"
+        data-location-types="mountain lake"
         data-score="3.63"
         data-price="12400.0"
         data-yield="2.75"
         data-ownership="5.0"
         data-retirement="3.4"
+        data-goal-retirement="4.01"
+        data-goal-second-home="4.19"
+        data-goal-investment="3.15"
+        data-goal-ownership="4.11"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="lake-tahoe" aria-label="Select Lake Tahoe for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#22</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/lake-tahoe/">Lake Tahoe</a></h3>
-            <p>United States · Mountain + Water</p>
+            <p>United States · Mountain, lake</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.6</strong></div>
@@ -1576,14 +1644,17 @@
         data-name="dolomites / south tyrol"
         data-country="italy"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.62"
         data-price="14350.0"
         data-yield="2.9"
         data-ownership="4.6"
         data-retirement="4.4"
+        data-goal-retirement="4.34"
+        data-goal-second-home="4.2"
+        data-goal-investment="3.05"
+        data-goal-ownership="3.79"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="dolomites-south-tyrol" aria-label="Select Dolomites / South Tyrol for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1606,21 +1677,24 @@
         data-name="perth / margaret river"
         data-country="australia"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="3.61"
         data-price="7000.0"
         data-yield="3.75"
         data-ownership="2.0"
         data-retirement="4.1"
+        data-goal-retirement="4.13"
+        data-goal-second-home="3.84"
+        data-goal-investment="3.78"
+        data-goal-ownership="2.6"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="perth-margaret-river" aria-label="Select Perth / Margaret River for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#24</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/perth-margaret-river/">Perth / Margaret River</a></h3>
-            <p>Australia · Water</p>
+            <p>Australia · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.6</strong></div>
@@ -1636,14 +1710,17 @@
         data-name="chamonix"
         data-country="france"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.59"
         data-price="15880.0"
         data-yield="3.1"
         data-ownership="4.5"
         data-retirement="4.0"
+        data-goal-retirement="4.27"
+        data-goal-second-home="4.28"
+        data-goal-investment="3.14"
+        data-goal-ownership="3.62"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="chamonix" aria-label="Select Chamonix for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1666,21 +1743,24 @@
         data-name="bali"
         data-country="indonesia"
         data-category="Water"
+        data-location-types="coast-island"
         data-score="3.56"
         data-price="2200.0"
         data-yield="5.0"
         data-ownership="1.8"
         data-retirement="3.8"
+        data-goal-retirement="4.04"
+        data-goal-second-home="3.73"
+        data-goal-investment="3.75"
+        data-goal-ownership="2.65"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="bali" aria-label="Select Bali for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#26</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/bali/">Bali</a></h3>
-            <p>Indonesia · Water</p>
+            <p>Indonesia · coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.6</strong></div>
@@ -1696,21 +1776,24 @@
         data-name="da nang / hoi an"
         data-country="vietnam"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="3.56"
         data-price="1700.0"
         data-yield="3.5"
         data-ownership="2.3"
         data-retirement="3.8"
+        data-goal-retirement="3.9"
+        data-goal-second-home="3.58"
+        data-goal-investment="3.64"
+        data-goal-ownership="2.93"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="da-nang-hoi-an" aria-label="Select Da Nang / Hoi An for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#27</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/da-nang-hoi-an/">Da Nang / Hoi An</a></h3>
-            <p>Vietnam · Water</p>
+            <p>Vietnam · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.6</strong></div>
@@ -1726,14 +1809,17 @@
         data-name="whistler"
         data-country="canada"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.55"
         data-price="10260.0"
         data-yield="3.0"
         data-ownership="3.0"
         data-retirement="3.7"
+        data-goal-retirement="4.19"
+        data-goal-second-home="4.04"
+        data-goal-investment="3.33"
+        data-goal-ownership="3.31"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="whistler" aria-label="Select Whistler for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1756,14 +1842,17 @@
         data-name="andermatt"
         data-country="switzerland"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.55"
         data-price="27340.0"
         data-yield="2.75"
         data-ownership="4.1"
         data-retirement="4.3"
+        data-goal-retirement="4.37"
+        data-goal-second-home="4.09"
+        data-goal-investment="3.02"
+        data-goal-ownership="3.7"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="andermatt" aria-label="Select Andermatt for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1786,21 +1875,24 @@
         data-name="innsbruck / tyrol"
         data-country="austria"
         data-category="Mountain"
+        data-location-types="city mountain"
         data-score="3.51"
         data-price="8600.0"
         data-yield="2.75"
         data-ownership="3.5"
         data-retirement="4.5"
+        data-goal-retirement="4.31"
+        data-goal-second-home="4.0"
+        data-goal-investment="3.14"
+        data-goal-ownership="3.12"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="innsbruck-tyrol" aria-label="Select Innsbruck / Tyrol for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#30</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/innsbruck-tyrol/">Innsbruck / Tyrol</a></h3>
-            <p>Austria · Mountain</p>
+            <p>Austria · City, Mountain</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.5</strong></div>
@@ -1816,14 +1908,17 @@
         data-name="jackson hole"
         data-country="united states"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.47"
         data-price="17200.0"
         data-yield="2.4"
         data-ownership="5.0"
         data-retirement="3.1"
+        data-goal-retirement="3.94"
+        data-goal-second-home="4.05"
+        data-goal-investment="2.85"
+        data-goal-ownership="4.19"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="jackson-hole" aria-label="Select Jackson Hole for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1846,14 +1941,17 @@
         data-name="aspen / snowmass"
         data-country="united states"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.44"
         data-price="51700.0"
         data-yield="2.15"
         data-ownership="5.0"
         data-retirement="3.2"
+        data-goal-retirement="4.1"
+        data-goal-second-home="4.29"
+        data-goal-investment="2.73"
+        data-goal-ownership="4.07"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="aspen-snowmass" aria-label="Select Aspen / Snowmass for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1876,21 +1974,24 @@
         data-name="gold coast / sunshine coast"
         data-country="australia"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="3.44"
         data-price="12600.0"
         data-yield="3.25"
         data-ownership="2.0"
         data-retirement="4.4"
+        data-goal-retirement="4.21"
+        data-goal-second-home="3.88"
+        data-goal-investment="3.44"
+        data-goal-ownership="2.46"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="gold-coast-sunshine-coast" aria-label="Select Gold Coast / Sunshine Coast for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#33</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/gold-coast-sunshine-coast/">Gold Coast / Sunshine Coast</a></h3>
-            <p>Australia · Water</p>
+            <p>Australia · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.4</strong></div>
@@ -1906,21 +2007,24 @@
         data-name="sydney / melbourne"
         data-country="australia"
         data-category="City"
+        data-location-types="city coast-island"
         data-score="3.44"
         data-price="11200.0"
         data-yield="2.75"
         data-ownership="2.0"
         data-retirement="4.2"
+        data-goal-retirement="4.36"
+        data-goal-second-home="4.23"
+        data-goal-investment="3.23"
+        data-goal-ownership="2.49"
         data-access="restricted"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="sydney-melbourne" aria-label="Select Sydney / Melbourne for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#34</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/sydney-melbourne/">Sydney / Melbourne</a></h3>
-            <p>Australia · City</p>
+            <p>Australia · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.4</strong></div>
@@ -1936,21 +2040,24 @@
         data-name="ticino / lake lugano"
         data-country="switzerland"
         data-category="Mountain + Water"
+        data-location-types="mountain lake"
         data-score="3.41"
         data-price="10400.0"
         data-yield="2.25"
         data-ownership="2.8"
         data-retirement="4.8"
+        data-goal-retirement="4.48"
+        data-goal-second-home="3.98"
+        data-goal-investment="2.9"
+        data-goal-ownership="2.98"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="yes"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="ticino-lake-lugano" aria-label="Select Ticino / Lake Lugano for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#35</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/ticino-lake-lugano/">Ticino / Lake Lugano</a></h3>
-            <p>Switzerland · Mountain + Water</p>
+            <p>Switzerland · Mountain, lake</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.4</strong></div>
@@ -1966,14 +2073,17 @@
         data-name="swiss valais / vaud alps"
         data-country="switzerland"
         data-category="Mountain"
+        data-location-types="mountain"
         data-score="3.3"
         data-price="29200.0"
         data-yield="2.25"
         data-ownership="2.6"
         data-retirement="4.7"
+        data-goal-retirement="4.53"
+        data-goal-second-home="4.02"
+        data-goal-investment="2.81"
+        data-goal-ownership="2.79"
         data-access="available"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="swiss-valais-vaud-alps" aria-label="Select Swiss Valais / Vaud Alps for comparison"><span>Select</span></label>
         <div class="market-row__market">
@@ -1996,21 +2106,24 @@
         data-name="vancouver"
         data-country="canada"
         data-category="Water"
+        data-location-types="city coast-island"
         data-score="2.97"
         data-price="9300.0"
         data-yield="2.25"
         data-ownership="1.2"
         data-retirement="4.3"
+        data-goal-retirement="4.16"
+        data-goal-second-home="3.88"
+        data-goal-investment="2.71"
+        data-goal-ownership="1.52"
         data-access="restricted"
-        data-shortlist="no"
-        data-top-retirement="no"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="vancouver" aria-label="Select Vancouver for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#37</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/vancouver/">Vancouver</a></h3>
-            <p>Canada · Water</p>
+            <p>Canada · City, coast / island</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>3.0</strong></div>
@@ -2120,6 +2233,7 @@
     const compareSelectionBar = document.getElementById("compareSelectionBar");
     const compareSelectionCount = document.getElementById("compareSelectionCount");
     const compareSelected = new Set();
+    const goalLabels = { retirement: "retirement / lifestyle", "second-home": "second home", investment: "investment-led buying", ownership: "clear ownership" };
     const defaultSortDirections = { rank: "asc", name: "asc", score: "desc", price: "asc", yield: "desc", ownership: "desc", access: "asc", retirement: "desc" };
     let sortKey = sort.value;
     let sortDirection = defaultSortDirections[sortKey];
@@ -2179,19 +2293,21 @@
 
       cards.forEach((card) => {
         const matchesQuery = !query || card.dataset.name.includes(query) || card.dataset.country.includes(query);
-        const matchesCategory = selectedCategory === "all" || card.dataset.category === selectedCategory;
-        const matchesQuick =
-          buyerGoal.value === "all" ||
-          (buyerGoal.value === "shortlist" && card.dataset.shortlist === "yes") ||
-          (buyerGoal.value === "ownership" && Number(card.dataset.ownership) >= 4) ||
-          (buyerGoal.value === "retirement" && card.dataset.topRetirement === "yes");
-        const visible = matchesQuery && matchesCategory && matchesQuick;
+        const locationTypes = (card.dataset.locationTypes || "").split(" ");
+        const matchesCategory = selectedCategory === "all" || locationTypes.includes(selectedCategory);
+        const visible = matchesQuery && matchesCategory;
         card.classList.toggle("hidden", !visible);
         if (visible) shown += 1;
       });
 
       const sorted = [...cards].sort((a, b) => {
         let comparison = 0;
+        if (buyerGoal.value !== "all") {
+          const goalKey = "goal" + buyerGoal.value.split("-").map((part) => part[0].toUpperCase() + part.slice(1)).join("");
+          comparison = Number(a.dataset[goalKey]) - Number(b.dataset[goalKey]);
+          if (comparison === 0) comparison = Number(a.dataset.score) - Number(b.dataset.score);
+          return comparison === 0 ? cardRank(a) - cardRank(b) : -comparison;
+        }
         if (sortKey === "name") comparison = a.dataset.name.localeCompare(b.dataset.name);
         else if (sortKey === "score") comparison = Number(a.dataset.score) - Number(b.dataset.score);
         else if (sortKey === "price") comparison = Number(a.dataset.price) - Number(b.dataset.price);
@@ -2204,7 +2320,10 @@
         return sortDirection === "asc" ? comparison : -comparison;
       });
       sorted.forEach((card) => cardsRoot.appendChild(card));
-      resultCount.textContent = shown + (shown === 1 ? " destination shown" : " destinations shown");
+      const countLabel = shown + (shown === 1 ? " destination" : " destinations");
+      resultCount.textContent = buyerGoal.value === "all"
+        ? countLabel + " shown"
+        : countLabel + " ranked for " + goalLabels[buyerGoal.value];
     }
 
     function destinationMetric(destination, key) {
@@ -2261,6 +2380,7 @@
     category.addEventListener("change", applyFilters);
     buyerGoal.addEventListener("change", applyFilters);
     sort.addEventListener("change", () => {
+      buyerGoal.value = "all";
       sortKey = sort.value;
       sortDirection = defaultSortDirections[sortKey] || "asc";
       updateSortIndicators();
@@ -2268,6 +2388,7 @@
     });
     sortButtons.forEach((button) => {
       button.addEventListener("click", () => {
+        buyerGoal.value = "all";
         const nextSortKey = button.dataset.columnSort;
         if (sortKey === nextSortKey) sortDirection = sortDirection === "asc" ? "desc" : "asc";
         else {

@@ -204,6 +204,10 @@ class CompactDashboardTests(unittest.TestCase):
             set(build_unified_app.destination_location_types(by_id["lake-como"])),
             {"mountain", "lake"},
         )
+        self.assertEqual(
+            set(build_unified_app.destination_location_types(by_id["dubai"])),
+            {"city", "coast-island"},
+        )
 
     def test_every_buying_goal_scores_the_full_destination_universe(self) -> None:
         expected_ids = {item["id"] for item in self.destinations}
@@ -217,6 +221,21 @@ class CompactDashboardTests(unittest.TestCase):
 
         ownership_ranked = build_unified_app.rank_destinations_for_goal(self.destinations, "ownership")
         self.assertIn("bali", {item["id"] for item in ownership_ranked})
+
+    def test_dashboard_uses_goal_lenses_without_hiding_candidates(self) -> None:
+        output = build_unified_app.build()
+        html = output.read_text(encoding="utf-8")
+
+        self.assertIn('data-location-types="city coast-island"', html)
+        self.assertEqual(html.count('data-goal-retirement="'), 37)
+        self.assertEqual(html.count('data-goal-second-home="'), 37)
+        self.assertEqual(html.count('data-goal-investment="'), 37)
+        self.assertEqual(html.count('data-goal-ownership="'), 37)
+        self.assertIn('<option value="retirement">Retirement / lifestyle</option>', html)
+        self.assertIn('<option value="second-home">Second home</option>', html)
+        self.assertIn('<option value="investment">Investment-led</option>', html)
+        self.assertNotIn('buyerGoal.value === "shortlist"', html)
+        self.assertNotIn('card.dataset.topRetirement === "yes"', html)
 
 
 if __name__ == "__main__":

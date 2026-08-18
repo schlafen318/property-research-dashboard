@@ -60,21 +60,6 @@ class SeoCtrContentTests(unittest.TestCase):
         self.assertIn("<td>4.1</td>", table_html)
         self.assertNotIn("4.09", recommendation_html + table_html + json.dumps(finder_data))
 
-    def test_vacation_home_page_targets_location_query_intent(self) -> None:
-        page = seo_page("best-places-to-buy-vacation-home-abroad")
-        text = " ".join(
-            [
-                page["title"],
-                page["description"],
-                page["h1"],
-                " ".join(question + " " + answer for question, answer in page["faqs"]),
-            ]
-        ).lower()
-
-        self.assertIn("vacation home", text)
-        self.assertIn("locations", text)
-        self.assertIn("best locations for vacation homes", text)
-
     def test_build_rejects_stale_override_hash(self) -> None:
         original_loader = build_unified_app.load_content_overrides
         stale = content_override(

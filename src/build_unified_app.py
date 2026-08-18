@@ -598,6 +598,90 @@ def consolidate_destination(dest: dict) -> dict:
     return enriched
 
 
+CITY_DESTINATION_IDS = {
+    "annecy",
+    "costa-brava-girona",
+    "da-nang-hoi-an",
+    "dubai",
+    "fukuoka-itoshima",
+    "gold-coast-sunshine-coast",
+    "innsbruck-tyrol",
+    "los-angeles-orange-county",
+    "malaga-costa-del-sol",
+    "m-laga-costa-del-sol",
+    "miami-fort-lauderdale",
+    "perth-margaret-river",
+    "sydney-melbourne",
+    "valencia",
+    "vancouver",
+    "vancouver-island-victoria",
+}
+COASTAL_CITY_IDS = {"dubai", "sydney-melbourne"}
+
+
+def destination_location_types(dest: dict) -> list[str]:
+    """Return all useful location types for a destination, including overlaps."""
+    category = dest.get("category") or ""
+    location_types: list[str] = []
+    if dest.get("id") in CITY_DESTINATION_IDS or category == "City":
+        location_types.append("city")
+    if category == "Water" or dest.get("id") in COASTAL_CITY_IDS:
+        location_types.append("coast-island")
+    elif category == "Mountain":
+        location_types.append("mountain")
+    elif category == "Mountain + Water":
+        location_types.extend(("mountain", "lake"))
+    return location_types
+
+
+GOAL_DIMENSION_WEIGHTS = {
+    "retirement": {
+        "retirement_fit": 0.45,
+        "lifestyle_magnetism": 0.25,
+        "global_access": 0.15,
+        "foreigner_fit": 0.15,
+    },
+    "second-home": {
+        "lifestyle_magnetism": 0.35,
+        "global_access": 0.20,
+        "exit_liquidity": 0.20,
+        "foreigner_fit": 0.15,
+        "ownership_clarity": 0.10,
+    },
+    "investment": {
+        "rental_profit": 0.35,
+        "capital_upside": 0.25,
+        "exit_liquidity": 0.20,
+        "value_entry": 0.20,
+    },
+    "ownership": {
+        "ownership_clarity": 0.45,
+        "regulatory_safety": 0.30,
+        "foreigner_fit": 0.25,
+    },
+}
+
+
+def rank_destinations_for_goal(destinations: list[dict], goal: str) -> list[dict]:
+    """Rank the full destination universe for a buying goal without excluding any market."""
+    weights = GOAL_DIMENSION_WEIGHTS[goal]
+    ranked = []
+    for destination in destinations:
+        dimensions = {
+            item["key"]: float(item.get("score", 0) or 0)
+            for item in destination.get("decision_dimensions", [])
+        }
+        goal_score = sum(dimensions.get(key, 0) * weight for key, weight in weights.items())
+        enriched = dict(destination)
+        enriched["goal_score"] = round(max(0, min(goal_score, 5)), 2)
+        ranked.append(enriched)
+    return sorted(
+        ranked,
+        key=lambda item: (float(item["goal_score"]), float(item.get("decision_score", 0) or 0)),
+        reverse=True,
+    )
+
+
 def rank_destinations(destinations: list[dict]) -> list[dict]:
     ranked = sorted(destinations, key=lambda item: float(item.get("decision_score", 0) or 0), reverse=True)
     for index, destination in enumerate(ranked, start=1):
@@ -755,7 +839,11 @@ def build_weight_controls(destinations: list[dict]) -> str:
     return "\n".join(controls)
 
 
-def build_destination_card(dest: dict, listings: list[dict], top_retirement_ids: set[str]) -> str:
+def build_destination_card(
+    dest: dict,
+    listings: list[dict],
+    _legacy_top_retirement_ids: set[str] | None = None,
+) -> str:
     ownership_score = score(dest, "ownership_clarity")
     retirement_score = score(dest, "retirement_suitability")
     yield_score = percentish(dest.get("net_yield_estimate"))
@@ -767,6 +855,20 @@ def build_destination_card(dest: dict, listings: list[dict], top_retirement_ids:
             '<p class="market-row__warning"><strong>Restricted buyer access.</strong> '
             f'{escape(access_summary)}</p>'
         )
+    location_types = " ".join(destination_location_types(dest))
+    location_label = ", ".join(
+        {
+            "city": "City",
+            "coast-island": "coast / island",
+            "mountain": "Mountain",
+            "lake": "lake",
+        }[item]
+        for item in destination_location_types(dest)
+    )
+    goal_scores = {
+        goal: rank_destinations_for_goal([dest], goal)[0]["goal_score"]
+        for goal in GOAL_DIMENSION_WEIGHTS
+    }
     return f"""
       <article
         class="market-row"
@@ -774,21 +876,24 @@ def build_destination_card(dest: dict, listings: list[dict], top_retirement_ids:
         data-name="{escape(dest["name"].lower())}"
         data-country="{escape((dest.get("country") or "").lower())}"
         data-category="{escape(dest.get("category") or "")}"
+        data-location-types="{escape(location_types)}"
         data-score="{dest.get("decision_score", dest.get("overall_score", 0))}"
         data-price="{dest.get("usd_per_m2", 0)}"
         data-yield="{yield_score}"
         data-ownership="{ownership_score}"
         data-retirement="{retirement_score}"
+        data-goal-retirement="{goal_scores['retirement']}"
+        data-goal-second-home="{goal_scores['second-home']}"
+        data-goal-investment="{goal_scores['investment']}"
+        data-goal-ownership="{goal_scores['ownership']}"
         data-access="{escape(access_label)}"
-        data-shortlist="{"yes" if dest["rank"] <= 8 else "no"}"
-        data-top-retirement="{"yes" if dest["id"] in top_retirement_ids else "no"}"
       >
         <label class="market-row__select"><input type="checkbox" class="compare-toggle" value="{escape(dest["id"])}" aria-label="Select {escape(dest["name"])} for comparison"><span>Select</span></label>
         <div class="market-row__market">
           <div class="rank-mark"><span>#{dest["rank"]}</span></div>
           <div class="market-row__identity">
             <h3><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></h3>
-            <p>{escape(dest.get("country") or "")} · {escape(dest.get("category") or "")}</p>
+            <p>{escape(dest.get("country") or "")} · {escape(location_label)}</p>
           </div>
         </div>
         <div class="market-row__metric"><span>Overall rating</span><strong data-custom-score>{dest.get("decision_score", dest.get("overall_score", 0)):.1f}</strong></div>
@@ -2888,13 +2993,14 @@ def build_landing_explore_links(pages: list[dict]) -> str:
     ]
     country_by_slug = {hub["slug"]: hub for hub in COUNTRY_HUBS}
     guide_slugs = [
+        RETIREMENT_DESTINATIONS_SLUG,
         "best-places-to-buy-property-abroad-for-retirement",
         "best-places-to-buy-a-second-home-abroad",
         "foreign-property-investment-risks",
         "best-places-to-buy-property-in-europe",
         "best-countries-to-buy-property-as-a-foreigner",
     ]
-    page_by_slug = {page["slug"]: page for page in pages}
+    page_by_slug = {page["slug"]: page for page in [RETIREMENT_DESTINATIONS_PAGE, *pages]}
 
     countries = [
         (country_by_slug[slug]["country"], f'/{country_path(country_by_slug[slug])}/')
@@ -2911,7 +3017,8 @@ def build_landing_explore_links(pages: list[dict]) -> str:
         def item_html(item: tuple[str, str], class_name: str = "") -> str:
             label, href = item
             class_attr = f' class="{class_name}"' if class_name else ""
-            return f'<li{class_attr}><a href="{escape(href)}" data-track="{track}" data-track-label="explore {escape(label)}">{escape(label)}</a></li>'
+            track_context = "landing" if track == "guide_click" else "explore"
+            return f'<li{class_attr}><a href="{escape(href)}" data-track="{track}" data-track-label="{track_context} {escape(label)}">{escape(label)}</a></li>'
 
         primary = "".join(item_html(item, "explore-primary") for item in items[:3])
         more = "".join(item_html(item) for item in items[3:])
@@ -3904,7 +4011,7 @@ __HEAD__
 </head>
 <body>
   <header class="calc-hero"><div class="calc-shell">
-    <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/guides/">Guides</a><a href="/#destination-index">Destinations</a><a href="/methodology/">Methodology</a><a href="/shortlist-review/">Shortlist Review</a></div></nav>
+    <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/#market-finder">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/guides/#country-selection">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
     <p class="eyebrow">International retirement planning tool</p><h1>Retirement Abroad Calculator</h1>
     <p class="lede">Estimate comfortable destination spending in today's dollars, project it to retirement, subtract reliable pension and non-portfolio income, and separate the liquid portfolio, property capital, and reserve you may need.</p>
   </div></header>
@@ -4122,7 +4229,7 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
       <nav class="article-toc" aria-label="In this article"><span>In this article</span><a href="#ranking">Ranking</a><a href="#components">What drives the cost</a><a href="#destinations">Destination notes</a><a href="#methodology">Methodology</a><a href="#faq">FAQ</a></nav>
       <div class="article-layout">
         <article class="article-body">
-          <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among the 30 destinations, {escape(lowest_name)} has the lowest modeled requirement at <strong>{money(lowest)}</strong>, while {escape(highest_name)} has the highest at <strong>{money(highest)}</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It is a comparable view of every destination currently covered by Global Home Atlas, using the same researched cost inputs as our retirement planning model.</p><aside class="article-callout"><div><strong>Make the estimate personal</strong><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p></div><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article callout">Open calculator</a></aside></section>
+          <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among the 30 destinations, {escape(lowest_name)} has the lowest modeled requirement at <strong>{money(lowest)}</strong>, while {escape(highest_name)} has the highest at <strong>{money(highest)}</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It compares the 30 Global Home Atlas destinations with complete retirement-cost coverage, using the same researched inputs as our retirement planning model.</p><aside class="article-callout"><div><strong>Make the estimate personal</strong><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p></div><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article callout">Open calculator</a></aside></section>
           <section class="article-section" id="ranking"><h2>Retirement destinations ranked by savings needed</h2><p>Each row uses today's USD and the same assumptions. The home purchase estimate is optional and does not affect the cost rank. Select a column heading to reorder all 30 destinations.</p><div class="table-wrap"><table><caption>Estimated retirement savings by destination for a couple renting</caption>{ranking_header}<tbody data-ranking-visible>{visible_rows}</tbody></table></div>
             <details class="ranking-more"><summary>View 20 more destinations</summary><div class="table-wrap"><table><caption>Additional retirement destinations</caption>{ranking_header}<tbody data-ranking-additional>{expandable_rows}</tbody></table></div></details>
             <figure class="infographic"><img src="/assets/retirement-destinations-required-capital.png" width="1600" height="900" alt="Lowest-cost 10 of 30 retirement destinations ranked by required capital for a couple renting" loading="eager"><figcaption>This chart shows the lowest-cost 10 of 30. Required capital combines the liquid portfolio and 12-month reserve; property is excluded from rank. Complete ranks 1–30 are in the tables above.</figcaption><a class="download-link" href="/assets/retirement-destinations-required-capital.png" download data-track="infographic_download" data-track-label="required retirement capital ranking">Download this infographic as PNG</a></figure>
@@ -5858,7 +5965,7 @@ def build_destination_page(
         <div>
           <p class="page-eyebrow">{escape(dest.get("category") or "Destination")} · {escape(dest.get("country") or "")}</p>
           <h1>{escape(dest["name"])}</h1>
-          <p class="page-lede">{escape(dest.get("panel_summary") or "")}</p>
+          <p class="page-lede">{escape(intro)}</p>
           {generated_link}
         </div>
         <aside class="page-hero-card">
@@ -6531,12 +6638,8 @@ def build() -> Path:
     for listing in listings:
         listings_by_dest.setdefault(listing["destination_id"], []).append(listing)
 
-    top_retirement_ids = {
-        item["id"]
-        for item in sorted(destinations, key=lambda d: score(d, "retirement_suitability"), reverse=True)[:5]
-    }
     cards = "".join(
-        build_destination_card(dest, listings_by_dest.get(dest["id"], []), top_retirement_ids)
+        build_destination_card(dest, listings_by_dest.get(dest["id"], []))
         for dest in destinations
     )
 
@@ -6547,7 +6650,7 @@ def build() -> Path:
     for entry in content_overrides:
         target = entry["target_url"]
         if target == SITE_URL:
-            base_html = build_landing_page(destinations, SEO_PAGES, listings, countries, content_overrides=[])
+            base_html = build_landing_page(destinations, guide_pages, listings, countries, content_overrides=[])
         elif target.startswith(f"{SITE_URL}countries/"):
             slug = target.removeprefix(f"{SITE_URL}countries/").strip("/")
             hub = next((item for item in COUNTRY_HUBS if item["slug"] == slug), None)
@@ -6588,10 +6691,12 @@ def build() -> Path:
             ))
         if entry["base_content_hash"] not in allowed_hashes:
             raise ValueError(f"Stale SEO content base hash: {target}")
-    categories = sorted({item.get("category") for item in destinations if item.get("category")})
-    category_options = "\n".join(
-        f'<option value="{escape(category)}">{escape(category)}</option>' for category in categories
-    )
+    category_options = """
+      <option value="city">City</option>
+      <option value="coast-island">Coast / island</option>
+      <option value="mountain">Mountain</option>
+      <option value="lake">Lake</option>
+    """
     app_data = json.dumps(
         {
             "destinations": destinations,
@@ -7463,7 +7568,7 @@ def build() -> Path:
           <div class="field field--search"><label for="search">Search</label><input id="search" type="search" placeholder="Destination or country" aria-label="Search destination or country"></div>
           <div class="field"><label for="category">Location type</label><select id="category" aria-label="Filter by location type"><option value="all">All location types</option>__CATEGORY_OPTIONS__</select></div>
           <div class="field"><label for="sort">Sort by</label><select id="sort" aria-label="Sort destinations"><option value="rank">Rank</option><option value="name">Destination name</option><option value="score">Overall rating</option><option value="price">Lowest price</option><option value="yield">Expected net yield</option><option value="ownership">Ownership clarity</option><option value="access">Buyer access</option><option value="retirement">Retirement</option></select></div>
-          <div class="field"><label for="buyerGoal">Buying goal</label><select id="buyerGoal"><option value="all">All goals</option><option value="shortlist">Top rated</option><option value="ownership">Clear ownership</option><option value="retirement">Retirement</option></select></div>
+          <div class="field"><label for="buyerGoal">Buying goal</label><select id="buyerGoal"><option value="all">Overall fit</option><option value="retirement">Retirement / lifestyle</option><option value="second-home">Second home</option><option value="investment">Investment-led</option><option value="ownership">Clear ownership</option></select></div>
         </form>
       </section>
 
@@ -7518,6 +7623,7 @@ def build() -> Path:
     const compareSelectionBar = document.getElementById("compareSelectionBar");
     const compareSelectionCount = document.getElementById("compareSelectionCount");
     const compareSelected = new Set();
+    const goalLabels = { retirement: "retirement / lifestyle", "second-home": "second home", investment: "investment-led buying", ownership: "clear ownership" };
     const defaultSortDirections = { rank: "asc", name: "asc", score: "desc", price: "asc", yield: "desc", ownership: "desc", access: "asc", retirement: "desc" };
     let sortKey = sort.value;
     let sortDirection = defaultSortDirections[sortKey];
@@ -7577,19 +7683,21 @@ def build() -> Path:
 
       cards.forEach((card) => {
         const matchesQuery = !query || card.dataset.name.includes(query) || card.dataset.country.includes(query);
-        const matchesCategory = selectedCategory === "all" || card.dataset.category === selectedCategory;
-        const matchesQuick =
-          buyerGoal.value === "all" ||
-          (buyerGoal.value === "shortlist" && card.dataset.shortlist === "yes") ||
-          (buyerGoal.value === "ownership" && Number(card.dataset.ownership) >= 4) ||
-          (buyerGoal.value === "retirement" && card.dataset.topRetirement === "yes");
-        const visible = matchesQuery && matchesCategory && matchesQuick;
+        const locationTypes = (card.dataset.locationTypes || "").split(" ");
+        const matchesCategory = selectedCategory === "all" || locationTypes.includes(selectedCategory);
+        const visible = matchesQuery && matchesCategory;
         card.classList.toggle("hidden", !visible);
         if (visible) shown += 1;
       });
 
       const sorted = [...cards].sort((a, b) => {
         let comparison = 0;
+        if (buyerGoal.value !== "all") {
+          const goalKey = "goal" + buyerGoal.value.split("-").map((part) => part[0].toUpperCase() + part.slice(1)).join("");
+          comparison = Number(a.dataset[goalKey]) - Number(b.dataset[goalKey]);
+          if (comparison === 0) comparison = Number(a.dataset.score) - Number(b.dataset.score);
+          return comparison === 0 ? cardRank(a) - cardRank(b) : -comparison;
+        }
         if (sortKey === "name") comparison = a.dataset.name.localeCompare(b.dataset.name);
         else if (sortKey === "score") comparison = Number(a.dataset.score) - Number(b.dataset.score);
         else if (sortKey === "price") comparison = Number(a.dataset.price) - Number(b.dataset.price);
@@ -7602,7 +7710,10 @@ def build() -> Path:
         return sortDirection === "asc" ? comparison : -comparison;
       });
       sorted.forEach((card) => cardsRoot.appendChild(card));
-      resultCount.textContent = shown + (shown === 1 ? " destination shown" : " destinations shown");
+      const countLabel = shown + (shown === 1 ? " destination" : " destinations");
+      resultCount.textContent = buyerGoal.value === "all"
+        ? countLabel + " shown"
+        : countLabel + " ranked for " + goalLabels[buyerGoal.value];
     }
 
     function destinationMetric(destination, key) {
@@ -7659,6 +7770,7 @@ def build() -> Path:
     category.addEventListener("change", applyFilters);
     buyerGoal.addEventListener("change", applyFilters);
     sort.addEventListener("change", () => {
+      buyerGoal.value = "all";
       sortKey = sort.value;
       sortDirection = defaultSortDirections[sortKey] || "asc";
       updateSortIndicators();
@@ -7666,6 +7778,7 @@ def build() -> Path:
     });
     sortButtons.forEach((button) => {
       button.addEventListener("click", () => {
+        buyerGoal.value = "all";
         const nextSortKey = button.dataset.columnSort;
         if (sortKey === nextSortKey) sortDirection = sortDirection === "asc" ? "desc" : "asc";
         else {
@@ -7866,7 +7979,7 @@ def build() -> Path:
     landing_html = clean_generated_html(
         build_landing_page(
             destinations,
-            SEO_PAGES,
+            guide_pages,
             listings,
             countries,
             content_overrides=content_overrides,
