@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-18 — Retirement abroad calculator
+
+- Added an indexable retirement-abroad calculator covering eight destination benchmarks for single retirees and couples.
+- Added source-audited cost, inflation, housing, property, acquisition-cost, and confidence inputs with transparent methodology and citations.
+- Added client-side projections for retirement expenses, reliable outside income, liquid portfolio capital, property capital, and emergency reserves without persisting raw financial inputs.
+- Linked the calculator from the retirement guide hub, retirement guides, and covered country and destination pages.
+
 ## Production publish setup
 
 - Updated `src/build_unified_app.py` to emit `artifacts/index.html`.

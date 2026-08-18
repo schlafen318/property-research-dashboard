@@ -114,6 +114,25 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         for forbidden_key in ('spending:', 'income:', 'portfolio:', 'property_price:', 'total_capital:'):
             self.assertNotIn(forbidden_key, source)
 
+    def test_calculator_is_linked_from_retirement_research_routes(self) -> None:
+        routes = [
+            ROOT / "artifacts" / "guides" / "index.html",
+            ROOT / "artifacts" / "buying-property-abroad-for-retirement" / "index.html",
+            ROOT / "artifacts" / "best-places-to-buy-property-abroad-for-retirement" / "index.html",
+            ROOT / "artifacts" / "destinations" / "valencia" / "index.html",
+            ROOT / "artifacts" / "countries" / "spain-property" / "index.html",
+        ]
+        for route in routes:
+            with self.subTest(route=route):
+                self.assertIn('/retirement-abroad-calculator/', route.read_text(encoding="utf-8"))
+
+    def test_sitemap_contains_one_calculator_url(self) -> None:
+        sitemap = (ROOT / "artifacts" / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertEqual(
+            1,
+            sitemap.count("https://globalhomeatlas.com/retirement-abroad-calculator/"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

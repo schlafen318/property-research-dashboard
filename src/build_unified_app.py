@@ -3552,6 +3552,16 @@ def retirement_benchmark_total(record: dict, household: str) -> float:
     return sum(float(value) for value in profile["categories_usd"].values()) + float(profile["annual_rent_usd"])
 
 
+def retirement_calculator_callout(css_class: str) -> str:
+    return f"""
+      <section class="{escape(css_class)}">
+        <h2>Estimate your retirement capital</h2>
+        <p>Start with destination expenses in today's money, then account for inflation, reliable pension and passive income, housing, property acquisition, and a liquid portfolio.</p>
+        <a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open">Open the retirement abroad calculator</a>
+      </section>
+    """
+
+
 def build_retirement_calculator_page(destinations: list[dict], retirement_payload: dict) -> str:
     canonical = page_url(RETIREMENT_CALCULATOR_SLUG)
     names = {item["id"]: item["name"] for item in destinations}
@@ -3821,6 +3831,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
+          {retirement_calculator_callout("page-section")}
           <section class="page-section priority-route" id="priority-route">
             <div>
               <h2>Start with the strongest route</h2>
@@ -4085,6 +4096,12 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
     guide_links = country_guide_links(hub, pages)
     peer_country_links = country_hub_links(hub["slug"], limit=6)
     report_title, report_reason = country_report_recommendation(hub)
+    retirement_ids = {item["destination_id"] for item in load_retirement_costs()["destinations"]}
+    retirement_callout = (
+        retirement_calculator_callout("page-section")
+        if retirement_ids.intersection(hub["destination_ids"])
+        else ""
+    )
 
     return f"""<!doctype html>
 <html lang="en">
@@ -4129,6 +4146,7 @@ def build_country_hub_page(hub: dict, destinations: list[dict], pages: list[dict
       {country_next_step_html(hub, selected, pages)}
       <div class="page-layout">
         <article class="page-article">
+          {retirement_callout}
           <details class="page-section" id="country-thesis" open>
             <summary><h2>Country Thesis</h2></summary>
             <p>{escape(hub["thesis"])}</p>
@@ -4231,6 +4249,14 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict], auto
     description = page["description"]
     updated = date.today().isoformat()
     country_count = len({item.get("country") for item in selected if item.get("country")})
+    retirement_callout = (
+        retirement_calculator_callout("seo-section")
+        if page["slug"] in {
+            "buying-property-abroad-for-retirement",
+            "best-places-to-buy-property-abroad-for-retirement",
+        }
+        else ""
+    )
 
     return f"""<!doctype html>
 <html lang="en">
@@ -4404,6 +4430,7 @@ def build_seo_page(page: dict, destinations: list[dict], pages: list[dict], auto
       {vacation_home_quick_answer_html(page, destinations)}
       <div class="seo-content">
         <article class="seo-article">
+          {retirement_callout}
           <section class="seo-section">
             <h2>How to Read This Shortlist</h2>
             <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
@@ -5260,6 +5287,8 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
         if country_hub
         else ""
     )
+    retirement_ids = {item["destination_id"] for item in load_retirement_costs()["destinations"]}
+    retirement_callout = retirement_calculator_callout("page-section") if dest["id"] in retirement_ids else ""
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5294,6 +5323,7 @@ def build_destination_page(dest: dict, listings: list[dict], destinations: list[
       {mobile_action_strip("#budget", "Budget", "/shortlist-review/", "Review")}
       <div class="page-layout">
         <article class="page-article">
+          {retirement_callout}
           <details class="page-section" id="overview" data-mobile-open="true" open>
             <summary><h2>Shortlist Verdict</h2></summary>
             <p>{escape(dest.get("profit_driver") or dest.get("panel_verdict") or "")}</p>
