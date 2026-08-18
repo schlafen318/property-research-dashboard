@@ -126,6 +126,16 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         self.assertIn(f'href="/{SLUG}/"', guides)
         self.assertIn(f'href="/{SLUG}/"', calculator)
 
+    def test_homepage_links_to_ranked_retirement_article_once(self) -> None:
+        homepage = (ROOT / "artifacts" / "index.html").read_text(encoding="utf-8")
+        article_link = (
+            f'<a href="/{SLUG}/" data-track="guide_click" '
+            'data-track-label="landing 8 Retirement Destinations Ranked by How Much You Need">'
+            '8 Retirement Destinations Ranked by How Much You Need</a>'
+        )
+        self.assertIn(article_link, homepage)
+        self.assertEqual(1, homepage.count(f'href="/{SLUG}/"'))
+
     def test_sitemap_contains_one_article_url(self) -> None:
         sitemap = (ROOT / "artifacts" / "sitemap.xml").read_text(encoding="utf-8")
         self.assertEqual(
