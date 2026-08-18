@@ -31,23 +31,52 @@ class RetirementCalculatorUITests(unittest.TestCase):
     def test_converts_monthly_spending_to_annual_for_the_engine(self) -> None:
         self.assertEqual(64_596, run_ui("annualSpendingFromMonthly", 5_383))
 
-    def test_buying_uses_owner_costs_instead_of_rent(self) -> None:
+    def test_owner_plans_use_owner_costs(self) -> None:
         profile = {
             "categories_usd": {"food": 20_000, "healthcare": 5_000},
             "annual_rent_usd": 24_000,
             "annual_owner_costs_usd": 8_000,
         }
         self.assertEqual(49_000, run_ui("annualBenchmark", {"profile": profile, "plan": "rent"}))
-        self.assertEqual(33_000, run_ui("annualBenchmark", {"profile": profile, "plan": "buy"}))
+        for plan in ("own", "buy_now", "buy_retirement"):
+            self.assertEqual(33_000, run_ui("annualBenchmark", {"profile": profile, "plan": plan}))
+
+    def test_only_purchase_plans_use_property_budget(self) -> None:
+        self.assertFalse(run_ui("usesPropertyBudget", "rent"))
+        self.assertFalse(run_ui("usesPropertyBudget", "own"))
+        self.assertTrue(run_ui("usesPropertyBudget", "buy_now"))
+        self.assertTrue(run_ui("usesPropertyBudget", "buy_retirement"))
+
+    def test_disabled_hidden_number_does_not_block_calculation(self) -> None:
+        self.assertFalse(
+            run_ui(
+                "isInvalidNumericControl",
+                {"disabled": True, "value": "", "valid": False},
+            )
+        )
+        self.assertTrue(
+            run_ui(
+                "isInvalidNumericControl",
+                {"disabled": False, "value": "", "valid": False},
+            )
+        )
 
     def test_housing_guidance_distinguishes_rent_owner_costs_and_purchase_budget(self) -> None:
         self.assertEqual(
-            "Includes rent and other living costs.",
+            "Monthly retirement living expenses, including rent.",
             run_ui("housingGuidance", "rent"),
         )
         self.assertEqual(
-            "Includes owner running costs after purchase, not rent. Enter the home purchase budget separately.",
-            run_ui("housingGuidance", "buy"),
+            "Monthly retirement living expenses, including owner running costs; no new home purchase.",
+            run_ui("housingGuidance", "own"),
+        )
+        self.assertEqual(
+            "Monthly retirement living expenses after purchase, including owner running costs but not the home purchase.",
+            run_ui("housingGuidance", "buy_now"),
+        )
+        self.assertEqual(
+            "Monthly retirement living expenses after purchase, including owner running costs but not the home purchase at retirement.",
+            run_ui("housingGuidance", "buy_retirement"),
         )
 
 
