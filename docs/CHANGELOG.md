@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-18 — Personalized retirement cash-flow model
+
+- Replaced the calculator's preset withdrawal-rate method with annual expense and reliable-income cash flows discounted by a required user-entered portfolio return after fees.
+- Added separate Buy now and Buy at retirement plans so today's property cost is never mixed with retirement-year capital.
+- Added the calculated first-year withdrawal as an output and removed the withdrawal override, portfolio style, cash-yield input, and asset-sale illustration.
+- Added clear straight-line-return and sequence-risk limitations while retaining the separate standardized 3.5% destination comparison.
+
 ## 2026-08-18 — Retirement calculator housing inputs
 
 - Replaced annual lifestyle spending with a monthly input while preserving annual calculations internally.
