@@ -10,7 +10,6 @@
     currency: "USD",
     maximumFractionDigits: 0,
   });
-  const presetYields = { "income": 0.03, "balanced": 0.02, "growth": 0.01 };
 
   function annualSpendingFromMonthly(monthlySpending) {
     return Number(monthlySpending) * 12;
@@ -27,10 +26,17 @@
     return categories + Number(housingAmount(input.profile, input.plan));
   }
 
+  function usesPropertyBudget(plan) {
+    return plan === "buy_now" || plan === "buy_retirement";
+  }
+
   function housingGuidance(plan) {
-    if (plan === "rent") return "Includes rent and other living costs.";
-    if (plan === "own") return "Includes owner running costs, with no new home purchase.";
-    return "Includes owner running costs after purchase, not rent. Enter the home purchase budget separately.";
+    if (plan === "rent") return "Monthly retirement living expenses, including rent.";
+    if (plan === "own") return "Monthly retirement living expenses, including owner running costs; no new home purchase.";
+    if (plan === "buy_now") {
+      return "Monthly retirement living expenses after purchase, including owner running costs but not the home purchase.";
+    }
+    return "Monthly retirement living expenses after purchase, including owner running costs but not the home purchase at retirement.";
   }
 
   function initRetirementCalculator(rootId, payload) {
@@ -59,8 +65,8 @@
       benchmarkValue = annualBenchmark({ profile: profile, plan: plan });
       el("ret-monthly-spending").value = String(Math.round(benchmarkValue / 12));
       el("ret-housing-guidance").textContent = housingGuidance(plan);
-      el("ret-property-field").hidden = plan !== "buy";
-      el("ret-property-budget").disabled = plan !== "buy";
+      el("ret-property-field").hidden = !usesPropertyBudget(plan);
+      el("ret-property-budget").disabled = !usesPropertyBudget(plan);
       if (resetPropertyBudget) {
         el("ret-property-budget").value = String(Math.round(Number(record.property.representative_price_usd)));
       }
@@ -95,8 +101,7 @@
       const profile = record.profiles[household];
       const plan = el("ret-housing-plan").value;
       const generalRate = rate("ret-general-inflation");
-      const override = el("ret-withdrawal-rate").value.trim();
-      const input = {
+      return {
         currentAge: number("ret-current-age"),
         retirementAge: number("ret-retirement-age"),
         horizonYears: number("ret-horizon"),
@@ -112,10 +117,8 @@
         acquisitionCostRate: Number(record.property.acquisition_cost_rate),
         generalInflation: generalRate,
         emergencyReserveMonths: number("ret-reserve-months"),
-        portfolioCashYield: rate("ret-cash-yield"),
+        expectedPortfolioReturn: rate("ret-expected-return"),
       };
-      if (override !== "") input.withdrawalRateOverride = Number(override) / 100;
-      return input;
     }
 
     function setMoney(id, value) {
@@ -135,7 +138,6 @@
         household_type: el("ret-household").value,
         housing_plan: el("ret-housing-plan").value,
         horizon_band: horizonBand(number("ret-horizon")),
-        portfolio_style: el("ret-income-preset").value,
       };
     }
 
@@ -145,30 +147,40 @@
 
     function render(result) {
       const record = selectedRecord();
-      setMoney("ret-total-capital", result.totalCapital);
+      const headline = result.propertyTiming === "retirement"
+        ? result.combinedRetirementCapital
+        : result.retirementCapital;
+      setMoney("ret-total-capital", headline);
       setMoney("ret-liquid-portfolio", result.liquidPortfolio);
       setMoney("ret-property-capital", result.propertyCapital);
       setMoney("ret-emergency-reserve", result.emergencyReserve);
-      setMoney("ret-today-total", result.todayDollarTotal);
+      setMoney("ret-today-total", result.todayDollarRetirementCapital);
       setMoney("ret-first-expenses", result.firstYearExpenses);
       setMoney("ret-outside-income", result.outsideIncome);
       setMoney("ret-funding-gap", result.fundingGap);
-      setMoney("ret-cash-income", result.portfolioCashIncome);
-      setMoney("ret-asset-sales", result.assetSales);
-      el("ret-result-rate").textContent = (result.withdrawalRate * 100).toFixed(2).replace(/\.00$/, "") + "%";
+      el("ret-result-return").textContent = (result.expectedPortfolioReturn * 100).toFixed(2).replace(/\.00$/, "") + "%";
+      el("ret-result-implied-withdrawal").textContent = result.impliedFirstYearWithdrawal === null
+        ? "—"
+        : (result.impliedFirstYearWithdrawal * 100).toFixed(2) + "%";
+      el("ret-headline-label").textContent = result.propertyTiming === "retirement"
+        ? "Combined capital at retirement"
+        : "Retirement capital needed at retirement";
+      el("ret-property-label").textContent = result.propertyTiming === "today"
+        ? "Home purchase needed now"
+        : result.propertyTiming === "retirement"
+          ? "Home purchase at retirement"
+          : "No property purchase";
       el("ret-result-status").textContent = record.name + " · " + el("ret-household").selectedOptions[0].textContent + " · " + result.yearsToRetirement + " years to retirement";
-      const lowerRate = Math.max(0.03, result.withdrawalRate - 0.005);
-      const upperRate = Math.min(0.04, result.withdrawalRate + 0.005);
       el("ret-result-assumptions").textContent =
         "Data " + payload.as_of + " · " + record.confidence.overall + " confidence · " +
-        "rate sensitivity " + (lowerRate * 100).toFixed(2) + "%–" + (upperRate * 100).toFixed(2) +
-        "%. Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.";
+        "uses the same expected return every year. Actual return order and market losses can materially change the outcome. " +
+        "Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.";
     }
 
     function firstInvalidField() {
       const controls = Array.from(form.querySelectorAll("input[type=number]"));
       return controls.find(function (control) {
-        return control.value === "" && control.id !== "ret-withdrawal-rate" || !control.checkValidity();
+        return control.value === "" || !control.checkValidity();
       });
     }
 
@@ -197,9 +209,6 @@
         if (id === "ret-destination") track("retirement_calculator_destination_change");
       });
     });
-    el("ret-income-preset").addEventListener("change", function () {
-      el("ret-cash-yield").value = String(presetYields[this.value] * 100);
-    });
     form.addEventListener("submit", calculate);
     syncDestinationDefaults(true);
     track("retirement_calculator_open");
@@ -208,6 +217,7 @@
   return {
     annualSpendingFromMonthly: annualSpendingFromMonthly,
     annualBenchmark: annualBenchmark,
+    usesPropertyBudget: usesPropertyBudget,
     housingGuidance: housingGuidance,
     initRetirementCalculator: initRetirementCalculator,
   };
