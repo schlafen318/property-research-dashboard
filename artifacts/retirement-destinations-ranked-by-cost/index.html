@@ -729,18 +729,24 @@
       .atlas-map__legend span { padding: 6px 7px; font-size: 9px; }
     }
 
-    .article-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1px; margin-top: -28px; border: 1px solid var(--line); border-radius: 8px; background: var(--line); overflow: hidden; position: relative; }
-    .article-summary div { padding: 18px; background: var(--paper); }
-    .article-summary span, .rank-card span { display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .07em; text-transform: uppercase; }
-    .article-summary strong { display: block; margin-top: 6px; font-size: 22px; }
-    .article-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 28px 0 58px; align-items: start; }
-    .article-body { display: grid; gap: 22px; min-width: 0; }
-    .article-section { min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    .page-hero { padding-bottom: 48px; }
+    .page-hero-grid { grid-template-columns: minmax(0, 820px); }
+    .page-hero h1 { font-size: clamp(40px, 6vw, 72px); }
+    main { margin-top: 0; }
+    .article-toc { max-width: 820px; display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 0 auto; padding: 18px 0; border-bottom: 1px solid var(--line); }
+    .article-toc span { color: var(--muted); font-size: 13px; font-weight: 850; }
+    .article-toc a { font-size: 13px; font-weight: 800; }
+    .article-layout { max-width: 820px; margin: 0 auto; padding: 20px 0 58px; }
+    .article-body { min-width: 0; }
+    .article-section { min-width: 0; padding: 30px 0; border-bottom: 1px solid var(--line); }
     .article-section h2 { margin: 0 0 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); line-height: 1.05; }
     .article-section h3 { margin: 18px 0 8px; }
     .article-section p { color: #3f4d48; }
+    .article-callout { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-top: 22px; padding: 18px 0; border-top: 1px solid var(--line); }
+    .article-callout strong { display: block; margin-bottom: 4px; font-size: 17px; }
+    .article-callout p { margin: 0; font-size: 14px; }
     .table-wrap { width: 100%; overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
-    table { width: 100%; min-width: 920px; border-collapse: collapse; background: #fff; }
+    table { width: 100%; min-width: 680px; border-collapse: collapse; background: #fff; }
     caption { padding: 14px; text-align: left; font-weight: 850; }
     th, td { padding: 12px; border-top: 1px solid var(--line); text-align: left; vertical-align: top; font-size: 13px; }
     thead th { color: var(--muted); font-size: 11px; letter-spacing: .05em; text-transform: uppercase; }
@@ -749,22 +755,19 @@
     .infographic img { display: block; width: 100%; height: auto; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
     .infographic figcaption { margin-top: 10px; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .download-link { display: inline-flex; margin-top: 10px; font-weight: 850; }
-    .rank-grid { display: grid; gap: 12px; }
-    .rank-card { padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }
-    .rank-card h3 { margin: 6px 0 12px; }
-    .rank-card dl { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin: 0; }
-    .rank-card dl div { padding: 10px; background: #f2f5f1; border-radius: 6px; }
-    .rank-card dt { color: var(--muted); font-size: 11px; font-weight: 800; }
-    .rank-card dd { margin: 5px 0 0; font-weight: 850; }
-    .rank-card p { margin-bottom: 0; }
-    .article-aside { position: sticky; top: 16px; display: grid; gap: 14px; }
-    .article-aside section { padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
-    .article-aside h2, .article-aside h3 { margin: 0 0 10px; font-size: 17px; }
-    .article-aside nav { display: grid; gap: 10px; }
+    .destination-notes { margin: 18px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+    .destination-notes li { padding: 20px 0; border-bottom: 1px solid var(--line); }
+    .destination-note-heading { display: grid; grid-template-columns: 32px minmax(0, 1fr) auto; gap: 10px; align-items: baseline; }
+    .destination-note-heading span { color: var(--gold); font-weight: 900; }
+    .destination-note-heading h3 { margin: 0; }
+    .destination-note-heading small { margin-left: 6px; color: var(--muted); font-family: Inter, ui-sans-serif, system-ui, sans-serif; font-size: 12px; font-weight: 700; }
+    .destination-note-heading strong { font-size: 14px; }
+    .destination-notes p { margin: 8px 0 0 42px; }
+    .article-related { display: flex; flex-wrap: wrap; gap: 10px 18px; margin-top: 18px; }
+    .article-related a { font-weight: 800; }
     .method-list { padding-left: 20px; }
     .source-list { overflow-wrap: anywhere; }
-    @media (max-width: 860px) { .article-layout { grid-template-columns: 1fr; } .article-aside { position: static; } .rank-card dl { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 560px) { .article-summary, .rank-card dl { grid-template-columns: 1fr; } .article-section { padding: 18px; } }
+    @media (max-width: 560px) { .article-callout { align-items: flex-start; flex-direction: column; } .destination-note-heading { grid-template-columns: 28px minmax(0, 1fr); } .destination-note-heading strong { grid-column: 2; } .destination-notes p { margin-left: 38px; } }
   </style>
 </head>
 <body>
@@ -806,22 +809,19 @@
           <p class="page-lede">Eight international retirement destinations compared under one transparent scenario. The rank answers a narrow financial question—how much capital a couple renting would need—not which place offers the best life.</p>
           <div class="page-actions"><a class="page-button" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="ranked retirement article hero">Calculate your own plan</a><a class="text-action" href="#ranking">See the ranking</a></div>
         </div>
-        <aside class="page-hero-card"><span>Lowest modeled capital</span><strong>$1,957,629</strong><span>Highest modeled capital</span><strong>$2,634,814</strong><span>Destinations compared</span><strong>8</strong></aside>
       </div>
     </div>
   </header>
   <main>
     <div class="page-shell">
-      <section class="article-summary" aria-label="Article summary"><div><span>Ranking unit</span><strong>Destination</strong></div><div><span>Standard household</span><strong>Couple renting</strong></div><div><span>Capital spread</span><strong>$677,186</strong></div></section>
+      <nav class="article-toc" aria-label="In this article"><span>In this article</span><a href="#ranking">Ranking</a><a href="#components">What drives the cost</a><a href="#destinations">Destination notes</a><a href="#methodology">Methodology</a><a href="#faq">FAQ</a></nav>
       <div class="article-layout">
         <article class="article-body">
-          <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among these eight selected destinations, Fukuoka / Itoshima has the lowest modeled requirement at <strong>$1,957,629</strong>, while Lake Como has the highest at <strong>$2,634,814</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It is a comparable view of destinations already covered by Global Home Atlas, using the same researched cost inputs as our <a href="/retirement-abroad-calculator/">retirement abroad calculator</a>.</p></section>
-          <section class="article-section" id="ranking"><h2>Retirement destinations ranked by required capital</h2><p>Each row uses today's USD and the same assumptions. Representative property capital is informative only and does not affect rank.</p><div class="table-wrap"><table><caption>Required retirement capital for a couple renting</caption><thead><tr><th>Rank</th><th>Destination / Country</th><th>Annual spending</th><th>Liquid portfolio</th><th>Emergency reserve</th><th>Required retirement capital</th><th>Property capital</th></tr></thead><tbody>
+          <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among these eight selected destinations, Fukuoka / Itoshima has the lowest modeled requirement at <strong>$1,957,629</strong>, while Lake Como has the highest at <strong>$2,634,814</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It is a comparable view of destinations already covered by Global Home Atlas, using the same researched cost inputs as our retirement planning model.</p><aside class="article-callout"><div><strong>Make the estimate personal</strong><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p></div><a class="page-button" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="ranked retirement article callout">Open calculator</a></aside></section>
+          <section class="article-section" id="ranking"><h2>Retirement destinations ranked by required capital</h2><p>Each row uses today's USD and the same assumptions. Representative property capital is informative only and does not affect rank.</p><div class="table-wrap"><table><caption>Required retirement capital for a couple renting</caption><thead><tr><th>Rank</th><th>Destination / Country</th><th>Annual spending</th><th>Required retirement capital</th><th>Property capital</th></tr></thead><tbody>
             <tr>
               <td>1</td>
               <th scope="row"><a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a><br><span>Japan</span></th>
-              <td>$66,200</td>
-              <td>$1,891,429</td>
               <td>$66,200</td>
               <td><strong>$1,957,629</strong></td>
               <td>$233,669</td>
@@ -830,16 +830,12 @@
               <td>2</td>
               <th scope="row"><a href="/destinations/hakone-izu/">Hakone / Izu</a><br><span>Japan</span></th>
               <td>$67,100</td>
-              <td>$1,917,143</td>
-              <td>$67,100</td>
               <td><strong>$1,984,243</strong></td>
               <td>$52,224</td>
             </tr>
             <tr>
               <td>3</td>
               <th scope="row"><a href="/destinations/crete/">Crete</a><br><span>Greece</span></th>
-              <td>$72,800</td>
-              <td>$2,080,000</td>
               <td>$72,800</td>
               <td><strong>$2,152,800</strong></td>
               <td>$1,856,058</td>
@@ -848,16 +844,12 @@
               <td>4</td>
               <th scope="row"><a href="/destinations/valencia/">Valencia</a><br><span>Spain</span></th>
               <td>$79,800</td>
-              <td>$2,280,000</td>
-              <td>$79,800</td>
               <td><strong>$2,359,800</strong></td>
               <td>$512,947</td>
             </tr>
             <tr>
               <td>5</td>
               <th scope="row"><a href="/destinations/algarve-cascais/">Algarve / Cascais</a><br><span>Portugal</span></th>
-              <td>$81,000</td>
-              <td>$2,314,286</td>
               <td>$81,000</td>
               <td><strong>$2,395,286</strong></td>
               <td>$1,238,635</td>
@@ -866,8 +858,6 @@
               <td>6</td>
               <th scope="row"><a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a><br><span>Spain</span></th>
               <td>$81,100</td>
-              <td>$2,317,143</td>
-              <td>$81,100</td>
               <td><strong>$2,398,243</strong></td>
               <td>$771,348</td>
             </tr>
@@ -875,16 +865,12 @@
               <td>7</td>
               <th scope="row"><a href="/destinations/madeira/">Madeira</a><br><span>Portugal</span></th>
               <td>$83,000</td>
-              <td>$2,371,429</td>
-              <td>$83,000</td>
               <td><strong>$2,454,429</strong></td>
               <td>$875,802</td>
             </tr>
             <tr>
               <td>8</td>
               <th scope="row"><a href="/destinations/lake-como/">Lake Como</a><br><span>Italy</span></th>
-              <td>$89,100</td>
-              <td>$2,545,714</td>
               <td>$89,100</td>
               <td><strong>$2,634,814</strong></td>
               <td>$668,502</td>
@@ -894,91 +880,43 @@
           <section class="article-section" id="components"><h2>Why the capital figures differ</h2><p>Required liquid portfolio capital magnifies differences in annual spending: at a 3.5% withdrawal rate, every additional $10,000 of first-year spending adds about $285,700 to the modeled portfolio. The emergency reserve then adds another year of expenses.</p><p>Property capital tells a different story. It combines the representative purchase price with estimated acquisition costs and can be much higher—or much lower—than the cost rank suggests. It is shown separately because buying is optional and listing samples are not market-wide medians.</p>
             <figure class="infographic"><img src="/assets/retirement-destinations-capital-breakdown.png" width="1600" height="900" alt="Annual spending, liquid portfolio, emergency reserve, and optional property capital across eight retirement destinations" loading="lazy"><figcaption>Living-cost funding and optional property acquisition are separate decisions. All figures are today's USD.</figcaption><a class="download-link" href="/assets/retirement-destinations-capital-breakdown.png" download data-track="infographic_download" data-track-label="retirement capital breakdown">Download the capital breakdown as PNG</a></figure>
           </section>
-          <section class="article-section" id="destinations"><h2>What to know about each destination</h2><p>The cost rank is a starting point, not a recommendation. Visa eligibility, taxes, healthcare access, language, neighborhood choice, climate, ownership rules, and resale depth require separate review.</p><div class="rank-grid">
-            <article class="rank-card">
-              <div><span>#1 · Japan</span><h3><a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a></h3></div>
-              <dl>
-                <div><dt>Required capital</dt><dd>$1,957,629</dd></div>
-                <div><dt>Annual spending</dt><dd>$66,200</dd></div>
-                <div><dt>Property capital</dt><dd>$233,669</dd></div>
-                <div><dt>Data confidence</dt><dd>medium-high</dd></div>
-              </dl>
+          <section class="article-section" id="destinations"><h2>What to know about each destination</h2><p>The cost rank is a starting point, not a recommendation. Visa eligibility, taxes, healthcare access, language, neighborhood choice, climate, ownership rules, and resale depth require separate review.</p><ol class="destination-notes">
+            <li>
+              <div class="destination-note-heading"><span>1</span><h3><a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <small>Japan</small></h3><strong>$1,957,629</strong></div>
               <p>The panel would treat this as the most practical “use it, rent it, live in it” candidate: not the most dramatic scenery, but the combination of airport access, food, safety, healthcare and clean ownership is unusually strong.</p>
-            </article>
-            <article class="rank-card">
-              <div><span>#2 · Japan</span><h3><a href="/destinations/hakone-izu/">Hakone / Izu</a></h3></div>
-              <dl>
-                <div><dt>Required capital</dt><dd>$1,984,243</dd></div>
-                <div><dt>Annual spending</dt><dd>$67,100</dd></div>
-                <div><dt>Property capital</dt><dd>$52,224</dd></div>
-                <div><dt>Data confidence</dt><dd>medium</dd></div>
-              </dl>
+            </li>
+            <li>
+              <div class="destination-note-heading"><span>2</span><h3><a href="/destinations/hakone-izu/">Hakone / Izu</a> <small>Japan</small></h3><strong>$1,984,243</strong></div>
               <p>This is the Tokyo-adjacent lifestyle option: easier to use often, cleaner to own, and more resilient domestically than many pure tourism plays. The panel would like it for optionality but question international demand depth.</p>
-            </article>
-            <article class="rank-card">
-              <div><span>#3 · Greece</span><h3><a href="/destinations/crete/">Crete</a></h3></div>
-              <dl>
-                <div><dt>Required capital</dt><dd>$2,152,800</dd></div>
-                <div><dt>Annual spending</dt><dd>$72,800</dd></div>
-                <div><dt>Property capital</dt><dd>$1,856,058</dd></div>
-                <div><dt>Data confidence</dt><dd>medium</dd></div>
-              </dl>
+            </li>
+            <li>
+              <div class="destination-note-heading"><span>3</span><h3><a href="/destinations/crete/">Crete</a> <small>Greece</small></h3><strong>$2,152,800</strong></div>
               <p>Crete is attractive because it combines affordability, food, beaches, history and a real local population. The panel would like the value angle but question liquidity and seasonality outside the best towns.</p>
-            </article>
-            <article class="rank-card">
-              <div><span>#4 · Spain</span><h3><a href="/destinations/valencia/">Valencia</a></h3></div>
-              <dl>
-                <div><dt>Required capital</dt><dd>$2,359,800</dd></div>
-                <div><dt>Annual spending</dt><dd>$79,800</dd></div>
-                <div><dt>Property capital</dt><dd>$512,947</dd></div>
-                <div><dt>Data confidence</dt><dd>medium-high</dd></div>
-              </dl>
+            </li>
+            <li>
+              <div class="destination-note-heading"><span>4</span><h3><a href="/destinations/valencia/">Valencia</a> <small>Spain</small></h3><strong>$2,359,800</strong></div>
               <p>This is one of the cleanest European retirement/liveability candidates. It wins on food, healthcare, cost, culture and year-round demand, but it is more lifestyle city than trophy holiday resort.</p>
-            </article>
-            <article class="rank-card">
-              <div><span>#5 · Portugal</span><h3><a href="/destinations/algarve-cascais/">Algarve / Cascais</a></h3></div>
-              <dl>
-                <div><dt>Required capital</dt><dd>$2,395,286</dd></div>
-                <div><dt>Annual spending</dt><dd>$81,000</dd></div>
-                <div><dt>Property capital</dt><dd>$1,238,635</dd></div>
-                <div><dt>Data confidence</dt><dd>medium</dd></div>
-              </dl>
+            </li>
+            <li>
+              <div class="destination-note-heading"><span>5</span><h3><a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <small>Portugal</small></h3><strong>$2,395,286</strong></div>
               <p>A proven retirement and second-home market with clean ownership and strong lifestyle appeal. The panel would like the risk-adjusted case, but would separate Cascais from Algarve in deeper diligence because economics and liquidity differ.</p>
-            </article>
-            <article class="rank-card">
-              <div><span>#6 · Spain</span><h3><a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a></h3></div>
-              <dl>
-                <div><dt>Required capital</dt><dd>$2,398,243</dd></div>
-                <div><dt>Annual spending</dt><dd>$81,100</dd></div>
-                <div><dt>Property capital</dt><dd>$771,348</dd></div>
-                <div><dt>Data confidence</dt><dd>medium-high</dd></div>
-              </dl>
+            </li>
+            <li>
+              <div class="destination-note-heading"><span>6</span><h3><a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a> <small>Spain</small></h3><strong>$2,398,243</strong></div>
               <p>This is a high-conviction lifestyle/retirement market because it has airport scale, healthcare, beach, food and a large expat ecosystem. The issue is whether you are buying after too much price appreciation.</p>
-            </article>
-            <article class="rank-card">
-              <div><span>#7 · Portugal</span><h3><a href="/destinations/madeira/">Madeira</a></h3></div>
-              <dl>
-                <div><dt>Required capital</dt><dd>$2,454,429</dd></div>
-                <div><dt>Annual spending</dt><dd>$83,000</dd></div>
-                <div><dt>Property capital</dt><dd>$875,802</dd></div>
-                <div><dt>Data confidence</dt><dd>medium</dd></div>
-              </dl>
+            </li>
+            <li>
+              <div class="destination-note-heading"><span>7</span><h3><a href="/destinations/madeira/">Madeira</a> <small>Portugal</small></h3><strong>$2,454,429</strong></div>
               <p>Madeira deserves a place because it has year-round climate, scenery and improving remote-work/retirement demand. The panel would like the lifestyle story but mark down island liquidity and healthcare depth versus mainland cities.</p>
-            </article>
-            <article class="rank-card">
-              <div><span>#8 · Italy</span><h3><a href="/destinations/lake-como/">Lake Como</a></h3></div>
-              <dl>
-                <div><dt>Required capital</dt><dd>$2,634,814</dd></div>
-                <div><dt>Annual spending</dt><dd>$89,100</dd></div>
-                <div><dt>Property capital</dt><dd>$668,502</dd></div>
-                <div><dt>Data confidence</dt><dd>medium</dd></div>
-              </dl>
+            </li>
+            <li>
+              <div class="destination-note-heading"><span>8</span><h3><a href="/destinations/lake-como/">Lake Como</a> <small>Italy</small></h3><strong>$2,634,814</strong></div>
               <p>A beautiful, globally recognised lake market with Milan access. The panel would view it as a lifestyle and capital-preservation candidate rather than a yield-led development market.</p>
-            </article></div></section>
+            </li></ol></section>
           <section class="article-section" id="destinations-not-countries"><h2>Destinations, not countries</h2><p>Country averages hide the decision retirees actually make. Valencia and Málaga share Spain's national framework, while Fukuoka / Itoshima and Hakone / Izu share Japan's, but housing, transport, access, and daily routines differ locally. We therefore rank destinations and keep the country visible as legal, tax, visa, and healthcare context.</p><p>The ranking does not rank lifestyle quality. A higher-cost destination may be the better personal fit, and a lower-cost destination can carry trade-offs that matter more than the savings.</p></section>
           <section class="article-section" id="methodology"><h2>Methodology and assumptions</h2><p>The ranking models a couple renting, with retirement starting today. It is designed for comparison rather than personal advice.</p><ul class="method-list"><li>30-year retirement horizon.</li><li>3.5% withdrawal rate.</li><li>12 months of expenses held as an emergency reserve.</li><li>No pension or other passive income.</li><li>Comfortable, not luxury, destination budgets in today's USD.</li><li>Liquid portfolio equals annual spending divided by 3.5%.</li><li>Required retirement capital equals liquid portfolio plus the reserve.</li><li>Property capital equals representative purchase price plus acquisition costs and is excluded from rank.</li></ul><p>Portfolio dividends and interest are already part of the portfolio withdrawal and must not be subtracted again as passive income. Reliable after-tax pension, annuity, business, or net rental income can reduce your personal funding gap in the <a href="/retirement-abroad-calculator/">calculator</a>.</p><p>See the full <a href="/methodology/">research methodology</a>. Data reviewed 2026-08-18.</p><h3>Cost evidence</h3><ul class="source-list"><li><a href="https://www.numbeo.com/cost-of-living/in/Fukuoka" rel="nofollow noopener">Numbeo — Fukuoka cost of living</a> — Rent, utilities, transport, dining and local cost benchmarks (May 2026)</li><li><a href="https://www.numbeo.com/cost-of-living/country_result.jsp?country=Japan" rel="nofollow noopener">Numbeo — Japan cost of living</a> — National cost and rent proxy for Hakone / Izu (June 2026)</li><li><a href="https://www.numbeo.com/cost-of-living/in/Heraklion" rel="nofollow noopener">Numbeo — Heraklion cost of living</a> — Crete urban rent and local cost proxy (May 2026)</li><li><a href="https://www.numbeo.com/cost-of-living/in/Valencia" rel="nofollow noopener">Numbeo — Valencia cost of living</a> — Rent, groceries, utilities, transport and dining benchmarks (July 2026)</li><li><a href="https://www.numbeo.com/cost-of-living/in/Algarve" rel="nofollow noopener">Numbeo — Algarve cost of living</a> — Algarve rent and local cost benchmarks (June 2026)</li><li><a href="https://www.numbeo.com/cost-of-living/in/Malaga" rel="nofollow noopener">Numbeo — Málaga cost of living</a> — Rent, groceries, utilities, transport and dining benchmarks (May 2026)</li><li><a href="https://www.numbeo.com/cost-of-living/in/Funchal" rel="nofollow noopener">Numbeo — Funchal cost of living</a> — Rent, groceries, utilities, transport and dining benchmarks (May 2026)</li><li><a href="https://www.numbeo.com/cost-of-living/in/Como" rel="nofollow noopener">Numbeo — Como cost of living</a> — Rent, groceries, utilities, transport and dining benchmarks (June 2026)</li></ul></section>
-          <section class="article-section"><h2>Use the ranking without over-reading it</h2><p>Start with the cost range, then test a personal scenario. Change household spending, retirement date, pension and passive income, housing plan, inflation, and planning horizon before comparing property. A financially viable location can still fail on residency, tax, healthcare, or day-to-day fit.</p><p>Continue with <a href="/best-places-to-buy-property-abroad-for-retirement/">the retirement property destination guide</a>, then open destination dossiers and consult qualified local legal, tax, immigration, healthcare, and financial advisers before acting.</p></section>
-          <section class="article-section faq"><h2>Frequently asked questions</h2>
+          <section class="article-section"><h2>Use the ranking without over-reading it</h2><p>Start with the cost range, then test a personal scenario. Change household spending, retirement date, pension and passive income, housing plan, inflation, and planning horizon before comparing property. A financially viable location can still fail on residency, tax, healthcare, or day-to-day fit.</p><p>Continue with <a href="/best-places-to-buy-property-abroad-for-retirement/">the retirement property destination guide</a>, then open destination dossiers and consult qualified local legal, tax, immigration, healthcare, and financial advisers before acting.</p><nav class="article-related" aria-label="Related research"><a href="/buying-property-abroad-for-retirement/">Buying abroad for retirement</a><a href="/guides/">All guides</a><a href="/methodology/">Research methodology</a></nav></section>
+          <section class="article-section faq" id="faq"><h2>Frequently asked questions</h2>
         <details class="faq-item">
           <summary>What is the lowest-cost retirement destination in this comparison?</summary>
           <p>Fukuoka / Itoshima has the lowest required retirement capital under this article&#x27;s standard couple-renting scenario. The comparison covers eight selected destinations, not every place retirees could choose.</p>
@@ -1003,7 +941,6 @@
         </details>
         </section>
         </article>
-        <aside class="article-aside"><section><h2>Personalize the numbers</h2><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p><a class="page-button" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="ranked retirement article aside">Open calculator</a></section><section><h3>In this article</h3><nav><a href="#ranking">Ranked table</a><a href="#components">Capital breakdown</a><a href="#destinations">Destination notes</a><a href="#methodology">Methodology</a></nav></section><section><h3>Related research</h3><nav><a href="/best-places-to-buy-property-abroad-for-retirement/">Retirement property destinations</a><a href="/buying-property-abroad-for-retirement/">Buying abroad for retirement</a><a href="/guides/">All guides</a></nav></section></aside>
       </div>
     </div>
   </main>
