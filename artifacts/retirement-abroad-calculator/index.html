@@ -50,12 +50,13 @@
         <fieldset><legend>Destination and housing</legend><div class="field-grid">
           <div class="field"><label for="ret-destination">Destination</label><select id="ret-destination"><option value="fukuoka-itoshima">Fukuoka / Itoshima</option><option value="valencia">Valencia</option><option value="algarve-cascais">Algarve / Cascais</option><option value="madeira">Madeira</option><option value="crete">Crete</option><option value="hakone-izu">Hakone / Izu</option><option value="lake-como">Lake Como</option><option value="m-laga-costa-del-sol">Málaga / Costa del Sol</option><option value="costa-brava-girona">Costa Brava / Girona</option><option value="hakuba">Hakuba</option><option value="annecy">Annecy</option><option value="mallorca">Mallorca</option><option value="croatia-istria-dalmatia">Croatia / Istria-Dalmatia</option><option value="niseko">Niseko</option><option value="queenstown">Queenstown</option><option value="phuket-koh-samui">Phuket / Koh Samui</option><option value="vancouver-island-victoria">Vancouver Island / Victoria</option><option value="dolomites-south-tyrol">Dolomites / South Tyrol</option><option value="bali">Bali</option><option value="chamonix">Chamonix</option><option value="park-city-deer-valley">Park City / Deer Valley</option><option value="da-nang-hoi-an">Da Nang / Hoi An</option><option value="whistler">Whistler</option><option value="andermatt">Andermatt</option><option value="innsbruck-tyrol">Innsbruck / Tyrol</option><option value="lake-tahoe">Lake Tahoe</option><option value="jackson-hole">Jackson Hole</option><option value="ticino-lake-lugano">Ticino / Lake Lugano</option><option value="aspen-snowmass">Aspen / Snowmass</option><option value="swiss-valais-vaud-alps">Swiss Valais / Vaud Alps</option></select></div>
           <div class="field"><label for="ret-housing-plan">Housing plan</label><select id="ret-housing-plan"><option value="rent">Rent</option><option value="own">Already own</option><option value="buy" selected>Buy at retirement</option></select></div>
-          <div class="field"><label for="ret-spending">Annual spending today (USD)</label><input id="ret-spending" type="number" min="0" step="100" value="0"><p class="hint">Editable comfortable-lifestyle benchmark, including housing.</p></div>
+          <div class="field"><label for="ret-monthly-spending">Monthly spending today (USD)</label><input id="ret-monthly-spending" type="number" min="0" step="1" value="0"><p class="hint" id="ret-housing-guidance">Includes owner running costs after purchase, not rent. Enter the home purchase budget separately.</p></div>
+          <div class="field" id="ret-property-field"><label for="ret-property-budget">Home purchase budget today (USD)</label><input id="ret-property-budget" type="number" min="0" step="1" value="0"><p class="hint">Prefilled with today's representative destination price. Edit it to match the home you expect to buy; acquisition costs are added separately.</p></div>
         </div></fieldset>
         <fieldset><legend>Reliable after-tax income</legend><p class="hint">Use net amounts expected to continue in retirement. Do not include dividends from the portfolio being calculated.</p><div class="field-grid">
           <div class="field"><label for="ret-pension">Annual pension (USD)</label><input id="ret-pension" type="number" min="0" step="100" value="24000"><label class="check"><input id="ret-pension-indexed" type="checkbox" checked> Inflation-linked</label></div>
           <div class="field"><label for="ret-other-income">Other non-portfolio income (USD)</label><input id="ret-other-income" type="number" min="0" step="100" value="18000"><label class="check"><input id="ret-other-indexed" type="checkbox"> Inflation-linked</label></div>
-          <div class="field"><label for="ret-rental-income">Destination net rental income (USD)</label><input id="ret-rental-income" type="number" min="0" step="100" value="0"><label class="check"><input id="ret-rental-indexed" type="checkbox"> Inflation-linked</label></div>
+          <div class="field"><label for="ret-rental-income">Other net rental income (annual USD)</label><input id="ret-rental-income" type="number" min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at $0 when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox"> Inflation-linked</label></div>
         </div></fieldset>
         <fieldset><legend>Portfolio income illustration</legend><label for="ret-income-preset">Portfolio style</label><select id="ret-income-preset"><option value="income">Income-focused</option><option value="balanced" selected>Balanced</option><option value="growth">Growth-focused</option></select><p class="hint">Illustrates cash yield versus asset sales only. It does not change required portfolio capital.</p></fieldset>
         <details class="assumptions"><summary>Advanced assumptions</summary><div class="field-grid">
@@ -199,7 +200,11 @@
   };
 });
 </script>
-  <script>(function (root) {
+  <script>(function (root, factory) {
+  const api = factory(root);
+  if (typeof module === "object" && module.exports) module.exports = api;
+  if (root) root.GHARetirementCalculatorUI = api;
+})(typeof window !== "undefined" ? window : null, function (root) {
   "use strict";
 
   const money = new Intl.NumberFormat("en-US", {
@@ -209,7 +214,29 @@
   });
   const presetYields = { "income": 0.03, "balanced": 0.02, "growth": 0.01 };
 
+  function annualSpendingFromMonthly(monthlySpending) {
+    return Number(monthlySpending) * 12;
+  }
+
+  function housingAmount(profile, plan) {
+    return plan === "rent" ? profile.annual_rent_usd : profile.annual_owner_costs_usd;
+  }
+
+  function annualBenchmark(input) {
+    const categories = Object.values(input.profile.categories_usd).reduce(function (total, value) {
+      return total + Number(value);
+    }, 0);
+    return categories + Number(housingAmount(input.profile, input.plan));
+  }
+
+  function housingGuidance(plan) {
+    if (plan === "rent") return "Includes rent and other living costs.";
+    if (plan === "own") return "Includes owner running costs, with no new home purchase.";
+    return "Includes owner running costs after purchase, not rent. Enter the home purchase budget separately.";
+  }
+
   function initRetirementCalculator(rootId, payload) {
+    if (!root) return;
     const form = document.getElementById(rootId);
     const engine = root.GHARetirementCalculator;
     if (!form || !engine || !payload || !Array.isArray(payload.destinations)) return;
@@ -226,19 +253,19 @@
       return byId[el("ret-destination").value];
     }
 
-    function housingAmount(profile, plan) {
-      return plan === "rent" ? profile.annual_rent_usd : profile.annual_owner_costs_usd;
-    }
-
-    function syncDestinationDefaults() {
+    function syncDestinationDefaults(resetPropertyBudget) {
       const record = selectedRecord();
       if (!record) return;
       const profile = record.profiles[el("ret-household").value];
       const plan = el("ret-housing-plan").value;
-      benchmarkValue = Object.values(profile.categories_usd).reduce(function (total, value) {
-        return total + Number(value);
-      }, 0) + Number(housingAmount(profile, plan));
-      el("ret-spending").value = String(Math.round(benchmarkValue));
+      benchmarkValue = annualBenchmark({ profile: profile, plan: plan });
+      el("ret-monthly-spending").value = String(Math.round(benchmarkValue / 12));
+      el("ret-housing-guidance").textContent = housingGuidance(plan);
+      el("ret-property-field").hidden = plan !== "buy";
+      el("ret-property-budget").disabled = plan !== "buy";
+      if (resetPropertyBudget) {
+        el("ret-property-budget").value = String(Math.round(Number(record.property.representative_price_usd)));
+      }
       el("ret-general-inflation").value = String(record.inflation.general * 100);
       el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
       el("ret-property-inflation").value = String(record.inflation.property * 100);
@@ -248,7 +275,8 @@
       const generalRate = rate("ret-general-inflation");
       const healthcareRate = rate("ret-healthcare-inflation");
       const propertyRate = rate("ret-property-inflation");
-      const scale = benchmarkValue > 0 ? number("ret-spending") / benchmarkValue : 1;
+      const annualSpending = annualSpendingFromMonthly(number("ret-monthly-spending"));
+      const scale = benchmarkValue > 0 ? annualSpending / benchmarkValue : 1;
       const categories = Object.entries(profile.categories_usd).map(function (entry) {
         return {
           amount: Number(entry[1]) * scale,
@@ -281,7 +309,7 @@
           { amount: number("ret-rental-income"), indexed: el("ret-rental-indexed").checked, inflationRate: generalRate },
         ],
         housingPlan: plan,
-        propertyPrice: Number(record.property.representative_price_usd),
+        propertyPrice: number("ret-property-budget"),
         propertyInflation: rate("ret-property-inflation"),
         acquisitionCostRate: Number(record.property.acquisition_cost_rate),
         generalInflation: generalRate,
@@ -367,7 +395,7 @@
 
     ["ret-destination", "ret-household", "ret-housing-plan"].forEach(function (id) {
       el(id).addEventListener("change", function () {
-        syncDestinationDefaults();
+        syncDestinationDefaults(id === "ret-destination");
         if (id === "ret-destination") track("retirement_calculator_destination_change");
       });
     });
@@ -375,12 +403,17 @@
       el("ret-cash-yield").value = String(presetYields[this.value] * 100);
     });
     form.addEventListener("submit", calculate);
-    syncDestinationDefaults();
+    syncDestinationDefaults(true);
     track("retirement_calculator_open");
   }
 
-  root.GHARetirementCalculatorUI = { initRetirementCalculator: initRetirementCalculator };
-})(window);
+  return {
+    annualSpendingFromMonthly: annualSpendingFromMonthly,
+    annualBenchmark: annualBenchmark,
+    housingGuidance: housingGuidance,
+    initRetirementCalculator: initRetirementCalculator,
+  };
+});
 </script>
 
   <script>

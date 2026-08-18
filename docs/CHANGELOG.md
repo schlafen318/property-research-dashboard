@@ -1,5 +1,12 @@
 # Changelog
 
+## 2026-08-18 — Retirement calculator housing inputs
+
+- Replaced annual lifestyle spending with a monthly input while preserving annual calculations internally.
+- Clarified that renting includes rent, while owning or buying includes owner running costs instead of rent.
+- Added an editable home purchase budget prefilled from the selected destination and applied only to buy-at-retirement scenarios.
+- Clarified that rental income should come from a separate rental property and remain zero for a self-use destination home.
+
 ## 2026-08-18 — Sortable retirement ranking
 
 - Made every ranking column sortable across all 30 destinations while retaining the 10-row preview and 20-row expansion.
