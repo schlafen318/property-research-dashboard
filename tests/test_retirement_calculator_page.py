@@ -106,6 +106,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         for element_id in required_ids:
             self.assertIn(f'id="{element_id}"', self.html)
         self.assertIn("GHARetirementCalculatorUI.initRetirementCalculator", self.html)
+        self.assertLess(self.html.index("window.GHA ="), self.html.index("GHARetirementCalculatorUI.initRetirementCalculator"))
 
     def test_ui_module_does_not_persist_or_transmit_financial_inputs(self) -> None:
         source = UI_MODULE.read_text(encoding="utf-8")

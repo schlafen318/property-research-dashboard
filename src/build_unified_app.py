@@ -3667,8 +3667,8 @@ __HEAD__
   <script id="retirement-destination-data" type="application/json">__DATA__</script>
   <script>__ENGINE__</script>
   <script>__UI__</script>
-  <script>if(window.GHARetirementCalculatorUI){window.GHARetirementCalculatorUI.initRetirementCalculator("retirement-calculator",JSON.parse(document.getElementById("retirement-destination-data").textContent));}</script>
 __ANALYTICS__
+  <script>if(window.GHARetirementCalculatorUI){window.GHARetirementCalculatorUI.initRetirementCalculator("retirement-calculator",JSON.parse(document.getElementById("retirement-destination-data").textContent));}</script>
 </body></html>"""
     replacements = {
         "__HEAD__": head_html(RETIREMENT_CALCULATOR_TITLE, RETIREMENT_CALCULATOR_DESCRIPTION, canonical, schema_for_retirement_calculator(canonical)),
