@@ -48,17 +48,21 @@
     a { color: var(--teal); text-underline-offset: 3px; overflow-wrap: anywhere; }
     p, li { line-height: 1.65; }
     .page-shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .access-notice { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--terracotta); background: #f8ebe6; }
+    .access-notice strong { font-size: 14px; }
+    .access-notice p { margin: 4px 0 0; color: #59443d; font-size: 14px; }
     .page-hero {
       color: var(--ink);
       background:
         linear-gradient(90deg, rgba(255, 253, 247, .98) 0 42%, rgba(255, 253, 247, .74) 62%, rgba(199, 211, 194, .28)),
-        url("/assets/destination-dossier-coast.jpg");
+        var(--destination-hero-image, url("/assets/destination-dossier-coast.jpg"));
       background-size: cover;
       background-position: center;
       padding: 18px 0 58px;
     }
     .page-nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 70px; }
-    .page-brand { color: var(--ink); font-weight: 900; text-decoration: none; }
+    .page-brand { display: flex; align-items: center; color: var(--ink); font-weight: 900; text-decoration: none; }
+    .primary-brand-logo { width: 174px; max-width: 48vw; height: auto; display: block; }
     .page-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
     .page-nav-links a { color: rgba(36, 49, 45, .76); text-decoration: none; font-size: 13px; font-weight: 800; }
     .mobile-menu { display: none; position: relative; }
@@ -119,6 +123,7 @@
     .conversion-callout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; background: #eef4ec; }
     .conversion-callout h3 { margin: 0 0 6px; font-size: 22px; line-height: 1.12; }
     .page-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }
+    .destination-layout { grid-template-columns: minmax(0, 1fr); }
     .page-article { display: grid; gap: 24px; min-width: 0; }
     .page-section { min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
     .page-section h2 { margin: 0 0 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 4vw, 38px); line-height: 1.04; }
@@ -242,6 +247,41 @@
     .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
     .decision-panel__facts div { padding: 16px; }
     .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .market-summary {
+      display: grid;
+      grid-template-columns: minmax(220px, .75fr) minmax(0, 1.7fr);
+      gap: 24px;
+      margin-top: 18px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+    .market-summary h2 { margin: 0 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 28px; }
+    .market-summary p { margin: 0; color: #3f4d48; }
+    .market-summary__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; margin: 0; }
+    .market-summary__facts div { min-width: 0; }
+    .market-summary__facts dt { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .market-summary__facts dd { margin: 4px 0 0; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+    .destination-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 20px 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef4ec;
+    }
+    .destination-actions h2 { margin: 0 0 4px; font-size: 21px; }
+    .destination-actions p { margin: 0; color: var(--muted); }
+    .destination-actions nav { display: flex; flex-wrap: wrap; gap: 10px; }
+    .continue-research h2 { margin-bottom: 16px; }
+    .continue-research__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+    .continue-research h3 { margin: 0 0 8px; font-size: 15px; }
+    .continue-research nav { display: grid; gap: 7px; font-size: 14px; }
+    .destination-updated { margin: -8px 0 0; color: var(--muted); font-size: 13px; text-align: right; }
     .query-match-panel {
       display: grid;
       gap: 16px;
@@ -566,8 +606,9 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section, .query-match-panel__grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section, .query-match-panel__grid, .market-summary { grid-template-columns: repeat(2, 1fr); }
       .buyer-next-step__grid, .conversion-callout { grid-template-columns: 1fr; }
+      .continue-research__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .location-map-section .map-context-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 560px) {
@@ -577,7 +618,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li, .buyer-next-step, .buyer-next-step__grid article, .conversion-callout {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .market-summary, .market-summary__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li, .buyer-next-step, .buyer-next-step__grid article, .conversion-callout {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -587,7 +628,9 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list, .query-match-panel__grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .market-summary, .market-summary__facts, .location-map-section, .location-map-section .map-context-list, .query-match-panel__grid { grid-template-columns: 1fr; }
+      .continue-research__grid { grid-template-columns: 1fr; }
+      .destination-actions { align-items: flex-start; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -744,29 +787,22 @@
     <div class="page-shell">
 
       <nav class="page-nav" aria-label="Primary">
-        <a class="page-brand" href="/">Global Home Atlas</a>
+        <a class="page-brand" href="/" aria-label="Global Home Atlas home"><img class="primary-brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="page-nav-links">
-          <a href="/dashboard/#compare">Compare</a>
-          <a href="/guides/">Guides</a>
-          <a href="/#destination-index">Destinations</a>
-          <a href="/countries/spain-property/">Countries</a>
-          <a href="/reports/">Reports</a>
-          <a href="/methodology/">Methodology</a>
-          <a href="/shortlist-review/">Shortlist Review</a>
-          <a href="/contact/">Contact</a>
-
+          <a href="/#market-finder">Find your fit</a>
+<a href="/dashboard/">Destinations</a>
+<a href="/guides/#country-selection">Countries</a>
+<a href="/guides/">Guides</a>
+<a href="/methodology/">Methodology</a>
         </div>
         <details class="mobile-menu">
           <summary>Menu</summary>
           <nav aria-label="Mobile primary">
-            <a href="/dashboard/#compare">Compare</a>
-            <a href="/countries/spain-property/">Countries</a>
-            <a href="/#destination-index">Destinations</a>
-            <a href="/guides/">Guides</a>
-            <a href="/reports/">Reports</a>
-            <a href="/methodology/">Methodology</a>
-            <a href="/shortlist-review/">Shortlist Review</a>
-            <a href="/contact/">Contact</a>
+            <a href="/#market-finder">Find your fit</a>
+<a href="/dashboard/">Destinations</a>
+<a href="/guides/#country-selection">Countries</a>
+<a href="/guides/">Guides</a>
+<a href="/methodology/">Methodology</a>
           </nav>
         </details>
       </nav>
@@ -778,7 +814,7 @@
           <p class="page-lede">Before you speak to agents or chase listings, use a structured review to test whether your countries and destinations match your budget, citizenship, lifestyle plan, risk tolerance, and holding period.</p>
         </div>
         <aside class="page-hero-card">
-          <span>Primary job</span><strong>Narrow markets</strong>
+          <span>Primary job</span><strong>Narrow destinations</strong>
           <span>Best timing</span><strong>Before viewings</strong>
           <span>Output</span><strong>Research route</strong>
         </aside>
@@ -799,7 +835,7 @@
         <div>
           <span>Methodology</span>
           <strong>10-dimension destination score</strong>
-          <p>Markets are compared across lifestyle, access, ownership clarity, regulatory safety, yield realism, capital upside, retirement fit, liquidity, foreigner fit, and value entry.</p>
+          <p>Destinations are compared across lifestyle, access, ownership clarity, regulatory safety, yield realism, capital upside, retirement fit, liquidity, foreigner fit, and value entry.</p>
         </div>
         <div>
           <span>Research standard</span>
@@ -817,7 +853,7 @@
         <article class="page-article">
           <section class="page-section" id="fit">
             <h2>Who This Is For</h2>
-            <p>The shortlist review is for serious international buyers who are still choosing the right market. It is most useful when the buyer has a budget range, a target use case, and a few possible countries, but has not yet committed to agents, viewings, lawyers, or a specific property.</p>
+            <p>The shortlist review is for serious international buyers who are still choosing the right destination. It is most useful when the buyer has a budget range, a target use case, and a few possible countries, but has not yet committed to agents, viewings, lawyers, or a specific property.</p>
             <div class="page-grid">
               <article class="page-card"><h3>Good fit</h3><ul><li>Retirement or second-home buyers comparing countries.</li><li>Families balancing lifestyle, healthcare, access, and future resale.</li><li>Investors who want yield realism without ignoring ownership and liquidity.</li></ul></article>
               <article class="page-card"><h3>Not the right fit</h3><ul><li>Property-specific legal, tax, immigration, or contract review.</li><li>Requests for guaranteed returns or rental projections.</li><li>Brokerage, paid placement, or undisclosed listing promotion.</li></ul></article>
@@ -828,7 +864,7 @@
             <div class="offer-steps">
               <article><span>01</span><strong>Clarify the job</strong><p>Define whether the property is for retirement, second-home use, rental support, capital preservation, or mixed goals.</p></article>
               <article><span>02</span><strong>Screen jurisdictions</strong><p>Compare ownership clarity, foreigner fit, tax and residency caveats, rental rules, and adviser depth.</p></article>
-              <article><span>03</span><strong>Rank market fit</strong><p>Use the Atlas model to prioritize destinations that fit the buyer instead of the most photogenic listings.</p></article>
+              <article><span>03</span><strong>Rank destination fit</strong><p>Use the Atlas model to prioritize destinations that fit the buyer instead of the most photogenic listings.</p></article>
               <article><span>04</span><strong>Order diligence</strong><p>Identify what to verify first with local counsel, tax advisers, immigration advisers, agents, or property managers.</p></article>
             </div>
           </section>
@@ -863,8 +899,8 @@
         <article class="report-card">
           <span>Premium brief</span>
           <h3>Polished Buyer Memo</h3>
-          <p>A paid version of the dashboard preview with personalized fit ranking, markets to avoid, ownership-path notes, transaction-risk priorities, and adviser questions.</p>
-          <strong>Best after you have compared 2-4 plausible markets and need a decision-ready brief.</strong>
+          <p>A paid version of the dashboard preview with personalized fit ranking, destinations to avoid, ownership-path notes, transaction-risk priorities, and adviser questions.</p>
+          <strong>Best after you have compared 2-4 plausible destinations and need a decision-ready brief.</strong>
           <a href="/shortlist-review/" data-track="report_teaser_click" data-track-label="Polished Buyer Memo">Discuss this brief</a>
         </article>
 
@@ -902,7 +938,7 @@
             <h2>Specialist Introduction Path</h2>
             <p>Some buyers eventually need local lawyers, tax advisers, immigration advisers, mortgage brokers, buyer agents, or property managers. Global Home Atlas can help identify the type of specialist to look for, and any future introductions should be clearly disclosed and quality-controlled.</p>
             <div class="page-grid">
-              <article class="page-card"><h3>When useful</h3><ul><li>After a market shortlist is narrowed to one or two jurisdictions.</li><li>When ownership, residency, tax, financing, or rental rules decide the next step.</li><li>Before viewing specific properties or signing local mandates.</li></ul></article>
+              <article class="page-card"><h3>When useful</h3><ul><li>After a destination shortlist is narrowed to one or two jurisdictions.</li><li>When ownership, residency, tax, financing, or rental rules decide the next step.</li><li>Before viewing specific properties or signing local mandates.</li></ul></article>
               <article class="page-card"><h3>Disclosure standard</h3><ul><li>No hidden paid placement in destination rankings.</li><li>Any commercial introduction should be disclosed before referral.</li><li>Buyer remains responsible for independent local due diligence.</li></ul></article>
             </div>
           </section>
@@ -915,16 +951,16 @@
         <aside class="page-aside">
           <section class="page-aside-card">
             <h2>Use Before You Submit</h2>
-            <p>Compare your saved markets in the dashboard, export a preview, then request a polished buyer memo when the shortlist is worth deeper review.</p>
+            <p>Compare your selected destinations in the dashboard, export a preview, then request a polished buyer memo when the shortlist is worth deeper review.</p>
             <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="shortlist review page">Open dashboard</a>
           </section>
           <section class="page-aside-card">
-            <h3>Strong Starting Markets</h3>
+            <h3>Strong Starting Destinations</h3>
             <nav><a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a>
+<a href="/destinations/dubai/">Dubai</a>
 <a href="/destinations/valencia/">Valencia</a>
 <a href="/destinations/algarve-cascais/">Algarve / Cascais</a>
-<a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a>
-<a href="/destinations/lake-como/">Lake Como</a></nav>
+<a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a></nav>
           </section>
           <section class="page-aside-card">
             <h3>Useful Guides</h3>

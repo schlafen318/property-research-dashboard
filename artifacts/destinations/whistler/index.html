@@ -18,7 +18,7 @@
   <meta property="og:url" content="https://globalhomeatlas.com/destinations/whistler/">
   <meta name="twitter:card" content="summary_large_image">
 
-  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"WebPage","name":"Whistler Property Research | Global Home Atlas","url":"https://globalhomeatlas.com/destinations/whistler/","description":"Whistler property research for global buyers: ownership clarity, retirement fit, rental income context, USD/m2 benchmark, risks, and long-term lifestyle thesis.","dateModified":"2026-08-18","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Home Atlas","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Destinations","item":"https://globalhomeatlas.com/#destinations"},{"@type":"ListItem","position":3,"name":"Whistler","item":"https://globalhomeatlas.com/destinations/whistler/"}]}]</script>
+  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"WebPage","name":"Whistler Property Research | Global Home Atlas","url":"https://globalhomeatlas.com/destinations/whistler/","description":"Whistler property research for global buyers: ownership clarity, retirement fit, rental income context, USD/m2 benchmark, risks, and long-term lifestyle thesis.","dateModified":"2026-08-19","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Global Home Atlas","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Destinations","item":"https://globalhomeatlas.com/#destinations"},{"@type":"ListItem","position":3,"name":"Whistler","item":"https://globalhomeatlas.com/destinations/whistler/"}]}]</script>
 
   <style>
     :root {
@@ -47,17 +47,21 @@
     a { color: var(--teal); text-underline-offset: 3px; overflow-wrap: anywhere; }
     p, li { line-height: 1.65; }
     .page-shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
+    .access-notice { margin: 18px 0; padding: 14px 16px; border-left: 4px solid var(--terracotta); background: #f8ebe6; }
+    .access-notice strong { font-size: 14px; }
+    .access-notice p { margin: 4px 0 0; color: #59443d; font-size: 14px; }
     .page-hero {
       color: var(--ink);
       background:
         linear-gradient(90deg, rgba(255, 253, 247, .98) 0 42%, rgba(255, 253, 247, .74) 62%, rgba(199, 211, 194, .28)),
-        url("/assets/destination-dossier-coast.jpg");
+        var(--destination-hero-image, url("/assets/destination-dossier-coast.jpg"));
       background-size: cover;
       background-position: center;
       padding: 18px 0 58px;
     }
     .page-nav { display: flex; align-items: center; justify-content: space-between; gap: 18px; margin-bottom: 70px; }
-    .page-brand { color: var(--ink); font-weight: 900; text-decoration: none; }
+    .page-brand { display: flex; align-items: center; color: var(--ink); font-weight: 900; text-decoration: none; }
+    .primary-brand-logo { width: 174px; max-width: 48vw; height: auto; display: block; }
     .page-nav-links { display: flex; gap: 18px; flex-wrap: wrap; }
     .page-nav-links a { color: rgba(36, 49, 45, .76); text-decoration: none; font-size: 13px; font-weight: 800; }
     .mobile-menu { display: none; position: relative; }
@@ -118,6 +122,7 @@
     .conversion-callout { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; align-items: center; background: #eef4ec; }
     .conversion-callout h3 { margin: 0 0 6px; font-size: 22px; line-height: 1.12; }
     .page-layout { display: grid; grid-template-columns: minmax(0, 1fr) 280px; gap: 28px; padding: 34px 0 58px; align-items: start; }
+    .destination-layout { grid-template-columns: minmax(0, 1fr); }
     .page-article { display: grid; gap: 24px; min-width: 0; }
     .page-section { min-width: 0; padding: 24px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
     .page-section h2 { margin: 0 0 12px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(25px, 4vw, 38px); line-height: 1.04; }
@@ -241,6 +246,41 @@
     .decision-panel__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1px; }
     .decision-panel__facts div { padding: 16px; }
     .decision-panel__facts strong { display: block; margin-top: 5px; font-size: 15px; line-height: 1.35; overflow-wrap: anywhere; }
+    .market-summary {
+      display: grid;
+      grid-template-columns: minmax(220px, .75fr) minmax(0, 1.7fr);
+      gap: 24px;
+      margin-top: 18px;
+      padding: 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--paper);
+    }
+    .market-summary h2 { margin: 0 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 28px; }
+    .market-summary p { margin: 0; color: #3f4d48; }
+    .market-summary__facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 24px; margin: 0; }
+    .market-summary__facts div { min-width: 0; }
+    .market-summary__facts dt { color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .market-summary__facts dd { margin: 4px 0 0; font-weight: 700; line-height: 1.4; overflow-wrap: anywhere; }
+    .destination-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      padding: 20px 22px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #eef4ec;
+    }
+    .destination-actions h2 { margin: 0 0 4px; font-size: 21px; }
+    .destination-actions p { margin: 0; color: var(--muted); }
+    .destination-actions nav { display: flex; flex-wrap: wrap; gap: 10px; }
+    .continue-research h2 { margin-bottom: 16px; }
+    .continue-research__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 22px; }
+    .continue-research h3 { margin: 0 0 8px; font-size: 15px; }
+    .continue-research nav { display: grid; gap: 7px; font-size: 14px; }
+    .destination-updated { margin: -8px 0 0; color: var(--muted); font-size: 13px; text-align: right; }
     .query-match-panel {
       display: grid;
       gap: 16px;
@@ -565,8 +605,9 @@
       .mobile-menu { display: block; }
       .page-hero-grid, .page-layout { grid-template-columns: 1fr; }
       .page-aside { position: static; }
-      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section, .query-match-panel__grid { grid-template-columns: repeat(2, 1fr); }
+      .page-stats, .page-grid, .score-list, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .location-map-section, .query-match-panel__grid, .market-summary { grid-template-columns: repeat(2, 1fr); }
       .buyer-next-step__grid, .conversion-callout { grid-template-columns: 1fr; }
+      .continue-research__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .location-map-section .map-context-list { grid-column: 1 / -1; grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
     @media (max-width: 560px) {
@@ -576,7 +617,7 @@
       h1 { max-width: min(100%, 362px); font-size: clamp(31px, 9.5vw, 40px); line-height: 1; word-break: break-word; }
       .page-lede { max-width: min(100%, 362px); }
       .page-lede { font-size: 16px; }
-      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li, .buyer-next-step, .buyer-next-step__grid article, .conversion-callout {
+      .page-article, .page-section, .page-card, .brief-panel, .brief-panel article, .trust-brief, .trust-brief div, .comparison-card, .mobile-resources, .page-aside-card, .executive-summary, .executive-summary article, .decision-panel, .decision-panel__intro, .decision-panel__facts div, .market-summary, .market-summary__facts div, .location-map-section, .atlas-map, .real-map, .map-context-list li, .buyer-next-step, .buyer-next-step__grid article, .conversion-callout {
         width: 100%;
         max-width: 100%;
         min-width: 0;
@@ -586,7 +627,9 @@
         overflow-wrap: anywhere;
         word-break: normal;
       }
-      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .location-map-section, .location-map-section .map-context-list, .query-match-panel__grid { grid-template-columns: 1fr; }
+      .page-stats, .page-grid, .score-list, .intake-grid, .trust-brief, .brief-panel, .executive-summary__grid, .report-grid, .offer-comparison, .decision-panel, .decision-panel__facts, .market-summary, .market-summary__facts, .location-map-section, .location-map-section .map-context-list, .query-match-panel__grid { grid-template-columns: 1fr; }
+      .continue-research__grid { grid-template-columns: 1fr; }
+      .destination-actions { align-items: flex-start; }
       .page-section { padding: 18px; }
       body.has-mobile-actions { padding-bottom: 74px; }
       main { margin-top: -18px; }
@@ -726,49 +769,42 @@
     }
 </style>
 </head>
-<body class="has-mobile-actions">
-  <header class="page-hero">
+<body>
+  <header class="page-hero" style="--destination-hero-image: url('/assets/market-whistler-900.webp')">
     <div class="page-shell">
 
       <nav class="page-nav" aria-label="Primary">
-        <a class="page-brand" href="/">Global Home Atlas</a>
+        <a class="page-brand" href="/" aria-label="Global Home Atlas home"><img class="primary-brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="page-nav-links">
-          <a href="/dashboard/#compare">Compare</a>
-          <a href="/guides/">Guides</a>
-          <a href="/#destination-index">Destinations</a>
-          <a href="/countries/spain-property/">Countries</a>
-          <a href="/reports/">Reports</a>
-          <a href="/methodology/">Methodology</a>
-          <a href="/shortlist-review/">Shortlist Review</a>
-          <a href="/contact/">Contact</a>
-
+          <a href="/#market-finder">Find your fit</a>
+<a href="/dashboard/">Destinations</a>
+<a href="/guides/#country-selection">Countries</a>
+<a href="/guides/">Guides</a>
+<a href="/methodology/">Methodology</a>
         </div>
         <details class="mobile-menu">
           <summary>Menu</summary>
           <nav aria-label="Mobile primary">
-            <a href="/dashboard/#compare">Compare</a>
-            <a href="/countries/spain-property/">Countries</a>
-            <a href="/#destination-index">Destinations</a>
-            <a href="/guides/">Guides</a>
-            <a href="/reports/">Reports</a>
-            <a href="/methodology/">Methodology</a>
-            <a href="/shortlist-review/">Shortlist Review</a>
-            <a href="/contact/">Contact</a>
+            <a href="/#market-finder">Find your fit</a>
+<a href="/dashboard/">Destinations</a>
+<a href="/guides/#country-selection">Countries</a>
+<a href="/guides/">Guides</a>
+<a href="/methodology/">Methodology</a>
           </nav>
         </details>
       </nav>
 
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">Mountain · Canada · updated 2026-08-18</p>
-          <h1>Whistler Property Research</h1>
+          <p class="page-eyebrow">Mountain · Canada</p>
+          <h1>Whistler</h1>
           <p class="page-lede">Whistler is an elite resort with real four-season depth, but Canada’s foreign-buyer rules and high price make it difficult for this mandate. The panel would not put it in the top tier for a foreign buyer.</p>
 
         </div>
         <aside class="page-hero-card">
-          <span>Global rank</span><strong>#23</strong>
-          <span>Decision score</span><strong>3.55/5</strong>
-          <span>Entry benchmark</span><strong>$10,260/m2</strong>
+          <span>Global rank</span><strong>#28</strong>
+          <span>Overall rating</span><strong>3.5/5</strong>
+          <span>Price guide</span><strong>$10,260/m2</strong>
         </aside>
       </div>
     </div>
@@ -776,18 +812,13 @@
   <main>
     <div class="page-shell">
 
-      <section class="decision-panel" aria-label="Quick destination decision">
-        <div class="decision-panel__intro">
-          <span>30-second decision</span>
-          <h2>Should this destination stay on your shortlist?</h2>
+
+      <section class="market-summary" aria-label="Destination at a glance">
+        <div class="market-summary__verdict">
+          <h2>At a glance</h2>
           <p>Watchlist/specialist. Excellent destination, poor fit unless legal eligibility and price are unusually favourable.</p>
         </div>
-        <div class="decision-panel__facts"><div><span>Best buyer</span><strong>World-class ski and summer activity market</strong></div>
-<div><span>Best use case</span><strong>Deep global ski brand, Vancouver access, summer biking, institutional-quality resort ecosystem.</strong></div>
-<div><span>Ownership</span><strong>Canada’s federal foreign-buyer ban is extended to 1 Jan 2027, but rules apply based on census areas and property types; BC resort exceptions and local zoning need legal confirmation.</strong></div>
-<div><span>Budget signal</span><strong>$10,260/m2 benchmark</strong></div>
-<div><span>Rental realism</span><strong>2–4% est. net</strong></div>
-<div><span>Main risk</span><strong>Foreign-buyer restrictions/taxes</strong></div></div>
+        <dl class="market-summary__facts"><div><dt>Best for</dt><dd>World-class ski and summer activity market</dd></div><div><dt>Ownership route</dt><dd>Canada’s federal foreign-buyer ban is extended to 1 Jan 2027, but rules apply based on census areas and property types; BC resort exceptions and local zoning need legal confirmation.</dd></div><div><dt>Price guide</dt><dd>$10,260/m2</dd></div><div><dt>Expected net yield</dt><dd>2–4% est. net</dd></div><div><dt>Main risk</dt><dd>Foreign-buyer restrictions/taxes</dd></div></dl>
       </section>
 
 
@@ -810,14 +841,8 @@
 <li><span>Nearby market</span><strong>Alternative shortlist</strong></li></ul>
       </section>
 
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#overview">Overview</a><a href="#where-it-is">Map</a><a href="#lifestyle">Lifestyle</a><a href="#buyer-fit">Buyer Fit</a><a href="#where-to-look">Areas</a><a href="#budget">Budget</a><a href="#risks">Risks</a><a href="#scores">Scores</a><a href="#evidence">Evidence</a><a href="#compare">Compare</a></nav>
-
-      <nav class="mobile-action-strip" aria-label="Priority actions">
-        <a href="#budget">Budget</a>
-        <a href="/shortlist-review/">Review</a>
-      </nav>
-
-      <div class="page-layout">
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#overview">Overview</a><a href="#buyer-fit">Buyer fit</a><a href="#where-to-look">Areas</a><a href="#budget">Costs and risks</a><a href="#evidence">Evidence</a><a href="#compare">Compare</a></nav>
+      <div class="page-layout destination-layout">
         <article class="page-article">
 
       <section class="page-section">
@@ -957,15 +982,6 @@
 <li>Validate title, transfer process, taxes, financing, and ownership structure with independent local advisers.</li></ul>
       </details>
 
-          <details class="page-section">
-            <summary><h2>Guide Context</h2></summary>
-            <p>Use these buying guides to compare Whistler against other markets that share the same buyer intent, ownership questions, or long-term lifestyle role.</p>
-            <nav class="page-grid"><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
-<a href="/best-places-to-buy-vacation-home-abroad/">Best Places to Buy a Vacation Home in the World</a>
-<a href="/best-countries-for-expats-to-buy-property/">Best Countries for Expats to Buy Property</a>
-<a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a>
-<a href="/buy-property-abroad/">Buy Property Abroad</a></nav>
-          </details>
           <details class="page-section" id="scores" open>
             <summary><h2>Score Breakdown</h2></summary>
             <ul class="score-list">
@@ -1110,7 +1126,7 @@
             <article class="comparison-card">
               <div class="comparison-card__head">
                 <h3><a href="/destinations/hakuba/">Hakuba</a></h3>
-                <span>3.86/5</span>
+                <span>3.9/5</span>
               </div>
               <dl>
                 <div><dt>Price</dt><dd>$6,700/m2</dd></div>
@@ -1121,8 +1137,20 @@
 
             <article class="comparison-card">
               <div class="comparison-card__head">
+                <h3><a href="/destinations/park-city-deer-valley/">Park City / Deer Valley</a></h3>
+                <span>3.8/5</span>
+              </div>
+              <dl>
+                <div><dt>Price</dt><dd>$14,000/m2</dd></div>
+                <div><dt>Yield</dt><dd>2.5-4% est. net</dd></div>
+              </dl>
+              <p>Worth adding as the most practical US ski benchmark. More investable than Aspen, but not cheap.</p>
+            </article>
+
+            <article class="comparison-card">
+              <div class="comparison-card__head">
                 <h3><a href="/destinations/niseko/">Niseko</a></h3>
-                <span>3.79/5</span>
+                <span>3.8/5</span>
               </div>
               <dl>
                 <div><dt>Price</dt><dd>$14,644/m2</dd></div>
@@ -1134,7 +1162,7 @@
             <article class="comparison-card">
               <div class="comparison-card__head">
                 <h3><a href="/destinations/vancouver-island-victoria/">Vancouver Island / Victoria</a></h3>
-                <span>3.66/5</span>
+                <span>3.7/5</span>
               </div>
               <dl>
                 <div><dt>Price</dt><dd>$6,800/m2</dd></div>
@@ -1142,59 +1170,42 @@
               </dl>
               <p>Add as the North American retirement-water benchmark. Strong lifestyle fit, but policy and tax diligence matter.</p>
             </article>
-
-            <article class="comparison-card">
-              <div class="comparison-card__head">
-                <h3><a href="/destinations/dolomites-south-tyrol/">Dolomites / South Tyrol</a></h3>
-                <span>3.62/5</span>
-              </div>
-              <dl>
-                <div><dt>Price</dt><dd>$14,350/m2</dd></div>
-                <div><dt>Yield</dt><dd>2–3.8% est. net</dd></div>
-              </dl>
-              <p>Keep as a premium mountain benchmark. Great lifestyle asset, but financial return depends on buying unusually well.</p>
-            </article>
             </div>
       </details>
 
-        </article>
-        <details class="page-aside mobile-resources" open>
-          <summary>More resources</summary>
-          <section class="page-aside-card">
-            <h2>Compare in Atlas</h2>
-            <p>Use the dashboard to compare Whistler against every market in the 10-dimension model.</p>
-            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="Whistler destination">Open dashboard</a>
-            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="Whistler destination">Review my shortlist</a>
+          <section class="destination-actions" aria-label="Destination actions">
+            <div>
+              <h2>Ready to compare?</h2>
+              <p>Place Whistler beside your other plausible destinations.</p>
+            </div>
+            <nav>
+              <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="Whistler destination">Compare destinations</a>
+              <a href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="Whistler destination">Review my shortlist</a>
+            </nav>
           </section>
-          <section class="page-aside-card">
-            <h3>Related Destinations</h3>
-            <nav><a href="/destinations/hakuba/">Hakuba</a>
+          <section class="page-section continue-research" id="continue-research">
+            <h2>Continue your research</h2>
+            <div class="continue-research__grid">
+              <div><h3>Related destinations</h3><nav><a href="/destinations/hakuba/">Hakuba</a>
+<a href="/destinations/park-city-deer-valley/">Park City / Deer Valley</a>
 <a href="/destinations/niseko/">Niseko</a>
 <a href="/destinations/vancouver-island-victoria/">Vancouver Island / Victoria</a>
 <a href="/destinations/dolomites-south-tyrol/">Dolomites / South Tyrol</a>
-<a href="/destinations/chamonix/">Chamonix</a>
-<a href="/destinations/park-city-deer-valley/">Park City / Deer Valley</a></nav>
-          </section>
-          <section class="page-aside-card">
-            <h3>Country Context</h3>
-            <nav><a href="/countries/canada-property/">Canada Property Guide for Foreign Buyers</a></nav>
-          </section>
-          <section class="page-aside-card">
-            <h3>Research Guides</h3>
-            <nav><a href="/guides/">All buying guides</a><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
+<a href="/destinations/chamonix/">Chamonix</a></nav></div>
+              <div><h3>Country guides</h3><nav><a href="/countries/canada-property/">Canada Property Guide for Foreign Buyers</a></nav></div>
+              <div><h3>Buying guides</h3><nav><a href="/guides/">All buying guides</a><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
 <a href="/best-places-to-buy-vacation-home-abroad/">Best Places to Buy a Vacation Home in the World</a>
 <a href="/best-countries-for-expats-to-buy-property/">Best Countries for Expats to Buy Property</a>
 <a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a>
-<a href="/buy-property-abroad/">Buy Property Abroad</a></nav>
-          </section>
-          <section class="page-aside-card">
-            <h3>Trust Layer</h3>
-            <nav><a href="/methodology/">Methodology</a>
+<a href="/buy-property-abroad/">Buy Property Abroad</a></nav></div>
+              <div><h3>How we research</h3><nav><a href="/methodology/">Methodology</a>
 <a href="/research-standards/">Research Standards</a>
 <a href="/about/">About Global Home Atlas</a>
-<a href="/contact/">Contact Global Home Atlas</a></nav>
+<a href="/contact/">Contact Global Home Atlas</a></nav></div>
+            </div>
           </section>
-        </details>
+          <p class="destination-updated">Last updated 2026-08-19</p>
+        </article>
       </div>
     </div>
   </main>
@@ -1202,15 +1213,6 @@
     <div class="page-shell">
       <strong>Global Home Atlas</strong>
       <p>Scores and listing benchmarks are research inputs, not financial, legal, tax, or immigration advice.</p>
-      <nav><a href="/guides/">All buying guides</a> <a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a>
-<a href="/best-places-to-buy-vacation-home-abroad/">Best Places to Buy a Vacation Home in the World</a>
-<a href="/best-countries-for-expats-to-buy-property/">Best Countries for Expats to Buy Property</a>
-<a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a>
-<a href="/buy-property-abroad/">Buy Property Abroad</a>
-<a href="/buying-property-abroad-for-retirement/">Buying Property Abroad for Retirement</a> <a href="/methodology/">Methodology</a>
-<a href="/research-standards/">Research Standards</a>
-<a href="/about/">About Global Home Atlas</a>
-<a href="/contact/">Contact Global Home Atlas</a></nav>
     </div>
   </footer>
 
