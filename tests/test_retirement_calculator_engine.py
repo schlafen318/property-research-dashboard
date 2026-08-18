@@ -130,14 +130,46 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertEqual([0, 600], result["annualFundingGaps"])
         self.assertEqual(600, result["liquidPortfolio"])
 
-    def test_property_capital_only_applies_to_buy(self) -> None:
-        rent_result = calculate(base_payload())
-        buy = base_payload()
-        buy["housingPlan"] = "buy"
-        buy_result = calculate(buy)
-        projected_property = 500000 * 1.026**10
-        self.assertEqual(0, rent_result["propertyCapital"])
-        self.assertAlmostEqual(projected_property * 1.1, buy_result["propertyCapital"], places=4)
+    def test_buy_now_uses_today_price_without_mixing_dates(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "housingPlan": "buy_now",
+                "propertyPrice": 500000,
+                "propertyInflation": 0.10,
+                "acquisitionCostRate": 0.10,
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual(550000, result["propertyCapital"])
+        self.assertEqual("today", result["propertyTiming"])
+        self.assertIsNone(result["combinedRetirementCapital"])
+
+    def test_buy_at_retirement_projects_property(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "currentAge": 58,
+                "retirementAge": 60,
+                "housingPlan": "buy_retirement",
+                "propertyPrice": 500000,
+                "propertyInflation": 0.10,
+                "acquisitionCostRate": 0.10,
+            }
+        )
+        result = calculate(payload)
+        self.assertAlmostEqual(665500, result["propertyCapital"], places=6)
+        self.assertEqual("retirement", result["propertyTiming"])
+        self.assertAlmostEqual(result["retirementCapital"] + 665500, result["combinedRetirementCapital"], places=6)
+
+    def test_rent_and_already_own_do_not_add_property_capital(self) -> None:
+        for plan in ("rent", "own"):
+            payload = level_cash_flow_payload()
+            payload.update({"housingPlan": plan, "propertyPrice": 500000})
+            result = calculate(payload)
+            self.assertEqual(0, result["propertyCapital"])
+            self.assertEqual("none", result["propertyTiming"])
+            self.assertEqual(result["retirementCapital"], result["combinedRetirementCapital"])
 
     def test_income_can_cover_all_spending_without_negative_portfolio(self) -> None:
         payload = base_payload()

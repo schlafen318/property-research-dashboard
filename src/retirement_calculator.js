@@ -5,7 +5,7 @@
 })(typeof window !== "undefined" ? window : null, function () {
   "use strict";
 
-  const HOUSING_PLANS = new Set(["rent", "own", "buy"]);
+  const HOUSING_PLANS = new Set(["rent", "own", "buy_now", "buy_retirement"]);
 
   function finiteNonNegative(value, label) {
     const number = Number(value);
@@ -73,7 +73,9 @@
     const emergencyReserveMonths = finiteNonNegative(input.emergencyReserveMonths, "Emergency reserve months");
     const expectedPortfolioReturn = boundedExpectedReturn(input.expectedPortfolioReturn);
 
-    if (!HOUSING_PLANS.has(input.housingPlan)) throw new Error("Housing plan must be rent, own, or buy");
+    if (!HOUSING_PLANS.has(input.housingPlan)) {
+      throw new Error("Housing plan must be rent, own, buy_now, or buy_retirement");
+    }
     if (!Array.isArray(input.expenseCategories) || input.expenseCategories.length === 0) {
       throw new Error("At least one expense category is required");
     }
@@ -98,12 +100,21 @@
     }, 0);
     const fundingGap = annualFundingGaps[0] || 0;
     const propertyPrice = finiteNonNegative(input.propertyPrice, "Property price");
-    const propertyCapital = input.housingPlan === "buy"
-      ? project(propertyPrice, propertyInflation, yearsToRetirement) * (1 + acquisitionCostRate)
-      : 0;
     const emergencyReserve = firstYearExpenses / 12 * emergencyReserveMonths;
     const retirementCapital = liquidPortfolio + emergencyReserve;
-    const totalCapital = retirementCapital + propertyCapital;
+    let propertyCapital = 0;
+    let propertyTiming = "none";
+    let combinedRetirementCapital = retirementCapital;
+    if (input.housingPlan === "buy_now") {
+      propertyCapital = propertyPrice * (1 + acquisitionCostRate);
+      propertyTiming = "today";
+      combinedRetirementCapital = null;
+    } else if (input.housingPlan === "buy_retirement") {
+      propertyCapital = project(propertyPrice, propertyInflation, yearsToRetirement) * (1 + acquisitionCostRate);
+      propertyTiming = "retirement";
+      combinedRetirementCapital = retirementCapital + propertyCapital;
+    }
+    const totalCapital = combinedRetirementCapital === null ? retirementCapital : combinedRetirementCapital;
     const impliedFirstYearWithdrawal = liquidPortfolio > 0 ? fundingGap / liquidPortfolio : null;
     const todayDollarRetirementCapital = retirementCapital / Math.pow(1 + generalInflation, yearsToRetirement);
     const todayDollarTotal = totalCapital / Math.pow(1 + generalInflation, yearsToRetirement);
@@ -117,8 +128,10 @@
       expectedPortfolioReturn: expectedPortfolioReturn,
       liquidPortfolio: liquidPortfolio,
       propertyCapital: propertyCapital,
+      propertyTiming: propertyTiming,
       emergencyReserve: emergencyReserve,
       retirementCapital: retirementCapital,
+      combinedRetirementCapital: combinedRetirementCapital,
       totalCapital: totalCapital,
       impliedFirstYearWithdrawal: impliedFirstYearWithdrawal,
       todayDollarRetirementCapital: todayDollarRetirementCapital,
