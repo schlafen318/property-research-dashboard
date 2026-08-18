@@ -1,5 +1,30 @@
 [
   {
+    "base_content_hash": "674dd655b09097d6c1f0bb0912a98f080fa2ec70610e12bbe671b577d04cdd0a",
+    "content": {
+      "faq_answer": null,
+      "faq_question": null,
+      "internal_link_anchor": null,
+      "internal_link_target": null,
+      "intro": null,
+      "meta_description": "Compare retirement property destinations abroad by healthcare, lifestyle, value, rental resilience, and exit liquidity in this practical guide.",
+      "title": "Best Places to Buy Property Abroad for Retirement: Guide"
+    },
+    "cooldown_until": "2026-09-15T02:32:38.058644+00:00",
+    "finding_fingerprint": "gha-low-ctr-opportunity-e083a4311500",
+    "generated_at": "2026-08-18T02:32:38.058644+00:00",
+    "lifecycle": "proposed",
+    "model": "gpt-5.6-luna",
+    "signal": {
+      "clicks": 0,
+      "ctr": 0,
+      "impressions": 27,
+      "page": "https://globalhomeatlas.com/best-places-to-buy-property-abroad-for-retirement/",
+      "position": 41.666666666666664
+    },
+    "target_url": "https://globalhomeatlas.com/best-places-to-buy-property-abroad-for-retirement/"
+  },
+  {
     "base_content_hash": "03ac5d1370fd562e95ce355aa84270ebf8a75f2d229f48afddad88fdebf5f8d5",
     "content": {
       "faq_answer": null,
