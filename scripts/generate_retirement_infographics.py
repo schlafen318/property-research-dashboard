@@ -88,27 +88,27 @@ def draw_required_capital(rankings: list[dict], as_of: str, output: Path) -> Non
     image, draw = canvas()
     brand_header(
         draw,
-        "Retirement destinations ranked by cost",
+        "Lowest-cost 10 of 30 retirement destinations",
         "How much capital does a couple need?",
-        "Required capital = liquid portfolio + one year of expenses. Property is excluded from rank.",
+        "Top 10 shown; complete ranks 1–30 are available in the guide.",
     )
     max_value = max(item["metrics"]["required_capital"] for item in rankings)
     bar_x = 510
     bar_max = 880
     row_y = 285
-    row_step = 65
+    row_step = 52
     for rank, item in enumerate(rankings, start=1):
         destination = item["destination"]
         value = item["metrics"]["required_capital"]
         y = row_y + (rank - 1) * row_step
-        draw.text((72, y + 10), f"{rank}", fill=BRASS, font=font(23, True))
-        draw.text((118, y), destination["name"], fill=INK, font=font(22, True))
-        draw.text((118, y + 29), destination.get("country") or "", fill=MUTED, font=font(16))
-        draw.rounded_rectangle((bar_x, y + 7, bar_x + bar_max, y + 43), radius=12, fill="#EBE5DA")
+        draw.text((72, y + 8), f"{rank}", fill=BRASS, font=font(20, True))
+        draw.text((118, y), destination["name"], fill=INK, font=font(19, True))
+        draw.text((118, y + 24), destination.get("country") or "", fill=MUTED, font=font(14))
+        draw.rounded_rectangle((bar_x, y + 6, bar_x + bar_max, y + 36), radius=10, fill="#EBE5DA")
         width = int(bar_max * value / max_value)
         fill = DEEP_GREEN if rank <= 2 else GREEN
-        draw.rounded_rectangle((bar_x, y + 7, bar_x + width, y + 43), radius=12, fill=fill)
-        draw.text((1430, y + 7), money_short(value), fill=INK, font=font(22, True))
+        draw.rounded_rectangle((bar_x, y + 6, bar_x + width, y + 36), radius=10, fill=fill)
+        draw.text((1430, y + 5), money_short(value), fill=INK, font=font(19, True))
     footer(draw, as_of)
     output.parent.mkdir(parents=True, exist_ok=True)
     image.save(output, format="PNG", optimize=True)
@@ -118,16 +118,16 @@ def draw_capital_breakdown(rankings: list[dict], as_of: str, output: Path) -> No
     image, draw = canvas()
     brand_header(
         draw,
-        "Retirement capital breakdown",
+        "Lowest-cost 10 of 30 retirement destinations",
         "Living-cost funding and property are separate decisions",
-        "Today's USD. Property capital is optional and does not affect the retirement-cost ranking.",
+        "Top 10 shown; complete ranks 1–30 are available in the guide.",
     )
     columns = [72, 560, 800, 1045, 1285]
     headers = ["DESTINATION", "ANNUAL SPEND", "LIQUID PORTFOLIO", "12-MO RESERVE", "PROPERTY CAPITAL"]
     for x, label in zip(columns, headers):
         draw.text((x, 278), label, fill=BRASS, font=font(15, True))
     row_top = 318
-    row_step = 61
+    row_step = 45
     max_property = max(item["metrics"]["property_capital"] for item in rankings)
     for rank, item in enumerate(rankings, start=1):
         destination = item["destination"]
@@ -156,14 +156,15 @@ def draw_capital_breakdown(rankings: list[dict], as_of: str, output: Path) -> No
 
 def main() -> int:
     rankings, as_of = load_rankings()
+    top_rankings = rankings[:10]
     assets = ROOT / "src" / "site_assets"
     draw_required_capital(
-        rankings,
+        top_rankings,
         as_of,
         assets / "retirement-destinations-required-capital.png",
     )
     draw_capital_breakdown(
-        rankings,
+        top_rankings,
         as_of,
         assets / "retirement-destinations-capital-breakdown.png",
     )

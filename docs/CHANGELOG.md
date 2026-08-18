@@ -1,5 +1,13 @@
 # Changelog
 
+## 2026-08-18 — All-destination retirement ranking
+
+- Expanded the source-audited retirement cost model from eight destinations to all 30 destinations currently covered by Global Home Atlas.
+- Kept the comparison readable by showing ranks 1–10 first and placing ranks 11–30 in accessible expandable tables on the guide and calculator.
+- Added all 30 destinations to the private client-side calculator and added a complete 30-entry ItemList schema to the ranking guide.
+- Regenerated both retirement graphics as lowest-cost-10-of-30 views while preserving the complete HTML ranking for readers and search engines.
+- Kept the ranking limited to modeled capital requirements for a couple renting; it does not rank lifestyle quality or provide personal financial advice.
+
 ## 2026-08-18 — Retirement abroad calculator
 
 - Added an indexable retirement-abroad calculator covering eight destination benchmarks for single retirees and couples.
