@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-08-18 — Retirement target and net return emphasis
+
+- Moved the retirement capital target above today's allocation so the primary planning goal appears first.
+- Added net return after withdrawal, calculated as expected return minus the first-year portfolio withdrawal rate.
+- Added a plain-language warning and negative-value styling when planned withdrawals exceed the assumed return.
+
 ## 2026-08-18 — Retirement results by planning date
 
 - Split the calculator estimate into what must be allocated today, what is needed at retirement, and first-retirement-year cash flow.

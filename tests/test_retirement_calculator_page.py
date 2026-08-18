@@ -115,6 +115,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-result-return",
             "ret-result-implied-withdrawal",
             "ret-withdrawal-explanation",
+            "ret-result-net-return",
+            "ret-net-return-explanation",
         ):
             self.assertIn(f'id="{element_id}"', results)
         self.assertIn("What you need today", results)
@@ -122,6 +124,9 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("First retirement year", results)
         self.assertIn("First-year funding gap ÷ liquid portfolio", results)
         self.assertIn("not a recommended safe withdrawal rate", results)
+        self.assertIn("Expected return minus first-year portfolio withdrawal", results)
+        self.assertLess(results.index('id="ret-retirement-section"'), results.index('id="ret-today-section"'))
+        self.assertLess(results.index('id="ret-today-section"'), results.index('id="ret-first-year-section"'))
         self.assertNotIn('id="ret-cash-income"', results)
         self.assertNotIn('id="ret-asset-sales"', results)
         self.assertNotIn('id="ret-today-total"', results)
@@ -189,6 +194,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-emergency-reserve",
             "ret-result-return",
             "ret-result-implied-withdrawal",
+            "ret-result-net-return",
             "ret-result-assumptions",
         }
         for element_id in required_ids:

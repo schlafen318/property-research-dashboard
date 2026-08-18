@@ -61,6 +61,11 @@ class RetirementCalculatorUITests(unittest.TestCase):
             )
         )
 
+    def test_negative_net_return_is_flagged(self) -> None:
+        self.assertTrue(run_ui("isNegativeRate", -0.001))
+        self.assertFalse(run_ui("isNegativeRate", 0))
+        self.assertFalse(run_ui("isNegativeRate", 0.001))
+
     def test_housing_guidance_distinguishes_rent_owner_costs_and_purchase_budget(self) -> None:
         self.assertEqual(
             "Monthly retirement living expenses, including rent.",

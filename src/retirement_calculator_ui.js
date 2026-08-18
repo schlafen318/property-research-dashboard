@@ -45,6 +45,10 @@
     return control.value === "" || !valid;
   }
 
+  function isNegativeRate(value) {
+    return Number(value) < 0;
+  }
+
   function initRetirementCalculator(rootId, payload) {
     if (!root) return;
     const form = document.getElementById(rootId);
@@ -167,6 +171,15 @@
       el("ret-result-implied-withdrawal").textContent = result.impliedFirstYearWithdrawal === null
         ? "—"
         : (result.impliedFirstYearWithdrawal * 100).toFixed(2) + "%";
+      const netReturn = el("ret-result-net-return");
+      const netReturnIsNegative = result.netReturnAfterWithdrawal !== null && isNegativeRate(result.netReturnAfterWithdrawal);
+      netReturn.textContent = result.netReturnAfterWithdrawal === null
+        ? "—"
+        : (result.netReturnAfterWithdrawal * 100).toFixed(2) + "%";
+      netReturn.classList.toggle("is-negative", netReturnIsNegative);
+      el("ret-net-return-explanation").textContent = netReturnIsNegative
+        ? "Expected return minus first-year portfolio withdrawal. Withdrawals exceed the assumed return."
+        : "Expected return minus first-year portfolio withdrawal.";
       el("ret-home-today-label").textContent = result.propertyTiming === "today"
         ? "Home purchase needed now"
         : "No home purchase today";
@@ -221,6 +234,7 @@
     usesPropertyBudget: usesPropertyBudget,
     housingGuidance: housingGuidance,
     isInvalidNumericControl: isInvalidNumericControl,
+    isNegativeRate: isNegativeRate,
     initRetirementCalculator: initRetirementCalculator,
   };
 });
