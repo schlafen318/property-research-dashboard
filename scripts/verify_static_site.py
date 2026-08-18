@@ -14,11 +14,17 @@ SITE_ORIGIN = "https://globalhomeatlas.com"
 
 KEY_PAGES = [
     ARTIFACTS / "guides" / "index.html",
+    ARTIFACTS / "retirement-abroad-calculator" / "index.html",
     ARTIFACTS / "best-countries-to-buy-property-as-a-foreigner" / "index.html",
     ARTIFACTS / "countries" / "spain-property" / "index.html",
 ]
 
 REQUIRED_MARKERS = {
+    ARTIFACTS / "retirement-abroad-calculator" / "index.html": [
+        "Retirement Abroad Calculator",
+        "Retirement cost benchmarks by destination",
+        "Portfolio dividends and interest",
+    ],
     ARTIFACTS / "guides" / "index.html": [
         "Start with the strongest route",
         "Ready to turn research into a shortlist?",
