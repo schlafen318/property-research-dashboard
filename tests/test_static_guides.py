@@ -26,8 +26,12 @@ class GuideHubIndexingTests(unittest.TestCase):
         self.assertIn("What daily life feels like for a foreigner", text)
         self.assertIn("Japanese will shape the quality of daily life", text)
         self.assertIn("Courtesy is not the same as instant friendship", text)
+        self.assertIn("The practical purchase sequence", text)
+        self.assertIn("The 48-hour neighbourhood test", text)
         self.assertIn("Japan's Ministry of Finance", text)
         self.assertIn("mlit.go.jp", text)
+        self.assertNotIn("Decision Framework", text)
+        self.assertNotIn("Destination Notes for Serious Buyers", text)
 
     def test_guide_hub_presents_an_editorial_reading_path_without_dashboard_chrome(self) -> None:
         text = self.guide_text()
