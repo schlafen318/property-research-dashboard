@@ -5208,6 +5208,14 @@ def build_seo_page(
         }
         else ""
     )
+    editorial_content = ""
+    if page["slug"] == "japan-retirement-property-foreign-buyers":
+        editorial_content = """
+          <section class="seo-section"><h2>What buying in Japan does and does not solve</h2><p>Japan is unusually straightforward on ownership: a foreign buyer can acquire Japanese real estate. Buying a home does not by itself give a buyer the right to live in Japan, create a financing route, or make a rural home easy to manage from overseas.</p><p>Treat the home as an asset you may own; treat residency, tax position, healthcare access, banking, and day-to-day management as separate decisions requiring their own professional answers.</p></section>
+          <section class="seo-section"><h2>Choose the kind of Japan you will actually use</h2><h3>Fukuoka / Itoshima is the all-season base</h3><p>Fukuoka provides airport access, hospitals, food, and urban services; Itoshima adds coast and a slower weekend rhythm. It is the practical answer when the home must work beyond the holiday calendar.</p><h3>Hakone / Izu is the Tokyo-adjacent escape</h3><p>Test road and rail access, slope and flood exposure, building maintenance, and whether the home remains attractive outside peak weekends.</p><h3>Hakuba and Niseko are specialist resort decisions</h3><p>Both demand a credible plan for seasonality, winter access, management, and resale depth. Niseko carries the higher entry benchmark; Hakuba is the more execution-sensitive proposition.</p></section>
+          <section class="seo-section"><h2>The diligence list before an offer</h2><ol><li>Have independent bilingual counsel explain registered title, land and building rights, boundaries, access, and management restrictions.</li><li>Read the Important Matters Explanation and request the current hazard-map position.</li><li>Model taxes, insurance, reserves, furnishing, and management separately from the asking price.</li><li>Confirm local keyholding, utilities, winterisation, inspections, and rental permissions.</li><li>For a non-resident purchase, confirm reporting and payment obligations before funds move.</li></ol></section>
+          <section class="seo-section"><h2>Primary sources to use with your advisers</h2><p><a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html">Japan's Ministry of Finance: reporting requirements for non-residents acquiring real property</a>; <a href="https://www.mlit.go.jp/report/press/totikensangyo13_hh_000269.html">MLIT: English introduction to Japan's real-estate transaction, registration, tax, and planning systems</a>; <a href="https://www.cao.go.jp/tochi-chosa/index_en.html">Cabinet Office: Act on Review of Important Real Estate</a>.</p></section>
+        """
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5384,13 +5392,13 @@ def build_seo_page(
       <div class="seo-content">
         <article class="seo-article">
           {retirement_callout}
-          <section class="seo-section">
+          {editorial_content or f'''<section class="seo-section">
             <h2>How to Read This Shortlist</h2>
             <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
             <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process. Global Home Atlas ranks destinations through ten decision dimensions: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry.</p>
             <p>That weighting is designed for affluent global citizens who may use one property for several jobs over time. A home can begin as a vacation base, become a semi-retirement address, then eventually need to rent or sell. The best destinations on this page are therefore not selected only for near-term excitement. They are selected because the evidence points to a more durable combination of livability, practicality, and investment defensibility.</p>
             <p>Use this page as a first-pass filter. It narrows the research field, highlights where each destination is strong, and shows which tradeoffs need professional verification. Before buying, confirm title, taxes, foreign-buyer rules, visa status, insurance, building condition, local rental permits, manager quality, and resale comparables with independent local advisers.</p>
-          </section>
+          </section>'''}
 
           <section class="seo-section" id="comparison">
             <h2>Best Destinations to Compare First</h2>
@@ -5405,7 +5413,7 @@ def build_seo_page(
             </div>
           </section>
 
-          <section class="seo-section">
+          {"" if editorial_content else """<section class=\"seo-section\">"""}
             <h2>Decision Framework</h2>
             <h3>1. Start with ownership clarity</h3>
             <p>Foreign buyers should eliminate markets where the legal structure is hard to explain, hard to finance, or heavily dependent on informal assumptions. A beautiful asset can become a poor decision if land rights, permits, taxes, or resale procedures are unclear. The ownership score in this guide is therefore intentionally prominent.</p>
@@ -5415,7 +5423,7 @@ def build_seo_page(
             <p>Rental income should offset risk, not justify ignoring it. Net yield estimates need to survive management fees, vacancy, repairs, taxes, furnishing, platform costs, insurance, and regulatory changes. A lower but cleaner yield in a liquid market can be superior to a headline yield that depends on aggressive occupancy or fragile short-term-rental permissions.</p>
             <h3>4. Plan the exit before entry</h3>
             <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
-          </section>
+          {"" if editorial_content else "</section>"}
 
           <section class="seo-section">
             <h2>Related Buying Guides</h2>
