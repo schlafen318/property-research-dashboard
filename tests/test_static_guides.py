@@ -13,11 +13,12 @@ class GuideHubIndexingTests(unittest.TestCase):
     def guide_text(self) -> str:
         return re.sub(r"\s+", " ", GUIDE_HUB.read_text(encoding="utf-8"))
 
-    def test_guide_hub_routes_readers_without_exposing_internal_seo_program_copy(self) -> None:
+    def test_guide_hub_presents_an_editorial_reading_path_without_dashboard_chrome(self) -> None:
         text = self.guide_text()
 
-        self.assertIn("Find the right guide for your purchase", text)
-        self.assertIn("Featured research", text)
+        self.assertIn("A considered guide to buying a home abroad", text)
+        self.assertIn('class="guide-section-nav"', text)
+        self.assertIn("The featured story", text)
         self.assertIn('class="guide-feature"', text)
         self.assertIn("Retirement or lifestyle base", text)
         self.assertIn("Second home abroad", text)
@@ -27,6 +28,8 @@ class GuideHubIndexingTests(unittest.TestCase):
         self.assertNotIn("Issue #", text)
         self.assertNotIn("Google is starting to index", text)
         self.assertNotIn("<strong>Use when:</strong>", text)
+        self.assertNotIn("Route 01", text)
+        self.assertNotIn('class="page-button" href="/best-countries-to-retire-abroad/"', text)
         self.assertIn('/best-places-to-buy-vacation-home-abroad/"', text)
         self.assertIn('/best-countries-for-expats-to-buy-property/"', text)
         self.assertIn('/best-countries-to-buy-property-as-a-foreigner/"', text)
