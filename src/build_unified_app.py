@@ -437,7 +437,7 @@ SEO_PAGES = [
         "keyword": "Japan retirement property foreign buyers",
         "theme": "Japan buyer guide",
         "intent": "foreign buyers considering Japan for lifestyle, retirement optionality, and clean ownership rather than pure yield",
-        "destination_ids": ["fukuoka-itoshima", "hakone-izu", "hakuba", "niseko", "valencia", "algarve-cascais"],
+        "destination_ids": ["fukuoka-itoshima", "hakone-izu", "hakuba", "niseko"],
         "faqs": [
             ("Can foreigners buy property in Japan?", "Foreign buyers can generally buy freehold property in Japan, but financing, taxes, management, and local rules still require careful advice."),
             ("Is Japan good for retirement property?", "Japan can be strong for safety, healthcare, food, transport, and ownership clarity, but visa status and income expectations need separate planning."),
@@ -5212,6 +5212,7 @@ def build_seo_page(
     if page["slug"] == "japan-retirement-property-foreign-buyers":
         editorial_content = """
           <section class="seo-section"><h2>What buying in Japan does and does not solve</h2><p>Japan is unusually straightforward on ownership: a foreign buyer can acquire Japanese real estate. Buying a home does not by itself give a buyer the right to live in Japan, create a financing route, or make a rural home easy to manage from overseas.</p><p>Treat the home as an asset you may own; treat residency, tax position, healthcare access, banking, and day-to-day management as separate decisions requiring their own professional answers.</p></section>
+          <section class="seo-section"><h2>What daily life feels like for a foreigner</h2><p>Japan can be exceptionally comfortable for a buyer who values safety, clean public spaces, reliable transport, excellent food, and a high standard of everyday service. It can also feel demanding: Japanese will shape the quality of daily life, especially in smaller cities, with tradespeople, in medical settings, and when a property issue needs resolving quickly.</p><p>Courtesy is not the same as instant friendship. Many newcomers find people considerate and helpful in structured interactions, while deeper relationships take time, repetition, and some language effort. Choose a place where you would happily build a routine: the local grocery, clinic, station, neighbourhood cafe, and the people who will know your home when you are away.</p></section>
           <section class="seo-section"><h2>Choose the kind of Japan you will actually use</h2><h3>Fukuoka / Itoshima is the all-season base</h3><p>Fukuoka provides airport access, hospitals, food, and urban services; Itoshima adds coast and a slower weekend rhythm. It is the practical answer when the home must work beyond the holiday calendar.</p><h3>Hakone / Izu is the Tokyo-adjacent escape</h3><p>Test road and rail access, slope and flood exposure, building maintenance, and whether the home remains attractive outside peak weekends.</p><h3>Hakuba and Niseko are specialist resort decisions</h3><p>Both demand a credible plan for seasonality, winter access, management, and resale depth. Niseko carries the higher entry benchmark; Hakuba is the more execution-sensitive proposition.</p></section>
           <section class="seo-section"><h2>The diligence list before an offer</h2><ol><li>Have independent bilingual counsel explain registered title, land and building rights, boundaries, access, and management restrictions.</li><li>Read the Important Matters Explanation and request the current hazard-map position.</li><li>Model taxes, insurance, reserves, furnishing, and management separately from the asking price.</li><li>Confirm local keyholding, utilities, winterisation, inspections, and rental permissions.</li><li>For a non-resident purchase, confirm reporting and payment obligations before funds move.</li></ol></section>
           <section class="seo-section"><h2>Primary sources to use with your advisers</h2><p><a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html">Japan's Ministry of Finance: reporting requirements for non-residents acquiring real property</a>; <a href="https://www.mlit.go.jp/report/press/totikensangyo13_hh_000269.html">MLIT: English introduction to Japan's real-estate transaction, registration, tax, and planning systems</a>; <a href="https://www.cao.go.jp/tochi-chosa/index_en.html">Cabinet Office: Act on Review of Important Real Estate</a>.</p></section>
@@ -5223,6 +5224,11 @@ def build_seo_page(
             <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process.</p>
           </section>
         """
+    is_japan_article = bool(editorial_content)
+    hero_actions = "" if is_japan_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations">Open the full dashboard</a><a class="seo-button secondary" href="#comparison">Compare destinations</a></div>'''
+    hero_aside = "" if is_japan_article else f'''<aside class="seo-hero-card"><span>Top current match</span><strong>{escape(top["name"])}</strong><span>Alternative to test</span><strong>{escape(runner_up["name"])}</strong><span>Destinations compared</span><strong>{len(selected)}</strong></aside>'''
+    guide_summary = "" if is_japan_article else f'''<section class="seo-panel" aria-label="Guide summary"><div class="seo-stats"><div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div><div><span>Destinations</span><strong>{len(selected)}</strong></div><div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div><div><span>Research status</span><strong>Updated {updated}</strong></div></div></section>'''
+    decision_path = "" if is_japan_article else guide_decision_path_html(page, destinations, pages)
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5368,33 +5374,16 @@ def build_seo_page(
           <h1>{escape(page["h1"])}</h1>
           <p class="seo-lede">{escape(intro)} This guide is written for {escape(page["intent"])}.</p>
           {generated_link}
-          <div class="seo-actions">
-          <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a>
-          <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a>
-          </div>
+          {hero_actions}
         </div>
-        <aside class="seo-hero-card">
-          <span>Top current match</span>
-          <strong>{escape(top["name"])}</strong>
-          <span>Alternative to test</span>
-          <strong>{escape(runner_up["name"])}</strong>
-          <span>Destinations compared</span>
-          <strong>{len(selected)}</strong>
-        </aside>
+        {hero_aside}
       </div>
     </div>
   </header>
   <main>
     <div class="seo-shell">
-      <section class="seo-panel" aria-label="Guide summary">
-        <div class="seo-stats">
-          <div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div>
-          <div><span>Destinations</span><strong>{len(selected)}</strong></div>
-          <div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div>
-          <div><span>Research status</span><strong>Updated {updated}</strong></div>
-        </div>
-      </section>
-      {guide_decision_path_html(page, destinations, pages)}
+      {guide_summary}
+      {decision_path}
       {vacation_home_quick_answer_html(page, destinations)}
       <div class="seo-content">
         <article class="seo-article">

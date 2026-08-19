@@ -23,6 +23,9 @@ class GuideHubIndexingTests(unittest.TestCase):
         self.assertIn("What buying in Japan does and does not solve", text)
         self.assertIn("Buying a home does not by itself give a buyer the right to live in Japan", text)
         self.assertIn("Fukuoka / Itoshima is the all-season base", text)
+        self.assertIn("What daily life feels like for a foreigner", text)
+        self.assertIn("Japanese will shape the quality of daily life", text)
+        self.assertIn("Courtesy is not the same as instant friendship", text)
         self.assertIn("Japan's Ministry of Finance", text)
         self.assertIn("mlit.go.jp", text)
 
