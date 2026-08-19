@@ -28,6 +28,8 @@ class GuideHubIndexingTests(unittest.TestCase):
         self.assertIn("Courtesy is not the same as instant friendship", text)
         self.assertIn("The practical purchase sequence", text)
         self.assertIn("The 48-hour neighbourhood test", text)
+        self.assertIn("Budget, finance, and operating reality", text)
+        self.assertIn("within 20 days after acquisition", text)
         self.assertIn("Japan's Ministry of Finance", text)
         self.assertIn("mlit.go.jp", text)
         self.assertNotIn("Decision Framework", text)
