@@ -7,11 +7,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 GUIDE_HUB = ROOT / "artifacts" / "guides" / "index.html"
+JAPAN_GUIDE = ROOT / "artifacts" / "japan-retirement-property-foreign-buyers" / "index.html"
 
 
 class GuideHubIndexingTests(unittest.TestCase):
     def guide_text(self) -> str:
         return re.sub(r"\s+", " ", GUIDE_HUB.read_text(encoding="utf-8"))
+
+    def japan_guide_text(self) -> str:
+        return re.sub(r"\s+", " ", JAPAN_GUIDE.read_text(encoding="utf-8"))
+
+    def test_japan_guide_has_country_specific_buyer_content_and_primary_sources(self) -> None:
+        text = self.japan_guide_text()
+
+        self.assertIn("What buying in Japan does and does not solve", text)
+        self.assertIn("Buying a home does not by itself give a buyer the right to live in Japan", text)
+        self.assertIn("Fukuoka / Itoshima is the all-season base", text)
+        self.assertIn("Japan's Ministry of Finance", text)
+        self.assertIn("mlit.go.jp", text)
 
     def test_guide_hub_presents_an_editorial_reading_path_without_dashboard_chrome(self) -> None:
         text = self.guide_text()
