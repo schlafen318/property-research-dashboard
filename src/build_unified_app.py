@@ -5216,6 +5216,13 @@ def build_seo_page(
           <section class="seo-section"><h2>The diligence list before an offer</h2><ol><li>Have independent bilingual counsel explain registered title, land and building rights, boundaries, access, and management restrictions.</li><li>Read the Important Matters Explanation and request the current hazard-map position.</li><li>Model taxes, insurance, reserves, furnishing, and management separately from the asking price.</li><li>Confirm local keyholding, utilities, winterisation, inspections, and rental permissions.</li><li>For a non-resident purchase, confirm reporting and payment obligations before funds move.</li></ol></section>
           <section class="seo-section"><h2>Primary sources to use with your advisers</h2><p><a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html">Japan's Ministry of Finance: reporting requirements for non-residents acquiring real property</a>; <a href="https://www.mlit.go.jp/report/press/totikensangyo13_hh_000269.html">MLIT: English introduction to Japan's real-estate transaction, registration, tax, and planning systems</a>; <a href="https://www.cao.go.jp/tochi-chosa/index_en.html">Cabinet Office: Act on Review of Important Real Estate</a>.</p></section>
         """
+    generic_intro = f"""
+          <section class="seo-section">
+            <h2>How to Read This Shortlist</h2>
+            <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
+            <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process.</p>
+          </section>
+        """
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5392,13 +5399,7 @@ def build_seo_page(
       <div class="seo-content">
         <article class="seo-article">
           {retirement_callout}
-          {editorial_content or f'''<section class="seo-section">
-            <h2>How to Read This Shortlist</h2>
-            <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
-            <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process. Global Home Atlas ranks destinations through ten decision dimensions: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry.</p>
-            <p>That weighting is designed for affluent global citizens who may use one property for several jobs over time. A home can begin as a vacation base, become a semi-retirement address, then eventually need to rent or sell. The best destinations on this page are therefore not selected only for near-term excitement. They are selected because the evidence points to a more durable combination of livability, practicality, and investment defensibility.</p>
-            <p>Use this page as a first-pass filter. It narrows the research field, highlights where each destination is strong, and shows which tradeoffs need professional verification. Before buying, confirm title, taxes, foreign-buyer rules, visa status, insurance, building condition, local rental permits, manager quality, and resale comparables with independent local advisers.</p>
-          </section>'''}
+          {editorial_content or generic_intro}
 
           <section class="seo-section" id="comparison">
             <h2>Best Destinations to Compare First</h2>
@@ -5413,7 +5414,7 @@ def build_seo_page(
             </div>
           </section>
 
-          {"" if editorial_content else """<section class=\"seo-section\">"""}
+          <section class="seo-section">
             <h2>Decision Framework</h2>
             <h3>1. Start with ownership clarity</h3>
             <p>Foreign buyers should eliminate markets where the legal structure is hard to explain, hard to finance, or heavily dependent on informal assumptions. A beautiful asset can become a poor decision if land rights, permits, taxes, or resale procedures are unclear. The ownership score in this guide is therefore intentionally prominent.</p>
@@ -5423,7 +5424,7 @@ def build_seo_page(
             <p>Rental income should offset risk, not justify ignoring it. Net yield estimates need to survive management fees, vacancy, repairs, taxes, furnishing, platform costs, insurance, and regulatory changes. A lower but cleaner yield in a liquid market can be superior to a headline yield that depends on aggressive occupancy or fragile short-term-rental permissions.</p>
             <h3>4. Plan the exit before entry</h3>
             <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
-          {"" if editorial_content else "</section>"}
+          </section>
 
           <section class="seo-section">
             <h2>Related Buying Guides</h2>
