@@ -343,9 +343,17 @@ class SeoCtrContentTests(unittest.TestCase):
         data = json.loads(build_unified_app.build_market_finder_data(destinations))
         html = build_unified_app.build_landing_page(destinations, [], [], 0)
 
-        self.assertEqual(data["investment"][0]["image"], "/assets/market-fukuoka-itoshima-600.webp")
-        self.assertEqual(data["retirement"][0]["imageAlt"], "Valencia streetscape opening toward the Mediterranean")
-        self.assertEqual(data["retirement"][2]["image"], "/assets/market-madeira-600.webp")
+        expected_images = {
+            "/assets/market-fukuoka-itoshima-600.webp",
+            "/assets/market-valencia-600.webp",
+            "/assets/market-algarve-cascais-600.webp",
+            "/assets/market-madeira-600.webp",
+        }
+        for matches in data.values():
+            self.assertEqual(3, len(matches))
+            for match in matches:
+                self.assertIn(match["image"], expected_images)
+                self.assertTrue(match["imageAlt"])
         self.assertIn('class="finder-map-cue" aria-hidden="true"', html)
         self.assertIn('class="finder-result__thumb"', html)
         self.assertIn("height: 82px;", html)

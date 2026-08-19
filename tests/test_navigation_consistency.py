@@ -8,7 +8,7 @@ from pathlib import Path
 ARTIFACTS = Path(__file__).resolve().parents[1] / "artifacts"
 EXPECTED_PRIMARY_LINKS = [
     ("/", "Global Home Atlas"),
-    ("/#market-finder", "Find your fit"),
+    ("/find-your-fit/", "Find your fit"),
     ("/dashboard/", "Destinations"),
     ("/guides/#country-selection", "Countries"),
     ("/guides/", "Guides"),

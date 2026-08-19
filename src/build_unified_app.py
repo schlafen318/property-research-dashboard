@@ -44,6 +44,12 @@ SHORTLIST_REVIEW_DESCRIPTION = (
     "Request a Global Home Atlas shortlist review before speaking to agents, with a "
     "research-led route across buyer intent, budget, citizenship, risk, and holding period."
 )
+FIND_YOUR_FIT_SLUG = "find-your-fit"
+FIND_YOUR_FIT_TITLE = "Find Your Best-Fit Property Destination | Global Home Atlas"
+FIND_YOUR_FIT_DESCRIPTION = (
+    "Answer five practical questions and compare property destinations by buying goal, "
+    "budget, preferred setting, intended use, and tolerance for complexity."
+)
 REPORT_LIBRARY_SLUG = "reports"
 REPORT_LIBRARY_TITLE = "Premium Property Research Reports | Global Home Atlas"
 REPORT_LIBRARY_DESCRIPTION = (
@@ -678,6 +684,88 @@ def rank_destinations_for_goal(destinations: list[dict], goal: str) -> list[dict
     return sorted(
         ranked,
         key=lambda item: (float(item["goal_score"]), float(item.get("decision_score", 0) or 0)),
+        reverse=True,
+    )
+
+
+FIT_BUDGET_THRESHOLDS = {
+    "low": 4000,
+    "mid": 8000,
+    "high": 15000,
+    "flexible": None,
+}
+
+
+def rank_destinations_for_fit(destinations: list[dict], preferences: dict) -> list[dict]:
+    """Rank every destination for a reader's broad buying preferences."""
+    goal = preferences.get("goal", "retirement")
+    setting = preferences.get("setting", "any")
+    use = preferences.get("use", "balanced")
+    tradeoff = preferences.get("tradeoff", "balanced")
+    budget_threshold = FIT_BUDGET_THRESHOLDS.get(preferences.get("budget", "flexible"))
+    ranked = []
+
+    for destination in destinations:
+        dimensions = {
+            item["key"]: float(item.get("score", 0) or 0)
+            for item in destination.get("decision_dimensions", [])
+        }
+        goal_score = rank_destinations_for_goal([destination], goal)[0]["goal_score"]
+        setting_score = goal_score if setting == "any" else (
+            5.0 if setting in destination_location_types(destination) else 2.0
+        )
+        price = float(destination.get("usd_per_m2", 0) or 0)
+        if budget_threshold is None or not price:
+            budget_score = goal_score
+        elif price <= budget_threshold:
+            budget_score = 5.0
+        elif price <= budget_threshold * 1.25:
+            budget_score = 3.5
+        else:
+            budget_score = max(1.0, 5.0 * budget_threshold / price)
+
+        if use == "personal":
+            use_score = (dimensions.get("lifestyle_magnetism", 0) + dimensions.get("retirement_fit", 0)) / 2
+        elif use == "rental":
+            use_score = (dimensions.get("rental_profit", 0) + dimensions.get("regulatory_safety", 0)) / 2
+        else:
+            use_score = float(destination.get("decision_score", 0) or 0)
+
+        if tradeoff == "clarity":
+            tradeoff_score = (
+                dimensions.get("ownership_clarity", 0)
+                + dimensions.get("regulatory_safety", 0)
+                + dimensions.get("foreigner_fit", 0)
+            ) / 3
+        elif tradeoff == "upside":
+            tradeoff_score = (
+                dimensions.get("capital_upside", 0) + dimensions.get("rental_profit", 0)
+            ) / 2
+        else:
+            tradeoff_score = float(destination.get("decision_score", 0) or 0)
+
+        fit_score = (
+            goal_score * 0.40
+            + setting_score * 0.20
+            + budget_score * 0.15
+            + use_score * 0.15
+            + tradeoff_score * 0.10
+        )
+        enriched = dict(destination)
+        enriched["fit_score"] = round(max(0, min(fit_score, 5)), 2)
+        enriched["fit_label"] = (
+            "Strong fit" if fit_score >= 4.25 else "Worth comparing" if fit_score >= 3.6 else "Conditional fit"
+        )
+        enriched["recommendable"] = is_destination_recommendable(destination)
+        ranked.append(enriched)
+
+    return sorted(
+        ranked,
+        key=lambda item: (
+            bool(item["recommendable"]),
+            float(item["fit_score"]),
+            float(item.get("decision_score", 0) or 0),
+        ),
         reverse=True,
     )
 
@@ -1420,7 +1508,7 @@ def trust_page_links(current_slug: str | None = None) -> str:
 
 
 PRIMARY_NAV_LINKS = [
-    ("/#market-finder", "Find your fit"),
+    (f"/{FIND_YOUR_FIT_SLUG}/", "Find your fit"),
     ("/dashboard/", "Destinations"),
     ("/guides/#country-selection", "Countries"),
     ("/guides/", "Guides"),
@@ -1718,43 +1806,40 @@ def build_market_finder_data(destinations: list[dict]) -> str:
             parts = [part.strip(" .") for part in parts[0].split(" and ") if part.strip(" .")]
         return parts[:4]
 
-    routes = {
-        "retirement": [
-            ("valencia", "City life, healthcare and easy travel"),
-            ("algarve-cascais", "Established expat areas and strong services"),
-            ("madeira", "Warm weather and better value than many European islands"),
-        ],
-        "second-home": [
-            ("algarve-cascais", "Easy to visit, with services for overseas owners"),
-            ("lake-como", "Beautiful, scarce homes in a high-price market"),
-            ("mallorca", "Strong second-home demand, but check resale and rental rules"),
-        ],
-        "investment": [
-            ("fukuoka-itoshima", "Straightforward ownership and steady local demand"),
-            ("valencia", "Broad demand at a more accessible price"),
-            ("m-laga-costa-del-sol", "Strong tourism, with rental rules to check carefully"),
-        ],
-        "ownership": [
-            ("fukuoka-itoshima", "Foreign buyers can own property directly"),
-            ("valencia", "Straightforward freehold ownership in a large city market"),
-            ("algarve-cascais", "A familiar buying process for overseas owners"),
-        ],
+    dimension_reasons = {
+        "retirement_fit": "Strong retirement and long-stay fit",
+        "lifestyle_magnetism": "Strong lifestyle appeal",
+        "global_access": "Strong international access",
+        "foreigner_fit": "Practical for overseas buyers",
+        "exit_liquidity": "Stronger resale depth",
+        "ownership_clarity": "Clearer ownership pathway",
+        "rental_profit": "Stronger rental fundamentals",
+        "capital_upside": "Stronger capital-growth potential",
+        "value_entry": "More accessible entry value",
+        "regulatory_safety": "More stable operating rules",
     }
-    by_id = {dest["id"]: dest for dest in destinations}
     payload: dict[str, list[dict]] = {}
-    for route, picks in routes.items():
+    for route, weights in GOAL_DIMENSION_WEIGHTS.items():
         payload[route] = []
-        for destination_id, reason in picks:
-            dest = by_id.get(destination_id)
-            if not dest or not is_destination_recommendable(dest):
-                continue
+        ranked = rank_destinations_for_goal(destinations, route)
+        picks = [dest for dest in ranked if is_destination_recommendable(dest)][:3]
+        for dest in picks:
+            dimensions = {
+                item["key"]: float(item.get("score", 0) or 0)
+                for item in dest.get("decision_dimensions", [])
+            }
+            strongest_dimension = max(
+                weights,
+                key=lambda key: dimensions.get(key, 0) * weights[key],
+            )
+            reason = dimension_reasons[strongest_dimension]
             item = {
                 "name": dest["name"],
                 "country": dest.get("country") or "",
                 "score": f"{dest.get('decision_score', 0):.1f}",
                 "href": f"/destinations/{destination_slug(dest)}/",
                 "reason": reason,
-                "reasonBullets": bullets(reason, split_and=True),
+                "reasonBullets": bullets(reason),
                 "watch": dest.get("red_flags") or "Verify legal, tax, rental, and resale assumptions locally.",
                 "watchBullets": bullets(dest.get("red_flags") or "Verify legal, tax, rental, and resale assumptions locally."),
             }
@@ -3363,7 +3448,7 @@ def build_landing_page(
         {generated_link}
         <p class="hero-proof"><i aria-hidden="true">✓</i> Independent research. Not paid placement.</p>
         <div class="hero-actions">
-          <a class="primary-action" href="#market-finder" data-track="homepage_start_click" data-track-label="hero">Find my best-fit destinations</a>
+          <a class="primary-action" href="/{FIND_YOUR_FIT_SLUG}/" data-track="homepage_start_click" data-track-label="hero">Find my best-fit destinations</a>
           <a class="text-action" href="#countries" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
           <a class="text-action" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="hero">Calculate retirement needs</a>
           <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
@@ -3393,8 +3478,7 @@ def build_landing_page(
                 <option value="ownership">Straightforward ownership</option>
               </select>
             </label>
-            <a class="secondary-action" href="/dashboard/" data-track="dashboard_open" data-track-label="market finder panel">Compare all destinations</a>
-            <a class="text-action" id="finderGuide" href="/best-places-to-buy-property-abroad-for-retirement/" data-track="guide_click" data-track-label="market finder guide">Read the guide for this goal</a>
+            <a class="secondary-action" id="finderDetailed" href="/{FIND_YOUR_FIT_SLUG}/?goal=retirement" data-track="fit_finder_open" data-track-label="market finder panel">Refine these matches</a>
           </div>
           <div class="finder-output">
             <p class="finder-step">2. Compare your matches</p>
@@ -3478,13 +3562,7 @@ def build_landing_page(
       const finderData = {build_market_finder_data(destinations)};
       const select = document.getElementById("finderGoal");
       const results = document.getElementById("finderResults");
-      const guide = document.getElementById("finderGuide");
-      const guideRoutes = {{
-        retirement: "/best-places-to-buy-property-abroad-for-retirement/",
-        "second-home": "/best-places-to-buy-a-second-home-abroad/",
-        investment: "/overseas-property-investment/",
-        ownership: "/where-can-foreigners-buy-property/"
-      }};
+      const detailed = document.getElementById("finderDetailed");
       function escapeHtml(value) {{
         return String(value || "").replace(/[&<>"']/g, (char) => ({{
           "&": "&amp;",
@@ -3505,7 +3583,7 @@ def build_landing_page(
         if (!select || !results) return;
         const route = select.value;
         const picks = finderData[route] || [];
-        if (guide) guide.href = guideRoutes[route] || "/guides/";
+        if (detailed) detailed.href = "/find-your-fit/?goal=" + encodeURIComponent(route);
         results.innerHTML = picks.map((item, index) => `
           <article class="finder-result">
             ${{finderThumbnail(item)}}
@@ -3925,6 +4003,328 @@ def split_rankings(
     return rankings[:visible_count], rankings[visible_count:]
 
 
+def build_find_your_fit_page(destinations: list[dict]) -> str:
+    payload_destinations = []
+    for destination in destinations:
+        dimensions = {
+            item["key"]: float(item.get("score", 0) or 0)
+            for item in destination.get("decision_dimensions", [])
+        }
+        image_assets = destination_image_assets(destination)
+        payload_destinations.append(
+            {
+                "id": destination["id"],
+                "name": destination["name"],
+                "country": destination.get("country") or "",
+                "href": f"/destinations/{destination_slug(destination)}/",
+                "price": float(destination.get("usd_per_m2", 0) or 0),
+                "yield": yield_range_label(destination.get("net_yield_estimate")),
+                "decisionScore": float(destination.get("decision_score", 0) or 0),
+                "locationTypes": destination_location_types(destination),
+                "goalScores": {
+                    goal: rank_destinations_for_goal([destination], goal)[0]["goal_score"]
+                    for goal in GOAL_DIMENSION_WEIGHTS
+                },
+                "dimensions": dimensions,
+                "recommendable": is_destination_recommendable(destination),
+                "watch": destination.get("access_summary")
+                if not is_destination_recommendable(destination)
+                else destination.get("red_flags")
+                or destination.get("main_risk")
+                or "Verify current ownership, tax, rental, and resale assumptions locally.",
+                "image": image_assets["webp_600"],
+                "imageAlt": image_assets["alt"],
+            }
+        )
+
+    payload = json.dumps(
+        {
+            "destinations": payload_destinations,
+            "universeCount": len(payload_destinations),
+            "budgetThresholds": FIT_BUDGET_THRESHOLDS,
+        },
+        ensure_ascii=False,
+    ).replace("</", "<\\/")
+    canonical = page_url(FIND_YOUR_FIT_SLUG)
+    schema = [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "Find your destination fit",
+            "url": canonical,
+            "description": FIND_YOUR_FIT_DESCRIPTION,
+            "dateModified": date.today().isoformat(),
+        },
+    ]
+    html = """<!doctype html>
+<html lang="en">
+<head>
+__HEAD__
+  <style>
+    :root { color: #24312d; background: #f5f1e9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#24312d; --muted:#66766f; --line:rgba(36,49,45,.15); --paper:#fffdf7; --sage:#c7d3c2; --green:#5f7f72; --gold:#a98a4b; }
+    * { box-sizing: border-box; }
+    html, body { overflow-x: hidden; }
+    body { margin: 0; min-width: 320px; }
+    a { color: var(--green); text-underline-offset: 3px; }
+    p, li { line-height: 1.55; }
+    button, input { font: inherit; }
+    .page-shell { width: min(1080px, calc(100% - 32px)); margin: 0 auto; }
+    .fit-hero { padding: 18px 0 54px; background: linear-gradient(120deg, #fffdf7 0 58%, #e7eee8); }
+    .page-nav { display:flex; align-items:center; justify-content:space-between; gap:18px; margin-bottom:62px; }
+    .page-brand { display:flex; align-items:center; text-decoration:none; }
+    .primary-brand-logo { width:174px; max-width:48vw; display:block; }
+    .page-nav-links { display:flex; gap:18px; flex-wrap:wrap; }
+    .page-nav-links a { color:rgba(36,49,45,.76); font-size:13px; font-weight:800; text-decoration:none; }
+    .mobile-menu { display:none; position:relative; }
+    .mobile-menu summary { min-height:42px; display:inline-flex; align-items:center; padding:0 13px; border:1px solid var(--line); border-radius:6px; font-weight:800; list-style:none; cursor:pointer; }
+    .mobile-menu summary::-webkit-details-marker { display:none; }
+    .mobile-menu nav { position:absolute; right:0; top:48px; z-index:20; width:260px; display:grid; gap:4px; padding:10px; border:1px solid var(--line); border-radius:8px; background:var(--paper); box-shadow:0 18px 44px rgba(36,49,45,.14); }
+    .mobile-menu nav a { padding:10px; color:var(--ink); font-weight:800; text-decoration:none; }
+    .eyebrow { margin:0 0 10px; color:#806738; font-size:12px; font-weight:900; letter-spacing:.1em; text-transform:uppercase; }
+    h1 { max-width:760px; margin:0; font-family:Georgia,serif; font-size:clamp(42px,7vw,78px); line-height:.96; }
+    .lede { max-width:720px; margin:20px 0 0; color:#46554f; font-size:19px; }
+    main { padding:34px 0 64px; }
+    .fit-layout { display:grid; grid-template-columns:minmax(0, .9fr) minmax(280px, .45fr); gap:24px; align-items:start; }
+    .fit-panel, .fit-note, .fit-results { border:1px solid var(--line); border-radius:10px; background:var(--paper); box-shadow:0 16px 42px rgba(36,49,45,.07); }
+    .fit-panel { padding:28px; }
+    .fit-progress { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:24px; color:var(--muted); font-size:13px; font-weight:800; }
+    .fit-progress span { flex:1; height:5px; overflow:hidden; border-radius:9px; background:#e6e6df; }
+    .fit-progress i { display:block; width:20%; height:100%; background:var(--green); transition:width .2s ease; }
+    fieldset { min-width:0; margin:0; padding:0; border:0; }
+    legend { max-width:680px; margin-bottom:8px; font-family:Georgia,serif; font-size:clamp(27px,4vw,38px); font-weight:700; line-height:1.05; }
+    .question-help { margin:0 0 20px; color:var(--muted); }
+    .choice-list { display:grid; gap:9px; }
+    .choice { position:relative; display:grid; grid-template-columns:auto 1fr; gap:12px; align-items:start; padding:14px; border:1px solid var(--line); border-radius:8px; cursor:pointer; }
+    .choice:has(input:checked) { border-color:var(--green); background:#eef4ef; box-shadow:inset 0 0 0 1px var(--green); }
+    .choice input { margin-top:3px; accent-color:var(--green); }
+    .choice strong { display:block; }
+    .choice small { display:block; margin-top:3px; color:var(--muted); line-height:1.4; }
+    .fit-actions { display:flex; justify-content:space-between; gap:12px; margin-top:24px; }
+    .fit-actions button, .results-actions a, .results-actions button { min-height:44px; display:inline-flex; align-items:center; justify-content:center; padding:0 15px; border:1px solid var(--line); border-radius:6px; background:var(--paper); color:var(--ink); font-weight:800; text-decoration:none; cursor:pointer; }
+    .fit-actions .primary, .results-actions .primary { border-color:var(--green); background:var(--green); color:#fff; }
+    .fit-note { padding:22px; }
+    .fit-note p { margin:0; color:#46554f; }
+    .fit-results { grid-column:1 / -1; padding:28px; }
+    .fit-results[hidden], [hidden] { display:none !important; }
+    .results-header { display:flex; align-items:end; justify-content:space-between; gap:20px; margin-bottom:20px; }
+    .results-header h2 { margin:0; font-family:Georgia,serif; font-size:clamp(30px,5vw,48px); }
+    .results-header p { margin:8px 0 0; color:var(--muted); }
+    .fit-result-list { display:grid; gap:12px; }
+    .fit-result { display:grid; grid-template-columns:132px minmax(0,1fr) 150px; gap:18px; align-items:start; padding:16px; border:1px solid var(--line); border-radius:9px; background:#fff; }
+    .fit-result img { width:132px; height:96px; object-fit:cover; border-radius:6px; filter:saturate(.82); }
+    .fit-result h3 { margin:0 0 4px; font-size:22px; }
+    .fit-result h3 a { color:var(--ink); text-decoration:none; }
+    .fit-result .place { margin:0 0 10px; color:var(--muted); font-size:14px; }
+    .fit-result ul { margin:0; padding-left:18px; color:#42514b; }
+    .fit-result .watch { margin:9px 0 0; color:#6c4f43; font-size:13px; }
+    .fit-result__facts { display:grid; gap:9px; }
+    .fit-result__facts span { color:var(--muted); font-size:11px; font-weight:900; letter-spacing:.06em; text-transform:uppercase; }
+    .fit-result__facts strong { display:block; margin-top:2px; }
+    .fit-label { color:#365f52; }
+    .other-results { margin-top:18px; border-top:1px solid var(--line); padding-top:16px; }
+    .other-results summary { cursor:pointer; font-weight:850; }
+    .other-results ol { columns:2; gap:36px; padding-left:24px; }
+    .other-results li { break-inside:avoid; padding:5px 0; }
+    .other-results small { color:var(--muted); }
+    .restriction-note { margin:14px 0 0; color:#6c4f43; font-size:13px; }
+    .results-actions { display:flex; flex-wrap:wrap; gap:10px; margin-top:22px; }
+    .page-footer { padding:28px 0 46px; border-top:1px solid var(--line); color:var(--muted); }
+    @media(max-width:760px) {
+      .page-nav-links { display:none; } .mobile-menu { display:block; }
+      .fit-layout { grid-template-columns:1fr; } .fit-note { order:-1; }
+      .fit-panel, .fit-results { padding:20px; }
+      .fit-result { grid-template-columns:88px minmax(0,1fr); }
+      .fit-result img { width:88px; height:78px; }
+      .fit-result__facts { grid-column:1 / -1; grid-template-columns:repeat(3,1fr); }
+      .other-results ol { columns:1; }
+    }
+    @media(max-width:480px) {
+      .page-shell { width:min(1080px, calc(100% - 24px)); }
+      .fit-hero { padding-bottom:38px; } .page-nav { margin-bottom:44px; }
+      h1 { font-size:40px; }
+      .lede { font-size:16px; }
+      .fit-result { grid-template-columns:1fr; }
+      .fit-result img { width:100%; height:150px; }
+      .fit-result__facts { grid-column:auto; }
+      .results-header { display:block; }
+    }
+  </style>
+</head>
+<body>
+  <header class="fit-hero">
+    <div class="page-shell">
+__PRIMARY_NAV__
+      <h1>Find your destination fit</h1>
+      <p class="lede">Tell us what the property needs to do for you. We will evaluate every destination currently in the Atlas and explain which ones deserve a closer look.</p>
+    </div>
+  </header>
+  <main>
+    <div class="page-shell fit-layout">
+      <section class="fit-panel" id="fitQuestionnaire">
+        <div class="fit-progress"><span><i id="fitProgressBar"></i></span><b id="fitProgressText">Question 1 of 5</b></div>
+        <form id="fitForm">
+          <fieldset data-fit-step="0">
+            <legend>What are you buying for?</legend>
+            <p class="question-help">This sets the strongest priorities in your match.</p>
+            <div class="choice-list">
+              <label class="choice"><input type="radio" name="goal" value="retirement" checked><span><strong>Retirement or lifestyle base</strong><small>Daily life, healthcare, access and long-stay comfort.</small></span></label>
+              <label class="choice"><input type="radio" name="goal" value="second-home"><span><strong>Second home</strong><small>Repeat visits, lifestyle appeal, access and resale depth.</small></span></label>
+              <label class="choice"><input type="radio" name="goal" value="investment"><span><strong>Investment-led purchase</strong><small>Rental realism, capital upside, value and exit liquidity.</small></span></label>
+              <label class="choice"><input type="radio" name="goal" value="ownership"><span><strong>Straightforward ownership</strong><small>Clear title, foreign-buyer access and regulatory stability.</small></span></label>
+            </div>
+          </fieldset>
+          <fieldset data-fit-step="1" hidden>
+            <legend>What is your approximate purchase budget?</legend>
+            <p class="question-help">This is an early market screen based on each destination's price-per-square-metre guide, not a listing quote.</p>
+            <div class="choice-list">
+              <label class="choice"><input type="radio" name="budget" value="low" checked><span><strong>Under roughly $300,000</strong><small>Prioritise markets near or below $4,000/m².</small></span></label>
+              <label class="choice"><input type="radio" name="budget" value="mid"><span><strong>Roughly $300,000–$600,000</strong><small>Consider markets up to about $8,000/m².</small></span></label>
+              <label class="choice"><input type="radio" name="budget" value="high"><span><strong>Roughly $600,000–$1.2 million</strong><small>Consider markets up to about $15,000/m².</small></span></label>
+              <label class="choice"><input type="radio" name="budget" value="flexible"><span><strong>Flexible or above $1.2 million</strong><small>Do not use price as a strong screen.</small></span></label>
+            </div>
+          </fieldset>
+          <fieldset data-fit-step="2" hidden>
+            <legend>What kind of setting feels right?</legend>
+            <p class="question-help">Destinations can belong to more than one setting.</p>
+            <div class="choice-list">
+              <label class="choice"><input type="radio" name="setting" value="any" checked><span><strong>No strong preference</strong><small>Let the other answers lead.</small></span></label>
+              <label class="choice"><input type="radio" name="setting" value="city"><span><strong>City</strong><small>Services, transport and year-round daily life.</small></span></label>
+              <label class="choice"><input type="radio" name="setting" value="coast-island"><span><strong>Coast or island</strong><small>Water access, warm-weather use and holiday appeal.</small></span></label>
+              <label class="choice"><input type="radio" name="setting" value="mountain"><span><strong>Mountain</strong><small>Outdoor access, seasons and resort-market dynamics.</small></span></label>
+              <label class="choice"><input type="radio" name="setting" value="lake"><span><strong>Lake</strong><small>Waterside living with a mountain or regional setting.</small></span></label>
+            </div>
+          </fieldset>
+          <fieldset data-fit-step="3" hidden>
+            <legend>How will you use the property?</legend>
+            <p class="question-help">This changes how much lifestyle or rental fundamentals matter.</p>
+            <div class="choice-list">
+              <label class="choice"><input type="radio" name="use" value="personal" checked><span><strong>Mainly personal use</strong><small>Prioritise lifestyle quality and long-stay comfort.</small></span></label>
+              <label class="choice"><input type="radio" name="use" value="balanced"><span><strong>Personal use with some rental offset</strong><small>Balance daily appeal with realistic operating economics.</small></span></label>
+              <label class="choice"><input type="radio" name="use" value="rental"><span><strong>Mainly rental income</strong><small>Give more weight to rental profit and regulatory safety.</small></span></label>
+            </div>
+          </fieldset>
+          <fieldset data-fit-step="4" hidden>
+            <legend>Which trade-off matters most?</legend>
+            <p class="question-help">No market is frictionless. Choose what should break a close tie.</p>
+            <div class="choice-list">
+              <label class="choice"><input type="radio" name="tradeoff" value="clarity" checked><span><strong>Ownership clarity</strong><small>Prefer simpler legal pathways and more stable operating rules.</small></span></label>
+              <label class="choice"><input type="radio" name="tradeoff" value="balanced"><span><strong>Balanced fundamentals</strong><small>Keep the Atlas's overall decision model as the tie-breaker.</small></span></label>
+              <label class="choice"><input type="radio" name="tradeoff" value="upside"><span><strong>Income and upside</strong><small>Accept more market complexity for stronger return potential.</small></span></label>
+            </div>
+          </fieldset>
+          <div class="fit-actions"><button type="button" id="fitBack" hidden>Back</button><button type="button" class="primary" id="fitNext">Continue</button><button type="submit" class="primary" id="fitSubmit" hidden>See my matches</button></div>
+        </form>
+      </section>
+      <aside class="fit-note">
+        <p><strong>All __DESTINATION_COUNT__ current destinations are evaluated.</strong> Restricted markets stay out of the recommended five. Your answers remain in this browser.</p>
+      </aside>
+      <section class="fit-results" id="fitResults" hidden data-universe-count="__DESTINATION_COUNT__">
+        <div class="results-header"><div><h2>Five destinations to compare</h2><p id="fitResultSummary"></p></div></div>
+        <div class="fit-result-list" id="fitResultList"></div>
+        <details class="other-results" id="fitOtherResults"><summary id="fitOtherSummary">Other destinations considered</summary><ol id="fitOtherList"></ol></details>
+        <p class="restriction-note" id="fitRestrictionNote"></p>
+        <div class="results-actions"><button type="button" id="fitEdit">Edit my answers</button><a class="primary" href="/dashboard/">Explore all destinations</a></div>
+      </section>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="page-shell"><strong>Global Home Atlas</strong><p>Research guidance only. Verify current legal, tax, immigration, financing, insurance, and property details locally.</p></div></footer>
+  <script type="application/json" id="fit-data">__FIT_DATA__</script>
+  <script>
+    (() => {
+      const data = JSON.parse(document.getElementById("fit-data").textContent);
+      const form = document.getElementById("fitForm");
+      const questionnaire = document.getElementById("fitQuestionnaire");
+      const steps = Array.from(form.querySelectorAll("[data-fit-step]"));
+      const back = document.getElementById("fitBack");
+      const next = document.getElementById("fitNext");
+      const submit = document.getElementById("fitSubmit");
+      const results = document.getElementById("fitResults");
+      let activeStep = 0;
+      const locationLabels = { city:"city setting", "coast-island":"coast or island setting", mountain:"mountain setting", lake:"lake setting" };
+      const dimensionLabels = { lifestyle_magnetism:"lifestyle appeal", global_access:"international access", ownership_clarity:"ownership clarity", regulatory_safety:"regulatory safety", rental_profit:"rental fundamentals", capital_upside:"capital upside", retirement_fit:"long-stay comfort", exit_liquidity:"resale depth", foreigner_fit:"foreigner practicality", value_entry:"value at entry" };
+      const goalLabels = { retirement:"retirement or lifestyle", "second-home":"second-home use", investment:"investment-led buying", ownership:"clear ownership" };
+
+      function escapeHtml(value) {
+        return String(value || "").replace(/[&<>"']/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[char]));
+      }
+      function showStep(index) {
+        activeStep = Math.max(0, Math.min(index, steps.length - 1));
+        steps.forEach((step, stepIndex) => { step.hidden = stepIndex !== activeStep; });
+        back.hidden = activeStep === 0;
+        next.hidden = activeStep === steps.length - 1;
+        submit.hidden = activeStep !== steps.length - 1;
+        document.getElementById("fitProgressText").textContent = `Question ${activeStep + 1} of ${steps.length}`;
+        document.getElementById("fitProgressBar").style.width = `${((activeStep + 1) / steps.length) * 100}%`;
+      }
+      function values() { return Object.fromEntries(new FormData(form).entries()); }
+      function average(item, keys) { return keys.reduce((sum, key) => sum + Number(item.dimensions[key] || 0), 0) / keys.length; }
+      function scoreItem(item, answers) {
+        const goalScore = Number(item.goalScores[answers.goal] || item.decisionScore || 0);
+        const settingScore = answers.setting === "any" ? goalScore : (item.locationTypes.includes(answers.setting) ? 5 : 2);
+        const threshold = data.budgetThresholds[answers.budget];
+        let budgetScore = goalScore;
+        if (threshold && item.price) {
+          if (item.price <= threshold) budgetScore = 5;
+          else if (item.price <= threshold * 1.25) budgetScore = 3.5;
+          else budgetScore = Math.max(1, 5 * threshold / item.price);
+        }
+        const useScore = answers.use === "personal" ? average(item, ["lifestyle_magnetism", "retirement_fit"]) : answers.use === "rental" ? average(item, ["rental_profit", "regulatory_safety"]) : item.decisionScore;
+        const tradeoffScore = answers.tradeoff === "clarity" ? average(item, ["ownership_clarity", "regulatory_safety", "foreigner_fit"]) : answers.tradeoff === "upside" ? average(item, ["capital_upside", "rental_profit"]) : item.decisionScore;
+        const fitScore = Math.max(0, Math.min(5, goalScore * .4 + settingScore * .2 + budgetScore * .15 + useScore * .15 + tradeoffScore * .1));
+        return { ...item, fitScore, fitLabel: fitScore >= 4.25 ? "Strong fit" : fitScore >= 3.6 ? "Worth comparing" : "Conditional fit", budgetScore };
+      }
+      function reasons(item, answers) {
+        const output = [`Strong relative fit for ${goalLabels[answers.goal]}.`];
+        if (answers.setting !== "any" && item.locationTypes.includes(answers.setting)) output.push(`Matches your preferred ${locationLabels[answers.setting]}.`);
+        if (item.budgetScore >= 3.5) output.push("Fits the broad price screen you selected.");
+        const strongest = Object.entries(item.dimensions).sort((a,b) => b[1] - a[1])[0];
+        if (strongest) output.push(`One of its strongest signals is ${dimensionLabels[strongest[0]] || strongest[0]}.`);
+        return output.slice(0, 3);
+      }
+      function resultCard(item, index, answers) {
+        return `<article class="fit-result"><img src="${escapeHtml(item.image)}" alt="${escapeHtml(item.imageAlt)}" width="600" height="400" loading="lazy" decoding="async"><div><h3><a href="${escapeHtml(item.href)}">${index + 1}. ${escapeHtml(item.name)}</a></h3><p class="place">${escapeHtml(item.country)}</p><ul>${reasons(item, answers).map((reason) => `<li>${escapeHtml(reason)}</li>`).join("")}</ul><p class="watch"><strong>Watch:</strong> ${escapeHtml(item.watch)}</p></div><div class="fit-result__facts"><div><span>Fit</span><strong class="fit-label">${escapeHtml(item.fitLabel)}</strong></div><div><span>Price guide</span><strong>${item.price ? "$" + Number(item.price).toLocaleString() + "/m²" : "n/a"}</strong></div><div><span>Net yield</span><strong>${escapeHtml(item.yield)}</strong></div></div></article>`;
+      }
+      function renderResults() {
+        const answers = values();
+        const ranked = data.destinations.map((item) => scoreItem(item, answers)).sort((a,b) => Number(b.recommendable) - Number(a.recommendable) || b.fitScore - a.fitScore || b.decisionScore - a.decisionScore);
+        const top = ranked.filter((item) => item.recommendable).slice(0, 5);
+        const topIds = new Set(top.map((item) => item.id));
+        const others = ranked.filter((item) => !topIds.has(item.id));
+        const restricted = ranked.filter((item) => !item.recommendable);
+        document.getElementById("fitResultList").innerHTML = top.map((item, index) => resultCard(item, index, answers)).join("");
+        document.getElementById("fitResultSummary").textContent = `${data.universeCount} destinations evaluated for ${goalLabels[answers.goal]}. Fit labels are directional research guidance, not investment scores.`;
+        document.getElementById("fitOtherSummary").textContent = `${others.length} other destinations considered`;
+        document.getElementById("fitOtherList").innerHTML = others.map((item) => `<li><a href="${escapeHtml(item.href)}">${escapeHtml(item.name)}</a> <small>— ${escapeHtml(item.recommendable ? item.fitLabel : "buyer access restricted")}</small></li>`).join("");
+        document.getElementById("fitRestrictionNote").textContent = restricted.length ? `${restricted.length} destinations were evaluated but kept out of the recommended five because current foreign-buyer access is restricted.` : "";
+        questionnaire.hidden = true;
+        results.hidden = false;
+        results.scrollIntoView({ behavior:"smooth", block:"start" });
+        if (window.GHA) window.GHA.track("fit_finder_complete", { goal:answers.goal, budget:answers.budget, setting:answers.setting, use:answers.use, tradeoff:answers.tradeoff, universe_count:data.universeCount });
+      }
+      next.addEventListener("click", () => showStep(activeStep + 1));
+      back.addEventListener("click", () => showStep(activeStep - 1));
+      form.addEventListener("submit", (event) => { event.preventDefault(); renderResults(); });
+      document.getElementById("fitEdit").addEventListener("click", () => { results.hidden = true; questionnaire.hidden = false; showStep(0); questionnaire.scrollIntoView({ behavior:"smooth", block:"start" }); });
+      const requestedGoal = new URLSearchParams(location.search).get("goal");
+      const goalInput = requestedGoal && form.querySelector(`input[name="goal"][value="${CSS.escape(requestedGoal)}"]`);
+      if (goalInput) goalInput.checked = true;
+      showStep(0);
+    })();
+  </script>
+__ANALYTICS__
+</body>
+</html>
+"""
+    return (
+        html.replace("__HEAD__", head_html(FIND_YOUR_FIT_TITLE, FIND_YOUR_FIT_DESCRIPTION, canonical, schema).strip())
+        .replace("__PRIMARY_NAV__", primary_nav_html().strip())
+        .replace("__DESTINATION_COUNT__", str(len(destinations)))
+        .replace("__FIT_DATA__", payload)
+        .replace("__ANALYTICS__", analytics_event_script())
+    )
+
+
 def retirement_calculator_callout(css_class: str) -> str:
     return f"""
       <section class="{escape(css_class)}">
@@ -4030,7 +4430,7 @@ __HEAD__
 </head>
 <body>
   <header class="calc-hero"><div class="calc-shell">
-    <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/#market-finder">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/guides/#country-selection">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
+    <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/find-your-fit/">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/guides/#country-selection">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
     <p class="eyebrow">International retirement planning tool</p><h1>Retirement Abroad Calculator</h1>
     <p class="lede">Estimate comfortable destination spending in today's dollars, project it to retirement, subtract reliable pension and non-portfolio income, and separate the liquid portfolio, property capital, and reserve you may need.</p>
   </div></header>
@@ -8009,6 +8409,12 @@ def build() -> Path:
     dashboard_dir.mkdir(parents=True, exist_ok=True)
     (dashboard_dir / "index.html").write_text(dashboard_html, encoding="utf-8")
     copy_site_assets()
+    fit_finder_dir = ARTIFACTS / FIND_YOUR_FIT_SLUG
+    fit_finder_dir.mkdir(parents=True, exist_ok=True)
+    (fit_finder_dir / "index.html").write_text(
+        clean_generated_html(build_find_your_fit_page(destinations)),
+        encoding="utf-8",
+    )
     guide_hub_dir = ARTIFACTS / GUIDE_HUB_SLUG
     guide_hub_dir.mkdir(parents=True, exist_ok=True)
     (guide_hub_dir / "index.html").write_text(
@@ -8118,6 +8524,7 @@ Sitemap: {SITE_URL}sitemap.xml
     indexnow_key_file.write_text(f"{INDEXNOW_KEY}\n", encoding="utf-8")
     sitemap_urls = [
         (SITE_URL, "1.0"),
+        (page_url(FIND_YOUR_FIT_SLUG), "0.94"),
         (page_url("dashboard"), "0.92"),
         (page_url(SHORTLIST_REVIEW_SLUG), "0.90"),
         (page_url(REPORT_LIBRARY_SLUG), "0.88"),
