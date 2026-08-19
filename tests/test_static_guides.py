@@ -13,17 +13,20 @@ class GuideHubIndexingTests(unittest.TestCase):
     def guide_text(self) -> str:
         return re.sub(r"\s+", " ", GUIDE_HUB.read_text(encoding="utf-8"))
 
-    def test_guide_hub_exposes_approved_p1_growth_routes(self) -> None:
+    def test_guide_hub_routes_readers_without_exposing_internal_seo_program_copy(self) -> None:
         text = self.guide_text()
 
-        self.assertIn("Approved P1 buyer paths", text)
-        self.assertIn("Vacation-home buyers", text)
-        self.assertIn("Foreign and expat buyers", text)
-        self.assertIn("Guides indexing fix", text)
+        self.assertIn("Find the right guide for your purchase", text)
+        self.assertIn("Retirement or lifestyle base", text)
+        self.assertIn("Second home abroad", text)
+        self.assertIn("Investment-led shortlist", text)
+        self.assertIn("Ownership and risk first", text)
+        self.assertNotIn("Approved P1 buyer paths", text)
+        self.assertNotIn("Issue #", text)
+        self.assertNotIn("Google is starting to index", text)
         self.assertIn('/best-places-to-buy-vacation-home-abroad/"', text)
         self.assertIn('/best-countries-for-expats-to-buy-property/"', text)
         self.assertIn('/best-countries-to-buy-property-as-a-foreigner/"', text)
-        self.assertIn('/guides/#choose-journey"', text)
 
 
 if __name__ == "__main__":

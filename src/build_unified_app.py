@@ -4680,7 +4680,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     clusters = [
         (
             "Getting Started",
-            "Core frameworks for buyers shaping the job of the property before choosing countries, agents, or individual homes.",
+            "Start here if you are defining the role of the property and the markets worth researching before speaking with agents.",
             [
                 "buy-property-abroad",
                 "best-countries-to-buy-property-as-a-foreigner",
@@ -4689,7 +4689,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
         ),
         (
             "Retirement",
-            "Pages for buyers testing long-stay livability, healthcare practicality, family use, and future retirement optionality.",
+            "Research long-stay livability, healthcare practicality, family use, and the flexibility to retire there later.",
             [
                 RETIREMENT_DESTINATIONS_SLUG,
                 "best-places-to-buy-property-abroad-for-retirement",
@@ -4699,7 +4699,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
         ),
         (
             "Second Homes",
-            "Shortlist paths for seasonal use, family travel, repeat access, vacation rental offset, and future resale flexibility.",
+            "Compare seasonal use, family travel, repeat access, realistic rental offset, and future resale flexibility.",
             [
                 "best-places-to-buy-a-second-home-abroad",
                 "best-places-to-buy-vacation-home-abroad",
@@ -4708,7 +4708,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
         ),
         (
             "Risk",
-            "Risk-first research for buyers who want to understand what can break before they commit time or capital.",
+            "Understand the ownership, regulatory, income, and exit risks that deserve attention before capital is committed.",
             [
                 "foreign-property-investment-risks",
                 "thailand-villa-ownership-foreigners",
@@ -4716,8 +4716,8 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
             ],
         ),
         (
-            "Country Selection",
-            "Country and region comparisons for buyers narrowing jurisdictions before local legal and tax work.",
+            "Country Comparisons",
+            "Compare jurisdictions before moving on to local legal, tax, and property-specific diligence.",
             [
                 "portugal-vs-spain-retirement-property",
                 "greece-vs-portugal-retirement-property",
@@ -4726,7 +4726,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
         ),
         (
             "Investment",
-            "Investment-oriented screens for buyers comparing yield realism, exit liquidity, value entry, and governance risk.",
+            "Test yield realism, entry value, governance risk, and exit liquidity alongside lifestyle value.",
             [
                 "overseas-property-investment",
                 "best-places-to-buy-property-in-europe",
@@ -4763,30 +4763,28 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
 {head_html(GUIDE_HUB_TITLE, GUIDE_HUB_DESCRIPTION, canonical, schema_for_guide_hub(canonical, pages))}
   <style>
 {shared_content_css()}
-    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 18px; }}
-    .journey-card {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; text-decoration: none; }}
+    .guide-hub-intro {{ max-width: 780px; }}
+    .guide-hub-intro h2 {{ margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(27px, 4vw, 42px); line-height: 1.04; }}
+    .guide-hub-intro p {{ margin: 0; color: #3f4d48; }}
+    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 22px; }}
+    .journey-card {{ min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fff; text-decoration: none; transition: transform .18s ease, box-shadow .18s ease; }}
+    .journey-card:hover {{ transform: translateY(-2px); box-shadow: 0 14px 28px rgba(36, 49, 45, .10); }}
     .journey-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .journey-card strong {{ display: block; margin: 8px 0 6px; color: var(--ink); font-size: 18px; line-height: 1.14; }}
     .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }}
-    .priority-route {{ display: grid; gap: 18px; }}
-    .route-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
-    .approved-paths {{ display: grid; gap: 12px; }}
-    .approved-paths__grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }}
-    .approved-path-card {{ min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fff; }}
-    .approved-path-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
-    .approved-path-card h3 {{ margin: 8px 0; font-size: 20px; line-height: 1.14; }}
-    .approved-path-card p {{ margin: 0 0 12px; color: var(--muted); font-size: 14px; line-height: 1.5; }}
-    .approved-path-card nav {{ display: grid; gap: 8px; }}
-    .approved-path-card nav a {{ font-weight: 850; }}
-    .conversion-strip {{ display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 18px; border: 1px solid rgba(95, 127, 114, .24); border-radius: 8px; background: #eef4ec; }}
-    .conversion-strip h2, .conversion-strip h3 {{ margin: 0 0 6px; font-family: Georgia, "Times New Roman", serif; font-size: 24px; line-height: 1.08; }}
-    .conversion-strip p {{ margin: 0; color: var(--muted); }}
+    .featured-guides {{ display: grid; gap: 18px; }}
+    .featured-guides .page-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
+    .featured-guides .page-card {{ background: linear-gradient(180deg, #fffdf7, #f4eee2); }}
+    .reader-note {{ padding: 18px 0 0; border-top: 1px solid var(--line); }}
+    .reader-note p {{ max-width: 760px; margin: 0; color: var(--muted); }}
+    .guide-catalog > h2 {{ margin-bottom: 8px; }}
+    .guide-catalog > p {{ max-width: 740px; margin-top: 0; }}
     .page-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
     .page-card p strong {{ color: var(--ink); }}
     .page-card p:last-child {{ display: grid; gap: 6px; }}
     .page-card p:last-child a {{ margin-right: 8px; font-size: 13px; font-weight: 800; }}
-    @media (max-width: 860px) {{ .journey-grid, .route-grid, .approved-paths__grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .conversion-strip {{ grid-template-columns: 1fr; }} }}
-    @media (max-width: 560px) {{ .journey-grid, .route-grid, .approved-paths__grid {{ grid-template-columns: 1fr; }} }}
+    @media (max-width: 860px) {{ .journey-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .featured-guides .page-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
+    @media (max-width: 560px) {{ .journey-grid, .featured-guides .page-grid {{ grid-template-columns: 1fr; }} }}
   </style>
 </head>
 <body>
@@ -4795,86 +4793,29 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
       {primary_nav_html()}
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">Buyer guide hub · updated {updated}</p>
+          <p class="page-eyebrow">Independent research for global home buyers · updated {updated}</p>
           <h1>Global Property Buying Guides</h1>
-          <p class="page-lede">{GUIDE_HUB_DESCRIPTION} Use this hub to move from broad intent to a shortlist that can survive legal review, long-term lifestyle use, and resale scrutiny.</p>
+          <p class="page-lede">Find a practical starting point for buying property abroad—then compare destinations with ownership, lifestyle, income, and resale in view.</p>
         </div>
         <aside class="page-hero-card">
-          <span>Guide pages</span><strong>{len(pages)}</strong>
-          <span>Destinations linked</span><strong>{len(destinations)}</strong>
-          <span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong>
+          <span>A better starting point</span>
+          <strong>Start with the decision, not the destination.</strong>
+          <p>Choose the role the property needs to play, then use the linked guides to narrow your shortlist before local diligence.</p>
         </aside>
       </div>
     </div>
   </header>
   <main>
     <div class="page-shell">
-      <section class="page-stats" aria-label="Guide hub metrics">
-        <div><span>Primary job</span><strong>Choose a destination</strong></div>
-        <div><span>Buyer type</span><strong>Global citizen</strong></div>
-        <div><span>Risk lens</span><strong>Ownership first</strong></div>
-        <div><span>Updated</span><strong>{updated}</strong></div>
-      </section>
-      {sticky_page_nav([("Start", "getting-started"), ("Retirement", "retirement"), ("Second homes", "second-homes"), ("Risk", "risk"), ("Countries", "country-selection"), ("Investment", "investment")])}
+      {sticky_page_nav([("Choose a route", "choose-journey"), ("Essentials", "essential-guides"), ("Retirement", "retirement"), ("Second homes", "second-homes"), ("Risk", "risk"), ("Countries", "country-comparisons")])}
       {trust_brief_html()}
       <div class="page-layout">
         <article class="page-article">
-          {retirement_calculator_callout("page-section")}
-          <section class="page-section priority-route" id="priority-route">
-            <div>
-              <h2>Start with the strongest route</h2>
-              <p>Google is starting to index the Atlas, so the first job is to route buyers into the highest-intent pages: foreign-buyer access, retirement property fit, and risk screening. Use these before comparing individual homes.</p>
-            </div>
-            <div class="route-grid">{priority_route_links}</div>
-            <div class="conversion-strip">
-              <div>
-                <h3>Ready to turn research into a shortlist?</h3>
-                <p>Use the dashboard to compare destinations, then request a shortlist review once buyer intent, budget, and holding period are clear.</p>
-              </div>
-              <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub priority route">Review my shortlist</a>
-            </div>
-          </section>
-          <section class="page-section approved-paths" id="approved-p1-paths">
-            <div>
-              <h2>Approved P1 buyer paths</h2>
-              <p>These are the approved implementation routes from the Search Console feedback loop. They keep the guide hub focused on the two highest-priority buyer intents while giving Google a clearer crawl path into the pages already earning impressions.</p>
-            </div>
-            <div class="approved-paths__grid">
-              <article class="approved-path-card">
-                <span>Issue #9 and #32</span>
-                <h3>Vacation-home buyers</h3>
-                <p>Start with the highest-impression vacation-home guide, then compare second-home and Europe alternatives before choosing destinations.</p>
-                <nav>
-                  <a href="/best-places-to-buy-vacation-home-abroad/">Best countries and places to buy a vacation home abroad</a>
-                  <a href="/best-places-to-buy-a-second-home-abroad/">Best places to buy a second home abroad</a>
-                  <a href="/best-places-to-buy-property-in-europe/">Best places to buy property in Europe</a>
-                </nav>
-              </article>
-              <article class="approved-path-card">
-                <span>Issue #21 and #24</span>
-                <h3>Foreign and expat buyers</h3>
-                <p>Use the expat and foreign-buyer guides together to compare ownership clarity, transaction practicality, livability, and resale depth.</p>
-                <nav>
-                  <a href="/best-countries-for-expats-to-buy-property/">Best countries for expats to buy property</a>
-                  <a href="/best-countries-to-buy-property-as-a-foreigner/">Best countries to buy property as a foreigner</a>
-                  <a href="/where-can-foreigners-buy-property/">Where can foreigners buy property?</a>
-                </nav>
-              </article>
-              <article class="approved-path-card">
-                <span>Issue #18 and #38</span>
-                <h3>Guides indexing fix</h3>
-                <p>Keep the guide hub crawlable, internally linked, and useful as the route map for buyers moving from broad research into a shortlist.</p>
-                <nav>
-                  <a href="/guides/#choose-journey">Choose your buyer journey</a>
-                  <a href="/buy-property-abroad/">Buy property abroad checklist</a>
-                  <a href="/shortlist-review/">Request shortlist review</a>
-                </nav>
-              </article>
-            </div>
-          </section>
           <section class="page-section" id="choose-journey">
-            <h2>Choose Your Buyer Journey</h2>
-            <p>Use the guide hub as a route map. Start with the job the property needs to perform, then compare countries and destinations only after the buyer intent is clear.</p>
+            <div class="guide-hub-intro">
+              <h2>Find the right guide for your purchase</h2>
+              <p>Begin with the job the property needs to do. Each route brings together the questions that matter most before you compare individual homes.</p>
+            </div>
             <div class="journey-grid">
               <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement route"><span>Route 01</span><strong>Retirement or lifestyle base</strong><p>Healthcare, daily convenience, climate, community, and resale depth.</p></a>
               <a class="journey-card" href="#second-homes" data-track="guide_journey_click" data-track-label="Second home route"><span>Route 02</span><strong>Second home abroad</strong><p>Repeat use, family visits, rental offset, and sensible ownership process.</p></a>
@@ -4882,39 +4823,40 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
               <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Risk route"><span>Route 04</span><strong>Ownership and risk first</strong><p>Title clarity, foreign-buyer rules, taxes, permits, and adviser depth.</p></a>
             </div>
           </section>
-          <section class="page-section">
-            <h2>How to Use These Guides</h2>
-            <p>Start with the page that matches the job of the property, then compare the linked destination dossiers before talking to local agents. The goal is to avoid falling in love with a listing before the market, ownership path, rental rules, healthcare practicality, and resale depth have been tested.</p>
-            <p>Every guide connects back to the same 10-dimension model: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry. That keeps broad searches comparable instead of turning each market into a separate story.</p>
+          <section class="page-section featured-guides" id="essential-guides">
+            <div class="guide-hub-intro">
+              <h2>Start with the essentials</h2>
+              <p>These three guides answer the questions most overseas buyers should settle before they get attached to a particular market or listing.</p>
+            </div>
+            <div class="page-grid">{priority_route_links}</div>
+            <div class="reader-note"><p>Use the destination links inside each guide to compare markets against the same framework: ownership clarity, lifestyle use, rental reality, value, and the path to resale.</p></div>
           </section>
+          {retirement_calculator_callout("page-section")}
           <section class="page-section">
             <h2>Country and Region Hubs</h2>
-            <p>Use these geographic hubs to move from broad buyer intent into local destination choices, ownership questions, and country-level tradeoffs.</p>
+            <p>Once your buyer intent is clear, use these hubs to compare local destination choices, ownership questions, and country-level tradeoffs.</p>
             <nav class="page-grid">{country_links}</nav>
           </section>
-          {cluster_html}
+          <section class="guide-catalog" aria-label="Browse all buying guides">{cluster_html}</section>
         </article>
         <aside class="page-aside">
           <section class="page-aside-card">
-            <h2>Use the Atlas</h2>
-            <p>Open the dashboard to compare all destination scores and export a shortlist memo.</p>
-            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="guide hub">Open dashboard</a>
-            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub">Review my shortlist</a>
+            <h2>Compare destinations</h2>
+            <p>Use the Atlas to place promising destinations side by side before you spend time on local listings.</p>
+            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="guide hub">Explore destinations</a>
           </section>
-          <section class="page-aside-card conversion-strip">
-            <div>
-              <h3>Ready to turn research into a shortlist?</h3>
-              <p>Bring a focused set of destinations into a buyer-specific review before local agent conversations.</p>
-            </div>
-            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub aside conversion">Start review</a>
+          <section class="page-aside-card">
+            <h3>When you have a shortlist</h3>
+            <p>Bring your goals, budget, holding period, and likely jurisdictions into a focused buyer-specific review.</p>
+            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub aside">Request a shortlist review</a>
           </section>
           <section class="page-aside-card">
             <h3>Best Starting Destinations</h3>
             <nav>{top_destination_links}</nav>
           </section>
           <section class="page-aside-card">
-            <h3>Trust Layer</h3>
-            <nav><a href="/seo-status/">SEO status dashboard</a>{trust_page_links()}</nav>
+            <h3>About the Atlas</h3>
+            <nav>{trust_page_links()}</nav>
           </section>
         </aside>
       </div>
