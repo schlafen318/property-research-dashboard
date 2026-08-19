@@ -17,6 +17,8 @@ class GuideHubIndexingTests(unittest.TestCase):
         text = self.guide_text()
 
         self.assertIn("Find the right guide for your purchase", text)
+        self.assertIn("Featured research", text)
+        self.assertIn('class="guide-feature"', text)
         self.assertIn("Retirement or lifestyle base", text)
         self.assertIn("Second home abroad", text)
         self.assertIn("Investment-led shortlist", text)
@@ -24,6 +26,7 @@ class GuideHubIndexingTests(unittest.TestCase):
         self.assertNotIn("Approved P1 buyer paths", text)
         self.assertNotIn("Issue #", text)
         self.assertNotIn("Google is starting to index", text)
+        self.assertNotIn("<strong>Use when:</strong>", text)
         self.assertIn('/best-places-to-buy-vacation-home-abroad/"', text)
         self.assertIn('/best-countries-for-expats-to-buy-property/"', text)
         self.assertIn('/best-countries-to-buy-property-as-a-foreigner/"', text)

@@ -769,28 +769,41 @@
       .atlas-map__legend span { padding: 6px 7px; font-size: 9px; }
     }
 
-    .guide-hub-intro { max-width: 780px; }
-    .guide-hub-intro h2 { margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(27px, 4vw, 42px); line-height: 1.04; }
-    .guide-hub-intro p { margin: 0; color: #3f4d48; }
-    .journey-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 22px; }
-    .journey-card { min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fff; text-decoration: none; transition: transform .18s ease, box-shadow .18s ease; }
-    .journey-card:hover { transform: translateY(-2px); box-shadow: 0 14px 28px rgba(36, 49, 45, .10); }
+    .page-hero { min-height: 480px; background-position: center; }
+    .guide-hero-card { align-self: start; margin-top: 40px; }
+    .guide-page-layout { display: block; max-width: 980px; margin: 0 auto; padding-top: 42px; }
+    .guide-page-layout .page-article { gap: 56px; }
+    .guide-kicker { margin: 0 0 12px; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+    .guide-intro { max-width: 720px; }
+    .guide-intro h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4.3vw, 44px); line-height: 1.02; }
+    .journey-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 22px; border: 1px solid var(--line); background: var(--line); }
+    .journey-card { min-width: 0; padding: 20px; background: var(--paper); color: var(--ink); text-decoration: none; }
+    .journey-card:nth-child(2) { background: #eef4ec; } .journey-card:nth-child(3) { background: #edf4f3; }
     .journey-card span { display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-    .journey-card strong { display: block; margin: 8px 0 6px; color: var(--ink); font-size: 18px; line-height: 1.14; }
+    .journey-card strong { display: block; margin: 24px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; line-height: 1.05; }
     .journey-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
-    .featured-guides { display: grid; gap: 18px; }
-    .featured-guides .page-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .featured-guides .page-card { background: linear-gradient(180deg, #fffdf7, #f4eee2); }
-    .reader-note { padding: 18px 0 0; border-top: 1px solid var(--line); }
-    .reader-note p { max-width: 760px; margin: 0; color: var(--muted); }
-    .guide-catalog > h2 { margin-bottom: 8px; }
-    .guide-catalog > p { max-width: 740px; margin-top: 0; }
-    .page-card span { display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-    .page-card p strong { color: var(--ink); }
-    .page-card p:last-child { display: grid; gap: 6px; }
-    .page-card p:last-child a { margin-right: 8px; font-size: 13px; font-weight: 800; }
-    @media (max-width: 860px) { .journey-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .featured-guides .page-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-    @media (max-width: 560px) { .journey-grid, .featured-guides .page-grid { grid-template-columns: 1fr; } }
+    .guide-feature { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); gap: 34px; align-items: stretch; padding: 28px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .guide-feature__image { min-height: 330px; background: linear-gradient(150deg, rgba(36,49,45,.1), rgba(36,49,45,.46)), url("/assets/destination-dossier-coast.jpg"); background-position: center; background-size: cover; }
+    .guide-feature__copy { display: flex; flex-direction: column; justify-content: center; }
+    .guide-feature__copy h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(31px, 4vw, 47px); line-height: 1.01; }
+    .guide-feature__copy p { color: #3f4d48; }
+    .guide-feature__copy .page-button { align-self: flex-start; margin-top: 12px; }
+    .guide-country-links { display: flex; flex-wrap: wrap; gap: 9px 18px; margin-top: 18px; }
+    .guide-country-links a { font-weight: 800; }
+    .guide-catalog { display: grid; gap: 46px; }
+    .guide-catalog .page-section { padding: 0; border: 0; background: transparent; }
+    .guide-catalog .page-section > p { max-width: 650px; margin-top: 0; }
+    .guide-story-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 22px; }
+    .guide-story { min-width: 0; padding-top: 15px; border-top: 3px solid var(--gold); }
+    .guide-story:nth-child(2) { border-top-color: var(--eucalyptus); } .guide-story:nth-child(3) { border-top-color: var(--terracotta); }
+    .guide-story span { color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
+    .guide-story h3 { margin: 9px 0; font-family: Georgia, "Times New Roman", serif; font-size: 24px; line-height: 1.06; }
+    .guide-story p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+    .guide-story__link { display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 900; }
+    .guide-research-note { padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .guide-research-note p { max-width: 710px; margin: 0; color: #3f4d48; }
+    @media (max-width: 860px) { .journey-grid, .guide-story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .guide-feature { grid-template-columns: 1fr; } .guide-feature__image { min-height: 260px; } }
+    @media (max-width: 560px) { .journey-grid, .guide-story-grid { grid-template-columns: 1fr; } .guide-page-layout { padding-top: 30px; } .guide-page-layout .page-article { gap: 38px; } }
   </style>
 </head>
 <body>
@@ -820,46 +833,27 @@
 
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">Independent research for global home buyers · updated 2026-08-19</p>
+          <p class="page-eyebrow">The Global Property Journal · updated 2026-08-19</p>
           <h1>Global Property Buying Guides</h1>
-          <p class="page-lede">Find a practical starting point for buying property abroad—then compare destinations with ownership, lifestyle, income, and resale in view.</p>
+          <p class="page-lede">Independent ideas and evidence for buying, retiring, and investing abroad—without starting with a listing.</p>
         </div>
-        <aside class="page-hero-card">
-          <span>A better starting point</span>
-          <strong>Start with the decision, not the destination.</strong>
-          <p>Choose the role the property needs to play, then use the linked guides to narrow your shortlist before local diligence.</p>
+        <aside class="page-hero-card guide-hero-card">
+          <span>Editorial principle</span>
+          <strong>Start with the life you want, then test the property decision.</strong>
+          <p>Choose a buying brief, read the relevant research, then verify locally before committing capital.</p>
         </aside>
       </div>
     </div>
   </header>
   <main>
     <div class="page-shell">
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#choose-journey">Choose a route</a><a href="#essential-guides">Essentials</a><a href="#retirement">Retirement</a><a href="#second-homes">Second homes</a><a href="#risk">Risk</a><a href="#country-comparisons">Countries</a></nav>
-
-      <section class="trust-brief" id="trust-context" aria-label="Research credibility">
-        <div>
-          <span>Methodology</span>
-          <strong>10-dimension destination score</strong>
-          <p>Destinations are compared across lifestyle, access, ownership clarity, regulatory safety, yield realism, capital upside, retirement fit, liquidity, foreigner fit, and value entry.</p>
-        </div>
-        <div>
-          <span>Research standard</span>
-          <strong>Independent destination intelligence</strong>
-          <p>Representative listings anchor market texture. They are not offers, availability guarantees, brokerage placements, or paid destination promotion.</p>
-        </div>
-        <div>
-          <span>Update cadence</span>
-          <strong>Regenerated with current source data</strong>
-          <p>Scores, caveats, and benchmark evidence should be treated as shortlist inputs, then verified with local legal, tax, immigration, and property advisers.</p>
-        </div>
-      </section>
-
-      <div class="page-layout">
+      <nav class="sticky-jump" aria-label="Page sections"><a href="#choose-journey">Start</a><a href="#featured-research">Featured</a><a href="#retirement">Retirement</a><a href="#second-homes">Second homes</a><a href="#risk">Risk</a><a href="#country-comparisons">Countries</a></nav>
+      <div class="page-layout guide-page-layout">
         <article class="page-article">
-          <section class="page-section" id="choose-journey">
-            <div class="guide-hub-intro">
+          <section id="choose-journey">
+            <div class="guide-intro">
+              <p class="guide-kicker">Begin with your brief</p>
               <h2>Find the right guide for your purchase</h2>
-              <p>Begin with the job the property needs to do. Each route brings together the questions that matter most before you compare individual homes.</p>
             </div>
             <div class="journey-grid">
               <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement route"><span>Route 01</span><strong>Retirement or lifestyle base</strong><p>Healthcare, daily convenience, climate, community, and resale depth.</p></a>
@@ -868,48 +862,22 @@
               <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Risk route"><span>Route 04</span><strong>Ownership and risk first</strong><p>Title clarity, foreign-buyer rules, taxes, permits, and adviser depth.</p></a>
             </div>
           </section>
-          <section class="page-section featured-guides" id="essential-guides">
-            <div class="guide-hub-intro">
-              <h2>Start with the essentials</h2>
-              <p>These three guides answer the questions most overseas buyers should settle before they get attached to a particular market or listing.</p>
+          <section class="guide-feature" id="featured-research">
+            <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
+            <div class="guide-feature__copy">
+              <p class="guide-kicker">Featured research</p>
+              <h2>30 Retirement Destinations Ranked by How Much You Need</h2>
+              <p>Compare all 30 Global Home Atlas retirement destinations by required capital, annual spending, reserves, and optional property costs using one methodology.</p>
+              <a class="page-button" href="/retirement-destinations-ranked-by-cost/">Read the featured guide</a>
             </div>
-            <div class="page-grid">
-            <article class="page-card">
-              <span>foreign-buyer access</span>
-              <h3><a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a></h3>
-              <p>Compare where foreigners can buy property with ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth.</p>
-              <p><strong>Use when:</strong> foreign buyers comparing legal access, title clarity, transaction practicality, lifestyle quality, and resale depth before choosing markets for local diligence</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a></p>
-            </article>
-
-            <article class="page-card">
-              <span>retirement planning</span>
-              <h3><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a></h3>
-              <p>Compare the best places to buy property abroad for retirement using ownership clarity, healthcare, lifestyle, value, rental resilience, and exit liquidity.</p>
-              <p><strong>Use when:</strong> buyers who want one property to support retirement optionality, seasonal living, and defensible resale value</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a></p>
-            </article>
-
-            <article class="page-card">
-              <span>risk framework</span>
-              <h3><a href="/foreign-property-investment-risks/">Foreign Property Investment Risks</a></h3>
-              <p>A practical risk framework for foreign property investment, covering title clarity, rental rules, currency exposure, liquidity, maintenance, and market concentration.</p>
-              <p><strong>Use when:</strong> buyers searching for a disciplined risk checklist before committing capital to property abroad</p>
-              <p><strong>Start with:</strong> <a href="/destinations/phuket-koh-samui/">Phuket / Koh Samui</a> <a href="/destinations/bali/">Bali</a> <a href="/destinations/da-nang-hoi-an/">Da Nang / Hoi An</a></p>
-            </article></div>
-            <div class="reader-note"><p>Use the destination links inside each guide to compare markets against the same framework: ownership clarity, lifestyle use, rental reality, value, and the path to resale.</p></div>
           </section>
-
-      <section class="page-section">
-        <h2>Estimate your retirement capital</h2>
-        <p>Start with destination expenses in today's money, then account for inflation, reliable pension and passive income, housing, property acquisition, and a liquid portfolio.</p>
-        <a class="page-button" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open">Open the retirement abroad calculator</a>
-      </section>
-
-          <section class="page-section">
-            <h2>Country and Region Hubs</h2>
-            <p>Once your buyer intent is clear, use these hubs to compare local destination choices, ownership questions, and country-level tradeoffs.</p>
-            <nav class="page-grid"><a href="/countries/spain-property/">Spain</a>
+          <section class="guide-research-note">
+            <p><strong>How to read the Atlas:</strong> Use each guide to form a shortlist, then compare destination evidence and local professional advice before you commit to a property.</p>
+          </section>
+          <section>
+            <p class="guide-kicker">Browse by country</p>
+            <h2>Country and region hubs</h2>
+            <nav class="guide-country-links"><a href="/countries/spain-property/">Spain</a>
 <a href="/countries/portugal-property/">Portugal</a>
 <a href="/countries/japan-property/">Japan</a>
 <a href="/countries/united-states-property/">United States</a>
@@ -921,29 +889,26 @@
           <section class="page-section" id="getting-started">
             <h2>Getting Started</h2>
             <p>Start here if you are defining the role of the property and the markets worth researching before speaking with agents.</p>
-            <div class="page-grid">
-            <article class="page-card">
+            <div class="guide-story-grid">
+            <article class="guide-story">
               <span>global purchase process</span>
               <h3><a href="/buy-property-abroad/">Buy Property Abroad</a></h3>
               <p>Use a structured framework to buy property abroad: shortlist countries, compare ownership risk, underwrite income, and plan exit liquidity.</p>
-              <p><strong>Use when:</strong> buyers moving from inspiration to a disciplined international property shortlist</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a></p>
+              <a class="guide-story__link" href="/buy-property-abroad/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>foreign-buyer access</span>
               <h3><a href="/best-countries-to-buy-property-as-a-foreigner/">Best Countries to Buy Property as a Foreigner</a></h3>
               <p>Compare where foreigners can buy property with ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth.</p>
-              <p><strong>Use when:</strong> foreign buyers comparing legal access, title clarity, transaction practicality, lifestyle quality, and resale depth before choosing markets for local diligence</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a></p>
+              <a class="guide-story__link" href="/best-countries-to-buy-property-as-a-foreigner/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>foreign ownership map</span>
               <h3><a href="/where-can-foreigners-buy-property/">Where Can Foreigners Buy Property?</a></h3>
               <p>Compare where foreigners can buy property using ownership clarity, transaction practicality, lifestyle quality, value, and resale depth across global destinations.</p>
-              <p><strong>Use when:</strong> early-stage global buyers looking for a practical map of foreign-buyer access and markets worth researching first</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a></p>
+              <a class="guide-story__link" href="/where-can-foreigners-buy-property/">Read guide</a>
             </article></div>
           </section>
 
@@ -951,37 +916,33 @@
           <section class="page-section" id="retirement">
             <h2>Retirement</h2>
             <p>Research long-stay livability, healthcare practicality, family use, and the flexibility to retire there later.</p>
-            <div class="page-grid">
-            <article class="page-card">
+            <div class="guide-story-grid">
+            <article class="guide-story">
               <span>retirement cost comparison</span>
               <h3><a href="/retirement-destinations-ranked-by-cost/">30 Retirement Destinations Ranked by How Much You Need</a></h3>
               <p>Compare all 30 Global Home Atlas retirement destinations by required capital, annual spending, reserves, and optional property costs using one methodology.</p>
-              <p><strong>Use when:</strong> retirees comparing how location changes annual spending and required retirement capital</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/hakone-izu/">Hakone / Izu</a> <a href="/destinations/crete/">Crete</a></p>
+              <a class="guide-story__link" href="/retirement-destinations-ranked-by-cost/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>retirement planning</span>
               <h3><a href="/best-places-to-buy-property-abroad-for-retirement/">Best Places to Buy Property Abroad for Retirement</a></h3>
               <p>Compare the best places to buy property abroad for retirement using ownership clarity, healthcare, lifestyle, value, rental resilience, and exit liquidity.</p>
-              <p><strong>Use when:</strong> buyers who want one property to support retirement optionality, seasonal living, and defensible resale value</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a></p>
+              <a class="guide-story__link" href="/best-places-to-buy-property-abroad-for-retirement/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>retirement buyer framework</span>
               <h3><a href="/buying-property-abroad-for-retirement/">Buying Property Abroad for Retirement</a></h3>
               <p>A retirement-focused framework for buying property abroad, comparing ownership clarity, healthcare practicality, lifestyle fit, value, and resale flexibility.</p>
-              <p><strong>Use when:</strong> retirement-oriented buyers comparing healthcare, daily convenience, ownership practicality, and future resale flexibility before choosing a long-stay market</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a></p>
+              <a class="guide-story__link" href="/buying-property-abroad-for-retirement/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>Japan buyer guide</span>
               <h3><a href="/japan-retirement-property-foreign-buyers/">Japan Retirement Property for Foreign Buyers</a></h3>
               <p>Assess Japan retirement property for foreign buyers, including ownership clarity, lifestyle quality, value, income limits, and resale considerations.</p>
-              <p><strong>Use when:</strong> foreign buyers considering Japan for lifestyle, retirement optionality, and clean ownership rather than pure yield</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/hakone-izu/">Hakone / Izu</a> <a href="/destinations/hakuba/">Hakuba</a></p>
+              <a class="guide-story__link" href="/japan-retirement-property-foreign-buyers/">Read guide</a>
             </article></div>
           </section>
 
@@ -989,29 +950,26 @@
           <section class="page-section" id="second-homes">
             <h2>Second Homes</h2>
             <p>Compare seasonal use, family travel, repeat access, realistic rental offset, and future resale flexibility.</p>
-            <div class="page-grid">
-            <article class="page-card">
+            <div class="guide-story-grid">
+            <article class="guide-story">
               <span>second-home shortlist</span>
               <h3><a href="/best-places-to-buy-a-second-home-abroad/">Best Places to Buy a Second Home Abroad</a></h3>
               <p>Compare the best places to buy a second home abroad for family use, vacation-home optionality, rental offset, ownership clarity, and resale liquidity.</p>
-              <p><strong>Use when:</strong> affluent buyers comparing vacation use, family use, rental offset, airport access, and long-term asset resilience</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <a href="/destinations/madeira/">Madeira</a></p>
+              <a class="guide-story__link" href="/best-places-to-buy-a-second-home-abroad/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>vacation-home acquisition</span>
               <h3><a href="/best-places-to-buy-vacation-home-abroad/">Best Places to Buy a Vacation Home in the World</a></h3>
               <p>Compare the best places to buy a vacation home in the world by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.</p>
-              <p><strong>Use when:</strong> buyers who want personal use, repeatable travel demand, and a realistic path to offset carrying costs</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <a href="/destinations/madeira/">Madeira</a></p>
+              <a class="guide-story__link" href="/best-places-to-buy-vacation-home-abroad/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>Europe shortlist</span>
               <h3><a href="/best-places-to-buy-property-in-europe/">Best Places to Buy Property in Europe</a></h3>
               <p>Compare the best places to buy property in Europe for foreign buyers focused on lifestyle, retirement, rental resilience, value discipline, and resale liquidity.</p>
-              <p><strong>Use when:</strong> buyers comparing European lifestyle markets with a global investor&#x27;s discipline</p>
-              <p><strong>Start with:</strong> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <a href="/destinations/madeira/">Madeira</a></p>
+              <a class="guide-story__link" href="/best-places-to-buy-property-in-europe/">Read guide</a>
             </article></div>
           </section>
 
@@ -1019,29 +977,26 @@
           <section class="page-section" id="risk">
             <h2>Risk</h2>
             <p>Understand the ownership, regulatory, income, and exit risks that deserve attention before capital is committed.</p>
-            <div class="page-grid">
-            <article class="page-card">
+            <div class="guide-story-grid">
+            <article class="guide-story">
               <span>risk framework</span>
               <h3><a href="/foreign-property-investment-risks/">Foreign Property Investment Risks</a></h3>
               <p>A practical risk framework for foreign property investment, covering title clarity, rental rules, currency exposure, liquidity, maintenance, and market concentration.</p>
-              <p><strong>Use when:</strong> buyers searching for a disciplined risk checklist before committing capital to property abroad</p>
-              <p><strong>Start with:</strong> <a href="/destinations/phuket-koh-samui/">Phuket / Koh Samui</a> <a href="/destinations/bali/">Bali</a> <a href="/destinations/da-nang-hoi-an/">Da Nang / Hoi An</a></p>
+              <a class="guide-story__link" href="/foreign-property-investment-risks/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>Thailand ownership</span>
               <h3><a href="/thailand-villa-ownership-foreigners/">Thailand Villa Ownership for Foreigners</a></h3>
               <p>Understand Thailand villa ownership for foreigners and compare Phuket and Koh Samui against other Asia lifestyle property alternatives.</p>
-              <p><strong>Use when:</strong> buyers attracted to Thai villas who need to understand structure, rental appeal, and legal friction</p>
-              <p><strong>Start with:</strong> <a href="/destinations/phuket-koh-samui/">Phuket / Koh Samui</a> <a href="/destinations/bali/">Bali</a> <a href="/destinations/da-nang-hoi-an/">Da Nang / Hoi An</a></p>
+              <a class="guide-story__link" href="/thailand-villa-ownership-foreigners/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>investment underwriting</span>
               <h3><a href="/overseas-property-investment/">Overseas Property Investment</a></h3>
               <p>Compare overseas property investment destinations by net yield, capital upside, regulatory safety, entry price, and liquidity.</p>
-              <p><strong>Use when:</strong> investors comparing income, appreciation, governance, and the ability to exit cleanly</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a></p>
+              <a class="guide-story__link" href="/overseas-property-investment/">Read guide</a>
             </article></div>
           </section>
 
@@ -1049,29 +1004,26 @@
           <section class="page-section" id="country-comparisons">
             <h2>Country Comparisons</h2>
             <p>Compare jurisdictions before moving on to local legal, tax, and property-specific diligence.</p>
-            <div class="page-grid">
-            <article class="page-card">
+            <div class="guide-story-grid">
+            <article class="guide-story">
               <span>country comparison</span>
               <h3><a href="/portugal-vs-spain-retirement-property/">Portugal vs Spain Retirement Property</a></h3>
               <p>Compare Portugal and Spain retirement property markets across lifestyle, ownership clarity, value, healthcare practicality, rentals, and resale.</p>
-              <p><strong>Use when:</strong> retirement buyers choosing between Iberian lifestyle, value, and legal-market depth</p>
-              <p><strong>Start with:</strong> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <a href="/destinations/madeira/">Madeira</a> <a href="/destinations/valencia/">Valencia</a></p>
+              <a class="guide-story__link" href="/portugal-vs-spain-retirement-property/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>country comparison</span>
               <h3><a href="/greece-vs-portugal-retirement-property/">Greece vs Portugal Retirement Property</a></h3>
               <p>Compare Greece and Portugal retirement property options for foreign buyers focused on lifestyle, value, ownership, rentals, and long-term livability.</p>
-              <p><strong>Use when:</strong> buyers weighing Mediterranean value, island lifestyle, legal clarity, and retirement resilience</p>
-              <p><strong>Start with:</strong> <a href="/destinations/crete/">Crete</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <a href="/destinations/madeira/">Madeira</a></p>
+              <a class="guide-story__link" href="/greece-vs-portugal-retirement-property/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>expat ownership</span>
               <h3><a href="/best-countries-for-expats-to-buy-property/">Best Countries for Expats to Buy Property</a></h3>
               <p>Compare the best countries for expats to buy property by foreign-buyer practicality, ownership rules, lifestyle quality, value, and resale depth.</p>
-              <p><strong>Use when:</strong> globally mobile buyers who need clear foreign ownership, usable infrastructure, and a livable long-term base</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a></p>
+              <a class="guide-story__link" href="/best-countries-for-expats-to-buy-property/">Read guide</a>
             </article></div>
           </section>
 
@@ -1079,61 +1031,37 @@
           <section class="page-section" id="investment">
             <h2>Investment</h2>
             <p>Test yield realism, entry value, governance risk, and exit liquidity alongside lifestyle value.</p>
-            <div class="page-grid">
-            <article class="page-card">
+            <div class="guide-story-grid">
+            <article class="guide-story">
               <span>investment underwriting</span>
               <h3><a href="/overseas-property-investment/">Overseas Property Investment</a></h3>
               <p>Compare overseas property investment destinations by net yield, capital upside, regulatory safety, entry price, and liquidity.</p>
-              <p><strong>Use when:</strong> investors comparing income, appreciation, governance, and the ability to exit cleanly</p>
-              <p><strong>Start with:</strong> <a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a></p>
+              <a class="guide-story__link" href="/overseas-property-investment/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>Europe shortlist</span>
               <h3><a href="/best-places-to-buy-property-in-europe/">Best Places to Buy Property in Europe</a></h3>
               <p>Compare the best places to buy property in Europe for foreign buyers focused on lifestyle, retirement, rental resilience, value discipline, and resale liquidity.</p>
-              <p><strong>Use when:</strong> buyers comparing European lifestyle markets with a global investor&#x27;s discipline</p>
-              <p><strong>Start with:</strong> <a href="/destinations/valencia/">Valencia</a> <a href="/destinations/algarve-cascais/">Algarve / Cascais</a> <a href="/destinations/madeira/">Madeira</a></p>
+              <a class="guide-story__link" href="/best-places-to-buy-property-in-europe/">Read guide</a>
             </article>
 
-            <article class="page-card">
+            <article class="guide-story">
               <span>risk framework</span>
               <h3><a href="/foreign-property-investment-risks/">Foreign Property Investment Risks</a></h3>
               <p>A practical risk framework for foreign property investment, covering title clarity, rental rules, currency exposure, liquidity, maintenance, and market concentration.</p>
-              <p><strong>Use when:</strong> buyers searching for a disciplined risk checklist before committing capital to property abroad</p>
-              <p><strong>Start with:</strong> <a href="/destinations/phuket-koh-samui/">Phuket / Koh Samui</a> <a href="/destinations/bali/">Bali</a> <a href="/destinations/da-nang-hoi-an/">Da Nang / Hoi An</a></p>
+              <a class="guide-story__link" href="/foreign-property-investment-risks/">Read guide</a>
             </article></div>
           </section>
         </section>
+
+      <section class="guide-research-note">
+        <h2>Estimate your retirement capital</h2>
+        <p>Start with destination expenses in today's money, then account for inflation, reliable pension and passive income, housing, property acquisition, and a liquid portfolio.</p>
+        <a class="page-button" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open">Open the retirement abroad calculator</a>
+      </section>
+
         </article>
-        <aside class="page-aside">
-          <section class="page-aside-card">
-            <h2>Compare destinations</h2>
-            <p>Use the Atlas to place promising destinations side by side before you spend time on local listings.</p>
-            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="guide hub">Explore destinations</a>
-          </section>
-          <section class="page-aside-card">
-            <h3>When you have a shortlist</h3>
-            <p>Bring your goals, budget, holding period, and likely jurisdictions into a focused buyer-specific review.</p>
-            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub aside">Request a shortlist review</a>
-          </section>
-          <section class="page-aside-card">
-            <h3>Best Starting Destinations</h3>
-            <nav><a href="/destinations/fukuoka-itoshima/">Fukuoka / Itoshima</a>
-<a href="/destinations/dubai/">Dubai</a>
-<a href="/destinations/valencia/">Valencia</a>
-<a href="/destinations/algarve-cascais/">Algarve / Cascais</a>
-<a href="/destinations/malaga-costa-del-sol/">Málaga / Costa del Sol</a>
-<a href="/destinations/lake-como/">Lake Como</a></nav>
-          </section>
-          <section class="page-aside-card">
-            <h3>About the Atlas</h3>
-            <nav><a href="/methodology/">Methodology</a>
-<a href="/research-standards/">Research Standards</a>
-<a href="/about/">About Global Home Atlas</a>
-<a href="/contact/">Contact Global Home Atlas</a></nav>
-          </section>
-        </aside>
       </div>
     </div>
   </main>

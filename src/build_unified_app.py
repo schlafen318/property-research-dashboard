@@ -3790,6 +3790,26 @@ def guide_cards_for_slugs(slugs: list[str], pages: list[dict], destinations: lis
     return "\n".join(cards)
 
 
+def guide_story_list_for_slugs(slugs: list[str], pages: list[dict]) -> str:
+    by_slug = {page["slug"]: page for page in pages}
+    stories = []
+    for slug in slugs:
+        page = by_slug.get(slug)
+        if not page:
+            continue
+        stories.append(
+            f"""
+            <article class="guide-story">
+              <span>{escape(page["theme"])}</span>
+              <h3><a href="/{escape(page["slug"])}/">{escape(page["h1"])}</a></h3>
+              <p>{escape(page["description"])}</p>
+              <a class="guide-story__link" href="/{escape(page["slug"])}/">Read guide</a>
+            </article>
+            """.rstrip()
+        )
+    return "\n".join(stories)
+
+
 RETIREMENT_FAQS = [
     (
         "How much do I need to retire abroad?",
@@ -4739,23 +4759,13 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
           <section class="page-section" id="{slugify(title)}">
             <h2>{escape(title)}</h2>
             <p>{escape(description)}</p>
-            <div class="page-grid">{guide_cards_for_slugs(slugs, pages, destinations)}</div>
+            <div class="guide-story-grid">{guide_story_list_for_slugs(slugs, pages)}</div>
           </section>
         """
         for title, description, slugs in clusters
     )
-    top_destinations = destinations[:6]
-    top_destination_links = destination_links(top_destinations, limit=6)
     country_links = country_hub_links(limit=7)
-    priority_route_links = guide_cards_for_slugs(
-        [
-            "best-countries-to-buy-property-as-a-foreigner",
-            "best-places-to-buy-property-abroad-for-retirement",
-            "foreign-property-investment-risks",
-        ],
-        pages,
-        destinations,
-    )
+    featured_page = next((page for page in pages if page["slug"] == RETIREMENT_DESTINATIONS_SLUG), pages[0])
 
     return f"""<!doctype html>
 <html lang="en">
@@ -4763,28 +4773,41 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
 {head_html(GUIDE_HUB_TITLE, GUIDE_HUB_DESCRIPTION, canonical, schema_for_guide_hub(canonical, pages))}
   <style>
 {shared_content_css()}
-    .guide-hub-intro {{ max-width: 780px; }}
-    .guide-hub-intro h2 {{ margin: 0 0 10px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(27px, 4vw, 42px); line-height: 1.04; }}
-    .guide-hub-intro p {{ margin: 0; color: #3f4d48; }}
-    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 22px; }}
-    .journey-card {{ min-width: 0; padding: 18px; border: 1px solid var(--line); border-radius: 8px; background: #fff; text-decoration: none; transition: transform .18s ease, box-shadow .18s ease; }}
-    .journey-card:hover {{ transform: translateY(-2px); box-shadow: 0 14px 28px rgba(36, 49, 45, .10); }}
+    .page-hero {{ min-height: 480px; background-position: center; }}
+    .guide-hero-card {{ align-self: start; margin-top: 40px; }}
+    .guide-page-layout {{ display: block; max-width: 980px; margin: 0 auto; padding-top: 42px; }}
+    .guide-page-layout .page-article {{ gap: 56px; }}
+    .guide-kicker {{ margin: 0 0 12px; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }}
+    .guide-intro {{ max-width: 720px; }}
+    .guide-intro h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4.3vw, 44px); line-height: 1.02; }}
+    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 22px; border: 1px solid var(--line); background: var(--line); }}
+    .journey-card {{ min-width: 0; padding: 20px; background: var(--paper); color: var(--ink); text-decoration: none; }}
+    .journey-card:nth-child(2) {{ background: #eef4ec; }} .journey-card:nth-child(3) {{ background: #edf4f3; }}
     .journey-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
-    .journey-card strong {{ display: block; margin: 8px 0 6px; color: var(--ink); font-size: 18px; line-height: 1.14; }}
+    .journey-card strong {{ display: block; margin: 24px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; line-height: 1.05; }}
     .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }}
-    .featured-guides {{ display: grid; gap: 18px; }}
-    .featured-guides .page-grid {{ grid-template-columns: repeat(3, minmax(0, 1fr)); }}
-    .featured-guides .page-card {{ background: linear-gradient(180deg, #fffdf7, #f4eee2); }}
-    .reader-note {{ padding: 18px 0 0; border-top: 1px solid var(--line); }}
-    .reader-note p {{ max-width: 760px; margin: 0; color: var(--muted); }}
-    .guide-catalog > h2 {{ margin-bottom: 8px; }}
-    .guide-catalog > p {{ max-width: 740px; margin-top: 0; }}
-    .page-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
-    .page-card p strong {{ color: var(--ink); }}
-    .page-card p:last-child {{ display: grid; gap: 6px; }}
-    .page-card p:last-child a {{ margin-right: 8px; font-size: 13px; font-weight: 800; }}
-    @media (max-width: 860px) {{ .journey-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .featured-guides .page-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
-    @media (max-width: 560px) {{ .journey-grid, .featured-guides .page-grid {{ grid-template-columns: 1fr; }} }}
+    .guide-feature {{ display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); gap: 34px; align-items: stretch; padding: 28px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }}
+    .guide-feature__image {{ min-height: 330px; background: linear-gradient(150deg, rgba(36,49,45,.1), rgba(36,49,45,.46)), url("/assets/destination-dossier-coast.jpg"); background-position: center; background-size: cover; }}
+    .guide-feature__copy {{ display: flex; flex-direction: column; justify-content: center; }}
+    .guide-feature__copy h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(31px, 4vw, 47px); line-height: 1.01; }}
+    .guide-feature__copy p {{ color: #3f4d48; }}
+    .guide-feature__copy .page-button {{ align-self: flex-start; margin-top: 12px; }}
+    .guide-country-links {{ display: flex; flex-wrap: wrap; gap: 9px 18px; margin-top: 18px; }}
+    .guide-country-links a {{ font-weight: 800; }}
+    .guide-catalog {{ display: grid; gap: 46px; }}
+    .guide-catalog .page-section {{ padding: 0; border: 0; background: transparent; }}
+    .guide-catalog .page-section > p {{ max-width: 650px; margin-top: 0; }}
+    .guide-story-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 22px; }}
+    .guide-story {{ min-width: 0; padding-top: 15px; border-top: 3px solid var(--gold); }}
+    .guide-story:nth-child(2) {{ border-top-color: var(--eucalyptus); }} .guide-story:nth-child(3) {{ border-top-color: var(--terracotta); }}
+    .guide-story span {{ color: var(--muted); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
+    .guide-story h3 {{ margin: 9px 0; font-family: Georgia, "Times New Roman", serif; font-size: 24px; line-height: 1.06; }}
+    .guide-story p {{ margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }}
+    .guide-story__link {{ display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 900; }}
+    .guide-research-note {{ padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }}
+    .guide-research-note p {{ max-width: 710px; margin: 0; color: #3f4d48; }}
+    @media (max-width: 860px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .guide-feature {{ grid-template-columns: 1fr; }} .guide-feature__image {{ min-height: 260px; }} }}
+    @media (max-width: 560px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: 1fr; }} .guide-page-layout {{ padding-top: 30px; }} .guide-page-layout .page-article {{ gap: 38px; }} }}
   </style>
 </head>
 <body>
@@ -4793,28 +4816,27 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
       {primary_nav_html()}
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">Independent research for global home buyers · updated {updated}</p>
+          <p class="page-eyebrow">The Global Property Journal · updated {updated}</p>
           <h1>Global Property Buying Guides</h1>
-          <p class="page-lede">Find a practical starting point for buying property abroad—then compare destinations with ownership, lifestyle, income, and resale in view.</p>
+          <p class="page-lede">Independent ideas and evidence for buying, retiring, and investing abroad—without starting with a listing.</p>
         </div>
-        <aside class="page-hero-card">
-          <span>A better starting point</span>
-          <strong>Start with the decision, not the destination.</strong>
-          <p>Choose the role the property needs to play, then use the linked guides to narrow your shortlist before local diligence.</p>
+        <aside class="page-hero-card guide-hero-card">
+          <span>Editorial principle</span>
+          <strong>Start with the life you want, then test the property decision.</strong>
+          <p>Choose a buying brief, read the relevant research, then verify locally before committing capital.</p>
         </aside>
       </div>
     </div>
   </header>
   <main>
     <div class="page-shell">
-      {sticky_page_nav([("Choose a route", "choose-journey"), ("Essentials", "essential-guides"), ("Retirement", "retirement"), ("Second homes", "second-homes"), ("Risk", "risk"), ("Countries", "country-comparisons")])}
-      {trust_brief_html()}
-      <div class="page-layout">
+      {sticky_page_nav([("Start", "choose-journey"), ("Featured", "featured-research"), ("Retirement", "retirement"), ("Second homes", "second-homes"), ("Risk", "risk"), ("Countries", "country-comparisons")])}
+      <div class="page-layout guide-page-layout">
         <article class="page-article">
-          <section class="page-section" id="choose-journey">
-            <div class="guide-hub-intro">
+          <section id="choose-journey">
+            <div class="guide-intro">
+              <p class="guide-kicker">Begin with your brief</p>
               <h2>Find the right guide for your purchase</h2>
-              <p>Begin with the job the property needs to do. Each route brings together the questions that matter most before you compare individual homes.</p>
             </div>
             <div class="journey-grid">
               <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement route"><span>Route 01</span><strong>Retirement or lifestyle base</strong><p>Healthcare, daily convenience, climate, community, and resale depth.</p></a>
@@ -4823,42 +4845,26 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
               <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Risk route"><span>Route 04</span><strong>Ownership and risk first</strong><p>Title clarity, foreign-buyer rules, taxes, permits, and adviser depth.</p></a>
             </div>
           </section>
-          <section class="page-section featured-guides" id="essential-guides">
-            <div class="guide-hub-intro">
-              <h2>Start with the essentials</h2>
-              <p>These three guides answer the questions most overseas buyers should settle before they get attached to a particular market or listing.</p>
+          <section class="guide-feature" id="featured-research">
+            <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
+            <div class="guide-feature__copy">
+              <p class="guide-kicker">Featured research</p>
+              <h2>{escape(featured_page["h1"])}</h2>
+              <p>{escape(featured_page["description"])}</p>
+              <a class="page-button" href="/{escape(featured_page["slug"])}/">Read the featured guide</a>
             </div>
-            <div class="page-grid">{priority_route_links}</div>
-            <div class="reader-note"><p>Use the destination links inside each guide to compare markets against the same framework: ownership clarity, lifestyle use, rental reality, value, and the path to resale.</p></div>
           </section>
-          {retirement_calculator_callout("page-section")}
-          <section class="page-section">
-            <h2>Country and Region Hubs</h2>
-            <p>Once your buyer intent is clear, use these hubs to compare local destination choices, ownership questions, and country-level tradeoffs.</p>
-            <nav class="page-grid">{country_links}</nav>
+          <section class="guide-research-note">
+            <p><strong>How to read the Atlas:</strong> Use each guide to form a shortlist, then compare destination evidence and local professional advice before you commit to a property.</p>
+          </section>
+          <section>
+            <p class="guide-kicker">Browse by country</p>
+            <h2>Country and region hubs</h2>
+            <nav class="guide-country-links">{country_links}</nav>
           </section>
           <section class="guide-catalog" aria-label="Browse all buying guides">{cluster_html}</section>
+          {retirement_calculator_callout("guide-research-note")}
         </article>
-        <aside class="page-aside">
-          <section class="page-aside-card">
-            <h2>Compare destinations</h2>
-            <p>Use the Atlas to place promising destinations side by side before you spend time on local listings.</p>
-            <a class="page-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="guide hub">Explore destinations</a>
-          </section>
-          <section class="page-aside-card">
-            <h3>When you have a shortlist</h3>
-            <p>Bring your goals, budget, holding period, and likely jurisdictions into a focused buyer-specific review.</p>
-            <a class="page-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="guide hub aside">Request a shortlist review</a>
-          </section>
-          <section class="page-aside-card">
-            <h3>Best Starting Destinations</h3>
-            <nav>{top_destination_links}</nav>
-          </section>
-          <section class="page-aside-card">
-            <h3>About the Atlas</h3>
-            <nav>{trust_page_links()}</nav>
-          </section>
-        </aside>
       </div>
     </div>
   </main>
