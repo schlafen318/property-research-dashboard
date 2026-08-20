@@ -432,12 +432,12 @@ SEO_PAGES = [
     {
         "slug": "japan-retirement-property-foreign-buyers",
         "title": "Japan Retirement Property for Foreign Buyers | Global Home Atlas",
-        "description": "Assess Japan retirement property for foreign buyers, including ownership clarity, lifestyle quality, value, income limits, and resale considerations.",
+        "description": "Compare Japan retirement property for foreign buyers across lifestyle, access, ownership, rental rules, healthcare, value, and resale in Fukuoka, Hakone, Hakuba, and Niseko.",
         "h1": "Japan Retirement Property for Foreign Buyers",
         "keyword": "Japan retirement property foreign buyers",
         "theme": "Japan buyer guide",
         "intent": "foreign buyers considering Japan for lifestyle, retirement optionality, and clean ownership rather than pure yield",
-        "destination_ids": ["fukuoka-itoshima", "hakone-izu", "hakuba", "niseko", "valencia", "algarve-cascais"],
+        "destination_ids": ["fukuoka-itoshima", "hakone-izu", "hakuba", "niseko"],
         "faqs": [
             ("Can foreigners buy property in Japan?", "Foreign buyers can generally buy freehold property in Japan, but financing, taxes, management, and local rules still require careful advice."),
             ("Is Japan good for retirement property?", "Japan can be strong for safety, healthcare, food, transport, and ownership clarity, but visa status and income expectations need separate planning."),
@@ -4823,25 +4823,27 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
 {head_html(GUIDE_HUB_TITLE, GUIDE_HUB_DESCRIPTION, canonical, schema_for_guide_hub(canonical, pages))}
   <style>
 {shared_content_css()}
-    .page-hero {{ min-height: 480px; background-position: center; }}
-    .guide-hero-card {{ align-self: start; margin-top: 40px; }}
+    .guide-page-hero {{ min-height: 430px; background-position: center; }}
+    .guide-page-hero .page-hero-grid {{ grid-template-columns: minmax(0, 720px); }}
     .guide-page-layout {{ display: block; max-width: 980px; margin: 0 auto; padding-top: 42px; }}
     .guide-page-layout .page-article {{ gap: 56px; }}
+    .guide-section-nav {{ display: flex; gap: 22px; margin: 0; padding: 15px 0; overflow-x: auto; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 800; letter-spacing: .045em; white-space: nowrap; scrollbar-width: thin; }}
+    .guide-section-nav a {{ color: var(--ink); text-decoration: none; }}
+    .guide-section-nav a:hover {{ color: var(--gold); }}
     .guide-kicker {{ margin: 0 0 12px; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }}
     .guide-intro {{ max-width: 720px; }}
     .guide-intro h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4.3vw, 44px); line-height: 1.02; }}
-    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 22px; border: 1px solid var(--line); background: var(--line); }}
-    .journey-card {{ min-width: 0; padding: 20px; background: var(--paper); color: var(--ink); text-decoration: none; }}
-    .journey-card:nth-child(2) {{ background: #eef4ec; }} .journey-card:nth-child(3) {{ background: #edf4f3; }}
+    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; margin-top: 28px; }}
+    .journey-card {{ min-width: 0; padding-top: 15px; border-top: 1px solid var(--ink); color: var(--ink); text-decoration: none; }}
     .journey-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
-    .journey-card strong {{ display: block; margin: 24px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; line-height: 1.05; }}
-    .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }}
+    .journey-card strong {{ display: block; margin: 14px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; line-height: 1.05; }}
+    .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }}
     .guide-feature {{ display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); gap: 34px; align-items: stretch; padding: 28px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }}
     .guide-feature__image {{ min-height: 330px; background: linear-gradient(150deg, rgba(36,49,45,.1), rgba(36,49,45,.46)), url("/assets/destination-dossier-coast.jpg"); background-position: center; background-size: cover; }}
     .guide-feature__copy {{ display: flex; flex-direction: column; justify-content: center; }}
     .guide-feature__copy h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(31px, 4vw, 47px); line-height: 1.01; }}
     .guide-feature__copy p {{ color: #3f4d48; }}
-    .guide-feature__copy .page-button {{ align-self: flex-start; margin-top: 12px; }}
+    .guide-text-link {{ display: inline-block; align-self: flex-start; margin-top: 14px; color: var(--ink); font-size: 13px; font-weight: 900; text-decoration: none; border-bottom: 1px solid currentColor; }}
     .guide-country-links {{ display: flex; flex-wrap: wrap; gap: 9px 18px; margin-top: 18px; }}
     .guide-country-links a {{ font-weight: 800; }}
     .guide-catalog {{ display: grid; gap: 46px; }}
@@ -4856,53 +4858,48 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     .guide-story__link {{ display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 900; }}
     .guide-research-note {{ padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }}
     .guide-research-note p {{ max-width: 710px; margin: 0; color: #3f4d48; }}
-    @media (max-width: 860px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .guide-feature {{ grid-template-columns: 1fr; }} .guide-feature__image {{ min-height: 260px; }} }}
-    @media (max-width: 560px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: 1fr; }} .guide-page-layout {{ padding-top: 30px; }} .guide-page-layout .page-article {{ gap: 38px; }} }}
+    @media (max-width: 860px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .guide-feature {{ grid-template-columns: 1fr; gap: 24px; }} .guide-feature__image {{ min-height: min(54vw, 390px); }} }}
+    @media (max-width: 560px) {{ .guide-page-hero {{ min-height: 350px; }} .guide-section-nav {{ gap: 17px; margin: 0 -2px; padding: 13px 2px; }} .journey-grid, .guide-story-grid {{ grid-template-columns: 1fr; gap: 22px; }} .guide-page-layout {{ padding-top: 26px; }} .guide-page-layout .page-article {{ gap: 38px; }} .journey-card {{ padding-top: 13px; }} .guide-feature {{ padding: 22px 0; }} .guide-feature__image {{ min-height: 250px; }} .guide-feature__copy h2 {{ font-size: 34px; }} }}
   </style>
 </head>
 <body>
-  <header class="page-hero">
+  <header class="page-hero guide-page-hero">
     <div class="page-shell">
       {primary_nav_html()}
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">The Global Property Journal · updated {updated}</p>
-          <h1>Global Property Buying Guides</h1>
-          <p class="page-lede">Independent ideas and evidence for buying, retiring, and investing abroad—without starting with a listing.</p>
+          <p class="page-eyebrow">Global Property Buying Guides · updated {updated}</p>
+          <h1>A considered guide to buying a home abroad</h1>
+          <p class="page-lede">Stories, places, and practical perspective for the life you are planning next.</p>
         </div>
-        <aside class="page-hero-card guide-hero-card">
-          <span>Editorial principle</span>
-          <strong>Start with the life you want, then test the property decision.</strong>
-          <p>Choose a buying brief, read the relevant research, then verify locally before committing capital.</p>
-        </aside>
       </div>
     </div>
   </header>
   <main>
     <div class="page-shell">
-      {sticky_page_nav([("Start", "choose-journey"), ("Featured", "featured-research"), ("Retirement", "retirement"), ("Second homes", "second-homes"), ("Risk", "risk"), ("Countries", "country-comparisons")])}
+      <nav class="guide-section-nav" aria-label="Guide sections"><a href="#choose-journey">Start here</a><a href="#featured-research">Featured story</a><a href="#retirement">Retirement</a><a href="#second-homes">Second homes</a><a href="#investment">Investment</a><a href="#country-comparisons">Places</a></nav>
       <div class="page-layout guide-page-layout">
         <article class="page-article">
           <section id="choose-journey">
             <div class="guide-intro">
-              <p class="guide-kicker">Begin with your brief</p>
-              <h2>Find the right guide for your purchase</h2>
+              <p class="guide-kicker">Where to begin</p>
+              <h2>Choose the question that matters most to you.</h2>
             </div>
             <div class="journey-grid">
-              <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement route"><span>Route 01</span><strong>Retirement or lifestyle base</strong><p>Healthcare, daily convenience, climate, community, and resale depth.</p></a>
-              <a class="journey-card" href="#second-homes" data-track="guide_journey_click" data-track-label="Second home route"><span>Route 02</span><strong>Second home abroad</strong><p>Repeat use, family visits, rental offset, and sensible ownership process.</p></a>
-              <a class="journey-card" href="#investment" data-track="guide_journey_click" data-track-label="Investment route"><span>Route 03</span><strong>Investment-led shortlist</strong><p>Yield realism, value entry, regulatory risk, and future exit liquidity.</p></a>
-              <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Risk route"><span>Route 04</span><strong>Ownership and risk first</strong><p>Title clarity, foreign-buyer rules, taxes, permits, and adviser depth.</p></a>
+              <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement"><span>A new chapter</span><strong>Retirement or lifestyle base</strong><p>Healthcare, climate, community, and the rhythm of daily life.</p></a>
+              <a class="journey-card" href="#second-homes" data-track="guide_journey_click" data-track-label="Second homes"><span>A second address</span><strong>Second home abroad</strong><p>Family time, repeat stays, and ownership that feels uncomplicated.</p></a>
+              <a class="journey-card" href="#investment" data-track="guide_journey_click" data-track-label="Investment"><span>A thoughtful investment</span><strong>Investment-led shortlist</strong><p>Value, income, regulation, and the quality of your eventual exit.</p></a>
+              <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Ownership and risk"><span>Before you commit</span><strong>Ownership and risk first</strong><p>Rules, taxes, title, and the questions worth settling early.</p></a>
             </div>
           </section>
           {retirement_calculator_callout("guide-research-note", "guide hub")}
           <section class="guide-feature" id="featured-research">
             <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
             <div class="guide-feature__copy">
-              <p class="guide-kicker">Featured research</p>
+              <p class="guide-kicker">The featured story</p>
               <h2>{escape(featured_page["h1"])}</h2>
               <p>{escape(featured_page["description"])}</p>
-              <a class="page-button" href="/{escape(featured_page["slug"])}/">Read the featured guide</a>
+              <a class="guide-text-link" href="/{escape(featured_page["slug"])}/">Read the story</a>
             </div>
           </section>
           <section class="guide-research-note">
@@ -5261,6 +5258,31 @@ def build_seo_page(
         }
         else ""
     )
+    editorial_content = ""
+    if page["slug"] == "japan-retirement-property-foreign-buyers":
+        editorial_content = """
+          <section class="seo-section"><h2>Japan through five retirement lenses</h2><p>Japan is compelling for retirement not because it is cheap or effortless, but because a few places make daily life unusually dependable. We use the same ten-pillar methodology as the Atlas, grouped here into five questions that matter most when a home must work for months, not weekends.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Lifestyle magnetism 10% · Retirement fit 11%</p><h2>Live well, year after year</h2><p>Fukuoka and Itoshima are the strongest all-season answer: city hospitals, a serious food culture and Kyushu at the doorstep, with coast available when the day should slow down. Hakone and Izu exchange city energy for onsen, gardens and a Tokyo-adjacent rhythm. Hakuba and Niseko are more deliberate choices: outstanding winter, increasingly credible green-season activity, but a life shaped by snow and shoulder season.</p><p>For a long stay, the distinction is practical. The Ministry of Health says qualifying foreign residents can use Japan's public system; ownership alone does not confer that eligibility. Fukuoka therefore has the clearest retirement utility of the four, while a mountain or resort home asks you to accept longer journeys for specialist care and a more seasonal social calendar.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Global access 10% · Foreigner fit 7%</p><h2>Reach it easily—and feel at home there</h2><p>Fukuoka wins on friction: JNTO notes that Hakata is a five-minute train ride from Fukuoka Airport. That changes how often a home gets used, and makes Korea, Taiwan and wider Asian connections genuinely convenient. Hakone and Izu work for Tokyo-based lives; Hakuba and Niseko require a winter-transfer plan, not a romantic assumption about the last mile.</p><p>Niseko has the most established international resort ecosystem and strong Chinese-speaking familiarity. Fukuoka offers deeper year-round urban services. In every location, Japanese remains the language of tradespeople, clinics and municipal administration; politeness is generous, but integration comes through repetition and language effort rather than an English-speaking bubble.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Ownership clarity 12% · Regulatory safety 8%</p><h2>Own and operate cleanly</h2><p>Foreigners can generally own Japanese land and buildings freehold. That clarity is a real advantage, but it is separate from residency, financing and public-health eligibility. For a non-resident purchase, the Ministry of Finance says FEFTA reporting is generally required through the Bank of Japan within 20 days after acquisition; the transaction is straightforward only when those parallel tracks are treated separately.</p><p>Rental use is market-specific. In Niseko and Hakuba, the operating model matters as much as the chalet: management, snow response and local compliance shape the income result. Minpaku is capped nationally at 180 days a year, and local rules can be tighter. Hakone and Izu need the same diligence, particularly where older stock, slopes and municipality rules meet an assumed short-stay plan.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Rental profit 13% · Capital upside 9%</p><h2>Income and upside need different stories</h2><p>Fukuoka's case is domestic and regional demand: a practical city base, resilient travel and a lower entry benchmark than global resorts. Hakone and Izu benefit from Tokyo weekend demand, but old homes and uneven rental evidence make them a personal-use-first decision. Hakuba is the earlier-stage ski proposition—lower entry than Niseko, a growing international profile and summer hiking or biking, offset by execution-heavy winter operations.</p><p>Niseko is the premium version: global Asian and Australian ski demand, high winter rates and branded-residence appeal. The cost is a far higher entry level, substantial operating friction and a more concentrated seasonal thesis. Neither resort should be described with a single yield number; owner use, management, snow, maintenance and the local permit route decide the outcome.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Exit liquidity 9% · Value entry 11%</p><h2>Preserve the exit—and the entry discipline</h2><p>Fukuoka is the broadest retirement asset of the four because domestic city demand sits beneath the foreign-buyer story. Hakone and Izu can offer striking low entry prices, but the gap between a charming bargain and an expensive renovation is wide. Hakuba has thinner liquidity than Niseko, so the price paid and the operator selected matter more.</p><p>Niseko has the clearest international resort buyer pool, but prime Hirafu pricing already reflects that recognition. The retirement conclusion is not that one location wins every pillar: choose Fukuoka for year-round use, Hakone or Izu for Tokyo-adjacent escape, Hakuba for earlier-stage mountain upside, and Niseko only when the premium winter thesis and its costs are fully acceptable.</p></section>
+          <section class="seo-section"><h2>Primary sources to use with advisers</h2><p><a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html">Japan's Ministry of Finance: non-resident real-property reporting</a>; <a href="https://www.mlit.go.jp/report/press/totikensangyo13_hh_000269.html">MLIT: real-estate transaction, registration, tax and planning systems</a>; <a href="https://www.mhlw.go.jp/content/12400000/001406614.pdf">MHLW: health insurance for foreign residents</a>; <a href="https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html">Japan Tourism Agency: the Private Lodging Business Act</a>; <a href="https://faq.japan-travel.jnto.go.jp/en/plan/airport-access/fukuoka-airport/">JNTO: Fukuoka Airport access</a>; <a href="https://www.stat.go.jp/english/data/nenkan/74nenkan/1431-20.html">Statistics Bureau: regional consumer-price comparisons</a>.</p></section>
+        """
+    generic_intro = f"""
+          <section class="seo-section">
+            <h2>How to Read This Shortlist</h2>
+            <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
+            <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process.</p>
+          </section>
+        """
+    is_japan_article = bool(editorial_content)
+    hero_actions = "" if is_japan_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations">Open the full dashboard</a><a class="seo-button secondary" href="#comparison">Compare destinations</a></div>'''
+    hero_aside = "" if is_japan_article else f'''<aside class="seo-hero-card"><span>Top current match</span><strong>{escape(top["name"])}</strong><span>Alternative to test</span><strong>{escape(runner_up["name"])}</strong><span>Destinations compared</span><strong>{len(selected)}</strong></aside>'''
+    guide_summary = "" if is_japan_article else f'''<section class="seo-panel" aria-label="Guide summary"><div class="seo-stats"><div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div><div><span>Destinations</span><strong>{len(selected)}</strong></div><div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div><div><span>Research status</span><strong>Updated {updated}</strong></div></div></section>'''
+    decision_path = "" if is_japan_article else guide_decision_path_html(page, destinations, pages)
+    destination_notes_title = "Four places to test in person" if is_japan_article else "Destination Notes for Serious Buyers"
+    decision_framework_html = "" if is_japan_article else """<section class="seo-section"><h2>Decision Framework</h2><h3>1. Start with ownership clarity</h3><p>Foreign buyers should eliminate markets where the legal structure is hard to explain, hard to finance, or heavily dependent on informal assumptions.</p><h3>2. Underwrite lifestyle as demand</h3><p>Lifestyle, access, safety, and year-round activity make a place usable by the owner and attractive to future buyers or tenants.</p><h3>3. Treat yield as a stress test</h3><p>Net yield needs to survive management fees, vacancy, repairs, taxes, furnishing, insurance, and regulatory changes.</p><h3>4. Plan the exit before entry</h3><p>Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p></section>"""
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5406,44 +5428,21 @@ def build_seo_page(
           <h1>{escape(page["h1"])}</h1>
           <p class="seo-lede">{escape(intro)} This guide is written for {escape(page["intent"])}.</p>
           {generated_link}
-          <div class="seo-actions">
-          <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a>
-          <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a>
-          </div>
+          {hero_actions}
         </div>
-        <aside class="seo-hero-card">
-          <span>Top current match</span>
-          <strong>{escape(top["name"])}</strong>
-          <span>Alternative to test</span>
-          <strong>{escape(runner_up["name"])}</strong>
-          <span>Destinations compared</span>
-          <strong>{len(selected)}</strong>
-        </aside>
+        {hero_aside}
       </div>
     </div>
   </header>
   <main>
     <div class="seo-shell">
-      <section class="seo-panel" aria-label="Guide summary">
-        <div class="seo-stats">
-          <div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div>
-          <div><span>Destinations</span><strong>{len(selected)}</strong></div>
-          <div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div>
-          <div><span>Research status</span><strong>Updated {updated}</strong></div>
-        </div>
-      </section>
-      {guide_decision_path_html(page, destinations, pages)}
+      {guide_summary}
+      {decision_path}
       {vacation_home_quick_answer_html(page, destinations)}
       <div class="seo-content">
         <article class="seo-article">
           {retirement_callout}
-          <section class="seo-section">
-            <h2>How to Read This Shortlist</h2>
-            <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
-            <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process. Global Home Atlas ranks destinations through ten decision dimensions: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry.</p>
-            <p>That weighting is designed for affluent global citizens who may use one property for several jobs over time. A home can begin as a vacation base, become a semi-retirement address, then eventually need to rent or sell. The best destinations on this page are therefore not selected only for near-term excitement. They are selected because the evidence points to a more durable combination of livability, practicality, and investment defensibility.</p>
-            <p>Use this page as a first-pass filter. It narrows the research field, highlights where each destination is strong, and shows which tradeoffs need professional verification. Before buying, confirm title, taxes, foreign-buyer rules, visa status, insurance, building condition, local rental permits, manager quality, and resale comparables with independent local advisers.</p>
-          </section>
+          {editorial_content or generic_intro}
 
           <section class="seo-section" id="comparison">
             <h2>Best Destinations to Compare First</h2>
@@ -5452,23 +5451,13 @@ def build_seo_page(
           </section>
 
           <section class="seo-section">
-            <h2>Destination Notes for Serious Buyers</h2>
+            <h2>{destination_notes_title}</h2>
             <div class="seo-card-grid">
               {build_seo_destination_cards(selected)}
             </div>
           </section>
 
-          <section class="seo-section">
-            <h2>Decision Framework</h2>
-            <h3>1. Start with ownership clarity</h3>
-            <p>Foreign buyers should eliminate markets where the legal structure is hard to explain, hard to finance, or heavily dependent on informal assumptions. A beautiful asset can become a poor decision if land rights, permits, taxes, or resale procedures are unclear. The ownership score in this guide is therefore intentionally prominent.</p>
-            <h3>2. Underwrite lifestyle as demand</h3>
-            <p>Lifestyle is not decoration. Food, healthcare, airport access, safety, climate, and year-round activity are the forces that make a place usable by the owner and attractive to future buyers or tenants. A market with repeated lifestyle demand has more ways to work if the original plan changes.</p>
-            <h3>3. Treat yield as a stress test</h3>
-            <p>Rental income should offset risk, not justify ignoring it. Net yield estimates need to survive management fees, vacancy, repairs, taxes, furnishing, platform costs, insurance, and regulatory changes. A lower but cleaner yield in a liquid market can be superior to a headline yield that depends on aggressive occupancy or fragile short-term-rental permissions.</p>
-            <h3>4. Plan the exit before entry</h3>
-            <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
-          </section>
+          {decision_framework_html}
 
           <section class="seo-section">
             <h2>Related Buying Guides</h2>
