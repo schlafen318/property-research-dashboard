@@ -144,12 +144,23 @@
 
   function financingLabel(profile, purchaseMethod) {
     if (purchaseMethod === "cash") return "Cash purchase";
-    return {
+    const label = {
       likely_available: "Likely available",
       conditional: "Available with conditions",
       no_standard_nonresident_route: "No standard non-resident route identified",
       research_incomplete: "Research incomplete",
     }[profile.availability] || "Research incomplete";
+    return purchaseMethod === "not_sure" ? "Illustrative mortgage · " + label : label;
+  }
+
+  function profileMatchesBuyer(input) {
+    const user = input && input.user || {};
+    const profile = input && input.profile || {};
+    const residencies = Array.isArray(profile.eligible_residency) ? profile.eligible_residency : [];
+    const incomeSources = Array.isArray(profile.eligible_income_sources) ? profile.eligible_income_sources : [];
+    const residency = user.residency || "non_resident";
+    const incomeSource = user.incomeSource || "overseas";
+    return residencies.includes(residency) && incomeSources.includes(incomeSource);
   }
 
   function recommendDestinations(input) {
@@ -204,6 +215,10 @@
         }
         if (mortgageRequested && mortgageProfile.availability === "no_standard_nonresident_route") {
           excluded.push({ destinationId: destination.id, name: destination.name, reasonCode: "no_standard_mortgage" });
+          return;
+        }
+        if (mortgageRequested && !profileMatchesBuyer({ user: user, profile: mortgageProfile })) {
+          excluded.push({ destinationId: destination.id, name: destination.name, reasonCode: "mortgage_profile_mismatch" });
           return;
         }
         const profile = cost.profiles[user.household];
@@ -296,6 +311,7 @@
     projectPortfolio: projectPortfolio,
     retirementTargetInput: retirementTargetInput,
     fundingTier: fundingTier,
+    profileMatchesBuyer: profileMatchesBuyer,
     recommendDestinations: recommendDestinations,
   };
 });

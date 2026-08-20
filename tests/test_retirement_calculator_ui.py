@@ -29,6 +29,22 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_detail_handoff_accepts_only_allowlisted_categories(self) -> None:
+        self.assertEqual(
+            {"destination": "valencia", "household": "couple", "housing": "buy_now"},
+            run_ui(
+                "retirementPrefill",
+                "?destination=valencia&household=couple&housing=buy_now&capital=900000&passport=GB",
+            ),
+        )
+        self.assertEqual(
+            {"destination": "", "household": "", "housing": ""},
+            run_ui(
+                "retirementPrefill",
+                "?destination=%3Cscript%3E&household=family&housing=sell&income=40000",
+            ),
+        )
+
     def test_first_valid_result_is_tracked_once_and_reveals_save_intent(self) -> None:
         source = UI_MODULE.read_text(encoding="utf-8")
 

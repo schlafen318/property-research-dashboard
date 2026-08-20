@@ -68,6 +68,8 @@ def mortgage_profile(availability: str = "likely_available", maximum_ltv: float 
         "maximum_term_years": 30,
         "maximum_age_at_maturity": 80,
         "conditions": [],
+        "eligible_residency": ["non_resident"],
+        "eligible_income_sources": ["overseas"],
         "confidence": "high" if availability != "research_incomplete" else "low",
         "evidence_date": "2026-08-20",
         "sources": [],
@@ -95,6 +97,26 @@ def user_payload(**overrides: object) -> dict:
 
 
 class RetirementDestinationFinderTests(unittest.TestCase):
+    def test_conditional_mortgage_requires_matching_residency_and_income_profile(self) -> None:
+        profile = mortgage_profile("conditional", 0.6)
+        profile["eligible_residency"] = ["resident"]
+        profile["eligible_income_sources"] = ["documented_overseas_income"]
+        self.assertFalse(
+            run_finder(
+                "profileMatchesBuyer",
+                {"user": {"residency": "non_resident", "incomeSource": "overseas"}, "profile": profile},
+            )
+        )
+        self.assertTrue(
+            run_finder(
+                "profileMatchesBuyer",
+                {
+                    "user": {"residency": "resident", "incomeSource": "documented_overseas_income"},
+                    "profile": profile,
+                },
+            )
+        )
+
     def test_retirement_engine_exposes_target_alias_without_changing_result(self) -> None:
         payload = base_payload()
         self.assertEqual(
