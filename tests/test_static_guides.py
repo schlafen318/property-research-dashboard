@@ -64,6 +64,15 @@ class GuideHubIndexingTests(unittest.TestCase):
         self.assertIn('/best-countries-for-expats-to-buy-property/"', text)
         self.assertIn('/best-countries-to-buy-property-as-a-foreigner/"', text)
 
+    def test_retirement_calculator_callout_precedes_the_full_catalog(self) -> None:
+        html = GUIDE_HUB.read_text(encoding="utf-8")
+
+        self.assertEqual(1, html.count('href="/retirement-abroad-calculator/"'))
+        self.assertLess(
+            html.index('href="/retirement-abroad-calculator/"'),
+            html.index('class="guide-catalog"'),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

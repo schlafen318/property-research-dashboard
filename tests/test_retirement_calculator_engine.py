@@ -46,6 +46,8 @@ def base_payload() -> dict:
         "generalInflation": 0.026,
         "emergencyReserveMonths": 12,
         "expectedPortfolioReturn": 0.05,
+        "monthlyIncomeBeforeRetirement": 0,
+        "incomeInvestedRate": 0,
     }
 
 
@@ -63,6 +65,8 @@ def level_cash_flow_payload() -> dict:
         "generalInflation": 0,
         "emergencyReserveMonths": 0,
         "expectedPortfolioReturn": 0,
+        "monthlyIncomeBeforeRetirement": 0,
+        "incomeInvestedRate": 0,
     }
 
 
@@ -105,6 +109,67 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertEqual(0, result["homePurchaseNeededToday"])
         self.assertAlmostEqual(expected_today, result["totalNeededToday"], places=6)
         self.assertEqual(result["retirementCapital"], result["totalCapitalAtRetirement"])
+
+    def test_monthly_contributions_reduce_the_lump_sum_needed_today(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "monthlyIncomeBeforeRetirement": 1000,
+                "incomeInvestedRate": 0.5,
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual(6000, result["contributionValueAtRetirement"])
+        self.assertEqual(24000, result["investmentNeededToday"])
+        self.assertEqual(
+            [
+                {"year": 0, "lumpSumValue": 24000, "contributionValue": 0, "totalValue": 24000},
+                {"year": 1, "lumpSumValue": 24000, "contributionValue": 6000, "totalValue": 30000},
+            ],
+            result["annualAccumulation"],
+        )
+
+    def test_monthly_income_rises_annually_with_general_inflation(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "currentAge": 58,
+                "retirementAge": 60,
+                "monthlyIncomeBeforeRetirement": 1000,
+                "incomeInvestedRate": 0.5,
+                "generalInflation": 0.10,
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual(12600, result["contributionValueAtRetirement"])
+        self.assertEqual(17400, result["investmentNeededToday"])
+        self.assertEqual(6000, result["annualAccumulation"][1]["contributionValue"])
+        self.assertEqual(12600, result["annualAccumulation"][2]["contributionValue"])
+
+    def test_monthly_contributions_use_the_equivalent_monthly_return(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "expectedPortfolioReturn": 0.12,
+                "monthlyIncomeBeforeRetirement": 1000,
+                "incomeInvestedRate": 0.1,
+            }
+        )
+        result = calculate(payload)
+        self.assertAlmostEqual(1264.6497908353188, result["contributionValueAtRetirement"], places=6)
+        self.assertAlmostEqual(22889.161083255633, result["investmentNeededToday"], places=6)
+
+    def test_contributions_above_the_target_floor_the_lump_sum_at_zero(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "monthlyIncomeBeforeRetirement": 10000,
+                "incomeInvestedRate": 1,
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual(0, result["investmentNeededToday"])
+        self.assertEqual(120000, result["contributionValueAtRetirement"])
 
     def test_inflation_projects_every_retirement_year(self) -> None:
         payload = level_cash_flow_payload()

@@ -133,18 +133,29 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
     def test_primary_ranking_table_focuses_on_decision_relevant_numbers(self) -> None:
         marker = 'id="ranking"'
         table = self.html.split(marker, 1)[1].split("</table>", 1)[0]
-        self.assertIn("Annual cost", table)
+        self.assertIn("Atlas rank", table)
+        self.assertIn("Annual cost incl. rent", table)
         self.assertIn("Savings needed", table)
         self.assertIn("Home purchase estimate", table)
         self.assertNotIn("<th>Liquid portfolio</th>", table)
         self.assertNotIn("<th>Emergency reserve</th>", table)
 
+    def test_annual_cost_method_is_explained_next_to_the_ranking(self) -> None:
+        ranking = self.html.split('id="ranking"', 1)[1].split("</section>", 1)[0]
+        self.assertIn("How annual cost is estimated", ranking)
+        self.assertIn("Annual cost includes rent", ranking)
+        self.assertIn("private healthcare", ranking)
+        self.assertIn("travel", ranking)
+        self.assertIn("contingency", ranking)
+        self.assertIn("Home purchase costs are separate", ranking)
+
     def test_ranking_headers_are_sortable_and_use_plain_language(self) -> None:
         ranking = self.html.split('id="ranking"', 1)[1].split("</section>", 1)[0]
         for key, label in (
             ("rank", "Cost rank"),
+            ("atlas", "Atlas rank"),
             ("name", "Destination"),
-            ("annual", "Annual cost"),
+            ("annual", "Annual cost incl. rent"),
             ("savings", "Savings needed"),
             ("property", "Home purchase estimate"),
         ):

@@ -14,7 +14,8 @@ def run_ui(function_name: str, payload: object) -> object:
     script = (
         "const ui = require(process.argv[1]);"
         "const input = JSON.parse(process.argv[2]);"
-        f"process.stdout.write(JSON.stringify(ui.{function_name}(input)));"
+        f"const fn = ui.{function_name} || (() => null);"
+        "process.stdout.write(JSON.stringify(fn(input)));"
     )
     result = subprocess.run(
         ["node", "-e", script, str(UI_MODULE), json.dumps(payload)],
@@ -28,8 +29,121 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_first_valid_result_is_tracked_once_and_reveals_save_intent(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+
+        self.assertIn("let hasTrackedResult = false;", source)
+        self.assertIn('track("retirement_calculator_result_view")', source)
+        self.assertIn("hasTrackedResult = true;", source)
+        self.assertIn('el("ret-save-action").hidden = false;', source)
+        self.assertIn('el("ret-save-intent-button").addEventListener("click"', source)
+        self.assertIn('el("ret-save-intent-status").hidden = false;', source)
+
+    def test_current_cost_input_events_reuse_the_latest_retirement_result(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+
+        self.assertIn(
+            'el(id).addEventListener("input", function () { renderCurrentCostComparison(); });',
+            source,
+        )
+        self.assertNotIn(
+            'el(id).addEventListener("input", renderCurrentCostComparison);',
+            source,
+        )
+
     def test_converts_monthly_spending_to_annual_for_the_engine(self) -> None:
         self.assertEqual(64_596, run_ui("annualSpendingFromMonthly", 5_383))
+
+    def test_current_cost_comparison_reports_a_lower_destination_cost(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "lower",
+                "monthlyDifference": 1_500,
+                "annualDifference": 18_000,
+                "percentDifference": 25,
+                "currentBarPercent": 100,
+                "destinationBarPercent": 75,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 6_000, "destinationMonthly": 4_500},
+            ),
+        )
+
+    def test_current_cost_comparison_reports_a_higher_destination_cost(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "monthlyDifference": 1_500,
+                "annualDifference": 18_000,
+                "percentDifference": 30,
+                "currentBarPercent": 76.92307692307693,
+                "destinationBarPercent": 100,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 5_000, "destinationMonthly": 6_500},
+            ),
+        )
+
+    def test_current_cost_comparison_handles_equal_and_missing_costs(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "same",
+                "monthlyDifference": 0,
+                "annualDifference": 0,
+                "percentDifference": 0,
+                "currentBarPercent": 100,
+                "destinationBarPercent": 100,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 4_000, "destinationMonthly": 4_000},
+            ),
+        )
+
+    def test_retirement_target_comparison_reports_destination_reduction(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "lower",
+                "targetDifference": 500_000,
+                "percentDifference": 25,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 2_000_000, "destinationTarget": 1_500_000},
+            ),
+        )
+
+    def test_retirement_target_comparison_reports_increase_and_handles_zero_current_target(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "targetDifference": 300_000,
+                "percentDifference": 20,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 1_500_000, "destinationTarget": 1_800_000},
+            ),
+        )
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "targetDifference": 1_800_000,
+                "percentDifference": None,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 0, "destinationTarget": 1_800_000},
+            )
+        )
+        self.assertIsNone(
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 0, "destinationMonthly": 4_000},
+            )
+        )
 
     def test_owner_plans_use_owner_costs(self) -> None:
         profile = {
@@ -40,6 +154,65 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertEqual(49_000, run_ui("annualBenchmark", {"profile": profile, "plan": "rent"}))
         for plan in ("own", "buy_now", "buy_retirement"):
             self.assertEqual(33_000, run_ui("annualBenchmark", {"profile": profile, "plan": plan}))
+
+    def test_destination_costs_rank_the_full_input_by_monthly_household_cost(self) -> None:
+        destinations = [
+            {
+                "destination_id": "alpha",
+                "name": "Alpha",
+                "profiles": {
+                    "couple": {
+                        "categories_usd": {"living": 100},
+                        "annual_rent_usd": 1100,
+                        "annual_owner_costs_usd": 500,
+                    }
+                },
+            },
+            {
+                "destination_id": "beta",
+                "name": "Beta",
+                "profiles": {
+                    "couple": {
+                        "categories_usd": {"living": 200},
+                        "annual_rent_usd": 400,
+                        "annual_owner_costs_usd": 100,
+                    }
+                },
+            },
+        ]
+        self.assertEqual(
+            [
+                {"destinationId": "beta", "name": "Beta", "monthlyCost": 50},
+                {"destinationId": "alpha", "name": "Alpha", "monthlyCost": 100},
+            ],
+            run_ui(
+                "rankDestinationCosts",
+                {"destinations": destinations, "household": "couple", "plan": "rent"},
+            ),
+        )
+
+    def test_destination_costs_use_owner_running_costs_for_purchase_plans(self) -> None:
+        destinations = [
+            {
+                "destination_id": "alpha",
+                "name": "Alpha",
+                "profiles": {
+                    "couple": {
+                        "categories_usd": {"living": 100},
+                        "annual_rent_usd": 1100,
+                        "annual_owner_costs_usd": 500,
+                    }
+                },
+            }
+        ]
+        for plan in ("own", "buy_now", "buy_retirement"):
+            self.assertEqual(
+                [{"destinationId": "alpha", "name": "Alpha", "monthlyCost": 50}],
+                run_ui(
+                    "rankDestinationCosts",
+                    {"destinations": destinations, "household": "couple", "plan": plan},
+                ),
+            )
 
     def test_only_purchase_plans_use_property_budget(self) -> None:
         self.assertFalse(run_ui("usesPropertyBudget", "rent"))
@@ -108,6 +281,100 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertEqual(
             "Monthly retirement living expenses after purchase, including owner running costs but not the home purchase at retirement.",
             run_ui("housingGuidance", "buy_retirement"),
+        )
+
+    def test_housing_expense_labels_name_the_included_cost(self) -> None:
+        self.assertEqual(
+            {
+                "input": "Monthly retirement living expenses including rent",
+                "result": "Annual spending incl. rent",
+            },
+            run_ui("housingExpenseLabels", "rent"),
+        )
+        for plan in ("own", "buy_now", "buy_retirement"):
+            self.assertEqual(
+                {
+                    "input": "Monthly retirement living expenses including owner costs",
+                    "result": "Annual spending incl. owner costs",
+                },
+                run_ui("housingExpenseLabels", plan),
+            )
+
+    def test_accumulation_chart_model_stacks_each_funding_source_by_year(self) -> None:
+        result = run_ui(
+            "accumulationChartModel",
+            {
+                "series": [
+                    {"year": 0, "lumpSumValue": 100, "contributionValue": 0, "totalValue": 100},
+                    {"year": 1, "lumpSumValue": 110, "contributionValue": 40, "totalValue": 150},
+                ],
+                "targetValue": 200,
+            },
+        )
+        self.assertEqual(200, result["maximum"])
+        self.assertEqual(18, result["targetY"])
+        self.assertEqual(
+            {
+                "year": 1,
+                "lumpSumValue": 110,
+                "contributionValue": 40,
+                "totalValue": 150,
+                "lumpHeight": 132,
+                "contributionHeight": 48,
+            },
+            result["years"][1],
+        )
+
+    def test_return_sensitivity_uses_one_percentage_point_either_side(self) -> None:
+        self.assertEqual(
+            [
+                {"key": "lower", "label": "Lower return", "rate": 0.04},
+                {"key": "selected", "label": "Your assumption", "rate": 0.05},
+                {"key": "higher", "label": "Higher return", "rate": 0.06},
+            ],
+            run_ui("sensitivityRates", 0.05),
+        )
+
+    def test_planning_summary_leads_with_investment_and_monthly_contribution(self) -> None:
+        self.assertEqual(
+            "Invest $986,656 today and $2,000 per month to fund this retirement plan.",
+            run_ui(
+                "planningSummary",
+                {
+                    "investmentNeededToday": 986_656,
+                    "monthlyContributionToday": 2_000,
+                    "homePurchaseNeededToday": 0,
+                },
+            ),
+        )
+        self.assertEqual(
+            "Invest $986,656 today and $2,000 per month for retirement, plus $500,000 for the home purchase.",
+            run_ui(
+                "planningSummary",
+                {
+                    "investmentNeededToday": 986_656,
+                    "monthlyContributionToday": 2_000,
+                    "homePurchaseNeededToday": 500_000,
+                },
+            ),
+        )
+
+    def test_chart_tooltip_reports_age_and_each_source_for_the_selected_year(self) -> None:
+        self.assertEqual(
+            {
+                "heading": "Year 3 · age 53",
+                "lumpSum": "$110",
+                "contributions": "$40",
+                "total": "$150",
+                "accessibleLabel": "Year 3, age 53. Lump sum and growth $110. Contributions and growth $40. Total $150.",
+            },
+            run_ui(
+                "accumulationTooltipContent",
+                {
+                    "currentAge": 50,
+                    "point": {"year": 3, "lumpSumValue": 110, "contributionValue": 40, "totalValue": 150},
+                },
+            ),
         )
 
 

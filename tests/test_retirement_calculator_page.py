@@ -51,7 +51,6 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("<h1>Retirement Abroad Calculator</h1>", self.html)
         self.assertIn('"@type":"WebApplication"', self.compact_html)
         self.assertIn('"@type":"FAQPage"', self.compact_html)
-        self.assertIn("Retirement cost benchmarks by destination", self.html)
         self.assertIn("Fukuoka / Itoshima", self.html)
         self.assertIn("Málaga / Costa del Sol", self.html)
         self.assertIn("Portfolio dividends and interest", self.html)
@@ -72,34 +71,174 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-other-income",
             "ret-rental-income",
             "ret-expected-return",
+            "ret-monthly-income",
+            "ret-income-invested-rate",
+            "ret-current-location",
+            "ret-current-monthly-spending",
             "ret-calculate",
         }
         self.assertTrue(expected_controls.issubset(parser.control_ids))
         self.assertTrue(expected_controls - {"ret-calculate"} <= parser.label_targets)
-        self.assertEqual(1, parser.live_regions)
+        self.assertEqual(2, parser.live_regions)
         self.assertGreaterEqual(parser.noscript_sections, 1)
 
     def test_housing_inputs_match_how_retirees_plan(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
-        self.assertIn('for="ret-monthly-spending">Monthly retirement living expenses (today\'s USD)</label>', form)
+        self.assertIn('id="ret-monthly-spending-label" for="ret-monthly-spending">Monthly retirement living expenses including rent</label>', form)
         self.assertIn('id="ret-monthly-spending" type="number" min="0" step="1"', form)
-        self.assertIn('for="ret-property-budget">Home purchase budget today (USD)</label>', form)
+        self.assertIn('for="ret-property-budget">Home purchase budget today</label>', form)
         self.assertIn('id="ret-property-budget" type="number" min="0" step="1"', form)
         self.assertIn('id="ret-housing-guidance"', form)
-        self.assertIn('for="ret-rental-income">Other net rental income (annual USD)</label>', form)
+        self.assertIn('<option value="rent" selected>Rent</option>', form)
+        self.assertIn('id="ret-cost-compare-open" type="button">Compare destination retirement costs</button>', form)
         self.assertIn("Leave at $0 when your destination home is for your own use", form)
         self.assertNotIn("Annual spending today (USD)", form)
         self.assertNotIn("Destination net rental income", form)
 
+    def test_destination_cost_sidecar_is_an_accessible_dynamic_selector(self) -> None:
+        self.assertIn('<dialog class="cost-sidecar" id="ret-cost-sidecar" aria-labelledby="ret-cost-sidecar-title">', self.html)
+        self.assertIn('<h2 id="ret-cost-sidecar-title">Compare monthly living expenses</h2>', self.html)
+        self.assertIn('id="ret-cost-sidecar-close" type="button" aria-label="Close destination comparison"', self.html)
+        self.assertIn('id="ret-cost-sidecar-chart"', self.html)
+        self.assertNotIn('href="/retirement-destinations-ranked-by-cost/">Compare destination retirement costs</a>', self.html)
+
+    def test_income_section_states_period_and_currency_once(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        self.assertIn("<legend>Income continuing after retirement (annual)</legend>", form)
+        self.assertIn('for="ret-pension">Pension</label>', form)
+        self.assertIn('for="ret-other-income">Other non-portfolio income</label>', form)
+        self.assertIn('for="ret-rental-income">Net rental income</label>', form)
+        self.assertNotIn("Annual pension (USD)", form)
+        self.assertNotIn("Other non-portfolio income (USD)", form)
+        self.assertNotIn("Other net rental income (annual USD)", form)
+
     def test_personalized_form_uses_cash_flow_inputs(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
-        self.assertIn("Monthly retirement living expenses (today's USD)", form)
+        self.assertIn("Monthly retirement living expenses including rent", form)
         self.assertIn('<option value="buy_now">Buy now</option>', form)
-        self.assertIn('<option value="buy_retirement" selected>Buy at retirement</option>', form)
+        self.assertIn('<option value="buy_retirement">Buy at retirement</option>', form)
+        self.assertNotIn('<option value="buy_retirement" selected>', form)
         self.assertIn("Expected annual portfolio return after fees (%)", form)
         self.assertIn('id="ret-expected-return" type="number" min="-5" max="15" step="0.1" required', form)
         for removed in ("ret-withdrawal-rate", "ret-income-preset", "ret-cash-yield"):
             self.assertNotIn(f'id="{removed}"', form)
+
+    def test_pre_retirement_income_is_monthly_and_inflation_adjusted(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        self.assertIn("<legend>Income you receive now (monthly)</legend>", form)
+        self.assertIn('for="ret-monthly-income">After-tax monthly income</label>', form)
+        self.assertIn('id="ret-monthly-income" type="number" min="0" step="100" value="0"', form)
+        self.assertIn('for="ret-income-invested-rate">Share invested from income (%)</label>', form)
+        self.assertIn('id="ret-monthly-investment-preview">Monthly contribution: $0</p>', form)
+        self.assertIn('id="ret-income-invested-rate" type="number" min="0" max="100" step="1" value="20"', form)
+        self.assertIn("Income rises annually with general inflation and the selected share is invested monthly.", form)
+
+    def test_page_states_currency_once_and_leads_with_a_decisive_result(self) -> None:
+        self.assertIn("All amounts are in today's USD unless marked “at retirement”", self.html)
+        results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
+        self.assertIn('id="ret-plan-summary"', results)
+        self.assertIn('id="ret-sensitivity"', results)
+        self.assertIn('id="ret-sensitivity-rows"', results)
+        self.assertIn('id="ret-housing-comparison"', results)
+        self.assertIn('id="ret-housing-comparison-rows"', results)
+
+    def test_sticky_result_panel_stays_compact_and_details_span_below_it(self) -> None:
+        detailed_marker = '<section class="calc-panel detailed-projection" id="ret-detailed-projection" hidden'
+        self.assertIn('</section>\n    ' + detailed_marker, self.html)
+        top_layout = self.html.split('<section class="calculator-layout"', 1)[1].split(
+            '</section>\n    ' + detailed_marker,
+            1,
+        )[0]
+        result_panel = top_layout.split('id="ret-results"', 1)[1]
+        self.assertIn('id="ret-plan-summary"', result_panel)
+        self.assertIn('id="ret-today-section"', result_panel)
+        self.assertIn('id="ret-total-today"', result_panel)
+        self.assertIn('id="ret-total-retirement-summary"', result_panel)
+        self.assertIn('id="ret-monthly-contribution"', result_panel)
+        self.assertIn('id="ret-home-summary" hidden', result_panel)
+        for detail_id in (
+            "ret-accumulation-figure",
+            "ret-sensitivity",
+            "ret-retirement-section",
+            "ret-housing-comparison",
+            "ret-first-year-section",
+        ):
+            self.assertNotIn(f'id="{detail_id}"', result_panel)
+        detailed = self.html.split('id="ret-detailed-projection"', 1)[1].split('</section>\n    <dialog', 1)[0]
+        self.assertIn('<h2 id="ret-detailed-projection-heading">Your detailed projection</h2>', detailed)
+        for detail_id in (
+            "ret-accumulation-figure",
+            "ret-sensitivity",
+            "ret-retirement-section",
+            "ret-housing-comparison",
+            "ret-first-year-section",
+        ):
+            self.assertIn(f'id="{detail_id}"', detailed)
+
+    def test_current_cost_comparison_follows_the_detailed_projection(self) -> None:
+        detailed = self.html.index('id="ret-detailed-projection"')
+        comparison = self.html.index('id="ret-current-cost-comparison"')
+        sidecar = self.html.index('id="ret-cost-sidecar"')
+        self.assertLess(detailed, comparison)
+        self.assertLess(comparison, sidecar)
+        section = self.html[comparison:sidecar]
+        self.assertIn('<h2 id="ret-current-cost-heading">Compare with where you live now</h2>', section)
+        self.assertIn(
+            'for="ret-current-location">Current location '
+            '<span class="optional-label">(optional)</span></label>',
+            section,
+        )
+        self.assertIn('id="ret-current-location" type="text" autocomplete="address-level2"', section)
+        self.assertIn('for="ret-current-monthly-spending">Current monthly spending</label>', section)
+        self.assertIn('id="ret-current-monthly-spending" type="number" min="1" step="1"', section)
+        self.assertIn('id="ret-current-cost-result" hidden aria-live="polite"', section)
+        self.assertIn('id="ret-current-cost-summary"', section)
+        self.assertIn('id="ret-current-cost-annual"', section)
+        self.assertIn('id="ret-current-cost-bars"', section)
+        self.assertIn('<h3>Retirement funding target</h3>', section)
+        self.assertIn('id="ret-current-target"', section)
+        self.assertIn('id="ret-destination-target"', section)
+        self.assertIn('id="ret-target-difference"', section)
+        self.assertIn('Excludes any separate home purchase', section)
+
+    def test_current_cost_comparison_does_not_persist_or_transmit_personal_values(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+        self.assertIn('track("retirement_calculator_current_cost_compare")', source)
+        self.assertNotIn("localStorage", source)
+        self.assertNotIn("sessionStorage", source)
+        self.assertNotIn("fetch(", source)
+        self.assertNotIn("XMLHttpRequest", source)
+
+    def test_result_card_contains_honest_save_intent_test(self) -> None:
+        results = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
+        self.assertIn('id="ret-save-action" hidden', results)
+        self.assertIn(
+            'id="ret-save-intent-button" type="button" '
+            'data-track="retirement_calculator_save_intent" '
+            'data-track-label="retirement calculator result">Save this plan</button>',
+            results,
+        )
+        self.assertIn('id="ret-save-intent-status" role="status" hidden', results)
+        self.assertIn("Saved plans are being evaluated. Your figures have not been stored.", results)
+        self.assertNotIn('type="password"', results)
+        self.assertNotIn('id="ret-account', results)
+        self.assertNotIn('id="ret-signup', results)
+
+    def test_chart_includes_a_retirement_target_line(self) -> None:
+        results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
+        self.assertIn('id="ret-accumulation-target"', results)
+        self.assertIn('id="ret-accumulation-target-label"', results)
+
+    def test_calculator_recalculates_after_valid_input_changes(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+        self.assertIn('form.addEventListener("input", scheduleCalculation)', source)
+        self.assertIn('form.addEventListener("change", scheduleCalculation)', source)
+
+    def test_long_reference_material_is_replaced_with_dedicated_links(self) -> None:
+        self.assertNotIn('<section id="benchmarks"', self.html)
+        self.assertNotIn('<section id="methodology"', self.html)
+        self.assertIn('href="/retirement-destinations-ranked-by-cost/"', self.html)
+        self.assertIn('href="/methodology/"', self.html)
 
     def test_results_remove_cash_yield_breakdown(self) -> None:
         results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
@@ -117,85 +256,43 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-withdrawal-explanation",
             "ret-result-net-return",
             "ret-net-return-explanation",
+            "ret-monthly-contribution",
+            "ret-contribution-retirement",
         ):
             self.assertIn(f'id="{element_id}"', results)
-        self.assertIn("What you need today", results)
+        self.assertIn("Needed today", results)
         self.assertIn("What you need at retirement", results)
         self.assertIn("First retirement year", results)
+        self.assertIn('id="ret-first-expenses-label">Annual spending incl. rent</span>', results)
         self.assertIn("First-year funding gap ÷ liquid portfolio", results)
         self.assertIn("not a recommended safe withdrawal rate", results)
         self.assertIn("Expected return minus first-year portfolio withdrawal", results)
-        self.assertLess(results.index('id="ret-retirement-section"'), results.index('id="ret-today-section"'))
-        self.assertLess(results.index('id="ret-today-section"'), results.index('id="ret-first-year-section"'))
+        self.assertLess(results.index('id="ret-today-section"'), results.index('id="ret-retirement-section"'))
+        self.assertLess(results.index('id="ret-retirement-section"'), results.index('id="ret-first-year-section"'))
         self.assertNotIn('id="ret-cash-income"', results)
         self.assertNotIn('id="ret-asset-sales"', results)
         self.assertNotIn('id="ret-today-total"', results)
 
-    def test_static_benchmarks_and_methodology_do_not_depend_on_javascript(self) -> None:
-        self.assertIn('<section id="benchmarks"', self.html)
-        self.assertIn('<section id="methodology"', self.html)
-        self.assertIn("How much capital do you need to retire abroad?", self.html)
-        self.assertIn("Annual spending", self.html)
-        self.assertIn("Liquid portfolio", self.html)
-        self.assertIn("Emergency reserve", self.html)
-        self.assertIn("Required retirement capital", self.html)
-        self.assertIn("Property capital", self.html)
-        self.assertIn("This standardized table is separate from the personalized cash-flow calculator above.", self.html)
+    def test_results_include_an_accessible_animated_accumulation_chart(self) -> None:
+        results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
+        self.assertIn('id="ret-accumulation-figure"', results)
+        self.assertIn('id="ret-accumulation-chart" role="img"', results)
+        self.assertIn('aria-labelledby="ret-accumulation-title ret-accumulation-desc"', results)
+        self.assertIn("Lump sum invested today", results)
+        self.assertIn("Monthly contributions", results)
+        self.assertIn('id="ret-accumulation-tooltip" role="status"', results)
+        self.assertIn("@keyframes ret-year-in", self.html)
+        self.assertIn("prefers-reduced-motion:reduce", self.compact_html)
+
+    def test_concise_reference_section_does_not_depend_on_javascript(self) -> None:
+        self.assertIn("How to read this estimate", self.html)
+        self.assertIn("portfolio, reserve, and property capital", self.html)
+        self.assertIn("Portfolio dividends and interest", self.html)
+        self.assertIn("Compare destination retirement costs", self.html)
 
     def test_calculator_contains_all_thirty_destination_options(self) -> None:
         select = self.html.split('id="ret-destination"', 1)[1].split("</select>", 1)[0]
         self.assertEqual(30, select.count("<option"))
-
-    def test_benchmarks_offer_one_household_view_at_a_time(self) -> None:
-        section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
-        selector = section.split('id="ret-benchmark-household"', 1)[1].split("</select>", 1)[0]
-        self.assertIn('<option value="couple" selected>Couple</option>', selector)
-        self.assertIn('<option value="single">Single</option>', selector)
-        self.assertIn('data-benchmark-panel="couple"', section)
-        self.assertIn('data-benchmark-panel="single" hidden', section)
-        self.assertNotIn('<span>Single ', section)
-        self.assertNotIn('<span>Couple ', section)
-
-    def test_benchmarks_offer_continent_filtering(self) -> None:
-        section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
-        selector = section.split('id="ret-benchmark-continent"', 1)[1].split("</select>", 1)[0]
-        self.assertIn('<option value="all" selected>All continents</option>', selector)
-        for continent in ("Asia", "Europe", "North America", "Oceania"):
-            self.assertIn(f'<option value="{continent.lower().replace(" ", "-")}">{continent}</option>', selector)
-            self.assertIn(f'data-continent="{continent.lower().replace(" ", "-")}"', section)
-
-    def test_each_household_benchmark_shows_ten_rows_then_expands_twenty(self) -> None:
-        section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
-        for household, next_household in (("couple", "single"), ("single", None)):
-            panel = section.split(f'data-benchmark-panel="{household}"', 1)[1]
-            if next_household:
-                panel = panel.split(f'data-benchmark-panel="{next_household}"', 1)[0]
-            visible = panel.split('<details class="benchmark-more"', 1)[0]
-            expandable = panel.split('<details class="benchmark-more"', 1)[1]
-            self.assertEqual(10, visible.count('class="benchmark-row"'))
-            self.assertEqual(20, expandable.count('class="benchmark-row"'))
-            self.assertIn("View ranks 11–30", expandable)
-
-    def test_capital_table_uses_guided_methodology_and_ranks_by_couple_requirement(self) -> None:
-        section = self.html.split('<section id="benchmarks"', 1)[1].split("</section>", 1)[0]
-        self.assertIn("3.5% guided withdrawal rate", section)
-        self.assertIn("12 months of expenses", section)
-        self.assertIn("no pension or outside passive income", section.lower())
-        couple_panel = section.split('data-benchmark-panel="couple"', 1)[1].split('data-benchmark-panel="single"', 1)[0]
-        self.assertIn("$2,359,800", couple_panel)
-        self.assertIn("$512,947", couple_panel)
-        ordered_names = [
-            "Fukuoka / Itoshima",
-            "Hakone / Izu",
-            "Crete",
-            "Valencia",
-            "Algarve / Cascais",
-            "Málaga / Costa del Sol",
-            "Madeira",
-            "Lake Como",
-        ]
-        positions = [couple_panel.index(name) for name in ordered_names]
-        self.assertEqual(sorted(positions), positions)
 
     def test_interactive_contract_and_result_targets_are_embedded(self) -> None:
         required_ids = {
@@ -223,10 +320,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         for element_id in required_ids:
             self.assertIn(f'id="{element_id}"', self.html)
         self.assertIn("GHARetirementCalculatorUI.initRetirementCalculator", self.html)
-        self.assertIn(
-            'GHARetirementCalculatorUI.initRetirementBenchmarkTable("ret-benchmark-household","ret-benchmark-continent")',
-            self.html,
-        )
+        self.assertNotIn("initRetirementBenchmarkTable(\"ret-benchmark-household\"", self.html)
         self.assertLess(self.html.index("window.GHA ="), self.html.index("GHARetirementCalculatorUI.initRetirementCalculator"))
 
     def test_ui_module_does_not_persist_or_transmit_financial_inputs(self) -> None:
@@ -247,6 +341,22 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         for route in routes:
             with self.subTest(route=route):
                 self.assertIn('/retirement-abroad-calculator/', route.read_text(encoding="utf-8"))
+
+    def test_calculator_callouts_include_fixed_source_labels(self) -> None:
+        routes_and_labels = {
+            ROOT / "artifacts" / "guides" / "index.html": "guide hub",
+            ROOT / "artifacts" / "buying-property-abroad-for-retirement" / "index.html": "buying guide",
+            ROOT / "artifacts" / "countries" / "spain-property" / "index.html": "country hub",
+            ROOT / "artifacts" / "destinations" / "valencia" / "index.html": "destination page",
+        }
+        for route, label in routes_and_labels.items():
+            with self.subTest(route=route):
+                html = route.read_text(encoding="utf-8")
+                self.assertIn(
+                    'data-track="retirement_calculator_open" '
+                    f'data-track-label="{label}"',
+                    html,
+                )
 
     def test_homepage_hero_links_to_retirement_calculator_once(self) -> None:
         homepage = (ROOT / "artifacts" / "index.html").read_text(encoding="utf-8")

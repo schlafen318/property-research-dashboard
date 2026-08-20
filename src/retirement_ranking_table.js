@@ -20,6 +20,18 @@
     });
   }
 
+  function rankingRowFromElement(element) {
+    return {
+      element: element,
+      rank: Number(element.dataset.rank),
+      atlas: Number(element.dataset.atlas),
+      name: element.dataset.name,
+      annual: Number(element.dataset.annual),
+      savings: Number(element.dataset.savings),
+      property: Number(element.dataset.property),
+    };
+  }
+
   function initRetirementRankingTable(rootElement) {
     if (!rootElement) return;
     const visibleBody = rootElement.querySelector("[data-ranking-visible]");
@@ -27,16 +39,7 @@
     const buttons = Array.from(rootElement.querySelectorAll("[data-sort-key]"));
     if (!visibleBody || !additionalBody || buttons.length === 0) return;
 
-    const rows = Array.from(rootElement.querySelectorAll(".ranking-row")).map(function (element) {
-      return {
-        element: element,
-        rank: Number(element.dataset.rank),
-        name: element.dataset.name,
-        annual: Number(element.dataset.annual),
-        savings: Number(element.dataset.savings),
-        property: Number(element.dataset.property),
-      };
-    });
+    const rows = Array.from(rootElement.querySelectorAll(".ranking-row")).map(rankingRowFromElement);
     let activeKey = "savings";
     let activeDirection = "ascending";
 
@@ -69,6 +72,7 @@
 
   return {
     sortRankingRows: sortRankingRows,
+    rankingRowFromElement: rankingRowFromElement,
     initRetirementRankingTable: initRetirementRankingTable,
   };
 });
