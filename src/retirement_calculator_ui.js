@@ -220,6 +220,7 @@
     const rate = function (id) { return number(id) / 100; };
     let benchmarkValue = 0;
     let autoCalculationTimer = null;
+    let hasTrackedResult = false;
 
     function selectedRecord() {
       return byId[el("ret-destination").value];
@@ -438,6 +439,11 @@
         "Data " + payload.as_of + " · " + record.confidence.overall + " confidence · " +
         "uses the same expected return every year. Actual return order and market losses can materially change the outcome. " +
         "Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.";
+      el("ret-save-action").hidden = false;
+      if (!hasTrackedResult) {
+        track("retirement_calculator_result_view");
+        hasTrackedResult = true;
+      }
     }
 
     function appendComparisonRow(container, label, rateLabel, value, isSelected) {
@@ -617,6 +623,10 @@
     form.addEventListener("submit", calculate);
     form.addEventListener("input", scheduleCalculation);
     form.addEventListener("change", scheduleCalculation);
+    el("ret-save-intent-button").addEventListener("click", function () {
+      el("ret-save-intent-button").hidden = true;
+      el("ret-save-intent-status").hidden = false;
+    });
     syncDestinationDefaults(true);
     updateMonthlyInvestmentPreview();
     initDestinationCostSidecar();

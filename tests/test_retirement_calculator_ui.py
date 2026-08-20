@@ -29,6 +29,16 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_first_valid_result_is_tracked_once_and_reveals_save_intent(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+
+        self.assertIn("let hasTrackedResult = false;", source)
+        self.assertIn('track("retirement_calculator_result_view")', source)
+        self.assertIn("hasTrackedResult = true;", source)
+        self.assertIn('el("ret-save-action").hidden = false;', source)
+        self.assertIn('el("ret-save-intent-button").addEventListener("click"', source)
+        self.assertIn('el("ret-save-intent-status").hidden = false;', source)
+
     def test_converts_monthly_spending_to_annual_for_the_engine(self) -> None:
         self.assertEqual(64_596, run_ui("annualSpendingFromMonthly", 5_383))
 
