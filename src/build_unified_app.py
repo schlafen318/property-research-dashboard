@@ -6,6 +6,7 @@ import re
 import shutil
 import sys
 import unicodedata
+from copy import deepcopy
 from datetime import date
 from html import escape
 from pathlib import Path
@@ -13,8 +14,10 @@ from urllib.parse import urlparse
 
 try:
     from src.seo_content_overrides import apply_content_override, load_content_overrides
+    from src.retirement_destination_finder_page import build_retirement_destination_finder_html
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from seo_content_overrides import apply_content_override, load_content_overrides
+    from retirement_destination_finder_page import build_retirement_destination_finder_html
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.seo_content_generator import PageContextParser, content_hash
@@ -63,6 +66,12 @@ RETIREMENT_CALCULATOR_DESCRIPTION = (
     "Estimate how much you need to retire abroad, including destination living costs, "
     "inflation, pension and passive income, property costs, and required portfolio capital."
 )
+RETIREMENT_FINDER_SLUG = "retirement-destination-finder"
+RETIREMENT_FINDER_TITLE = "Retirement Destination Finder | Global Home Atlas"
+RETIREMENT_FINDER_DESCRIPTION = (
+    "Project your retirement savings and monthly investing, then compare destinations "
+    "you may be able to afford when renting or buying abroad."
+)
 RETIREMENT_DESTINATIONS_SLUG = "retirement-destinations-ranked-by-cost"
 RETIREMENT_DESTINATIONS_TITLE = "Retirement Destinations Ranked by Cost (2026) | Global Home Atlas"
 RETIREMENT_DESTINATIONS_H1 = "30 Retirement Destinations Ranked by How Much You Need"
@@ -71,9 +80,30 @@ RETIREMENT_DESTINATIONS_DESCRIPTION = (
     "annual spending, reserves, and optional property costs using one methodology."
 )
 RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
+MORTGAGE_PROFILES_PATH = DATA / "mortgage_profiles.json"
 RETIREMENT_ENGINE_PATH = ROOT / "src" / "retirement_calculator.js"
 RETIREMENT_UI_PATH = ROOT / "src" / "retirement_calculator_ui.js"
+PROPERTY_FINANCE_PATH = ROOT / "src" / "property_finance.js"
+RETIREMENT_FINDER_ENGINE_PATH = ROOT / "src" / "retirement_destination_finder.js"
+RETIREMENT_FINDER_UI_PATH = ROOT / "src" / "retirement_destination_finder_ui.js"
 RETIREMENT_RANKING_TABLE_PATH = ROOT / "src" / "retirement_ranking_table.js"
+CONTINENT_BY_COUNTRY = {
+    "Austria": "europe",
+    "Canada": "north-america",
+    "Croatia": "europe",
+    "France": "europe",
+    "Greece": "europe",
+    "Indonesia": "asia",
+    "Italy": "europe",
+    "Japan": "asia",
+    "New Zealand": "oceania",
+    "Portugal": "europe",
+    "Spain": "europe",
+    "Switzerland": "europe",
+    "Thailand": "asia",
+    "United States": "north-america",
+    "Vietnam": "asia",
+}
 RETIREMENT_DESTINATIONS_PAGE = {
     "slug": RETIREMENT_DESTINATIONS_SLUG,
     "title": RETIREMENT_DESTINATIONS_TITLE,
@@ -803,6 +833,30 @@ def load_retirement_costs(path: Path = RETIREMENT_COSTS_PATH) -> dict:
     if len(ids) != len(records) or len(ids) != len(set(ids)) or any(not item for item in ids):
         raise ValueError("Retirement destination IDs must be present and unique")
     return payload
+
+
+def load_mortgage_profiles(path: Path = MORTGAGE_PROFILES_PATH) -> dict:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or not isinstance(payload.get("countries"), dict):
+        raise ValueError("Mortgage profiles must contain a countries object")
+    if not isinstance(payload.get("destination_overrides", {}), dict):
+        raise ValueError("Mortgage destination overrides must be an object")
+    return payload
+
+
+def resolve_mortgage_profile(destination: dict, payload: dict) -> dict:
+    country = destination.get("country")
+    country_profile = payload.get("countries", {}).get(country)
+    if not isinstance(country_profile, dict):
+        raise ValueError(f"Missing mortgage profile for {country}")
+    resolved = deepcopy(country_profile)
+    override = payload.get("destination_overrides", {}).get(destination.get("id"), {})
+    if not isinstance(override, dict):
+        raise ValueError(f"Invalid mortgage override for {destination.get('id')}")
+    resolved.update(deepcopy(override))
+    resolved["country"] = country
+    resolved["destination_id"] = destination.get("id")
+    return resolved
 
 
 def copy_site_assets() -> None:
@@ -3452,6 +3506,7 @@ def build_landing_page(
           <nav class="hero-secondary-actions" aria-label="Explore Global Home Atlas">
             <a class="text-action" href="/guides/#country-selection" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
             <a class="text-action" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="hero">Calculate retirement needs</a>
+            <a class="text-action" href="/{RETIREMENT_FINDER_SLUG}/">Find affordable retirement destinations</a>
             <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
           </nav>
         </div>
@@ -4347,6 +4402,72 @@ __ANALYTICS__
     )
 
 
+def schema_for_retirement_finder(canonical: str) -> list[dict]:
+    return [
+        *global_schema_entities(),
+        {
+            "@type": "WebApplication",
+            "@id": f"{canonical}#calculator",
+            "name": "Retirement Destination Finder",
+            "url": canonical,
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Any",
+            "description": RETIREMENT_FINDER_DESCRIPTION,
+            "isAccessibleForFree": True,
+        },
+    ]
+
+
+def build_retirement_destination_finder_page(
+    destinations: list[dict],
+    retirement_payload: dict,
+    mortgage_payload: dict,
+) -> str:
+    retirement_ids = {item["destination_id"] for item in retirement_payload["destinations"]}
+    eligible_destinations = [item for item in destinations if item["id"] in retirement_ids]
+    mortgage_profiles = {
+        item["id"]: resolve_mortgage_profile(item, mortgage_payload)
+        for item in eligible_destinations
+    }
+    browser_destinations = [
+        {
+            **item,
+            "continent": CONTINENT_BY_COUNTRY.get(item.get("country", ""), ""),
+            "recommendable": is_destination_recommendable(item),
+        }
+        for item in eligible_destinations
+    ]
+    payload = {
+        "asOf": retirement_payload.get("as_of"),
+        "destinations": browser_destinations,
+        "retirementCosts": retirement_payload["destinations"],
+        "mortgageProfiles": mortgage_profiles,
+        "defaultBuyerProfile": mortgage_payload["default_buyer_profile"],
+    }
+    region_options = "".join(
+        f'<option value="{escape(region)}">{escape(region.replace("-", " ").title())}</option>'
+        for region in sorted({item["continent"] for item in browser_destinations if item["continent"]})
+    )
+    canonical = page_url(RETIREMENT_FINDER_SLUG)
+    return build_retirement_destination_finder_html(
+        head=head_html(
+            RETIREMENT_FINDER_TITLE,
+            RETIREMENT_FINDER_DESCRIPTION,
+            canonical,
+            schema_for_retirement_finder(canonical),
+        ).strip(),
+        navigation=primary_nav_html().strip(),
+        region_options=region_options,
+        universe_count=len(eligible_destinations),
+        payload_json=json.dumps(payload, separators=(",", ":")).replace("</", "<\\/"),
+        retirement_engine=RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        property_engine=PROPERTY_FINANCE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        finder_ui=RETIREMENT_FINDER_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        analytics=analytics_event_script(),
+    )
+
+
 def retirement_calculator_callout(css_class: str, source_label: str) -> str:
     return f"""
       <section class="{escape(css_class)}">
@@ -4360,23 +4481,6 @@ def retirement_calculator_callout(css_class: str, source_label: str) -> str:
 def build_retirement_calculator_page(destinations: list[dict], retirement_payload: dict) -> str:
     canonical = page_url(RETIREMENT_CALCULATOR_SLUG)
     destination_by_id = {item["id"]: item for item in destinations}
-    continent_by_country = {
-        "Austria": "europe",
-        "Canada": "north-america",
-        "Croatia": "europe",
-        "France": "europe",
-        "Greece": "europe",
-        "Indonesia": "asia",
-        "Italy": "europe",
-        "Japan": "asia",
-        "New Zealand": "oceania",
-        "Portugal": "europe",
-        "Spain": "europe",
-        "Switzerland": "europe",
-        "Thailand": "asia",
-        "United States": "north-america",
-        "Vietnam": "asia",
-    }
     records = retirement_payload["destinations"]
     browser_records = []
     options = []
@@ -4385,7 +4489,7 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         item = dict(record)
         destination = destination_by_id.get(record["destination_id"], {})
         item["name"] = destination.get("name", record["destination_id"].replace("-", " ").title())
-        item["continent"] = continent_by_country.get(destination.get("country", ""), "")
+        item["continent"] = CONTINENT_BY_COUNTRY.get(destination.get("country", ""), "")
         browser_records.append(item)
         options.append(f'<option value="{escape(item["destination_id"])}">{escape(item["name"])}</option>')
         first_source = item["sources"][0]
@@ -4442,7 +4546,7 @@ __HEAD__
     :root { color: #24312d; background: #f5f1e9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#24312d; --muted:#66736c; --line:#d8d1c4; --paper:#fffdf7; --green:#315e50; }
     * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
     .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; } .calc-nav { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:18px 0; border-bottom:1px solid rgba(255,255,255,.18); } .calc-brand { color:#fff; text-decoration:none; font-weight:900; } .calc-nav-links { display:flex; flex-wrap:wrap; gap:16px; } .calc-nav-links a { color:#f5f1e9; text-decoration:none; font-size:14px; }
-    .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; }
+    .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; } .calc-modes { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-weight:750; } .calc-modes a { color:#fff; } .calc-modes a[aria-current] { color:#d8c28d; text-decoration:none; border-bottom:2px solid #d8c28d; }
     main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
     .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .save-intent { padding-top:2px; } .save-intent .text-button { font-weight:750; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
     .accumulation-figure { position:relative; margin:0; padding:18px 0; border-top:1px solid var(--line); } .accumulation-figure h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .chart-legend { display:flex; gap:18px; color:var(--muted); font-size:12px; margin-bottom:8px; } .chart-key::before { content:""; display:inline-block; width:10px; height:10px; margin-right:6px; background:#315e50; } .chart-key.contribution::before { background:#c29b45; } .accumulation-chart { display:block; width:100%; height:auto; overflow:visible; } .chart-axis { stroke:var(--line); stroke-width:1; } .chart-target { stroke:#9b6a33; stroke-width:1.5; stroke-dasharray:5 4; } .chart-target-label { fill:#7a5227; font-size:11px; font-weight:700; } .chart-axis-label { fill:var(--muted); font-size:10px; } .chart-lump { fill:#315e50; } .chart-contribution { fill:#c29b45; } .chart-year { opacity:0; transform:translateY(8px); animation:ret-year-in .35s ease forwards; animation-delay:var(--year-delay); cursor:pointer; outline:none; } .chart-year.is-active rect,.chart-year:focus-visible rect { stroke:#24312d; stroke-width:2px; } .chart-tooltip { position:absolute; z-index:2; top:60px; right:0; width:min(245px,calc(100% - 20px)); padding:11px 13px; border-radius:6px; background:#24312d; color:#fff; box-shadow:0 8px 24px rgba(36,49,45,.2); font-size:12px; } .chart-tooltip strong { display:block; font-size:14px; margin-bottom:5px; } .chart-tooltip div { display:flex; justify-content:space-between; gap:12px; } .chart-tooltip span { color:#dfe7e3; } .result-comparison { padding:16px 0; border-top:1px solid var(--line); } .result-comparison h3,.result-comparison summary { font-family:Georgia,serif; font-size:21px; } .result-table { min-width:0; font-size:13px; background:transparent; } .result-table th,.result-table td { padding:8px 5px; white-space:normal; } .result-table td { text-align:right; } .result-table .is-selected { background:#f1eee4; } @keyframes ret-year-in { to { opacity:1; transform:translateY(0); } }
@@ -4459,7 +4563,7 @@ __HEAD__
   <header class="calc-hero"><div class="calc-shell">
     <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/find-your-fit/">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/guides/#country-selection">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
     <p class="eyebrow">International retirement planning tool</p><h1>Retirement Abroad Calculator</h1>
-    <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p>
+    <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p><nav class="calc-modes" aria-label="Retirement calculator mode"><a href="/retirement-abroad-calculator/" aria-current="page">Plan for a destination</a><a href="/retirement-destination-finder/">Find destinations I can afford</a></nav>
   </div></header>
   <main><div class="calc-shell">
     <section class="calculator-layout" aria-label="Retirement calculator">
@@ -4556,7 +4660,7 @@ __HEAD__
       <div class="cost-sidecar-panel"><header class="cost-sidecar-header"><div><h2 id="ret-cost-sidecar-title">Compare monthly living expenses</h2><p class="hint" id="ret-cost-sidecar-context"></p></div><button class="cost-sidecar-close" id="ret-cost-sidecar-close" type="button" aria-label="Close destination comparison">Close</button></header><div class="cost-sidecar-chart" id="ret-cost-sidecar-chart"></div></div>
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
-    <section class="content-section"><h2>How to read this estimate</h2><p>The model projects destination expenses and reliable retirement income, then shows the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest belong inside that expected return rather than being counted again as outside income.</p><p class="related"><a href="/retirement-destinations-ranked-by-cost/" data-track="retirement_calculator_guide_click">Compare destination retirement costs</a><a href="/methodology/">Read the methodology</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p></section>
+    <section class="content-section"><h2>How to read this estimate</h2><p>The model projects destination expenses and reliable retirement income, then shows the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest belong inside that expected return rather than being counted again as outside income.</p><p class="related"><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/retirement-destinations-ranked-by-cost/" data-track="retirement_calculator_guide_click">Compare destination retirement costs</a><a href="/methodology/">Read the methodology</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
   <footer><div class="calc-shell">Global Home Atlas · Research for overseas property and long-stay decisions · <a href="/contact/">Contact</a></div></footer>
@@ -4708,7 +4812,7 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
         <div>
           <h1>{RETIREMENT_DESTINATIONS_H1}</h1>
           <p class="page-lede">All 30 Global Home Atlas retirement destinations compared under one transparent scenario. The rank answers a narrow financial question—how much capital a couple renting would need—not which place offers the best life.</p>
-          <div class="page-actions"><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article hero">Calculate your plan</a><a class="page-button page-button-secondary" href="#ranking">View rankings</a></div>
+          <div class="page-actions"><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article hero">Calculate your plan</a><a class="page-button page-button-secondary" href="/{RETIREMENT_FINDER_SLUG}/">Find destinations I can afford</a><a class="page-button page-button-secondary" href="#ranking">View rankings</a></div>
         </div>
       </div>
     </div>
@@ -7037,6 +7141,7 @@ def build() -> Path:
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = rank_destinations(destinations)
     retirement_costs = load_retirement_costs()
+    mortgage_profiles = load_mortgage_profiles()
     guide_pages = [RETIREMENT_DESTINATIONS_PAGE, *SEO_PAGES]
     listings = load_json("listings.json")
     fx = load_json("fx_rates.json")
@@ -8414,6 +8519,14 @@ def build() -> Path:
         clean_generated_html(build_retirement_calculator_page(destinations, retirement_costs)),
         encoding="utf-8",
     )
+    retirement_finder_dir = ARTIFACTS / RETIREMENT_FINDER_SLUG
+    retirement_finder_dir.mkdir(parents=True, exist_ok=True)
+    (retirement_finder_dir / "index.html").write_text(
+        clean_generated_html(
+            build_retirement_destination_finder_page(destinations, retirement_costs, mortgage_profiles)
+        ),
+        encoding="utf-8",
+    )
     retirement_article_dir = ARTIFACTS / RETIREMENT_DESTINATIONS_SLUG
     retirement_article_dir.mkdir(parents=True, exist_ok=True)
     (retirement_article_dir / "index.html").write_text(
@@ -8518,6 +8631,7 @@ Sitemap: {SITE_URL}sitemap.xml
         (page_url("country-comparison"), "0.88"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         (page_url(RETIREMENT_CALCULATOR_SLUG), "0.92"),
+        (page_url(RETIREMENT_FINDER_SLUG), "0.92"),
         (page_url(RETIREMENT_DESTINATIONS_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
         *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],

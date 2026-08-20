@@ -24,7 +24,7 @@
     :root { color: #24312d; background: #f5f1e9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#24312d; --muted:#66736c; --line:#d8d1c4; --paper:#fffdf7; --green:#315e50; }
     * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
     .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; } .calc-nav { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:18px 0; border-bottom:1px solid rgba(255,255,255,.18); } .calc-brand { color:#fff; text-decoration:none; font-weight:900; } .calc-nav-links { display:flex; flex-wrap:wrap; gap:16px; } .calc-nav-links a { color:#f5f1e9; text-decoration:none; font-size:14px; }
-    .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; }
+    .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; } .calc-modes { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-weight:750; } .calc-modes a { color:#fff; } .calc-modes a[aria-current] { color:#d8c28d; text-decoration:none; border-bottom:2px solid #d8c28d; }
     main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
     .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .save-intent { padding-top:2px; } .save-intent .text-button { font-weight:750; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
     .accumulation-figure { position:relative; margin:0; padding:18px 0; border-top:1px solid var(--line); } .accumulation-figure h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .chart-legend { display:flex; gap:18px; color:var(--muted); font-size:12px; margin-bottom:8px; } .chart-key::before { content:""; display:inline-block; width:10px; height:10px; margin-right:6px; background:#315e50; } .chart-key.contribution::before { background:#c29b45; } .accumulation-chart { display:block; width:100%; height:auto; overflow:visible; } .chart-axis { stroke:var(--line); stroke-width:1; } .chart-target { stroke:#9b6a33; stroke-width:1.5; stroke-dasharray:5 4; } .chart-target-label { fill:#7a5227; font-size:11px; font-weight:700; } .chart-axis-label { fill:var(--muted); font-size:10px; } .chart-lump { fill:#315e50; } .chart-contribution { fill:#c29b45; } .chart-year { opacity:0; transform:translateY(8px); animation:ret-year-in .35s ease forwards; animation-delay:var(--year-delay); cursor:pointer; outline:none; } .chart-year.is-active rect,.chart-year:focus-visible rect { stroke:#24312d; stroke-width:2px; } .chart-tooltip { position:absolute; z-index:2; top:60px; right:0; width:min(245px,calc(100% - 20px)); padding:11px 13px; border-radius:6px; background:#24312d; color:#fff; box-shadow:0 8px 24px rgba(36,49,45,.2); font-size:12px; } .chart-tooltip strong { display:block; font-size:14px; margin-bottom:5px; } .chart-tooltip div { display:flex; justify-content:space-between; gap:12px; } .chart-tooltip span { color:#dfe7e3; } .result-comparison { padding:16px 0; border-top:1px solid var(--line); } .result-comparison h3,.result-comparison summary { font-family:Georgia,serif; font-size:21px; } .result-table { min-width:0; font-size:13px; background:transparent; } .result-table th,.result-table td { padding:8px 5px; white-space:normal; } .result-table td { text-align:right; } .result-table .is-selected { background:#f1eee4; } @keyframes ret-year-in { to { opacity:1; transform:translateY(0); } }
@@ -41,7 +41,7 @@
   <header class="calc-hero"><div class="calc-shell">
     <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/find-your-fit/">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/guides/#country-selection">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
     <p class="eyebrow">International retirement planning tool</p><h1>Retirement Abroad Calculator</h1>
-    <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p>
+    <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p><nav class="calc-modes" aria-label="Retirement calculator mode"><a href="/retirement-abroad-calculator/" aria-current="page">Plan for a destination</a><a href="/retirement-destination-finder/">Find destinations I can afford</a></nav>
   </div></header>
   <main><div class="calc-shell">
     <section class="calculator-layout" aria-label="Retirement calculator">
@@ -138,7 +138,7 @@
       <div class="cost-sidecar-panel"><header class="cost-sidecar-header"><div><h2 id="ret-cost-sidecar-title">Compare monthly living expenses</h2><p class="hint" id="ret-cost-sidecar-context"></p></div><button class="cost-sidecar-close" id="ret-cost-sidecar-close" type="button" aria-label="Close destination comparison">Close</button></header><div class="cost-sidecar-chart" id="ret-cost-sidecar-chart"></div></div>
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
-    <section class="content-section"><h2>How to read this estimate</h2><p>The model projects destination expenses and reliable retirement income, then shows the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest belong inside that expected return rather than being counted again as outside income.</p><p class="related"><a href="/retirement-destinations-ranked-by-cost/" data-track="retirement_calculator_guide_click">Compare destination retirement costs</a><a href="/methodology/">Read the methodology</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p></section>
+    <section class="content-section"><h2>How to read this estimate</h2><p>The model projects destination expenses and reliable retirement income, then shows the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest belong inside that expected return rather than being counted again as outside income.</p><p class="related"><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/retirement-destinations-ranked-by-cost/" data-track="retirement_calculator_guide_click">Compare destination retirement costs</a><a href="/methodology/">Read the methodology</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2><details><summary>How much do I need to retire abroad?</summary><p>The answer depends on your destination, household, housing plan, retirement date, reliable outside income, and planning horizon. This calculator estimates annual spending first, then separates the liquid portfolio, property capital, and emergency reserve required.</p></details>
 <details><summary>How does the calculator handle inflation?</summary><p>It projects each expense for every year in the retirement horizon. Healthcare and property-related costs can use different assumptions from general living costs, while indexed income rises with inflation and fixed income does not.</p></details>
 <details><summary>How are pensions and passive income treated?</summary><p>After-tax pensions, annuities, existing net rental income, and other reliable non-portfolio income reduce the first-year funding gap. Each stream can be treated as inflation-linked or fixed.</p></details>
@@ -344,6 +344,7 @@
 
   return {
     calculateRetirement: calculateRetirement,
+    calculateRetirementTarget: calculateRetirement,
   };
 });
 </script>
@@ -603,6 +604,20 @@
     let hasTrackedResult = false;
     let hasTrackedCurrentCostComparison = false;
     let latestResult = null;
+
+    const prefill = retirementPrefill(root.location && root.location.search);
+    [
+      ["ret-destination", prefill.destination],
+      ["ret-household", prefill.household],
+      ["ret-housing-plan", prefill.housing],
+    ].forEach(function (entry) {
+      if (!entry[1]) return;
+      const control = el(entry[0]);
+      const match = Array.from(control.options).some(function (option) {
+        return option.value === entry[1];
+      });
+      if (match) control.value = entry[1];
+    });
 
     function selectedRecord() {
       return byId[el("ret-destination").value];
@@ -1084,6 +1099,18 @@
     track("retirement_calculator_open");
   }
 
+  function retirementPrefill(queryString) {
+    const params = new URLSearchParams(String(queryString || ""));
+    const destinationValue = params.get("destination") || "";
+    const householdValue = params.get("household") || "";
+    const housingValue = params.get("housing") || "";
+    return {
+      destination: /^[a-z0-9-]+$/.test(destinationValue) ? destinationValue : "",
+      household: new Set(["single", "couple"]).has(householdValue) ? householdValue : "",
+      housing: new Set(["rent", "own", "buy_now", "buy_retirement"]).has(housingValue) ? housingValue : "",
+    };
+  }
+
   return {
     annualSpendingFromMonthly: annualSpendingFromMonthly,
     currentCostComparison: currentCostComparison,
@@ -1101,6 +1128,7 @@
     isNegativeRate: isNegativeRate,
     isBenchmarkPanelHidden: isBenchmarkPanelHidden,
     partitionBenchmarkRows: partitionBenchmarkRows,
+    retirementPrefill: retirementPrefill,
     initRetirementBenchmarkTable: initRetirementBenchmarkTable,
     initRetirementCalculator: initRetirementCalculator,
   };

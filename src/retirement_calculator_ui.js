@@ -255,6 +255,20 @@
     let hasTrackedCurrentCostComparison = false;
     let latestResult = null;
 
+    const prefill = retirementPrefill(root.location && root.location.search);
+    [
+      ["ret-destination", prefill.destination],
+      ["ret-household", prefill.household],
+      ["ret-housing-plan", prefill.housing],
+    ].forEach(function (entry) {
+      if (!entry[1]) return;
+      const control = el(entry[0]);
+      const match = Array.from(control.options).some(function (option) {
+        return option.value === entry[1];
+      });
+      if (match) control.value = entry[1];
+    });
+
     function selectedRecord() {
       return byId[el("ret-destination").value];
     }
@@ -735,6 +749,18 @@
     track("retirement_calculator_open");
   }
 
+  function retirementPrefill(queryString) {
+    const params = new URLSearchParams(String(queryString || ""));
+    const destinationValue = params.get("destination") || "";
+    const householdValue = params.get("household") || "";
+    const housingValue = params.get("housing") || "";
+    return {
+      destination: /^[a-z0-9-]+$/.test(destinationValue) ? destinationValue : "",
+      household: new Set(["single", "couple"]).has(householdValue) ? householdValue : "",
+      housing: new Set(["rent", "own", "buy_now", "buy_retirement"]).has(housingValue) ? housingValue : "",
+    };
+  }
+
   return {
     annualSpendingFromMonthly: annualSpendingFromMonthly,
     currentCostComparison: currentCostComparison,
@@ -752,6 +778,7 @@
     isNegativeRate: isNegativeRate,
     isBenchmarkPanelHidden: isBenchmarkPanelHidden,
     partitionBenchmarkRows: partitionBenchmarkRows,
+    retirementPrefill: retirementPrefill,
     initRetirementBenchmarkTable: initRetirementBenchmarkTable,
     initRetirementCalculator: initRetirementCalculator,
   };
