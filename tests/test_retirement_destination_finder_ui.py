@@ -70,6 +70,10 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertIn("$432,100", tooltip["value"])
         self.assertIn("Year 7", tooltip["accessibleLabel"])
 
+    def test_mobile_chart_width_preserves_one_touch_target_per_year(self) -> None:
+        self.assertEqual(779, run_ui("mobileChartWidth", 16))
+        self.assertEqual(44, run_ui("mobileChartWidth", 1))
+
     def test_ui_does_not_store_or_transmit_financial_values(self) -> None:
         source = UI.read_text()
         for forbidden in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage"):
