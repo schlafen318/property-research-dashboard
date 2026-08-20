@@ -105,7 +105,9 @@
 
     const profile = input.mortgageProfile || {};
     const reasons = [];
-    let supported = !new Set(["no_standard_nonresident_route", "research_incomplete"]).has(profile.availability);
+    const mortgageRequested = requestedLtv > 0;
+    let supported = !mortgageRequested ||
+      !new Set(["no_standard_nonresident_route", "research_incomplete"]).has(profile.availability);
     if (!supported) reasons.push("No supported standard mortgage route is documented for this buyer profile.");
     const maximumLtv = profile.maximum_ltv === null || profile.maximum_ltv === undefined
       ? requestedLtv
@@ -121,7 +123,7 @@
     if (mortgageTermYears < requestedTermYears) {
       reasons.push("Mortgage term is limited to " + mortgageTermYears + " years for this destination.");
     }
-    if (profile.maximum_age_at_maturity !== null && profile.maximum_age_at_maturity !== undefined &&
+    if (mortgageRequested && profile.maximum_age_at_maturity !== null && profile.maximum_age_at_maturity !== undefined &&
         currentAge + mortgageTermYears > Number(profile.maximum_age_at_maturity)) {
       supported = false;
       reasons.push("Mortgage maturity exceeds the documented borrower age limit.");

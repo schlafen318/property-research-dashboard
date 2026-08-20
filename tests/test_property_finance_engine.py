@@ -90,6 +90,25 @@ class PropertyFinanceEngineTests(unittest.TestCase):
         self.assertFalse(result["supported"])
         self.assertIn("property allocation", " ".join(result["reasons"]))
 
+    def test_cash_purchase_does_not_require_mortgage_research(self) -> None:
+        result = run_engine(
+            "evaluateBuyNow",
+            buy_now_payload(
+                requestedLtv=0,
+                totalLiquidCapital=600000,
+                maximumPropertyAllocation=600000,
+                mortgageProfile={
+                    "availability": "research_incomplete",
+                    "maximum_ltv": None,
+                    "maximum_term_years": None,
+                    "maximum_age_at_maturity": None,
+                    "conditions": [],
+                },
+            ),
+        )
+        self.assertTrue(result["supported"])
+        self.assertNotIn("mortgage route", " ".join(result["reasons"]))
+
     def test_personal_use_has_no_rent_and_reduces_monthly_investing(self) -> None:
         result = run_engine(
             "evaluateBuyNow",
