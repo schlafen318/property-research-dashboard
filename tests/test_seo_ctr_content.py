@@ -210,6 +210,16 @@ class SeoCtrContentTests(unittest.TestCase):
         self.assertIn("By country", html)
         self.assertIn("Buying guides", html)
 
+    def test_homepage_hero_groups_useful_actions_without_a_proof_badge(self) -> None:
+        html = build_unified_app.build_landing_page([], [], [], 0)
+
+        self.assertNotIn('class="hero-proof"', html)
+        self.assertEqual(1, html.count('data-track="homepage_start_click"'))
+        self.assertIn('<nav class="hero-secondary-actions" aria-label="Explore Global Home Atlas">', html)
+        self.assertIn('href="/guides/#country-selection"', html)
+        self.assertIn('href="/retirement-abroad-calculator/"', html)
+        self.assertIn('href="/methodology/"', html)
+
     def test_homepage_limits_editorial_recommendations_to_three(self) -> None:
         destinations = [
             {

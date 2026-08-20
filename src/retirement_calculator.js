@@ -72,6 +72,11 @@
     const acquisitionCostRate = boundedRate(input.acquisitionCostRate, "Acquisition cost rate", 0.25);
     const emergencyReserveMonths = finiteNonNegative(input.emergencyReserveMonths, "Emergency reserve months");
     const expectedPortfolioReturn = boundedExpectedReturn(input.expectedPortfolioReturn);
+    const monthlyIncomeBeforeRetirement = finiteNonNegative(
+      input.monthlyIncomeBeforeRetirement,
+      "Monthly income before retirement"
+    );
+    const incomeInvestedRate = boundedRate(input.incomeInvestedRate, "Income invested rate", 1);
 
     if (!HOUSING_PLANS.has(input.housingPlan)) {
       throw new Error("Housing plan must be rent, own, buy_now, or buy_retirement");
@@ -117,9 +122,45 @@
     const totalCapitalAtRetirement = combinedRetirementCapital === null
       ? retirementCapital
       : combinedRetirementCapital;
-    const investmentNeededToday = totalCapitalAtRetirement / Math.pow(1 + expectedPortfolioReturn, yearsToRetirement);
+    const monthsToRetirement = yearsToRetirement * 12;
+    const monthlyPortfolioReturn = Math.pow(1 + expectedPortfolioReturn, 1 / 12) - 1;
+    const monthlyContributionToday = monthlyIncomeBeforeRetirement * incomeInvestedRate;
+    let contributionValueAtRetirement = 0;
+    for (let month = 0; month < monthsToRetirement; month += 1) {
+      const completedYears = Math.floor(month / 12);
+      const monthlyContribution = monthlyContributionToday * Math.pow(1 + generalInflation, completedYears);
+      contributionValueAtRetirement = contributionValueAtRetirement * (1 + monthlyPortfolioReturn) + monthlyContribution;
+    }
+    const retirementCapitalNotFundedByContributions = Math.max(
+      0,
+      totalCapitalAtRetirement - contributionValueAtRetirement
+    );
+    const investmentNeededToday = retirementCapitalNotFundedByContributions /
+      Math.pow(1 + expectedPortfolioReturn, yearsToRetirement);
     const homePurchaseNeededToday = propertyTiming === "today" ? propertyCapital : 0;
     const totalNeededToday = investmentNeededToday + homePurchaseNeededToday;
+    const annualAccumulation = [{
+      year: 0,
+      lumpSumValue: investmentNeededToday,
+      contributionValue: 0,
+      totalValue: investmentNeededToday,
+    }];
+    let lumpSumValue = investmentNeededToday;
+    let contributionValue = 0;
+    for (let month = 0; month < monthsToRetirement; month += 1) {
+      const completedYears = Math.floor(month / 12);
+      const monthlyContribution = monthlyContributionToday * Math.pow(1 + generalInflation, completedYears);
+      lumpSumValue *= 1 + monthlyPortfolioReturn;
+      contributionValue = contributionValue * (1 + monthlyPortfolioReturn) + monthlyContribution;
+      if ((month + 1) % 12 === 0) {
+        annualAccumulation.push({
+          year: (month + 1) / 12,
+          lumpSumValue: normalizeFloatingPoint(lumpSumValue),
+          contributionValue: normalizeFloatingPoint(contributionValue),
+          totalValue: normalizeFloatingPoint(lumpSumValue + contributionValue),
+        });
+      }
+    }
     const impliedFirstYearWithdrawal = liquidPortfolio > 0 ? fundingGap / liquidPortfolio : null;
     const netReturnAfterWithdrawal = impliedFirstYearWithdrawal === null
       ? null
@@ -140,6 +181,9 @@
       retirementCapital: retirementCapital,
       combinedRetirementCapital: combinedRetirementCapital,
       totalCapitalAtRetirement: totalCapitalAtRetirement,
+      monthlyContributionToday: monthlyContributionToday,
+      contributionValueAtRetirement: normalizeFloatingPoint(contributionValueAtRetirement),
+      annualAccumulation: annualAccumulation,
       investmentNeededToday: investmentNeededToday,
       homePurchaseNeededToday: homePurchaseNeededToday,
       totalNeededToday: totalNeededToday,

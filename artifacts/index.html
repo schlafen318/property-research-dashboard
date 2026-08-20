@@ -69,9 +69,8 @@
     .eyebrow { max-width: 100%; margin: 0 0 12px; color: #806738; font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; overflow-wrap: anywhere; }
     h1 { max-width: 860px; margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(46px, 8vw, 104px); line-height: .9; letter-spacing: 0; }
     .lede { max-width: 720px; margin: 24px 0 0; color: #45534e; font-size: clamp(17px, 2.2vw, 21px); }
-    .hero-proof { width: fit-content; margin: 16px 0 0; display: inline-flex; align-items: center; gap: 8px; padding: 8px 10px; border: 1px solid rgba(95, 127, 114, .28); border-radius: 999px; background: rgba(255, 253, 247, .82); color: #344640; font-size: 13px; font-weight: 700; letter-spacing: 0; }
-    .hero-proof i { width: 18px; height: 18px; display: grid; place-items: center; border-radius: 50%; background: var(--eucalyptus); color: #fffdf7; font-style: normal; font-size: 12px; }
-    .hero-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 28px; }
+    .hero-actions { display: grid; justify-items: start; gap: 12px; margin-top: 28px; }
+    .hero-secondary-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; }
     .primary-action, .secondary-action {
       min-height: 46px;
       display: inline-flex;
@@ -85,8 +84,9 @@
     }
     .primary-action { background: var(--eucalyptus); color: #fffdf7; }
     .secondary-action { border: 1px solid rgba(36, 49, 45, .20); background: rgba(255, 253, 247, .66); color: var(--ink); }
-    .text-action { min-height: 46px; display: inline-flex; align-items: center; color: var(--ink); font-size: 15px; font-weight: 650; text-decoration: none; letter-spacing: 0; }
-    .text-action::after, .card-link::after, .path-card em::after, .inspired-visual::after { content: " ->"; }
+    .text-action { min-height: 36px; display: inline-flex; align-items: center; color: var(--ink); font-size: 14px; font-weight: 650; text-decoration: none; letter-spacing: 0; }
+    .text-action::after { content: " →"; }
+    .card-link::after, .path-card em::after, .inspired-visual::after { content: " ->"; }
     .primary-action:hover, .secondary-action:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(36, 49, 45, .13); }
     .text-action:hover, .card-link:hover { color: #365f6d; }
     .atlas-visual { min-height: 178px; position: relative; overflow: hidden; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: linear-gradient(135deg, rgba(255, 253, 247, .48), rgba(199, 211, 194, .12)), url("/assets/atlas-map-coastal-sage.jpg"); background-size: cover; background-position: center; }
@@ -242,9 +242,10 @@
       .eyebrow { max-width: 330px; font-size: 11px; letter-spacing: .12em; }
       h1 { max-width: min(100%, 362px); font-size: clamp(36px, 10vw, 48px); line-height: 1; overflow-wrap: anywhere; }
       .lede { max-width: min(100%, 362px); margin-top: 18px; font-size: 16px; }
-      .hero-actions { display: grid; gap: 8px; }
-      .hero-actions a { width: 100%; }
-      .hero-proof { font-size: 12px; }
+      .hero-actions { gap: 10px; }
+      .hero-actions > .primary-action, .hero-secondary-actions { width: 100%; }
+      .hero-secondary-actions { display: grid; gap: 2px; }
+      .hero-secondary-actions a { width: 100%; min-height: 38px; }
       .section { padding: 18px; }
       .section--finder { padding: 20px; }
       .finder-map-cue { width: 190px; height: 110px; opacity: .09; }
@@ -295,12 +296,13 @@
         <h1>Global Home Atlas</h1>
         <p class="lede">Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan.</p>
 
-        <p class="hero-proof"><i aria-hidden="true">✓</i> Independent research. Not paid placement.</p>
         <div class="hero-actions">
           <a class="primary-action" href="/find-your-fit/" data-track="homepage_start_click" data-track-label="hero">Find my best-fit destinations</a>
-          <a class="text-action" href="#countries" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
-          <a class="text-action" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="hero">Calculate retirement needs</a>
-          <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
+          <nav class="hero-secondary-actions" aria-label="Explore Global Home Atlas">
+            <a class="text-action" href="/guides/#country-selection" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
+            <a class="text-action" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="hero">Calculate retirement needs</a>
+            <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
+          </nav>
         </div>
       </div>
     </div>
