@@ -53,6 +53,11 @@
     };
   }
 
+  function mobileChartWidth(pointCount) {
+    const count = Math.max(1, Math.floor(Number(pointCount) || 0));
+    return count * 44 + (count - 1) * 5;
+  }
+
   function escapeHtml(value) {
     return String(value === null || value === undefined ? "" : value).replace(/[&<>"']/g, function (character) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
@@ -164,6 +169,7 @@
       }
       element("finder-projection-wrap").hidden = false;
       element("finder-buy-now-chart-note").hidden = true;
+      chart.style.setProperty("--finder-chart-mobile-width", mobileChartWidth(projection.annualProjection.length) + "px");
       const maximum = Math.max.apply(null, projection.annualProjection.map(function (point) {
         return Math.max(0, Number(point.portfolio));
       }).concat([1]));
@@ -329,6 +335,7 @@
     safeDetailHref: safeDetailHref,
     tierLabel: tierLabel,
     chartTooltip: chartTooltip,
+    mobileChartWidth: mobileChartWidth,
     initRetirementDestinationFinder: initRetirementDestinationFinder,
   };
 });

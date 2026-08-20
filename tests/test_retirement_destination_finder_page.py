@@ -76,6 +76,15 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("Surplus or gap", self.html)
         self.assertNotIn("Retirement score", self.html)
 
+    def test_mobile_navigation_and_results_use_touch_sized_controls(self) -> None:
+        self.assertIn(".mobile-menu>nav{position:absolute", self.html)
+        self.assertIn(".mobile-menu>nav a{display:flex;min-height:44px", self.html)
+        self.assertIn(".finder-projection{overflow-x:auto", self.html)
+        self.assertIn(".finder-chart-bar{min-width:44px", self.html)
+        self.assertIn(".finder-result header a{display:flex;min-height:44px", self.html)
+        self.assertIn(".finder-results{min-width:0", self.html)
+        self.assertIn(".finder-projection-wrap{min-width:0", self.html)
+
     def test_embeds_complete_dynamic_universe(self) -> None:
         self.assertIn(f'data-universe-count="{self.retirement_count}"', self.html)
         self.assertNotIn("All 30 current destinations", self.html)
