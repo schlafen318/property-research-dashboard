@@ -6,6 +6,7 @@ import re
 import shutil
 import sys
 import unicodedata
+from copy import deepcopy
 from datetime import date
 from html import escape
 from pathlib import Path
@@ -71,6 +72,7 @@ RETIREMENT_DESTINATIONS_DESCRIPTION = (
     "annual spending, reserves, and optional property costs using one methodology."
 )
 RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
+MORTGAGE_PROFILES_PATH = DATA / "mortgage_profiles.json"
 RETIREMENT_ENGINE_PATH = ROOT / "src" / "retirement_calculator.js"
 RETIREMENT_UI_PATH = ROOT / "src" / "retirement_calculator_ui.js"
 RETIREMENT_RANKING_TABLE_PATH = ROOT / "src" / "retirement_ranking_table.js"
@@ -803,6 +805,30 @@ def load_retirement_costs(path: Path = RETIREMENT_COSTS_PATH) -> dict:
     if len(ids) != len(records) or len(ids) != len(set(ids)) or any(not item for item in ids):
         raise ValueError("Retirement destination IDs must be present and unique")
     return payload
+
+
+def load_mortgage_profiles(path: Path = MORTGAGE_PROFILES_PATH) -> dict:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or not isinstance(payload.get("countries"), dict):
+        raise ValueError("Mortgage profiles must contain a countries object")
+    if not isinstance(payload.get("destination_overrides", {}), dict):
+        raise ValueError("Mortgage destination overrides must be an object")
+    return payload
+
+
+def resolve_mortgage_profile(destination: dict, payload: dict) -> dict:
+    country = destination.get("country")
+    country_profile = payload.get("countries", {}).get(country)
+    if not isinstance(country_profile, dict):
+        raise ValueError(f"Missing mortgage profile for {country}")
+    resolved = deepcopy(country_profile)
+    override = payload.get("destination_overrides", {}).get(destination.get("id"), {})
+    if not isinstance(override, dict):
+        raise ValueError(f"Invalid mortgage override for {destination.get('id')}")
+    resolved.update(deepcopy(override))
+    resolved["country"] = country
+    resolved["destination_id"] = destination.get("id")
+    return resolved
 
 
 def copy_site_assets() -> None:

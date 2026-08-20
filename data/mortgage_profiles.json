@@ -1,0 +1,281 @@
+{
+  "as_of": "2026-08-20",
+  "default_buyer_profile": {
+    "residency": "non_resident",
+    "income_source": "overseas"
+  },
+  "countries": {
+    "Austria": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": [],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["No current first-party lender terms for the default non-resident overseas-income profile were verified."],
+      "confidence": "low",
+      "evidence_date": "2026-08-20",
+      "sources": []
+    },
+    "Canada": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["CAD"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["Federal foreign-buyer restrictions and exceptions must be resolved before financing; no current standard non-resident lender terms were verified."],
+      "confidence": "medium",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "Government of Canada — extension of foreign-buyer restrictions",
+          "url": "https://www.canada.ca/en/department-finance/corporate/transparency/2024/nffn-part-3.html"
+        }
+      ]
+    },
+    "Croatia": {
+      "availability": "conditional",
+      "maximum_ltv": 0.6,
+      "maximum_term_years": 20,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["EUR"],
+      "eligible_residency": ["eu_national", "croatian_working_in_eu"],
+      "eligible_income_sources": ["eu_income"],
+      "supported_uses": ["personal", "rental"],
+      "conditions": ["Published terms cover EU nationals and Croatian nationals working in the EU; other non-resident profiles require lender confirmation."],
+      "confidence": "medium-high",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "Erste Bank Croatia — housing loans",
+          "url": "https://www.erstebank.hr/en/private-clients/loans/housing-loans/erste-housing-loans-hr"
+        }
+      ]
+    },
+    "France": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["EUR"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["No current first-party lender product with explicit default non-resident eligibility and leverage was verified."],
+      "confidence": "low",
+      "evidence_date": "2026-08-20",
+      "sources": []
+    },
+    "Greece": {
+      "availability": "likely_available",
+      "maximum_ltv": 0.65,
+      "maximum_term_years": 15,
+      "maximum_age_at_maturity": 75,
+      "loan_currencies": ["EUR"],
+      "eligible_residency": ["non_resident"],
+      "eligible_income_sources": ["overseas"],
+      "supported_uses": ["personal", "rental"],
+      "conditions": ["Non-Greek and non-Cypriot borrowers are limited to 65% of commercial value and generally 15 years; a Greek lawyer may act by proxy."],
+      "confidence": "high",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "Eurobank — mortgage loan for non-residents",
+          "url": "https://www.eurobank.gr/en/international-customers/what-we-offer/mortgage-loan-for-non-residents"
+        }
+      ]
+    },
+    "Indonesia": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["IDR"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["No current first-party lender terms for a non-resident foreign buyer with overseas income were verified."],
+      "confidence": "low",
+      "evidence_date": "2026-08-20",
+      "sources": []
+    },
+    "Italy": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["EUR"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["No current first-party lender product with explicit default non-resident eligibility and leverage was verified."],
+      "confidence": "low",
+      "evidence_date": "2026-08-20",
+      "sources": []
+    },
+    "Japan": {
+      "availability": "conditional",
+      "maximum_ltv": null,
+      "maximum_term_years": 35,
+      "maximum_age_at_maturity": 80,
+      "loan_currencies": ["JPY"],
+      "eligible_residency": ["resident"],
+      "eligible_income_sources": ["japan_income", "documented_overseas_income"],
+      "supported_uses": ["personal", "rental"],
+      "conditions": ["The verified lender accepts foreign nationals without permanent residence, but applicants must reside in Japan with a qualifying status and meet income and underwriting requirements."],
+      "confidence": "high",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "SMBC Trust Bank PRESTIA — foreign-national loan requirements",
+          "url": "https://faq.smbctb.co.jp/faq/show/869?site_domain=smbctben"
+        },
+        {
+          "name": "SMBC Trust Bank PRESTIA — housing loan",
+          "url": "https://www.smbctb.co.jp/en/lp/housingloan/"
+        }
+      ]
+    },
+    "New Zealand": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["NZD"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["Property-purchase eligibility and current first-party lender terms for the default non-resident profile were not verified."],
+      "confidence": "low",
+      "evidence_date": "2026-08-20",
+      "sources": []
+    },
+    "Portugal": {
+      "availability": "likely_available",
+      "maximum_ltv": 0.7,
+      "maximum_term_years": 30,
+      "maximum_age_at_maturity": 75,
+      "loan_currencies": ["EUR"],
+      "eligible_residency": ["non_resident"],
+      "eligible_income_sources": ["overseas"],
+      "supported_uses": ["personal", "rental"],
+      "conditions": ["BPI publishes eligibility by residence and nationality; applicants outside its stated country set require separate confirmation."],
+      "confidence": "high",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "Banco BPI — solutions for non-resident foreigners",
+          "url": "https://www.bancobpi.pt/en/premier/credit/en-credito-habitacao/solutions-for-non-resident-foreigners"
+        },
+        {
+          "name": "Banco BPI — non-resident eligibility",
+          "url": "https://www.bancobpi.pt/ajuda/credito/credito-habitacao/quem-pode-pedir-credito-habitacao-para-estrangeiros-nao-residentes"
+        }
+      ]
+    },
+    "Spain": {
+      "availability": "likely_available",
+      "maximum_ltv": 0.7,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["EUR"],
+      "eligible_residency": ["non_resident"],
+      "eligible_income_sources": ["overseas"],
+      "supported_uses": ["personal", "rental"],
+      "conditions": ["Online application access is limited to specified residence countries; other applicants are directed to a branch and remain subject to underwriting."],
+      "confidence": "high",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "CaixaBank HolaBank — mortgage for non-residents",
+          "url": "https://www.caixabank.es/particular/holabank/holabank-mortgage.html"
+        }
+      ]
+    },
+    "Switzerland": {
+      "availability": "conditional",
+      "maximum_ltv": 0.6,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["CHF"],
+      "eligible_residency": ["resident", "non_resident_with_purchase_permit"],
+      "eligible_income_sources": ["swiss_income", "documented_overseas_income"],
+      "supported_uses": ["personal", "rental"],
+      "conditions": ["A person abroad generally needs acquisition permission; holiday-home quotas, eligible municipalities, use, and size restrictions apply. Vacation-home financing commonly requires at least 40% equity."],
+      "confidence": "medium-high",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "UBS — mortgage for vacation and investment properties",
+          "url": "https://www.ubs.com/ch/en/services/guide/mortgages-and-financing/articles/mortgage-for-second-home-and-investment-property.html"
+        },
+        {
+          "name": "UBS — Lex Koller foreign-buyer restrictions",
+          "url": "https://www.ubs.com/ch/en/services/guide/mortgages-and-financing/articles/lex-koller.html"
+        }
+      ]
+    },
+    "Thailand": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["THB", "SGD"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": ["condominium"],
+      "conditions": ["The local home-loan product requires Thai nationality. UOB references an international Thailand property loan, but current public eligibility and leverage terms were not available on the Thai bank page."],
+      "confidence": "medium",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "UOB Thailand — local home-loan applicant qualifications",
+          "url": "https://www.uob.co.th/personal-en/loans/housing/housing-loan-home-loan.page"
+        },
+        {
+          "name": "UOB Thailand — international property-loan referral",
+          "url": "https://www.uob.co.th/personal-en/redirect/international-loan.page"
+        }
+      ]
+    },
+    "United States": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["USD"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["No current nationwide first-party lender product with explicit standard foreign-national terms was verified; availability varies by lender, state, income documentation, and property use."],
+      "confidence": "low",
+      "evidence_date": "2026-08-20",
+      "sources": []
+    },
+    "Vietnam": {
+      "availability": "no_standard_nonresident_route",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": 65,
+      "loan_currencies": ["VND"],
+      "eligible_residency": ["local_resident"],
+      "eligible_income_sources": ["vietnam_income"],
+      "supported_uses": ["personal"],
+      "conditions": ["The verified retail mortgage is limited to Vietnamese citizens or overseas Vietnamese who reside in listed local areas; it does not establish a standard route for the default non-resident foreign profile."],
+      "confidence": "medium-high",
+      "evidence_date": "2026-08-20",
+      "sources": [
+        {
+          "name": "HSBC Vietnam — home-loan eligibility",
+          "url": "https://www.hsbc.com.vn/en-vn/loans/products/home/"
+        }
+      ]
+    }
+  },
+  "destination_overrides": {}
+}
