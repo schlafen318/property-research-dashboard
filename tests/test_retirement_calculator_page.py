@@ -195,6 +195,11 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-current-cost-summary"', section)
         self.assertIn('id="ret-current-cost-annual"', section)
         self.assertIn('id="ret-current-cost-bars"', section)
+        self.assertIn('<h3>Retirement funding target</h3>', section)
+        self.assertIn('id="ret-current-target"', section)
+        self.assertIn('id="ret-destination-target"', section)
+        self.assertIn('id="ret-target-difference"', section)
+        self.assertIn('Excludes any separate home purchase', section)
 
     def test_current_cost_comparison_does_not_persist_or_transmit_personal_values(self) -> None:
         source = UI_MODULE.read_text(encoding="utf-8")

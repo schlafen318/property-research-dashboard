@@ -31,6 +31,21 @@
     };
   }
 
+  function retirementTargetComparison(input) {
+    const currentTarget = Number(input.currentTarget);
+    const destinationTarget = Number(input.destinationTarget);
+    if (!Number.isFinite(currentTarget) || !Number.isFinite(destinationTarget) ||
+        currentTarget < 0 || destinationTarget < 0) return null;
+    const difference = destinationTarget - currentTarget;
+    return {
+      direction: difference < 0 ? "lower" : difference > 0 ? "higher" : "same",
+      targetDifference: Math.abs(difference),
+      percentDifference: currentTarget === 0
+        ? null
+        : Math.round(Math.abs(difference) / currentTarget * 100),
+    };
+  }
+
   function housingAmount(profile, plan) {
     return plan === "rent" ? profile.annual_rent_usd : profile.annual_owner_costs_usd;
   }
@@ -238,6 +253,7 @@
     let autoCalculationTimer = null;
     let hasTrackedResult = false;
     let hasTrackedCurrentCostComparison = false;
+    let latestResult = null;
 
     function selectedRecord() {
       return byId[el("ret-destination").value];
@@ -339,11 +355,14 @@
       sidecar.addEventListener("close", function () { opener.focus(); });
     }
 
-    function expenseCategories(record, profile, plan) {
+    function expenseCategories(record, profile, plan, monthlySpendingOverride) {
       const generalRate = rate("ret-general-inflation");
       const healthcareRate = rate("ret-healthcare-inflation");
       const propertyRate = rate("ret-property-inflation");
-      const annualSpending = annualSpendingFromMonthly(number("ret-monthly-spending"));
+      const monthlySpending = monthlySpendingOverride === undefined
+        ? number("ret-monthly-spending")
+        : Number(monthlySpendingOverride);
+      const annualSpending = annualSpendingFromMonthly(monthlySpending);
       const scale = benchmarkValue > 0 ? annualSpending / benchmarkValue : 1;
       const categories = Object.entries(profile.categories_usd).map(function (entry) {
         return {
@@ -358,7 +377,7 @@
       return categories;
     }
 
-    function calculatorInput(planOverride) {
+    function calculatorInput(planOverride, monthlySpendingOverride) {
       const record = selectedRecord();
       if (!record) throw new Error("Choose a destination with available cost data");
       const household = el("ret-household").value;
@@ -369,7 +388,7 @@
         currentAge: number("ret-current-age"),
         retirementAge: number("ret-retirement-age"),
         horizonYears: number("ret-horizon"),
-        expenseCategories: expenseCategories(record, profile, plan),
+        expenseCategories: expenseCategories(record, profile, plan, monthlySpendingOverride),
         incomeStreams: [
           { amount: number("ret-pension"), indexed: el("ret-pension-indexed").checked, inflationRate: generalRate },
           { amount: number("ret-other-income"), indexed: el("ret-other-indexed").checked, inflationRate: generalRate },
@@ -411,16 +430,18 @@
       if (root.GHA && typeof root.GHA.track === "function") root.GHA.track(name, trackingContext());
     }
 
-    function renderCurrentCostComparison() {
+    function renderCurrentCostComparison(resultOverride) {
       const section = el("ret-current-cost-comparison");
       const result = el("ret-current-cost-result");
       const destination = selectedRecord();
+      const retirementResult = resultOverride || latestResult;
+      const currentMonthly = number("ret-current-monthly-spending");
       const comparison = currentCostComparison({
-        currentMonthly: number("ret-current-monthly-spending"),
+        currentMonthly: currentMonthly,
         destinationMonthly: number("ret-monthly-spending"),
       });
       section.hidden = false;
-      if (!comparison || !destination) {
+      if (!comparison || !destination || !retirementResult) {
         result.hidden = true;
         return;
       }
@@ -429,10 +450,19 @@
       const destinationLabel = destination.name;
       el("ret-current-cost-label").textContent = currentLabel;
       el("ret-current-cost-destination-label").textContent = destinationLabel;
+      el("ret-current-target-label").textContent = currentLabel;
+      el("ret-destination-target-label").textContent = destinationLabel;
       setMoney("ret-current-cost-amount", number("ret-current-monthly-spending"));
       setMoney("ret-current-cost-destination-amount", number("ret-monthly-spending"));
       el("ret-current-cost-bar").style.width = comparison.currentBarPercent.toFixed(1) + "%";
       el("ret-current-cost-destination-bar").style.width = comparison.destinationBarPercent.toFixed(1) + "%";
+      const currentRetirementResult = engine.calculateRetirement(calculatorInput(undefined, currentMonthly));
+      const targets = retirementTargetComparison({
+        currentTarget: currentRetirementResult.liquidPortfolio + currentRetirementResult.emergencyReserve,
+        destinationTarget: retirementResult.liquidPortfolio + retirementResult.emergencyReserve,
+      });
+      setMoney("ret-current-target", currentRetirementResult.liquidPortfolio + currentRetirementResult.emergencyReserve);
+      setMoney("ret-destination-target", retirementResult.liquidPortfolio + retirementResult.emergencyReserve);
       if (comparison.direction === "same") {
         el("ret-current-cost-summary").textContent = destinationLabel +
           " is about the same per month as " + currentLabel + ".";
@@ -446,6 +476,14 @@
           money.format(comparison.annualDifference) + " " +
           (comparison.direction === "lower" ? "less" : "more") + " per year.";
       }
+      if (targets.direction === "same") {
+        el("ret-target-difference").textContent = "The modeled retirement funding targets are about the same.";
+      } else {
+        el("ret-target-difference").textContent = "The destination target is " +
+          money.format(targets.targetDifference) + " " +
+          (targets.direction === "lower" ? "lower" : "higher") +
+          (targets.percentDifference === null ? "." : " (" + targets.percentDifference + "%).");
+      }
       result.hidden = false;
       if (!hasTrackedCurrentCostComparison) {
         track("retirement_calculator_current_cost_compare");
@@ -455,6 +493,7 @@
 
     function render(result) {
       const record = selectedRecord();
+      latestResult = result;
       el("ret-detailed-projection").hidden = false;
       el("ret-plan-summary").textContent = planningSummary(result);
       setMoney("ret-total-today", result.totalNeededToday);
@@ -688,7 +727,7 @@
       el("ret-save-intent-status").hidden = false;
     });
     ["ret-current-location", "ret-current-monthly-spending"].forEach(function (id) {
-      el(id).addEventListener("input", renderCurrentCostComparison);
+      el(id).addEventListener("input", function () { renderCurrentCostComparison(); });
     });
     syncDestinationDefaults(true);
     updateMonthlyInvestmentPreview();
@@ -699,6 +738,7 @@
   return {
     annualSpendingFromMonthly: annualSpendingFromMonthly,
     currentCostComparison: currentCostComparison,
+    retirementTargetComparison: retirementTargetComparison,
     annualBenchmark: annualBenchmark,
     rankDestinationCosts: rankDestinationCosts,
     usesPropertyBudget: usesPropertyBudget,

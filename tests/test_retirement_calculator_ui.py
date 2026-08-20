@@ -39,6 +39,18 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertIn('el("ret-save-intent-button").addEventListener("click"', source)
         self.assertIn('el("ret-save-intent-status").hidden = false;', source)
 
+    def test_current_cost_input_events_reuse_the_latest_retirement_result(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+
+        self.assertIn(
+            'el(id).addEventListener("input", function () { renderCurrentCostComparison(); });',
+            source,
+        )
+        self.assertNotIn(
+            'el(id).addEventListener("input", renderCurrentCostComparison);',
+            source,
+        )
+
     def test_converts_monthly_spending_to_annual_for_the_engine(self) -> None:
         self.assertEqual(64_596, run_ui("annualSpendingFromMonthly", 5_383))
 
@@ -88,6 +100,43 @@ class RetirementCalculatorUITests(unittest.TestCase):
                 "currentCostComparison",
                 {"currentMonthly": 4_000, "destinationMonthly": 4_000},
             ),
+        )
+
+    def test_retirement_target_comparison_reports_destination_reduction(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "lower",
+                "targetDifference": 500_000,
+                "percentDifference": 25,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 2_000_000, "destinationTarget": 1_500_000},
+            ),
+        )
+
+    def test_retirement_target_comparison_reports_increase_and_handles_zero_current_target(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "targetDifference": 300_000,
+                "percentDifference": 20,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 1_500_000, "destinationTarget": 1_800_000},
+            ),
+        )
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "targetDifference": 1_800_000,
+                "percentDifference": None,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 0, "destinationTarget": 1_800_000},
+            )
         )
         self.assertIsNone(
             run_ui(
