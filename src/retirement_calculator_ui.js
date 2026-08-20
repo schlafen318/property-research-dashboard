@@ -15,6 +15,22 @@
     return Number(monthlySpending) * 12;
   }
 
+  function currentCostComparison(input) {
+    const currentMonthly = Number(input.currentMonthly);
+    const destinationMonthly = Number(input.destinationMonthly);
+    if (!(currentMonthly > 0) || !(destinationMonthly > 0)) return null;
+    const difference = destinationMonthly - currentMonthly;
+    const maximum = Math.max(currentMonthly, destinationMonthly);
+    return {
+      direction: difference < 0 ? "lower" : difference > 0 ? "higher" : "same",
+      monthlyDifference: Math.abs(difference),
+      annualDifference: Math.abs(difference) * 12,
+      percentDifference: Math.round(Math.abs(difference) / currentMonthly * 100),
+      currentBarPercent: currentMonthly / maximum * 100,
+      destinationBarPercent: destinationMonthly / maximum * 100,
+    };
+  }
+
   function housingAmount(profile, plan) {
     return plan === "rent" ? profile.annual_rent_usd : profile.annual_owner_costs_usd;
   }
@@ -221,6 +237,7 @@
     let benchmarkValue = 0;
     let autoCalculationTimer = null;
     let hasTrackedResult = false;
+    let hasTrackedCurrentCostComparison = false;
 
     function selectedRecord() {
       return byId[el("ret-destination").value];
@@ -394,6 +411,48 @@
       if (root.GHA && typeof root.GHA.track === "function") root.GHA.track(name, trackingContext());
     }
 
+    function renderCurrentCostComparison() {
+      const section = el("ret-current-cost-comparison");
+      const result = el("ret-current-cost-result");
+      const destination = selectedRecord();
+      const comparison = currentCostComparison({
+        currentMonthly: number("ret-current-monthly-spending"),
+        destinationMonthly: number("ret-monthly-spending"),
+      });
+      section.hidden = false;
+      if (!comparison || !destination) {
+        result.hidden = true;
+        return;
+      }
+      const enteredLocation = el("ret-current-location").value.trim();
+      const currentLabel = enteredLocation || "Where you live now";
+      const destinationLabel = destination.name;
+      el("ret-current-cost-label").textContent = currentLabel;
+      el("ret-current-cost-destination-label").textContent = destinationLabel;
+      setMoney("ret-current-cost-amount", number("ret-current-monthly-spending"));
+      setMoney("ret-current-cost-destination-amount", number("ret-monthly-spending"));
+      el("ret-current-cost-bar").style.width = comparison.currentBarPercent.toFixed(1) + "%";
+      el("ret-current-cost-destination-bar").style.width = comparison.destinationBarPercent.toFixed(1) + "%";
+      if (comparison.direction === "same") {
+        el("ret-current-cost-summary").textContent = destinationLabel +
+          " is about the same per month as " + currentLabel + ".";
+        el("ret-current-cost-annual").textContent = "No modeled annual difference at these spending levels.";
+      } else {
+        el("ret-current-cost-summary").textContent = destinationLabel + " is " +
+          money.format(comparison.monthlyDifference) + " " +
+          (comparison.direction === "lower" ? "less" : "more") + " per month (" +
+          comparison.percentDifference + "% " + comparison.direction + ") than " + currentLabel + ".";
+        el("ret-current-cost-annual").textContent = "That is about " +
+          money.format(comparison.annualDifference) + " " +
+          (comparison.direction === "lower" ? "less" : "more") + " per year.";
+      }
+      result.hidden = false;
+      if (!hasTrackedCurrentCostComparison) {
+        track("retirement_calculator_current_cost_compare");
+        hasTrackedCurrentCostComparison = true;
+      }
+    }
+
     function render(result) {
       const record = selectedRecord();
       el("ret-detailed-projection").hidden = false;
@@ -435,6 +494,7 @@
       renderSensitivity();
       renderHousingComparison();
       renderAccumulationChart(result.annualAccumulation, result.totalCapitalAtRetirement);
+      renderCurrentCostComparison();
       el("ret-result-assumptions").textContent =
         "Data " + payload.as_of + " · " + record.confidence.overall + " confidence · " +
         "uses the same expected return every year. Actual return order and market losses can materially change the outcome. " +
@@ -627,6 +687,9 @@
       el("ret-save-intent-button").hidden = true;
       el("ret-save-intent-status").hidden = false;
     });
+    ["ret-current-location", "ret-current-monthly-spending"].forEach(function (id) {
+      el(id).addEventListener("input", renderCurrentCostComparison);
+    });
     syncDestinationDefaults(true);
     updateMonthlyInvestmentPreview();
     initDestinationCostSidecar();
@@ -635,6 +698,7 @@
 
   return {
     annualSpendingFromMonthly: annualSpendingFromMonthly,
+    currentCostComparison: currentCostComparison,
     annualBenchmark: annualBenchmark,
     rankDestinationCosts: rankDestinationCosts,
     usesPropertyBudget: usesPropertyBudget,

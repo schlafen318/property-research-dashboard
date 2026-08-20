@@ -42,6 +42,60 @@ class RetirementCalculatorUITests(unittest.TestCase):
     def test_converts_monthly_spending_to_annual_for_the_engine(self) -> None:
         self.assertEqual(64_596, run_ui("annualSpendingFromMonthly", 5_383))
 
+    def test_current_cost_comparison_reports_a_lower_destination_cost(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "lower",
+                "monthlyDifference": 1_500,
+                "annualDifference": 18_000,
+                "percentDifference": 25,
+                "currentBarPercent": 100,
+                "destinationBarPercent": 75,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 6_000, "destinationMonthly": 4_500},
+            ),
+        )
+
+    def test_current_cost_comparison_reports_a_higher_destination_cost(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "monthlyDifference": 1_500,
+                "annualDifference": 18_000,
+                "percentDifference": 30,
+                "currentBarPercent": 76.92307692307693,
+                "destinationBarPercent": 100,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 5_000, "destinationMonthly": 6_500},
+            ),
+        )
+
+    def test_current_cost_comparison_handles_equal_and_missing_costs(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "same",
+                "monthlyDifference": 0,
+                "annualDifference": 0,
+                "percentDifference": 0,
+                "currentBarPercent": 100,
+                "destinationBarPercent": 100,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 4_000, "destinationMonthly": 4_000},
+            ),
+        )
+        self.assertIsNone(
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 0, "destinationMonthly": 4_000},
+            )
+        )
+
     def test_owner_plans_use_owner_costs(self) -> None:
         profile = {
             "categories_usd": {"food": 20_000, "healthcare": 5_000},
