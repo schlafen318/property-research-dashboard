@@ -769,25 +769,27 @@
       .atlas-map__legend span { padding: 6px 7px; font-size: 9px; }
     }
 
-    .page-hero { min-height: 480px; background-position: center; }
-    .guide-hero-card { align-self: start; margin-top: 40px; }
+    .guide-page-hero { min-height: 430px; background-position: center; }
+    .guide-page-hero .page-hero-grid { grid-template-columns: minmax(0, 720px); }
     .guide-page-layout { display: block; max-width: 980px; margin: 0 auto; padding-top: 42px; }
     .guide-page-layout .page-article { gap: 56px; }
+    .guide-section-nav { display: flex; gap: 22px; margin: 0; padding: 15px 0; overflow-x: auto; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 800; letter-spacing: .045em; white-space: nowrap; scrollbar-width: thin; }
+    .guide-section-nav a { color: var(--ink); text-decoration: none; }
+    .guide-section-nav a:hover { color: var(--gold); }
     .guide-kicker { margin: 0 0 12px; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
     .guide-intro { max-width: 720px; }
     .guide-intro h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4.3vw, 44px); line-height: 1.02; }
-    .journey-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 22px; border: 1px solid var(--line); background: var(--line); }
-    .journey-card { min-width: 0; padding: 20px; background: var(--paper); color: var(--ink); text-decoration: none; }
-    .journey-card:nth-child(2) { background: #eef4ec; } .journey-card:nth-child(3) { background: #edf4f3; }
+    .journey-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; margin-top: 28px; }
+    .journey-card { min-width: 0; padding-top: 15px; border-top: 1px solid var(--ink); color: var(--ink); text-decoration: none; }
     .journey-card span { display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-    .journey-card strong { display: block; margin: 24px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; line-height: 1.05; }
-    .journey-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }
+    .journey-card strong { display: block; margin: 14px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; line-height: 1.05; }
+    .journey-card p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }
     .guide-feature { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); gap: 34px; align-items: stretch; padding: 28px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
     .guide-feature__image { min-height: 330px; background: linear-gradient(150deg, rgba(36,49,45,.1), rgba(36,49,45,.46)), url("/assets/destination-dossier-coast.jpg"); background-position: center; background-size: cover; }
     .guide-feature__copy { display: flex; flex-direction: column; justify-content: center; }
     .guide-feature__copy h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(31px, 4vw, 47px); line-height: 1.01; }
     .guide-feature__copy p { color: #3f4d48; }
-    .guide-feature__copy .page-button { align-self: flex-start; margin-top: 12px; }
+    .guide-text-link { display: inline-block; align-self: flex-start; margin-top: 14px; color: var(--ink); font-size: 13px; font-weight: 900; text-decoration: none; border-bottom: 1px solid currentColor; }
     .guide-country-links { display: flex; flex-wrap: wrap; gap: 9px 18px; margin-top: 18px; }
     .guide-country-links a { font-weight: 800; }
     .guide-catalog { display: grid; gap: 46px; }
@@ -802,12 +804,12 @@
     .guide-story__link { display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 900; }
     .guide-research-note { padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
     .guide-research-note p { max-width: 710px; margin: 0; color: #3f4d48; }
-    @media (max-width: 860px) { .journey-grid, .guide-story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .guide-feature { grid-template-columns: 1fr; } .guide-feature__image { min-height: 260px; } }
-    @media (max-width: 560px) { .journey-grid, .guide-story-grid { grid-template-columns: 1fr; } .guide-page-layout { padding-top: 30px; } .guide-page-layout .page-article { gap: 38px; } }
+    @media (max-width: 860px) { .journey-grid, .guide-story-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .guide-feature { grid-template-columns: 1fr; gap: 24px; } .guide-feature__image { min-height: min(54vw, 390px); } }
+    @media (max-width: 560px) { .guide-page-hero { min-height: 350px; } .guide-section-nav { gap: 17px; margin: 0 -2px; padding: 13px 2px; } .journey-grid, .guide-story-grid { grid-template-columns: 1fr; gap: 22px; } .guide-page-layout { padding-top: 26px; } .guide-page-layout .page-article { gap: 38px; } .journey-card { padding-top: 13px; } .guide-feature { padding: 22px 0; } .guide-feature__image { min-height: 250px; } .guide-feature__copy h2 { font-size: 34px; } }
   </style>
 </head>
 <body>
-  <header class="page-hero">
+  <header class="page-hero guide-page-hero">
     <div class="page-shell">
 
       <nav class="page-nav" aria-label="Primary">
@@ -833,42 +835,44 @@
 
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">The Global Property Journal · updated 2026-08-20</p>
-          <h1>Global Property Buying Guides</h1>
-          <p class="page-lede">Independent ideas and evidence for buying, retiring, and investing abroad—without starting with a listing.</p>
+          <p class="page-eyebrow">Global Property Buying Guides · updated 2026-08-20</p>
+          <h1>A considered guide to buying a home abroad</h1>
+          <p class="page-lede">Stories, places, and practical perspective for the life you are planning next.</p>
         </div>
-        <aside class="page-hero-card guide-hero-card">
-          <span>Editorial principle</span>
-          <strong>Start with the life you want, then test the property decision.</strong>
-          <p>Choose a buying brief, read the relevant research, then verify locally before committing capital.</p>
-        </aside>
       </div>
     </div>
   </header>
   <main>
     <div class="page-shell">
-      <nav class="sticky-jump" aria-label="Page sections"><a href="#choose-journey">Start</a><a href="#featured-research">Featured</a><a href="#retirement">Retirement</a><a href="#second-homes">Second homes</a><a href="#risk">Risk</a><a href="#country-comparisons">Countries</a></nav>
+      <nav class="guide-section-nav" aria-label="Guide sections"><a href="#choose-journey">Start here</a><a href="#featured-research">Featured story</a><a href="#retirement">Retirement</a><a href="#second-homes">Second homes</a><a href="#investment">Investment</a><a href="#country-comparisons">Places</a></nav>
       <div class="page-layout guide-page-layout">
         <article class="page-article">
           <section id="choose-journey">
             <div class="guide-intro">
-              <p class="guide-kicker">Begin with your brief</p>
-              <h2>Find the right guide for your purchase</h2>
+              <p class="guide-kicker">Where to begin</p>
+              <h2>Choose the question that matters most to you.</h2>
             </div>
             <div class="journey-grid">
-              <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement route"><span>Route 01</span><strong>Retirement or lifestyle base</strong><p>Healthcare, daily convenience, climate, community, and resale depth.</p></a>
-              <a class="journey-card" href="#second-homes" data-track="guide_journey_click" data-track-label="Second home route"><span>Route 02</span><strong>Second home abroad</strong><p>Repeat use, family visits, rental offset, and sensible ownership process.</p></a>
-              <a class="journey-card" href="#investment" data-track="guide_journey_click" data-track-label="Investment route"><span>Route 03</span><strong>Investment-led shortlist</strong><p>Yield realism, value entry, regulatory risk, and future exit liquidity.</p></a>
-              <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Risk route"><span>Route 04</span><strong>Ownership and risk first</strong><p>Title clarity, foreign-buyer rules, taxes, permits, and adviser depth.</p></a>
+              <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement"><span>A new chapter</span><strong>Retirement or lifestyle base</strong><p>Healthcare, climate, community, and the rhythm of daily life.</p></a>
+              <a class="journey-card" href="#second-homes" data-track="guide_journey_click" data-track-label="Second homes"><span>A second address</span><strong>Second home abroad</strong><p>Family time, repeat stays, and ownership that feels uncomplicated.</p></a>
+              <a class="journey-card" href="#investment" data-track="guide_journey_click" data-track-label="Investment"><span>A thoughtful investment</span><strong>Investment-led shortlist</strong><p>Value, income, regulation, and the quality of your eventual exit.</p></a>
+              <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Ownership and risk"><span>Before you commit</span><strong>Ownership and risk first</strong><p>Rules, taxes, title, and the questions worth settling early.</p></a>
             </div>
           </section>
+
+      <section class="guide-research-note">
+        <h2>Estimate your retirement capital</h2>
+        <p>Start with destination expenses in today's money, then account for inflation, reliable pension and passive income, housing, property acquisition, and a liquid portfolio.</p>
+        <a class="page-button" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="guide hub">Open the retirement abroad calculator</a>
+      </section>
+
           <section class="guide-feature" id="featured-research">
             <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
             <div class="guide-feature__copy">
-              <p class="guide-kicker">Featured research</p>
+              <p class="guide-kicker">The featured story</p>
               <h2>30 Retirement Destinations Ranked by How Much You Need</h2>
               <p>Compare all 30 Global Home Atlas retirement destinations by required capital, annual spending, reserves, and optional property costs using one methodology.</p>
-              <a class="page-button" href="/retirement-destinations-ranked-by-cost/">Read the featured guide</a>
+              <a class="guide-text-link" href="/retirement-destinations-ranked-by-cost/">Read the story</a>
             </div>
           </section>
           <section class="guide-research-note">
@@ -941,7 +945,7 @@
             <article class="guide-story">
               <span>Japan buyer guide</span>
               <h3><a href="/japan-retirement-property-foreign-buyers/">Japan Retirement Property for Foreign Buyers</a></h3>
-              <p>Assess Japan retirement property for foreign buyers, including ownership clarity, lifestyle quality, value, income limits, and resale considerations.</p>
+              <p>Compare Japan retirement property for foreign buyers across lifestyle, access, ownership, rental rules, healthcare, value, and resale in Fukuoka, Hakone, Hakuba, and Niseko.</p>
               <a class="guide-story__link" href="/japan-retirement-property-foreign-buyers/">Read guide</a>
             </article></div>
           </section>
@@ -1054,13 +1058,6 @@
             </article></div>
           </section>
         </section>
-
-      <section class="guide-research-note">
-        <h2>Estimate your retirement capital</h2>
-        <p>Start with destination expenses in today's money, then account for inflation, reliable pension and passive income, housing, property acquisition, and a liquid portfolio.</p>
-        <a class="page-button" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open">Open the retirement abroad calculator</a>
-      </section>
-
         </article>
       </div>
     </div>

@@ -73,11 +73,13 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-expected-return",
             "ret-monthly-income",
             "ret-income-invested-rate",
+            "ret-current-location",
+            "ret-current-monthly-spending",
             "ret-calculate",
         }
         self.assertTrue(expected_controls.issubset(parser.control_ids))
         self.assertTrue(expected_controls - {"ret-calculate"} <= parser.label_targets)
-        self.assertEqual(1, parser.live_regions)
+        self.assertEqual(2, parser.live_regions)
         self.assertGreaterEqual(parser.noscript_sections, 1)
 
     def test_housing_inputs_match_how_retirees_plan(self) -> None:
@@ -172,6 +174,55 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-first-year-section",
         ):
             self.assertIn(f'id="{detail_id}"', detailed)
+
+    def test_current_cost_comparison_follows_the_detailed_projection(self) -> None:
+        detailed = self.html.index('id="ret-detailed-projection"')
+        comparison = self.html.index('id="ret-current-cost-comparison"')
+        sidecar = self.html.index('id="ret-cost-sidecar"')
+        self.assertLess(detailed, comparison)
+        self.assertLess(comparison, sidecar)
+        section = self.html[comparison:sidecar]
+        self.assertIn('<h2 id="ret-current-cost-heading">Compare with where you live now</h2>', section)
+        self.assertIn(
+            'for="ret-current-location">Current location '
+            '<span class="optional-label">(optional)</span></label>',
+            section,
+        )
+        self.assertIn('id="ret-current-location" type="text" autocomplete="address-level2"', section)
+        self.assertIn('for="ret-current-monthly-spending">Current monthly spending</label>', section)
+        self.assertIn('id="ret-current-monthly-spending" type="number" min="1" step="1"', section)
+        self.assertIn('id="ret-current-cost-result" hidden aria-live="polite"', section)
+        self.assertIn('id="ret-current-cost-summary"', section)
+        self.assertIn('id="ret-current-cost-annual"', section)
+        self.assertIn('id="ret-current-cost-bars"', section)
+        self.assertIn('<h3>Retirement funding target</h3>', section)
+        self.assertIn('id="ret-current-target"', section)
+        self.assertIn('id="ret-destination-target"', section)
+        self.assertIn('id="ret-target-difference"', section)
+        self.assertIn('Excludes any separate home purchase', section)
+
+    def test_current_cost_comparison_does_not_persist_or_transmit_personal_values(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+        self.assertIn('track("retirement_calculator_current_cost_compare")', source)
+        self.assertNotIn("localStorage", source)
+        self.assertNotIn("sessionStorage", source)
+        self.assertNotIn("fetch(", source)
+        self.assertNotIn("XMLHttpRequest", source)
+
+    def test_result_card_contains_honest_save_intent_test(self) -> None:
+        results = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
+        self.assertIn('id="ret-save-action" hidden', results)
+        self.assertIn(
+            'id="ret-save-intent-button" type="button" '
+            'data-track="retirement_calculator_save_intent" '
+            'data-track-label="retirement calculator result">Save this plan</button>',
+            results,
+        )
+        self.assertIn('id="ret-save-intent-status" role="status" hidden', results)
+        self.assertIn("Saved plans are being evaluated. Your figures have not been stored.", results)
+        self.assertNotIn('type="password"', results)
+        self.assertNotIn('id="ret-account', results)
+        self.assertNotIn('id="ret-signup', results)
 
     def test_chart_includes_a_retirement_target_line(self) -> None:
         results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
@@ -290,6 +341,22 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         for route in routes:
             with self.subTest(route=route):
                 self.assertIn('/retirement-abroad-calculator/', route.read_text(encoding="utf-8"))
+
+    def test_calculator_callouts_include_fixed_source_labels(self) -> None:
+        routes_and_labels = {
+            ROOT / "artifacts" / "guides" / "index.html": "guide hub",
+            ROOT / "artifacts" / "buying-property-abroad-for-retirement" / "index.html": "buying guide",
+            ROOT / "artifacts" / "countries" / "spain-property" / "index.html": "country hub",
+            ROOT / "artifacts" / "destinations" / "valencia" / "index.html": "destination page",
+        }
+        for route, label in routes_and_labels.items():
+            with self.subTest(route=route):
+                html = route.read_text(encoding="utf-8")
+                self.assertIn(
+                    'data-track="retirement_calculator_open" '
+                    f'data-track-label="{label}"',
+                    html,
+                )
 
     def test_homepage_hero_links_to_retirement_calculator_once(self) -> None:
         homepage = (ROOT / "artifacts" / "index.html").read_text(encoding="utf-8")

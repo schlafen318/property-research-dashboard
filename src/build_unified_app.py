@@ -6,6 +6,7 @@ import re
 import shutil
 import sys
 import unicodedata
+from copy import deepcopy
 from datetime import date
 from html import escape
 from pathlib import Path
@@ -13,8 +14,10 @@ from urllib.parse import urlparse
 
 try:
     from src.seo_content_overrides import apply_content_override, load_content_overrides
+    from src.retirement_destination_finder_page import build_retirement_destination_finder_html
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from seo_content_overrides import apply_content_override, load_content_overrides
+    from retirement_destination_finder_page import build_retirement_destination_finder_html
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.seo_content_generator import PageContextParser, content_hash
@@ -63,6 +66,12 @@ RETIREMENT_CALCULATOR_DESCRIPTION = (
     "Estimate how much you need to retire abroad, including destination living costs, "
     "inflation, pension and passive income, property costs, and required portfolio capital."
 )
+RETIREMENT_FINDER_SLUG = "retirement-destination-finder"
+RETIREMENT_FINDER_TITLE = "Retirement Destination Finder | Global Home Atlas"
+RETIREMENT_FINDER_DESCRIPTION = (
+    "Project your retirement savings and monthly investing, then compare destinations "
+    "you may be able to afford when renting or buying abroad."
+)
 RETIREMENT_DESTINATIONS_SLUG = "retirement-destinations-ranked-by-cost"
 RETIREMENT_DESTINATIONS_TITLE = "Retirement Destinations Ranked by Cost (2026) | Global Home Atlas"
 RETIREMENT_DESTINATIONS_H1 = "30 Retirement Destinations Ranked by How Much You Need"
@@ -71,9 +80,30 @@ RETIREMENT_DESTINATIONS_DESCRIPTION = (
     "annual spending, reserves, and optional property costs using one methodology."
 )
 RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
+MORTGAGE_PROFILES_PATH = DATA / "mortgage_profiles.json"
 RETIREMENT_ENGINE_PATH = ROOT / "src" / "retirement_calculator.js"
 RETIREMENT_UI_PATH = ROOT / "src" / "retirement_calculator_ui.js"
+PROPERTY_FINANCE_PATH = ROOT / "src" / "property_finance.js"
+RETIREMENT_FINDER_ENGINE_PATH = ROOT / "src" / "retirement_destination_finder.js"
+RETIREMENT_FINDER_UI_PATH = ROOT / "src" / "retirement_destination_finder_ui.js"
 RETIREMENT_RANKING_TABLE_PATH = ROOT / "src" / "retirement_ranking_table.js"
+CONTINENT_BY_COUNTRY = {
+    "Austria": "europe",
+    "Canada": "north-america",
+    "Croatia": "europe",
+    "France": "europe",
+    "Greece": "europe",
+    "Indonesia": "asia",
+    "Italy": "europe",
+    "Japan": "asia",
+    "New Zealand": "oceania",
+    "Portugal": "europe",
+    "Spain": "europe",
+    "Switzerland": "europe",
+    "Thailand": "asia",
+    "United States": "north-america",
+    "Vietnam": "asia",
+}
 RETIREMENT_DESTINATIONS_PAGE = {
     "slug": RETIREMENT_DESTINATIONS_SLUG,
     "title": RETIREMENT_DESTINATIONS_TITLE,
@@ -432,7 +462,7 @@ SEO_PAGES = [
     {
         "slug": "japan-retirement-property-foreign-buyers",
         "title": "Japan Retirement Property for Foreign Buyers | Global Home Atlas",
-        "description": "A 2026 guide to Japan retirement property for foreign buyers, covering residency, ownership, reporting, costs, healthcare, rentals, risks, and four destinations.",
+        "description": "Compare Japan retirement property for foreign buyers across lifestyle, access, ownership, residency, reporting, costs, healthcare, rental rules, risks, and four destinations.",
         "h1": "Japan Retirement Property for Foreign Buyers",
         "keyword": "Japan retirement property for foreign buyers",
         "theme": "Japan buyer guide",
@@ -806,6 +836,30 @@ def load_retirement_costs(path: Path = RETIREMENT_COSTS_PATH) -> dict:
     if len(ids) != len(records) or len(ids) != len(set(ids)) or any(not item for item in ids):
         raise ValueError("Retirement destination IDs must be present and unique")
     return payload
+
+
+def load_mortgage_profiles(path: Path = MORTGAGE_PROFILES_PATH) -> dict:
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict) or not isinstance(payload.get("countries"), dict):
+        raise ValueError("Mortgage profiles must contain a countries object")
+    if not isinstance(payload.get("destination_overrides", {}), dict):
+        raise ValueError("Mortgage destination overrides must be an object")
+    return payload
+
+
+def resolve_mortgage_profile(destination: dict, payload: dict) -> dict:
+    country = destination.get("country")
+    country_profile = payload.get("countries", {}).get(country)
+    if not isinstance(country_profile, dict):
+        raise ValueError(f"Missing mortgage profile for {country}")
+    resolved = deepcopy(country_profile)
+    override = payload.get("destination_overrides", {}).get(destination.get("id"), {})
+    if not isinstance(override, dict):
+        raise ValueError(f"Invalid mortgage override for {destination.get('id')}")
+    resolved.update(deepcopy(override))
+    resolved["country"] = country
+    resolved["destination_id"] = destination.get("id")
+    return resolved
 
 
 def copy_site_assets() -> None:
@@ -3455,6 +3509,7 @@ def build_landing_page(
           <nav class="hero-secondary-actions" aria-label="Explore Global Home Atlas">
             <a class="text-action" href="/guides/#country-selection" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
             <a class="text-action" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="hero">Calculate retirement needs</a>
+            <a class="text-action" href="/{RETIREMENT_FINDER_SLUG}/">Find affordable retirement destinations</a>
             <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
           </nav>
         </div>
@@ -4567,12 +4622,78 @@ __ANALYTICS__
     )
 
 
-def retirement_calculator_callout(css_class: str) -> str:
+def schema_for_retirement_finder(canonical: str) -> list[dict]:
+    return [
+        *global_schema_entities(),
+        {
+            "@type": "WebApplication",
+            "@id": f"{canonical}#calculator",
+            "name": "Retirement Destination Finder",
+            "url": canonical,
+            "applicationCategory": "FinanceApplication",
+            "operatingSystem": "Any",
+            "description": RETIREMENT_FINDER_DESCRIPTION,
+            "isAccessibleForFree": True,
+        },
+    ]
+
+
+def build_retirement_destination_finder_page(
+    destinations: list[dict],
+    retirement_payload: dict,
+    mortgage_payload: dict,
+) -> str:
+    retirement_ids = {item["destination_id"] for item in retirement_payload["destinations"]}
+    eligible_destinations = [item for item in destinations if item["id"] in retirement_ids]
+    mortgage_profiles = {
+        item["id"]: resolve_mortgage_profile(item, mortgage_payload)
+        for item in eligible_destinations
+    }
+    browser_destinations = [
+        {
+            **item,
+            "continent": CONTINENT_BY_COUNTRY.get(item.get("country", ""), ""),
+            "recommendable": is_destination_recommendable(item),
+        }
+        for item in eligible_destinations
+    ]
+    payload = {
+        "asOf": retirement_payload.get("as_of"),
+        "destinations": browser_destinations,
+        "retirementCosts": retirement_payload["destinations"],
+        "mortgageProfiles": mortgage_profiles,
+        "defaultBuyerProfile": mortgage_payload["default_buyer_profile"],
+    }
+    region_options = "".join(
+        f'<option value="{escape(region)}">{escape(region.replace("-", " ").title())}</option>'
+        for region in sorted({item["continent"] for item in browser_destinations if item["continent"]})
+    )
+    canonical = page_url(RETIREMENT_FINDER_SLUG)
+    return build_retirement_destination_finder_html(
+        head=head_html(
+            RETIREMENT_FINDER_TITLE,
+            RETIREMENT_FINDER_DESCRIPTION,
+            canonical,
+            schema_for_retirement_finder(canonical),
+        ).strip(),
+        navigation=primary_nav_html().strip(),
+        region_options=region_options,
+        universe_count=len(eligible_destinations),
+        payload_json=json.dumps(payload, separators=(",", ":")).replace("</", "<\\/"),
+        retirement_engine=RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        property_engine=PROPERTY_FINANCE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        finder_ui=RETIREMENT_FINDER_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        analytics=analytics_event_script(),
+    )
+
+
+def retirement_calculator_callout(css_class: str, source_label: str) -> str:
     return f"""
       <section class="{escape(css_class)}">
         <h2>Estimate your retirement capital</h2>
         <p>Start with destination expenses in today's money, then account for inflation, reliable pension and passive income, housing, property acquisition, and a liquid portfolio.</p>
-        <a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open">Open the retirement abroad calculator</a>
+        <a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="{escape(source_label)}">Open the retirement abroad calculator</a>
       </section>
     """
 
@@ -4580,23 +4701,6 @@ def retirement_calculator_callout(css_class: str) -> str:
 def build_retirement_calculator_page(destinations: list[dict], retirement_payload: dict) -> str:
     canonical = page_url(RETIREMENT_CALCULATOR_SLUG)
     destination_by_id = {item["id"]: item for item in destinations}
-    continent_by_country = {
-        "Austria": "europe",
-        "Canada": "north-america",
-        "Croatia": "europe",
-        "France": "europe",
-        "Greece": "europe",
-        "Indonesia": "asia",
-        "Italy": "europe",
-        "Japan": "asia",
-        "New Zealand": "oceania",
-        "Portugal": "europe",
-        "Spain": "europe",
-        "Switzerland": "europe",
-        "Thailand": "asia",
-        "United States": "north-america",
-        "Vietnam": "asia",
-    }
     records = retirement_payload["destinations"]
     browser_records = []
     options = []
@@ -4605,7 +4709,7 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         item = dict(record)
         destination = destination_by_id.get(record["destination_id"], {})
         item["name"] = destination.get("name", record["destination_id"].replace("-", " ").title())
-        item["continent"] = continent_by_country.get(destination.get("country", ""), "")
+        item["continent"] = CONTINENT_BY_COUNTRY.get(destination.get("country", ""), "")
         browser_records.append(item)
         options.append(f'<option value="{escape(item["destination_id"])}">{escape(item["name"])}</option>')
         first_source = item["sources"][0]
@@ -4662,14 +4766,15 @@ __HEAD__
     :root { color: #24312d; background: #f5f1e9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#24312d; --muted:#66736c; --line:#d8d1c4; --paper:#fffdf7; --green:#315e50; }
     * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
     .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; } .calc-nav { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:18px 0; border-bottom:1px solid rgba(255,255,255,.18); } .calc-brand { color:#fff; text-decoration:none; font-weight:900; } .calc-nav-links { display:flex; flex-wrap:wrap; gap:16px; } .calc-nav-links a { color:#f5f1e9; text-decoration:none; font-size:14px; }
-    .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; }
+    .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; } .calc-modes { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-weight:750; } .calc-modes a { color:#fff; } .calc-modes a[aria-current] { color:#d8c28d; text-decoration:none; border-bottom:2px solid #d8c28d; }
     main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
-    .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
+    .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .save-intent { padding-top:2px; } .save-intent .text-button { font-weight:750; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
     .accumulation-figure { position:relative; margin:0; padding:18px 0; border-top:1px solid var(--line); } .accumulation-figure h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .chart-legend { display:flex; gap:18px; color:var(--muted); font-size:12px; margin-bottom:8px; } .chart-key::before { content:""; display:inline-block; width:10px; height:10px; margin-right:6px; background:#315e50; } .chart-key.contribution::before { background:#c29b45; } .accumulation-chart { display:block; width:100%; height:auto; overflow:visible; } .chart-axis { stroke:var(--line); stroke-width:1; } .chart-target { stroke:#9b6a33; stroke-width:1.5; stroke-dasharray:5 4; } .chart-target-label { fill:#7a5227; font-size:11px; font-weight:700; } .chart-axis-label { fill:var(--muted); font-size:10px; } .chart-lump { fill:#315e50; } .chart-contribution { fill:#c29b45; } .chart-year { opacity:0; transform:translateY(8px); animation:ret-year-in .35s ease forwards; animation-delay:var(--year-delay); cursor:pointer; outline:none; } .chart-year.is-active rect,.chart-year:focus-visible rect { stroke:#24312d; stroke-width:2px; } .chart-tooltip { position:absolute; z-index:2; top:60px; right:0; width:min(245px,calc(100% - 20px)); padding:11px 13px; border-radius:6px; background:#24312d; color:#fff; box-shadow:0 8px 24px rgba(36,49,45,.2); font-size:12px; } .chart-tooltip strong { display:block; font-size:14px; margin-bottom:5px; } .chart-tooltip div { display:flex; justify-content:space-between; gap:12px; } .chart-tooltip span { color:#dfe7e3; } .result-comparison { padding:16px 0; border-top:1px solid var(--line); } .result-comparison h3,.result-comparison summary { font-family:Georgia,serif; font-size:21px; } .result-table { min-width:0; font-size:13px; background:transparent; } .result-table th,.result-table td { padding:8px 5px; white-space:normal; } .result-table td { text-align:right; } .result-table .is-selected { background:#f1eee4; } @keyframes ret-year-in { to { opacity:1; transform:translateY(0); } }
     .text-button { width:auto; min-height:0; padding:0; border:0; border-radius:0; background:none; color:#245c4b; text-decoration:underline; cursor:pointer; font-size:13px; }
+    .current-cost-comparison { margin-top:24px; } .current-cost-comparison h2 { margin:0 0 8px; } .current-cost-layout { display:grid; grid-template-columns:minmax(230px,.72fr) minmax(0,1.28fr); gap:28px; align-items:start; margin-top:20px; } .optional-label { color:var(--muted); font-weight:400; } .current-cost-result { border-left:1px solid var(--line); padding-left:28px; } .current-cost-summary { margin:0; font-family:Georgia,serif; font-size:23px; line-height:1.28; } .current-cost-annual { margin:7px 0 20px; color:var(--muted); } .current-cost-bars { display:grid; gap:14px; } .current-cost-bar-heading { display:flex; justify-content:space-between; gap:16px; margin-bottom:5px; } .current-cost-bar-heading span { color:var(--muted); white-space:nowrap; } .current-cost-track { height:10px; background:#e7e1d6; } .current-cost-fill { display:block; height:100%; background:#7d968b; transition:width .35s ease; } .current-cost-row.destination .current-cost-fill { background:var(--green); } .target-comparison { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); } .target-comparison h3 { margin:0 0 12px; font-family:Georgia,serif; font-size:21px; } .target-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .target-figures div { border-top:1px solid var(--line); padding-top:9px; } .target-figures span { display:block; color:var(--muted); font-size:12px; } .target-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:24px; } .target-difference { margin:12px 0 0; font-weight:750; }
     .cost-sidecar { width:min(560px,100%); max-width:none; height:100dvh; max-height:none; margin:0 0 0 auto; padding:0; border:0; background:transparent; overflow:hidden; } .cost-sidecar[open] { animation:cost-sidecar-in .25s ease-out; } .cost-sidecar::backdrop { background:rgba(24,34,30,.42); } .cost-sidecar-panel { height:100%; padding:24px; overflow:auto; background:var(--paper); box-shadow:-12px 0 32px rgba(36,49,45,.18); } .cost-sidecar-header { position:sticky; top:-24px; z-index:1; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin:-24px -24px 14px; padding:24px; border-bottom:1px solid var(--line); background:var(--paper); } .cost-sidecar-header h2 { margin:0; font-size:30px; } .cost-sidecar-close { width:auto; min-height:40px; padding:7px 10px; background:transparent; cursor:pointer; } .cost-sidecar-chart { display:grid; gap:5px; } .cost-row { min-height:0; padding:9px 10px; border:1px solid transparent; border-radius:3px; background:transparent; text-align:left; cursor:pointer; } .cost-row:hover,.cost-row:focus-visible { border-color:var(--line); background:#f5f1e9; } .cost-row.is-current { border-color:var(--green); } .cost-row-heading { display:flex; justify-content:space-between; gap:16px; } .cost-row-heading > span { color:var(--muted); white-space:nowrap; } .cost-bar-track { display:block; height:8px; margin-top:6px; background:#e7e1d6; } .cost-bar-fill { display:block; height:100%; background:#56806f; } @keyframes cost-sidecar-in { from { transform:translateX(100%); } to { transform:translateX(0); } }
     .content-section { padding:34px 0; border-top:1px solid var(--line); } .benchmark-controls { display:flex; flex-wrap:wrap; gap:14px; margin:20px 0 14px; } .benchmark-control { width:min(240px,100%); } .table-wrap { overflow-x:auto; } table { width:100%; min-width:1080px; border-collapse:collapse; background:var(--paper); } caption { padding:12px; text-align:left; color:var(--muted); font-weight:750; } th,td { text-align:left; padding:12px; border-bottom:1px solid var(--line); white-space:nowrap; } th { white-space:normal; } .benchmark-more { margin-top:18px; } .benchmark-more > summary { display:inline-block; padding:8px 0; color:var(--green); cursor:pointer; } .benchmark-more > summary:focus-visible { outline:3px solid #d6b96f; outline-offset:4px; } .benchmark-more .table-wrap { margin-top:10px; } .scenario-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; } .scenario-grid article { border-left:3px solid #bfa45f; padding-left:14px; } .faq details { padding:14px 0; border-bottom:1px solid var(--line); } .related { display:flex; flex-wrap:wrap; gap:16px; } footer { padding:30px 0; background:#243f37; color:#e2e8e4; } footer a { color:#fff; }
-    @media(max-width:780px) { .calculator-layout,.projection-grid { grid-template-columns:1fr; } .result-panel { position:static; } .calc-nav-links { display:none; } .scenario-grid { grid-template-columns:1fr; } }
+    @media(max-width:780px) { .calculator-layout,.projection-grid,.current-cost-layout { grid-template-columns:1fr; } .result-panel { position:static; } .calc-nav-links { display:none; } .scenario-grid { grid-template-columns:1fr; } .current-cost-result { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } }
     @media(max-width:520px) { .calc-shell { width:min(100% - 22px,1120px); } .field-grid,.result-grid { grid-template-columns:1fr; } h1 { overflow-wrap:anywhere; } th,td { padding:10px 8px; font-size:13px; } }
     @media(prefers-reduced-motion:reduce) { .chart-year,.cost-sidecar[open] { animation:none; opacity:1; transform:none; } }
   </style>
@@ -4678,7 +4783,7 @@ __HEAD__
   <header class="calc-hero"><div class="calc-shell">
     <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/find-your-fit/">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/guides/#country-selection">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
     <p class="eyebrow">International retirement planning tool</p><h1>Retirement Abroad Calculator</h1>
-    <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p>
+    <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p><nav class="calc-modes" aria-label="Retirement calculator mode"><a href="/retirement-abroad-calculator/" aria-current="page">Plan for a destination</a><a href="/retirement-destination-finder/">Find destinations I can afford</a></nav>
   </div></header>
   <main><div class="calc-shell">
     <section class="calculator-layout" aria-label="Retirement calculator">
@@ -4724,6 +4829,10 @@ __HEAD__
           <div><span>Needed today</span><strong id="ret-total-today">—</strong></div><div><span>Needed at retirement</span><strong id="ret-total-retirement-summary">—</strong></div><div><span>Monthly contribution</span><strong id="ret-monthly-contribution">—</strong></div><div id="ret-home-summary" hidden><span id="ret-home-today-label">Home purchase today</span><strong id="ret-home-today">—</strong></div>
         </div>
         </section>
+        <div class="save-intent" id="ret-save-action" hidden>
+          <button class="text-button" id="ret-save-intent-button" type="button" data-track="retirement_calculator_save_intent" data-track-label="retirement calculator result">Save this plan</button>
+          <p class="hint" id="ret-save-intent-status" role="status" hidden>Saved plans are being evaluated. Your figures have not been stored.</p>
+        </div>
       </section>
     </section>
     <section class="calc-panel detailed-projection" id="ret-detailed-projection" hidden aria-labelledby="ret-detailed-projection-heading">
@@ -4742,11 +4851,36 @@ __HEAD__
         </div>
         <p class="hint" id="ret-result-assumptions">Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.</p>
       </section>
+    <section class="calc-panel current-cost-comparison" id="ret-current-cost-comparison" hidden aria-labelledby="ret-current-cost-heading">
+      <h2 id="ret-current-cost-heading">Compare with where you live now</h2>
+      <p class="hint">Use your household's current monthly spending, including housing, in today's USD. This comparison does not change your retirement estimate.</p>
+      <div class="current-cost-layout">
+        <div class="field-grid">
+          <div class="field"><label for="ret-current-location">Current location <span class="optional-label">(optional)</span></label><input id="ret-current-location" type="text" autocomplete="address-level2" placeholder="For example, London"></div>
+          <div class="field"><label for="ret-current-monthly-spending">Current monthly spending</label><input id="ret-current-monthly-spending" type="number" min="1" step="1" inputmode="decimal" placeholder="Enter amount"><p class="hint">Include housing and use the same household basis as the destination estimate.</p></div>
+        </div>
+        <div class="current-cost-result" id="ret-current-cost-result" hidden aria-live="polite">
+          <p class="current-cost-summary" id="ret-current-cost-summary"></p>
+          <p class="current-cost-annual" id="ret-current-cost-annual"></p>
+          <div class="current-cost-bars" id="ret-current-cost-bars">
+            <div class="current-cost-row"><div class="current-cost-bar-heading"><strong id="ret-current-cost-label">Where you live now</strong><span id="ret-current-cost-amount"></span></div><div class="current-cost-track" aria-hidden="true"><span class="current-cost-fill" id="ret-current-cost-bar"></span></div></div>
+            <div class="current-cost-row destination"><div class="current-cost-bar-heading"><strong id="ret-current-cost-destination-label">Destination</strong><span id="ret-current-cost-destination-amount"></span></div><div class="current-cost-track" aria-hidden="true"><span class="current-cost-fill" id="ret-current-cost-destination-bar"></span></div></div>
+          </div>
+          <div class="target-comparison">
+            <h3>Retirement funding target</h3>
+            <div class="target-figures"><div><span id="ret-current-target-label">Where you live now</span><strong id="ret-current-target"></strong></div><div><span id="ret-destination-target-label">Destination</span><strong id="ret-destination-target"></strong></div></div>
+            <p class="target-difference" id="ret-target-difference"></p>
+            <p class="hint">Liquid portfolio plus emergency reserve, using the same planning assumptions. Excludes any separate home purchase.</p>
+          </div>
+          <p class="hint">A directional comparison, not a like-for-like purchasing-power or tax analysis.</p>
+        </div>
+      </div>
+    </section>
     <dialog class="cost-sidecar" id="ret-cost-sidecar" aria-labelledby="ret-cost-sidecar-title">
       <div class="cost-sidecar-panel"><header class="cost-sidecar-header"><div><h2 id="ret-cost-sidecar-title">Compare monthly living expenses</h2><p class="hint" id="ret-cost-sidecar-context"></p></div><button class="cost-sidecar-close" id="ret-cost-sidecar-close" type="button" aria-label="Close destination comparison">Close</button></header><div class="cost-sidecar-chart" id="ret-cost-sidecar-chart"></div></div>
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
-    <section class="content-section"><h2>How to read this estimate</h2><p>The model projects destination expenses and reliable retirement income, then shows the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest belong inside that expected return rather than being counted again as outside income.</p><p class="related"><a href="/retirement-destinations-ranked-by-cost/" data-track="retirement_calculator_guide_click">Compare destination retirement costs</a><a href="/methodology/">Read the methodology</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p></section>
+    <section class="content-section"><h2>How to read this estimate</h2><p>The model projects destination expenses and reliable retirement income, then shows the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest belong inside that expected return rather than being counted again as outside income.</p><p class="related"><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/retirement-destinations-ranked-by-cost/" data-track="retirement_calculator_guide_click">Compare destination retirement costs</a><a href="/methodology/">Read the methodology</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
   <footer><div class="calc-shell">Global Home Atlas · Research for overseas property and long-stay decisions · <a href="/contact/">Contact</a></div></footer>
@@ -4898,7 +5032,7 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
         <div>
           <h1>{RETIREMENT_DESTINATIONS_H1}</h1>
           <p class="page-lede">All 30 Global Home Atlas retirement destinations compared under one transparent scenario. The rank answers a narrow financial question—how much capital a couple renting would need—not which place offers the best life.</p>
-          <div class="page-actions"><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article hero">Calculate your plan</a><a class="page-button page-button-secondary" href="#ranking">View rankings</a></div>
+          <div class="page-actions"><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article hero">Calculate your plan</a><a class="page-button page-button-secondary" href="/{RETIREMENT_FINDER_SLUG}/">Find destinations I can afford</a><a class="page-button page-button-secondary" href="#ranking">View rankings</a></div>
         </div>
       </div>
     </div>
@@ -5013,25 +5147,27 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
 {head_html(GUIDE_HUB_TITLE, GUIDE_HUB_DESCRIPTION, canonical, schema_for_guide_hub(canonical, pages))}
   <style>
 {shared_content_css()}
-    .page-hero {{ min-height: 480px; background-position: center; }}
-    .guide-hero-card {{ align-self: start; margin-top: 40px; }}
+    .guide-page-hero {{ min-height: 430px; background-position: center; }}
+    .guide-page-hero .page-hero-grid {{ grid-template-columns: minmax(0, 720px); }}
     .guide-page-layout {{ display: block; max-width: 980px; margin: 0 auto; padding-top: 42px; }}
     .guide-page-layout .page-article {{ gap: 56px; }}
+    .guide-section-nav {{ display: flex; gap: 22px; margin: 0; padding: 15px 0; overflow-x: auto; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 800; letter-spacing: .045em; white-space: nowrap; scrollbar-width: thin; }}
+    .guide-section-nav a {{ color: var(--ink); text-decoration: none; }}
+    .guide-section-nav a:hover {{ color: var(--gold); }}
     .guide-kicker {{ margin: 0 0 12px; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }}
     .guide-intro {{ max-width: 720px; }}
     .guide-intro h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4.3vw, 44px); line-height: 1.02; }}
-    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 0; margin-top: 22px; border: 1px solid var(--line); background: var(--line); }}
-    .journey-card {{ min-width: 0; padding: 20px; background: var(--paper); color: var(--ink); text-decoration: none; }}
-    .journey-card:nth-child(2) {{ background: #eef4ec; }} .journey-card:nth-child(3) {{ background: #edf4f3; }}
+    .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; margin-top: 28px; }}
+    .journey-card {{ min-width: 0; padding-top: 15px; border-top: 1px solid var(--ink); color: var(--ink); text-decoration: none; }}
     .journey-card span {{ display: block; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }}
-    .journey-card strong {{ display: block; margin: 24px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; line-height: 1.05; }}
-    .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.45; }}
+    .journey-card strong {{ display: block; margin: 14px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 700; line-height: 1.05; }}
+    .journey-card p {{ margin: 0; color: var(--muted); font-size: 13px; line-height: 1.5; }}
     .guide-feature {{ display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(260px, .9fr); gap: 34px; align-items: stretch; padding: 28px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }}
     .guide-feature__image {{ min-height: 330px; background: linear-gradient(150deg, rgba(36,49,45,.1), rgba(36,49,45,.46)), url("/assets/destination-dossier-coast.jpg"); background-position: center; background-size: cover; }}
     .guide-feature__copy {{ display: flex; flex-direction: column; justify-content: center; }}
     .guide-feature__copy h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(31px, 4vw, 47px); line-height: 1.01; }}
     .guide-feature__copy p {{ color: #3f4d48; }}
-    .guide-feature__copy .page-button {{ align-self: flex-start; margin-top: 12px; }}
+    .guide-text-link {{ display: inline-block; align-self: flex-start; margin-top: 14px; color: var(--ink); font-size: 13px; font-weight: 900; text-decoration: none; border-bottom: 1px solid currentColor; }}
     .guide-country-links {{ display: flex; flex-wrap: wrap; gap: 9px 18px; margin-top: 18px; }}
     .guide-country-links a {{ font-weight: 800; }}
     .guide-catalog {{ display: grid; gap: 46px; }}
@@ -5046,52 +5182,48 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     .guide-story__link {{ display: inline-block; margin-top: 12px; font-size: 13px; font-weight: 900; }}
     .guide-research-note {{ padding: 20px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }}
     .guide-research-note p {{ max-width: 710px; margin: 0; color: #3f4d48; }}
-    @media (max-width: 860px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .guide-feature {{ grid-template-columns: 1fr; }} .guide-feature__image {{ min-height: 260px; }} }}
-    @media (max-width: 560px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: 1fr; }} .guide-page-layout {{ padding-top: 30px; }} .guide-page-layout .page-article {{ gap: 38px; }} }}
+    @media (max-width: 860px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .guide-feature {{ grid-template-columns: 1fr; gap: 24px; }} .guide-feature__image {{ min-height: min(54vw, 390px); }} }}
+    @media (max-width: 560px) {{ .guide-page-hero {{ min-height: 350px; }} .guide-section-nav {{ gap: 17px; margin: 0 -2px; padding: 13px 2px; }} .journey-grid, .guide-story-grid {{ grid-template-columns: 1fr; gap: 22px; }} .guide-page-layout {{ padding-top: 26px; }} .guide-page-layout .page-article {{ gap: 38px; }} .journey-card {{ padding-top: 13px; }} .guide-feature {{ padding: 22px 0; }} .guide-feature__image {{ min-height: 250px; }} .guide-feature__copy h2 {{ font-size: 34px; }} }}
   </style>
 </head>
 <body>
-  <header class="page-hero">
+  <header class="page-hero guide-page-hero">
     <div class="page-shell">
       {primary_nav_html()}
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">The Global Property Journal · updated {updated}</p>
-          <h1>Global Property Buying Guides</h1>
-          <p class="page-lede">Independent ideas and evidence for buying, retiring, and investing abroad—without starting with a listing.</p>
+          <p class="page-eyebrow">Global Property Buying Guides · updated {updated}</p>
+          <h1>A considered guide to buying a home abroad</h1>
+          <p class="page-lede">Stories, places, and practical perspective for the life you are planning next.</p>
         </div>
-        <aside class="page-hero-card guide-hero-card">
-          <span>Editorial principle</span>
-          <strong>Start with the life you want, then test the property decision.</strong>
-          <p>Choose a buying brief, read the relevant research, then verify locally before committing capital.</p>
-        </aside>
       </div>
     </div>
   </header>
   <main>
     <div class="page-shell">
-      {sticky_page_nav([("Start", "choose-journey"), ("Featured", "featured-research"), ("Retirement", "retirement"), ("Second homes", "second-homes"), ("Risk", "risk"), ("Countries", "country-comparisons")])}
+      <nav class="guide-section-nav" aria-label="Guide sections"><a href="#choose-journey">Start here</a><a href="#featured-research">Featured story</a><a href="#retirement">Retirement</a><a href="#second-homes">Second homes</a><a href="#investment">Investment</a><a href="#country-comparisons">Places</a></nav>
       <div class="page-layout guide-page-layout">
         <article class="page-article">
           <section id="choose-journey">
             <div class="guide-intro">
-              <p class="guide-kicker">Begin with your brief</p>
-              <h2>Find the right guide for your purchase</h2>
+              <p class="guide-kicker">Where to begin</p>
+              <h2>Choose the question that matters most to you.</h2>
             </div>
             <div class="journey-grid">
-              <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement route"><span>Route 01</span><strong>Retirement or lifestyle base</strong><p>Healthcare, daily convenience, climate, community, and resale depth.</p></a>
-              <a class="journey-card" href="#second-homes" data-track="guide_journey_click" data-track-label="Second home route"><span>Route 02</span><strong>Second home abroad</strong><p>Repeat use, family visits, rental offset, and sensible ownership process.</p></a>
-              <a class="journey-card" href="#investment" data-track="guide_journey_click" data-track-label="Investment route"><span>Route 03</span><strong>Investment-led shortlist</strong><p>Yield realism, value entry, regulatory risk, and future exit liquidity.</p></a>
-              <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Risk route"><span>Route 04</span><strong>Ownership and risk first</strong><p>Title clarity, foreign-buyer rules, taxes, permits, and adviser depth.</p></a>
+              <a class="journey-card" href="#retirement" data-track="guide_journey_click" data-track-label="Retirement"><span>A new chapter</span><strong>Retirement or lifestyle base</strong><p>Healthcare, climate, community, and the rhythm of daily life.</p></a>
+              <a class="journey-card" href="#second-homes" data-track="guide_journey_click" data-track-label="Second homes"><span>A second address</span><strong>Second home abroad</strong><p>Family time, repeat stays, and ownership that feels uncomplicated.</p></a>
+              <a class="journey-card" href="#investment" data-track="guide_journey_click" data-track-label="Investment"><span>A thoughtful investment</span><strong>Investment-led shortlist</strong><p>Value, income, regulation, and the quality of your eventual exit.</p></a>
+              <a class="journey-card" href="#risk" data-track="guide_journey_click" data-track-label="Ownership and risk"><span>Before you commit</span><strong>Ownership and risk first</strong><p>Rules, taxes, title, and the questions worth settling early.</p></a>
             </div>
           </section>
+          {retirement_calculator_callout("guide-research-note", "guide hub")}
           <section class="guide-feature" id="featured-research">
             <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
             <div class="guide-feature__copy">
-              <p class="guide-kicker">Featured research</p>
+              <p class="guide-kicker">The featured story</p>
               <h2>{escape(featured_page["h1"])}</h2>
               <p>{escape(featured_page["description"])}</p>
-              <a class="page-button" href="/{escape(featured_page["slug"])}/">Read the featured guide</a>
+              <a class="guide-text-link" href="/{escape(featured_page["slug"])}/">Read the story</a>
             </div>
           </section>
           <section class="guide-research-note">
@@ -5103,7 +5235,6 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
             <nav class="guide-country-links">{country_links}</nav>
           </section>
           <section class="guide-catalog" aria-label="Browse all buying guides">{cluster_html}</section>
-          {retirement_calculator_callout("guide-research-note")}
         </article>
       </div>
     </div>
@@ -5280,7 +5411,7 @@ def build_country_hub_page(
     report_title, report_reason = country_report_recommendation(hub)
     retirement_ids = {item["destination_id"] for item in load_retirement_costs()["destinations"]}
     retirement_callout = (
-        retirement_calculator_callout("page-section")
+        retirement_calculator_callout("page-section", "country hub")
         if retirement_ids.intersection(hub["destination_ids"])
         else ""
     )
@@ -5442,6 +5573,7 @@ def build_seo_page(
     intro = page.get("generated_intro") or description
     generated_link = generated_internal_link_html(page)
     updated = date.today().isoformat()
+    country_count = len({item.get("country") for item in selected if item.get("country")})
     author_html = (
         f'<p style="margin:12px 0 0;color:rgba(36,49,45,.68);font-size:13px;font-weight:750">By {escape(page["author"])} · First published {escape(page["date_published"])}</p>'
         if page.get("author") and page.get("date_published")
@@ -5453,7 +5585,7 @@ def build_seo_page(
     destination_notes_html = seo_destination_notes_html(page, selected)
     decision_framework_html = seo_decision_framework_html(page)
     retirement_callout = (
-        retirement_calculator_callout("seo-section")
+        retirement_calculator_callout("seo-section", "buying guide")
         if page["slug"] in {
             "buying-property-abroad-for-retirement",
             "best-places-to-buy-property-abroad-for-retirement",
@@ -5461,11 +5593,35 @@ def build_seo_page(
         }
         else ""
     )
-    top_decision_path = (
-        "" if is_japan_retirement_guide(page) else guide_decision_path_html(page, destinations, pages)
-    )
-    callout_before_overview = "" if is_japan_retirement_guide(page) else retirement_callout
-    callout_after_overview = retirement_callout if is_japan_retirement_guide(page) else ""
+    editorial_content = ""
+    if page["slug"] == "japan-retirement-property-foreign-buyers":
+        editorial_content = """
+          <section class="seo-section"><h2>Japan through five retirement lenses</h2><p>Japan is compelling for retirement not because it is cheap or effortless, but because a few places make daily life unusually dependable. We use the same ten-pillar methodology as the Atlas, grouped here into five questions that matter most when a home must work for months, not weekends.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Lifestyle magnetism 10% · Retirement fit 11%</p><h2>Live well, year after year</h2><p>Fukuoka and Itoshima are the strongest all-season answer: city hospitals, a serious food culture and Kyushu at the doorstep, with coast available when the day should slow down. Hakone and Izu exchange city energy for onsen, gardens and a Tokyo-adjacent rhythm. Hakuba and Niseko are more deliberate choices: outstanding winter, increasingly credible green-season activity, but a life shaped by snow and shoulder season.</p><p>Healthcare follows a sequence. A long-stay residence status comes first; then you register an address with the municipality. The Ministry of Health says eligible foreign residents, including those living in Japan for more than three months, can join the public system—through employee cover when employed, or National Health Insurance otherwise. A property deed does not create residency or coverage. Fukuoka therefore has the clearest retirement utility of the four, while a mountain or resort home asks you to accept longer journeys for specialist care and a more seasonal social calendar.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Global access 10% · Foreigner fit 7%</p><h2>Reach it easily—and feel at home there</h2><p>Fukuoka wins on friction: JNTO notes that Hakata is a five-minute train ride from Fukuoka Airport. That changes how often a home gets used, and makes Korea, Taiwan and wider Asian connections genuinely convenient. Hakone and Izu work for Tokyo-based lives; Hakuba and Niseko require a winter-transfer plan, not a romantic assumption about the last mile.</p><p>Niseko has the most established international resort ecosystem and strong Chinese-speaking familiarity. Fukuoka offers deeper year-round urban services. In every location, Japanese remains the language of tradespeople, clinics and municipal administration; politeness is generous, but integration comes through repetition and language effort rather than an English-speaking bubble.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Ownership clarity 12% · Regulatory safety 8%</p><h2>Own and operate cleanly</h2><p>Foreigners can generally own Japanese land and buildings freehold. That clarity is a real advantage, but it is separate from residency, financing and public-health eligibility. For a non-resident purchase, the Ministry of Finance says FEFTA reporting is generally required through the Bank of Japan within 20 days after acquisition. Real estate acquisition tax and registration licence tax are separate purchase costs; fixed-asset tax is an ongoing owner cost. Where the seller is also non-resident, Japanese withholding rules can affect settlement, so the payment route needs a tax adviser before contracts are exchanged.</p><p>Before signing, the agent's Important Matters Explanation is where the relevant rights, restrictions and hazard information should be explained; closing and registration then record the transfer. The explanation must show the property's location on the official flood-hazard map. Treat that as a starting point, not a clean bill of health: in Hakone and Izu, older stock, slope, typhoon and earthquake exposure are part of the asset; in Hakuba and Niseko, snow load, winter access and heating systems are. Rental use is equally market-specific. In Niseko and Hakuba, the operating model matters as much as the chalet: management, snow response and local compliance shape the income result. Minpaku is capped nationally at 180 days a year, and local rules can be tighter.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Rental profit 13% · Capital upside 9%</p><h2>Income and upside need different stories</h2><p>Fukuoka's case is domestic and regional demand: a practical city base, resilient travel and a lower entry benchmark than global resorts. Hakone and Izu benefit from Tokyo weekend demand, but old homes and uneven rental evidence make them a personal-use-first decision. Hakuba is the earlier-stage ski proposition—lower entry than Niseko, a growing international profile and summer hiking or biking, offset by execution-heavy winter operations.</p><p>Niseko is the premium version: global Asian and Australian ski demand, high winter rates and branded-residence appeal. The cost is a far higher entry level, substantial operating friction and a more concentrated seasonal thesis. Neither resort should be described with a single yield number; owner use, management, snow, maintenance and the local permit route decide the outcome.</p></section>
+          <section class="seo-section"><p class="seo-eyebrow">Exit liquidity 9% · Value entry 11%</p><h2>Preserve the exit—and the entry discipline</h2><p>Fukuoka is the broadest retirement asset of the four because domestic city demand sits beneath the foreign-buyer story. Hakone and Izu can offer striking low entry prices, but the gap between a charming bargain and an expensive renovation is wide. Hakuba has thinner liquidity than Niseko, so the price paid and the operator selected matter more.</p><p>Niseko has the clearest international resort buyer pool, but prime Hirafu pricing already reflects that recognition. The retirement conclusion is not that one location wins every pillar: choose Fukuoka for year-round use, Hakone or Izu for Tokyo-adjacent escape, Hakuba for earlier-stage mountain upside, and Niseko only when the premium winter thesis and its costs are fully acceptable.</p></section>
+          <section class="seo-section"><h2>Primary sources to use with advisers</h2><p><a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html">Japan's Ministry of Finance: non-resident real-property reporting</a>; <a href="https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf">National Tax Agency: non-resident tax when buying or selling Japanese real estate</a>; <a href="https://www.mlit.go.jp/report/press/totikensangyo13_hh_000269.html">MLIT: real-estate transaction, registration, tax and planning systems</a>; <a href="https://www.mlit.go.jp/totikensangyo/const/sosei_const_fr3_000074.html">MLIT: flood-hazard maps in the Important Matters Explanation</a>; <a href="https://www.mhlw.go.jp/content/12400000/001406614.pdf">MHLW: health insurance for foreign residents</a>; <a href="https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html">Japan Tourism Agency: the Private Lodging Business Act</a>; <a href="https://faq.japan-travel.jnto.go.jp/en/plan/airport-access/fukuoka-airport/">JNTO: Fukuoka Airport access</a>; <a href="https://www.stat.go.jp/english/data/nenkan/74nenkan/1431-20.html">Statistics Bureau: regional consumer-price comparisons</a>.</p></section>
+        """
+    generic_intro = f"""
+          <section class="seo-section">
+            <h2>How to Read This Shortlist</h2>
+            <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
+            <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process.</p>
+          </section>
+        """
+    is_japan_article = is_japan_retirement_guide(page)
+    if is_japan_article:
+        overview_html = f"{overview_html}{editorial_content}"
+    hero_actions = "" if is_japan_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a><a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a></div>'''
+    hero_aside = "" if is_japan_article else f'''<aside class="seo-hero-card"><span>Top current match</span><strong>{escape(top["name"])}</strong><span>Alternative to test</span><strong>{escape(runner_up["name"])}</strong><span>Destinations compared</span><strong>{len(selected)}</strong></aside>'''
+    guide_summary = "" if is_japan_article else f'''<section class="seo-panel" aria-label="Guide summary"><div class="seo-stats"><div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div><div><span>Destinations</span><strong>{len(selected)}</strong></div><div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div><div><span>Research status</span><strong>Updated {updated}</strong></div></div></section>'''
+    decision_path = "" if is_japan_article else guide_decision_path_html(page, destinations, pages)
+    destination_notes_title = "Four places to test in person" if is_japan_article else "Destination Notes for Serious Buyers"
+    decision_framework_html = seo_decision_framework_html(page)
+    callout_before_overview = "" if is_japan_article else retirement_callout
+    callout_after_overview = retirement_callout if is_japan_article else ""
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5611,33 +5767,16 @@ def build_seo_page(
           <h1>{escape(page["h1"])}</h1>
           <p class="seo-lede">{escape(intro)} This guide is written for {escape(page["intent"])}.</p>
           {hero_detail_html}
-          <div class="seo-actions">
-          <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a>
-          <a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a>
-          </div>
+          {hero_actions}
         </div>
-        <aside class="seo-hero-card">
-          <span>Top current match</span>
-          <strong>{escape(top["name"])}</strong>
-          <span>Alternative to test</span>
-          <strong>{escape(runner_up["name"])}</strong>
-          <span>Destinations compared</span>
-          <strong>{len(selected)}</strong>
-        </aside>
+        {hero_aside}
       </div>
     </div>
   </header>
   <main>
     <div class="seo-shell">
-      <section class="seo-panel" aria-label="Guide summary">
-        <div class="seo-stats">
-          <div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div>
-          <div><span>Destinations</span><strong>{len(selected)}</strong></div>
-          <div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div>
-          <div><span>Research status</span><strong>Updated {updated}</strong></div>
-        </div>
-      </section>
-      {top_decision_path}
+      {guide_summary}
+      {decision_path}
       {vacation_home_quick_answer_html(page, destinations)}
       <div class="seo-content">
         <article class="seo-article">
@@ -6542,7 +6681,7 @@ def build_destination_page(
         else ""
     )
     retirement_ids = {item["destination_id"] for item in load_retirement_costs()["destinations"]}
-    retirement_callout = retirement_calculator_callout("page-section") if dest["id"] in retirement_ids else ""
+    retirement_callout = retirement_calculator_callout("page-section", "destination page") if dest["id"] in retirement_ids else ""
     destination_image = destination_image_assets(dest)
     access_notice = destination_access_notice_html(dest)
 
@@ -7226,6 +7365,7 @@ def build() -> Path:
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = rank_destinations(destinations)
     retirement_costs = load_retirement_costs()
+    mortgage_profiles = load_mortgage_profiles()
     guide_pages = [RETIREMENT_DESTINATIONS_PAGE, *SEO_PAGES]
     listings = load_json("listings.json")
     fx = load_json("fx_rates.json")
@@ -8603,6 +8743,14 @@ def build() -> Path:
         clean_generated_html(build_retirement_calculator_page(destinations, retirement_costs)),
         encoding="utf-8",
     )
+    retirement_finder_dir = ARTIFACTS / RETIREMENT_FINDER_SLUG
+    retirement_finder_dir.mkdir(parents=True, exist_ok=True)
+    (retirement_finder_dir / "index.html").write_text(
+        clean_generated_html(
+            build_retirement_destination_finder_page(destinations, retirement_costs, mortgage_profiles)
+        ),
+        encoding="utf-8",
+    )
     retirement_article_dir = ARTIFACTS / RETIREMENT_DESTINATIONS_SLUG
     retirement_article_dir.mkdir(parents=True, exist_ok=True)
     (retirement_article_dir / "index.html").write_text(
@@ -8707,6 +8855,7 @@ Sitemap: {SITE_URL}sitemap.xml
         (page_url("country-comparison"), "0.88"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         (page_url(RETIREMENT_CALCULATOR_SLUG), "0.92"),
+        (page_url(RETIREMENT_FINDER_SLUG), "0.92"),
         (page_url(RETIREMENT_DESTINATIONS_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
         *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],

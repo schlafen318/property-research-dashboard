@@ -29,8 +29,137 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_detail_handoff_accepts_only_allowlisted_categories(self) -> None:
+        self.assertEqual(
+            {"destination": "valencia", "household": "couple", "housing": "buy_now"},
+            run_ui(
+                "retirementPrefill",
+                "?destination=valencia&household=couple&housing=buy_now&capital=900000&passport=GB",
+            ),
+        )
+        self.assertEqual(
+            {"destination": "", "household": "", "housing": ""},
+            run_ui(
+                "retirementPrefill",
+                "?destination=%3Cscript%3E&household=family&housing=sell&income=40000",
+            ),
+        )
+
+    def test_first_valid_result_is_tracked_once_and_reveals_save_intent(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+
+        self.assertIn("let hasTrackedResult = false;", source)
+        self.assertIn('track("retirement_calculator_result_view")', source)
+        self.assertIn("hasTrackedResult = true;", source)
+        self.assertIn('el("ret-save-action").hidden = false;', source)
+        self.assertIn('el("ret-save-intent-button").addEventListener("click"', source)
+        self.assertIn('el("ret-save-intent-status").hidden = false;', source)
+
+    def test_current_cost_input_events_reuse_the_latest_retirement_result(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+
+        self.assertIn(
+            'el(id).addEventListener("input", function () { renderCurrentCostComparison(); });',
+            source,
+        )
+        self.assertNotIn(
+            'el(id).addEventListener("input", renderCurrentCostComparison);',
+            source,
+        )
+
     def test_converts_monthly_spending_to_annual_for_the_engine(self) -> None:
         self.assertEqual(64_596, run_ui("annualSpendingFromMonthly", 5_383))
+
+    def test_current_cost_comparison_reports_a_lower_destination_cost(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "lower",
+                "monthlyDifference": 1_500,
+                "annualDifference": 18_000,
+                "percentDifference": 25,
+                "currentBarPercent": 100,
+                "destinationBarPercent": 75,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 6_000, "destinationMonthly": 4_500},
+            ),
+        )
+
+    def test_current_cost_comparison_reports_a_higher_destination_cost(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "monthlyDifference": 1_500,
+                "annualDifference": 18_000,
+                "percentDifference": 30,
+                "currentBarPercent": 76.92307692307693,
+                "destinationBarPercent": 100,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 5_000, "destinationMonthly": 6_500},
+            ),
+        )
+
+    def test_current_cost_comparison_handles_equal_and_missing_costs(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "same",
+                "monthlyDifference": 0,
+                "annualDifference": 0,
+                "percentDifference": 0,
+                "currentBarPercent": 100,
+                "destinationBarPercent": 100,
+            },
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 4_000, "destinationMonthly": 4_000},
+            ),
+        )
+
+    def test_retirement_target_comparison_reports_destination_reduction(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "lower",
+                "targetDifference": 500_000,
+                "percentDifference": 25,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 2_000_000, "destinationTarget": 1_500_000},
+            ),
+        )
+
+    def test_retirement_target_comparison_reports_increase_and_handles_zero_current_target(self) -> None:
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "targetDifference": 300_000,
+                "percentDifference": 20,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 1_500_000, "destinationTarget": 1_800_000},
+            ),
+        )
+        self.assertEqual(
+            {
+                "direction": "higher",
+                "targetDifference": 1_800_000,
+                "percentDifference": None,
+            },
+            run_ui(
+                "retirementTargetComparison",
+                {"currentTarget": 0, "destinationTarget": 1_800_000},
+            )
+        )
+        self.assertIsNone(
+            run_ui(
+                "currentCostComparison",
+                {"currentMonthly": 0, "destinationMonthly": 4_000},
+            )
+        )
 
     def test_owner_plans_use_owner_costs(self) -> None:
         profile = {

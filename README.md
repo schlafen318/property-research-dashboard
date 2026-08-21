@@ -114,6 +114,18 @@ Tracked events include dashboard opens, guide clicks, destination clicks,
 comparison selections, memo shortlist additions/removals, memo export, JSON/CSV
 exports, outbound listing clicks, and custom shortlist submissions.
 
+### Retirement calculator demand validation
+
+Set the `GA4_MEASUREMENT_ID` repository secret before deploying so calculator
+events are aggregated in GA4. Mark `retirement_calculator_result_view` and
+`retirement_calculator_save_intent` as key events in the GA4 property.
+
+Review the experiment after at least four weeks and 300 qualified calculator
+visits. Proceed to account-backed saved plans when the funnel includes at least
+100 first valid results and 15 save-intent clicks, or when repeated direct user
+requests provide equivalent evidence. Calculator inputs and result values must
+not be included in analytics events.
+
 ## SEO Monitoring
 
 The full automatic SEO growth system is documented in

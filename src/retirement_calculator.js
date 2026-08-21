@@ -195,5 +195,6 @@
 
   return {
     calculateRetirement: calculateRetirement,
+    calculateRetirementTarget: calculateRetirement,
   };
 });
