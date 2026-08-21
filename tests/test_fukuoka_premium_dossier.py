@@ -86,5 +86,38 @@ class PremiumDossierContentTests(unittest.TestCase):
         self.assertEqual(10, len(enriched["decision_dimensions"]))
 
 
+class PremiumDossierListingTests(unittest.TestCase):
+    def test_fukuoka_has_three_to_five_complete_listing_observations(self) -> None:
+        listings = json.loads((Path(__file__).parents[1] / "data" / "listings.json").read_text())
+        rows = [row for row in listings if row["destination_id"] == "fukuoka-itoshima"]
+        self.assertGreaterEqual(len(rows), 3)
+        self.assertLessEqual(len(rows), 5)
+        required = {
+            "property_type",
+            "listing_name",
+            "local_currency",
+            "local_price",
+            "usd_price",
+            "size_m2",
+            "usd_per_m2",
+            "fx_basis",
+            "source_name",
+            "source_url",
+            "captured_date",
+            "confidence",
+            "note",
+        }
+        for row in rows:
+            self.assertFalse(required - row.keys())
+            self.assertTrue(all(row[field] not in (None, "") for field in required))
+            self.assertEqual("JPY", row["local_currency"])
+            self.assertEqual("2026-08-21", row["captured_date"])
+
+        self.assertGreaterEqual(len({row["property_type"] for row in rows}), 2)
+        notes = " ".join(row["note"].lower() for row in rows)
+        self.assertRegex(notes, r"daily-life|practical")
+        self.assertRegex(notes, r"coastal|lifestyle|high-end")
+
+
 if __name__ == "__main__":
     unittest.main()
