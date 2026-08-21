@@ -3772,7 +3772,7 @@ def japan_retirement_overview_html() -> str:
 
           {japan_retirement_fit_html()}
 
-          <section class="seo-section">
+          <section class="seo-section" id="owner-changes">
             <h2>What changed for foreign owners in 2026</h2>
             <h3>Non-resident acquisition reporting</h3>
             <p>Under the Foreign Exchange and Foreign Trade Act, a non-resident who acquires Japanese real estate or a right in it generally must report the acquisition to the Minister of Finance through the Bank of Japan within 20 days. The report is in Japanese and may be filed by a Japan-based agent. Confirm the current scope and exemptions with the <a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html" rel="noopener noreferrer">Ministry of Finance</a>.</p>
@@ -3782,14 +3782,14 @@ def japan_retirement_overview_html() -> str:
             <p>The Japanese government is continuing to review how foreign land acquisitions should be recorded and governed. That does not mean a general foreign-buyer ban is in force, but it makes a current legal check essential before exchange and closing. Follow the <a href="https://www.cas.go.jp/jp/seisaku/symbiotic_society/index.html" rel="noopener noreferrer">Cabinet Secretariat review</a>.</p>
           </section>
 
-          <section class="seo-section">
+          <section class="seo-section" id="costs">
             <h2>Financing and ownership costs</h2>
             <p>Do not assume that clear ownership means easy financing. A non-resident without Japanese income or a domestic credit history may face a smaller lender pool, lower loan-to-value limits, additional guarantor requirements, or a cash-only transaction. Obtain written lending terms before making a non-refundable commitment.</p>
             <p>Budget separately for the purchase price, brokerage and legal support, registration and acquisition taxes, insurance, repairs, condominium or resort management fees, annual fixed-asset costs, and eventual sale costs. Japan taxes property at acquisition, during ownership, and on disposal; the applicable reliefs depend on the buyer, asset, use and date. Start with the <a href="https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html" rel="noopener noreferrer">Ministry of Land property-tax overview</a>, then obtain a transaction-specific estimate from a Japanese tax adviser.</p>
             <p><strong>Decision rule:</strong> compare five-year total cash outlay rather than the listing price alone, and keep a separate reserve for building and equipment replacement.</p>
           </section>
 
-          <section class="seo-section">
+          <section class="seo-section" id="practicality">
             <h2>Retirement practicality beyond the purchase</h2>
             <h3>Healthcare follows residence status</h3>
             <p>Owning a home does not itself create eligibility for Japan's public health-insurance system. Eligibility depends on residence and enrolment rules. Confirm coverage before moving and maintain appropriate private or travel insurance for any period outside the public system. The <a href="https://www.mhlw.go.jp/stf/newpage_21539.html" rel="noopener noreferrer">Ministry of Health guidance</a> identifies categories, including short-stay foreign visitors, who are not eligible for National Health Insurance.</p>
@@ -5615,7 +5615,7 @@ def build_seo_page(
     editorial_content = ""
     if page["slug"] == "japan-retirement-property-foreign-buyers":
         editorial_content = """
-          <section class="seo-section"><h2>Japan through five retirement lenses</h2><p>Japan is compelling for retirement not because it is cheap or effortless, but because a few places make daily life unusually dependable. We use the same ten-pillar methodology as the Atlas, grouped here into five questions that matter most when a home must work for months, not weekends.</p></section>
+          <section class="seo-section" id="lenses"><h2>Japan through five retirement lenses</h2><p>Japan is compelling for retirement not because it is cheap or effortless, but because a few places make daily life unusually dependable. We use the same ten-pillar methodology as the Atlas, grouped here into five questions that matter most when a home must work for months, not weekends.</p></section>
           <section class="seo-section"><h2>Live well, year after year</h2><p>Fukuoka and Itoshima are the strongest all-season answer: city hospitals, a serious food culture and Kyushu at the doorstep, with coast available when the day should slow down. Hakone and Izu exchange city energy for onsen, gardens and a Tokyo-adjacent rhythm. Hakuba and Niseko are more deliberate choices: outstanding winter, increasingly credible green-season activity, but a life shaped by snow and shoulder season.</p><p>Healthcare follows a sequence. A long-stay residence status comes first; then you register an address with the municipality. The Ministry of Health says eligible foreign residents, including those living in Japan for more than three months, can join the public system—through employee cover when employed, or National Health Insurance otherwise. A property deed does not create residency or coverage. Fukuoka therefore has the clearest retirement utility of the four, while a mountain or resort home asks you to accept longer journeys for specialist care and a more seasonal social calendar.</p></section>
           <section class="seo-section"><h2>Reach it easily—and feel at home there</h2><p>Fukuoka wins on friction: JNTO notes that Hakata is a five-minute train ride from Fukuoka Airport. That changes how often a home gets used, and makes Korea, Taiwan and wider Asian connections genuinely convenient. Hakone and Izu work for Tokyo-based lives; Hakuba and Niseko require a winter-transfer plan, not a romantic assumption about the last mile.</p><p>Niseko has the most established international resort ecosystem and strong Chinese-speaking familiarity. Fukuoka offers deeper year-round urban services. In every location, Japanese remains the language of tradespeople, clinics and municipal administration; politeness is generous, but integration comes through repetition and language effort rather than an English-speaking bubble.</p></section>
           <section class="seo-section"><h2>Own and operate cleanly</h2><p>Foreigners can generally own Japanese land and buildings freehold. That clarity is a real advantage, but it is separate from residency, financing and public-health eligibility. For a non-resident purchase, the Ministry of Finance says FEFTA reporting is generally required through the Bank of Japan within 20 days after acquisition. Real estate acquisition tax and registration licence tax are separate purchase costs; fixed-asset tax is an ongoing owner cost. Where the seller is also non-resident, Japanese withholding rules can affect settlement, so the payment route needs a tax adviser before contracts are exchanged.</p><p>Before signing, the agent's Important Matters Explanation is where the relevant rights, restrictions and hazard information should be explained; closing and registration then record the transfer. The explanation must show the property's location on the official flood-hazard map. Treat that as a starting point, not a clean bill of health: in Hakone and Izu, older stock, slope, typhoon and earthquake exposure are part of the asset; in Hakuba and Niseko, snow load, winter access and heating systems are. Rental use is equally market-specific. In Niseko and Hakuba, the operating model matters as much as the chalet: management, snow response and local compliance shape the income result. Minpaku is capped nationally at 180 days a year, and local rules can be tighter.</p></section>
@@ -5652,6 +5652,10 @@ def build_seo_page(
             <p class="seo-eyebrow">In this guide</p>
             <a href="#residency">Residency first</a>
             <a href="#fit">Who Japan suits</a>
+            <a href="#owner-changes">2026 owner changes</a>
+            <a href="#costs">Financing and costs</a>
+            <a href="#practicality">Retirement practicality</a>
+            <a href="#lenses">Five retirement lenses</a>
             <a href="#comparison">Compare destinations</a>
             <a href="#faq">Common questions</a>
             <a href="#sources">References</a>

@@ -153,6 +153,23 @@ class JapanRetirementArticleTests(unittest.TestCase):
         ):
             self.assertNotIn(label, html)
 
+    def test_guide_rail_links_to_all_major_article_waypoints(self) -> None:
+        html = rendered_article()
+
+        for section_id, label in (
+            ("residency", "Residency first"),
+            ("fit", "Who Japan suits"),
+            ("owner-changes", "2026 owner changes"),
+            ("costs", "Financing and costs"),
+            ("practicality", "Retirement practicality"),
+            ("lenses", "Five retirement lenses"),
+            ("comparison", "Compare destinations"),
+            ("faq", "Common questions"),
+            ("sources", "References"),
+        ):
+            self.assertIn(f'id="{section_id}"', html)
+            self.assertIn(f'href="#{section_id}">{label}</a>', html)
+
 
 if __name__ == "__main__":
     unittest.main()
