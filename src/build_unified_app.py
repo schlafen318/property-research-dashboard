@@ -5921,7 +5921,7 @@ def build_seo_page(
             <a href="#sources">References</a>
           </nav>
           <div class="japan-guide-rail__action">
-            <p>Compare Japan with the full 25-destination Atlas.</p>
+            <p>Compare Japan with every destination in the Atlas.</p>
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
           </div>
           <p class="japan-guide-rail__note">Research inputs only. Verify current legal, tax and immigration rules locally.</p>
@@ -5942,7 +5942,7 @@ def build_seo_page(
             <a href="#sources">References</a>
           </nav>
           <div class="editorial-guide-rail__action">
-            <p>Compare Spain with the full 25-destination Atlas.</p>
+            <p>Compare Spain with every destination in the Atlas.</p>
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
           </div>
           <p class="editorial-guide-rail__note">Research inputs only. Verify current legal, tax and immigration rules locally.</p>
@@ -5952,7 +5952,7 @@ def build_seo_page(
         <aside class="seo-aside">
           <section class="seo-aside-card">
             <h2>Use the Full Atlas</h2>
-            <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
+            <p>Compare every destination, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open dashboard</a>
             <a class="seo-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(page["h1"])}">Review my shortlist</a>
           </section>
