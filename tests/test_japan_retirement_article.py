@@ -133,6 +133,26 @@ class JapanRetirementArticleTests(unittest.TestCase):
         self.assertIn('.seo-page--japan .seo-section', html)
         self.assertIn('--editorial-serif:', html)
 
+    def test_editorial_labels_and_guide_rail_use_restrained_typography(self) -> None:
+        html = rendered_article()
+
+        self.assertIn('class="seo-eyebrow japan-section-label"', html)
+        self.assertIn('.seo-page--japan .japan-section-label { font-weight: 500;', html)
+        self.assertIn('.seo-page--japan .japan-guide-rail nav a { padding: 11px 0;', html)
+        self.assertIn('font-size: 14px;', html)
+        self.assertIn(
+            '.seo-page--japan .japan-guide-rail .seo-button { font-weight: 500;',
+            html,
+        )
+        for label in (
+            "Lifestyle magnetism 10%",
+            "Global access 10%",
+            "Ownership clarity 12%",
+            "Rental profit 13%",
+            "Exit liquidity 9%",
+        ):
+            self.assertNotIn(label, html)
+
 
 if __name__ == "__main__":
     unittest.main()
