@@ -132,7 +132,7 @@ COUNTRY_HUBS = [
         "h1": "Spain Property Guide for Foreign Buyers",
         "thesis": "Spain is one of the deepest lifestyle-property markets in the Atlas because it combines city infrastructure, Mediterranean living, healthcare access, and several resale buyer pools. The discipline is entry price and local rental regulation.",
         "destination_ids": ["valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
-        "guide_slugs": ["portugal-vs-spain-retirement-property", "best-places-to-buy-property-in-europe", "buying-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad"],
+        "guide_slugs": ["spain-retirement-property-foreign-buyers", "portugal-vs-spain-retirement-property", "best-places-to-buy-property-in-europe", "buying-property-abroad-for-retirement"],
     },
     {
         "slug": "portugal-property",
@@ -475,6 +475,24 @@ SEO_PAGES = [
             ("Can foreigners buy property in Japan?", "Foreign buyers can generally acquire and register land and buildings, but non-resident reporting, financing, tax, management, and location-specific rules still need professional review."),
             ("Does Japan have a retirement visa?", "Japan does not offer a general retirement visa. A designated-activities route can permit eligible visa-waiver nationals with sufficient savings to stay for six months and, after an extension, up to one year."),
             ("Where should retirement buyers compare in Japan?", "Start with Fukuoka and Itoshima for year-round city access, Hakone and Izu for Tokyo-adjacent lifestyle use, and Hakuba or Niseko only when a seasonal resort property and professional management fit the plan."),
+        ],
+    },
+    {
+        "slug": "spain-retirement-property-foreign-buyers",
+        "title": "Spain Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Spain retirement property for foreign buyers across residency, healthcare, ownership, taxes, rental rules, climate risk, and four distinct destinations.",
+        "h1": "Spain Retirement Property for Foreign Buyers",
+        "keyword": "Spain retirement property for foreign buyers",
+        "theme": "Spain retirement buyer guide",
+        "intent": "foreign buyers deciding whether Spain fits their long-term residence, healthcare, lifestyle and property plan",
+        "destination_ids": ["valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-08-21",
+        "faqs": [
+            ("Does buying property give a foreigner residency in Spain?", "No. Property ownership and immigration status are separate. Spain ended residence permits linked to qualifying investment, including real estate, on 3 April 2025. A buyer needs an independent right or authorization to reside."),
+            ("Can foreigners buy property in Spain?", "Foreign buyers can generally acquire Spanish property, but the transaction, financing, taxes, land-registry position, community rules and intended rental use need property-specific review."),
+            ("How does healthcare work for foreign retirees in Spain?", "Eligibility depends on residence, social-security coordination and other legal routes, not on owning a home. Confirm the route before moving; some applicants must demonstrate private cover during the residence process."),
+            ("Where should retirement buyers compare in Spain?", "Start with Valencia for a balanced year-round city, Málaga and the Costa del Sol for international retirement infrastructure, Costa Brava and Girona for a more seasonal Catalan lifestyle, and Mallorca when island access and premium carrying costs are acceptable."),
         ],
     },
     {
@@ -3749,6 +3767,14 @@ def is_japan_retirement_guide(page: dict) -> bool:
     return page.get("slug") == "japan-retirement-property-foreign-buyers"
 
 
+def is_spain_retirement_guide(page: dict) -> bool:
+    return page.get("slug") == "spain-retirement-property-foreign-buyers"
+
+
+def is_editorial_retirement_guide(page: dict) -> bool:
+    return is_japan_retirement_guide(page) or is_spain_retirement_guide(page)
+
+
 def japan_retirement_fit_html() -> str:
     return """
           <section class="seo-section" id="fit">
@@ -3911,9 +3937,152 @@ def japan_retirement_references_html() -> str:
     """
 
 
+SPAIN_RETIREMENT_DESTINATION_GUIDANCE = {
+    "valencia": {
+        "best_for": "Balanced year-round city life with beach access and everyday services",
+        "daily_life": "The broadest retirement base in this shortlist",
+        "diligence": "Neighborhood heat, flood exposure, community rules and local rental permissions",
+        "rental": "Prefer durable residential demand over a tourist-only income case",
+    },
+    "m-laga-costa-del-sol": {
+        "best_for": "International retirement infrastructure, flights and established coastal communities",
+        "daily_life": "Easy to enter socially, but the coast varies sharply by municipality",
+        "diligence": "Planning history, water and heat exposure, community approval and municipal tourist-use rules",
+        "rental": "Underwrite building by building; do not assume an existing holiday listing can continue",
+    },
+    "costa-brava-girona": {
+        "best_for": "Catalan culture, landscape and a quieter second-city or coastal rhythm",
+        "daily_life": "Compelling for selective locations, more seasonal away from Girona",
+        "diligence": "Winter services, car dependence, coastal planning, wildfire and flood exposure",
+        "rental": "Treat licensing and seasonality as constraints, not upside assumptions",
+    },
+    "mallorca": {
+        "best_for": "Premium island living with a deep international buyer and service ecosystem",
+        "daily_life": "Highly usable where year-round services remain close",
+        "diligence": "Entry price, water and heat resilience, legal building status, community rules and island logistics",
+        "rental": "Do not buy on a holiday-rental thesis until the exact asset and permissions are verified",
+    },
+}
+
+
+def spain_retirement_fit_html() -> str:
+    return """
+          <section class="seo-section" id="fit">
+            <h2>Who Spain suits</h2>
+            <p><strong>Spain is a strong fit</strong> for buyers who can establish an independent residence route, want a genuine year-round social and healthcare environment, accept region-by-region tax and rental rules, and value daily life more than maximum property yield.</p>
+            <p><strong>Look elsewhere first</strong> if the purchase is expected to create residency, the financial case depends on unrestricted short-term letting, the buyer cannot tolerate summer heat or water constraints, or the plan requires simple tax treatment across several countries.</p>
+            <p>Before offering, confirm residence, tax residence, healthcare, financing, title, planning status, community rules, hazards, rental permission and exit demand—in that order. A home can be legally purchasable while the retirement plan around it remains unworkable.</p>
+          </section>
+    """
+
+
+def spain_retirement_overview_html() -> str:
+    return f"""
+          <section class="seo-section" id="residency">
+            <p class="seo-eyebrow editorial-section-label">Start here</p>
+            <h2>Buying property does not give you residency</h2>
+            <p>Foreign buyers can generally acquire Spanish property, but a deed does not create a visa, residence authorization, permanent residence, public-healthcare entitlement or tax advantage. Spain's investor-residence route—including the former real-estate route—<a href="https://www.lamoncloa.gob.es/serviciosdeprensa/notasprensa/vivienda-agenda-urbana/Paginas/2025/020425-fin-golden-visa.aspx" rel="noopener noreferrer">ended on 3 April 2025</a>. Treat immigration and property as separate workstreams.</p>
+            <p>EU, EEA and Swiss citizens use free-movement rules and registration procedures. For many non-EU retirees, the relevant starting point is Spain's <a href="https://www.inclusion.gob.es/en/web/migraciones/w/autorizacion-inicial-de-residencia-temporal-no-lucrativa" rel="noopener noreferrer">non-lucrative residence</a>, which permits residence without work when the applicant meets the current financial, insurance and other requirements. It is not a property-owner visa, and individual circumstances, family composition and renewal plans matter.</p>
+            <p><strong>Decision rule:</strong> do not reserve a retirement home until an immigration adviser has confirmed the route, documentary requirements, renewal conditions and whether each accompanying family member qualifies.</p>
+          </section>
+
+          {spain_retirement_fit_html()}
+
+          <section class="seo-section" id="owner-changes">
+            <h2>What changed in 2025 and 2026</h2>
+            <h3>Property investment no longer creates a residence route</h3>
+            <p>The end of Spain's investor visas is not a temporary pause. New buyers must qualify under a different immigration category. Do not rely on property advertising that still connects a purchase price to Spanish residence.</p>
+            <h3>New tourist use may need community approval</h3>
+            <p>For tourist activity beginning after 3 April 2025 in a building governed by the Horizontal Property Law, the owner should expect to prove express <strong>three-fifths approval</strong> from both owners and participation quotas, subject to the exact facts and transitional position. A January 2026 registry decision illustrates the rule and the narrow protection for activity already validly operating before the change. See the <a href="https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-11152" rel="noopener noreferrer">official BOE decision</a>.</p>
+            <h3>The national short-rental register changed again in 2026</h3>
+            <p>Spain introduced a national registration procedure for short-duration accommodation under Royal Decree 1312/2024. The Supreme Court's judgment of <strong>19 May 2026</strong> annulled that national registration procedure and related references; the consolidated text now marks the affected articles as annulled. This does not deregulate holiday letting: regional and municipal rules remain, alongside planning, consumer and community-of-owners controls. Check the <a href="https://www.boe.es/boe/dias/2026/06/08/" rel="noopener noreferrer">Supreme Court publication</a> and the current <a href="https://www.boe.es/buscar/act.php?id=BOE-A-2024-26931" rel="noopener noreferrer">consolidated decree</a> immediately before underwriting rental income.</p>
+          </section>
+
+          <section class="seo-section" id="costs">
+            <h2>Financing and ownership costs</h2>
+            <p>Foreign-buyer financing exists, but residence status, euro income, age, credit history, property type and lender policy determine the practical terms. Obtain a written credit decision before paying a deposit whose return depends on financing. Model currency exposure separately if pension or portfolio income is not in euros.</p>
+            <p>For tax, separate new from resale property and separate national rules from autonomous-community rates. The Tax Agency states that a new home purchased from a developer is generally subject to <a href="https://sede.agenciatributaria.gob.es/Sede/iva/iva-operaciones-inmobiliarias/compro-vivienda-tengo-que-pagar-itp.html" rel="noopener noreferrer">10% VAT</a>, while a used home is generally subject to transfer tax administered where the property is located. Add notary, registry, legal, valuation, mortgage, insurance, community, maintenance and eventual disposal costs; obtain a location- and buyer-specific closing statement rather than applying one national percentage.</p>
+            <p>Non-resident owners may owe Spanish tax on rent, gains and imputed income from urban property. When a buyer acquires Spanish property from a non-resident seller, the Tax Agency says the buyer generally must retain and pay <a href="https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/irnr-sin-establecimiento-permanente/retenciones-irnr-sin-establecimiento-permanente/retencion-adquirente-inmueble.html" rel="noopener noreferrer">3% of the agreed consideration</a> as a payment on account for the seller. Residence planning also changes the frame: a person may become Spanish tax resident by spending <a href="https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/residencia-personas-fisicas-juridicas/persona-fisica-residente-espana.html" rel="noopener noreferrer">more than 183 days</a> in Spain during the calendar year or by locating the main base of economic interests there.</p>
+            <p><strong>Decision rule:</strong> compare five-year cash outlay after tax, financing, community fees and maintenance, then commission cross-border tax advice before deciding how many days to spend in Spain.</p>
+          </section>
+
+          <section class="seo-section" id="practicality">
+            <h2>Retirement practicality beyond the purchase</h2>
+            <h3>Healthcare follows residence and entitlement</h3>
+            <p>Property ownership does not itself open Spain's National Health System. Social Security guidance ties publicly funded entitlement to Spanish or qualifying foreign residence, social-security status, international coordination or another legal basis. Some economically inactive residents can use an S1, private insurance or a regional special agreement depending on their circumstances. Confirm the route before moving with the <a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesTrabajadores/10938/30476/177505" rel="noopener noreferrer">Spanish Social Security eligibility guidance</a> and the relevant autonomous-community health service.</p>
+            <h3>Flood, wildfire and heat diligence</h3>
+            <p>Spain's retirement appeal is inseparable from climate. Screen river, flash-flood and coastal exposure on the national <a href="https://www.miteco.gob.es/es/agua/temas/gestion-de-los-riesgos-de-inundacion/snczi.html" rel="noopener noreferrer">flood-zone mapping system</a>, then check municipal plans, building access, drainage, previous losses and insurability. In wooded or peri-urban areas, inspect wildfire access and defensible space. For every location, test summer heat, shading, ventilation, water security and cooling costs rather than relying on an annual climate average.</p>
+            <h3>Planning and community records matter</h3>
+            <p>Obtain an up-to-date land-registry extract, compare it with the cadastre and physical property, confirm planning and occupancy status, and review community statutes, minutes, accounts, reserve position, works and litigation. Spain's registrars provide an English-language <a href="https://www.registradores.org/gl/documentacion-y-descargas/guias-rapidas" rel="noopener noreferrer">guide to buying property</a> and translated registry information for international users.</p>
+            <h3>Rental permission is asset-specific</h3>
+            <p>A tourist-use registration in one region or municipality says little about another. Before assigning value to income, confirm the current autonomous-community regime, municipal zoning, building statutes, community approval, occupancy documentation, platform rules and whether any historic authorization transfers with the property. Underwrite the home first as a retirement asset; treat permitted rental as optionality.</p>
+          </section>
+    """
+
+
+def spain_retirement_comparison_html(destinations: list[dict]) -> str:
+    rows = []
+    for dest in destinations:
+        guidance = SPAIN_RETIREMENT_DESTINATION_GUIDANCE[dest["id"]]
+        rows.append(
+            f"""
+            <tr>
+              <td><strong><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></strong></td>
+              <td>{escape(guidance["best_for"])}</td>
+              <td>{escape(guidance["daily_life"])}</td>
+              <td>{escape(guidance["diligence"])}</td>
+              <td>{escape(guidance["rental"])}</td>
+            </tr>
+            """.rstrip()
+        )
+    return f"""
+          <section class="seo-section" id="comparison">
+            <h2>Four Spanish destinations to compare</h2>
+            <p>Choose the retirement pattern before the property. Valencia offers the most balanced year-round city case; Málaga and the Costa del Sol offer the deepest international retirement infrastructure; Costa Brava and Girona suit a more selective Catalan rhythm; Mallorca is the premium island choice when carrying costs and logistics remain comfortable.</p>
+            <div class="seo-table-wrap">
+              <table class="seo-table">
+                <thead><tr><th>Destination</th><th>Best for</th><th>Daily-life read</th><th>Primary diligence</th><th>Rental stance</th></tr></thead>
+                <tbody>{"".join(rows)}</tbody>
+              </table>
+            </div>
+          </section>
+    """
+
+
+def spain_retirement_references_html() -> str:
+    return """
+          <section class="seo-section" id="sources">
+            <h2>References and update policy</h2>
+            <p>Legal and administrative claims in this guide use Spanish government, EU, tax-agency, Social Security, land-registry, airport and BOE sources. Spain divides important powers among the state, autonomous communities, municipalities and communities of owners. Recheck every linked source and the exact property's local position before signing. This guide was substantively reviewed on 21 August 2026.</p>
+            <ul>
+              <li><a href="https://www.inclusion.gob.es/en/web/migraciones/w/autorizacion-inicial-de-residencia-temporal-no-lucrativa" rel="noopener noreferrer">Ministry of Inclusion: initial non-lucrative temporary residence</a></li>
+              <li><a href="https://www.lamoncloa.gob.es/serviciosdeprensa/notasprensa/vivienda-agenda-urbana/Paginas/2025/020425-fin-golden-visa.aspx" rel="noopener noreferrer">Government of Spain: investor residence ended on 3 April 2025</a></li>
+              <li><a href="https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/residencia-personas-fisicas-juridicas/persona-fisica-residente-espana.html" rel="noopener noreferrer">Tax Agency: individual tax residence in Spain</a></li>
+              <li><a href="https://sede.agenciatributaria.gob.es/Sede/vivienda-otros-inmuebles/no-residentes-tributacion-inmuebles.html" rel="noopener noreferrer">Tax Agency: taxation of property owned by non-residents</a></li>
+              <li><a href="https://sede.agenciatributaria.gob.es/Sede/iva/iva-operaciones-inmobiliarias/compro-vivienda-tengo-que-pagar-itp.html" rel="noopener noreferrer">Tax Agency: VAT or transfer tax when buying a home</a></li>
+              <li><a href="https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/irnr-sin-establecimiento-permanente/retenciones-irnr-sin-establecimiento-permanente/retencion-adquirente-inmueble.html" rel="noopener noreferrer">Tax Agency: purchaser withholding when the seller is non-resident</a></li>
+              <li><a href="https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesTrabajadores/10938/30476/177505" rel="noopener noreferrer">Spanish Social Security: healthcare entitlement and requirements</a></li>
+              <li><a href="https://www.sanidad.gob.es/servCiudadanos/internacional/convenioEspecial.htm" rel="noopener noreferrer">Ministry of Health: special healthcare agreement</a></li>
+              <li><a href="https://www.registradores.org/gl/documentacion-y-descargas/guias-rapidas" rel="noopener noreferrer">Registradores de España: guide to buying property in Spain</a></li>
+              <li><a href="https://sede.registradores.org/site/propiedad?lang=en_EN" rel="noopener noreferrer">Land Registry: extracts and information for international users</a></li>
+              <li><a href="https://www.registradores.org/es/web/guest/-/el-precio-medio-de-la-vivienda-crece-un-2-2-en-el-%C3%BAltimo-trimestre-del-a%C3%B1o-y-alcanza-el-9-5-anual-en-2025" rel="noopener noreferrer">Registradores de España: 2025 registered housing-market statistics</a></li>
+              <li><a href="https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-11152" rel="noopener noreferrer">BOE: community approval for new tourist-use activity</a></li>
+              <li><a href="https://www.boe.es/boe/dias/2026/06/08/" rel="noopener noreferrer">BOE: Supreme Court judgment of 19 May 2026</a></li>
+              <li><a href="https://www.boe.es/buscar/act.php?id=BOE-A-2024-26931" rel="noopener noreferrer">BOE: consolidated short-duration accommodation decree</a></li>
+              <li><a href="https://www.miteco.gob.es/es/agua/temas/gestion-de-los-riesgos-de-inundacion/snczi.html" rel="noopener noreferrer">MITECO: national flood-zone mapping system</a></li>
+              <li><a href="https://www.aena.es/en/valencia/airlines-destinations/airport-destinations.html" rel="noopener noreferrer">Aena: Valencia Airport destinations</a></li>
+              <li><a href="https://www.aena.es/en/malaga-costa-del-sol/airlines-and-destinations/airport-destinations.html" rel="noopener noreferrer">Aena: Málaga–Costa del Sol Airport destinations</a></li>
+              <li><a href="https://www.aena.es/en/palma-de-mallorca/airlines-and-destinations/airport-destinations.html" rel="noopener noreferrer">Aena: Palma de Mallorca Airport destinations</a></li>
+            </ul>
+          </section>
+    """
+
+
 def seo_overview_html(page: dict, selected: list[dict]) -> str:
     if is_japan_retirement_guide(page):
         return japan_retirement_overview_html()
+    if is_spain_retirement_guide(page):
+        return spain_retirement_overview_html()
     country_count = len({item.get("country") for item in selected if item.get("country")})
     return f"""
           <section class="seo-section">
@@ -3929,6 +4098,8 @@ def seo_overview_html(page: dict, selected: list[dict]) -> str:
 def seo_comparison_html(page: dict, selected: list[dict], top: dict, runner_up: dict) -> str:
     if is_japan_retirement_guide(page):
         return japan_retirement_comparison_html(selected)
+    if is_spain_retirement_guide(page):
+        return spain_retirement_comparison_html(selected)
     return f"""
           <section class="seo-section" id="comparison">
             <h2>Best Destinations to Compare First</h2>
@@ -3939,7 +4110,7 @@ def seo_comparison_html(page: dict, selected: list[dict], top: dict, runner_up: 
 
 
 def seo_destination_notes_html(page: dict, selected: list[dict]) -> str:
-    if is_japan_retirement_guide(page):
+    if is_editorial_retirement_guide(page):
         return ""
     return f"""
           <section class="seo-section">
@@ -3952,7 +4123,7 @@ def seo_destination_notes_html(page: dict, selected: list[dict]) -> str:
 
 
 def seo_decision_framework_html(page: dict) -> str:
-    if is_japan_retirement_guide(page):
+    if is_editorial_retirement_guide(page):
         return ""
     return """
           <section class="seo-section">
@@ -3970,7 +4141,11 @@ def seo_decision_framework_html(page: dict) -> str:
 
 
 def seo_references_html(page: dict) -> str:
-    return japan_retirement_references_html() if is_japan_retirement_guide(page) else ""
+    if is_japan_retirement_guide(page):
+        return japan_retirement_references_html()
+    if is_spain_retirement_guide(page):
+        return spain_retirement_references_html()
+    return ""
 
 
 def schema_for_page(page: dict, canonical: str) -> list[dict]:
@@ -5603,12 +5778,14 @@ def build_seo_page(
     generated_link = generated_internal_link_html(page)
     updated = date.today().isoformat()
     is_japan_article = is_japan_retirement_guide(page)
+    is_spain_article = is_spain_retirement_guide(page)
+    is_editorial_article = is_editorial_retirement_guide(page)
     country_count = len({item.get("country") for item in selected if item.get("country")})
-    author_weight = 400 if is_japan_article else 750
+    author_weight = 400 if is_editorial_article else 750
     published = escape(page.get("date_published", ""))
     author_dates = (
         f"Published {published} · Updated {updated}"
-        if is_japan_article
+        if is_editorial_article
         else f"First published {published}"
     )
     author_html = (
@@ -5616,7 +5793,7 @@ def build_seo_page(
         if page.get("author") and page.get("date_published")
         else ""
     )
-    hero_eyebrow = "" if is_japan_article else f'<p class="seo-eyebrow">{escape(page["theme"])} · updated {updated}</p>'
+    hero_eyebrow = "" if is_editorial_article else f'<p class="seo-eyebrow">{escape(page["theme"])} · updated {updated}</p>'
     hero_detail_html = f"{author_html}\n{generated_link}" if author_html else generated_link
     overview_html = seo_overview_html(page, selected)
     comparison_html = seo_comparison_html(page, selected, top, runner_up)
@@ -5629,6 +5806,7 @@ def build_seo_page(
             "buying-property-abroad-for-retirement",
             "best-places-to-buy-property-abroad-for-retirement",
             "japan-retirement-property-foreign-buyers",
+            "spain-retirement-property-foreign-buyers",
         }
         else ""
     )
@@ -5648,6 +5826,22 @@ def build_seo_page(
         "Fukuoka · Waterfront calm with compact-city convenience",
         "japan-inline-visual",
     )
+    spain_daily_life_figure = destination_editorial_figure_html(
+        {
+            "src": "/assets/spain-malaga-daily-life.webp",
+            "alt": "A shaded Málaga neighborhood where residents walk past cafés and Mediterranean planting",
+        },
+        "Málaga · Daily life extends beyond the holiday season",
+        "editorial-inline-visual",
+    )
+    spain_access_figure = destination_editorial_figure_html(
+        {
+            "src": "/assets/spain-mallorca-access-lifestyle.webp",
+            "alt": "A lived-in Mallorcan coastal town with stone homes, local streets and the sea nearby",
+        },
+        "Mallorca · Island appeal works best with year-round services close by",
+        "editorial-inline-visual",
+    )
     editorial_content = ""
     if page["slug"] == "japan-retirement-property-foreign-buyers":
         editorial_content = f"""
@@ -5658,6 +5852,15 @@ def build_seo_page(
           <section class="seo-section"><h2>Income and upside need different stories</h2><p>Fukuoka's case is domestic and regional demand: a practical city base, resilient travel and a lower entry benchmark than global resorts. Hakone and Izu benefit from Tokyo weekend demand, but old homes and uneven rental evidence make them a personal-use-first decision. Hakuba is the earlier-stage ski proposition—lower entry than Niseko, a growing international profile and summer hiking or biking, offset by execution-heavy winter operations.</p><p>Niseko is the premium version: global Asian and Australian ski demand, high winter rates and branded-residence appeal. The cost is a far higher entry level, substantial operating friction and a more concentrated seasonal thesis. Neither resort should be described with a single yield number; owner use, management, snow, maintenance and the local permit route decide the outcome.</p></section>
           <section class="seo-section"><h2>Preserve the exit—and the entry discipline</h2><p>Fukuoka is the broadest retirement asset of the four because domestic city demand sits beneath the foreign-buyer story. Hakone and Izu can offer striking low entry prices, but the gap between a charming bargain and an expensive renovation is wide. Hakuba has thinner liquidity than Niseko, so the price paid and the operator selected matter more.</p><p>Niseko has the clearest international resort buyer pool, but prime Hirafu pricing already reflects that recognition. The retirement conclusion is not that one location wins every pillar: choose Fukuoka for year-round use, Hakone or Izu for Tokyo-adjacent escape, Hakuba for earlier-stage mountain upside, and Niseko only when the premium winter thesis and its costs are fully acceptable.</p></section>
         """
+    elif page["slug"] == "spain-retirement-property-foreign-buyers":
+        editorial_content = f"""
+          <section class="seo-section" id="lenses"><h2>Spain through five retirement lenses</h2><p>Spain succeeds as a retirement base when the buyer chooses a real community rather than a holiday proposition. The same national framework produces very different outcomes across an inland Valencia neighborhood, a Costa del Sol apartment, a Girona townhouse and a Mallorcan village. These five questions connect the property to the life it must support.</p></section>
+          <section class="seo-section"><h2>Live well, year after year</h2><p>Valencia offers the most balanced version of urban Mediterranean retirement: a substantial city, beaches, culture and daily services without requiring a resort routine. Málaga and the Costa del Sol make entry socially easier through established international communities, but municipality and neighborhood selection determine whether life remains pleasant outside the visitor economy. Girona and the Costa Brava reward buyers seeking Catalan character and landscape, while Mallorca offers a polished island ecosystem at a higher price and with more logistical dependence.</p><p>Healthcare, shade, walkability, groceries, public transport and year-round social life matter more after the first month than a sea view. Test each location in its hottest period and in winter. A retirement home should remain comfortable when restaurants close, visitors leave, a car cannot be used and a specialist appointment is required.</p>{spain_daily_life_figure}</section>
+          <section class="seo-section"><h2>Reach Spain easily—and choose the right rhythm</h2><p>Spain has unusual depth for repeat international use. Málaga, Valencia and Palma support broad air networks, while high-speed rail strengthens the mainland city case. Access alone is not enough: model the full door-to-door journey, seasonal schedules, onward transport and whether friends or family can visit without a complex transfer.</p><p>Valencia is the easiest place in this shortlist to build an ordinary urban routine. Málaga and the Costa del Sol are strongest for internationally connected coastal living. Girona and the Costa Brava divide between a functioning second city and car-dependent coastal settlements. Mallorca's air access is extensive, but island life still concentrates maintenance, medical travel and family logistics into a different rhythm.</p>{spain_access_figure}</section>
+          <section class="seo-section"><h2>Own and operate with regional discipline</h2><p>Spain's land-registry and notarial systems provide a recognizable ownership path, but a registry extract is not a substitute for full diligence. The buyer must reconcile title, cadastre, planning status, physical works, occupancy documentation, debts, community records and intended use. Coastal extensions, converted terraces, rural buildings and older planning histories deserve particular scrutiny.</p><p>Operation is regional and local. Transfer taxes differ by autonomous community; tourist-use rules can sit at regional, municipal and building levels; water, flood, wildfire and heat exposure vary by site. A buyer who cannot explain which authority controls each issue is not ready to price the asset.</p></section>
+          <section class="seo-section"><h2>Income and upside need a local story</h2><p>Spain has a deep foreign-buyer market, but national demand does not make every home liquid. Registradores reported that foreign purchasers represented 13.8% of Spanish home sales in 2025, with especially high shares in the Balearic Islands and Valencia. That supports international depth; it does not validate a particular price or yield.</p><p>Valencia and Málaga have the broadest mix of local, national and international demand in this shortlist. Mallorca has a powerful international buyer pool but a high entry threshold and more policy sensitivity. Costa Brava and Girona range from globally recognized enclaves to thin, highly seasonal micro-markets. Underwrite long-term value from location quality and ordinary usability, not from a tourist licence whose status may change.</p></section>
+          <section class="seo-section"><h2>Preserve the exit—and the life around it</h2><p>Exit quality begins at purchase. Favor understandable title, legal building status, manageable community costs, climate resilience and a layout that appeals beyond one nationality or rental strategy. Avoid paying a premium for informal alterations, assumed licences or a view that comes with difficult access and weak year-round services.</p><p>The retirement conclusion is conditional: choose Valencia for the strongest all-round urban base; Málaga and the Costa del Sol for established international infrastructure; Girona or the Costa Brava for a more selective Catalan life; and Mallorca when premium island living, travel dependence and carrying costs all fit comfortably. The best property is the one that remains useful even if short-term rental income disappears.</p></section>
+        """
     generic_intro = f"""
           <section class="seo-section">
             <h2>How to Read This Shortlist</h2>
@@ -5665,18 +5868,24 @@ def build_seo_page(
             <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process.</p>
           </section>
         """
-    if is_japan_article:
+    if is_editorial_article:
         overview_html = f"{overview_html}{editorial_content}"
-    hero_actions = "" if is_japan_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a><a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a></div>'''
-    hero_aside = "" if is_japan_article else f'''<aside class="seo-hero-card"><span>Top current match</span><strong>{escape(top["name"])}</strong><span>Alternative to test</span><strong>{escape(runner_up["name"])}</strong><span>Destinations compared</span><strong>{len(selected)}</strong></aside>'''
-    guide_summary = "" if is_japan_article else f'''<section class="seo-panel" aria-label="Guide summary"><div class="seo-stats"><div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div><div><span>Destinations</span><strong>{len(selected)}</strong></div><div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div><div><span>Research status</span><strong>Updated {updated}</strong></div></div></section>'''
-    decision_path = "" if is_japan_article else guide_decision_path_html(page, destinations, pages)
+    hero_actions = "" if is_editorial_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a><a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a></div>'''
+    hero_aside = "" if is_editorial_article else f'''<aside class="seo-hero-card"><span>Top current match</span><strong>{escape(top["name"])}</strong><span>Alternative to test</span><strong>{escape(runner_up["name"])}</strong><span>Destinations compared</span><strong>{len(selected)}</strong></aside>'''
+    guide_summary = "" if is_editorial_article else f'''<section class="seo-panel" aria-label="Guide summary"><div class="seo-stats"><div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div><div><span>Destinations</span><strong>{len(selected)}</strong></div><div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div><div><span>Research status</span><strong>Updated {updated}</strong></div></div></section>'''
+    decision_path = "" if is_editorial_article else guide_decision_path_html(page, destinations, pages)
     destination_notes_title = "Four places to test in person" if is_japan_article else "Destination Notes for Serious Buyers"
     decision_framework_html = seo_decision_framework_html(page)
-    callout_before_overview = "" if is_japan_article else retirement_callout
-    callout_after_overview = retirement_callout if is_japan_article else ""
-    body_class = "seo-page seo-page--japan" if is_japan_article else "seo-page"
-    japan_hero_visual = (
+    callout_before_overview = "" if is_editorial_article else retirement_callout
+    callout_after_overview = retirement_callout if is_editorial_article else ""
+    body_class = (
+        "seo-page seo-page--japan"
+        if is_japan_article
+        else "seo-page seo-page--editorial-retirement"
+        if is_spain_article
+        else "seo-page"
+    )
+    editorial_hero_visual = (
         destination_editorial_figure_html(
             {
                 "src": "/assets/fukuoka-itoshima-coast.webp",
@@ -5686,6 +5895,15 @@ def build_seo_page(
             "japan-hero-visual",
         )
         if is_japan_article
+        else destination_editorial_figure_html(
+            {
+                "src": "/assets/spain-valencia-coast-hero.webp",
+                "alt": "Older residents and cyclists using Valencia's green Turia Gardens corridor in warm morning light",
+            },
+            "Valencia · A year-round city with the Mediterranean close by",
+            "editorial-hero-visual",
+        )
+        if is_spain_article
         else hero_aside
     )
     japan_guide_rail = f'''
@@ -5707,6 +5925,27 @@ def build_seo_page(
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
           </div>
           <p class="japan-guide-rail__note">Research inputs only. Verify current legal, tax and immigration rules locally.</p>
+        </aside>
+    '''
+    spain_guide_rail = f'''
+        <aside class="seo-aside editorial-guide-rail">
+          <nav aria-label="In this guide">
+            <p class="seo-eyebrow">In this guide</p>
+            <a href="#residency">Residency first</a>
+            <a href="#fit">Who Spain suits</a>
+            <a href="#owner-changes">2025–2026 changes</a>
+            <a href="#costs">Financing and costs</a>
+            <a href="#practicality">Retirement practicality</a>
+            <a href="#lenses">Five retirement lenses</a>
+            <a href="#comparison">Compare destinations</a>
+            <a href="#faq">Common questions</a>
+            <a href="#sources">References</a>
+          </nav>
+          <div class="editorial-guide-rail__action">
+            <p>Compare Spain with the full 25-destination Atlas.</p>
+            <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
+          </div>
+          <p class="editorial-guide-rail__note">Research inputs only. Verify current legal, tax and immigration rules locally.</p>
         </aside>
     '''
     standard_guide_rail = f'''
@@ -5731,7 +5970,13 @@ def build_seo_page(
           </section>
         </aside>
     '''
-    guide_rail = japan_guide_rail if is_japan_article else standard_guide_rail
+    guide_rail = (
+        japan_guide_rail
+        if is_japan_article
+        else spain_guide_rail
+        if is_spain_article
+        else standard_guide_rail
+    )
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5846,7 +6091,7 @@ def build_seo_page(
     .seo-aside-card h2, .seo-aside-card h3 {{ margin: 0 0 10px; font-size: 16px; }}
     .seo-aside-card nav {{ display: grid; gap: 10px; }}
     .seo-aside-card p, .seo-aside-card a {{ font-size: 14px; }}
-    .japan-hero-visual, .japan-guide-rail {{ display: none; }}
+    .japan-hero-visual, .japan-guide-rail, .editorial-hero-visual, .editorial-guide-rail {{ display: none; }}
     .seo-page--japan {{ color: #202825; background: #f3efe5; font-family: var(--editorial-sans); }}
     .seo-page--japan .seo-shell {{ width: min(1220px, calc(100% - 48px)); }}
     .seo-page--japan .seo-hero {{ padding: 20px 0 44px; border-bottom: 1px solid rgba(32, 40, 37, .28); background: #f3efe5; }}
@@ -5895,6 +6140,51 @@ def build_seo_page(
     .seo-page--japan .faq-item summary {{ font-family: var(--editorial-serif); font-size: 18px; font-weight: 600; }}
     .seo-page--japan .seo-footer {{ background: #202825; color: #e7e1d6; }}
     .seo-page--japan .seo-footer a {{ color: #c8b58a; }}
+    .seo-page--editorial-retirement {{ color: #24312d; background: #f4efe4; font-family: var(--editorial-sans); }}
+    .seo-page--editorial-retirement .seo-shell {{ width: min(1220px, calc(100% - 48px)); }}
+    .seo-page--editorial-retirement .seo-hero {{ padding: 20px 0 44px; border-bottom: 1px solid rgba(36, 49, 45, .28); background: #f4efe4; }}
+    .seo-page--editorial-retirement .seo-nav {{ margin-bottom: 42px; padding-bottom: 16px; border-bottom: 3px solid #24312d; }}
+    .seo-page--editorial-retirement .seo-nav-links {{ gap: 24px; }}
+    .seo-page--editorial-retirement .seo-nav-links a {{ color: #24312d; font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }}
+    .seo-page--editorial-retirement .seo-hero-grid {{ grid-template-columns: minmax(0, .95fr) minmax(360px, .72fr); gap: clamp(32px, 6vw, 80px); align-items: stretch; }}
+    .seo-page--editorial-retirement .seo-hero-grid > div {{ display: flex; flex-direction: column; justify-content: center; padding: 24px 0 18px; }}
+    .seo-page--editorial-retirement h1 {{ max-width: 760px; font-family: var(--editorial-serif); font-size: clamp(54px, 6.6vw, 92px); font-weight: 500; line-height: .93; letter-spacing: -.035em; }}
+    .seo-page--editorial-retirement .seo-lede {{ max-width: 680px; margin-top: 28px; color: #4b5651; font-family: var(--editorial-serif); font-size: clamp(19px, 2vw, 24px); line-height: 1.42; }}
+    .seo-page--editorial-retirement .seo-eyebrow {{ color: #a44e2f; font-size: 10px; letter-spacing: .16em; }}
+    .seo-page--editorial-retirement .editorial-section-label {{ font-weight: 500; }}
+    .seo-page--editorial-retirement .editorial-hero-visual {{ display: grid; grid-template-rows: 1fr auto; min-height: 530px; margin: 0; background: #24312d; }}
+    .seo-page--editorial-retirement .editorial-hero-visual img {{ display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; }}
+    .seo-page--editorial-retirement .editorial-hero-visual figcaption {{ padding: 11px 14px; color: #f4efe4; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }}
+    .seo-page--editorial-retirement main {{ margin-top: 0; }}
+    .seo-page--editorial-retirement .seo-content {{ grid-template-columns: minmax(0, 830px) 220px; justify-content: space-between; gap: clamp(48px, 8vw, 112px); padding: 72px 0 84px; }}
+    .seo-page--editorial-retirement .seo-article {{ gap: 0; }}
+    .seo-page--editorial-retirement .seo-section {{ padding: 46px 0; border: 0; border-top: 1px solid rgba(36, 49, 45, .28); border-radius: 0; background: transparent; }}
+    .seo-page--editorial-retirement .seo-article > .seo-section:first-child {{ padding-top: 0; border-top: 0; }}
+    .seo-page--editorial-retirement .seo-section h2 {{ max-width: 720px; margin-bottom: 20px; font-family: var(--editorial-serif); font-size: clamp(34px, 4vw, 50px); font-weight: 500; line-height: 1.02; letter-spacing: -.025em; }}
+    .seo-page--editorial-retirement .seo-section h3 {{ margin-top: 28px; font-size: 16px; letter-spacing: .01em; }}
+    .seo-page--editorial-retirement .seo-section p, .seo-page--editorial-retirement .seo-section li {{ color: #3b4943; font-size: 17px; line-height: 1.72; }}
+    .seo-page--editorial-retirement .seo-section p {{ max-width: 72ch; }}
+    .seo-page--editorial-retirement .seo-section p + p {{ margin-top: 1.25em; }}
+    .seo-page--editorial-retirement .editorial-inline-visual {{ margin: 32px 0 0; }}
+    .seo-page--editorial-retirement .editorial-inline-visual img {{ display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }}
+    .seo-page--editorial-retirement .editorial-inline-visual figcaption {{ margin-top: 10px; color: #6e756f; font-size: 12px; letter-spacing: .03em; }}
+    .seo-page--editorial-retirement .seo-table-wrap {{ margin-top: 28px; border: 0; border-top: 3px solid #24312d; border-bottom: 1px solid #24312d; border-radius: 0; }}
+    .seo-page--editorial-retirement .seo-table {{ background: transparent; }}
+    .seo-page--editorial-retirement .seo-table th, .seo-page--editorial-retirement .seo-table td {{ padding: 16px 12px; border-color: rgba(36, 49, 45, .2); }}
+    .seo-page--editorial-retirement .seo-table th {{ color: #24312d; font-size: 10px; letter-spacing: .11em; }}
+    .seo-page--editorial-retirement .seo-link-grid {{ gap: 0; border-top: 1px solid rgba(36, 49, 45, .22); }}
+    .seo-page--editorial-retirement .seo-link-card {{ padding: 20px 18px 20px 0; border: 0; border-bottom: 1px solid rgba(36, 49, 45, .22); border-radius: 0; background: transparent; }}
+    .seo-page--editorial-retirement .seo-button {{ border-radius: 0; background: #24312d; font-size: 12px; font-weight: 500; letter-spacing: .05em; text-transform: uppercase; }}
+    .seo-page--editorial-retirement .editorial-guide-rail {{ position: sticky; top: 24px; display: block; padding-top: 14px; border-top: 3px solid #24312d; }}
+    .seo-page--editorial-retirement .editorial-guide-rail nav {{ display: grid; }}
+    .seo-page--editorial-retirement .editorial-guide-rail .seo-eyebrow {{ font-size: 12px; font-weight: 600; }}
+    .seo-page--editorial-retirement .editorial-guide-rail nav a {{ padding: 11px 0; border-top: 1px solid rgba(36, 49, 45, .16); color: #24312d; font-size: 14px; font-weight: 500; text-decoration: none; }}
+    .seo-page--editorial-retirement .editorial-guide-rail__action {{ margin-top: 28px; padding: 18px 0; border-top: 1px solid rgba(36, 49, 45, .28); border-bottom: 1px solid rgba(36, 49, 45, .28); }}
+    .seo-page--editorial-retirement .editorial-guide-rail__action p {{ margin-top: 0; font-family: var(--editorial-serif); font-size: 17px; line-height: 1.35; }}
+    .seo-page--editorial-retirement .editorial-guide-rail__note {{ color: #6e756f; font-size: 12px; line-height: 1.55; }}
+    .seo-page--editorial-retirement .faq-item summary {{ font-family: var(--editorial-serif); font-size: 18px; font-weight: 600; }}
+    .seo-page--editorial-retirement .seo-footer {{ background: #24312d; color: #e9e1d4; }}
+    .seo-page--editorial-retirement .seo-footer a {{ color: #d2b988; }}
     .faq-item {{ border-top: 1px solid var(--line); padding: 14px 0; }}
     .faq-item summary {{ cursor: pointer; font-weight: 850; }}
     .faq-item p {{ margin-bottom: 0; }}
@@ -5911,6 +6201,11 @@ def build_seo_page(
       .seo-page--japan .seo-content {{ grid-template-columns: 1fr; padding-top: 52px; }}
       .seo-page--japan .japan-guide-rail {{ position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; order: -1; }}
       .seo-page--japan .japan-guide-rail__action {{ margin-top: 0; }}
+      .seo-page--editorial-retirement .seo-hero-grid {{ grid-template-columns: 1fr; }}
+      .seo-page--editorial-retirement .editorial-hero-visual {{ min-height: 400px; }}
+      .seo-page--editorial-retirement .seo-content {{ grid-template-columns: 1fr; padding-top: 52px; }}
+      .seo-page--editorial-retirement .editorial-guide-rail {{ position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; order: -1; }}
+      .seo-page--editorial-retirement .editorial-guide-rail__action {{ margin-top: 0; }}
     }}
     @media (max-width: 560px) {{
       .seo-shell {{ width: min(100% - 28px, 1120px); }}
@@ -5929,6 +6224,15 @@ def build_seo_page(
       .seo-page--japan .seo-section h2 {{ font-size: clamp(32px, 10vw, 42px); }}
       .seo-page--japan .seo-section p, .seo-page--japan .seo-section li {{ font-size: 16px; }}
       .seo-page--japan .japan-guide-rail {{ grid-template-columns: 1fr; gap: 14px; }}
+      .seo-page--editorial-retirement .seo-shell {{ width: min(100% - 28px, 1220px); }}
+      .seo-page--editorial-retirement .seo-nav {{ margin-bottom: 24px; }}
+      .seo-page--editorial-retirement .seo-hero-grid > div {{ padding-top: 10px; }}
+      .seo-page--editorial-retirement h1 {{ font-size: clamp(46px, 14vw, 66px); }}
+      .seo-page--editorial-retirement .editorial-hero-visual {{ min-height: 300px; }}
+      .seo-page--editorial-retirement .seo-section {{ padding: 36px 0; }}
+      .seo-page--editorial-retirement .seo-section h2 {{ font-size: clamp(32px, 10vw, 42px); }}
+      .seo-page--editorial-retirement .seo-section p, .seo-page--editorial-retirement .seo-section li {{ font-size: 16px; }}
+      .seo-page--editorial-retirement .editorial-guide-rail {{ grid-template-columns: 1fr; gap: 14px; }}
     }}
   </style>
 </head>
@@ -5944,7 +6248,7 @@ def build_seo_page(
           {hero_detail_html}
           {hero_actions}
         </div>
-        {japan_hero_visual}
+        {editorial_hero_visual}
       </div>
     </div>
   </header>
