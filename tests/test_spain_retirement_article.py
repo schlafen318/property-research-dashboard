@@ -23,6 +23,17 @@ def rendered_article() -> str:
     )
 
 
+def rendered_page(slug: str) -> str:
+    destinations = [
+        build_unified_app.consolidate_destination(item)
+        for item in build_unified_app.load_json("destinations.json")
+    ]
+    page = next(page for page in build_unified_app.SEO_PAGES if page["slug"] == slug)
+    return build_unified_app.build_seo_page(
+        page, destinations, build_unified_app.SEO_PAGES
+    )
+
+
 class SpainRetirementArticleTests(unittest.TestCase):
     def test_spain_country_hub_links_to_the_retirement_guide(self) -> None:
         hub = next(
@@ -182,6 +193,22 @@ class SpainRetirementArticleTests(unittest.TestCase):
         ):
             self.assertIn(f'id="{section_id}"', html)
             self.assertIn(f'href="#{section_id}">{label}</a>', html)
+
+    def test_atlas_sidebar_copy_does_not_hard_code_destination_totals(self) -> None:
+        expected_copy = {
+            "spain-retirement-property-foreign-buyers":
+                "Compare Spain with every destination in the Atlas.",
+            "japan-retirement-property-foreign-buyers":
+                "Compare Japan with every destination in the Atlas.",
+            "buy-property-abroad":
+                "Compare every destination, adjust the 10-dimension weighting model, and export a shortlist memo.",
+        }
+
+        for slug, expected in expected_copy.items():
+            html = rendered_page(slug)
+            self.assertIn(expected, html)
+            self.assertNotIn("25-destination Atlas", html)
+            self.assertNotIn("all 25 destinations", html)
 
 
 if __name__ == "__main__":
