@@ -7113,7 +7113,7 @@ def premium_dossier_score_table(dest: dict, spec: PremiumDossierSpec) -> str:
     )
     return (
         '<div class="premium-table-wrap"><table class="premium-score-table">'
-        '<thead><tr><th>Dimension</th><th>Score</th><th>Weight</th><th>Research read</th></tr></thead>'
+        '<thead><tr><th>Dimension</th><th>Score</th><th>Weight</th><th>Atlas read</th></tr></thead>'
         f'<tbody>{rows}</tbody></table></div>'
     )
 
@@ -7349,7 +7349,7 @@ def build_premium_destination_page(
         {premium_dossier_lenses_html(spec)}
         <section class="premium-section" id="scores">
           <h2>The Atlas assessment</h2>
-          <p>These comparative inputs connect the dossier to the same ten-dimension model used across Global Home Atlas. They are research judgments, not forecasts.</p>
+          <p>Here’s how Fukuoka / Itoshima scores on the ten factors that matter most when choosing a long-term home abroad.</p>
           {premium_dossier_score_table(dest, spec)}
           <p class="premium-score-total"><strong>Weighted assessment: {float(dest["decision_score"]):.1f}/5.</strong> Reviewed {escape(spec.date_reviewed)}. <a href="/methodology/">Read the scoring methodology</a>.</p>
         </section>
