@@ -179,6 +179,15 @@ class JapanRetirementArticleTests(unittest.TestCase):
             html,
         )
 
+    def test_article_byline_uses_regular_not_bold_weight(self) -> None:
+        html = rendered_article()
+
+        self.assertIn(
+            'class="seo-byline" style="margin:12px 0 0;color:rgba(36,49,45,.68);'
+            'font-size:13px;font-weight:400"',
+            html,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -5592,8 +5592,9 @@ def build_seo_page(
     generated_link = generated_internal_link_html(page)
     updated = date.today().isoformat()
     country_count = len({item.get("country") for item in selected if item.get("country")})
+    author_weight = 400 if page["slug"] == "japan-retirement-property-foreign-buyers" else 750
     author_html = (
-        f'<p style="margin:12px 0 0;color:rgba(36,49,45,.68);font-size:13px;font-weight:750">By {escape(page["author"])} · First published {escape(page["date_published"])}</p>'
+        f'<p class="seo-byline" style="margin:12px 0 0;color:rgba(36,49,45,.68);font-size:13px;font-weight:{author_weight}">By {escape(page["author"])} · First published {escape(page["date_published"])}</p>'
         if page.get("author") and page.get("date_published")
         else ""
     )
