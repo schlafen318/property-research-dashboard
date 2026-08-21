@@ -58,6 +58,7 @@ Use this checklist for every guide, comparison, destination article, and calcula
 - [ ] Article schema includes headline, description, canonical URL, author, publisher, date published, and date modified.
 - [ ] FAQ schema exactly matches the visible FAQ.
 - [ ] Internal links are relevant, non-duplicative, and use descriptive anchors.
+- [ ] In destination-led narrative, the first substantive mention of each featured destination links to its destination dossier and uses restrained semibold emphasis; later mentions in the same section remain plain text.
 - [ ] External citations link directly to the authoritative supporting page.
 
 ## 7. Visual and technical QA

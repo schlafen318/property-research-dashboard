@@ -144,6 +144,28 @@ class SpainRetirementArticleTests(unittest.TestCase):
         self.assertGreater(html.index("/assets/spain-mallorca-access-lifestyle.webp"), access)
         self.assertLess(html.index("/assets/spain-mallorca-access-lifestyle.webp"), ownership)
 
+    def test_first_narrative_destination_mentions_link_to_their_dossiers(self) -> None:
+        html = rendered_article()
+
+        expected_links = (
+            ('/destinations/valencia/', 'Valencia'),
+            ('/destinations/malaga-costa-del-sol/', 'Málaga and the Costa del Sol'),
+            ('/destinations/costa-brava-girona/', 'Girona and the Costa Brava'),
+            ('/destinations/mallorca/', 'Mallorca'),
+        )
+        for href, label in expected_links:
+            anchor = (
+                f'<a class="editorial-destination-link" href="{href}" '
+                f'data-track="destination_click">{label}</a>'
+            )
+            self.assertEqual(1, html.count(anchor))
+
+        live_well_start = html.index("Live well, year after year")
+        live_well_end = html.index("Reach Spain easily—and choose the right rhythm")
+        live_well = html[live_well_start:live_well_end]
+        self.assertEqual(4, live_well.count('class="editorial-destination-link"'))
+        self.assertIn(".editorial-destination-link", html)
+
     def test_guide_rail_links_to_every_major_waypoint(self) -> None:
         html = rendered_article()
 
