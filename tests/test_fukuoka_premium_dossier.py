@@ -119,5 +119,66 @@ class PremiumDossierListingTests(unittest.TestCase):
         self.assertRegex(notes, r"coastal|lifestyle|high-end")
 
 
+class PremiumDossierRenderingTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        from src.build_unified_app import build_destination_page, consolidate_destination
+
+        root = Path(__file__).parents[1]
+        destinations = json.loads((root / "data" / "destinations.json").read_text())
+        listings = json.loads((root / "data" / "listings.json").read_text())
+        enriched = [consolidate_destination(row) for row in destinations]
+        fukuoka = next(row for row in enriched if row["id"] == "fukuoka-itoshima")
+        valencia = next(row for row in enriched if row["id"] == "valencia")
+        cls.fukuoka_html = build_destination_page(fukuoka, listings, enriched, [])
+        cls.valencia_html = build_destination_page(valencia, listings, enriched, [])
+
+    def test_fukuoka_uses_the_premium_renderer_in_specification_order(self) -> None:
+        self.assertIn('<body class="premium-dossier">', self.fukuoka_html)
+        section_ids = ["verdict", "lenses", "scores", "listings", "locations", "checklist", "sources"]
+        positions = [self.fukuoka_html.index(f'id="{section_id}"') for section_id in section_ids]
+        self.assertEqual(sorted(positions), positions)
+        for lens in get_premium_dossier("fukuoka-itoshima").lenses:
+            self.assertEqual(1, self.fukuoka_html.count(lens.heading))
+
+    def test_score_and_listing_tables_are_model_and_data_derived(self) -> None:
+        self.assertEqual(10, self.fukuoka_html.count('class="premium-score-row"'))
+        self.assertIn("4.3/5", self.fukuoka_html)
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-listing-row"'))
+        self.assertIn("31,800,000 JPY", self.fukuoka_html)
+        self.assertIn("2026-08-21", self.fukuoka_html)
+
+    def test_page_has_authorship_schema_links_and_final_references(self) -> None:
+        self.assertIn("Global Home Atlas Research Team", self.fukuoka_html)
+        self.assertIn('"@type":"Article"', self.fukuoka_html)
+        self.assertIn('"@type":"BreadcrumbList"', self.fukuoka_html)
+        self.assertIn('/japan-retirement-property-foreign-buyers/', self.fukuoka_html)
+        self.assertIn('/methodology/', self.fukuoka_html)
+        self.assertNotIn("25-destination", self.fukuoka_html)
+        article_end = self.fukuoka_html.index("</article>")
+        self.assertLess(self.fukuoka_html.index('id="sources"'), article_end)
+        self.assertNotIn("<section", self.fukuoka_html[self.fukuoka_html.index('id="sources"'):article_end])
+
+    def test_other_destinations_keep_the_generic_renderer(self) -> None:
+        self.assertNotIn('<body class="premium-dossier">', self.valencia_html)
+        self.assertNotIn('id="lenses"', self.valencia_html)
+
+    def test_three_images_are_distributed_once_with_accessible_text(self) -> None:
+        spec = get_premium_dossier("fukuoka-itoshima")
+        self.assertEqual(3, self.fukuoka_html.count("<figure"))
+        self.assertNotIn("montage", self.fukuoka_html.lower())
+        for image in spec.images:
+            self.assertEqual(1, self.fukuoka_html.count(f'src="{image.src}"'))
+            self.assertIn(f'alt="{image.alt}"', self.fukuoka_html)
+            asset = Path(__file__).parents[1] / "src" / "site_assets" / Path(image.src).name
+            self.assertTrue(asset.exists())
+
+    def test_premium_css_has_mobile_readability_and_contained_tables(self) -> None:
+        self.assertIn("@media (max-width: 560px)", self.fukuoka_html)
+        self.assertIn(".premium-section p, .premium-section li { font-size: 16px; }", self.fukuoka_html)
+        self.assertIn("overflow-x: auto", self.fukuoka_html)
+        self.assertIn("font-weight: 500", self.fukuoka_html)
+
+
 if __name__ == "__main__":
     unittest.main()
