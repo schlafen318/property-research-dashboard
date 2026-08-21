@@ -3749,8 +3749,19 @@ def is_japan_retirement_guide(page: dict) -> bool:
     return page.get("slug") == "japan-retirement-property-foreign-buyers"
 
 
-def japan_retirement_overview_html() -> str:
+def japan_retirement_fit_html() -> str:
     return """
+          <section class="seo-section">
+            <h2>Who Japan suits</h2>
+            <p><strong>Japan is a strong fit</strong> for buyers who already have a credible residence route, value safety, transport, food and healthcare access, can operate in a Japanese-language administrative environment, and prefer lifestyle utility over aggressive yield.</p>
+            <p><strong>Look elsewhere first</strong> if the property is expected to create residency, easy non-resident leverage is essential, short-term-rental income must carry the investment, or family members need a simple dependent pathway.</p>
+            <p>Before making an offer, complete the immigration, financing, tax, hazard, building, management and exit checks in that order. A technically purchasable property is not necessarily a workable retirement plan.</p>
+          </section>
+    """
+
+
+def japan_retirement_overview_html() -> str:
+    return f"""
           <section class="seo-section">
             <p class="seo-eyebrow">Start here</p>
             <h2>Buying property does not give you residency</h2>
@@ -3758,6 +3769,8 @@ def japan_retirement_overview_html() -> str:
             <p>Japan does not have a general retirement visa. The closest official option for some affluent long-stay visitors is the designated-activities route for sightseeing and recreation. It is limited to nationals of visa-waiver countries or regions, requires savings of at least ¥30 million for the applicant and spouse, normally permits six months, and can reach a maximum of one year after an extension. Dependent children cannot accompany the applicant under this route. See the <a href="https://www.mofa.go.jp/ca/fna/page22e_000738.html" rel="noopener noreferrer">Ministry of Foreign Affairs requirements</a> and the <a href="https://www.moj.go.jp/isa/applications/status/index.html?language=eng" rel="noopener noreferrer">Immigration Services Agency status list</a>.</p>
             <p><strong>Decision rule:</strong> do not buy for full-time retirement until an immigration professional has confirmed the residence path, its renewal limits, and whether a spouse or dependent can use the same plan.</p>
           </section>
+
+          {japan_retirement_fit_html()}
 
           <section class="seo-section">
             <h2>What changed for foreign owners in 2026</h2>
@@ -3874,24 +3887,25 @@ def japan_retirement_destination_notes_html(destinations: list[dict]) -> str:
     """
 
 
-def japan_retirement_closing_html() -> str:
+def japan_retirement_references_html() -> str:
     return """
-          <section class="seo-section">
-            <h2>Who Japan suits</h2>
-            <p><strong>Japan is a strong fit</strong> for buyers who already have a credible residence route, value safety, transport, food and healthcare access, can operate in a Japanese-language administrative environment, and prefer lifestyle utility over aggressive yield.</p>
-            <p><strong>Look elsewhere first</strong> if the property is expected to create residency, easy non-resident leverage is essential, short-term-rental income must carry the investment, or family members need a simple dependent pathway.</p>
-            <p>Before making an offer, complete the immigration, financing, tax, hazard, building, management and exit checks in that order. A technically purchasable property is not necessarily a workable retirement plan.</p>
-          </section>
-
           <section class="seo-section" id="sources">
-            <h2>Sources and update policy</h2>
+            <h2>References and update policy</h2>
             <p>Legal and administrative claims in this guide use Japanese government sources. Rules can change, and local ordinances or building bylaws may be stricter than national rules. Recheck every linked source and obtain current professional advice before signing.</p>
             <ul>
               <li><a href="https://www.mofa.go.jp/ca/fna/page22e_000738.html" rel="noopener noreferrer">Ministry of Foreign Affairs: long stay for sightseeing and recreation</a></li>
               <li><a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html" rel="noopener noreferrer">Ministry of Finance: non-resident real-property reporting</a></li>
               <li><a href="https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html" rel="noopener noreferrer">Ministry of Justice: registration obligations from 2026</a></li>
               <li><a href="https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html" rel="noopener noreferrer">MLIT: property-tax overview</a></li>
+              <li><a href="https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf" rel="noopener noreferrer">National Tax Agency: non-resident tax when buying or selling real estate</a></li>
+              <li><a href="https://www.mlit.go.jp/report/press/totikensangyo13_hh_000269.html" rel="noopener noreferrer">MLIT: transaction, registration, tax and planning systems</a></li>
+              <li><a href="https://www.mlit.go.jp/totikensangyo/const/sosei_const_fr3_000074.html" rel="noopener noreferrer">MLIT: flood-hazard maps in the Important Matters Explanation</a></li>
+              <li><a href="https://www.mhlw.go.jp/content/12400000/001406614.pdf" rel="noopener noreferrer">Ministry of Health: health insurance for foreign residents</a></li>
+              <li><a href="https://disaportal.gsi.go.jp/" rel="noopener noreferrer">Geospatial Information Authority: national hazard-map portal</a></li>
+              <li><a href="https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf" rel="noopener noreferrer">MLIT: guide for foreign condominium owners</a></li>
               <li><a href="https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html" rel="noopener noreferrer">Japan Tourism Agency: Private Lodging Business Act</a></li>
+              <li><a href="https://faq.japan-travel.jnto.go.jp/en/plan/airport-access/fukuoka-airport/" rel="noopener noreferrer">JNTO: Fukuoka Airport access</a></li>
+              <li><a href="https://www.stat.go.jp/english/data/nenkan/74nenkan/1431-20.html" rel="noopener noreferrer">Statistics Bureau: regional consumer-price comparisons</a></li>
             </ul>
           </section>
     """
@@ -3926,7 +3940,7 @@ def seo_comparison_html(page: dict, selected: list[dict], top: dict, runner_up: 
 
 def seo_destination_notes_html(page: dict, selected: list[dict]) -> str:
     if is_japan_retirement_guide(page):
-        return japan_retirement_destination_notes_html(selected)
+        return ""
     return f"""
           <section class="seo-section">
             <h2>Destination Notes for Serious Buyers</h2>
@@ -3939,7 +3953,7 @@ def seo_destination_notes_html(page: dict, selected: list[dict]) -> str:
 
 def seo_decision_framework_html(page: dict) -> str:
     if is_japan_retirement_guide(page):
-        return japan_retirement_closing_html()
+        return ""
     return """
           <section class="seo-section">
             <h2>Decision Framework</h2>
@@ -3953,6 +3967,10 @@ def seo_decision_framework_html(page: dict) -> str:
             <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
           </section>
     """
+
+
+def seo_references_html(page: dict) -> str:
+    return japan_retirement_references_html() if is_japan_retirement_guide(page) else ""
 
 
 def schema_for_page(page: dict, canonical: str) -> list[dict]:
@@ -5584,6 +5602,7 @@ def build_seo_page(
     comparison_html = seo_comparison_html(page, selected, top, runner_up)
     destination_notes_html = seo_destination_notes_html(page, selected)
     decision_framework_html = seo_decision_framework_html(page)
+    references_html = seo_references_html(page)
     retirement_callout = (
         retirement_calculator_callout("seo-section", "buying guide")
         if page["slug"] in {
@@ -5602,7 +5621,6 @@ def build_seo_page(
           <section class="seo-section"><p class="seo-eyebrow">Ownership clarity 12% · Regulatory safety 8%</p><h2>Own and operate cleanly</h2><p>Foreigners can generally own Japanese land and buildings freehold. That clarity is a real advantage, but it is separate from residency, financing and public-health eligibility. For a non-resident purchase, the Ministry of Finance says FEFTA reporting is generally required through the Bank of Japan within 20 days after acquisition. Real estate acquisition tax and registration licence tax are separate purchase costs; fixed-asset tax is an ongoing owner cost. Where the seller is also non-resident, Japanese withholding rules can affect settlement, so the payment route needs a tax adviser before contracts are exchanged.</p><p>Before signing, the agent's Important Matters Explanation is where the relevant rights, restrictions and hazard information should be explained; closing and registration then record the transfer. The explanation must show the property's location on the official flood-hazard map. Treat that as a starting point, not a clean bill of health: in Hakone and Izu, older stock, slope, typhoon and earthquake exposure are part of the asset; in Hakuba and Niseko, snow load, winter access and heating systems are. Rental use is equally market-specific. In Niseko and Hakuba, the operating model matters as much as the chalet: management, snow response and local compliance shape the income result. Minpaku is capped nationally at 180 days a year, and local rules can be tighter.</p></section>
           <section class="seo-section"><p class="seo-eyebrow">Rental profit 13% · Capital upside 9%</p><h2>Income and upside need different stories</h2><p>Fukuoka's case is domestic and regional demand: a practical city base, resilient travel and a lower entry benchmark than global resorts. Hakone and Izu benefit from Tokyo weekend demand, but old homes and uneven rental evidence make them a personal-use-first decision. Hakuba is the earlier-stage ski proposition—lower entry than Niseko, a growing international profile and summer hiking or biking, offset by execution-heavy winter operations.</p><p>Niseko is the premium version: global Asian and Australian ski demand, high winter rates and branded-residence appeal. The cost is a far higher entry level, substantial operating friction and a more concentrated seasonal thesis. Neither resort should be described with a single yield number; owner use, management, snow, maintenance and the local permit route decide the outcome.</p></section>
           <section class="seo-section"><p class="seo-eyebrow">Exit liquidity 9% · Value entry 11%</p><h2>Preserve the exit—and the entry discipline</h2><p>Fukuoka is the broadest retirement asset of the four because domestic city demand sits beneath the foreign-buyer story. Hakone and Izu can offer striking low entry prices, but the gap between a charming bargain and an expensive renovation is wide. Hakuba has thinner liquidity than Niseko, so the price paid and the operator selected matter more.</p><p>Niseko has the clearest international resort buyer pool, but prime Hirafu pricing already reflects that recognition. The retirement conclusion is not that one location wins every pillar: choose Fukuoka for year-round use, Hakone or Izu for Tokyo-adjacent escape, Hakuba for earlier-stage mountain upside, and Niseko only when the premium winter thesis and its costs are fully acceptable.</p></section>
-          <section class="seo-section"><h2>Primary sources to use with advisers</h2><p><a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html">Japan's Ministry of Finance: non-resident real-property reporting</a>; <a href="https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf">National Tax Agency: non-resident tax when buying or selling Japanese real estate</a>; <a href="https://www.mlit.go.jp/report/press/totikensangyo13_hh_000269.html">MLIT: real-estate transaction, registration, tax and planning systems</a>; <a href="https://www.mlit.go.jp/totikensangyo/const/sosei_const_fr3_000074.html">MLIT: flood-hazard maps in the Important Matters Explanation</a>; <a href="https://www.mhlw.go.jp/content/12400000/001406614.pdf">MHLW: health insurance for foreign residents</a>; <a href="https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html">Japan Tourism Agency: the Private Lodging Business Act</a>; <a href="https://faq.japan-travel.jnto.go.jp/en/plan/airport-access/fukuoka-airport/">JNTO: Fukuoka Airport access</a>; <a href="https://www.stat.go.jp/english/data/nenkan/74nenkan/1431-20.html">Statistics Bureau: regional consumer-price comparisons</a>.</p></section>
         """
     generic_intro = f"""
           <section class="seo-section">
@@ -5797,6 +5815,7 @@ def build_seo_page(
             <h2>FAQ</h2>
             {build_faq_html(page.get("faqs", []))}
           </section>
+          {references_html}
         </article>
 
         <aside class="seo-aside">
