@@ -170,6 +170,15 @@ class JapanRetirementArticleTests(unittest.TestCase):
             self.assertIn(f'id="{section_id}"', html)
             self.assertIn(f'href="#{section_id}">{label}</a>', html)
 
+    def test_primary_navigation_uses_medium_not_bold_weight(self) -> None:
+        html = rendered_article()
+
+        self.assertIn(
+            ".seo-page--japan .seo-nav-links a { color: #202825; "
+            "font-size: 11px; font-weight: 500;",
+            html,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

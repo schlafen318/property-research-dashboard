@@ -5810,7 +5810,7 @@ def build_seo_page(
     .seo-page--japan .seo-hero {{ padding: 20px 0 44px; border-bottom: 1px solid rgba(32, 40, 37, .28); background: #f3efe5; }}
     .seo-page--japan .seo-nav {{ margin-bottom: 42px; padding-bottom: 16px; border-bottom: 3px solid #202825; }}
     .seo-page--japan .seo-nav-links {{ gap: 24px; }}
-    .seo-page--japan .seo-nav-links a {{ color: #202825; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }}
+    .seo-page--japan .seo-nav-links a {{ color: #202825; font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }}
     .seo-page--japan .seo-hero-grid {{ grid-template-columns: minmax(0, .95fr) minmax(360px, .72fr); gap: clamp(32px, 6vw, 80px); align-items: stretch; }}
     .seo-page--japan .seo-hero-grid > div {{ display: flex; flex-direction: column; justify-content: center; padding: 24px 0 18px; }}
     .seo-page--japan h1 {{ max-width: 760px; font-family: var(--editorial-serif); font-size: clamp(54px, 6.6vw, 92px); font-weight: 500; line-height: .93; letter-spacing: -.035em; }}
