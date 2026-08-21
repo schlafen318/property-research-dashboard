@@ -68,7 +68,7 @@ class JapanRetirementArticleTests(unittest.TestCase):
             "Financing and ownership costs",
             "Earthquake, flood and building diligence",
             "Short-term rentals are regulated",
-            "Sources and update policy",
+            "References and update policy",
         ):
             self.assertIn(phrase, html)
         self.assertIn("https://disaportal.gsi.go.jp/", html)
@@ -93,6 +93,32 @@ class JapanRetirementArticleTests(unittest.TestCase):
             '"author":{"@type":"Organization","name":"Global Home Atlas Research Team"}',
             html,
         )
+
+    def test_fit_guidance_follows_the_opening_residency_section(self) -> None:
+        html = rendered_article()
+
+        residency = html.index("Buying property does not give you residency")
+        fit = html.index("Who Japan suits")
+        owner_updates = html.index("What changed for foreign owners in 2026")
+
+        self.assertLess(residency, fit)
+        self.assertLess(fit, owner_updates)
+
+    def test_article_has_one_consolidated_destination_block(self) -> None:
+        html = rendered_article()
+
+        self.assertEqual(1, html.count("Four Japanese destinations to compare"))
+        self.assertNotIn("Destination notes for serious buyers", html)
+
+    def test_references_are_consolidated_as_the_final_article_section(self) -> None:
+        html = rendered_article()
+
+        self.assertNotIn("Primary sources to use with advisers", html)
+        self.assertEqual(1, html.count('id="sources"'))
+        self.assertGreater(html.index('id="sources"'), html.index('id="faq"'))
+        article_end = html.index("</article>")
+        sources = html.index('id="sources"')
+        self.assertNotIn('<section class="seo-section"', html[sources + 1 : article_end])
 
 
 if __name__ == "__main__":
