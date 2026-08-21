@@ -4,6 +4,7 @@ import re
 from pathlib import Path
 
 from src.premium_destination_dossiers import (
+    DECISION_DIMENSION_KEYS,
     PREMIUM_DESTINATION_DOSSIERS,
     get_premium_dossier,
     validate_premium_dossier,
@@ -85,6 +86,17 @@ class PremiumDossierContentTests(unittest.TestCase):
         self.assertEqual(4.27, enriched["decision_score"])
         self.assertEqual(10, len(enriched["decision_dimensions"]))
 
+    def test_score_reads_are_complete_concise_and_destination_specific(self) -> None:
+        self.assertEqual("2026-08-22", self.spec.date_reviewed)
+        score_reads = getattr(self.spec, "score_reads", {})
+        self.assertEqual(DECISION_DIMENSION_KEYS, set(score_reads))
+        for key, research_read in score_reads.items():
+            with self.subTest(key=key):
+                words = research_read.split()
+                self.assertGreaterEqual(len(words), 12)
+                self.assertLessEqual(len(words), 34)
+                self.assertRegex(research_read, r"Fukuoka|Itoshima")
+
 
 class PremiumDossierListingTests(unittest.TestCase):
     def test_fukuoka_has_three_to_five_complete_listing_observations(self) -> None:
@@ -155,6 +167,17 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         self.assertIn("31,800,000 JPY", self.fukuoka_html)
         self.assertIn("2026-08-21", self.fukuoka_html)
 
+    def test_score_table_uses_dossier_specific_research_reads(self) -> None:
+        spec = get_premium_dossier("fukuoka-itoshima")
+        score_reads = getattr(spec, "score_reads", {})
+        self.assertEqual(10, len(score_reads))
+        for research_read in score_reads.values():
+            self.assertEqual(1, self.fukuoka_html.count(research_read))
+        self.assertNotIn(
+            "Natural setting, food culture, and repeatable year-round reasons to be there.",
+            self.fukuoka_html,
+        )
+
     def test_page_has_authorship_schema_links_and_final_references(self) -> None:
         self.assertIn("Global Home Atlas Research Team", self.fukuoka_html)
         self.assertIn('"@type":"Article"', self.fukuoka_html)
@@ -214,6 +237,7 @@ class PremiumDossierPublishingRuleTests(unittest.TestCase):
         self.assertIn("five editorial lenses", checklist)
         self.assertIn("three to five representative listing observations", checklist)
         self.assertIn("exactly one 10-row score table", checklist)
+        self.assertIn("destination-specific research read", checklist)
 
 
 if __name__ == "__main__":

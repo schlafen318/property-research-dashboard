@@ -7098,7 +7098,7 @@ def premium_dossier_figure(image, *, hero: bool = False) -> str:
     )
 
 
-def premium_dossier_score_table(dest: dict) -> str:
+def premium_dossier_score_table(dest: dict, spec: PremiumDossierSpec) -> str:
     dimensions = dest.get("decision_dimensions", [])
     if len(dimensions) != 10 or len({item["key"] for item in dimensions}) != 10:
         raise ValueError(f"{dest['id']} premium dossier requires exactly 10 score dimensions")
@@ -7107,7 +7107,7 @@ def premium_dossier_score_table(dest: dict) -> str:
         f'<th scope="row">{escape(item["label"])}</th>'
         f'<td class="premium-number">{float(item["score"]):.1f}/5</td>'
         f'<td class="premium-number">{float(item["weight"]) * 100:.0f}%</td>'
-        f'<td>{escape(item["evidence"])}</td>'
+        f'<td>{escape(spec.score_reads[item["key"]])}</td>'
         "</tr>"
         for item in dimensions
     )
@@ -7350,7 +7350,7 @@ def build_premium_destination_page(
         <section class="premium-section" id="scores">
           <h2>The Atlas assessment</h2>
           <p>These comparative inputs connect the dossier to the same ten-dimension model used across Global Home Atlas. They are research judgments, not forecasts.</p>
-          {premium_dossier_score_table(dest)}
+          {premium_dossier_score_table(dest, spec)}
           <p class="premium-score-total"><strong>Weighted assessment: {float(dest["decision_score"]):.1f}/5.</strong> Reviewed {escape(spec.date_reviewed)}. <a href="/methodology/">Read the scoring methodology</a>.</p>
         </section>
         <section class="premium-section" id="listings">
