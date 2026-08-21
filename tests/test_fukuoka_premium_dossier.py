@@ -180,5 +180,31 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         self.assertIn("font-weight: 500", self.fukuoka_html)
 
 
+class PremiumDossierPublishingRuleTests(unittest.TestCase):
+    def test_japan_guide_links_its_first_substantive_fukuoka_mention(self) -> None:
+        from src import build_unified_app
+
+        destinations = [
+            build_unified_app.consolidate_destination(row)
+            for row in build_unified_app.load_json("destinations.json")
+        ]
+        page = next(
+            row for row in build_unified_app.SEO_PAGES
+            if row["slug"] == "japan-retirement-property-foreign-buyers"
+        )
+        html = build_unified_app.build_seo_page(page, destinations, build_unified_app.SEO_PAGES)
+        self.assertIn(
+            '<a class="editorial-destination-link" href="/destinations/fukuoka-itoshima/">Fukuoka and Itoshima</a>',
+            html,
+        )
+
+    def test_publish_checklist_contains_the_premium_dossier_gate(self) -> None:
+        checklist = (Path(__file__).parents[1] / "docs" / "CONTENT_PUBLISH_READINESS_CHECKLIST.md").read_text()
+        checklist = checklist.lower()
+        self.assertIn("five editorial lenses", checklist)
+        self.assertIn("three to five representative listing observations", checklist)
+        self.assertIn("exactly one 10-row score table", checklist)
+
+
 if __name__ == "__main__":
     unittest.main()
