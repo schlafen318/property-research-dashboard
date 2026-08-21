@@ -462,16 +462,19 @@ SEO_PAGES = [
     {
         "slug": "japan-retirement-property-foreign-buyers",
         "title": "Japan Retirement Property for Foreign Buyers | Global Home Atlas",
-        "description": "Compare Japan retirement property for foreign buyers across lifestyle, access, ownership, rental rules, healthcare, value, and resale in Fukuoka, Hakone, Hakuba, and Niseko.",
+        "description": "Compare Japan retirement property for foreign buyers across lifestyle, access, ownership, residency, reporting, costs, healthcare, rental rules, risks, and four destinations.",
         "h1": "Japan Retirement Property for Foreign Buyers",
-        "keyword": "Japan retirement property foreign buyers",
+        "keyword": "Japan retirement property for foreign buyers",
         "theme": "Japan buyer guide",
-        "intent": "foreign buyers considering Japan for lifestyle, retirement optionality, and clean ownership rather than pure yield",
+        "intent": "foreign buyers deciding whether they can live in Japan long term and whether a Japanese home fits their retirement plan",
         "destination_ids": ["fukuoka-itoshima", "hakone-izu", "hakuba", "niseko"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-06-23",
         "faqs": [
-            ("Can foreigners buy property in Japan?", "Foreign buyers can generally buy freehold property in Japan, but financing, taxes, management, and local rules still require careful advice."),
-            ("Is Japan good for retirement property?", "Japan can be strong for safety, healthcare, food, transport, and ownership clarity, but visa status and income expectations need separate planning."),
-            ("Where should foreign buyers compare in Japan?", "Compare city-adjacent lifestyle markets such as Fukuoka and Itoshima with resort markets such as Hakone, Hakuba, and Niseko."),
+            ("Can buying property give a foreigner residency in Japan?", "No. Property ownership and immigration status are separate. Buyers need an independent status of residence or another lawful basis for each stay."),
+            ("Can foreigners buy property in Japan?", "Foreign buyers can generally acquire and register land and buildings, but non-resident reporting, financing, tax, management, and location-specific rules still need professional review."),
+            ("Does Japan have a retirement visa?", "Japan does not offer a general retirement visa. A designated-activities route can permit eligible visa-waiver nationals with sufficient savings to stay for six months and, after an extension, up to one year."),
+            ("Where should retirement buyers compare in Japan?", "Start with Fukuoka and Itoshima for year-round city access, Hakone and Izu for Tokyo-adjacent lifestyle use, and Hakuba or Niseko only when a seasonal resort property and professional management fit the plan."),
         ],
     },
     {
@@ -3742,6 +3745,216 @@ def build_faq_html(faqs: list[tuple[str, str]]) -> str:
     )
 
 
+def is_japan_retirement_guide(page: dict) -> bool:
+    return page.get("slug") == "japan-retirement-property-foreign-buyers"
+
+
+def japan_retirement_overview_html() -> str:
+    return """
+          <section class="seo-section">
+            <p class="seo-eyebrow">Start here</p>
+            <h2>Buying property does not give you residency</h2>
+            <p>Foreign buyers can generally acquire and register a home in Japan, but ownership does not create a visa, a status of residence, permanent residency, or access to public healthcare. Establish a lawful long-stay route before treating a purchase as a retirement home.</p>
+            <p>Japan does not have a general retirement visa. The closest official option for some affluent long-stay visitors is the designated-activities route for sightseeing and recreation. It is limited to nationals of visa-waiver countries or regions, requires savings of at least ¥30 million for the applicant and spouse, normally permits six months, and can reach a maximum of one year after an extension. Dependent children cannot accompany the applicant under this route. See the <a href="https://www.mofa.go.jp/ca/fna/page22e_000738.html" rel="noopener noreferrer">Ministry of Foreign Affairs requirements</a> and the <a href="https://www.moj.go.jp/isa/applications/status/index.html?language=eng" rel="noopener noreferrer">Immigration Services Agency status list</a>.</p>
+            <p><strong>Decision rule:</strong> do not buy for full-time retirement until an immigration professional has confirmed the residence path, its renewal limits, and whether a spouse or dependent can use the same plan.</p>
+          </section>
+
+          <section class="seo-section">
+            <h2>What changed for foreign owners in 2026</h2>
+            <h3>Non-resident acquisition reporting</h3>
+            <p>Under the Foreign Exchange and Foreign Trade Act, a non-resident who acquires Japanese real estate or a right in it generally must report the acquisition to the Minister of Finance through the Bank of Japan within 20 days. The report is in Japanese and may be filed by a Japan-based agent. Confirm the current scope and exemptions with the <a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html" rel="noopener noreferrer">Ministry of Finance</a>.</p>
+            <h3>Owner details must stay current</h3>
+            <p>From April 2026, registered owners who change their name or address are required to apply for an update within two years. Overseas owners should agree in writing who will monitor notices and handle registration changes. See the <a href="https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html" rel="noopener noreferrer">Ministry of Justice guidance</a>.</p>
+            <h3>Rules remain under review</h3>
+            <p>The Japanese government is continuing to review how foreign land acquisitions should be recorded and governed. That does not mean a general foreign-buyer ban is in force, but it makes a current legal check essential before exchange and closing. Follow the <a href="https://www.cas.go.jp/jp/seisaku/symbiotic_society/index.html" rel="noopener noreferrer">Cabinet Secretariat review</a>.</p>
+          </section>
+
+          <section class="seo-section">
+            <h2>Financing and ownership costs</h2>
+            <p>Do not assume that clear ownership means easy financing. A non-resident without Japanese income or a domestic credit history may face a smaller lender pool, lower loan-to-value limits, additional guarantor requirements, or a cash-only transaction. Obtain written lending terms before making a non-refundable commitment.</p>
+            <p>Budget separately for the purchase price, brokerage and legal support, registration and acquisition taxes, insurance, repairs, condominium or resort management fees, annual fixed-asset costs, and eventual sale costs. Japan taxes property at acquisition, during ownership, and on disposal; the applicable reliefs depend on the buyer, asset, use and date. Start with the <a href="https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html" rel="noopener noreferrer">Ministry of Land property-tax overview</a>, then obtain a transaction-specific estimate from a Japanese tax adviser.</p>
+            <p><strong>Decision rule:</strong> compare five-year total cash outlay rather than the listing price alone, and keep a separate reserve for building and equipment replacement.</p>
+          </section>
+
+          <section class="seo-section">
+            <h2>Retirement practicality beyond the purchase</h2>
+            <h3>Healthcare follows residence status</h3>
+            <p>Owning a home does not itself create eligibility for Japan's public health-insurance system. Eligibility depends on residence and enrolment rules. Confirm coverage before moving and maintain appropriate private or travel insurance for any period outside the public system. The <a href="https://www.mhlw.go.jp/stf/newpage_21539.html" rel="noopener noreferrer">Ministry of Health guidance</a> identifies categories, including short-stay foreign visitors, who are not eligible for National Health Insurance.</p>
+            <h3>Earthquake, flood and building diligence</h3>
+            <p>Review the property's structural survey, seismic standard and retrofit history, soil and slope conditions, flood, tsunami and landslide exposure, evacuation access, insurance availability, and the condition of roofs, waterproofing, plumbing and heating. Check the national <a href="https://disaportal.gsi.go.jp/" rel="noopener noreferrer">hazard-map portal</a> and the municipality's own maps; national screening does not replace an asset-level inspection.</p>
+            <h3>Condominium and absentee-owner governance</h3>
+            <p>For an apartment, read the management bylaws, reserve-fund balance, major-repair plan, meeting minutes, arrears, litigation, pet and renovation rules, and any restriction on short-term letting. An overseas owner also needs a reliable domestic contact or manager. MLIT publishes a <a href="https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf" rel="noopener noreferrer">guide for foreign condominium owners</a>.</p>
+            <h3>Short-term rentals are regulated</h3>
+            <p>Under the national private-lodging route, notified minpaku operations are capped at 180 days a year. Municipal ordinances and condominium rules can be tighter, and hotel or ryokan licensing follows a different route. Verify the exact property before underwriting any income. See the <a href="https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html" rel="noopener noreferrer">Japan Tourism Agency overview</a>.</p>
+          </section>
+    """
+
+
+JAPAN_RETIREMENT_DESTINATION_GUIDANCE = {
+    "fukuoka-itoshima": {
+        "best_for": "Year-round living with airport, healthcare and city services",
+        "daily_life": "Best all-round retirement base of this shortlist",
+        "diligence": "Flood and tsunami maps, apartment reserves, transport needs in coastal Itoshima",
+        "rental": "Prefer long-stay demand; verify any short-stay use building by building",
+    },
+    "hakone-izu": {
+        "best_for": "Tokyo-adjacent second-home or part-time retirement use",
+        "daily_life": "Strong leisure access, but car and slope practicality vary",
+        "diligence": "Volcanic, landslide and flood exposure, older homes, onsen rights and maintenance",
+        "rental": "Treat income as secondary unless the property has a compliant operator",
+    },
+    "hakuba": {
+        "best_for": "Active alpine lifestyle with professional local management",
+        "daily_life": "Seasonal resort rather than a default year-round retirement base",
+        "diligence": "Snow load, heating, winter access, staffing, building condition and operating permissions",
+        "rental": "Operator-dependent and seasonal; stress-test owner-use conflicts and all costs",
+    },
+    "niseko": {
+        "best_for": "Premium resort use for buyers comfortable with high carrying costs",
+        "daily_life": "Internationally accessible in winter, less complete for ordinary retirement needs",
+        "diligence": "Service charges, operator contract, owner-use limits, construction quality and resale depth",
+        "rental": "Do not rely on headline winter revenue; model management, vacancy and shoulder season",
+    },
+}
+
+
+def japan_retirement_comparison_html(destinations: list[dict]) -> str:
+    rows = []
+    for dest in destinations:
+        guidance = JAPAN_RETIREMENT_DESTINATION_GUIDANCE[dest["id"]]
+        rows.append(
+            f"""
+            <tr>
+              <td><strong><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></strong></td>
+              <td>{escape(guidance["best_for"])}</td>
+              <td>{escape(guidance["daily_life"])}</td>
+              <td>{escape(guidance["diligence"])}</td>
+              <td>{escape(guidance["rental"])}</td>
+            </tr>
+            """.rstrip()
+        )
+    return f"""
+          <section class="seo-section" id="comparison">
+            <h2>Four Japanese destinations to compare</h2>
+            <p>Choose the type of retirement life before the property. Fukuoka and Itoshima provide the strongest year-round base; Hakone and Izu suit repeat use near Tokyo; Hakuba and Niseko are specialist resort choices that demand stronger management and seasonal-risk tolerance.</p>
+            <div class="seo-table-wrap">
+              <table class="seo-table">
+                <thead><tr><th>Destination</th><th>Best for</th><th>Daily-life read</th><th>Primary diligence</th><th>Rental stance</th></tr></thead>
+                <tbody>{"".join(rows)}</tbody>
+              </table>
+            </div>
+          </section>
+    """
+
+
+def japan_retirement_destination_notes_html(destinations: list[dict]) -> str:
+    cards = []
+    for dest in destinations:
+        guidance = JAPAN_RETIREMENT_DESTINATION_GUIDANCE[dest["id"]]
+        cards.append(
+            f"""
+            <article class="seo-destination-card">
+              <div>
+                <span>{escape(dest.get("country") or "Japan")}</span>
+                <h3><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></h3>
+                <p>{escape(dest.get("panel_summary") or "")}</p>
+              </div>
+              <dl>
+                <div><dt>Best for</dt><dd>{escape(guidance["best_for"])}</dd></div>
+                <div><dt>Verify first</dt><dd>{escape(guidance["diligence"])}</dd></div>
+              </dl>
+            </article>
+            """.rstrip()
+        )
+    return f"""
+          <section class="seo-section">
+            <h2>Destination notes for serious buyers</h2>
+            <div class="seo-card-grid">{"".join(cards)}</div>
+          </section>
+    """
+
+
+def japan_retirement_closing_html() -> str:
+    return """
+          <section class="seo-section">
+            <h2>Who Japan suits</h2>
+            <p><strong>Japan is a strong fit</strong> for buyers who already have a credible residence route, value safety, transport, food and healthcare access, can operate in a Japanese-language administrative environment, and prefer lifestyle utility over aggressive yield.</p>
+            <p><strong>Look elsewhere first</strong> if the property is expected to create residency, easy non-resident leverage is essential, short-term-rental income must carry the investment, or family members need a simple dependent pathway.</p>
+            <p>Before making an offer, complete the immigration, financing, tax, hazard, building, management and exit checks in that order. A technically purchasable property is not necessarily a workable retirement plan.</p>
+          </section>
+
+          <section class="seo-section" id="sources">
+            <h2>Sources and update policy</h2>
+            <p>Legal and administrative claims in this guide use Japanese government sources. Rules can change, and local ordinances or building bylaws may be stricter than national rules. Recheck every linked source and obtain current professional advice before signing.</p>
+            <ul>
+              <li><a href="https://www.mofa.go.jp/ca/fna/page22e_000738.html" rel="noopener noreferrer">Ministry of Foreign Affairs: long stay for sightseeing and recreation</a></li>
+              <li><a href="https://www.mof.go.jp/english/policy/international_policy/real_property/index.html" rel="noopener noreferrer">Ministry of Finance: non-resident real-property reporting</a></li>
+              <li><a href="https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html" rel="noopener noreferrer">Ministry of Justice: registration obligations from 2026</a></li>
+              <li><a href="https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html" rel="noopener noreferrer">MLIT: property-tax overview</a></li>
+              <li><a href="https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html" rel="noopener noreferrer">Japan Tourism Agency: Private Lodging Business Act</a></li>
+            </ul>
+          </section>
+    """
+
+
+def seo_overview_html(page: dict, selected: list[dict]) -> str:
+    if is_japan_retirement_guide(page):
+        return japan_retirement_overview_html()
+    country_count = len({item.get("country") for item in selected if item.get("country")})
+    return f"""
+          <section class="seo-section">
+            <h2>How to Read This Shortlist</h2>
+            <p><strong>Credibility note:</strong> this page compares {len(selected)} destinations across {country_count} countries using a consistent {len(DIMENSIONS)}-dimension model. It is research-grade destination intelligence, not financial, legal, tax, immigration, or transaction advice.</p>
+            <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process. Global Home Atlas ranks destinations through ten decision dimensions: lifestyle magnetism, global access, ownership clarity, regulatory safety, rental profit, capital upside, retirement fit, exit liquidity, foreigner fit, and value entry.</p>
+            <p>That weighting is designed for affluent global citizens who may use one property for several jobs over time. A home can begin as a vacation base, become a semi-retirement address, then eventually need to rent or sell. The best destinations on this page are therefore not selected only for near-term excitement. They are selected because the evidence points to a more durable combination of livability, practicality, and investment defensibility.</p>
+            <p>Use this page as a first-pass filter. It narrows the research field, highlights where each destination is strong, and shows which tradeoffs need professional verification. Before buying, confirm title, taxes, foreign-buyer rules, visa status, insurance, building condition, local rental permits, manager quality, and resale comparables with independent local advisers.</p>
+          </section>
+    """
+
+
+def seo_comparison_html(page: dict, selected: list[dict], top: dict, runner_up: dict) -> str:
+    if is_japan_retirement_guide(page):
+        return japan_retirement_comparison_html(selected)
+    return f"""
+          <section class="seo-section" id="comparison">
+            <h2>Best Destinations to Compare First</h2>
+            <p>For this search, the strongest candidates are {escape(top["name"])} and {escape(runner_up["name"])} because they balance high decision scores with practical ownership and lifestyle use. The table below keeps the comparison deliberately concrete: entry benchmark, yield context, ownership clarity, retirement fit, and the committee read. These are the variables most likely to change a real buy/no-buy decision.</p>
+            {build_seo_destination_table(selected)}
+          </section>
+    """
+
+
+def seo_destination_notes_html(page: dict, selected: list[dict]) -> str:
+    if is_japan_retirement_guide(page):
+        return japan_retirement_destination_notes_html(selected)
+    return f"""
+          <section class="seo-section">
+            <h2>Destination Notes for Serious Buyers</h2>
+            <div class="seo-card-grid">
+              {build_seo_destination_cards(selected)}
+            </div>
+          </section>
+    """
+
+
+def seo_decision_framework_html(page: dict) -> str:
+    if is_japan_retirement_guide(page):
+        return japan_retirement_closing_html()
+    return """
+          <section class="seo-section">
+            <h2>Decision Framework</h2>
+            <h3>1. Start with ownership clarity</h3>
+            <p>Foreign buyers should eliminate markets where the legal structure is hard to explain, hard to finance, or heavily dependent on informal assumptions. A beautiful asset can become a poor decision if land rights, permits, taxes, or resale procedures are unclear. The ownership score in this guide is therefore intentionally prominent.</p>
+            <h3>2. Underwrite lifestyle as demand</h3>
+            <p>Lifestyle is not decoration. Food, healthcare, airport access, safety, climate, and year-round activity are the forces that make a place usable by the owner and attractive to future buyers or tenants. A market with repeated lifestyle demand has more ways to work if the original plan changes.</p>
+            <h3>3. Treat yield as a stress test</h3>
+            <p>Rental income should offset risk, not justify ignoring it. Net yield estimates need to survive management fees, vacancy, repairs, taxes, furnishing, platform costs, insurance, and regulatory changes. A lower but cleaner yield in a liquid market can be superior to a headline yield that depends on aggressive occupancy or fragile short-term-rental permissions.</p>
+            <h3>4. Plan the exit before entry</h3>
+            <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
+          </section>
+    """
+
+
 def schema_for_page(page: dict, canonical: str) -> list[dict]:
     breadcrumb = {
         "@context": "https://schema.org",
@@ -3771,6 +3984,13 @@ def schema_for_page(page: dict, canonical: str) -> list[dict]:
         "publisher": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL},
         "mainEntityOfPage": canonical,
     }
+    if page.get("date_published"):
+        article["datePublished"] = page["date_published"]
+    if page.get("author"):
+        article["author"] = {
+            "@type": "Organization",
+            "name": page["author"],
+        }
     faq = {
         "@context": "https://schema.org",
         "@type": "FAQPage",
@@ -5354,11 +5574,22 @@ def build_seo_page(
     generated_link = generated_internal_link_html(page)
     updated = date.today().isoformat()
     country_count = len({item.get("country") for item in selected if item.get("country")})
+    author_html = (
+        f'<p style="margin:12px 0 0;color:rgba(36,49,45,.68);font-size:13px;font-weight:750">By {escape(page["author"])} · First published {escape(page["date_published"])}</p>'
+        if page.get("author") and page.get("date_published")
+        else ""
+    )
+    hero_detail_html = f"{author_html}\n{generated_link}" if author_html else generated_link
+    overview_html = seo_overview_html(page, selected)
+    comparison_html = seo_comparison_html(page, selected, top, runner_up)
+    destination_notes_html = seo_destination_notes_html(page, selected)
+    decision_framework_html = seo_decision_framework_html(page)
     retirement_callout = (
         retirement_calculator_callout("seo-section", "buying guide")
         if page["slug"] in {
             "buying-property-abroad-for-retirement",
             "best-places-to-buy-property-abroad-for-retirement",
+            "japan-retirement-property-foreign-buyers",
         }
         else ""
     )
@@ -5380,13 +5611,17 @@ def build_seo_page(
             <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process.</p>
           </section>
         """
-    is_japan_article = bool(editorial_content)
-    hero_actions = "" if is_japan_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations">Open the full dashboard</a><a class="seo-button secondary" href="#comparison">Compare destinations</a></div>'''
+    is_japan_article = is_japan_retirement_guide(page)
+    if is_japan_article:
+        overview_html = f"{overview_html}{editorial_content}"
+    hero_actions = "" if is_japan_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a><a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a></div>'''
     hero_aside = "" if is_japan_article else f'''<aside class="seo-hero-card"><span>Top current match</span><strong>{escape(top["name"])}</strong><span>Alternative to test</span><strong>{escape(runner_up["name"])}</strong><span>Destinations compared</span><strong>{len(selected)}</strong></aside>'''
     guide_summary = "" if is_japan_article else f'''<section class="seo-panel" aria-label="Guide summary"><div class="seo-stats"><div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div><div><span>Destinations</span><strong>{len(selected)}</strong></div><div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div><div><span>Research status</span><strong>Updated {updated}</strong></div></div></section>'''
     decision_path = "" if is_japan_article else guide_decision_path_html(page, destinations, pages)
     destination_notes_title = "Four places to test in person" if is_japan_article else "Destination Notes for Serious Buyers"
-    decision_framework_html = "" if is_japan_article else """<section class="seo-section"><h2>Decision Framework</h2><h3>1. Start with ownership clarity</h3><p>Foreign buyers should eliminate markets where the legal structure is hard to explain, hard to finance, or heavily dependent on informal assumptions.</p><h3>2. Underwrite lifestyle as demand</h3><p>Lifestyle, access, safety, and year-round activity make a place usable by the owner and attractive to future buyers or tenants.</p><h3>3. Treat yield as a stress test</h3><p>Net yield needs to survive management fees, vacancy, repairs, taxes, furnishing, insurance, and regulatory changes.</p><h3>4. Plan the exit before entry</h3><p>Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p></section>"""
+    decision_framework_html = seo_decision_framework_html(page)
+    callout_before_overview = "" if is_japan_article else retirement_callout
+    callout_after_overview = retirement_callout if is_japan_article else ""
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5531,7 +5766,7 @@ def build_seo_page(
           <p class="seo-eyebrow">{escape(page["theme"])} · updated {updated}</p>
           <h1>{escape(page["h1"])}</h1>
           <p class="seo-lede">{escape(intro)} This guide is written for {escape(page["intent"])}.</p>
-          {generated_link}
+          {hero_detail_html}
           {hero_actions}
         </div>
         {hero_aside}
@@ -5545,22 +5780,11 @@ def build_seo_page(
       {vacation_home_quick_answer_html(page, destinations)}
       <div class="seo-content">
         <article class="seo-article">
-          {retirement_callout}
-          {editorial_content or generic_intro}
-
-          <section class="seo-section" id="comparison">
-            <h2>Best Destinations to Compare First</h2>
-            <p>For this search, the strongest candidates are {escape(top["name"])} and {escape(runner_up["name"])} because they balance high decision scores with practical ownership and lifestyle use. The table below keeps the comparison deliberately concrete: entry benchmark, yield context, ownership clarity, retirement fit, and the committee read. These are the variables most likely to change a real buy/no-buy decision.</p>
-            {build_seo_destination_table(selected)}
-          </section>
-
-          <section class="seo-section">
-            <h2>{destination_notes_title}</h2>
-            <div class="seo-card-grid">
-              {build_seo_destination_cards(selected)}
-            </div>
-          </section>
-
+          {callout_before_overview}
+          {overview_html}
+          {callout_after_overview}
+          {comparison_html}
+          {destination_notes_html}
           {decision_framework_html}
 
           <section class="seo-section">
