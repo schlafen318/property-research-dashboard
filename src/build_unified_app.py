@@ -5402,6 +5402,24 @@ def country_cluster_visual(destinations: list[dict]) -> str:
     """
 
 
+def destination_visual_story_html(
+    images: list[dict[str, str]], caption: str, figure_class: str = ""
+) -> str:
+    image_html = []
+    for index, image in enumerate(images):
+        position = " destination-visual-story__image--primary" if index == 0 else ""
+        image_html.append(
+            f'<img class="destination-visual-story__image{position}" '
+            f'src="{escape(image["src"])}" alt="{escape(image["alt"])}">'
+        )
+    classes = f"{figure_class} destination-visual-story".strip()
+    return (
+        f'<figure class="{classes}">'
+        f'<div class="destination-visual-story__grid">{"".join(image_html)}</div>'
+        f'<figcaption>{escape(caption)}</figcaption></figure>'
+    )
+
+
 def country_guide_links(hub: dict, pages: list[dict]) -> str:
     by_slug = {page["slug"]: page for page in pages}
     links = []
@@ -5650,7 +5668,24 @@ def build_seo_page(
     callout_after_overview = retirement_callout if is_japan_article else ""
     body_class = "seo-page seo-page--japan" if is_japan_article else "seo-page"
     japan_hero_visual = (
-        '''<figure class="japan-hero-visual"><img src="/assets/market-fukuoka-itoshima-900.webp" alt="Coastal landscape in Fukuoka and Itoshima, Japan"><figcaption>Fukuoka / Itoshima · Japan's strongest year-round base</figcaption></figure>'''
+        destination_visual_story_html(
+            [
+                {
+                    "src": "/assets/fukuoka-itoshima-coast.webp",
+                    "alt": "The blue-green sea, beach and wooded coastline of Itoshima near Fukuoka",
+                },
+                {
+                    "src": "/assets/fukuoka-itoshima-seaside-life.webp",
+                    "alt": "A quiet coastal lane, local produce and everyday seaside life in Itoshima",
+                },
+                {
+                    "src": "/assets/fukuoka-itoshima-city-access.webp",
+                    "alt": "Fukuoka waterfront promenade connecting calm public space with the compact city",
+                },
+            ],
+            "Fukuoka / Itoshima · Coast, culture and city convenience",
+            "japan-hero-visual",
+        )
         if is_japan_article
         else hero_aside
     )
@@ -5826,7 +5861,9 @@ def build_seo_page(
     .seo-page--japan .seo-eyebrow {{ color: #9a5a2d; font-size: 10px; letter-spacing: .16em; }}
     .seo-page--japan .japan-section-label {{ font-weight: 500; }}
     .seo-page--japan .japan-hero-visual {{ display: grid; grid-template-rows: 1fr auto; min-height: 530px; margin: 0; background: #202825; }}
-    .seo-page--japan .japan-hero-visual img {{ width: 100%; height: 100%; min-height: 0; object-fit: cover; }}
+    .seo-page--japan .destination-visual-story__grid {{ display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 3px; min-height: 0; }}
+    .seo-page--japan .destination-visual-story__image {{ width: 100%; height: 100%; min-height: 0; object-fit: cover; }}
+    .seo-page--japan .destination-visual-story__image--primary {{ grid-row: 1 / 3; }}
     .seo-page--japan .japan-hero-visual figcaption {{ padding: 11px 14px; color: #f3efe5; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }}
     .seo-page--japan main {{ margin-top: 0; }}
     .seo-page--japan .seo-content {{ grid-template-columns: minmax(0, 830px) 220px; justify-content: space-between; gap: clamp(48px, 8vw, 112px); padding: 72px 0 84px; }}
