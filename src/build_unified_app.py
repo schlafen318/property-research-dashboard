@@ -15,9 +15,19 @@ from urllib.parse import urlparse
 try:
     from src.seo_content_overrides import apply_content_override, load_content_overrides
     from src.retirement_destination_finder_page import build_retirement_destination_finder_html
+    from src.premium_destination_dossiers import (
+        PremiumDossierSpec,
+        get_premium_dossier,
+        validate_premium_dossier,
+    )
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from seo_content_overrides import apply_content_override, load_content_overrides
     from retirement_destination_finder_page import build_retirement_destination_finder_html
+    from premium_destination_dossiers import (
+        PremiumDossierSpec,
+        get_premium_dossier,
+        validate_premium_dossier,
+    )
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from scripts.seo_content_generator import PageContextParser, content_hash
@@ -5846,7 +5856,7 @@ def build_seo_page(
     if page["slug"] == "japan-retirement-property-foreign-buyers":
         editorial_content = f"""
           <section class="seo-section" id="lenses"><h2>Japan through five retirement lenses</h2><p>Japan is compelling for retirement not because it is cheap or effortless, but because a few places make daily life unusually dependable. We use the same ten-pillar methodology as the Atlas, grouped here into five questions that matter most when a home must work for months, not weekends.</p></section>
-          <section class="seo-section"><h2>Live well, year after year</h2><p>Fukuoka and Itoshima are the strongest all-season answer: city hospitals, a serious food culture and Kyushu at the doorstep, with coast available when the day should slow down. Hakone and Izu exchange city energy for onsen, gardens and a Tokyo-adjacent rhythm. Hakuba and Niseko are more deliberate choices: outstanding winter, increasingly credible green-season activity, but a life shaped by snow and shoulder season.</p><p>Healthcare follows a sequence. A long-stay residence status comes first; then you register an address with the municipality. The Ministry of Health says eligible foreign residents, including those living in Japan for more than three months, can join the public system—through employee cover when employed, or National Health Insurance otherwise. A property deed does not create residency or coverage. Fukuoka therefore has the clearest retirement utility of the four, while a mountain or resort home asks you to accept longer journeys for specialist care and a more seasonal social calendar.</p>{seaside_life_figure}</section>
+          <section class="seo-section"><h2>Live well, year after year</h2><p><a class="editorial-destination-link" href="/destinations/fukuoka-itoshima/">Fukuoka and Itoshima</a> are the strongest all-season answer: city hospitals, a serious food culture and Kyushu at the doorstep, with coast available when the day should slow down. Hakone and Izu exchange city energy for onsen, gardens and a Tokyo-adjacent rhythm. Hakuba and Niseko are more deliberate choices: outstanding winter, increasingly credible green-season activity, but a life shaped by snow and shoulder season.</p><p>Healthcare follows a sequence. A long-stay residence status comes first; then you register an address with the municipality. The Ministry of Health says eligible foreign residents, including those living in Japan for more than three months, can join the public system—through employee cover when employed, or National Health Insurance otherwise. A property deed does not create residency or coverage. Fukuoka therefore has the clearest retirement utility of the four, while a mountain or resort home asks you to accept longer journeys for specialist care and a more seasonal social calendar.</p>{seaside_life_figure}</section>
           <section class="seo-section"><h2>Reach it easily—and feel at home there</h2><p>Fukuoka wins on friction: JNTO notes that Hakata is a five-minute train ride from Fukuoka Airport. That changes how often a home gets used, and makes Korea, Taiwan and wider Asian connections genuinely convenient. Hakone and Izu work for Tokyo-based lives; Hakuba and Niseko require a winter-transfer plan, not a romantic assumption about the last mile.</p><p>Niseko has the most established international resort ecosystem and strong Chinese-speaking familiarity. Fukuoka offers deeper year-round urban services. In every location, Japanese remains the language of tradespeople, clinics and municipal administration; politeness is generous, but integration comes through repetition and language effort rather than an English-speaking bubble.</p>{city_access_figure}</section>
           <section class="seo-section"><h2>Own and operate cleanly</h2><p>Foreigners can generally own Japanese land and buildings freehold. That clarity is a real advantage, but it is separate from residency, financing and public-health eligibility. For a non-resident purchase, the Ministry of Finance says FEFTA reporting is generally required through the Bank of Japan within 20 days after acquisition. Real estate acquisition tax and registration licence tax are separate purchase costs; fixed-asset tax is an ongoing owner cost. Where the seller is also non-resident, Japanese withholding rules can affect settlement, so the payment route needs a tax adviser before contracts are exchanged.</p><p>Before signing, the agent's Important Matters Explanation is where the relevant rights, restrictions and hazard information should be explained; closing and registration then record the transfer. The explanation must show the property's location on the official flood-hazard map. Treat that as a starting point, not a clean bill of health: in Hakone and Izu, older stock, slope, typhoon and earthquake exposure are part of the asset; in Hakuba and Niseko, snow load, winter access and heating systems are. Rental use is equally market-specific. In Niseko and Hakuba, the operating model matters as much as the chalet: management, snow response and local compliance shape the income result. Minpaku is capped nationally at 180 days a year, and local rules can be tighter.</p></section>
           <section class="seo-section"><h2>Income and upside need different stories</h2><p>Fukuoka's case is domestic and regional demand: a practical city base, resilient travel and a lower entry benchmark than global resorts. Hakone and Izu benefit from Tokyo weekend demand, but old homes and uneven rental evidence make them a personal-use-first decision. Hakuba is the earlier-stage ski proposition—lower entry than Niseko, a growing international profile and summer hiking or biking, offset by execution-heavy winter operations.</p><p>Niseko is the premium version: global Asian and Australian ski demand, high winter rates and branded-residence appeal. The cost is a far higher entry level, substantial operating friction and a more concentrated seasonal thesis. Neither resort should be described with a single yield number; owner use, management, snow, maintenance and the local permit route decide the outcome.</p></section>
@@ -6117,6 +6127,8 @@ def build_seo_page(
     .seo-page--japan .seo-section p, .seo-page--japan .seo-section li {{ color: #384540; font-size: 17px; line-height: 1.72; }}
     .seo-page--japan .seo-section p {{ max-width: 72ch; }}
     .seo-page--japan .seo-section p + p {{ margin-top: 1.25em; }}
+    .seo-page--japan .editorial-destination-link {{ color: #202825; font-weight: 600; text-decoration-color: rgba(32, 40, 37, .45); text-decoration-thickness: 1px; text-underline-offset: .16em; }}
+    .seo-page--japan .editorial-destination-link:hover {{ text-decoration-color: #9a5a2d; }}
     .seo-page--japan .japan-inline-visual {{ margin: 32px 0 0; }}
     .seo-page--japan .japan-inline-visual img {{ display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }}
     .seo-page--japan .japan-inline-visual figcaption {{ margin-top: 10px; color: #68726d; font-size: 12px; letter-spacing: .03em; }}
@@ -7049,6 +7061,325 @@ def shared_content_css() -> str:
 """
 
 
+def premium_dossier_schema(dest: dict, canonical: str, spec: PremiumDossierSpec) -> list[dict]:
+    return [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": spec.h1,
+            "description": spec.description,
+            "datePublished": spec.date_published,
+            "dateModified": spec.date_reviewed,
+            "author": {"@type": "Organization", "name": spec.author},
+            "publisher": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL},
+            "mainEntityOfPage": {"@type": "WebPage", "@id": canonical},
+            "image": f"{SITE_URL.rstrip('/')}{spec.images[0].src}",
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Destinations", "item": f"{SITE_URL}dashboard/"},
+                {"@type": "ListItem", "position": 3, "name": dest["name"], "item": canonical},
+            ],
+        },
+    ]
+
+
+def premium_dossier_figure(image, *, hero: bool = False) -> str:
+    class_name = "premium-hero-visual" if hero else f"premium-inline-visual {escape(image.placement_class)}"
+    return (
+        f'<figure class="{class_name}">'
+        f'<img src="{escape(image.src)}" alt="{escape(image.alt)}" loading="{"eager" if hero else "lazy"}">'
+        f'<figcaption>{escape(image.caption)}</figcaption>'
+        "</figure>"
+    )
+
+
+def premium_dossier_score_table(dest: dict) -> str:
+    dimensions = dest.get("decision_dimensions", [])
+    if len(dimensions) != 10 or len({item["key"] for item in dimensions}) != 10:
+        raise ValueError(f"{dest['id']} premium dossier requires exactly 10 score dimensions")
+    rows = "".join(
+        '<tr class="premium-score-row">'
+        f'<th scope="row">{escape(item["label"])}</th>'
+        f'<td class="premium-number">{float(item["score"]):.1f}/5</td>'
+        f'<td class="premium-number">{float(item["weight"]) * 100:.0f}%</td>'
+        f'<td>{escape(item["evidence"])}</td>'
+        "</tr>"
+        for item in dimensions
+    )
+    return (
+        '<div class="premium-table-wrap"><table class="premium-score-table">'
+        '<thead><tr><th>Dimension</th><th>Score</th><th>Weight</th><th>Research read</th></tr></thead>'
+        f'<tbody>{rows}</tbody></table></div>'
+    )
+
+
+def premium_dossier_listing_table(rows: list[dict]) -> str:
+    required = {
+        "property_type",
+        "listing_name",
+        "local_currency",
+        "local_price",
+        "usd_price",
+        "size_m2",
+        "usd_per_m2",
+        "source_name",
+        "source_url",
+        "captured_date",
+        "confidence",
+        "note",
+        "fx_basis",
+    }
+    if not 3 <= len(rows) <= 5:
+        raise ValueError("premium dossier requires three to five representative listings")
+    body = []
+    for row in rows:
+        missing = required - row.keys()
+        if missing or any(row[field] in (None, "") for field in required):
+            raise ValueError(f"incomplete representative listing: {sorted(missing)}")
+        body.append(
+            '<tr class="premium-listing-row">'
+            f'<th scope="row">{escape(row["listing_name"])}</th>'
+            f'<td>{escape(row["property_type"])}</td>'
+            f'<td class="premium-number">{float(row["local_price"]):,.0f} {escape(row["local_currency"])}</td>'
+            f'<td class="premium-number">{money(row["usd_price"])}</td>'
+            f'<td class="premium-number">{float(row["size_m2"]):,.1f} m²</td>'
+            f'<td class="premium-number">{money(row["usd_per_m2"])}/m²</td>'
+            f'<td><a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a><br><span>{escape(row["captured_date"])}</span></td>'
+            f'<td>{escape(row["confidence"])}</td>'
+            f'<td>{escape(row["note"])}</td>'
+            "</tr>"
+        )
+    return (
+        '<div class="premium-table-wrap"><table class="premium-listing-table">'
+        '<thead><tr><th>Observation</th><th>Type</th><th>Asking price</th><th>USD comparison</th><th>Area</th><th>USD/m²</th><th>Source / captured</th><th>Confidence</th><th>What it represents</th></tr></thead>'
+        f'<tbody>{"".join(body)}</tbody></table></div>'
+    )
+
+
+def premium_dossier_lenses_html(spec: PremiumDossierSpec) -> str:
+    images = {item.key: item for item in spec.images}
+    sections = []
+    for lens in spec.lenses:
+        paragraphs = "".join(f"<p>{escape(paragraph)}</p>" for paragraph in lens.paragraphs)
+        figure = premium_dossier_figure(images[lens.image_key]) if lens.image_key else ""
+        sections.append(f'<div class="premium-lens"><h3>{escape(lens.heading)}</h3>{paragraphs}{figure}</div>')
+    return (
+        '<section class="premium-section" id="lenses">'
+        '<h2>Fukuoka / Itoshima through five destination lenses</h2>'
+        f'<p>{escape(spec.lenses_intro)}</p>{"".join(sections)}</section>'
+    )
+
+
+def premium_dossier_micro_locations_html(spec: PremiumDossierSpec) -> str:
+    rows = "".join(
+        '<tr>'
+        f'<th scope="row">{escape(item["name"])}</th>'
+        f'<td>{escape(item["best_for"])}</td>'
+        f'<td>{escape(item["daily_life"])}</td>'
+        f'<td>{escape(item["diligence"])}</td>'
+        "</tr>"
+        for item in spec.micro_locations
+    )
+    return (
+        '<section class="premium-section" id="locations"><h2>Where to look</h2>'
+        f'<p>{escape(spec.micro_locations_intro)}</p>'
+        '<div class="premium-table-wrap"><table class="premium-location-table">'
+        '<thead><tr><th>Micro-location</th><th>Best for</th><th>Daily life</th><th>Primary diligence</th></tr></thead>'
+        f'<tbody>{rows}</tbody></table></div></section>'
+    )
+
+
+def premium_dossier_references_html(spec: PremiumDossierSpec) -> str:
+    links = "".join(
+        f'<li><a href="{escape(item["url"])}" rel="noopener noreferrer">{escape(item["label"])}</a></li>'
+        for item in spec.references
+    )
+    return (
+        '<section class="premium-section premium-references" id="sources">'
+        '<h2>References and update policy</h2>'
+        f'<p>{escape(spec.references_intro)}</p><ol>{links}</ol></section>'
+    )
+
+
+def premium_dossier_css() -> str:
+    return """
+    :root {
+      color: #24312d;
+      background: #f4efe4;
+      --ink: #24312d;
+      --muted: #69736e;
+      --line: rgba(36, 49, 45, .24);
+      --paper: #f4efe4;
+      --accent: #a44e2f;
+      --serif: "Iowan Old Style", "Baskerville", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --sans: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body.premium-dossier { margin: 0; min-width: 320px; overflow-x: hidden; color: var(--ink); background: var(--paper); font-family: var(--sans); }
+    .premium-shell { width: min(1220px, calc(100% - 48px)); margin: 0 auto; }
+    .premium-dossier a { color: #516f65; text-underline-offset: .18em; }
+    .premium-dossier p, .premium-dossier li { font-size: 17px; line-height: 1.72; }
+    .premium-dossier .page-nav { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin: 0 0 38px; padding: 18px 0 16px; border-bottom: 3px solid var(--ink); }
+    .premium-dossier .page-brand { display: flex; }
+    .premium-dossier .primary-brand-logo { display: block; width: 174px; max-width: 48vw; }
+    .premium-dossier .page-nav-links { display: flex; gap: 24px; }
+    .premium-dossier .page-nav-links a { color: var(--ink); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-decoration: none; text-transform: uppercase; }
+    .premium-dossier .mobile-menu { display: none; position: relative; }
+    .premium-dossier .mobile-menu summary { min-height: 44px; display: inline-flex; align-items: center; padding: 0 13px; border: 1px solid var(--line); cursor: pointer; list-style: none; }
+    .premium-dossier .mobile-menu summary::-webkit-details-marker { display: none; }
+    .premium-dossier .mobile-menu nav { position: absolute; right: 0; z-index: 20; width: min(78vw, 280px); display: grid; padding: 8px; border: 1px solid var(--line); background: #f9f5ed; }
+    .premium-dossier .mobile-menu nav a { min-height: 44px; padding: 12px; color: var(--ink); text-decoration: none; }
+    .premium-hero { padding-bottom: 42px; border-bottom: 1px solid var(--line); }
+    .premium-hero-grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(360px, .72fr); gap: clamp(32px, 6vw, 80px); align-items: stretch; }
+    .premium-hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 24px 0 18px; }
+    .premium-hero h1 { max-width: 760px; margin: 0; font-family: var(--serif); font-size: clamp(54px, 6.6vw, 88px); font-weight: 500; line-height: .93; letter-spacing: -.035em; }
+    .premium-lede { max-width: 680px; margin: 28px 0 0; color: #4b5651; font-family: var(--serif); font-size: clamp(19px, 2vw, 24px) !important; line-height: 1.42 !important; }
+    .premium-byline { margin: 20px 0 0; color: var(--muted); font-size: 12px !important; font-weight: 400; }
+    .premium-hero-visual { display: grid; grid-template-rows: 1fr auto; min-height: 520px; margin: 0; background: var(--ink); }
+    .premium-hero-visual img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; }
+    .premium-hero-visual figcaption { padding: 11px 14px; color: #f4efe4; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+    .premium-content { display: grid; grid-template-columns: minmax(0, 830px) 220px; justify-content: space-between; gap: clamp(48px, 8vw, 112px); padding: 72px 0 84px; align-items: start; }
+    .premium-article { min-width: 0; }
+    .premium-section { padding: 46px 0; border-top: 1px solid var(--line); }
+    .premium-article > .premium-section:first-child { padding-top: 0; border-top: 0; }
+    .premium-section h2 { max-width: 720px; margin: 0 0 20px; font-family: var(--serif); font-size: clamp(34px, 4vw, 50px); font-weight: 500; line-height: 1.02; letter-spacing: -.025em; }
+    .premium-lens { padding: 42px 0 0; }
+    .premium-lens + .premium-lens { margin-top: 42px; border-top: 1px solid rgba(36, 49, 45, .16); }
+    .premium-lens h3 { max-width: 690px; margin: 0 0 18px; font-family: var(--serif); font-size: clamp(29px, 3.2vw, 42px); font-weight: 500; line-height: 1.05; letter-spacing: -.02em; }
+    .premium-section p { max-width: 72ch; color: #3b4943; }
+    .premium-section p + p { margin-top: 1.25em; }
+    .premium-inline-visual { margin: 32px 0 0; }
+    .premium-inline-visual img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    .premium-inline-visual figcaption { margin-top: 10px; color: var(--muted); font-size: 12px; letter-spacing: .03em; }
+    .premium-score-total { margin: 22px 0 0; font-family: var(--serif); font-size: 21px !important; }
+    .premium-table-wrap { width: 100%; max-width: 100%; margin-top: 28px; overflow-x: auto; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--ink); }
+    .premium-table-wrap table { width: 100%; min-width: 760px; border-collapse: collapse; background: transparent; }
+    .premium-listing-table { min-width: 1180px !important; }
+    .premium-table-wrap th, .premium-table-wrap td { padding: 15px 11px; border-top: 1px solid rgba(36, 49, 45, .18); text-align: left; vertical-align: top; font-size: 13px; line-height: 1.5; }
+    .premium-table-wrap thead th { border-top: 0; color: var(--ink); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
+    .premium-table-wrap tbody th { font-weight: 600; }
+    .premium-number { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .premium-table-wrap span { color: var(--muted); }
+    .premium-disclaimer { color: var(--muted) !important; font-size: 13px !important; }
+    .premium-checklist { margin: 24px 0 0; padding-left: 26px; }
+    .premium-checklist li { padding: 8px 0 8px 6px; border-top: 1px solid rgba(36, 49, 45, .14); }
+    .premium-handoff { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
+    .premium-handoff a { font-weight: 600; }
+    .premium-references ol { columns: 2; column-gap: 38px; margin: 28px 0 0; padding-left: 22px; }
+    .premium-references li { break-inside: avoid; padding: 0 0 10px 4px; font-size: 13px; line-height: 1.5; }
+    .premium-rail { position: sticky; top: 24px; padding-top: 14px; border-top: 3px solid var(--ink); }
+    .premium-rail h2 { margin: 0 0 8px; color: var(--accent); font-size: 11px; font-weight: 600; letter-spacing: .11em; text-transform: uppercase; }
+    .premium-rail nav { display: grid; }
+    .premium-rail nav a { padding: 11px 0; border-top: 1px solid rgba(36, 49, 45, .16); color: var(--ink); font-size: 14px; font-weight: 500; text-decoration: none; }
+    .premium-rail-action { margin-top: 28px; padding: 18px 0; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .premium-rail-action p { margin: 0 0 14px; font-family: var(--serif); font-size: 17px; line-height: 1.35; }
+    .premium-button { display: inline-flex; min-height: 44px; align-items: center; padding: 0 15px; background: var(--ink); color: #f4efe4 !important; font-size: 12px; font-weight: 500; letter-spacing: .05em; text-decoration: none; text-transform: uppercase; }
+    .premium-footer { padding: 28px 0 42px; border-top: 1px solid var(--line); color: var(--muted); }
+    .premium-footer p { margin: 6px 0 0; font-size: 13px; }
+    @media (max-width: 900px) {
+      .premium-hero-grid, .premium-content { grid-template-columns: 1fr; }
+      .premium-hero-visual { min-height: 400px; }
+      .premium-content { padding-top: 52px; }
+      .premium-rail { position: static; order: -1; }
+      .premium-rail nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .premium-rail nav a:nth-child(2n) { padding-left: 18px; }
+    }
+    @media (max-width: 560px) {
+      .premium-shell { width: min(100% - 28px, 1220px); }
+      .premium-dossier .page-nav-links { display: none; }
+      .premium-dossier .mobile-menu { display: block; }
+      .premium-hero h1 { font-size: clamp(46px, 15vw, 64px); }
+      .premium-hero-visual { min-height: 330px; }
+      .premium-content { padding: 42px 0 64px; }
+      .premium-section { padding: 38px 0; }
+      .premium-section p, .premium-section li { font-size: 16px; }
+      .premium-lens { padding-top: 34px; }
+      .premium-lens + .premium-lens { margin-top: 34px; }
+      .premium-rail nav { grid-template-columns: 1fr; }
+      .premium-rail nav a:nth-child(2n) { padding-left: 0; }
+      .premium-references ol { columns: 1; }
+    }
+    """
+
+
+def build_premium_destination_page(
+    dest: dict,
+    listings: list[dict],
+    destinations: list[dict],
+    pages: list[dict],
+    spec: PremiumDossierSpec,
+) -> str:
+    del destinations, pages
+    validate_premium_dossier(spec)
+    canonical = destination_url(dest)
+    rows = [row for row in listings if row.get("destination_id") == dest["id"]]
+    verdict = "".join(f"<p>{escape(paragraph)}</p>" for paragraph in spec.verdict_paragraphs)
+    checklist = "".join(f"<li>{escape(item)}</li>" for item in spec.checklist)
+    rail_links = "".join(f'<a href="#{escape(anchor)}">{escape(label)}</a>' for anchor, label in spec.nav_items)
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(spec.title, spec.description, canonical, premium_dossier_schema(dest, canonical, spec))}
+  <style>{premium_dossier_css()}</style>
+</head>
+<body class="premium-dossier">
+  <header class="premium-hero">
+    <div class="premium-shell">
+      {primary_nav_html()}
+      <div class="premium-hero-grid">
+        <div class="premium-hero-copy">
+          <h1>{escape(spec.h1)}</h1>
+          <p class="premium-lede">{escape(spec.lede)}</p>
+          <p class="premium-byline">By {escape(spec.author)} · Published {escape(spec.date_published)} · Reviewed {escape(spec.date_reviewed)}</p>
+        </div>
+        {premium_dossier_figure(spec.images[0], hero=True)}
+      </div>
+    </div>
+  </header>
+  <main>
+    <div class="premium-shell premium-content">
+      <article class="premium-article">
+        <section class="premium-section" id="verdict"><h2>The verdict</h2>{verdict}</section>
+        {premium_dossier_lenses_html(spec)}
+        <section class="premium-section" id="scores">
+          <h2>The Atlas assessment</h2>
+          <p>These comparative inputs connect the dossier to the same ten-dimension model used across Global Home Atlas. They are research judgments, not forecasts.</p>
+          {premium_dossier_score_table(dest)}
+          <p class="premium-score-total"><strong>Weighted assessment: {float(dest["decision_score"]):.1f}/5.</strong> Reviewed {escape(spec.date_reviewed)}. <a href="/methodology/">Read the scoring methodology</a>.</p>
+        </section>
+        <section class="premium-section" id="listings">
+          <h2>Representative property evidence</h2>
+          <p>Three observations show the spread between a practical western-Fukuoka apartment, an Itoshima lifestyle house and a higher-end coastal asset. Local asking price is primary; USD uses the recorded dataset exchange basis.</p>
+          {premium_dossier_listing_table(rows)}
+          <p class="premium-disclaimer">Asking-price evidence only. Global Home Atlas has not verified availability, title, legal use, building condition, negotiability, fees or completed transaction value.</p>
+        </section>
+        {premium_dossier_micro_locations_html(spec)}
+        <section class="premium-section" id="checklist">
+          <h2>Buyer checklist—in decision order</h2>
+          <ol class="premium-checklist">{checklist}</ol>
+          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="/japan-retirement-property-foreign-buyers/">Japan retirement property guide</a>. To compare the destination with other markets, <a href="/dashboard/">open the full Atlas</a>.</p>
+        </section>
+        {premium_dossier_references_html(spec)}
+      </article>
+      <aside class="premium-rail" aria-label="In this dossier">
+        <h2>In this dossier</h2><nav>{rail_links}</nav>
+        <div class="premium-rail-action"><p>Compare Fukuoka / Itoshima with the full Atlas.</p><a class="premium-button" href="/dashboard/">Open the Atlas</a></div>
+      </aside>
+    </div>
+  </main>
+  <footer class="premium-footer"><div class="premium-shell"><strong>{SITE_NAME}</strong><p>Independent research for global home buyers. Verify current legal, tax, immigration and property rules locally.</p></div></footer>
+{analytics_event_script()}
+</body>
+</html>
+"""
+
+
 def schema_for_destination(
     dest: dict,
     canonical: str,
@@ -7088,6 +7419,21 @@ def build_destination_page(
     pages: list[dict],
     content_overrides: list[dict] | None = None,
 ) -> str:
+    premium_spec = get_premium_dossier(dest["id"])
+    premium_rows = [row for row in listings if row.get("destination_id") == dest["id"]]
+    has_destination_override = any(
+        row.get("target_url") == destination_url(dest)
+        for row in (content_overrides or [])
+    )
+    premium_ready = (
+        premium_spec is not None
+        and not has_destination_override
+        and len(dest.get("decision_dimensions", [])) == 10
+        and 3 <= len(premium_rows) <= 5
+    )
+    if premium_ready:
+        return build_premium_destination_page(dest, listings, destinations, pages, premium_spec)
+
     slug = destination_slug(dest)
     canonical = destination_url(dest)
     title = f"{dest['name']} Property Research | Global Home Atlas"
