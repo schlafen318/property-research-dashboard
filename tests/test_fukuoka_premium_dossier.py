@@ -178,6 +178,17 @@ class PremiumDossierRenderingTests(unittest.TestCase):
             self.fukuoka_html,
         )
 
+    def test_score_table_uses_plain_reader_facing_language(self) -> None:
+        self.assertIn(
+            "Here’s how Fukuoka / Itoshima scores on the ten factors that matter most when choosing a long-term home abroad.",
+            self.fukuoka_html,
+        )
+        self.assertIn("<th>Atlas read</th>", self.fukuoka_html)
+        self.assertNotIn("comparative inputs", self.fukuoka_html.lower())
+        self.assertNotIn("research judgments", self.fukuoka_html.lower())
+        self.assertNotIn("<th>Research read</th>", self.fukuoka_html)
+        self.assertNotIn("<th>What it means</th>", self.fukuoka_html)
+
     def test_page_has_authorship_schema_links_and_final_references(self) -> None:
         self.assertIn("Global Home Atlas Research Team", self.fukuoka_html)
         self.assertIn('"@type":"Article"', self.fukuoka_html)
@@ -238,6 +249,7 @@ class PremiumDossierPublishingRuleTests(unittest.TestCase):
         self.assertIn("three to five representative listing observations", checklist)
         self.assertIn("exactly one 10-row score table", checklist)
         self.assertIn("destination-specific research read", checklist)
+        self.assertIn("plain reader-facing language", checklist)
 
 
 if __name__ == "__main__":
