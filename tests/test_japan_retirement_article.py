@@ -124,14 +124,31 @@ class JapanRetirementArticleTests(unittest.TestCase):
         html = rendered_article()
 
         self.assertIn('<body class="seo-page seo-page--japan">', html)
-        self.assertIn('class="japan-hero-visual"', html)
-        self.assertIn('/assets/market-fukuoka-itoshima-900.webp', html)
+        self.assertIn('class="japan-hero-visual destination-visual-story"', html)
+        self.assertIn('/assets/fukuoka-itoshima-coast.webp', html)
         self.assertIn('class="seo-aside japan-guide-rail"', html)
         self.assertIn('href="#residency"', html)
         self.assertIn('href="#comparison"', html)
         self.assertIn('href="#sources"', html)
         self.assertIn('.seo-page--japan .seo-section', html)
         self.assertIn('--editorial-serif:', html)
+
+    def test_hero_uses_repeatable_three_image_destination_story(self) -> None:
+        html = rendered_article()
+
+        self.assertIn('class="japan-hero-visual destination-visual-story"', html)
+        self.assertIn('class="destination-visual-story__grid"', html)
+        self.assertEqual(3, html.count('class="destination-visual-story__image'))
+        for asset in (
+            "/assets/fukuoka-itoshima-coast.webp",
+            "/assets/fukuoka-itoshima-seaside-life.webp",
+            "/assets/fukuoka-itoshima-city-access.webp",
+        ):
+            self.assertIn(asset, html)
+        self.assertIn(
+            "Fukuoka / Itoshima · Coast, culture and city convenience",
+            html,
+        )
 
     def test_editorial_labels_and_guide_rail_use_restrained_typography(self) -> None:
         html = rendered_article()
