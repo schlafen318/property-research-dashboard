@@ -124,7 +124,7 @@ class JapanRetirementArticleTests(unittest.TestCase):
         html = rendered_article()
 
         self.assertIn('<body class="seo-page seo-page--japan">', html)
-        self.assertIn('class="japan-hero-visual destination-visual-story"', html)
+        self.assertIn('class="japan-hero-visual destination-editorial-figure"', html)
         self.assertIn('/assets/fukuoka-itoshima-coast.webp', html)
         self.assertIn('class="seo-aside japan-guide-rail"', html)
         self.assertIn('href="#residency"', html)
@@ -133,18 +133,36 @@ class JapanRetirementArticleTests(unittest.TestCase):
         self.assertIn('.seo-page--japan .seo-section', html)
         self.assertIn('--editorial-serif:', html)
 
-    def test_hero_uses_repeatable_three_image_destination_story(self) -> None:
+    def test_destination_images_are_distributed_through_relevant_sections(self) -> None:
         html = rendered_article()
 
-        self.assertIn('class="japan-hero-visual destination-visual-story"', html)
-        self.assertIn('class="destination-visual-story__grid"', html)
-        self.assertEqual(3, html.count('class="destination-visual-story__image'))
+        self.assertNotIn('class="destination-visual-story__grid"', html)
+        self.assertEqual(3, html.count(' destination-editorial-figure">'))
         for asset in (
             "/assets/fukuoka-itoshima-coast.webp",
             "/assets/fukuoka-itoshima-seaside-life.webp",
             "/assets/fukuoka-itoshima-city-access.webp",
         ):
-            self.assertIn(asset, html)
+            self.assertEqual(1, html.count(asset))
+
+        header_end = html.index("</header>")
+        live_well = html.index("Live well, year after year")
+        reach_it = html.index("Reach it easily—and feel at home there")
+        own_cleanly = html.index("Own and operate cleanly")
+
+        self.assertLess(html.index("/assets/fukuoka-itoshima-coast.webp"), header_end)
+        self.assertGreater(
+            html.index("/assets/fukuoka-itoshima-seaside-life.webp"), live_well
+        )
+        self.assertLess(
+            html.index("/assets/fukuoka-itoshima-seaside-life.webp"), reach_it
+        )
+        self.assertGreater(
+            html.index("/assets/fukuoka-itoshima-city-access.webp"), reach_it
+        )
+        self.assertLess(
+            html.index("/assets/fukuoka-itoshima-city-access.webp"), own_cleanly
+        )
         self.assertIn(
             "Fukuoka / Itoshima · Coast, culture and city convenience",
             html,

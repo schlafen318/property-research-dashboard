@@ -5402,20 +5402,13 @@ def country_cluster_visual(destinations: list[dict]) -> str:
     """
 
 
-def destination_visual_story_html(
-    images: list[dict[str, str]], caption: str, figure_class: str = ""
+def destination_editorial_figure_html(
+    image: dict[str, str], caption: str, figure_class: str = ""
 ) -> str:
-    image_html = []
-    for index, image in enumerate(images):
-        position = " destination-visual-story__image--primary" if index == 0 else ""
-        image_html.append(
-            f'<img class="destination-visual-story__image{position}" '
-            f'src="{escape(image["src"])}" alt="{escape(image["alt"])}">'
-        )
-    classes = f"{figure_class} destination-visual-story".strip()
+    classes = f"{figure_class} destination-editorial-figure".strip()
     return (
         f'<figure class="{classes}">'
-        f'<div class="destination-visual-story__grid">{"".join(image_html)}</div>'
+        f'<img src="{escape(image["src"])}" alt="{escape(image["alt"])}">'
         f'<figcaption>{escape(caption)}</figcaption></figure>'
     )
 
@@ -5639,12 +5632,28 @@ def build_seo_page(
         }
         else ""
     )
+    seaside_life_figure = destination_editorial_figure_html(
+        {
+            "src": "/assets/fukuoka-itoshima-seaside-life.webp",
+            "alt": "A quiet coastal lane, local produce and everyday seaside life in Itoshima",
+        },
+        "Itoshima · Everyday life keeps the coast close",
+        "japan-inline-visual",
+    )
+    city_access_figure = destination_editorial_figure_html(
+        {
+            "src": "/assets/fukuoka-itoshima-city-access.webp",
+            "alt": "Fukuoka waterfront promenade connecting calm public space with the compact city",
+        },
+        "Fukuoka · Waterfront calm with compact-city convenience",
+        "japan-inline-visual",
+    )
     editorial_content = ""
     if page["slug"] == "japan-retirement-property-foreign-buyers":
-        editorial_content = """
+        editorial_content = f"""
           <section class="seo-section" id="lenses"><h2>Japan through five retirement lenses</h2><p>Japan is compelling for retirement not because it is cheap or effortless, but because a few places make daily life unusually dependable. We use the same ten-pillar methodology as the Atlas, grouped here into five questions that matter most when a home must work for months, not weekends.</p></section>
-          <section class="seo-section"><h2>Live well, year after year</h2><p>Fukuoka and Itoshima are the strongest all-season answer: city hospitals, a serious food culture and Kyushu at the doorstep, with coast available when the day should slow down. Hakone and Izu exchange city energy for onsen, gardens and a Tokyo-adjacent rhythm. Hakuba and Niseko are more deliberate choices: outstanding winter, increasingly credible green-season activity, but a life shaped by snow and shoulder season.</p><p>Healthcare follows a sequence. A long-stay residence status comes first; then you register an address with the municipality. The Ministry of Health says eligible foreign residents, including those living in Japan for more than three months, can join the public system—through employee cover when employed, or National Health Insurance otherwise. A property deed does not create residency or coverage. Fukuoka therefore has the clearest retirement utility of the four, while a mountain or resort home asks you to accept longer journeys for specialist care and a more seasonal social calendar.</p></section>
-          <section class="seo-section"><h2>Reach it easily—and feel at home there</h2><p>Fukuoka wins on friction: JNTO notes that Hakata is a five-minute train ride from Fukuoka Airport. That changes how often a home gets used, and makes Korea, Taiwan and wider Asian connections genuinely convenient. Hakone and Izu work for Tokyo-based lives; Hakuba and Niseko require a winter-transfer plan, not a romantic assumption about the last mile.</p><p>Niseko has the most established international resort ecosystem and strong Chinese-speaking familiarity. Fukuoka offers deeper year-round urban services. In every location, Japanese remains the language of tradespeople, clinics and municipal administration; politeness is generous, but integration comes through repetition and language effort rather than an English-speaking bubble.</p></section>
+          <section class="seo-section"><h2>Live well, year after year</h2><p>Fukuoka and Itoshima are the strongest all-season answer: city hospitals, a serious food culture and Kyushu at the doorstep, with coast available when the day should slow down. Hakone and Izu exchange city energy for onsen, gardens and a Tokyo-adjacent rhythm. Hakuba and Niseko are more deliberate choices: outstanding winter, increasingly credible green-season activity, but a life shaped by snow and shoulder season.</p><p>Healthcare follows a sequence. A long-stay residence status comes first; then you register an address with the municipality. The Ministry of Health says eligible foreign residents, including those living in Japan for more than three months, can join the public system—through employee cover when employed, or National Health Insurance otherwise. A property deed does not create residency or coverage. Fukuoka therefore has the clearest retirement utility of the four, while a mountain or resort home asks you to accept longer journeys for specialist care and a more seasonal social calendar.</p>{seaside_life_figure}</section>
+          <section class="seo-section"><h2>Reach it easily—and feel at home there</h2><p>Fukuoka wins on friction: JNTO notes that Hakata is a five-minute train ride from Fukuoka Airport. That changes how often a home gets used, and makes Korea, Taiwan and wider Asian connections genuinely convenient. Hakone and Izu work for Tokyo-based lives; Hakuba and Niseko require a winter-transfer plan, not a romantic assumption about the last mile.</p><p>Niseko has the most established international resort ecosystem and strong Chinese-speaking familiarity. Fukuoka offers deeper year-round urban services. In every location, Japanese remains the language of tradespeople, clinics and municipal administration; politeness is generous, but integration comes through repetition and language effort rather than an English-speaking bubble.</p>{city_access_figure}</section>
           <section class="seo-section"><h2>Own and operate cleanly</h2><p>Foreigners can generally own Japanese land and buildings freehold. That clarity is a real advantage, but it is separate from residency, financing and public-health eligibility. For a non-resident purchase, the Ministry of Finance says FEFTA reporting is generally required through the Bank of Japan within 20 days after acquisition. Real estate acquisition tax and registration licence tax are separate purchase costs; fixed-asset tax is an ongoing owner cost. Where the seller is also non-resident, Japanese withholding rules can affect settlement, so the payment route needs a tax adviser before contracts are exchanged.</p><p>Before signing, the agent's Important Matters Explanation is where the relevant rights, restrictions and hazard information should be explained; closing and registration then record the transfer. The explanation must show the property's location on the official flood-hazard map. Treat that as a starting point, not a clean bill of health: in Hakone and Izu, older stock, slope, typhoon and earthquake exposure are part of the asset; in Hakuba and Niseko, snow load, winter access and heating systems are. Rental use is equally market-specific. In Niseko and Hakuba, the operating model matters as much as the chalet: management, snow response and local compliance shape the income result. Minpaku is capped nationally at 180 days a year, and local rules can be tighter.</p></section>
           <section class="seo-section"><h2>Income and upside need different stories</h2><p>Fukuoka's case is domestic and regional demand: a practical city base, resilient travel and a lower entry benchmark than global resorts. Hakone and Izu benefit from Tokyo weekend demand, but old homes and uneven rental evidence make them a personal-use-first decision. Hakuba is the earlier-stage ski proposition—lower entry than Niseko, a growing international profile and summer hiking or biking, offset by execution-heavy winter operations.</p><p>Niseko is the premium version: global Asian and Australian ski demand, high winter rates and branded-residence appeal. The cost is a far higher entry level, substantial operating friction and a more concentrated seasonal thesis. Neither resort should be described with a single yield number; owner use, management, snow, maintenance and the local permit route decide the outcome.</p></section>
           <section class="seo-section"><h2>Preserve the exit—and the entry discipline</h2><p>Fukuoka is the broadest retirement asset of the four because domestic city demand sits beneath the foreign-buyer story. Hakone and Izu can offer striking low entry prices, but the gap between a charming bargain and an expensive renovation is wide. Hakuba has thinner liquidity than Niseko, so the price paid and the operator selected matter more.</p><p>Niseko has the clearest international resort buyer pool, but prime Hirafu pricing already reflects that recognition. The retirement conclusion is not that one location wins every pillar: choose Fukuoka for year-round use, Hakone or Izu for Tokyo-adjacent escape, Hakuba for earlier-stage mountain upside, and Niseko only when the premium winter thesis and its costs are fully acceptable.</p></section>
@@ -5668,21 +5677,11 @@ def build_seo_page(
     callout_after_overview = retirement_callout if is_japan_article else ""
     body_class = "seo-page seo-page--japan" if is_japan_article else "seo-page"
     japan_hero_visual = (
-        destination_visual_story_html(
-            [
-                {
-                    "src": "/assets/fukuoka-itoshima-coast.webp",
-                    "alt": "The blue-green sea, beach and wooded coastline of Itoshima near Fukuoka",
-                },
-                {
-                    "src": "/assets/fukuoka-itoshima-seaside-life.webp",
-                    "alt": "A quiet coastal lane, local produce and everyday seaside life in Itoshima",
-                },
-                {
-                    "src": "/assets/fukuoka-itoshima-city-access.webp",
-                    "alt": "Fukuoka waterfront promenade connecting calm public space with the compact city",
-                },
-            ],
+        destination_editorial_figure_html(
+            {
+                "src": "/assets/fukuoka-itoshima-coast.webp",
+                "alt": "The blue-green sea, beach and wooded coastline of Itoshima near Fukuoka",
+            },
             "Fukuoka / Itoshima · Coast, culture and city convenience",
             "japan-hero-visual",
         )
@@ -5861,9 +5860,7 @@ def build_seo_page(
     .seo-page--japan .seo-eyebrow {{ color: #9a5a2d; font-size: 10px; letter-spacing: .16em; }}
     .seo-page--japan .japan-section-label {{ font-weight: 500; }}
     .seo-page--japan .japan-hero-visual {{ display: grid; grid-template-rows: 1fr auto; min-height: 530px; margin: 0; background: #202825; }}
-    .seo-page--japan .destination-visual-story__grid {{ display: grid; grid-template-columns: minmax(0, 1.35fr) minmax(0, .85fr); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 3px; min-height: 0; }}
-    .seo-page--japan .destination-visual-story__image {{ width: 100%; height: 100%; min-height: 0; object-fit: cover; }}
-    .seo-page--japan .destination-visual-story__image--primary {{ grid-row: 1 / 3; }}
+    .seo-page--japan .japan-hero-visual img {{ display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; }}
     .seo-page--japan .japan-hero-visual figcaption {{ padding: 11px 14px; color: #f3efe5; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }}
     .seo-page--japan main {{ margin-top: 0; }}
     .seo-page--japan .seo-content {{ grid-template-columns: minmax(0, 830px) 220px; justify-content: space-between; gap: clamp(48px, 8vw, 112px); padding: 72px 0 84px; }}
@@ -5875,6 +5872,9 @@ def build_seo_page(
     .seo-page--japan .seo-section p, .seo-page--japan .seo-section li {{ color: #384540; font-size: 17px; line-height: 1.72; }}
     .seo-page--japan .seo-section p {{ max-width: 72ch; }}
     .seo-page--japan .seo-section p + p {{ margin-top: 1.25em; }}
+    .seo-page--japan .japan-inline-visual {{ margin: 32px 0 0; }}
+    .seo-page--japan .japan-inline-visual img {{ display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }}
+    .seo-page--japan .japan-inline-visual figcaption {{ margin-top: 10px; color: #68726d; font-size: 12px; letter-spacing: .03em; }}
     .seo-page--japan .seo-table-wrap {{ margin-top: 28px; border: 0; border-top: 3px solid #202825; border-bottom: 1px solid #202825; border-radius: 0; }}
     .seo-page--japan .seo-table {{ background: transparent; }}
     .seo-page--japan .seo-table th, .seo-page--japan .seo-table td {{ padding: 16px 12px; border-color: rgba(32, 40, 37, .2); }}
