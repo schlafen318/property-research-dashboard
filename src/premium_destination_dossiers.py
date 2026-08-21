@@ -47,6 +47,7 @@ class PremiumDossierSpec:
     verdict_paragraphs: tuple[str, ...]
     lenses_intro: str
     lenses: tuple[DossierLens, ...]
+    score_reads: dict[str, str]
     micro_locations_intro: str
     micro_locations: tuple[dict[str, str], ...]
     checklist: tuple[str, ...]
@@ -66,7 +67,7 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
     ),
     author="Global Home Atlas Research Team",
     date_published="2026-08-21",
-    date_reviewed="2026-08-21",
+    date_reviewed="2026-08-22",
     verdict_paragraphs=(
         "The verdict is positive with one controlling condition: establish a credible right to live in Japan before treating the property as a retirement home. Foreigners can generally acquire Japanese real estate, but a deed does not create residence status, public-healthcare eligibility or domestic borrowing access. Japan has no general retirement visa. The official designated-activities route for long sightseeing permits six months and may be extended to a maximum of one year for eligible applicants, but it requires substantial savings, private medical travel insurance and does not accept dependent children. Fukuoka City also says that people staying under the sightseeing-and-recreation form of designated activities cannot join its National Health Insurance. A buyer planning full-time retirement therefore needs a different, renewable residence basis confirmed before purchase.",
         "Subject to that constraint, Fukuoka / Itoshima suits a buyer who values safe, service-rich daily life more than trophy scarcity or aggressive yield. It is especially credible for someone comfortable using Japanese professional help, willing to separate Fukuoka’s urban convenience from Itoshima’s coastal logistics, and prepared to own a home for personal utility even if short-term rental income disappoints. It is weaker for anyone who expects the purchase to solve immigration, needs high non-resident leverage, refuses car dependence but wants a remote beach setting, or requires a simple absentee rental business.",
@@ -124,6 +125,18 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
             ),
         ),
     ),
+    score_reads={
+        "lifestyle_magnetism": "Fukuoka combines food, waterfront and year-round city life; Itoshima adds beaches and space, with a more car-dependent rhythm.",
+        "global_access": "Fukuoka Airport reaches Hakata in about five minutes by subway, while coastal Itoshima adds meaningful last-mile time and transport risk.",
+        "ownership_clarity": "Fukuoka and Itoshima follow Japan’s generally open foreign-ownership framework, but non-resident reporting, tax administration and Japanese-language professional support remain necessary.",
+        "regulatory_safety": "Fukuoka and Itoshima require address-level hazard review; short-stay use also faces the 180-night national cap, local rules and building restrictions.",
+        "rental_profit": "Fukuoka has broad long-term residential demand; Itoshima coastal rentals face greater seasonality, management cost, operator dependence and a thinner evidence base.",
+        "capital_upside": "Fukuoka’s population and infrastructure support the case, while Itoshima appreciation is more asset-selective and should not be treated as guaranteed.",
+        "retirement_fit": "Fukuoka offers hospitals, transit and daily services, but legal residence must precede public-healthcare access; remote Itoshima increases driving dependence.",
+        "exit_liquidity": "Fukuoka’s urban and rail-served homes reach a broader buyer pool; singular or isolated Itoshima coastal houses can take longer to resell.",
+        "foreigner_fit": "Fukuoka provides multilingual support and strong regional access, but property documents, tax notices and ongoing Itoshima management may still operate in Japanese.",
+        "value_entry": "Fukuoka apartments, Maebaru houses and premium Itoshima coastal homes span very different price points, maintenance burdens and future buyer pools.",
+    },
     micro_locations_intro=(
         "The useful comparison is not Fukuoka versus Itoshima in the abstract. It is a progression from fully urban and transit-led living to lower-density coastal living. Boundaries below are decision aids rather than price zones; confirm the exact address, school district, planning designation, hazard layers and transport timetable."
     ),
@@ -207,6 +220,11 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
     for lens in spec.lenses:
         if not lens.heading.strip() or not lens.paragraphs or any(not paragraph.strip() for paragraph in lens.paragraphs):
             raise ValueError("every lens requires a heading and non-empty paragraphs")
+
+    if set(spec.score_reads) != DECISION_DIMENSION_KEYS:
+        raise ValueError("premium dossier requires one research read for every decision dimension")
+    if any(not research_read.strip() for research_read in spec.score_reads.values()):
+        raise ValueError("premium dossier research reads must not be empty")
 
     if len(spec.nav_items) > 7:
         raise ValueError("premium dossier navigation may contain at most seven items")

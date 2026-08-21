@@ -78,7 +78,7 @@ Apply this gate to every premium destination dossier in addition to the general 
 - [ ] The verdict appears before scores, listings, methodology, or promotional actions and states who should proceed, pause, or look elsewhere.
 - [ ] Five editorial lenses cover all ten Atlas dimensions exactly once: lifestyle magnetism + retirement fit; global access + foreigner fit; ownership clarity + regulatory safety; rental profit + capital upside; value entry + exit liquidity.
 - [ ] The narrative explains buyer consequences and does not repeat the score rationales.
-- [ ] The page contains exactly one 10-row score table, and its weighted result is derived from the destination dataset rather than overridden in the article.
+- [ ] The page contains exactly one 10-row score table, its weighted result is derived from the destination dataset rather than overridden in the article, and every row includes a concise destination-specific research read rather than a generic methodology definition.
 - [ ] Three to five representative listing observations show distinct buyer cases, use local currency first, record area and price per square metre, include a dated USD basis, link the source, state capture date and confidence, and carry an asking-price disclaimer.
 - [ ] The visible benchmark, listing evidence, value-entry assessment, and confidence statement do not materially contradict one another.
 - [ ] One compact micro-location table distinguishes daily-life pattern and primary diligence; it is not duplicated as cards.
