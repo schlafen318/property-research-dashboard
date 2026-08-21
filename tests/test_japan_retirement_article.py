@@ -179,12 +179,20 @@ class JapanRetirementArticleTests(unittest.TestCase):
             html,
         )
 
-    def test_article_byline_uses_regular_not_bold_weight(self) -> None:
+    def test_article_consolidates_hero_metadata_in_regular_weight_byline(self) -> None:
         html = rendered_article()
 
+        self.assertNotIn(
+            '<p class="seo-eyebrow">Japan buyer guide',
+            html,
+        )
         self.assertIn(
             'class="seo-byline" style="margin:12px 0 0;color:rgba(36,49,45,.68);'
             'font-size:13px;font-weight:400"',
+            html,
+        )
+        self.assertIn(
+            "By Global Home Atlas Research Team · Published 2026-06-23 · Updated 2026-08-21",
             html,
         )
 

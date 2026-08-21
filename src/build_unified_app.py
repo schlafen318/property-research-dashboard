@@ -5591,13 +5591,21 @@ def build_seo_page(
     intro = page.get("generated_intro") or description
     generated_link = generated_internal_link_html(page)
     updated = date.today().isoformat()
+    is_japan_article = is_japan_retirement_guide(page)
     country_count = len({item.get("country") for item in selected if item.get("country")})
-    author_weight = 400 if page["slug"] == "japan-retirement-property-foreign-buyers" else 750
+    author_weight = 400 if is_japan_article else 750
+    published = escape(page.get("date_published", ""))
+    author_dates = (
+        f"Published {published} · Updated {updated}"
+        if is_japan_article
+        else f"First published {published}"
+    )
     author_html = (
-        f'<p class="seo-byline" style="margin:12px 0 0;color:rgba(36,49,45,.68);font-size:13px;font-weight:{author_weight}">By {escape(page["author"])} · First published {escape(page["date_published"])}</p>'
+        f'<p class="seo-byline" style="margin:12px 0 0;color:rgba(36,49,45,.68);font-size:13px;font-weight:{author_weight}">By {escape(page["author"])} · {author_dates}</p>'
         if page.get("author") and page.get("date_published")
         else ""
     )
+    hero_eyebrow = "" if is_japan_article else f'<p class="seo-eyebrow">{escape(page["theme"])} · updated {updated}</p>'
     hero_detail_html = f"{author_html}\n{generated_link}" if author_html else generated_link
     overview_html = seo_overview_html(page, selected)
     comparison_html = seo_comparison_html(page, selected, top, runner_up)
@@ -5630,7 +5638,6 @@ def build_seo_page(
             <p>The right answer for {escape(page["keyword"])} is rarely the destination with the prettiest photos or the highest advertised yield. A global buyer needs a place that can survive legal review, repeated use, currency shifts, maintenance surprises, and a future resale process.</p>
           </section>
         """
-    is_japan_article = is_japan_retirement_guide(page)
     if is_japan_article:
         overview_html = f"{overview_html}{editorial_content}"
     hero_actions = "" if is_japan_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a><a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a></div>'''
@@ -5894,7 +5901,7 @@ def build_seo_page(
       {primary_nav_html("seo")}
       <div class="seo-hero-grid">
         <div>
-          <p class="seo-eyebrow">{escape(page["theme"])} · updated {updated}</p>
+          {hero_eyebrow}
           <h1>{escape(page["h1"])}</h1>
           <p class="seo-lede">{escape(intro)} This guide is written for {escape(page["intent"])}.</p>
           {hero_detail_html}
