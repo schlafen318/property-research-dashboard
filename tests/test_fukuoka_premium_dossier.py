@@ -122,7 +122,7 @@ class PremiumDossierListingTests(unittest.TestCase):
 class PremiumDossierRenderingTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        from src.build_unified_app import build_destination_page, consolidate_destination
+        from src.build_unified_app import build_destination_page, consolidate_destination, load_content_overrides
 
         root = Path(__file__).parents[1]
         destinations = json.loads((root / "data" / "destinations.json").read_text())
@@ -132,6 +132,13 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         valencia = next(row for row in enriched if row["id"] == "valencia")
         cls.fukuoka_html = build_destination_page(fukuoka, listings, enriched, [])
         cls.valencia_html = build_destination_page(valencia, listings, enriched, [])
+        cls.fukuoka_html_with_site_overrides = build_destination_page(
+            fukuoka,
+            listings,
+            enriched,
+            [],
+            content_overrides=load_content_overrides(),
+        )
 
     def test_fukuoka_uses_the_premium_renderer_in_specification_order(self) -> None:
         self.assertIn('<body class="premium-dossier">', self.fukuoka_html)
@@ -162,6 +169,9 @@ class PremiumDossierRenderingTests(unittest.TestCase):
     def test_other_destinations_keep_the_generic_renderer(self) -> None:
         self.assertNotIn('<body class="premium-dossier">', self.valencia_html)
         self.assertNotIn('id="lenses"', self.valencia_html)
+
+    def test_unrelated_site_overrides_do_not_disable_premium_renderer(self) -> None:
+        self.assertIn('<body class="premium-dossier">', self.fukuoka_html_with_site_overrides)
 
     def test_three_images_are_distributed_once_with_accessible_text(self) -> None:
         spec = get_premium_dossier("fukuoka-itoshima")

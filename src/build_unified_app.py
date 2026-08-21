@@ -7421,9 +7421,13 @@ def build_destination_page(
 ) -> str:
     premium_spec = get_premium_dossier(dest["id"])
     premium_rows = [row for row in listings if row.get("destination_id") == dest["id"]]
+    has_destination_override = any(
+        row.get("target_url") == destination_url(dest)
+        for row in (content_overrides or [])
+    )
     premium_ready = (
         premium_spec is not None
-        and not content_overrides
+        and not has_destination_override
         and len(dest.get("decision_dimensions", [])) == 10
         and 3 <= len(premium_rows) <= 5
     )
