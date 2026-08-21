@@ -120,6 +120,19 @@ class JapanRetirementArticleTests(unittest.TestCase):
         sources = html.index('id="sources"')
         self.assertNotIn('<section class="seo-section"', html[sources + 1 : article_end])
 
+    def test_article_uses_premium_editorial_layout(self) -> None:
+        html = rendered_article()
+
+        self.assertIn('<body class="seo-page seo-page--japan">', html)
+        self.assertIn('class="japan-hero-visual"', html)
+        self.assertIn('/assets/market-fukuoka-itoshima-900.webp', html)
+        self.assertIn('class="seo-aside japan-guide-rail"', html)
+        self.assertIn('href="#residency"', html)
+        self.assertIn('href="#comparison"', html)
+        self.assertIn('href="#sources"', html)
+        self.assertIn('.seo-page--japan .seo-section', html)
+        self.assertIn('--editorial-serif:', html)
+
 
 if __name__ == "__main__":
     unittest.main()

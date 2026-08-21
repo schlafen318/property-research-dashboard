@@ -3751,7 +3751,7 @@ def is_japan_retirement_guide(page: dict) -> bool:
 
 def japan_retirement_fit_html() -> str:
     return """
-          <section class="seo-section">
+          <section class="seo-section" id="fit">
             <h2>Who Japan suits</h2>
             <p><strong>Japan is a strong fit</strong> for buyers who already have a credible residence route, value safety, transport, food and healthcare access, can operate in a Japanese-language administrative environment, and prefer lifestyle utility over aggressive yield.</p>
             <p><strong>Look elsewhere first</strong> if the property is expected to create residency, easy non-resident leverage is essential, short-term-rental income must carry the investment, or family members need a simple dependent pathway.</p>
@@ -3762,7 +3762,7 @@ def japan_retirement_fit_html() -> str:
 
 def japan_retirement_overview_html() -> str:
     return f"""
-          <section class="seo-section">
+          <section class="seo-section" id="residency">
             <p class="seo-eyebrow">Start here</p>
             <h2>Buying property does not give you residency</h2>
             <p>Foreign buyers can generally acquire and register a home in Japan, but ownership does not create a visa, a status of residence, permanent residency, or access to public healthcare. Establish a lawful long-stay route before treating a purchase as a retirement home.</p>
@@ -5640,6 +5640,52 @@ def build_seo_page(
     decision_framework_html = seo_decision_framework_html(page)
     callout_before_overview = "" if is_japan_article else retirement_callout
     callout_after_overview = retirement_callout if is_japan_article else ""
+    body_class = "seo-page seo-page--japan" if is_japan_article else "seo-page"
+    japan_hero_visual = (
+        '''<figure class="japan-hero-visual"><img src="/assets/market-fukuoka-itoshima-900.webp" alt="Coastal landscape in Fukuoka and Itoshima, Japan"><figcaption>Fukuoka / Itoshima · Japan's strongest year-round base</figcaption></figure>'''
+        if is_japan_article
+        else hero_aside
+    )
+    japan_guide_rail = f'''
+        <aside class="seo-aside japan-guide-rail">
+          <nav aria-label="In this guide">
+            <p class="seo-eyebrow">In this guide</p>
+            <a href="#residency">Residency first</a>
+            <a href="#fit">Who Japan suits</a>
+            <a href="#comparison">Compare destinations</a>
+            <a href="#faq">Common questions</a>
+            <a href="#sources">References</a>
+          </nav>
+          <div class="japan-guide-rail__action">
+            <p>Compare Japan with the full 25-destination Atlas.</p>
+            <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
+          </div>
+          <p class="japan-guide-rail__note">Research inputs only. Verify current legal, tax and immigration rules locally.</p>
+        </aside>
+    '''
+    standard_guide_rail = f'''
+        <aside class="seo-aside">
+          <section class="seo-aside-card">
+            <h2>Use the Full Atlas</h2>
+            <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
+            <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open dashboard</a>
+            <a class="seo-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(page["h1"])}">Review my shortlist</a>
+          </section>
+          <section class="seo-aside-card">
+            <h3>Related Guides</h3>
+            <nav><a href="/guides/">All buying guides</a>{related_links}</nav>
+          </section>
+          <section class="seo-aside-card">
+            <h3>Trust Layer</h3>
+            <nav>{trust_page_links()}</nav>
+          </section>
+          <section class="seo-aside-card">
+            <h3>Research Caveat</h3>
+            <p>Scores and listing benchmarks are research inputs, not financial, legal, tax, or immigration advice. Verify current rules locally before acting.</p>
+          </section>
+        </aside>
+    '''
+    guide_rail = japan_guide_rail if is_japan_article else standard_guide_rail
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5665,6 +5711,8 @@ def build_seo_page(
       --teal: #5f7f72;
       --gold: #a98a4b;
       --clay: #b76f57;
+      --editorial-serif: "Iowan Old Style", "Baskerville", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+      --editorial-sans: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
     }}
     * {{ box-sizing: border-box; }}
     body {{ margin: 0; min-width: 320px; }}
@@ -5752,6 +5800,49 @@ def build_seo_page(
     .seo-aside-card h2, .seo-aside-card h3 {{ margin: 0 0 10px; font-size: 16px; }}
     .seo-aside-card nav {{ display: grid; gap: 10px; }}
     .seo-aside-card p, .seo-aside-card a {{ font-size: 14px; }}
+    .japan-hero-visual, .japan-guide-rail {{ display: none; }}
+    .seo-page--japan {{ color: #202825; background: #f3efe5; font-family: var(--editorial-sans); }}
+    .seo-page--japan .seo-shell {{ width: min(1220px, calc(100% - 48px)); }}
+    .seo-page--japan .seo-hero {{ padding: 20px 0 44px; border-bottom: 1px solid rgba(32, 40, 37, .28); background: #f3efe5; }}
+    .seo-page--japan .seo-nav {{ margin-bottom: 42px; padding-bottom: 16px; border-bottom: 3px solid #202825; }}
+    .seo-page--japan .seo-nav-links {{ gap: 24px; }}
+    .seo-page--japan .seo-nav-links a {{ color: #202825; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }}
+    .seo-page--japan .seo-hero-grid {{ grid-template-columns: minmax(0, .95fr) minmax(360px, .72fr); gap: clamp(32px, 6vw, 80px); align-items: stretch; }}
+    .seo-page--japan .seo-hero-grid > div {{ display: flex; flex-direction: column; justify-content: center; padding: 24px 0 18px; }}
+    .seo-page--japan h1 {{ max-width: 760px; font-family: var(--editorial-serif); font-size: clamp(54px, 6.6vw, 92px); font-weight: 500; line-height: .93; letter-spacing: -.035em; }}
+    .seo-page--japan .seo-lede {{ max-width: 680px; margin-top: 28px; color: #48534f; font-family: var(--editorial-serif); font-size: clamp(19px, 2vw, 24px); line-height: 1.42; }}
+    .seo-page--japan .seo-eyebrow {{ color: #9a5a2d; font-size: 10px; letter-spacing: .16em; }}
+    .seo-page--japan .japan-hero-visual {{ display: grid; grid-template-rows: 1fr auto; min-height: 530px; margin: 0; background: #202825; }}
+    .seo-page--japan .japan-hero-visual img {{ width: 100%; height: 100%; min-height: 0; object-fit: cover; }}
+    .seo-page--japan .japan-hero-visual figcaption {{ padding: 11px 14px; color: #f3efe5; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }}
+    .seo-page--japan main {{ margin-top: 0; }}
+    .seo-page--japan .seo-content {{ grid-template-columns: minmax(0, 830px) 220px; justify-content: space-between; gap: clamp(48px, 8vw, 112px); padding: 72px 0 84px; }}
+    .seo-page--japan .seo-article {{ gap: 0; }}
+    .seo-page--japan .seo-section {{ padding: 46px 0; border: 0; border-top: 1px solid rgba(32, 40, 37, .28); border-radius: 0; background: transparent; }}
+    .seo-page--japan .seo-article > .seo-section:first-child {{ padding-top: 0; border-top: 0; }}
+    .seo-page--japan .seo-section h2 {{ max-width: 720px; margin-bottom: 20px; font-family: var(--editorial-serif); font-size: clamp(34px, 4vw, 50px); font-weight: 500; line-height: 1.02; letter-spacing: -.025em; }}
+    .seo-page--japan .seo-section h3 {{ margin-top: 28px; font-size: 16px; letter-spacing: .01em; }}
+    .seo-page--japan .seo-section p, .seo-page--japan .seo-section li {{ color: #384540; font-size: 17px; line-height: 1.72; }}
+    .seo-page--japan .seo-section p {{ max-width: 72ch; }}
+    .seo-page--japan .seo-section p + p {{ margin-top: 1.25em; }}
+    .seo-page--japan .seo-table-wrap {{ margin-top: 28px; border: 0; border-top: 3px solid #202825; border-bottom: 1px solid #202825; border-radius: 0; }}
+    .seo-page--japan .seo-table {{ background: transparent; }}
+    .seo-page--japan .seo-table th, .seo-page--japan .seo-table td {{ padding: 16px 12px; border-color: rgba(32, 40, 37, .2); }}
+    .seo-page--japan .seo-table th {{ color: #202825; font-size: 10px; letter-spacing: .11em; }}
+    .seo-page--japan .seo-destination-card {{ padding: 22px 0; border: 0; border-top: 1px solid rgba(32, 40, 37, .22); border-radius: 0; background: transparent; }}
+    .seo-page--japan .seo-destination-card dl div {{ padding: 10px 12px; border-radius: 0; background: rgba(199, 211, 194, .28); }}
+    .seo-page--japan .seo-link-grid {{ gap: 0; border-top: 1px solid rgba(32, 40, 37, .22); }}
+    .seo-page--japan .seo-link-card {{ padding: 20px 18px 20px 0; border: 0; border-bottom: 1px solid rgba(32, 40, 37, .22); border-radius: 0; background: transparent; }}
+    .seo-page--japan .seo-button {{ border-radius: 0; background: #202825; font-size: 12px; letter-spacing: .05em; text-transform: uppercase; }}
+    .seo-page--japan .japan-guide-rail {{ position: sticky; top: 24px; display: block; padding-top: 14px; border-top: 3px solid #202825; }}
+    .seo-page--japan .japan-guide-rail nav {{ display: grid; }}
+    .seo-page--japan .japan-guide-rail nav a {{ padding: 10px 0; border-top: 1px solid rgba(32, 40, 37, .16); color: #202825; font-size: 12px; font-weight: 700; text-decoration: none; }}
+    .seo-page--japan .japan-guide-rail__action {{ margin-top: 28px; padding: 18px 0; border-top: 1px solid rgba(32, 40, 37, .28); border-bottom: 1px solid rgba(32, 40, 37, .28); }}
+    .seo-page--japan .japan-guide-rail__action p {{ margin-top: 0; font-family: var(--editorial-serif); font-size: 17px; line-height: 1.35; }}
+    .seo-page--japan .japan-guide-rail__note {{ color: #68726d; font-size: 11px; line-height: 1.5; }}
+    .seo-page--japan .faq-item summary {{ font-family: var(--editorial-serif); font-size: 18px; font-weight: 600; }}
+    .seo-page--japan .seo-footer {{ background: #202825; color: #e7e1d6; }}
+    .seo-page--japan .seo-footer a {{ color: #c8b58a; }}
     .faq-item {{ border-top: 1px solid var(--line); padding: 14px 0; }}
     .faq-item summary {{ cursor: pointer; font-weight: 850; }}
     .faq-item p {{ margin-bottom: 0; }}
@@ -5763,6 +5854,11 @@ def build_seo_page(
       .seo-aside {{ position: static; }}
       .seo-stats {{ grid-template-columns: repeat(2, 1fr); }}
       .decision-path__grid, .conversion-callout, .quick-answer__grid {{ grid-template-columns: 1fr; }}
+      .seo-page--japan .seo-hero-grid {{ grid-template-columns: 1fr; }}
+      .seo-page--japan .japan-hero-visual {{ min-height: 400px; }}
+      .seo-page--japan .seo-content {{ grid-template-columns: 1fr; padding-top: 52px; }}
+      .seo-page--japan .japan-guide-rail {{ position: static; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; order: -1; }}
+      .seo-page--japan .japan-guide-rail__action {{ margin-top: 0; }}
     }}
     @media (max-width: 560px) {{
       .seo-shell {{ width: min(100% - 28px, 1120px); }}
@@ -5772,10 +5868,19 @@ def build_seo_page(
       .seo-hero {{ padding-bottom: 48px; }}
       .seo-stats, .seo-destination-card, .seo-destination-card dl, .seo-link-grid, .quick-answer__grid dl {{ grid-template-columns: 1fr; }}
       .seo-section {{ padding: 18px; }}
+      .seo-page--japan .seo-shell {{ width: min(100% - 28px, 1220px); }}
+      .seo-page--japan .seo-nav {{ margin-bottom: 24px; }}
+      .seo-page--japan .seo-hero-grid > div {{ padding-top: 10px; }}
+      .seo-page--japan h1 {{ font-size: clamp(46px, 14vw, 66px); }}
+      .seo-page--japan .japan-hero-visual {{ min-height: 300px; }}
+      .seo-page--japan .seo-section {{ padding: 36px 0; }}
+      .seo-page--japan .seo-section h2 {{ font-size: clamp(32px, 10vw, 42px); }}
+      .seo-page--japan .seo-section p, .seo-page--japan .seo-section li {{ font-size: 16px; }}
+      .seo-page--japan .japan-guide-rail {{ grid-template-columns: 1fr; gap: 14px; }}
     }}
   </style>
 </head>
-<body>
+<body class="{body_class}">
   <header class="seo-hero">
     <div class="seo-shell">
       {primary_nav_html("seo")}
@@ -5787,7 +5892,7 @@ def build_seo_page(
           {hero_detail_html}
           {hero_actions}
         </div>
-        {hero_aside}
+        {japan_hero_visual}
       </div>
     </div>
   </header>
@@ -5818,26 +5923,7 @@ def build_seo_page(
           {references_html}
         </article>
 
-        <aside class="seo-aside">
-          <section class="seo-aside-card">
-            <h2>Use the Full Atlas</h2>
-            <p>Compare all 25 destinations, adjust the 10-dimension weighting model, and export a shortlist memo.</p>
-            <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open dashboard</a>
-            <a class="seo-button" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="{escape(page["h1"])}">Review my shortlist</a>
-          </section>
-          <section class="seo-aside-card">
-            <h3>Related Guides</h3>
-            <nav><a href="/guides/">All buying guides</a>{related_links}</nav>
-          </section>
-          <section class="seo-aside-card">
-            <h3>Trust Layer</h3>
-            <nav>{trust_page_links()}</nav>
-          </section>
-          <section class="seo-aside-card">
-            <h3>Research Caveat</h3>
-            <p>Scores and listing benchmarks are research inputs, not financial, legal, tax, or immigration advice. Verify current rules locally before acting.</p>
-          </section>
-        </aside>
+        {guide_rail}
       </div>
     </div>
   </main>
