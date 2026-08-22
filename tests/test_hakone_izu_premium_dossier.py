@@ -15,6 +15,7 @@ ROOT = Path(__file__).parents[1]
 DESTINATION_ID = "hakone-izu"
 REVIEWED_DOSSIERS = {
     "fukuoka-itoshima",
+    "valencia",
     "algarve-cascais",
     "madeira",
     "malaga-costa-del-sol",

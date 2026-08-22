@@ -7269,8 +7269,8 @@ def premium_dossier_css() -> str:
     .premium-dossier .mobile-menu nav a { min-height: 44px; padding: 12px; color: var(--ink); text-decoration: none; }
     .premium-hero { padding-bottom: 42px; border-bottom: 1px solid var(--line); }
     .premium-hero-grid { display: grid; grid-template-columns: minmax(0, .95fr) minmax(360px, .72fr); gap: clamp(32px, 6vw, 80px); align-items: stretch; }
-    .premium-hero-copy { display: flex; flex-direction: column; justify-content: center; padding: 24px 0 18px; }
-    .premium-hero h1 { max-width: 760px; margin: 0; font-family: var(--serif); font-size: clamp(54px, 6.6vw, 88px); font-weight: 500; line-height: .93; letter-spacing: -.035em; }
+    .premium-hero-copy { min-width: 0; display: flex; flex-direction: column; justify-content: center; padding: 24px 0 18px; }
+    .premium-hero h1 { max-width: 760px; margin: 0; overflow-wrap: anywhere; font-family: var(--serif); font-size: clamp(54px, 6.6vw, 88px); font-weight: 500; line-height: .93; letter-spacing: -.035em; }
     .premium-lede { max-width: 680px; margin: 28px 0 0; color: #4b5651; font-family: var(--serif); font-size: clamp(19px, 2vw, 24px) !important; line-height: 1.42 !important; }
     .premium-byline { margin: 20px 0 0; color: var(--muted); font-size: 12px !important; font-weight: 400; }
     .premium-hero-visual { display: grid; grid-template-rows: 1fr auto; min-height: 520px; margin: 0; background: var(--ink); }
@@ -7335,7 +7335,7 @@ def premium_dossier_css() -> str:
     .premium-footer { padding: 28px 0 42px; border-top: 1px solid var(--line); color: var(--muted); }
     .premium-footer p { margin: 6px 0 0; font-size: 13px; }
     @media (max-width: 900px) {
-      .premium-hero-grid, .premium-content { grid-template-columns: 1fr; }
+      .premium-hero-grid, .premium-content { grid-template-columns: minmax(0, 1fr); }
       .premium-hero-visual { min-height: 400px; }
       .premium-content { padding-top: 52px; }
       .premium-rail { position: static; order: -1; }
@@ -7431,7 +7431,7 @@ def build_premium_destination_page(
         <section class="premium-section" id="checklist">
           <h2>Buyer checklist—in decision order</h2>
           <ol class="premium-checklist">{checklist}</ol>
-          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="{escape(spec.country_guide_url)}">{escape(spec.country_guide_label)}</a>. To compare the destination with other markets, <a href="/dashboard/">open the full Atlas</a>.</p>
+          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="{escape(spec.country_guide_url)}">{escape(spec.country_guide_label)}</a>. To size the plan, use the <a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="destination page">retirement abroad calculator</a>. To compare the destination with other markets, <a href="/dashboard/">open the full Atlas</a>.</p>
         </section>
         {premium_dossier_references_html(spec)}
       </article>

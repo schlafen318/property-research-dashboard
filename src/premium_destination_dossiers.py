@@ -983,6 +983,153 @@ LAKE_COMO_DOSSIER = PremiumDossierSpec(
 )
 
 
+VALENCIA_DOSSIER = PremiumDossierSpec(
+    destination_id="valencia",
+    title="Valencia Retirement Property Dossier",
+    description="Assess Valencia retirement property through daily life, access, foreign ownership, rental rules, heat and flood risk, value, resale, and representative listings.",
+    h1="Valencia: Mediterranean city life that works year-round",
+    lede=(
+        "Valencia is one of Europe’s strongest all-round retirement-property candidates: a substantial city with beaches, food culture, healthcare, an airport and fast rail rather than a resort that must imitate normal life. The attraction is real, but the address decides the outcome. A Russafa apartment, an El Pla del Real home beside the Turia gardens, an El Cabanyal-Canyamelar flat and a Patacona sea-view property carry different heat, noise, rental, building and resale assumptions. This dossier turns the broad Valencia story into a buyer’s sequence of decisions."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is positive for a buyer seeking a genuine city home with Mediterranean access, provided the purchase works without creating residence or depending on tourist rent. Buying Spanish property does not itself grant a right to live in Spain. The property-linked investor-residence route ended on 3 April 2025, so a prospective retiree must establish a separate lawful route—often the non-lucrative residence route for a non-working applicant—and confirm income, insurance, renewal and tax consequences before committing. Healthcare entitlement also follows residence and social-security status, not the deed. Those are plan-first questions, not closing formalities.",
+        "Valencia best suits someone who wants ordinary urban life: markets, restaurants, parks, hospitals, public transport and the sea within one metropolitan area. It can support a car-light routine in central and tram-served districts, and its resident economy gives well-located homes a broader purpose than holiday demand alone. It is less suitable for a buyer who expects unrestricted short-stay letting, treats every coastal address as walkable, cannot tolerate hot summers, or wants a detached villa without accepting suburban driving and a different resale pool.",
+        "Proceed in this order: establish residence, healthcare and tax advice; choose the daily-life pattern; inspect the building and community; verify the exact permitted use in writing; overlay flood and heat exposure; then compare the price with public market signals and realistic resale demand. The strongest purchase is usually a comfortable, accessible home that still makes sense as a long-term residence. A tourist licence, sea glimpse or renovation aesthetic should never substitute for that core case."
+    ),
+    lenses_intro="The five paired lenses below translate the Atlas model into practical choices. The complete ten-dimension assessment appears once in the score table; the prose explains what changes between Valencia’s centre, park edge, maritime districts and northern beach.",
+    lenses=(
+        DossierLens(
+            "Choose the life before the postcode",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Valencia’s principal advantage is that retirement life is not confined to a waterfront strip. The historic centre and Eixample provide shops, food markets, culture and dense services. Russafa is energetic and restaurant-rich, but nightlife, traffic and older buildings make exact-street testing essential. El Pla del Real and the Turia gardens offer a calmer park-led pattern close to universities and established neighbourhood services. Farther east, El Cabanyal-Canyamelar brings tiled façades, local commerce and proximity to the sea, while Malvarrosa feels more overtly beach-facing. Patacona continues the promenade into Alboraya, but the municipal boundary and transport pattern change.",
+                "Retirement fit depends less on postcard distance than on the repeat journeys. Map the walk to groceries, pharmacy, primary care and a useful bus, metro or tram stop. Test the lift, entrance steps, pavement shade and late-evening route. Valencia’s La Fe health department provides major hospital and primary-care services, but a pleasant neighbourhood still needs a realistic route to the right facility. A beach home may be level and sociable; it may also be windier, salt-exposed and farther from specialist care. A central apartment may be convenient; it may also be noisy, dark or difficult to cool.",
+                "Summer is the honest viewing season. Inspect bedroom orientation, cross-ventilation, shutters, air-conditioning capacity, insulation and the cost of cooling. Valencia maintains a network of climate refuges, which is useful civic infrastructure but not a cure for a heat-trapping home. Return in winter to check damp, daylight and how the promenade or street functions outside peak season. The goal is not the most animated district on a three-day visit. It is an address where meals, movement, healthcare and friendships remain easy when the weather is less flattering and mobility becomes more valuable."
+            ),
+            "daily-life",
+        ),
+        DossierLens(
+            "Connect the whole journey, not just the airport",
+            ("global_access", "foreigner_fit"),
+            (
+                "Valencia Airport and the metropolitan rail network make the city internationally workable. Aena publishes the airport’s current destination list; Metrovalencia connects the airport to central interchanges, while the city’s bus and tram systems distribute journeys across the urban area. High-speed and long-distance services use Joaquín Sorolla station, close to but separate from Estació del Nord. Adif describes the station as about 800 metres south of Nord, and current access works can alter approaches. A buyer should time the actual door-to-platform journey with luggage rather than rely on a city-level access score.",
+                "The centre and Eixample make daily car-free living easiest. El Pla del Real benefits from buses, cycle routes and proximity to the Turia. El Cabanyal-Canyamelar and Malvarrosa have tram and bus options, but the useful line depends on the exact block and destination. Patacona lies in Alboraya: it remains visually continuous with Valencia’s beach, yet local administration and the last kilometre deserve separate checking. For any outer address, test the morning hospital journey, the late return from Joaquín Sorolla and the airport trip during service disruption. A ten-minute map estimate is not the same as resilient access.",
+                "Foreign buyers will find international services and a sizeable expatriate community, but integration still rewards Spanish—and sometimes Valencian—language capacity. Reservation contracts, community minutes, planning certificates, tax notices, utilities and contractor discussions may not arrive in English. Appoint an independent lawyer, tax adviser and surveyor rather than relying on the selling chain. Keep a local contact able to receive notices and enter the property. Valencia’s openness is a genuine advantage; the best foreigner fit comes from combining that welcome with professional translation and an effort to participate in the resident neighbourhood."
+            ),
+        ),
+        DossierLens(
+            "Own the home—and prove how it may be used",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Foreigners can generally buy Spanish real estate, but a clean purchase requires more than checking the seller’s name. Obtain a current Land Registry extract, compare it with the cadastre and physical property, investigate debts and charges, confirm planning status and legal floor area, and read the community statutes and minutes. For an apartment, scrutinise façade, roof, lift, structural, accessibility and energy works as well as arrears and approved assessments. For a renovated home, verify permissions and completion. Use a technical survey even when the building looks polished; attractive finishes can conceal old services, moisture or unauthorised alterations.",
+                "Tourist use is a property-level legal question. The Valencian Community’s Decree-Law 9/2024 changed the regional framework, while Valencia City approved restrictive planning rules in 2026. The city describes neighbourhood caps, location conditions such as ground or first-floor placement with independent access, and community approval requirements; its procedure also requires a favourable planning-compatibility answer or the prescribed evidence of a pending request. Rules and transitional positions can change. Do not advertise, value or finance a home on short-stay income until an independent lawyer has confirmed the exact address, registration, planning status, community consent and operating obligations in writing.",
+                "Physical risk is just as local. Valencia’s municipal emergency planning and the Generalitat’s PATRICOVA material should be checked alongside Spain’s national flood-zone system. Review river, coastal and pluvial flood layers, basement and garage exposure, street drainage, evacuation routes and the building’s loss history. Ask what happened during severe rainfall, but verify answers against documents and an insurance quotation. Heat deserves its own assessment: shading, top-floor exposure, mechanical systems and power costs can materially change comfort. Regulatory safety means the legal use, the building and the hazard profile all work together; a clear title alone is insufficient."
+            ),
+        ),
+        DossierLens(
+            "Underwrite resident demand before visitor demand",
+            ("rental_profit", "capital_upside"),
+            (
+                "Valencia’s investment resilience starts with a large resident city, universities, employment, transport and year-round demand—not with a holiday calendar. For a rental case, compare ordinary long-term or legally suitable medium-term demand with vacancy, management, tax, community charges, maintenance and tenant regulation. Then model tourist use only if the exact property has a current, transferable and operationally viable legal path. A high nightly rate is irrelevant when planning, community or registration rules prevent the use. The base case should remain acceptable if short-stay revenue is zero.",
+                "Public data provide useful scale but not a valuation. Valencia City’s official Q3 2025 series reported 2,725.90 EUR/m² for total free housing and 3,078.20 EUR/m² for homes up to five years old. The Registradores Q1 2026 report placed the Valencia province average for registered housing at 1,716 EUR/m². These measures cover different geographies, periods and property mixes, so the gap is information rather than contradiction. Compare the candidate with the correct district, age, condition and legal area, then seek recent completed evidence and a lender appraisal if financing.",
+                "Capital upside is plausible but must be earned through entry discipline. Transit, the Turia, walkable services and high-quality urban fabric can support enduring buyer demand. Russafa’s popularity, El Pla del Real’s established character, Cabanyal’s continuing change and Patacona’s beach premium are different theses, not one rising-market story. Planning works, street quality, building condition and future supply can alter each block. Model flat real prices, higher community costs and a longer resale period. Appreciation should be a benefit of owning a good home in a useful location, never the mechanism that repairs an optimistic purchase price."
+            ),
+            "coast-access",
+        ),
+        DossierLens(
+            "Pay for utility and preserve the exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The representative listings below show why a city average cannot price Valencia. A large Russafa apartment, a smaller El Cabanyal home and a Patacona sea-view property ask buyers to pay for different combinations of space, building quality, neighbourhood energy and coastal scarcity. They are dated asking observations, not completed sales or valuations. Verify legal floor area, terrace treatment, lift access, community charges, energy performance and renovation scope, then compare each with completed transactions and an independent appraisal. Apparent value per square metre can disappear when unusable area or major works are corrected.",
+                "Preserve resale by choosing attributes that a broad resident buyer pool understands: comfortable layout, lift or level access, natural light without intolerable heat, manageable fees, sound building governance, useful transport and an address that works all year. Russafa can offer depth but buyers may discount noise and parking. El Pla del Real has established utility but commands a different entry level. El Cabanyal-Canyamelar can combine character and sea access, yet building-by-building diligence is decisive. Patacona may attract lifestyle buyers, but a premium narrows the pool and should be justified by view, orientation, access and construction quality.",
+                "Model five-year cash outlay in euros: purchase taxes, notary, registry, legal and technical advice, financing, insurance, community charges, cooling, repairs, renovations, tax administration and eventual sale costs. Add currency stress if income or capital is elsewhere. Before signing, ask two agents who did not source the home who would buy it next, what comparable completed evidence supports the range, and which defect would slow the sale. The right Valencia property is not the most romantic listing; it is the one whose daily usefulness and future buyer pool remain aligned after the novelty fades."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Valencia combines a resident city, Turia park and coast; Russafa energy and Patacona calm suit different daily routines.",
+        "global_access": "Valencia Airport, Metrovalencia and Joaquín Sorolla rail are strong, but Patacona and outer addresses add last-mile friction.",
+        "ownership_clarity": "Valencia follows Spain’s open purchase framework, while every apartment still needs registry, cadastre, community and alteration checks.",
+        "regulatory_safety": "Valencia tourist-use rules, community approval and address-level flood exposure make written property-specific clearance essential.",
+        "rental_profit": "Valencia has year-round resident demand; Russafa or Cabanyal tourist income belongs only in a fully verified legal case.",
+        "capital_upside": "Valencia infrastructure supports demand, but Cabanyal change and Patacona scarcity do not justify automatic appreciation assumptions.",
+        "retirement_fit": "Valencia offers healthcare, flat districts and daily services; summer heat and the exact hospital route still need testing.",
+        "exit_liquidity": "Valencia apartments with lifts, transit and broad layouts should resell more easily than compromised or premium-only Patacona stock.",
+        "foreigner_fit": "Valencia is internationally accessible, but Spanish-language legal, community, tax and contractor support remains part of responsible ownership.",
+        "value_entry": "Valencia value changes sharply between Russafa, El Pla del Real, Cabanyal and Patacona, so city averages require local correction.",
+    },
+    market_anchors=(
+        {"location": "Valencia city — total free housing", "evidence": "2,725.90 EUR/m²", "buyer_read": "Official Q3 2025 appraisal series for the municipality; a broad market signal, not an address-level valuation.", "source_label": "Valencia City statistics / MIVAU", "source_url": "https://www.valencia.es/estadistica/UltDatos/PrecioVivienda_val.pdf"},
+        {"location": "Valencia city — homes up to five years old", "evidence": "3,078.20 EUR/m²", "buyer_read": "Official Q3 2025 appraisal series for newer homes; age is only one adjustment and does not price view, district or condition.", "source_label": "Valencia City statistics / MIVAU", "source_url": "https://www.valencia.es/estadistica/UltDatos/PrecioVivienda_val.pdf"},
+        {"location": "Valencia province — all registered housing", "evidence": "1,716 EUR/m²", "buyer_read": "Q1 2026 registered-price average across the province; wider geography explains why it cannot appraise a Valencia-city home.", "source_label": "Registradores Q1 2026 report", "source_url": "https://www.registradores.org/documents/d/guest/eri-2026_1t"},
+    ),
+    micro_locations_intro="Valencia is best read as four daily-life patterns rather than one market. These are orientation aids, not pricing zones; confirm municipal boundary, transport, planning, community rules, legal area, hazards and building condition for the exact address.",
+    micro_locations=(
+        {"name": "Eixample / Russafa", "best_for": "Food and central energy", "daily_life": "Walkable, animated and urban", "diligence": "Noise, lift, heat and building works"},
+        {"name": "El Pla del Real / Turia", "best_for": "Park-led city living", "daily_life": "Established and service-rich", "diligence": "Entry premium and exact transit"},
+        {"name": "El Cabanyal-Canyamelar / Malvarrosa", "best_for": "Character near the sea", "daily_life": "Maritime district with tram and buses", "diligence": "Building condition and permitted use"},
+        {"name": "Patacona / Alboraya", "best_for": "Promenade and beach outlook", "daily_life": "Coastal and municipality-specific", "diligence": "Premium, salt, access and resale depth"},
+    ),
+    checklist=(
+        "Confirm residence, healthcare and Spanish tax consequences before choosing the property.",
+        "Choose the centre, Turia, maritime or Patacona daily-life pattern and test it in summer and winter.",
+        "Verify Land Registry, cadastre, planning, legal area, charges and every alteration.",
+        "Read community statutes, minutes, accounts, works, arrears, access and tourist-use decisions.",
+        "Survey structure, services, damp, cooling, energy performance and salt exposure where relevant.",
+        "Check municipal, PATRICOVA and national flood layers, drainage history and insurability.",
+        "Obtain a written address-specific answer for any rental or tourist use before underwriting income.",
+        "Compare current asking evidence with completed sales, full five-year costs and the likely resale buyer.",
+    ),
+    references_intro="Legal, tax, residence, healthcare, transport, market, planning, hazard and rental claims were reviewed on 22 August 2026 against the primary sources below. The next scheduled review is 22 February 2027, or sooner if a cited law, municipal rule, transport service, hazard source, market data release or listing changes. Recheck every live source and obtain independent Spanish legal, tax, immigration, planning, technical and insurance advice for the exact buyer and property before signing. Listing observations are dated asking evidence only and do not verify availability, title, condition, permitted use, negotiability or completed value.",
+    references=(
+        {"label": "Spain retirement property guide", "url": "/spain-retirement-property-foreign-buyers/"},
+        {"label": "Spanish Migration Ministry: non-lucrative residence", "url": "https://www.inclusion.gob.es/en/web/migraciones/w/autorizacion-inicial-de-residencia-temporal-no-lucrativa"},
+        {"label": "Spanish Government: investor residence ended 3 April 2025", "url": "https://www.lamoncloa.gob.es/serviciosdeprensa/notasprensa/vivienda-agenda-urbana/Paginas/2025/020425-fin-golden-visa.aspx"},
+        {"label": "Spanish Tax Agency: individual tax residence", "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/residencia-personas-fisicas-juridicas/persona-fisica-residente-espana.html"},
+        {"label": "Spanish Tax Agency: non-resident property taxation", "url": "https://sede.agenciatributaria.gob.es/Sede/vivienda-otros-inmuebles/no-residentes-tributacion-inmuebles.html"},
+        {"label": "Spanish Tax Agency: VAT or transfer tax on a home", "url": "https://sede.agenciatributaria.gob.es/Sede/iva/iva-operaciones-inmobiliarias/compro-vivienda-tengo-que-pagar-itp.html"},
+        {"label": "Spanish Property Registrars: buyer guides and registry information", "url": "https://www.registradores.org/gl/documentacion-y-descargas/guias-rapidas"},
+        {"label": "BOE: community approval rule for tourist use", "url": "https://www.boe.es/diario_boe/txt.php?id=BOE-A-2026-11152"},
+        {"label": "Generalitat Valenciana: Decree-Law 9/2024 tourist housing", "url": "https://www.turisme.gva.es/opencms/opencms/turisme/es/contents/home/noticia/noticia_1725542158000.html"},
+        {"label": "Generalitat Valenciana: current tourist-housing FAQ", "url": "https://www.turisme.gva.es/turisme/es/files/pdf/FAQ_viviendas_uso_turistico.pdf"},
+        {"label": "Valencia City: 2026 tourist-apartment rules and enforcement", "url": "https://www.valencia.es/cas/actualidad/-/content/val%C3%A8ncia-multiplica-%C3%B3rdenes-cierre-apartamentos-tur%C3%ADsticos-irregulares"},
+        {"label": "Valencia City: tourist-housing planning procedure", "url": "https://sede.valencia.es/sede/registro/procedimiento/UA.AT.50?lang=1"},
+        {"label": "Aena: Valencia Airport destinations", "url": "https://www.aena.es/en/valencia/airlines-destinations/airport-destinations.html"},
+        {"label": "Adif: Valencia Joaquín Sorolla station", "url": "https://www.adif.es/w/03216-valencia-joaquin-sorolla"},
+        {"label": "Metrovalencia: official zonal map", "url": "https://www.metrovalencia.es/wp-content/uploads/2023/03/Plano-zonal-tarifario-Metrovalencia-.pdf"},
+        {"label": "La Fe: emergency and hospital services", "url": "https://lafe.san.gva.es/es/urgencias"},
+        {"label": "Valencia City: climate-refuge network", "url": "https://www.valencia.es/documents/20142/424002/20240802%2BInformacion%2B%2BXarxa%2Bde%2BRefugis%2BClima%CC%80tics%2Bde%2BVale%CC%80ncia_cast.pdf/275c1287-c90f-e5bd-cea9-649efac00b4a?t=1722603141185"},
+        {"label": "Valencia City: civil-protection and flood plans", "url": "https://www.valencia.es/cas/bomberos/proteccion-civil"},
+        {"label": "Generalitat Valenciana: PATRICOVA map", "url": "https://mediambient.gva.es/ca/mapa-web"},
+        {"label": "Valencia City: official housing-price series", "url": "https://www.valencia.es/estadistica/UltDatos/PrecioVivienda_val.pdf"},
+        {"label": "Valencia open data: free-housing price per square metre", "url": "https://opendata.vlci.valencia.es/dataset/free-housing-square-meter-price"},
+        {"label": "Registradores: Q1 2026 property report", "url": "https://www.registradores.org/documents/d/guest/eri-2026_1t"},
+        {"label": "European Central Bank: euro reference exchange rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("turia-city", "/assets/valencia-turia-city-hero.webp", "Valencia skyline and the Turia gardens in warm morning light", "The Turia links everyday city life rather than staging a resort view.", "hero"),
+        DossierImage("daily-life", "/assets/valencia-daily-life-market.webp", "Residents shopping on a shaded Valencia neighbourhood street", "Daily value begins with shade, shops, level access and a useful route home.", "wide"),
+        DossierImage("coast-access", "/assets/valencia-coast-access.webp", "Valencia beach promenade with residents walking and cycling", "The coast works best when transport and year-round services remain part of the address.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Valencia through five destination lenses",
+    assessment_intro="Here’s how Valencia scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show different buyer cases in Russafa, El Cabanyal and Patacona. EUR is primary; USD uses the recorded ECB reference basis for comparison only.",
+    market_anchors_intro="These are public market signals—not valuations. The city appraisal series and province-wide registered average cover different geographies and stock; reconcile every candidate for district, legal area, age, condition and completed comparable evidence.",
+    orientation_groups=(
+        DossierOrientationGroup("Airport, centre and rail", (("Valencia Airport", "Metro gateway"), ("Àngel Guimerà / Colón", "Central interchange"), ("Nord / Joaquín Sorolla", "Rail stations"), ("Turia / El Pla del Real", "Park-led city"))),
+        DossierOrientationGroup("Centre to the northern beach", (("Russafa / centre", "Urban daily life"), ("El Cabanyal-Canyamelar", "Maritime district"), ("Malvarrosa", "Valencia beach"), ("Patacona / Alboraya", "Northern promenade"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current services, walking conditions, municipal boundary and the exact door-to-door route.",
+    country_guide_url="/countries/spain-property/",
+    country_guide_label="Spain property guide",
+    rail_comparison="Compare Valencia with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -990,6 +1137,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     MALAGA_COSTA_DEL_SOL_DOSSIER.destination_id: MALAGA_COSTA_DEL_SOL_DOSSIER,
     LAKE_COMO_DOSSIER.destination_id: LAKE_COMO_DOSSIER,
     HAKONE_IZU_DOSSIER.destination_id: HAKONE_IZU_DOSSIER,
+    VALENCIA_DOSSIER.destination_id: VALENCIA_DOSSIER,
 }
 
 
@@ -1058,3 +1206,4 @@ validate_premium_dossier(ALGARVE_CASCAIS_DOSSIER)
 validate_premium_dossier(MADEIRA_DOSSIER)
 validate_premium_dossier(LAKE_COMO_DOSSIER)
 validate_premium_dossier(HAKONE_IZU_DOSSIER)
+validate_premium_dossier(VALENCIA_DOSSIER)
