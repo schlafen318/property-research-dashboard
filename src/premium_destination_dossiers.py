@@ -32,6 +32,7 @@ class DossierImage:
     alt: str
     caption: str
     placement_class: str
+    role: str = ""
 
 
 @dataclass(frozen=True)
@@ -71,6 +72,7 @@ class PremiumDossierSpec:
     country_guide_url: str
     country_guide_label: str
     rail_comparison: str
+    property_anchor_indexes: tuple[int | None, ...] = ()
 
 
 FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
@@ -220,9 +222,9 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
         {"label": "Itoshima City: current city-planning map", "url": "https://www.city.itoshima.lg.jp/s021/020/010/020/010/tokeizu-h280914.html"},
     ),
     images=(
-        DossierImage("coast", "/assets/fukuoka-itoshima-coast.webp", "Fukuoka and Itoshima coastline", "City access meets the Itoshima coast.", "hero"),
-        DossierImage("city-access", "/assets/fukuoka-itoshima-city-access.webp", "Everyday urban access in Fukuoka", "Fukuoka provides the practical urban base.", "wide"),
-        DossierImage("seaside-life", "/assets/fukuoka-itoshima-seaside-life.webp", "Everyday seaside life in Itoshima", "Coastal life requires a closer look at access and seasonality.", "wide"),
+        DossierImage("coast", "/assets/fukuoka-itoshima-coast.webp", "Fukuoka and Itoshima coastline", "City access meets the Itoshima coast.", "hero", "defining-place"),
+        DossierImage("city-access", "/assets/fukuoka-itoshima-city-access.webp", "Everyday urban access in Fukuoka", "Fukuoka provides the practical urban base.", "wide", "built-environment-access"),
+        DossierImage("seaside-life", "/assets/fukuoka-itoshima-seaside-life.webp", "Everyday seaside life in Itoshima", "Coastal life requires a closer look at access and seasonality.", "wide", "decision-texture"),
     ),
     nav_items=(
         ("verdict", "Verdict"),
@@ -252,6 +254,7 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
     country_guide_url="/japan-retirement-property-foreign-buyers/",
     country_guide_label="Japan retirement property guide",
     rail_comparison="Compare Fukuoka / Itoshima with the full Atlas.",
+    property_anchor_indexes=(0, 1, 2),
 )
 
 
@@ -3530,6 +3533,16 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
     for anchor in spec.market_anchors:
         if required_anchor_fields - anchor.keys() or any(not anchor[field].strip() for field in required_anchor_fields):
             raise ValueError("premium dossier market anchors must be complete")
+
+    if spec.property_anchor_indexes:
+        if len(spec.property_anchor_indexes) != 3:
+            raise ValueError(f"{spec.destination_id} requires three property-anchor associations")
+        indexes = [index for index in spec.property_anchor_indexes if index is not None]
+        if (
+            len(indexes) != len(set(indexes))
+            or any(index < 0 or index >= len(spec.market_anchors) for index in indexes)
+        ):
+            raise ValueError(f"{spec.destination_id} has invalid property-anchor associations")
 
     if len(spec.nav_items) > 7:
         raise ValueError("premium dossier navigation may contain at most seven items")

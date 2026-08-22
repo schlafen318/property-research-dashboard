@@ -31,6 +31,14 @@ class PremiumDossierContractTests(unittest.TestCase):
         self.assertEqual(3, len(spec.market_anchors))
         self.assertEqual("sources", spec.nav_items[-1][0])
 
+    def test_fukuoka_declares_property_anchor_associations_and_image_roles(self) -> None:
+        spec = get_premium_dossier("fukuoka-itoshima")
+        self.assertEqual((0, 1, 2), spec.property_anchor_indexes)
+        self.assertEqual(
+            ["defining-place", "built-environment-access", "decision-texture"],
+            [image.role for image in spec.images],
+        )
+
 
 class PremiumDossierContentTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -51,6 +59,22 @@ class PremiumDossierContentTests(unittest.TestCase):
         for fragment in required_fragments:
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, urls)
+
+    def test_reader_copy_contains_conclusions_not_production_commentary(self) -> None:
+        reader_copy = " ".join((
+            self.spec.lenses_intro,
+            self.spec.assessment_intro,
+            self.spec.listings_intro,
+            *(paragraph for lens in self.spec.lenses for paragraph in lens.paragraphs),
+        )).lower()
+        for phrase in (
+            "recorded dataset exchange basis",
+            "the prose below explains",
+            "complete ten-dimension assessment appears once",
+            "the listings below",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, reader_copy)
 
     def test_each_lens_is_destination_specific_and_editorial_length_is_bounded(self) -> None:
         for lens in self.spec.lenses:
