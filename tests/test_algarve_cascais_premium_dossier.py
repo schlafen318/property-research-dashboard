@@ -20,7 +20,7 @@ class AlgarveCascaisDossierContractTests(unittest.TestCase):
 
     def test_registry_contains_the_three_reviewed_dossiers(self) -> None:
         self.assertEqual(
-            {"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "malaga-costa-del-sol", "lake-como", "hakone-izu", "hakuba"},
+            {"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "malaga-costa-del-sol", "lake-como", "hakone-izu", "hakuba", "costa-brava-girona"},
             set(PREMIUM_DESTINATION_DOSSIERS),
         )
         self.assertIsNotNone(self.spec)
