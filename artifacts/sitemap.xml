@@ -337,12 +337,6 @@
     <priority>0.80</priority>
   </url>
   <url>
-    <loc>https://globalhomeatlas.com/destinations/phuket-koh-samui/</loc>
-    <lastmod>2026-08-22</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.80</priority>
-  </url>
-  <url>
     <loc>https://globalhomeatlas.com/destinations/vancouver-island-victoria/</loc>
     <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
@@ -362,6 +356,12 @@
   </url>
   <url>
     <loc>https://globalhomeatlas.com/destinations/perth-margaret-river/</loc>
+    <lastmod>2026-08-22</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.80</priority>
+  </url>
+  <url>
+    <loc>https://globalhomeatlas.com/destinations/phuket-koh-samui/</loc>
     <lastmod>2026-08-22</lastmod>
     <changefreq>weekly</changefreq>
     <priority>0.80</priority>

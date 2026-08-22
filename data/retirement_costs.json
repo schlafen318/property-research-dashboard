@@ -1227,7 +1227,7 @@
     {
       "destination_id": "phuket-koh-samui",
       "display_currency": "THB",
-      "fx_to_usd": 0.0303905,
+      "fx_to_usd": 0.030381294215563875,
       "inflation": {
         "general": 0.025,
         "healthcare": 0.05,
@@ -1264,9 +1264,10 @@
         }
       },
       "property": {
-        "representative_price_usd": 479000,
-        "acquisition_cost_rate": 0.07,
-        "price_basis": "Median of three representative Phuket / Koh Samui listing snapshots captured by Global Home Atlas."
+        "representative_price_usd": 425338,
+        "acquisition_cost_rate": 0.025,
+        "acquisition_cost_basis": "Planning allowance anchored to the Department of Lands' 2% registration fee on assessed value, plus a modest allowance for buyer-side legal and administrative work. Actual tax, duty, professional and structure costs require transaction-specific quotations.",
+        "price_basis": "Median of three current direct asking observations captured 22 August 2026: a Rawai foreign-quota condominium, a Si Sunthon villa and a Maenam villa. This mixed-asset median is a planning input, not a valuation."
       },
       "confidence": {
         "overall": "medium-high",
@@ -1295,12 +1296,28 @@
           "notes": "Official national index used as a planning proxy, not a forecast."
         },
         {
-          "name": "Tranio — property listings",
-          "url": "https://tranio.com/articles/phuket-property-prices/",
-          "metric_supported": "Representative property acquisition benchmark",
-          "source_date": "2026-06-21",
-          "accessed_on": "2026-08-18",
-          "notes": "Median of three captured listings; not a market-wide median and availability changes."
+          "name": "Thailand Department of Lands — fees, taxes and duties",
+          "url": "https://www.dol.go.th/en/dol-services/public-service-manual/land-registration/fees-taxes-duties/",
+          "metric_supported": "Official 2% registration-fee anchor; other transaction costs vary",
+          "source_date": "Current guidance",
+          "accessed_on": "2026-08-22",
+          "notes": "The calculator uses a 2.5% planning allowance, not a universal transaction quote."
+        },
+        {
+          "name": "European Central Bank — euro reference rates",
+          "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+          "metric_supported": "20 August 2026 cross-rate: 1 THB = 0.030381294215563875 USD",
+          "source_date": "2026-08-20",
+          "accessed_on": "2026-08-22",
+          "notes": "USD values are presentation conversions; local THB asking prices remain primary."
+        },
+        {
+          "name": "FazWaz — three direct Phuket / Koh Samui asking observations",
+          "url": "https://www.fazwaz.com/property-sales/2-bedroom-condo-for-sale-at-selina-serenity-resort-residences-in-rawai-phuket-u1944488",
+          "metric_supported": "Representative-property input reconciled with two additional direct observations in listings.json",
+          "source_date": "2026-08-22 capture",
+          "accessed_on": "2026-08-22",
+          "notes": "Asking evidence only; availability, tenure statements and property details require re-verification."
         }
       ]
     },

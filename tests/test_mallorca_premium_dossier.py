@@ -10,7 +10,7 @@ DESTINATION_ID = "mallorca"
 REVIEWED_DOSSIERS = {
     "fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "malaga-costa-del-sol",
     "hakone-izu", "lake-como", "hakuba", "costa-brava-girona", "park-city-deer-valley",
-    "crete", "niseko", "annecy", DESTINATION_ID, "croatia-istria-dalmatia", "queenstown",
+    "crete", "niseko", "annecy", DESTINATION_ID, "croatia-istria-dalmatia", "queenstown", "phuket-koh-samui",
 }
 
 

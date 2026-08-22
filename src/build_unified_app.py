@@ -191,6 +191,18 @@ COUNTRY_HUBS = [
         "description": "Assess Thailand property for foreign buyers, including Phuket and Koh Samui ownership structures, villa risks, rental appeal, and alternatives.",
         "h1": "Thailand Property Guide for Foreign Buyers",
         "thesis": "Thailand can be compelling for lifestyle, rental demand, and regional access, but the legal structure matters more than the brochure. Villa buyers need to understand land, leasehold, company, and condominium rules before underwriting income.",
+        "country_rules": [
+            {"heading": "Foreign land ownership", "text": "Foreign individuals generally cannot own Thai land. A villa sale may separate rights in the building from rights in the land; leases, superficies and company arrangements require independent Thai legal analysis. Illegal nominee structures are not a substitute for lawful ownership."},
+            {"heading": "Foreign-quota condominium", "text": "Foreign freehold can be available in a registered condominium only while foreign ownership remains within the statutory 49% aggregate quota and required foreign-currency evidence is satisfied. Confirm the unit title and quota directly with the juristic person and Land Office."},
+            {"heading": "Residence is separate", "text": "A Thai home does not itself create a right to live in Thailand. Visa pathways, including the BOI Long-Term Resident programme, have separate age, income, investment and eligibility tests; property may be one qualifying investment but is not automatic approval."},
+            {"heading": "Short stays are an accommodation business", "text": "Providing temporary accommodation for compensation can fall under the Hotel Act licence regime. Do not assume a residential title, developer rental programme or online listing makes nightly operation lawful; verify the exact exemption or licence and local permissions."},
+        ],
+        "primary_sources": [
+            {"label": "Department of Lands: foreign condominium ownership regulation", "url": "https://www.dol.go.th/en/dol-services/public-service-manual/land-registration/land-for-foreigners/dol-regulation-foreign-condominium-ownership-2004/"},
+            {"label": "Department of Lands: foreign-buyer transfer documents", "url": "https://www.dol.go.th/question-answer/Q2601-000065"},
+            {"label": "BOI: Long-Term Resident visa", "url": "https://ltr.boi.go.th/"},
+            {"label": "Department of Provincial Administration: Hotel Act", "url": "https://multi.dopa.go.th/legal/assets/modules/news/uploads/a8fec27695d5ecdb26fe0de8f70040fc5c00b4c6870cd0192022484170852251.pdf"},
+        ],
         "destination_ids": ["phuket-koh-samui"],
         "guide_slugs": ["thailand-villa-ownership-foreigners", "foreign-property-investment-risks", "where-can-foreigners-buy-property", "overseas-property-investment"],
     },
