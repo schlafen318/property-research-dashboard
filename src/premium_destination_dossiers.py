@@ -2411,6 +2411,153 @@ QUEENSTOWN_DOSSIER = PremiumDossierSpec(
 )
 
 
+PHUKET_KOH_SAMUI_DOSSIER = PremiumDossierSpec(
+    destination_id="phuket-koh-samui",
+    title="Phuket and Koh Samui Retirement Property Dossier",
+    description="Assess Phuket and Koh Samui retirement property through legal ownership, residence, healthcare, access, rental rules, hazards, value, exit liquidity, and current asking evidence.",
+    h1="Phuket / Koh Samui: choose the legal product before the tropical life",
+    lede=(
+        "Phuket and Koh Samui can deliver an unusually rich tropical life: warm-water coast, strong food culture, international airports and established private services. They are not one property market. Phuket offers the deeper hospital, retail and condominium ecosystem; Samui offers a more intimate villa-and-island rhythm with greater operational dependence. The controlling decision is legal, not scenic: choose the ownership product, lawful use and future buyer pool before choosing the view."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is selectively positive for a well-capitalised buyer who will use independent Thai legal, tax and building professionals and who values the home even without short-stay income. A registered foreign-quota condominium is usually the clearest ownership product because the foreign buyer can hold the unit freehold when the building remains inside the statutory 49% foreign-ownership ceiling and the required remittance evidence is satisfied. A villa is different: foreigners generally cannot own Thai land, so the buyer must understand separately the land right, building ownership, lease, superficies, company, succession and resale mechanics. A brochure's word ‘freehold’ is not enough.",
+        "Phuket is the stronger year-round operating base. Phuket Town and Wichit connect hospitals, government services and ordinary urban life; Rawai, Nai Harn and Chalong provide a lived-in southern coastal pattern; Choeng Thale, Laguna and Si Sunthon provide a polished international service ecosystem at a higher price and with more development exposure. Koh Samui is credible for buyers who deliberately want an island villa life around Bo Phut, Maenam or Lamai and accept narrower healthcare depth, road dependence, water and wastewater questions, storm disruption and a smaller operator and resale pool.",
+        "Look elsewhere first if the plan depends on the property creating residence, direct foreign land freehold, an informal nominee company, guaranteed yield or hands-off villa ownership. A Thai home does not grant a visa. The BOI Long-Term Resident programme has separate age, passive-income and investment tests; property can be part of a qualifying investment for some applicants but does not produce automatic approval. Proceed in order: establish residence and healthcare, select the legal product, choose the daily-life zone, reconcile title and building, test hazards and services, then price the exit."
+    ),
+    lenses_intro="The Atlas pairs the ten decision dimensions into five practical questions. Phuket and Koh Samui share a national legal framework, but daily life, infrastructure, product type and the future buyer pool differ enough that each address needs its own conclusion.",
+    lenses=(
+        DossierLens(
+            "Choose the daily system, not the holiday memory",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Phuket's best retirement case is ordinary life with tropical access. Phuket Town and Wichit offer supermarkets, markets, cafés, municipal services and the island's deepest concentration of hospitals and specialists. Bangkok Hospital Phuket publishes emergency and specialist contact routes, while other private and public providers expand the local network. Rawai and Chalong have a strong foreign-resident ecosystem, marinas, restaurants and south-coast access, but traffic and distance from major hospitals vary by address. Choeng Thale and Laguna add polished services and beach proximity, though the pattern can feel more resort-led and development-heavy. Test the home on a weekday in wet season, not only at sunset.",
+                "Koh Samui offers a more private island rhythm. Bo Phut combines airport access, services and a broad residential base; Maenam is quieter and greener with a longer east-coast service trip; Lamai has an established town and beach pattern south of the busiest northeast corridor. The trade is operational. Samui's hospital choice and airport are useful but smaller, specialist care can require travel, and most households depend on a car, driver or motorbike on roads with variable width, drainage and lighting. Koh Samui municipality publishes water-resource and wastewater work because those systems matter. Confirm actual supply, storage, septic or sewer connection and backup arrangements for the candidate home.",
+                "Retirement fit changes when heat, mobility or health changes. Walk the route to groceries, test stairs and bedroom access, time an emergency journey and ask who can manage the property during an absence. Private healthcare needs insurance or a funded self-pay plan; owning a home does not create public coverage or residence. On both islands, inspect cooling, shade, ventilation, mosquito control, mould, salt corrosion and wet-season access. The strongest home remains manageable when one household member cannot drive, when a flight is disrupted and when the pool, pump, air-conditioning or roof needs urgent work. Tropical appeal earns the destination's lifestyle score; repeatable daily life earns retirement fit.",
+            ),
+        ),
+        DossierLens(
+            "Use the airports, but price the final kilometre",
+            ("global_access", "foreigner_fit"),
+            (
+                "Phuket International Airport gives the island a material access advantage. Airports of Thailand publishes current passenger services, transport and flight information, and the airport supports domestic and regional routes without a Bangkok road transfer. That does not make every address easy. The north-south road system can turn a modest map distance into a slow journey in peak traffic or heavy rain. Choeng Thale and the northwest sit closer to the airport than Rawai and Nai Harn; Phuket Town and Wichit are better connected to administrative and hospital functions. Time the front-door journey during a realistic arrival, including luggage, rain, taxi availability and a late flight.",
+                "Samui Airport makes island living far more practical than a ferry-only destination, but route breadth, pricing and disruption tolerance differ from Phuket. The airport is close to Bo Phut and the northeast; Maenam and Lamai add road time. Ferries provide useful redundancy and vehicle access, yet port choice, queues, weather and onward travel matter. A buyer who makes frequent long-haul journeys should compare the whole chain, not the existence of an airport icon. Keep a plan for missed connections, medical transfer, storm disruption and receiving contractors or family when the owner is abroad.",
+                "Both islands are internationally familiar, with English-speaking agents, private hospitals and service businesses. Familiarity reduces friction but does not change the language or authority of Land Office records, building permits, tax filings, juristic-person documents or local licences. Appoint an independent Thai lawyer who did not represent the seller or developer, a tax adviser, an engineer and a reliable local contact. Have material documents translated, identify who receives official notices and agree inspection and payment controls. Foreigner fit is strong for a buyer who builds this local operating system; it is weak for someone expecting the sales team or rental manager to substitute for independent governance.",
+            ),
+        ),
+        DossierLens(
+            "Separate land, building, title and permitted use",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Start with the legal product. The Department of Lands' English guidance explains that foreign ownership in a registered condominium cannot exceed 49% of the aggregate unit area and requires qualifying foreign-currency evidence. Confirm the condominium registration, unit title, current foreign quota, remittance documentation, common-property rights, juristic-person accounts, reserve fund, insurance, arrears, litigation and rules. A resort residence can have a condominium title, a hotel operating layer, both or neither. Ask whether the unit is independently transferable and occupiable if a branded operator changes, and whether promised services are contractual, funded and lawful.",
+                "A villa requires a different file. Foreign individuals generally cannot own land, and a Thai company's landholding cannot lawfully rely on nominee shareholders. A lease can grant use for its registered term but is not land freehold; renewal promises, inheritance and transfer economics need written analysis. Building ownership, superficies, usufruct, access, utilities and the land title must be reconciled. Check the Chanote or other title, survey and encumbrances at the Land Office; trace seller authority and company history; verify the construction permit, completion, lawful floor area, pool and retaining structures. The Si Sunthon observation below is marketed with company ownership. That description is a diligence warning, not an endorsed structure.",
+                "Hazard and building review belong beside title. The Department of Mineral Resources publishes landslide susceptibility and geohazard maps, including Phuket tsunami material; the Meteorological Department publishes monsoon and rainfall evidence. Overlay current tsunami, flood, landslide and drainage information, then inspect the actual site after rain. Review slope cuts, retaining walls, access gradient, stormwater route, roof fixing, corrosion, water storage, electrical systems and evacuation. Koh Samui hillside villas require particular road, retaining-wall and runoff scrutiny. Obtain a property-specific insurance quotation before commitment. Being outside a mapped outline does not prove the address will drain, evacuate or insure well.",
+            ),
+            "monsoon-road",
+        ),
+        DossierLens(
+            "Treat short stays as a regulated operating business",
+            ("rental_profit", "capital_upside"),
+            (
+                "Do not underwrite nightly income from an online listing. Thailand's Hotel Act defines temporary accommodation for compensation as a hotel and creates a licence framework, subject to current exemptions and implementing rules; accommodation provided on a monthly basis or longer is treated differently in the Act's definition. The exact building, unit, room count, operator and local permission determine the answer. Verify the Hotel Act licence or exemption, building use, local registration, condominium rules, tax position and operator authority in writing. A developer pool, management contract or historic guest activity is not proof that a new owner may continue the same operation.",
+                "A lawful property still needs a complete operating model. Reconcile achieved nights and rates with bank, tax and booking records, then deduct management, guest communication, cleaning, linen, platform fees, electricity, water, internet, pool and garden care, pest control, insurance, repairs, replacement reserve, tax, owner use and empty periods. Villa utilities and maintenance can be large, particularly when cooling, pumps and salt exposure combine. Phuket has a deeper management market; Samui's operator dependence and logistics can be greater. Compare the outcome with a normal monthly tenancy and with personal use only. Reject guaranteed yield unless the guarantor, security, term, exclusions and payment history survive independent review.",
+                "Official REIC evidence provides scale, not a return forecast. In 2025 foreigners transferred 1,190 condominium units worth 6,087 million baht in Phuket, versus 212 units worth 552 million baht across Surat Thani Province. The latter is province-wide and is not a Samui villa series. REIC's Q1 2026 secondary asking inventory showed 2,898 Phuket listings with an average asking price of 8.3 million baht, while Surat Thani's broader inventory was larger and cheaper on average. These figures confirm activity and dispersion; they do not establish a candidate yield, lawful use or appreciation. Capital upside remains product- and structure-specific.",
+            ),
+            "samui-villa-life",
+        ),
+        DossierLens(
+            "Enter through a recognisable product and preserve the exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The three current observations deliberately mix products. The Rawai condominium asks 14 million baht for 134 square metres of seller-stated indoor area and is marketed as foreign quota. The Si Sunthon villa asks 28.9 million baht for 534 square metres and is marketed with company ownership. The Maenam villa asks 12.9 million baht for 220 square metres on a stated 600-square-metre plot and explicitly notes that a foreigner cannot own the land. Their converted area prices are not a clean index: common areas, land, age, services, fit-out and legal rights differ. They are asking evidence—not valuations or proof of availability.",
+                "Value entry begins with comparability. For a condominium, compare completed transfers in the same building or immediate area, unit condition, view, floor, foreign quota, common fees, reserve and operating restrictions. For a villa, compare the lawful building and land rights, plot, internal area, age, access, drainage, water, permit and maintenance record. REIC's official inventory and foreign-transfer totals can challenge an implausible story, but a candidate needs matched completed evidence and an independent valuation. A cheap legal structure can be expensive at exit; a premium for clear foreign-quota title, ordinary access and a well-run building may be rational.",
+                "Exit liquidity follows the next buyer's eligibility and confidence. A well-located foreign-quota Phuket condominium can reach a broader international pool if the building is funded and the title is clean. A practical Rawai or Choeng Thale home may attract resident and second-home demand, but competition from new supply matters. A Samui villa's pool narrows with ticket size, lease duration, company risk, steep access, specialised design and operator dependence. Before purchase, ask two independent agents how they would resell the exact legal product, which completed deals they would use and how long it could take. Model a slow sale, full selling costs and no appreciation.",
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Phuket combines deep services with Rawai and Choeng Thale coast life; Koh Samui offers a quieter villa rhythm around Maenam and Bo Phut.",
+        "global_access": "Phuket Airport has the broader network; Samui Airport keeps island life viable but adds higher connection, road and disruption sensitivity.",
+        "ownership_clarity": "Phuket and Koh Samui condominiums can offer foreign-quota freehold; villa land, building, lease and company rights require separate legal proof.",
+        "regulatory_safety": "Phuket and Samui buyers must reconcile title, permits, lawful accommodation use, tsunami, flood, landslide, drainage and insurance at address level.",
+        "rental_profit": "Phuket has the deeper operator market, while Koh Samui villas can carry heavier utilities, maintenance, seasonality and management dependence.",
+        "capital_upside": "Phuket transaction depth supports selected products; Koh Samui scarcity can help distinctive villas, but structure and exit risk constrain broad appreciation claims.",
+        "retirement_fit": "Phuket Town and Wichit provide the strongest healthcare base; Maenam, Bo Phut and Lamai require more driving and medical-transfer planning.",
+        "exit_liquidity": "Foreign-quota Phuket condominiums reach a clearer buyer pool; singular Samui villas and company or lease structures can take longer to resell.",
+        "foreigner_fit": "Phuket and Koh Samui are internationally familiar, yet Land Office, visa, tax, building and licensing work still needs independent Thai support.",
+        "value_entry": "Rawai, Si Sunthon and Maenam asking evidence spans unlike legal and physical products, so one island-wide price cannot establish value.",
+    },
+    market_anchors=(
+        {"location": "Phuket foreign condominium transfers", "evidence": "1,190 units / 6,087 million THB", "buyer_read": "Official REIC 2025 foreign-buyer transfers; activity evidence, not an asking-price or villa-market benchmark.", "source_label": "REIC 2025 foreign condominium report", "source_url": "https://www.reic.or.th/News/RealEstate/470678"},
+        {"location": "Surat Thani foreign condominium transfers", "evidence": "212 units / 552 million THB", "buyer_read": "Official REIC 2025 province-wide evidence; not specific to Koh Samui and not a villa series.", "source_label": "REIC 2025 foreign condominium report", "source_url": "https://www.reic.or.th/News/RealEstate/470678"},
+        {"location": "Phuket secondary asking inventory", "evidence": "2,898 listings / 8.3 million THB average", "buyer_read": "Official Q1 2026 asking-inventory evidence; a broad listing average, not a completed-sale median or candidate valuation.", "source_label": "REIC Q1 2026 secondary inventory", "source_url": "https://www.reic.or.th/Upload/260616-PressReleaseREIC-Q1-69-02_59769_1781663071_30035.pdf"},
+    ),
+    micro_locations_intro="Choose the operating pattern before the property. These four areas span urban service depth, southern resident coast, premium northwest development and Samui island life; none substitutes for address-level title, building, hazard and transport work.",
+    micro_locations=(
+        {"name": "Phuket Town / Wichit", "best_for": "Strongest year-round services and hospitals", "daily_life": "Urban markets, retail, administration and ordinary resident demand", "diligence": "Traffic, flood drainage, building management and coast access"},
+        {"name": "Rawai / Nai Harn / Chalong", "best_for": "Lived-in southern coast and foreign-resident services", "daily_life": "Restaurants, marinas and beach access with a car-led rhythm", "diligence": "Airport and hospital time, oversupply, title, drainage and lawful rent"},
+        {"name": "Choeng Thale / Laguna / Si Sunthon", "best_for": "Polished services and northwest beach access", "daily_life": "International schools, dining, clubs and expanding residential zones", "diligence": "Construction pipeline, traffic, common fees, water and villa structure"},
+        {"name": "Koh Samui: Bo Phut / Maenam / Lamai", "best_for": "Deliberate island and villa lifestyle", "daily_life": "Airport-side services, quieter north coast or established southeast town", "diligence": "Roads, slope, water, wastewater, healthcare transfer, operator and exit"},
+    ),
+    checklist=(
+        "Confirm the residence, healthcare and tax plan separately from property ownership.",
+        "Obtain an independent Thai opinion on the buyer, title, land, building, lease, company and exit rights.",
+        "For a condominium, verify registration, unit title, foreign quota, remittance evidence and juristic-person finances.",
+        "For a villa, reconcile Chanote, survey, access, building permit, lawful area, pool, utilities and every land right.",
+        "Overlay tsunami, flood, landslide and rainfall evidence; inspect drainage, slope and evacuation on site.",
+        "Assume zero nightly income until the Hotel Act licence or exemption, building use and operator authority are proven.",
+        "Test airport, hospital, grocery and contractor journeys in peak traffic and wet season.",
+        "Model five-year cash outlay and a slow resale to the next legally eligible buyer.",
+    ),
+    references_intro="Ownership, residence, tax, lodging, title, hazards, healthcare, transport, market and listing claims were reviewed on 22 August 2026. Recheck no later than 22 February 2027 and immediately after any ownership, visa, tax, lodging, listing, transport, hazard or market-data change. Obtain current Thai legal, tax, immigration, building, engineering, insurance and management advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "Department of Lands: foreign ownership guidance", "url": "https://www.dol.go.th/train/Documents/ENG_E_BOOK.pdf"},
+        {"label": "Department of Lands: English Land Code", "url": "https://www.dol.go.th/media/813280848056029184/2026/02/EBAF485hLGxjwntourvyDW2a.pdf"},
+        {"label": "Department of Lands: land for foreigners", "url": "https://www.dol.go.th/dol-services/public-service-manual/land-registration/land-for-foreigners/?page=1"},
+        {"label": "Department of Lands: fees and taxes", "url": "https://www.dol.go.th/en/dol-services/public-service-manual/land-registration/fees-taxes-duties/"},
+        {"label": "BOI: Long-Term Resident programme", "url": "https://ltr.boi.go.th/"},
+        {"label": "Department of Provincial Administration: Hotel Act", "url": "https://multi.dopa.go.th/legal/assets/modules/news/uploads/a8fec27695d5ecdb26fe0de8f70040fc5c00b4c6870cd0192022484170852251.pdf"},
+        {"label": "Revenue Department: rental income", "url": "https://www.rd.go.th/english/6045.html"},
+        {"label": "Revenue Department: statutory tax chapters", "url": "https://www.rd.go.th/english/37748.html"},
+        {"label": "REIC: 2025 foreign condominium transfers", "url": "https://www.reic.or.th/News/RealEstate/470678"},
+        {"label": "REIC: Q1 2026 secondary asking inventory", "url": "https://www.reic.or.th/Upload/260616-PressReleaseREIC-Q1-69-02_59769_1781663071_30035.pdf"},
+        {"label": "Department of Mineral Resources: landslide susceptibility", "url": "https://gisportal.dmr.go.th/arcgis/rest/services/hazard/landslide_susceptibility/mapserver"},
+        {"label": "Department of Mineral Resources: geohazard maps", "url": "https://www.dmr.go.th/map_service/geohazard_map/"},
+        {"label": "Department of Mineral Resources: Phuket tsunami material", "url": "https://www.dmr.go.th/wp-content/uploads/2022/11/cartoontsunami.pdf"},
+        {"label": "Thai Meteorological Department: monthly climate summaries", "url": "https://tmd.go.th/en/climate/summarymonthly"},
+        {"label": "Phuket International Airport", "url": "https://phuket.airportthai.co.th/?lang=en"},
+        {"label": "Samui Airport", "url": "https://www.samuiairport.com/en/"},
+        {"label": "Bangkok Hospital Phuket: important contacts", "url": "https://www.bangkokhospital.com/en/phuket/visit/important-telephone-numbers"},
+        {"label": "Koh Samui municipality: water resources", "url": "https://www.kohsamuicity.go.th/content/resource"},
+        {"label": "Koh Samui municipality: wastewater", "url": "https://www.kohsamuicity.go.th/news/detail/78559/data.html"},
+        {"label": "Rawai condominium asking observation", "url": "https://www.fazwaz.com/property-sales/2-bedroom-condo-for-sale-at-selina-serenity-resort-residences-in-rawai-phuket-u1944488"},
+        {"label": "Si Sunthon villa asking observation", "url": "https://www.fazwaz.com/property-sales/4-bedroom-villa-for-sale-at-manor-phuket-in-si-sunthon-phuket-u6144306"},
+        {"label": "Maenam villa asking observation", "url": "https://www.fazwaz.com/property-sales/3-bedroom-villa-for-sale-in-maenam-surat-thani-u6076824"},
+        {"label": "European Central Bank: euro reference rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("phuket-service-base", "/assets/phuket-koh-samui-phuket-service-base.webp", "Older residents walking through a shaded Phuket neighbourhood near shops and everyday services", "Phuket's strongest case is a practical year-round base with the coast nearby.", "hero"),
+        DossierImage("monsoon-road", "/assets/phuket-koh-samui-monsoon-road.webp", "Wet-season road and tropical drainage beside homes in Phuket", "Monsoon access, drainage and slope conditions belong in the property file.", "wide"),
+        DossierImage("samui-villa-life", "/assets/phuket-koh-samui-samui-villa-life.webp", "Mature couple on a shaded Koh Samui terrace overlooking a tropical residential hillside", "Samui's villa life is compelling when water, roads, healthcare and management are solved.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Phuket / Koh Samui through five destination lenses",
+    assessment_intro="Here’s how Phuket / Koh Samui scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current observations show a Rawai foreign-quota condominium, a Si Sunthon company-structure villa and a Maenam villa. They are asking evidence—not valuations. Local THB is primary; USD uses the recorded ECB cross-rate basis.",
+    market_anchors_intro="These official REIC figures establish market scale and broad asking context. They do not price a candidate, prove lawful use or create a Koh Samui villa index.",
+    orientation_groups=(
+        DossierOrientationGroup("Phuket service and coast corridors", (("Phuket Town / Wichit", "Hospitals and urban services"), ("Chalong / Rawai", "Southern resident coast"), ("Nai Harn", "Beach-led south"), ("Choeng Thale / Laguna", "Northwest international services"), ("Si Sunthon", "Inland villa growth"))),
+        DossierOrientationGroup("Koh Samui north, east and south", (("Maenam", "Quieter north coast"), ("Bo Phut", "Airport-side services"), ("Chaweng", "Busiest east-coast hub"), ("Lamai", "Established southeast town"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current airport and ferry schedules, wet-season roads, hospital time, water and wastewater arrangements, and property-level access.",
+    country_guide_url="/countries/thailand-property/",
+    country_guide_label="Thailand property guide",
+    rail_comparison="Compare Phuket / Koh Samui with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -2428,6 +2575,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     MALLORCA_DOSSIER.destination_id: MALLORCA_DOSSIER,
     CROATIA_ISTRIA_DALMATIA_DOSSIER.destination_id: CROATIA_ISTRIA_DALMATIA_DOSSIER,
     QUEENSTOWN_DOSSIER.destination_id: QUEENSTOWN_DOSSIER,
+    PHUKET_KOH_SAMUI_DOSSIER.destination_id: PHUKET_KOH_SAMUI_DOSSIER,
 }
 
 

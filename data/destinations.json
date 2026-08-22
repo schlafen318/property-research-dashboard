@@ -1737,15 +1737,15 @@
     "country": "Thailand",
     "category": "Water",
     "overall_score": 3.76,
-    "usd_per_m2": 2900.0,
-    "net_yield_estimate": "3–6% est. net; leasehold risk should require higher hurdle rate",
+    "usd_per_m2": 1800.0,
+    "net_yield_estimate": "Property-specific: model only lawful, evidenced net income",
     "quick_metrics": {
-      "usd_m": "$2,900",
-      "net_yield": "3–6% est. net; leasehold risk should require higher hurdle rate",
+      "usd_m": "$1,800",
+      "net_yield": "Property-specific; verify lawful use and costs",
       "ownership": "2.0/5",
       "friendly": "4.5/5"
     },
-    "panel_summary": "Thailand is compelling on yield and lifestyle but weak on land ownership clarity. The panel would view it as an operating/yield play, not a clean retirement-property ownership play.",
+    "panel_summary": "Phuket and Koh Samui can deliver exceptional tropical daily life, but the legal product comes first: foreign-quota condominium, leasehold, building ownership and land rights have different risk and resale profiles.",
     "pros": [
       "Strong tourism demand",
       "high villa ADR potential",
@@ -1759,7 +1759,7 @@
       "oversupply pockets",
       "governance and exit liquidity vary widely."
     ],
-    "panel_verdict": "Keep as a yield candidate only with conservative legal structuring. Not a clean core holding.",
+    "panel_verdict": "Proceed only after an independent Thai lawyer confirms the buyer, title, land rights, building ownership, permitted use and exit path in writing.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -1793,7 +1793,7 @@
       },
       "rental_profit_potential": {
         "label": "Rental profit potential",
-        "score": 4.3,
+        "score": 3.7,
         "weight": 0.12
       },
       "capital_upside": {
@@ -1835,15 +1835,15 @@
     "ownership_notes": "Foreigners cannot own Thai land freehold. Condos can be freehold within the 49% foreign quota; villas typically use leasehold/superficies/company structures with legal risk.",
     "red_flags": "Land-title/leasehold economics, illegal nominee/company structures, oversupply pockets, monsoon/maintenance.",
     "rental": {
-      "gross_yield": "4–8% gross often cited; trophy villas can exceed but results are operator/location-specific",
-      "net_yield": "3–6% est. net; leasehold risk should require higher hurdle rate",
-      "revenue": "AirROI Phuket: ~$12,292 avg annual revenue, $162 ADR, 37.7% occupancy. AirDNA/Airbtics Koh Samui snapshots: ~56–66% occupancy; Samui median revenue around THB1.26m per listing cited by local analysis.",
-      "adr_occupancy": "Phuket $162; Samui sources $140–254 / Phuket 37.7%; Samui ~56–66%",
-      "confidence": "High for STR metrics; medium for actual villa yield"
+      "gross_yield": "No destination-wide yield used; verify lawful accommodation use and filed property records",
+      "net_yield": "Property-specific after management, utilities, maintenance, tax, empty periods and owner use",
+      "revenue": "No commercial aggregate is used as a substitute for property-level lawful revenue and expense evidence.",
+      "adr_occupancy": "Not used for underwriting without address-level operating records",
+      "confidence": "Low until licence, legal use and filed operating evidence are verified"
     },
-    "price_basis": "USD-denominated project benchmark. Phuket 2026 data shows condos around $2,000–3,400/m² for freehold units in many areas and higher new-project apartment averages around $4,100–4,220/m²; villas can be around ~$2,390/m². Dashboard uses blended villa/condo entry proxy.",
-    "price_confidence": "Medium; zone/tenure mix matters a lot",
-    "profit_driver": "Asian tourism, wellness, high villa ADR, strong operating ecosystem, relatively low construction/labour costs."
+    "price_basis": "The $1,800/m² display is a rounded median of three direct asking observations captured 22 August 2026. This is mixed-asset evidence spanning a foreign-quota Rawai condominium and two villas, using seller-stated indoor area and the ECB cross-rate of 1 THB = 0.0303813 USD. It is asking evidence, not a completed-sale median, valuation or like-for-like market benchmark.",
+    "price_confidence": "Medium-low; three current direct observations with explicit indoor-area and tenure notes, bounded by official REIC market evidence",
+    "profit_driver": "Lawful utility, legal structure, airport and healthcare access, professional operation and a credible future buyer pool."
   },
   {
     "id": "vancouver-island-victoria",

@@ -16,7 +16,7 @@ DESTINATION_ID = "park-city-deer-valley"
 REVIEWED_DOSSIERS = {
     "fukuoka-itoshima", "valencia", "algarve-cascais", "madeira",
     "malaga-costa-del-sol", "hakone-izu", "lake-como", "hakuba",
-    "costa-brava-girona", DESTINATION_ID, "crete", "niseko", "annecy", "mallorca", "croatia-istria-dalmatia", "queenstown",
+    "costa-brava-girona", DESTINATION_ID, "crete", "niseko", "annecy", "mallorca", "croatia-istria-dalmatia", "queenstown", "phuket-koh-samui",
 }
 
 
