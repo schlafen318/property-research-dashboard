@@ -35,6 +35,12 @@ class DossierImage:
 
 
 @dataclass(frozen=True)
+class DossierOrientationGroup:
+    label: str
+    stops: tuple[tuple[str, str], ...]
+
+
+@dataclass(frozen=True)
 class PremiumDossierSpec:
     destination_id: str
     title: str
@@ -48,6 +54,7 @@ class PremiumDossierSpec:
     lenses_intro: str
     lenses: tuple[DossierLens, ...]
     score_reads: dict[str, str]
+    market_anchors: tuple[dict[str, str], ...]
     micro_locations_intro: str
     micro_locations: tuple[dict[str, str], ...]
     checklist: tuple[str, ...]
@@ -55,6 +62,15 @@ class PremiumDossierSpec:
     references: tuple[dict[str, str], ...]
     images: tuple[DossierImage, ...]
     nav_items: tuple[tuple[str, str], ...]
+    lenses_heading: str
+    assessment_intro: str
+    listings_intro: str
+    market_anchors_intro: str
+    orientation_groups: tuple[DossierOrientationGroup, ...]
+    orientation_caption: str
+    country_guide_url: str
+    country_guide_label: str
+    rail_comparison: str
 
 
 FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
@@ -63,7 +79,7 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
     description="Assess Fukuoka and Itoshima retirement property through daily life, access, foreign ownership, rental rules, value, resale, hazards, and representative listings.",
     h1="Fukuoka / Itoshima: city ease, coast within reach",
     lede=(
-        "Fukuoka / Itoshima is the Atlas’s strongest Japanese proposition for a buyer who wants a home to work on ordinary weekdays, not only on holidays. Fukuoka supplies hospitals, rail, an unusually close airport, food and a large resident economy; Itoshima adds beaches, fields and a slower rhythm west of the city. The pairing is compelling, but it is not interchangeable. A station-area apartment, a Maebaru house and a car-dependent coastal home solve different retirement problems and carry different hazard, maintenance and resale risks."
+        "Fukuoka / Itoshima is Japan’s clearest city-and-coast retirement proposition. Fukuoka offers hospitals, rail, an airport minutes from downtown and a deep resident economy; Itoshima adds beaches, fields and a slower rhythm. The choice is not interchangeable: a station-area apartment, a Maebaru house and a car-dependent coastal home deliver different daily lives, maintenance burdens and resale prospects. This dossier shows where each pattern works—and where the romance needs harder diligence."
     ),
     author="Global Home Atlas Research Team",
     date_published="2026-08-21",
@@ -137,6 +153,29 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
         "foreigner_fit": "Fukuoka provides multilingual support and strong regional access, but property documents, tax notices and ongoing Itoshima management may still operate in Japanese.",
         "value_entry": "Fukuoka apartments, Maebaru houses and premium Itoshima coastal homes span very different price points, maintenance burdens and future buyer pools.",
     },
+    market_anchors=(
+        {
+            "location": "Imashuku station catchment",
+            "evidence": "121,700–132,400 JPY/m²",
+            "buyer_read": "Four normal land comparables in the 2026 MLIT appraisal; the same report places a typical new-build house at about 35–45 million JPY.",
+            "source_label": "MLIT 2026 appraisal",
+            "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/40/2026401350006.html",
+        },
+        {
+            "location": "Eastern Itoshima / Takata",
+            "evidence": "82,900–108,500 JPY/m²",
+            "buyer_read": "Four normal land comparables used in the 2025 MLIT appraisal, with the standard residential site assessed at 96,000 JPY/m².",
+            "source_label": "MLIT 2025 appraisal",
+            "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2025/40/2025402300001.html",
+        },
+        {
+            "location": "Outer Itoshima / Shima and Nijo",
+            "evidence": "7,720–41,400 JPY/m²",
+            "buyer_read": "Selected 2025 residential land benchmarks show how sharply value changes with rail access, settlement and coastal position.",
+            "source_label": "Fukuoka Prefecture 2025 land survey",
+            "source_url": "https://www.pref.fukuoka.lg.jp/uploaded/life/792986_62689081_misc.pdf",
+        },
+    ),
     micro_locations_intro=(
         "The useful comparison is not Fukuoka versus Itoshima in the abstract. It is a progression from fully urban and transit-led living to lower-density coastal living. Boundaries below are decision aids rather than price zones; confirm the exact address, school district, planning designation, hazard layers and transport timetable."
     ),
@@ -167,6 +206,9 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
         {"label": "Ministry of Land: taxes when buying, holding and selling land", "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html"},
         {"label": "Ministry of Land: water-hazard maps in the important-matters explanation", "url": "https://www.mlit.go.jp/totikensangyo/const/sosei_const_fr3_000074.html"},
         {"label": "Ministry of Land: Real Estate Information Library", "url": "https://www.reinfolib.mlit.go.jp/"},
+        {"label": "Ministry of Land: 2026 Imashuku appraisal and comparable land evidence", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/40/2026401350006.html"},
+        {"label": "Ministry of Land: 2025 eastern Itoshima appraisal and comparable land evidence", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2025/40/2025402300001.html"},
+        {"label": "Fukuoka Prefecture: 2025 land-price survey", "url": "https://www.pref.fukuoka.lg.jp/uploaded/life/792986_62689081_misc.pdf"},
         {"label": "Japan Tourism Agency: Private Lodging Business Act", "url": "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html"},
         {"label": "Fukuoka Airport: official access guidance", "url": "https://www.fukuoka-airport.jp/en/access/"},
         {"label": "Fukuoka City: population and municipal statistics", "url": "https://www.city.fukuoka.lg.jp/shisei/toukei/index.html"},
@@ -191,11 +233,176 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
         ("checklist", "Buyer checklist"),
         ("sources", "References"),
     ),
+    lenses_heading="Fukuoka / Itoshima through five destination lenses",
+    assessment_intro="Here’s how Fukuoka / Itoshima scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three observations show the spread between a practical western-Fukuoka apartment, an Itoshima lifestyle house and a higher-end coastal asset. Local asking price is primary; USD uses the recorded dataset exchange basis.",
+    market_anchors_intro="These figures are land evidence—not finished-home prices. They provide a public-market check on the asking listings above and must still be matched for location, building, age and condition.",
+    orientation_groups=(
+        DossierOrientationGroup(
+            "City to coast",
+            (
+                ("Central Fukuoka", "Urban and transit-led"),
+                ("Meinohama corridor", "Connected western base"),
+                ("Maebaru", "Town services with rail access"),
+                ("Itoshima coast", "Car-led and seasonal"),
+            ),
+        ),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact route and timetable for every address.",
+    country_guide_url="/japan-retirement-property-foreign-buyers/",
+    country_guide_label="Japan retirement property guide",
+    rail_comparison="Compare Fukuoka / Itoshima with the full Atlas.",
+)
+
+
+ALGARVE_CASCAIS_DOSSIER = PremiumDossierSpec(
+    destination_id="algarve-cascais",
+    title="Algarve and Cascais Retirement Property Dossier",
+    description="Assess Algarve and Cascais retirement property through daily life, access, ownership, residence, rental rules, climate risk, value, resale, and current listings.",
+    h1="Algarve / Cascais: two Portuguese coasts, two ownership lives",
+    lede=(
+        "Algarve / Cascais is a comparison, not a single market. Cascais is a premium Atlantic town tied to Lisbon’s jobs, hospitals, airport and rail network. The Algarve is a long southern region whose eastern towns, central airport corridor and western coast produce different daily routines and buyer pools. Both can support an excellent retirement home; neither should be bought on sunshine alone. The address, residence route, municipal rules and year-round operating plan decide whether the promise survives ordinary life."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is positive for a lifestyle-led buyer who values liveability, established international communities and clear purchase mechanics more than high yield. Cascais is the stronger all-season, low-friction base: Lisbon Airport, major hospitals, urban culture and professional services are within the wider metropolitan system, while the Cascais rail line supports a recognisable car-light pattern. The Algarve offers more geographic and price choice, warmer winters and a deeper holiday-home ecosystem, but the practical answer changes markedly between Faro and Loulé, Tavira in the east, and Lagos in the west. Treating those places as substitutes is the fastest way to misprice access, seasonality and future resale.",
+        "One condition sits above the property decision: ownership is not residence. Portugal’s current investment-residence page lists routes such as job creation, research, cultural support and qualifying investment funds; buying an ordinary home is not listed as a qualifying route. A deed can help prove accommodation within a valid residence application, but it does not itself create permission to live in Portugal or automatic access to the National Health Service. Confirm the buyer’s residence basis, tax position and healthcare registration sequence before using a second-home purchase as a retirement plan.",
+        "Proceed if the home works without tourist rent, the preferred town remains useful outside summer, and the household accepts the location’s real transport pattern. Look elsewhere if the investment needs aggressive short-stay income, a property-created visa, low entry pricing in a prime coastal district, or effortless car-free living in a dispersed Algarve resort. The strongest purchase is usually an established, legally documented home near the services the buyer will use weekly—not the most dramatic view at the edge of the map."
+    ),
+    lenses_intro=(
+        "The five lenses below pair the Atlas’s ten scoring dimensions and keep the decision in buyer language. Each lens contrasts Cascais with the relevant Algarve submarkets; the complete ten-factor assessment appears once in the score table."
+    ),
+    lenses=(
+        DossierLens(
+            "Choose the life that still works in February",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Cascais offers the most complete urban-coastal retirement pattern in this dossier. The town has beaches, a walkable centre, restaurants and an established international community, but its deeper advantage is proximity to the Lisbon metropolitan economy. Groceries, pharmacies, private clinics, rail services and everyday administration do not disappear after the holiday season. The trade-off is price: buyers pay for that repeatability, and quieter villas beyond the rail-served core can still create driving and maintenance dependence.",
+                "The Algarve is not one lifestyle. Faro and Loulé provide the broadest year-round service base and the shortest relationship with Faro Airport. Tavira offers a slower eastern-Algarve rhythm, a real town centre and access to the Ria Formosa, while Lagos combines a functioning western town with the scenery and visitor economy that make the region internationally legible. Resort belts and isolated villas can be pleasant, but winter closures, summer congestion, heat, garden care and the distance to routine healthcare become more important than a sea view after the first month.",
+                "Healthcare follows residence and registration. Portugal’s health regulator says a foreign resident with a valid residence permit can have the National Register of Users updated so eligible SNS care is assigned under the public system; incomplete documentation can leave the patient financially responsible. Test the preferred base in winter and peak summer, walk to food and pharmacy, make a trial journey to the likely hospital, and ask what happens when one household member no longer drives. Cascais scores highest for repeatable convenience; Algarve retirement fit is strongest in established towns with services rather than seasonal compounds."
+            ),
+            "tavira-life",
+        ),
+        DossierLens(
+            "Measure the whole journey, then the integration work",
+            ("global_access", "foreigner_fit"),
+            (
+                "Cascais uses Lisbon as its gateway. Lisbon Airport’s official guidance places the airport within the capital’s metro and public-transport system, but Cascais still requires a transfer to rail, taxi or road. The railway is valuable because it links central Cascais and Estoril with Lisbon’s western waterfront, yet door-to-door travel depends on the exact walk, luggage, interchange and time of day. A listing described as ‘near Lisbon’ should be tested from the front door to the terminal rather than measured as a straight line.",
+                "Faro Airport is the Algarve gateway, but the last mile expands quickly. Faro and central Algarve locations have the simplest airport relationship. Tavira is east of the airport and can support town-based living, while Lagos lies far to the west and turns a nominally convenient regional airport into a longer road or coach journey. Rail serves parts of the Algarve, but many coastal homes, golf developments and daily errands remain car-led. Calculate airport, supermarket and hospital trips separately; one access score cannot describe every address along a coast more than 150 kilometres long.",
+                "English is widely used in both markets, especially in property and tourism, but the legal and operating environment remains Portuguese. Tax registration, title and land-registry work, condominium minutes, municipal planning, insurance claims and contractor coordination need reliable local interpretation. Cascais has the larger Lisbon professional-services pool; the Algarve has mature foreign-buyer networks but more variation between municipalities and operators. Foreigner friendliness is an advantage, not a substitute for an independent lawyer, tax adviser and surveyor who owe duties to the buyer rather than the selling chain."
+            ),
+        ),
+        DossierLens(
+            "Buy clearly—and verify the exact permitted use",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Portugal’s transaction framework is comparatively legible. The government’s property guide identifies the tax number, land-registry certificate, tax record, use licence, energy certificate and building technical file among the documents used in a purchase. The Tax Authority states that IMT is charged on the higher of the contractual price and taxable patrimonial value, with stamp duty generally charged at 0.8 percent; annual urban-property IMI is normally set by municipalities within a statutory range, and higher-value holdings may also enter AIMI. Obtain a buyer-specific completion statement instead of applying one headline percentage.",
+                "Clear acquisition does not mean every building or use is simple. For an apartment in Cascais, Estoril, Faro, Tavira or Lagos, read condominium bylaws, recent minutes, arrears, insurance, reserve position and major works. For a villa, reconcile the registered areas with the physical building, licences, extensions, pool and outbuildings; check boundaries, access, utilities and whether renovation constraints apply. Coastal position adds salt, wind and moisture, while low-density Algarve plots can add private roads, boreholes, septic systems, gardens and expensive vacant-period supervision.",
+                "Short-stay operation is property- and municipality-specific. Portugal’s current Alojamento Local guide describes registration by prior communication and allows municipal opposition periods that lengthen in containment areas; national amendments restored meaningful municipal control. Condominium and planning constraints can further narrow the answer, and Loulé began a municipal process for sustainable local-accommodation management in 2025. Do not underwrite tourist rent until the municipality, building documents and condominium position have been checked in writing. Climate diligence belongs in the same file: civil-protection material identifies drought exposure in the Algarve, while flood, wildfire, coastal erosion and extreme heat must be checked address by address."
+            ),
+        ),
+        DossierLens(
+            "Separate a durable home from a seasonal business",
+            ("rental_profit", "capital_upside"),
+            (
+                "Cascais has the broader resident-demand story. Its connection to Lisbon, international schools, services and a high-income owner-occupier pool can support long-term demand and resale, although a high purchase price compresses yield. An apartment near the rail line and town services should first be tested against a conventional tenancy, condominium costs and owner-occupier resale. Holiday demand is an optional operating case only after municipal and building approval—not the base case that makes an expensive acquisition work.",
+                "The Algarve has a deep visitor economy, but gross booking revenue is not net return. Faro and Loulé can draw from year-round employment and services; Tavira and Lagos mix residents, second-home owners and tourists in different proportions. A managed villa adds cleaning, pool and garden care, utilities, platform fees, local representation, maintenance, insurance and empty periods. Peak summer can look persuasive while winter occupancy, licence restrictions and owner-use dates weaken the annual result. Model long-term rent, compliant short-stay operation and zero rent as three separate cases.",
+                "Capital upside should be tied to scarcity that future buyers can understand. Cascais has metropolitan depth and a globally legible name, but the entry premium already reflects much of that quality. Established Algarve towns and proven coastal districts may retain international appeal, yet new supply, water constraints, climate adaptation costs and a thinner buyer pool can change the exit. Do not treat Portugal’s past price growth as a forecast. The asset must still make sense at today’s completed-sale evidence, today’s carrying cost and a conservative resale timetable."
+            ),
+            "lagos-coast",
+        ),
+        DossierLens(
+            "Enter at the right local price—and protect the exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Official completed-sale medians show why one Portugal-wide price is unhelpful. Statistics Portugal’s 2025 housing publication reports materially different municipal levels for Cascais, Loulé and Lagos, while an individual home can sit well above or below its municipality depending on precise street, view, age, condition and legal documentation. The three listing observations below are current asking examples, not valuations. Their purpose is to expose the spread between a Cascais apartment, an eastern-Algarve town apartment and a western-Algarve detached house.",
+                "Liquidity follows buyer-pool breadth. A well-located Cascais or Estoril apartment can appeal to local professionals, international residents, downsizers and second-home buyers. Central Algarve homes near services and the airport have a different but still explainable pool. Tavira attracts buyers who value town character and the eastern coast; Lagos attracts buyers who accept western-Algarve distance in exchange for scenery and a recognised leisure market. A singular villa on an isolated road may command emotion at purchase and require patience at sale.",
+                "Build a five-year cash model in euros and in the household’s spending currency. Include IMT and stamp duty, legal and registration work, financing, condominium charges, IMI and possible AIMI, insurance, utilities, management, garden or pool care, repairs, climate adaptation, currency movement and selling costs. Ask two agents who did not source the home to identify the likely future buyer and evidence-based resale range. Value entry is not the lowest ticket; it is the price at which daily usefulness, compliance and future demand compensate for the risks actually attached to the address."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Cascais pairs Atlantic town life with Lisbon access; the Algarve adds warmer winters and wider coastal choice, with stronger seasonality outside established towns.",
+        "global_access": "Cascais uses Lisbon Airport and metropolitan links; the Algarve uses Faro Airport, but Tavira, Loulé and Lagos have sharply different last-mile journeys.",
+        "ownership_clarity": "Cascais and the Algarve share Portugal’s clear purchase framework, though licensed areas, condominium records, taxes and physical buildings still require reconciliation.",
+        "regulatory_safety": "Cascais and Algarve municipalities can shape short-stay permissions, while condominium rules, drought, fire, flood and coastal exposure require address-level checks.",
+        "rental_profit": "Cascais benefits from resident demand but high entry prices; Algarve income can be seasonal and management-heavy, especially for villas dependent on tourist use.",
+        "capital_upside": "Cascais has metropolitan buyer depth and Algarve towns have international appeal, but current premiums, climate costs and local supply limit automatic upside.",
+        "retirement_fit": "Cascais offers the easiest all-season service base; Faro, Loulé, Tavira and Lagos can work well when healthcare, transport and winter life are tested.",
+        "exit_liquidity": "Cascais and established Algarve towns reach recognisable buyer pools; isolated resort or rural villas can require longer marketing and larger price adjustments.",
+        "foreigner_fit": "Cascais and the Algarve have mature international services, but Portuguese tax, registry, municipal, condominium and contractor work still needs independent local support.",
+        "value_entry": "Cascais carries a Lisbon-coast premium, while Tavira, Loulé and Lagos offer different tickets; completed-sale evidence matters more than a blended Algarve average.",
+    },
+    market_anchors=(
+        {"location": "Cascais", "evidence": "4,550 EUR/m²", "buyer_read": "Median completed sale value for family dwellings in 2025; a municipal anchor, not a valuation for a particular home.", "source_label": "Statistics Portugal: Construction and Housing 2025", "source_url": "https://ine.pt/xportal/xmain?PUBLICACOESpub_boui=2247645&xpgid=ine_publicacoes&xpid=INE"},
+        {"location": "Loulé", "evidence": "3,993 EUR/m²", "buyer_read": "Median completed sale value for family dwellings in 2025, illustrating the central Algarve’s premium municipal baseline.", "source_label": "Statistics Portugal: Construction and Housing 2025", "source_url": "https://ine.pt/xportal/xmain?PUBLICACOESpub_boui=2247645&xpgid=ine_publicacoes&xpid=INE"},
+        {"location": "Lagos", "evidence": "3,801 EUR/m²", "buyer_read": "Median completed sale value for family dwellings in 2025; condition, view, legal area and micro-location can move far around it.", "source_label": "Statistics Portugal: Construction and Housing 2025", "source_url": "https://ine.pt/xportal/xmain?PUBLICACOESpub_boui=2247645&xpgid=ine_publicacoes&xpid=INE"},
+    ),
+    micro_locations_intro=(
+        "Where to look begins with two gateways, not one coastal line. Cascais and Estoril belong to Lisbon’s metropolitan orbit. The Algarve runs outward from Faro into central, eastern and western submarkets whose access, seasonality and buyer pools differ. The labels below are decision zones, not price boundaries; verify the municipality, parish, planning status, hazards and actual travel time for every address. Within each zone, walkable town-centre property, a condominium beside the coast and a detached inland villa can have little in common. Compare the home with nearby completed transactions of the same legal type, then repeat the daily-life test from its actual front door. A ten-minute map difference can change car dependence, summer congestion, winter convenience and the number of buyers likely to understand the asset on resale."
+    ),
+    micro_locations=(
+        {"name": "Cascais / Estoril", "best_for": "Metropolitan coastal life", "daily_life": "Rail-linked and service-rich", "diligence": "Entry price, condominium and municipal use"},
+        {"name": "Central Algarve", "best_for": "Airport and service access", "daily_life": "Faro / Loulé year-round base", "diligence": "Exact coast-inland position and car use"},
+        {"name": "Eastern Algarve", "best_for": "Town-led slower living", "daily_life": "Tavira and Ria Formosa rhythm", "diligence": "Flood, coastal rules and seasonal demand"},
+        {"name": "Western Algarve", "best_for": "Scenery and leisure depth", "daily_life": "Lagos-led, more distant from Faro", "diligence": "Water, fire, wind and resale depth"},
+    ),
+    checklist=(
+        "Confirm the residence, tax and healthcare route before treating the purchase as a retirement home.",
+        "Choose Cascais or a specific Algarve corridor; do not search both as one market.",
+        "Test airport, hospital, grocery and social journeys in winter and peak summer.",
+        "Obtain a buyer-specific IMT, stamp-duty, IMI, AIMI and financing statement.",
+        "Reconcile title, registered areas, licences, energy record, condition and condominium governance.",
+        "Confirm short-stay permission with the municipality and building before underwriting any tourist rent.",
+        "Overlay current flood, fire, heat, drought, coastal and insurance evidence for the exact address.",
+        "Model five-year carrying cost and identify the likely resale buyer before making a binding offer.",
+    ),
+    references_intro=(
+        "Legal, tax, residence, health, access, market and hazard claims were reviewed on 22 August 2026 against the primary sources below. The next scheduled review is 22 February 2027, or sooner if a cited law, municipal rule, tax table, transport service, hazard map or market release changes. Recheck the live source and obtain independent Portuguese legal, tax, immigration, building and insurance advice for the exact buyer and property before signing. Listing observations are dated asking evidence only and do not verify availability, title, condition, permitted use or completed value."
+    ),
+    references=(
+        {"label": "Portugal government: buying and selling property", "url": "https://www.gov.pt/guias/compra-e-venda-de-imoveis-em-portugal-cidadaos-europeus"},
+        {"label": "Portuguese Tax Authority: taxes on buying a home", "url": "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Compra_da_casa/Paginas/default.aspx"},
+        {"label": "Portuguese Tax Authority: annual IMI and AIMI", "url": "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Imposto_anual/Paginas/default.aspx"},
+        {"label": "AIMA: current residence-by-investment routes", "url": "https://aima.gov.pt/pt/viver/autorizacao-de-residencia-para-investimento-art-90-o-a"},
+        {"label": "AIMA: residence documentation and proof of accommodation", "url": "https://aima.gov.pt/pt/decreto-regulamentar-da-lei-de-estrangeiros-alteracoes/perguntas-frequentes"},
+        {"label": "Health Regulatory Authority: foreign residents and the National Health Service", "url": "https://www.ers.pt/pt/utentes/perguntas-frequentes/faq/acesso-de-cidadaos-estrangeiros-a-prestacao-de-cuidados-de-saude-no-servico-nacional-de-saude/"},
+        {"label": "Portugal government: registration at a health centre", "url": "https://www.gov.pt/servicos/inscrever-se-no-centro-de-saude"},
+        {"label": "Portugal government: Alojamento Local registration and municipal control", "url": "https://www.gov.pt/guias/alojamento-local"},
+        {"label": "Statistics Portugal: Construction and Housing Statistics 2025", "url": "https://ine.pt/xportal/xmain?PUBLICACOESpub_boui=2247645&xpgid=ine_publicacoes&xpid=INE"},
+        {"label": "Lisbon Airport: official public-transport access", "url": "https://live-site.ana.pt/pt/lis/acesso-e-estacionamento/chegar-e-sair-do-aeroporto/transportes-publicos"},
+        {"label": "ANA Airports: Faro and Lisbon airport access", "url": "https://www.ana.pt/pt/app-content-type/access"},
+        {"label": "National Civil Protection Authority: national risk assessment", "url": "https://prociv.gov.pt/media/h4fgmxul/anr2023_revis%C3%A3o_ultima.pdf"},
+        {"label": "Loulé Municipal Assembly: local-accommodation regulation process", "url": "https://assembleia.cm-loule.pt/sessoes/222"},
+        {"label": "Lagos municipality: local-accommodation registration evidence", "url": "https://www.cm-lagos.pt/site_content/270-espaco-da-empresa/13284-43-qual-e-a-documentacao-necessaria-para-pedir-o-registo-de-estabelecimento-de-alojamento-local-como-recebo-o-numero-de-registo"},
+        {"label": "European Central Bank: euro reference exchange rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("cascais-hero", "/assets/algarve-cascais-coast-hero.webp", "Cascais waterfront promenade and historic town", "Cascais combines an Atlantic town with Lisbon-connected daily life.", "hero"),
+        DossierImage("tavira-life", "/assets/algarve-cascais-tavira-daily-life.webp", "Residents walking on a shaded street in Tavira", "Tavira’s appeal is a functioning eastern-Algarve town, not only a holiday season.", "wide"),
+        DossierImage("lagos-coast", "/assets/algarve-cascais-lagos-coast.webp", "Coastal path and limestone coves near Lagos", "Lagos trades greater distance from Faro for a distinctive western-Algarve landscape.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Algarve / Cascais through five destination lenses",
+    assessment_intro="Here’s how Algarve / Cascais scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations expose the market spread: a Cascais apartment, a Tavira town apartment and a detached Lagos home. EUR is primary; USD uses the recorded ECB reference basis for comparison only.",
+    market_anchors_intro="These figures are official municipal completed-sale evidence—not asking prices or valuations for the listings above. Match every candidate for exact location, legal area, building type, age, condition and view.",
+    orientation_groups=(
+        DossierOrientationGroup("Lisbon gateway", (("Lisbon Airport", "Metropolitan arrival"), ("Cascais / Estoril", "Rail-linked Atlantic base"))),
+        DossierOrientationGroup("Faro gateway", (("Faro Airport", "Regional arrival"), ("Central Algarve", "Faro / Loulé"), ("Eastern Algarve", "Tavira corridor"), ("Western Algarve", "Lagos corridor"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Cascais and the Algarve are separate systems; confirm the actual route, timetable and peak-season travel time for every address.",
+    country_guide_url="/countries/portugal-property/",
+    country_guide_label="Portugal property guide",
+    rail_comparison="Compare Algarve / Cascais with the full Atlas.",
 )
 
 
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
+    ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
 }
 
 
@@ -204,9 +411,6 @@ def get_premium_dossier(destination_id: str) -> PremiumDossierSpec | None:
 
 
 def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
-    if spec.destination_id != "fukuoka-itoshima":
-        raise ValueError("premium dossier is registered for the wrong destination")
-
     for field in fields(spec):
         value = getattr(spec, field.name)
         if isinstance(value, str) and not value.strip():
@@ -226,6 +430,13 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
     if any(not research_read.strip() for research_read in spec.score_reads.values()):
         raise ValueError("premium dossier research reads must not be empty")
 
+    if len(spec.market_anchors) != 3:
+        raise ValueError("premium dossier requires exactly three official market anchors")
+    required_anchor_fields = {"location", "evidence", "buyer_read", "source_label", "source_url"}
+    for anchor in spec.market_anchors:
+        if required_anchor_fields - anchor.keys() or any(not anchor[field].strip() for field in required_anchor_fields):
+            raise ValueError("premium dossier market anchors must be complete")
+
     if len(spec.nav_items) > 7:
         raise ValueError("premium dossier navigation may contain at most seven items")
     if not spec.nav_items or spec.nav_items[-1][0] != "sources":
@@ -242,6 +453,13 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
 
     if len(spec.micro_locations) < 3:
         raise ValueError("premium dossier requires at least three micro-locations")
+    if not 1 <= len(spec.orientation_groups) <= 2:
+        raise ValueError("premium dossier requires one or two orientation groups")
+    for group in spec.orientation_groups:
+        if not group.label.strip() or len(group.stops) < 2:
+            raise ValueError("each orientation group requires a label and at least two stops")
+        if any(not name.strip() or not note.strip() for name, note in group.stops):
+            raise ValueError("orientation stops must be complete")
     if not 6 <= len(spec.checklist) <= 8:
         raise ValueError("premium dossier checklist must contain six to eight items")
     if not spec.references:
@@ -249,3 +467,4 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
 
 
 validate_premium_dossier(FUKUOKA_ITOSHIMA_DOSSIER)
+validate_premium_dossier(ALGARVE_CASCAIS_DOSSIER)

@@ -7104,15 +7104,15 @@ def premium_dossier_score_table(dest: dict, spec: PremiumDossierSpec) -> str:
         raise ValueError(f"{dest['id']} premium dossier requires exactly 10 score dimensions")
     rows = "".join(
         '<tr class="premium-score-row">'
-        f'<th scope="row">{escape(item["label"])}</th>'
-        f'<td class="premium-number">{float(item["score"]):.1f}/5</td>'
-        f'<td class="premium-number">{float(item["weight"]) * 100:.0f}%</td>'
-        f'<td>{escape(spec.score_reads[item["key"]])}</td>'
+        f'<th scope="row" data-label="Dimension">{escape(item["label"])}</th>'
+        f'<td class="premium-number" data-label="Score">{float(item["score"]):.1f}/5</td>'
+        f'<td class="premium-number" data-label="Weight">{float(item["weight"]) * 100:.0f}%</td>'
+        f'<td data-label="Atlas read">{escape(spec.score_reads[item["key"]])}</td>'
         "</tr>"
         for item in dimensions
     )
     return (
-        '<div class="premium-table-wrap"><table class="premium-score-table">'
+        '<div class="premium-table-wrap premium-card-table-wrap"><table class="premium-score-table premium-card-table">'
         '<thead><tr><th>Dimension</th><th>Score</th><th>Weight</th><th>Atlas read</th></tr></thead>'
         f'<tbody>{rows}</tbody></table></div>'
     )
@@ -7143,19 +7143,19 @@ def premium_dossier_listing_table(rows: list[dict]) -> str:
             raise ValueError(f"incomplete representative listing: {sorted(missing)}")
         body.append(
             '<tr class="premium-listing-row">'
-            f'<th scope="row">{escape(row["listing_name"])}</th>'
-            f'<td>{escape(row["property_type"])}</td>'
-            f'<td class="premium-number">{float(row["local_price"]):,.0f} {escape(row["local_currency"])}</td>'
-            f'<td class="premium-number">{money(row["usd_price"])}</td>'
-            f'<td class="premium-number">{float(row["size_m2"]):,.1f} m²</td>'
-            f'<td class="premium-number">{money(row["usd_per_m2"])}/m²</td>'
-            f'<td><a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a><br><span>{escape(row["captured_date"])}</span></td>'
-            f'<td>{escape(row["confidence"])}</td>'
-            f'<td>{escape(row["note"])}</td>'
+            f'<th scope="row" data-label="Observation">{escape(row["listing_name"])}</th>'
+            f'<td data-label="Type">{escape(row["property_type"])}</td>'
+            f'<td class="premium-number" data-label="Asking price">{float(row["local_price"]):,.0f} {escape(row["local_currency"])}</td>'
+            f'<td class="premium-number" data-label="USD comparison">{money(row["usd_price"])}</td>'
+            f'<td class="premium-number" data-label="Area">{float(row["size_m2"]):,.1f} m²</td>'
+            f'<td class="premium-number" data-label="USD/m²">{money(row["usd_per_m2"])}/m²</td>'
+            f'<td data-label="Source / captured"><a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a><br><span>{escape(row["captured_date"])}</span></td>'
+            f'<td data-label="Confidence">{escape(row["confidence"])}</td>'
+            f'<td data-label="What it represents">{escape(row["note"])}</td>'
             "</tr>"
         )
     return (
-        '<div class="premium-table-wrap"><table class="premium-listing-table">'
+        '<div class="premium-table-wrap premium-card-table-wrap"><table class="premium-listing-table premium-card-table">'
         '<thead><tr><th>Observation</th><th>Type</th><th>Asking price</th><th>USD comparison</th><th>Area</th><th>USD/m²</th><th>Source / captured</th><th>Confidence</th><th>What it represents</th></tr></thead>'
         f'<tbody>{"".join(body)}</tbody></table></div>'
     )
@@ -7170,7 +7170,7 @@ def premium_dossier_lenses_html(spec: PremiumDossierSpec) -> str:
         sections.append(f'<div class="premium-lens"><h3>{escape(lens.heading)}</h3>{paragraphs}{figure}</div>')
     return (
         '<section class="premium-section" id="lenses">'
-        '<h2>Fukuoka / Itoshima through five destination lenses</h2>'
+        f'<h2>{escape(spec.lenses_heading)}</h2>'
         f'<p>{escape(spec.lenses_intro)}</p>{"".join(sections)}</section>'
     )
 
@@ -7185,12 +7185,45 @@ def premium_dossier_micro_locations_html(spec: PremiumDossierSpec) -> str:
         "</tr>"
         for item in spec.micro_locations
     )
+    groups = []
+    for group in spec.orientation_groups:
+        stops = "".join(
+            '<li class="premium-location-stop">'
+            f'<strong>{escape(name)}</strong><span>{escape(note)}</span>'
+            '</li>'
+            for name, note in group.stops
+        )
+        groups.append(
+            '<div class="premium-orientation-group">'
+            f'<h3>{escape(group.label)}</h3><ol>{stops}</ol></div>'
+        )
     return (
         '<section class="premium-section" id="locations"><h2>Where to look</h2>'
         f'<p>{escape(spec.micro_locations_intro)}</p>'
+        '<figure class="premium-location-orientation" aria-labelledby="location-orientation-caption">'
+        f'<div class="premium-orientation-groups">{"".join(groups)}</div>'
+        f'<figcaption id="location-orientation-caption">{escape(spec.orientation_caption)}</figcaption>'
+        '</figure>'
         '<div class="premium-table-wrap"><table class="premium-location-table">'
         '<thead><tr><th>Micro-location</th><th>Best for</th><th>Daily life</th><th>Primary diligence</th></tr></thead>'
         f'<tbody>{rows}</tbody></table></div></section>'
+    )
+
+
+def premium_dossier_market_anchors_html(spec: PremiumDossierSpec) -> str:
+    anchors = "".join(
+        '<div class="premium-market-anchor">'
+        f'<dt>{escape(anchor["location"])}</dt>'
+        f'<dd><strong>{escape(anchor["evidence"])}</strong> {escape(anchor["buyer_read"])}</dd>'
+        f'<dd class="premium-anchor-source"><a href="{escape(anchor["source_url"])}" rel="noopener noreferrer">{escape(anchor["source_label"])}</a></dd>'
+        '</div>'
+        for anchor in spec.market_anchors
+    )
+    return (
+        '<div class="premium-market-anchors" id="official-market-anchors">'
+        '<h3>Official market anchors</h3>'
+        f'<p>{escape(spec.market_anchors_intro)}</p>'
+        f'<dl>{anchors}</dl></div>'
     )
 
 
@@ -7267,6 +7300,26 @@ def premium_dossier_css() -> str:
     .premium-number { white-space: nowrap; font-variant-numeric: tabular-nums; }
     .premium-table-wrap span { color: var(--muted); }
     .premium-disclaimer { color: var(--muted) !important; font-size: 13px !important; }
+    .premium-market-anchors { margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--line); }
+    .premium-market-anchors h3 { margin: 0 0 10px; font-family: var(--serif); font-size: 30px; font-weight: 500; }
+    .premium-market-anchors dl { margin: 24px 0 0; border-top: 3px solid var(--ink); }
+    .premium-market-anchor { display: grid; grid-template-columns: minmax(150px, .34fr) minmax(0, 1fr); gap: 7px 24px; padding: 18px 0; border-bottom: 1px solid rgba(36, 49, 45, .18); }
+    .premium-market-anchor dt { grid-row: 1 / span 2; font-weight: 600; }
+    .premium-market-anchor dd { margin: 0; color: #3b4943; font-size: 14px; line-height: 1.55; }
+    .premium-market-anchor dd strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: 17px; font-variant-numeric: tabular-nums; }
+    .premium-anchor-source { font-size: 12px !important; }
+    .premium-location-orientation { margin: 30px 0 0; padding: 24px 0; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--line); }
+    .premium-orientation-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 34px; }
+    .premium-orientation-group h3 { margin: 0 0 20px; color: var(--muted); font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .premium-location-orientation ol { position: relative; display: grid; grid-template-columns: repeat(var(--stop-count, 4), minmax(0, 1fr)); gap: 18px; margin: 0; padding: 0; list-style: none; }
+    .premium-orientation-group ol { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
+    .premium-location-orientation ol::before { content: ""; position: absolute; top: 8px; right: 8%; left: 8%; height: 1px; background: var(--ink); }
+    .premium-location-stop { position: relative; padding-top: 25px; }
+    .premium-location-stop::before { content: ""; position: absolute; top: 3px; left: 0; width: 11px; height: 11px; border: 2px solid var(--paper); border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
+    .premium-location-stop strong, .premium-location-stop span { display: block; }
+    .premium-location-stop strong { font-size: 14px; }
+    .premium-location-stop span { margin-top: 5px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .premium-location-orientation figcaption { margin-top: 20px; color: var(--muted); font-size: 12px; }
     .premium-checklist { margin: 24px 0 0; padding-left: 26px; }
     .premium-checklist li { padding: 8px 0 8px 6px; border-top: 1px solid rgba(36, 49, 45, .14); }
     .premium-handoff { margin-top: 30px; padding-top: 22px; border-top: 1px solid var(--line); }
@@ -7304,6 +7357,21 @@ def premium_dossier_css() -> str:
       .premium-rail nav { grid-template-columns: 1fr; }
       .premium-rail nav a:nth-child(2n) { padding-left: 0; }
       .premium-references ol { columns: 1; }
+      .premium-card-table-wrap { overflow: visible; border-top: 0; border-bottom: 0; }
+      .premium-card-table { display: block; min-width: 0 !important; }
+      .premium-card-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+      .premium-card-table tbody { display: grid; gap: 18px; }
+      .premium-card-table tbody tr { display: grid; grid-template-columns: 1fr; padding: 16px 0; border-top: 3px solid var(--ink); }
+      .premium-card-table tbody th, .premium-card-table tbody td { display: grid; grid-template-columns: minmax(104px, .42fr) minmax(0, 1fr); gap: 12px; padding: 9px 0; border-top: 1px solid rgba(36, 49, 45, .16); }
+      .premium-card-table tbody th::before, .premium-card-table tbody td::before { content: attr(data-label); color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+      .premium-card-table tbody th { font-size: 16px; }
+      .premium-market-anchor { grid-template-columns: 1fr; }
+      .premium-market-anchor dt { grid-row: auto; }
+      .premium-orientation-groups { grid-template-columns: 1fr; }
+      .premium-location-orientation ol { grid-template-columns: 1fr; gap: 0; }
+      .premium-location-orientation ol::before { top: 10px; bottom: 18px; left: 6px; width: 1px; height: auto; }
+      .premium-location-stop { padding: 0 0 22px 30px; }
+      .premium-location-stop::before { top: 4px; left: 0; }
     }
     """
 
@@ -7349,27 +7417,28 @@ def build_premium_destination_page(
         {premium_dossier_lenses_html(spec)}
         <section class="premium-section" id="scores">
           <h2>The Atlas assessment</h2>
-          <p>Here’s how Fukuoka / Itoshima scores on the ten factors that matter most when choosing a long-term home abroad.</p>
+          <p>{escape(spec.assessment_intro)}</p>
           {premium_dossier_score_table(dest, spec)}
           <p class="premium-score-total"><strong>Weighted assessment: {float(dest["decision_score"]):.1f}/5.</strong> Reviewed {escape(spec.date_reviewed)}. <a href="/methodology/">Read the scoring methodology</a>.</p>
         </section>
         <section class="premium-section" id="listings">
           <h2>Representative property evidence</h2>
-          <p>Three observations show the spread between a practical western-Fukuoka apartment, an Itoshima lifestyle house and a higher-end coastal asset. Local asking price is primary; USD uses the recorded dataset exchange basis.</p>
+          <p>{escape(spec.listings_intro)}</p>
           {premium_dossier_listing_table(rows)}
           <p class="premium-disclaimer">Asking-price evidence only. Global Home Atlas has not verified availability, title, legal use, building condition, negotiability, fees or completed transaction value.</p>
+          {premium_dossier_market_anchors_html(spec)}
         </section>
         {premium_dossier_micro_locations_html(spec)}
         <section class="premium-section" id="checklist">
           <h2>Buyer checklist—in decision order</h2>
           <ol class="premium-checklist">{checklist}</ol>
-          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="/japan-retirement-property-foreign-buyers/">Japan retirement property guide</a>. To compare the destination with other markets, <a href="/dashboard/">open the full Atlas</a>.</p>
+          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="{escape(spec.country_guide_url)}">{escape(spec.country_guide_label)}</a>. To compare the destination with other markets, <a href="/dashboard/">open the full Atlas</a>.</p>
         </section>
         {premium_dossier_references_html(spec)}
       </article>
       <aside class="premium-rail" aria-label="In this dossier">
         <h2>In this dossier</h2><nav>{rail_links}</nav>
-        <div class="premium-rail-action"><p>Compare Fukuoka / Itoshima with the full Atlas.</p><a class="premium-button" href="/dashboard/">Open the Atlas</a></div>
+        <div class="premium-rail-action"><p>{escape(spec.rail_comparison)}</p><a class="premium-button" href="/dashboard/">Open the Atlas</a></div>
       </aside>
     </div>
   </main>

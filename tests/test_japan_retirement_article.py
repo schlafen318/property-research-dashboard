@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from datetime import date
 
 from src import build_unified_app
 
@@ -227,7 +228,7 @@ class JapanRetirementArticleTests(unittest.TestCase):
             html,
         )
         self.assertIn(
-            "By Global Home Atlas Research Team · Published 2026-06-23 · Updated 2026-08-21",
+            f"By Global Home Atlas Research Team · Published 2026-06-23 · Updated {date.today().isoformat()}",
             html,
         )
 
