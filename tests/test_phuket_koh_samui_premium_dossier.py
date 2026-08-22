@@ -250,7 +250,8 @@ class PhuketKohSamuiRenderingTests(unittest.TestCase):
             "Foreign-quota condominium",
             "Residence is separate",
             "Short stays are an accommodation business",
-            "https://www.dol.go.th/Documents/manual/2566/Info_Eng/ENG-No.42.pdf",
+            "https://www.dol.go.th/en/dol-services/public-service-manual/land-registration/land-for-foreigners/dol-regulation-foreign-condominium-ownership-2004/",
+            "https://www.dol.go.th/question-answer/Q2601-000065",
             "https://ltr.boi.go.th/",
             "https://multi.dopa.go.th/legal/assets/modules/news/uploads/a8fec27695d5ecdb26fe0de8f70040fc5c00b4c6870cd0192022484170852251.pdf",
         ):

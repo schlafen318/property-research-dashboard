@@ -198,7 +198,8 @@ COUNTRY_HUBS = [
             {"heading": "Short stays are an accommodation business", "text": "Providing temporary accommodation for compensation can fall under the Hotel Act licence regime. Do not assume a residential title, developer rental programme or online listing makes nightly operation lawful; verify the exact exemption or licence and local permissions."},
         ],
         "primary_sources": [
-            {"label": "Department of Lands: transfer guide for foreign condominium buyers", "url": "https://www.dol.go.th/Documents/manual/2566/Info_Eng/ENG-No.42.pdf"},
+            {"label": "Department of Lands: foreign condominium ownership regulation", "url": "https://www.dol.go.th/en/dol-services/public-service-manual/land-registration/land-for-foreigners/dol-regulation-foreign-condominium-ownership-2004/"},
+            {"label": "Department of Lands: foreign-buyer transfer documents", "url": "https://www.dol.go.th/question-answer/Q2601-000065"},
             {"label": "BOI: Long-Term Resident visa", "url": "https://ltr.boi.go.th/"},
             {"label": "Department of Provincial Administration: Hotel Act", "url": "https://multi.dopa.go.th/legal/assets/modules/news/uploads/a8fec27695d5ecdb26fe0de8f70040fc5c00b4c6870cd0192022484170852251.pdf"},
         ],
