@@ -154,7 +154,7 @@ class PhuketKohSamuiListingTests(unittest.TestCase):
             {
                 "Rawai foreign-quota resort condominium",
                 "Si Sunthon company-structure pool villa",
-                "Maenam completed pool villa",
+                "Maenam company-sale pool villa",
             },
             {item["listing_name"] for item in rows},
         )
@@ -174,6 +174,10 @@ class PhuketKohSamuiListingTests(unittest.TestCase):
             self.assertAlmostEqual(row["local_price"] * FX, row["usd_price"], places=2)
             self.assertAlmostEqual(row["usd_price"] / row["size_m2"], row["usd_per_m2"], places=2)
         self.assertEqual({134, 220, 534}, {row["size_m2"] for row in rows})
+        si_sunthon = next(row for row in rows if row["listing_name"].startswith("Si Sunthon"))
+        self.assertEqual(30900000, si_sunthon["local_price"])
+        maenam = next(row for row in rows if row["listing_name"].startswith("Maenam"))
+        self.assertIn("Sale with Company", maenam["note"])
 
     def test_shared_price_basis_and_calculator_are_reconciled(self):
         destination = next(
@@ -246,7 +250,7 @@ class PhuketKohSamuiRenderingTests(unittest.TestCase):
             "Foreign-quota condominium",
             "Residence is separate",
             "Short stays are an accommodation business",
-            "https://www.dol.go.th/train/Documents/ENG_E_BOOK.pdf",
+            "https://www.dol.go.th/Documents/manual/2566/Info_Eng/ENG-No.42.pdf",
             "https://ltr.boi.go.th/",
             "https://multi.dopa.go.th/legal/assets/modules/news/uploads/a8fec27695d5ecdb26fe0de8f70040fc5c00b4c6870cd0192022484170852251.pdf",
         ):
