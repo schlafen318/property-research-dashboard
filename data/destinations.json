@@ -2200,16 +2200,16 @@
     "rank": 22,
     "country": "France",
     "category": "Mountain",
-    "overall_score": 3.67,
-    "usd_per_m2": 15880.0,
-    "net_yield_estimate": "2.2–4% est. net",
+    "overall_score": 3.59,
+    "usd_per_m2": 11418.0,
+    "net_yield_estimate": "Property-specific only; no verified valley-wide net yield",
     "quick_metrics": {
-      "usd_m": "$15,880",
-      "net_yield": "2.2–4% est. net",
+      "usd_m": "$11,418",
+      "net_yield": "Property-specific only; no verified valley-wide net yield",
       "ownership": "4.5/5",
       "friendly": "3.5/5"
     },
-    "panel_summary": "Chamonix is a true global alpine trophy destination with year-round outdoor demand. The panel would respect the brand but mark it down hard on price and yield.",
+    "panel_summary": "Chamonix is a true global alpine destination with year-round outdoor demand. The case is strongest when the address works for daily life and the purchase does not rely on tourist rent.",
     "pros": [
       "Iconic mountain brand",
       "Geneva access",
@@ -2219,12 +2219,12 @@
     ],
     "cons": [
       "Very expensive",
-      "low yields",
+      "No verified valley-wide net yield; high entry and running costs",
       "older building stock",
       "local STR rules and renovation constraints",
       "not cheap enough for the risk-adjusted score to lead."
     ],
-    "panel_verdict": "Keep as a benchmark, not a priority acquisition unless the asset is exceptional.",
+    "panel_verdict": "Positive for a lifestyle-led buyer who clears residence, lawful use, building condition, hazards and exit before paying the Mont Blanc premium.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -2297,18 +2297,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "Foreigners can generally buy French property, but Chamonix/France have tightened tourist-let rules. From 2025/26, registration/authorisation and building-level STR bans can matter.",
-    "red_flags": "Short-term rental authorisation risk, tax changes, local anti-second-home pressure.",
+    "ownership_notes": "France has a familiar notarised purchase process, but buying does not create residence. Since 1 May 2025 the Chamonix valley requires tourist-let registration and, for physical-person owners, change-of-use authorization; copropriété, DPE, planning and hazard rules remain unit-specific.",
+    "red_flags": "Tourist-let authorization, copropriété works, weak DPE, alpine hazards, winter access and a narrow trophy-asset exit.",
     "rental": {
-      "gross_yield": "STR revenue strong but price and regulation compress yield",
-      "net_yield": "2.2–4% est. net",
-      "revenue": "AirROI 2026: ~$36,531–36,980 average annual Airbnb revenue; Airbtics cites ~€44k median",
-      "adr_occupancy": "$352–360 / 42.1–44.8% by AirROI; Airbtics cites 65% median",
-      "confidence": "Medium; datasets diverge materially"
+      "gross_yield": "No verified valley-wide benchmark; use achieved property statements only after lawful-use confirmation",
+      "net_yield": "Property-specific only; no verified valley-wide net yield",
+      "revenue": "Model the exact authorized unit from achieved bookings and bank receipts; do not apply a destination average",
+      "adr_occupancy": "No verified decision-grade valley benchmark",
+      "confidence": "Low; regulation, owner use, asset type and operator costs vary materially"
     },
-    "price_basis": "Built-property benchmark. Chamonix-Mont-Blanc average property price about €13,833/m²; converted at 1 EUR = 1.14784 USD => ~$15,877/m².",
-    "price_confidence": "Medium-high",
-    "profit_driver": "Global alpine brand, Geneva access, mountaineering, skiing, summer outdoor sports."
+    "price_basis": "Notaires de France 2025 completed-sale median of EUR 9,760/m² for old apartments in Chamonix-Mont-Blanc, published in the 2026 Savoie observatory; converted at ECB EUR 1 = USD 1.1699 on 2026-08-21 and rounded to $11,418/m². This is a broad commune median, not a valuation.",
+    "price_confidence": "High for the stated completed-market scope; not candidate-specific",
+    "profit_driver": "Global alpine recognition and year-round use support selected homes, but lawful use, building quality, access, entry price and future buyer pool determine the outcome."
   },
   {
     "id": "park-city-deer-valley",
