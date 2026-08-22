@@ -205,6 +205,16 @@ COUNTRY_HUBS = [
         "guide_slugs": ["greece-vs-portugal-retirement-property", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-property-in-europe", "buy-property-abroad"],
     },
     {
+        "slug": "croatia-property",
+        "country": "Croatia",
+        "title": "Croatia Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Assess Croatia property for foreign buyers through Istria and Dalmatia, including residence, ownership eligibility, title, tourist-rental rules, hazards, access, and resale depth.",
+        "h1": "Croatia Property Guide for Foreign Buyers",
+        "thesis": "Croatia can offer compelling Adriatic lifestyle value, but residence, ownership eligibility, title reconciliation, lawful construction, tourist-rental consent, seasonal access, and hazard exposure must be verified separately. The strongest retirement cases begin with a year-round operating base rather than a summer view.",
+        "destination_ids": ["croatia-istria-dalmatia"],
+        "guide_slugs": ["buying-property-abroad-for-retirement", "best-places-to-buy-property-in-europe", "where-can-foreigners-buy-property", "foreign-property-investment-risks"],
+    },
+    {
         "slug": "italy-property",
         "country": "Italy",
         "title": "Italy Property Guide for Foreign Buyers | Global Home Atlas",
@@ -2667,6 +2677,7 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
     cards = []
     for hub in COUNTRY_HUBS:
         metrics = country_summary_metrics(hub, destinations)
+        destination_label = "destination" if metrics["count"] == 1 else "destinations"
         rows.append(
             f"""
             <tr>
@@ -2684,7 +2695,7 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
         cards.append(
             f"""
             <article class="page-card">
-              <span>{metrics["count"]} destinations</span>
+              <span>{metrics["count"]} {destination_label}</span>
               <h3><a href="/countries/{escape(hub["slug"])}/">{escape(hub["country"])}</a></h3>
               <p>{escape(hub["description"])}</p>
               <p><strong>{metrics["score"]:.1f}/5</strong> average decision score · <strong>{metrics["ownership"]:.1f}/5</strong> ownership clarity</p>

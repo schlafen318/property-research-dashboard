@@ -1392,10 +1392,10 @@
     "country": "Croatia",
     "category": "Water",
     "overall_score": 3.79,
-    "usd_per_m2": 4700.0,
+    "usd_per_m2": 3900.0,
     "net_yield_estimate": "3–4.8% est. net",
     "quick_metrics": {
-      "usd_m": "$4,700",
+      "usd_m": "$3,900",
       "net_yield": "3–4.8% est. net",
       "ownership": "4.4/5",
       "friendly": "3.1/5"
@@ -1493,11 +1493,11 @@
     "rental": {
       "gross_yield": "Tourist demand strong in prime coast; yields depend heavily on season, licence and management",
       "net_yield": "3–4.8% est. net",
-      "revenue": "May 2026 Croatia data shows Dalmatia around €4,089/m²; Istria references around €2,500–4,000/m² depending view/location.",
+      "revenue": "Official 2025 completed apartment medians were €2,743/m² across Istria County and €3,333/m² across Split-Dalmatia County; municipal medians ranged higher in Split and selected coastal towns.",
       "adr_occupancy": "High in summer / Seasonal, better in larger towns",
       "confidence": "Medium"
     },
-    "price_basis": "Built-property coastal proxy. Dalmatia ~€4,089/m² × EUR/USD 1.14784 ≈ $4,693/m²; Istria can be lower or similar in prime towns.",
+    "price_basis": "Completed-market regional proxy. Split-Dalmatia County's 2025 completed apartment median of €3,333/m² × EUR/USD 1.1699 ≈ $3,900/m²; Istria County was €2,743/m² and municipality-level evidence varies sharply.",
     "price_confidence": "Medium",
     "profit_driver": "Adriatic scenery, EU access, still cheaper than many Western Med peers, improving infrastructure."
   },
