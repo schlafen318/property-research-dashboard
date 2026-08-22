@@ -17,7 +17,7 @@ REVIEWED_DOSSIERS = {
     "fukuoka-itoshima", "valencia", "algarve-cascais", "madeira",
     "malaga-costa-del-sol", "hakone-izu", "lake-como", "hakuba",
     "costa-brava-girona", "park-city-deer-valley", "crete", "niseko",
-    DESTINATION_ID, "mallorca",
+    DESTINATION_ID, "mallorca", "croatia-istria-dalmatia",
 }
 
 

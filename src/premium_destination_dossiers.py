@@ -2119,6 +2119,149 @@ MALLORCA_DOSSIER = PremiumDossierSpec(
 )
 
 
+CROATIA_ISTRIA_DALMATIA_DOSSIER = PremiumDossierSpec(
+    destination_id="croatia-istria-dalmatia",
+    title="Croatia Istria and Dalmatia Retirement Property Dossier",
+    description="Assess retirement property in Istria and Dalmatia through residence, foreign ownership, title, tourist rules, healthcare, access, hazards, value, resale, and current listings.",
+    h1="Croatia: choose the operating base before the Adriatic view",
+    lede="Croatia's coast is not one retirement market. Split is a working regional city with hospitals, an airport and year-round services. Trogir and Kaštela keep the mainland close while changing building and traffic constraints. Rovinj, Pula and Poreč create distinct Istrian routines. Hvar and Brač add island character—and ferry dependence. The useful question is not whether the Adriatic is beautiful. It is which address remains practical in January, during an August heat wave and when a title, repair or medical journey needs attention.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "Croatia can be a strong retirement-home choice for a buyer who establishes residence independently, matches the property to an all-season service base and accepts more document reconciliation than the scenery suggests. A deed does not create a right to remain in Croatia or automatic healthcare cover. EEA citizens follow the registration framework for stays beyond three months; third-country nationals need a qualifying temporary-stay basis. The digital-nomad route is for eligible remote workers, not a general retirement visa. Long-term residence for a third-country national normally follows five years of qualifying legal stay. Confirm the route, absences, household eligibility, tax residence and HZZO position before a deposit turns a lifestyle decision into an immigration problem.",
+        "Ownership rules also depend on nationality and asset type. EU, Icelandic, Liechtenstein and Norwegian buyers generally acquire ordinary real estate on Croatian terms, subject to exempted categories. Swiss buyers have their own registration condition. Other foreign nationals normally require reciprocity and ministerial consent for the specific property. Agricultural land, protected areas and corporate structures need separate analysis. Even when a buyer may acquire, the transaction is only as clear as the land-registry entry, cadastral parcel, lawful construction, use permit, access, utilities, co-ownership and physical building. Historic stone houses, divided apartments and rural plots make that reconciliation especially important.",
+        "Proceed in this order: confirm residence, healthcare, ownership eligibility and tax administration; choose the year-round operating pattern; then audit title, cadastre, planning, permits, energy certificate, community governance, hazards and insurance. Start the income model with zero tourist rent. A categorisation decision, tax registration, eVisitor operation and—inside a multi-unit building—the required co-owner and adjoining-neighbour consents are property and operator questions, not transferable marketing labels. Croatia works best when personal utility supports the carrying cost. Treat seasonal rent and appreciation as separately verified scenarios rather than the reason an address is affordable.",
+    ),
+    lenses_intro="The five paired lenses below turn Croatia's long coastline into ten buyer decisions. Each tests a particular base and operating plan; the score table then presents the complete Atlas assessment once.",
+    lenses=(
+        DossierLens(
+            "Live in a town that still works in winter",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Split offers the coast's strongest combination of ordinary city life and Adriatic access. Hospitals, specialists, markets, schools, ferries and municipal services serve residents rather than only visitors. The historic centre is magnetic, but stairs, stone surfaces, noise, summer crowding and restricted vehicle access can undermine an older household's routine. Residential districts outside the palace may be less cinematic and more useful. Test the walk to groceries and a pharmacy, the route to KBC Split, parking, lift access and winter social life. A split apartment marketed as two tourist units should also be judged as a future home: layout, legal subdivision, sound insulation and community relations matter after the rental story is removed.",
+                "Istria offers a different pattern. Pula has the peninsula's deepest hospital, administrative and transport base. Rovinj carries exceptional character and an international premium; its old town also brings stairs, parking and service-access constraints. Poreč has a broad visitor economy and year-round residents, while inland towns trade the waterfront for space, quieter streets and road dependence. Rovinjsko Selo can be close to Rovinj without being walkable to its daily services. Visit in January and August. Check which shops remain open, how heating performs in damp or windy weather, whether a car is essential and how quickly a doctor, pharmacy, technician or carer can reach the address.",
+                "Trogir and Kaštela can preserve mainland access while offering smaller-scale coastal life. Trogir's protected historic fabric and bridge traffic change parking, deliveries and renovation. Kaštela stretches along multiple settlements, so an attractive seafront description can conceal a weak walking route or road exposure. Hvar and Brač deepen the lifestyle appeal but add ferry timetables, weather disruption and smaller local service pools. An island home can work for an active household with redundancy, storage and local help; it is weaker for someone who needs frequent specialist care or same-day contractor access. Retirement fit therefore follows the least convenient recurring journey, not the best summer evening.",
+            ),
+        ),
+        DossierLens(
+            "Count the full journey, including the ferry",
+            ("global_access", "foreigner_fit"),
+            (
+                "Split Airport handled 3,881,186 passengers in 2025, but the monthly pattern matters more than the annual headline: July handled 786,945 passengers and January 35,479. That gap captures the destination's access strength and seasonality. Split is about 20 kilometres from the airport and Trogir about 6 kilometres, while congestion can widen door-to-door times. Winter schedules are much thinner than summer schedules. Before buying, test the actual routes the household will use—not only whether an airline serves Split in July. Pula and Dubrovnik airports support other coastal zones, but route breadth, frequency and onward transport vary by season and should be rechecked each year.",
+                "Island access needs its own operating budget. Jadrolinija publishes route-specific 2026 sailing schedules, but a timetable does not eliminate weather, queues, vehicle reservations, port parking or the onward trip. Hvar town, Stari Grad, Supetar and other ports serve different property catchments. The same island can produce a simple summer foot-passenger arrival and a demanding winter medical or repair journey. Price the airport-to-port transfer, ferry, luggage, car and final road. Ask what happens when the last sailing is missed, a vehicle ferry is full or strong wind interrupts service. Keep several days of essentials and identify who can open the house when the owner is abroad.",
+                "Croatia's international familiarity reduces some friction, especially in Rovinj, Poreč, Split, Trogir and Hvar. It does not change the official language of contracts, land records, tax notices, planning files or community decisions. A buyer abroad needs an OIB where required for Croatian administration, independent Croatian legal and tax advice, and a reliable person to receive notices and inspect after storms or water failures. For third-country ownership, reciprocity and ministerial consent can make the process longer and property-specific. Foreigner fit is strongest for a household willing to build a local professional network and participate in ordinary Croatian systems, not one expecting an English-language resort layer to carry every obligation.",
+            ),
+        ),
+        DossierLens(
+            "Reconcile the registry, cadastre and building",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Croatia's land registry and cadastre are available through the official Uređena zemlja system, but matching records remain a buyer task. The land-registry extract establishes registered rights and charges; the cadastral plan describes the parcel and physical record. Compare both with the sale contract, official construction act, use permit, energy certificate and what an independent surveyor measures on site. Confirm seller authority, co-ownership, mortgages, litigation, easements, access and utilities. Registration—not merely signing—acquires title. In an apartment, verify the condominium unit, storage, parking, terraces, reserve fund, manager, arrears and recent decisions. In a stone house, trace every floor, annex and change of use.",
+                "Planning review belongs beside title review. The state ISPU system publishes spatial plans and building information, but a map screenshot is not a legal opinion on a parcel. Coastal setbacks, protected historic fabric, agricultural classification, Natura or other protected status, road access and municipal plans can limit renovation or new work. Pools, terraces, auxiliary buildings, converted attics and divided tourist units may not align across title, cadastre and permits. Ask an independent architect or engineer for a written lawful-area schedule. A seller's claim that an older addition is tolerated, visible in cadastre or capable of later legalisation is not a substitute for a current permit and enforcement analysis.",
+                "Hazard diligence must combine official maps, site inspection and insurance. Croatian Waters maps river, groundwater, dam and high-sea flooding under three probability scenarios. Coastal and karst addresses also need drainage, retaining-wall and flash-runoff review. The fire service's 2026 programme directs extra resources toward higher-risk coastal and island areas, while DHMZ issues heat and wind warnings that can affect vulnerable residents, ferries and small craft. Check vegetation, defendable access, hydrants, evacuation routes, wind exposure, roof and shutters, prior claims, water storage and firefighting access. Being outside a mapped flood outline does not prove the property will drain or insure well.",
+            ),
+            "istria-access-diligence",
+        ),
+        DossierLens(
+            "Treat tourist rent as a regulated business",
+            ("rental_profit", "capital_upside"),
+            (
+                "Croatia has deep summer visitor demand, but a home is not automatically lawful tourist accommodation. Verify the current categorisation decision, registered capacity, owner or host status, tax position, guest-registration process and local obligations for the exact premises. The Tourism Ministry maintains current categorised-property lists; an advertisement or plaque alone is not confirmation that a new owner can continue. In multi-unit buildings, the Building Management and Maintenance Act requires prior written consent from a two-thirds majority of co-owners plus every directly adjoining co-owner for short-term rental. Consent has a defined term and can be revoked after repeated house-rule breaches. Read the actual consent and transition position with Croatian counsel.",
+                "A lawful operation still faces a short season and real costs. Model management, guest communication, cleaning, linen, utilities, cooling, platform fees, tourist and income taxes, insurance, community charges, pool and garden work, repairs, empty months and travel for owner oversight. Split and Pula have more year-round demand than a beach settlement or island villa, but product and location still determine long-term rent. An Hvar pool villa has a different booking window and operator pool from a Rovinj-area apartment. Obtain filed revenue and expense records, reconcile them with eVisitor or other official records where lawfully available, and compare the net result with a normal tenancy and personal use only.",
+                "Capital upside should not be inferred from Croatia's tourism growth or euro membership. Official 2025 transaction evidence shows wide dispersion: the median apartment price was €2,743/m² across Istria County, €4,068/m² in Split and €3,921/m² in Dubrovnik. Those completed-market anchors mix neighbourhoods and property quality; they do not price a candidate. Split's resident economy and established historic towns support selected demand, while scarce island or waterfront homes can attract international buyers. The same scarcity can narrow the resale pool and amplify permitting, access or insurance problems. Model flat real prices and a longer exit before paying for a view or rental narrative.",
+            ),
+            "island-operating-reality",
+        ),
+        DossierLens(
+            "Buy the future buyer's practical home",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The representative listings below deliberately span three operating patterns: a compact new apartment in Rovinjsko Selo, an established Split apartment and a Hvar pool villa. Their asking prices use seller-stated living area so the €/m² arithmetic is internally consistent, but none is a valuation. The Rovinj-area example includes a garden and parking outside the living-area denominator. The Split seller says the apartment was divided into two units, which requires legal and community reconciliation. The Hvar villa adds land, pool and furnished condition that a simple living-area comparison cannot capture. Compare each with completed transactions matched for location, lawful area, age, condition, rights and access.",
+                "Value entry comes from daily utility at the chosen address. A Pula apartment near services may be less expensive than Rovinj and easier to operate year-round. A Split district outside the historic core can reach a broader resident pool than a tourism-optimised palace unit. Kaštela or Trogir can offer airport proximity but require street, traffic and building checks. Inland Istria can deliver space, yet heating, driving and resale demand must be priced. On Hvar or Brač, pay an island premium only when ferry logistics, local management, water, wastewater and lawful construction are already solved. A sea view cannot compensate for an unresolved right, unusable stair or impossible delivery route.",
+                "Exit liquidity is deepest where another buyer can understand the home without adopting the seller's holiday business. Split and Pula generally offer the broadest resident logic. Rovinj and Poreč add international recognition but can carry high entry prices. Trogir's heritage and Hvar's brand reach global buyers, while ticket size, access and seasonality reduce the number who can act. Before signing, ask two agents who did not source the property how they would resell it, to whom, using which completed evidence and over what period. Model five-year cash outlay including tax, legal work, financing, community charges, management, repairs, insurance, currency and selling costs. Preserve optionality rather than depending on one exit story.",
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Croatia pairs Split and Pula city life with Rovinj, Trogir and island character; each brings a different year-round rhythm.",
+        "global_access": "Split's airport and motorway support Dalmatia, while Istria and the islands add seasonal flights, road time and ferry dependence.",
+        "ownership_clarity": "Croatia has digital land records, but nationality, reciprocity, title, cadastre, lawful area and exempted land remain property-specific.",
+        "regulatory_safety": "Istria and Dalmatia require parcel-level planning, building, flood, fire, wind and community checks before a coastal purchase.",
+        "rental_profit": "Croatia has strong summer demand, but categorisation, co-owner consent, management cost and empty months constrain the net case.",
+        "capital_upside": "Split, Rovinj and established islands have recognised demand; high entry prices and legal or access defects limit blanket upside claims.",
+        "retirement_fit": "Split and Pula offer the deepest services; Trogir, inland Istria, Hvar and Brač add driving, stairs or ferry dependence.",
+        "exit_liquidity": "Split and Pula reach broader resident pools, while trophy Rovinj, Hvar and singular stone homes need narrower budgets and tastes.",
+        "foreigner_fit": "Croatia is internationally familiar, but third-country reciprocity and Croatian-language legal, tax and planning work require local support.",
+        "value_entry": "Istria, Split, Trogir and the islands occupy different price bands; lawful area, daily utility and resale depth determine real value.",
+    },
+    market_anchors=(
+        {"location": "Istria County apartments", "evidence": "€2,743/m²", "buyer_read": "Median for 2025 completed apartment transactions across Istria County; not a Rovinj, Pula or property valuation.", "source_label": "Croatian Ministry 2025 market review", "source_url": "https://mpgi.gov.hr/UserDocsImages/dokumenti/stambeno/Rasic_Pregled-trzista-nekretnina_2024_2025.pdf"},
+        {"location": "Split apartments", "evidence": "€4,068/m²", "buyer_read": "Highest reported 2025 municipal median for completed apartment transactions; district, legal area and condition still require matched evidence.", "source_label": "Croatian Ministry 2025 market review", "source_url": "https://mpgi.gov.hr/UserDocsImages/dokumenti/stambeno/Rasic_Pregled-trzista-nekretnina_2024_2025.pdf"},
+        {"location": "Dubrovnik apartments", "evidence": "€3,921/m²", "buyer_read": "2025 completed-transaction median used as a southern-coast premium comparator, not a valuation for Dalmatia generally.", "source_label": "Croatian Ministry 2025 market review", "source_url": "https://mpgi.gov.hr/UserDocsImages/dokumenti/stambeno/Rasic_Pregled-trzista-nekretnina_2024_2025.pdf"},
+    ),
+    micro_locations_intro="Croatia is best read as four operating patterns rather than one coastal average. These are orientation aids, not valuation zones. Confirm municipality, parcel, ownership eligibility, title, permits, transport, healthcare, hazards and lawful use for every address.",
+    micro_locations=(
+        {"name": "Split", "best_for": "Year-round city and hospital base", "daily_life": "Urban services, airport and ferry hub", "diligence": "Legal subdivision, noise, stairs, parking and community"},
+        {"name": "Trogir / Kaštela", "best_for": "Mainland coast near the airport", "daily_life": "Smaller settlements with road-led access", "diligence": "Historic fabric, traffic, title, permits and drainage"},
+        {"name": "Pula / Rovinj / Poreč / inland Istria", "best_for": "Peninsula choice", "daily_life": "City, polished coast or quieter inland pattern", "diligence": "Entry premium, heating, driving, planning and fire"},
+        {"name": "Hvar / Brač", "best_for": "Island lifestyle", "daily_life": "Seasonal towns and ferry-linked services", "diligence": "Sailings, water, wastewater, management and emergency access"},
+    ),
+    checklist=(
+        "Confirm residence, healthcare, tax residence, OIB and representation before purchase.",
+        "Confirm nationality-specific ownership eligibility, reciprocity and any ministerial consent.",
+        "Choose Split, mainland coast, Istria or island daily life before choosing a view.",
+        "Travel the airport, hospital, grocery, port and property routes in summer and winter.",
+        "Reconcile land registry, cadastre, lawful area, permits, use, access and utilities.",
+        "Overlay current flood, fire, heat, wind and coastal hazards with insurance terms.",
+        "Assume zero tourist rent until categorisation, consents, tax and operator duties are confirmed.",
+        "Model five-year cash outlay and identify the future resale buyer before signing.",
+    ),
+    references_intro="Residence, ownership, tax, title, planning, tourism, healthcare, transport, hazard, market and listing claims were reviewed on 22 August 2026. Recheck every time-sensitive source no later than 22 February 2027 and immediately after any residence, reciprocity, tax, planning, tourist-rental, listing, transport, hazard, healthcare or market-data change. Obtain current Croatian legal, tax, immigration, planning, building, insurance and property-management advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "Croatian Interior Ministry: EEA residence", "url": "https://mup.gov.hr/aliens-281621/stay-and-work/stay-and-work-of-eea-nationals-and-their-family-members-281689/281689"},
+        {"label": "Croatian Interior Ministry: third-country stay", "url": "https://mup.gov.hr/aliens-281621/digital-nomads/281622"},
+        {"label": "Croatian Interior Ministry: long-term residence", "url": "https://mup.gov.hr/aliens-281621/stay-and-work/permanent-stay/281682"},
+        {"label": "Croatian Government: foreign property ownership", "url": "https://www.gov.hr/en/real-estate-purchase-for-foreign-nationals/1291"},
+        {"label": "Croatian Government: property purchase checks", "url": "https://www.gov.hr/en/purchase-of-real-property/1282"},
+        {"label": "Croatian Government: real-estate transfer tax", "url": "https://www.gov.hr/en/real-estate-transfer-tax/1464"},
+        {"label": "Uređena zemlja: land registry and cadastre", "url": "https://oss.uredjenazemlja.hr/en"},
+        {"label": "ISPU: official spatial-planning system", "url": "https://portal-ispu.gov.hr/en/e-services"},
+        {"label": "Croatian Tourism Ministry: categorised accommodation", "url": "https://mint.gov.hr/kategorizacija-11512/11512"},
+        {"label": "Official Gazette: Building Management and Maintenance Act", "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2024_12_152_2502.html"},
+        {"label": "HZZO: health insurance in Croatia", "url": "https://hzzo.hr/en/national-contact-point-ncp/health-insurance-republic-croatia"},
+        {"label": "Split Airport: passenger statistics", "url": "https://www.split-airport.hr/statistics/"},
+        {"label": "Jadrolinija: 2026 Split sailing schedule", "url": "https://www.jadrolinija.hr/download/05995d6650992c77457e0686c75aae6c"},
+        {"label": "Croatian Waters: flood hazard and risk maps", "url": "https://www.voda.hr/en/node/7088"},
+        {"label": "Croatian Firefighting Association: 2026 programme", "url": "https://hvz.gov.hr/program-aktivnosti/1788"},
+        {"label": "DHMZ: Croatian coastal climate", "url": "https://www.meteo.hr/klima_e.php?param=k1&section=klima_hrvatska"},
+        {"label": "Croatian Ministry: 2025 property market review", "url": "https://mpgi.gov.hr/UserDocsImages/dokumenti/stambeno/Rasic_Pregled-trzista-nekretnina_2024_2025.pdf"},
+        {"label": "Opereta: Rovinjsko Selo asking observation", "url": "https://www.opereta.hr/en/real-estate/apartment/121643-sale-apartment-2-room-istarska-zupanija-rovinjsko-selo"},
+        {"label": "Croatia Property Sales: Split asking observation", "url": "https://www.croatiapropertysales.com/hr/hrvatska-split-apartman-na-prodaju-5802/"},
+        {"label": "Croatia Property Sales: Hvar asking observation", "url": "https://www.croatiapropertysales.com/croatia-hvar-villa-for-sale-5399/"},
+        {"label": "European Central Bank: euro reference rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("split-year-round-life", "/assets/croatia-split-year-round-life.webp", "Older residents walking through a shaded Split neighbourhood near a market", "Split's case rests on ordinary year-round city life as much as the waterfront.", "hero"),
+        DossierImage("istria-access-diligence", "/assets/croatia-istria-access-diligence.webp", "Mature couple walking along a stone street in an Istrian hill town", "Istrian character changes with gradients, parking, road access and distance from services.", "wide"),
+        DossierImage("island-operating-reality", "/assets/croatia-island-operating-reality.webp", "Residents carrying groceries from a ferry along a Croatian island quay", "An island home depends on ferries, local help and ordinary supplies after summer.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Croatia through five destination lenses",
+    assessment_intro="Here’s how Croatia scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current observations show the spread from a Rovinjsko Selo apartment through a Split apartment to a Hvar villa. They are asking evidence—not valuations. Local EUR is primary; USD uses the recorded dataset exchange basis.",
+    market_anchors_intro="These 2025 completed-transaction medians are broad anchors—not asking prices or property valuations. Reconcile each candidate for municipality, property type, lawful living area, condition, land, access, outlook and rights.",
+    orientation_groups=(
+        DossierOrientationGroup("Istrian peninsula", (("Pula", "Hospital and administrative base"), ("Rovinj / Poreč", "Premium western coast"), ("Inland Istria", "Space and hill-town routine"))),
+        DossierOrientationGroup("Central Dalmatia and islands", (("Split", "Year-round regional city"), ("Kaštela / Trogir", "Airport-side mainland coast"), ("Brač", "Frequent ferry-linked island"), ("Hvar", "Premium seasonal island"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current road, bus, airport and ferry timetables and the exact hospital, service and port journey.",
+    country_guide_url="/guides/",
+    country_guide_label="Buying guides",
+    rail_comparison="Compare Croatia with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -2134,6 +2277,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     NISEKO_DOSSIER.destination_id: NISEKO_DOSSIER,
     ANNECY_DOSSIER.destination_id: ANNECY_DOSSIER,
     MALLORCA_DOSSIER.destination_id: MALLORCA_DOSSIER,
+    CROATIA_ISTRIA_DALMATIA_DOSSIER.destination_id: CROATIA_ISTRIA_DALMATIA_DOSSIER,
 }
 
 

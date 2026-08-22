@@ -21,7 +21,7 @@ class MalagaCostaDelSolDossierContractTests(unittest.TestCase):
 
     def test_registry_contains_the_four_reviewed_dossiers(self) -> None:
         self.assertEqual(
-            {"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", DESTINATION_ID, "lake-como", "hakone-izu", "hakuba", "costa-brava-girona", "park-city-deer-valley", "crete", "niseko", "annecy", "mallorca"},
+            {"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", DESTINATION_ID, "lake-como", "hakone-izu", "hakuba", "costa-brava-girona", "park-city-deer-valley", "crete", "niseko", "annecy", "mallorca", "croatia-istria-dalmatia"},
             set(PREMIUM_DESTINATION_DOSSIERS),
         )
         self.assertIsNotNone(self.spec)
