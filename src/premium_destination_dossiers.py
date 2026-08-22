@@ -545,10 +545,159 @@ MADEIRA_DOSSIER = PremiumDossierSpec(
 )
 
 
+MALAGA_COSTA_DEL_SOL_DOSSIER = PremiumDossierSpec(
+    destination_id="malaga-costa-del-sol",
+    title="Málaga and Costa del Sol Retirement Property Dossier",
+    description="Assess Málaga and Costa del Sol retirement property through daily life, rail and road access, ownership, rental rules, value, resale, hazards, and current market evidence.",
+    h1="Málaga / Costa del Sol: buy the everyday coast, not the headline",
+    lede=(
+        "Málaga and the Costa del Sol combine an international airport, substantial healthcare, established foreign communities and a Mediterranean life that continues beyond summer. But the label hides several markets. Málaga city and the C1 rail corridor can support a less car-dependent routine; Marbella and Estepona offer deeper resort services but rely on the A-7 road spine. Prices, rental permissions and resale depth change sharply by municipality and building. The opportunity is credible only when the buyer chooses the daily system before the view."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "Málaga / Costa del Sol belongs on a retirement shortlist for a buyer who values direct European access, a large international community, year-round restaurants and services, and multiple hospital options. The strongest version is a practical home connected to ordinary daily life: Málaga city for urban depth, Benalmádena or Fuengirola for a rail-served coast, Marbella or San Pedro for a premium service ecosystem, and Estepona for a slower western base. The destination does not need unrestricted holiday rent or guaranteed appreciation to work; personal utility should carry the case.",
+        "Pause or look elsewhere if low entry price is essential, if the household cannot tolerate summer heat or water constraints, if every trip must remain car-free beyond Fuengirola, or if a new tourist licence is required to make the budget balance. Property ownership does not create Spanish residence or public-healthcare entitlement. Málaga city has tightened tourist-use approvals, Andalucía requires planning compatibility, and national community-of-owners rules can add another approval layer. A listing advertised with a licence is evidence to verify, not a transferable promise.",
+        "Proceed in order. Confirm residence, tax and healthcare; select urban, rail-served or road-led daily life; test airport, hospital and grocery routes from the exact address in summer traffic; reconcile registry, cadastre, planning, occupancy and community records; establish the live rental position with the municipality and building; overlay flood, wildfire, heat and water evidence; then compare completed transactions and model a five-year exit without tourist income. The controlling condition is strict entry-price discipline at a specific address—not confidence in the coast as a whole."
+    ),
+    lenses_intro=(
+        "The coast becomes clearer when treated as connected daily-life systems rather than one resort strip. These five paired lenses show where the proposition strengthens, where it weakens, and what can reverse the decision."
+    ),
+    lenses=(
+        DossierLens(
+            "Live where the coast still works on an ordinary Tuesday",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Málaga city offers the deepest non-resort life in the corridor. Markets, culture, universities, neighbourhood commerce, two major public teaching hospitals and the waterfront sit within a substantial resident economy. Centro and the eastern districts can support a walkable routine, while other neighbourhoods depend more on buses or a car. Historic-core charm brings noise, visitor pressure, older buildings and occasional missing lifts. The retirement test is not whether the centre is lively; it is whether groceries, shade, healthcare and a quiet bedroom remain easy in August and in winter.",
+                "Benalmádena and Fuengirola provide the clearest coastal compromise for someone who wants beach access without surrendering rail. Arroyo de la Miel, Los Boliches and central Fuengirola have stations, supermarkets, clinics and year-round street life. Hillside parts of Benalmádena, Torreblanca and Mijas Costa can look close on a map while requiring steep walks or daily driving. Visit without a rental car, carry shopping home, and test the route to the station. The C1 line is a practical asset only when the front door can use it comfortably.",
+                "Marbella, San Pedro and Estepona support mature international communities, private medicine, restaurants, golf and household services, but their practical pattern is more road-led. Hospital Universitario Costa del Sol is a regional specialty hospital, with high-resolution facilities in Estepona and Mijas, yet entitlement and referral still depend on the household’s legal and insurance position. Test care routes, prescription access and summer congestion. A sea-view urbanisation may deliver privacy while making every meal, appointment and social visit dependent on a driver.",
+                "Climate comfort must also be tested inside the home. Visit during the hottest period, close the windows against road or nightlife noise, and note whether shade, cross-ventilation and efficient cooling still make the principal rooms usable. Return in winter to check damp, low sun, building occupation and which nearby businesses remain open. A property that performs only with terraces open or a resort fully staffed is a holiday proposition, not necessarily a durable retirement base."
+            ),
+            "daily-life",
+        ),
+        DossierLens(
+            "Use the airport and rail advantage before the road takes over",
+            ("global_access", "foreigner_fit"),
+            (
+                "Málaga–Costa del Sol Airport is the destination’s structural advantage. Aena places Málaga centre about twelve minutes away by C1, Benalmádena about eighteen and Fuengirola about thirty-four, with María Zambrano high-speed rail reached in roughly eight. That makes Málaga city and the rail corridor unusually legible for international travel. Measure the whole trip from the property, however: station access, luggage, service hours and the final walk matter more than an airport pin on a listing map.",
+                "The rail line ends at Fuengirola. Mijas Costa, Marbella, San Pedro, Estepona and Manilva depend mainly on the A-7/AP-7 road system, buses and taxis. A western address can still be globally accessible, but its last mile is a different proposition. Drive it during weekday peaks and summer changeover periods, price airport transfers, and identify a workable alternative if one household member stops driving. The same distance can feel reasonable on a quiet February morning and exhausting after a delayed flight in August.",
+                "The international ecosystem is deep by Spanish coastal standards. Estate agents, lawyers, tax advisers, clinics and service businesses routinely work with foreign residents, especially from Fuengirola westward. That helps, but the legal record remains Spanish and municipal practice remains local. Contracts, tax notices, community meetings and planning files should be understood through independent advisers. Integration is strongest when international support opens the door to local systems; it is weakest when English-speaking sales material is mistaken for due diligence."
+            ),
+        ),
+        DossierLens(
+            "Own the home clearly—and verify the use separately",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Spain generally permits foreign buyers to own property, but clear access to title does not remove transaction work. Obtain a current Nota Simple, compare the registry and cadastre with the physical home, verify planning and occupancy status, and identify mortgages, charges, tenants and community debts. For an apartment, read statutes, minutes, budgets, reserve position, litigation, major works and accessibility. For villas and townhouses, confirm boundaries, pools, extensions, retaining walls, utility connections and any works that need regularisation before a deposit becomes difficult to recover.",
+                "Tourist use is an address-level legal question. Andalucía’s amended rules require planning compatibility and exclude homes where community statutes expressly prohibit tourist accommodation. Málaga city’s planning controls have already restricted new registrations in saturated neighbourhoods and its 2026 planning work continues to prioritise residential use. Other Costa del Sol municipalities can take different positions. National community approval requirements and building rules add further layers. Ask counsel for a written answer covering the municipality, premises, community, operator and date—not a screenshot of an old registration.",
+                "Physical risk also changes block by block. Screen official flood mapping, then review municipal drainage, steep access, wildfire interface, coastal exposure and insurability. AEMET’s Málaga Airport climate normals show hot, nearly rainless midsummer conditions, but annual averages hide heat inside a west-facing apartment and intense autumn rain on a low site. The western water system has required infrastructure designed to improve resilience and emergency transfers. Check shade, cooling, water pressure, garden demand, previous losses and an insurance quotation for the exact property.",
+                "Budget separately for the legal home and the operating home. Acquisition tax, notary, registry and advice are only the opening costs; lifts, façades, pools, gardens, security, air-conditioning, pest control and water can dominate later years. Read at least three years of community minutes and accounts, ask for the technical building inspection where applicable, and commission a specialist survey. A low community fee may signal efficiency, or it may signal deferred work and an approaching special assessment."
+            ),
+            "west-coast",
+        ),
+        DossierLens(
+            "Build the financial case on resident demand, not a licence story",
+            ("rental_profit", "capital_upside"),
+            (
+                "Málaga city has the broadest ordinary rental foundation because employment, education, healthcare and transport operate beyond tourism. Fuengirola and Benalmádena add resident and seasonal demand; Marbella and Estepona have international and service economies but a larger share of resort-led stock. None of that turns a specific apartment into a simple yield asset. Model community fees, management, insurance, utilities, maintenance, vacancy, tax and furnishing before comparing the result with a conventional tenancy and no rental income.",
+                "Short-stay revenue should be the final scenario, not the first. A registration may be unavailable, suspended, limited by municipal zoning, blocked by a community, tied to conditions the property no longer meets, or economically weak after professional management. Existing activity must be checked for validity and continuity after sale. If the purchase fails without tourist rent, the buyer has not bought retirement optionality; the buyer has underwritten a regulated hospitality business. Keep owner-use dates and the cost of compliance visible in every revenue model.",
+                "Capital upside is plausible where scarcity, service depth and a broad future buyer pool coincide, but rapid price growth has already raised the entry bar. Registered 2025 evidence for Málaga province averaged 3,101 EUR/m², with new homes at 3,387 and used homes at 2,964. Those figures do not value Marbella, Centro Málaga or an Estepona villa; they show why unlike stock must not be averaged into a promise. Future gains should be a sensitivity, not the reason an over-priced home appears affordable."
+            ),
+        ),
+        DossierLens(
+            "Pay for a buyer pool you can name on the way out",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Entry value comes from choosing a coherent buyer case. A central Málaga apartment may command a high price per square metre but reach residents, professionals, international buyers and downsizers. A Los Boliches apartment can combine rail, beach and services, provided the building and street remain comfortable year-round. A larger Estepona house may offer space at a lower unit price while adding renovation, car, garden and community costs. Compare total five-year cash outlay, not the portal price or the sea-view premium alone.",
+                "The three listing observations below are dated asking examples: a historic-centre Málaga apartment, a rail-served Fuengirola apartment and a western-coast Estepona house. They intentionally differ in legal type, condition and daily system. Official registered-sale figures cover the province and broad new-versus-used categories, so they are context rather than direct comparables. Obtain completed evidence for the same municipality, property type, size, age, condition and micro-location, and ask why a seller’s chosen comparables are genuinely substitutable.",
+                "Protect the exit before offering. Ask two agents who did not introduce the property to identify the likely next buyer, normal marketing period and price-sensitive defects. A lift, level approach, parking, walkable services and efficient cooling can widen an older buyer pool. An isolated hillside villa, irregular extension or tourism-dependent studio may require more time and discount. Model sale costs, currency movement and a weaker market after five years. The best Costa del Sol purchase is not the cheapest or most photographed; it is the one whose future buyer can already be described."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Málaga combines city culture and coast; Fuengirola, Marbella and Estepona extend the choice, but summer crowding and road-led urbanisations change daily life.",
+        "global_access": "Málaga Airport and the C1 line make the city, Benalmádena and Fuengirola unusually accessible; Marbella and Estepona add a road-dependent final leg.",
+        "ownership_clarity": "Málaga / Costa del Sol follows Spain’s open ownership framework, while every home still needs registry, cadastre, planning, occupancy and community records reconciled.",
+        "regulatory_safety": "Málaga city restrictions, Andalusian tourist-use rules and community approval make rental permission property-specific; flood, heat and wildfire review must also be address-specific.",
+        "rental_profit": "Málaga city has the broadest resident demand; Fuengirola, Marbella and Estepona can add visitor demand, but licences and operating costs constrain net return.",
+        "capital_upside": "Costa del Sol demand and infrastructure are supportive, yet rapid appreciation means Málaga, Marbella and Estepona buyers must not rely on continued multiple expansion.",
+        "retirement_fit": "Málaga city offers the deepest healthcare and services; Fuengirola retains rail, while Marbella and Estepona provide strong amenities with greater car dependence.",
+        "exit_liquidity": "Málaga apartments and established Fuengirola homes reach broad buyer pools; specialised hillside villas west of Marbella need more time and price discipline.",
+        "foreigner_fit": "Costa del Sol has deep international professional support, especially around Fuengirola, Marbella and Estepona, but binding legal and municipal work remains Spanish-led.",
+        "value_entry": "Málaga and the central coast carry mature premiums; Estepona can offer more space, but transport, renovation and a narrower buyer pool can absorb the discount.",
+    },
+    market_anchors=(
+        {"location": "Málaga province · all homes", "evidence": "3,101 EUR/m²", "buyer_read": "Average price of homes registered in 2025. This broad provincial transaction anchor combines very different municipalities, property types and conditions.", "source_label": "Registradores: 2025 registered housing statistics", "source_url": "https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2025.pdf"},
+        {"location": "Málaga province · new homes", "evidence": "3,387 EUR/m²", "buyer_read": "Average registered price for new homes in 2025. It is a province-wide asset-basis comparison, not a new-build valuation for a specific development.", "source_label": "Registradores: 2025 registered housing statistics", "source_url": "https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2025.pdf"},
+        {"location": "Málaga province · used homes", "evidence": "2,964 EUR/m²", "buyer_read": "Average registered price for used homes in 2025. Age, legal area, lift, condition, exact town and coast access remain essential comparability limits.", "source_label": "Registradores: 2025 registered housing statistics", "source_url": "https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2025.pdf"},
+    ),
+    micro_locations_intro=(
+        "Use four daily-life patterns, not one Costa del Sol average. Málaga city is the urban and transport base; Benalmádena and Fuengirola are the rail-served coast; Marbella and San Pedro form a premium service corridor; Estepona and Manilva trade airport ease for space and a slower western rhythm. The lines are not price boundaries. Confirm the exact municipality, station or road route, gradient, summer congestion, hospital journey, planning status, community rules and likely future buyer for every address."
+    ),
+    micro_locations=(
+        {"name": "Málaga city / east Málaga", "best_for": "Urban retirement and airport access", "daily_life": "Deepest services and least resort dependence", "diligence": "Noise, heat, lift, flood and tourist-use zone"},
+        {"name": "Benalmádena / Fuengirola", "best_for": "Rail-served coastal routine", "daily_life": "Stations, beach and year-round commerce", "diligence": "Gradient, building, crowding and licence"},
+        {"name": "Marbella / San Pedro", "best_for": "Premium international services", "daily_life": "Mature coastal ecosystem, mainly road-led", "diligence": "Entry price, traffic, community and resale"},
+        {"name": "Estepona / Manilva", "best_for": "Space and western-coast lifestyle", "daily_life": "Slower rhythm with longer airport journey", "diligence": "Car dependence, water, build status and exit"},
+    ),
+    checklist=(
+        "Confirm residence, tax, public-healthcare and private-insurance arrangements independently of the property purchase.",
+        "Choose urban, rail-served or road-led daily life before comparing listings across the coast.",
+        "Travel the airport, hospital, grocery and social routes from the exact address in summer traffic and without a car.",
+        "Reconcile the Nota Simple, cadastre, planning, occupancy, boundaries, extensions, debts and community records.",
+        "Obtain a written tourist-use answer covering Andalucía, the municipality, the building, the operator and continuity after sale.",
+        "Screen official flood mapping, wildfire interface, heat, water, drainage and insurability for the exact coordinates.",
+        "Compare asking evidence with completed transactions of the same legal type, condition and micro-location.",
+        "Model five-year ownership and a conservative resale without holiday income, then name the likely future buyer.",
+    ),
+    references_intro=(
+        "Legal, tax, residence, healthcare, transport, climate, market and rental claims were reviewed on 22 August 2026 against the primary sources below. The next scheduled review is 22 February 2027, or sooner if a cited law, municipal rule, tax table, transport service, hazard source or statistics release changes. Recheck the live source and obtain independent Spanish legal, tax, immigration, planning, engineering and insurance advice for the exact buyer and property before signing. Listing observations are dated asking evidence only and do not verify availability, title, condition, legal use, transferability or completed value."
+    ),
+    references=(
+        {"label": "Ministry of Inclusion: non-lucrative residence", "url": "https://www.inclusion.gob.es/en/web/migraciones/w/autorizacion-inicial-de-residencia-temporal-no-lucrativa"},
+        {"label": "Spanish Tax Agency: individual tax residence", "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/residencia-personas-fisicas-juridicas/persona-fisica-residente-espana.html"},
+        {"label": "Spanish Tax Agency: non-resident property taxation", "url": "https://sede.agenciatributaria.gob.es/Sede/vivienda-otros-inmuebles/no-residentes-tributacion-inmuebles.html"},
+        {"label": "Spanish Social Security: healthcare entitlement", "url": "https://www.seg-social.es/wps/portal/wss/internet/Trabajadores/PrestacionesPensionesTrabajadores/10938/30476/177505"},
+        {"label": "Registradores: international buyer guidance", "url": "https://www.registradores.org/gl/documentacion-y-descargas/guias-rapidas"},
+        {"label": "Registradores: 2025 registered housing statistics", "url": "https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2025.pdf"},
+        {"label": "Junta de Andalucía: Decree 31/2024 on tourist-use homes", "url": "https://www.juntadeandalucia.es/boja/2024/24/50"},
+        {"label": "Málaga City Council: tourist-use limits in saturated neighbourhoods", "url": "https://urbanismo.malaga.eu/anuncios-de-planeamiento/planificacion/modificacion-de-elementos/index.html"},
+        {"label": "Málaga City Council: 2026 residential and hospitality-use planning update", "url": "https://www.malaga.eu/el-ayuntamiento/notas-de-prensa/detalle-de-la-nota-de-prensa/index.html?id=178224"},
+        {"label": "Aena: Málaga Airport C1 access and journey times", "url": "https://www.aena.es/en/malaga-costa-del-sol/getting-there/trains.html"},
+        {"label": "Renfe: Málaga Cercanías network map", "url": "https://www.renfe.com/content/dam/renfe/es/Viajeros/Secciones/Cercanias/Mapas/2025/mapa_malaga_abril_2025.pdf"},
+        {"label": "Andalusian Health Service: Hospital Universitario Costa del Sol", "url": "https://www.sspa.juntadeandalucia.es/servicioandaluzdesalud/el-sas/servicios-y-centros/informacion-por-centros/25532"},
+        {"label": "AEMET: Málaga Airport climate normals", "url": "https://www.aemet.es/en/serviciosclimaticos/datosclimatologicos/valoresclimatologicos?l=6155A"},
+        {"label": "MITECO: national flood-zone mapping system", "url": "https://www.miteco.gob.es/es/agua/temas/gestion-de-los-riesgos-de-inundacion/snczi.html"},
+        {"label": "Junta de Andalucía: 2026 Costa del Sol water-system resilience works", "url": "https://www.juntadeandalucia.es/boja/2026/19/45"},
+        {"label": "European Central Bank: euro reference exchange rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("city-hero", "/assets/malaga-costa-del-sol-city-hero.webp", "Málaga neighbourhoods, waterfront and coastline in morning light", "Málaga city gives the coast its deepest year-round service and transport base.", "hero"),
+        DossierImage("daily-life", "/assets/malaga-costa-del-sol-daily-life.webp", "Older residents walking along a shaded street near the sea on the Costa del Sol", "The rail-served coast works best where ordinary errands remain close and shaded.", "wide"),
+        DossierImage("west-coast", "/assets/malaga-costa-del-sol-west-coast.webp", "Homes, the coastal road and dry hills west of Málaga", "West of Fuengirola, road access and the property proposition become inseparable.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Málaga / Costa del Sol through five destination lenses",
+    assessment_intro="Here’s how Málaga / Costa del Sol scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show distinct buyer cases in Málaga city, rail-served Fuengirola and road-led Estepona. EUR is primary; USD uses the recorded ECB reference basis for comparison only.",
+    market_anchors_intro="These figures are official registered-sale evidence—not asking prices or valuations for the listings above. They are province-wide new-versus-used context; match every candidate for municipality, legal type, area basis, age, condition, access and completed transaction date.",
+    orientation_groups=(
+        DossierOrientationGroup("C1 airport and rail spine", (("Málaga city", "Urban service base"), ("Málaga Airport", "International gateway"), ("Benalmádena", "Rail-served coast"), ("Fuengirola", "C1 terminus"))),
+        DossierOrientationGroup("West by road", (("Mijas Costa", "Road transition"), ("Marbella / San Pedro", "Premium service coast"), ("Estepona", "Western town base"), ("Manilva", "Far-west value edge"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. C1 rail ends at Fuengirola; west-coast journey times depend on the A-7/AP-7, local roads, traffic and the exact address.",
+    country_guide_url="/countries/spain-property/",
+    country_guide_label="Spain property guide",
+    rail_comparison="Compare Málaga / Costa del Sol with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
     MADEIRA_DOSSIER.destination_id: MADEIRA_DOSSIER,
+    MALAGA_COSTA_DEL_SOL_DOSSIER.destination_id: MALAGA_COSTA_DEL_SOL_DOSSIER,
 }
 
 

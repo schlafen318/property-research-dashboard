@@ -128,7 +128,7 @@ RETIREMENT_DESTINATIONS_PAGE = {
         "crete",
         "valencia",
         "algarve-cascais",
-        "m-laga-costa-del-sol",
+        "malaga-costa-del-sol",
         "madeira",
         "lake-como",
     ],
@@ -141,7 +141,7 @@ COUNTRY_HUBS = [
         "description": "Compare Spain property destinations for foreign buyers, including Valencia, Malaga, Costa Brava, and Mallorca across lifestyle, ownership, rentals, and retirement fit.",
         "h1": "Spain Property Guide for Foreign Buyers",
         "thesis": "Spain is one of the deepest lifestyle-property markets in the Atlas because it combines city infrastructure, Mediterranean living, healthcare access, and several resale buyer pools. The discipline is entry price and local rental regulation.",
-        "destination_ids": ["valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
+        "destination_ids": ["valencia", "malaga-costa-del-sol", "costa-brava-girona", "mallorca"],
         "guide_slugs": ["spain-retirement-property-foreign-buyers", "portugal-vs-spain-retirement-property", "best-places-to-buy-property-in-europe", "buying-property-abroad-for-retirement"],
     },
     {
@@ -312,7 +312,7 @@ SEO_PAGES = [
         "keyword": "best places to buy property abroad for retirement",
         "theme": "retirement planning",
         "intent": "buyers who want one property to support retirement optionality, seasonal living, and defensible resale value",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "lake-como", "hakone-izu", "m-laga-costa-del-sol"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "lake-como", "hakone-izu", "malaga-costa-del-sol"],
         "faqs": [
             ("What matters most when buying abroad for retirement?", "Ownership clarity, healthcare access, daily convenience, tax and visa planning, and resale liquidity should be weighted before lifestyle appeal."),
             ("Should retirement buyers prioritize rental yield?", "Yield helps offset ownership costs, but retirement buyers should avoid assets where income depends on fragile short-term-rental rules."),
@@ -342,7 +342,7 @@ SEO_PAGES = [
         "keyword": "best countries for expats to buy property",
         "theme": "expat ownership",
         "intent": "globally mobile buyers who need clear foreign ownership, usable infrastructure, and a livable long-term base",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "da-nang-hoi-an", "phuket-koh-samui"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "da-nang-hoi-an", "phuket-koh-samui"],
         "faqs": [
             ("Which countries are easiest for expats to buy in?", "Ease depends on title structure, local counsel quality, banking, taxes, and residency rules, not only whether foreign ownership is technically allowed."),
             ("Should expats buy before moving?", "Usually only after validating healthcare, transport, language friction, taxes, and the specific neighborhood through extended stays."),
@@ -357,7 +357,7 @@ SEO_PAGES = [
         "keyword": "best countries to buy property as a foreigner",
         "theme": "foreign-buyer access",
         "intent": "foreign buyers comparing legal access, title clarity, transaction practicality, lifestyle quality, and resale depth before choosing markets for local diligence",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "lake-como", "costa-brava-girona", "hakone-izu", "phuket-koh-samui"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "lake-como", "costa-brava-girona", "hakone-izu", "phuket-koh-samui"],
         "faqs": [
             ("What are the best countries to buy property as a foreigner?", "The best options are markets where foreign buyers can understand the title path, hire independent local counsel, fund the purchase cleanly, use the property realistically, and resell into a broad buyer pool."),
             ("What legal risks should foreign buyers check first?", "Start with title structure, transfer process, taxes, permits, foreign ownership restrictions, financing access, rental rules, and whether the structure is simple enough to explain without relying on informal assurances."),
@@ -372,7 +372,7 @@ SEO_PAGES = [
         "keyword": "buy property abroad",
         "theme": "global purchase process",
         "intent": "buyers moving from inspiration to a disciplined international property shortlist",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "lake-como", "madeira", "costa-brava-girona", "crete"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "lake-como", "madeira", "costa-brava-girona", "crete"],
         "faqs": [
             ("What is the first step to buy property abroad?", "Define the job of the property: retirement base, vacation home, income asset, capital preservation, or a blend."),
             ("How many destinations should I compare?", "Start with five to eight destinations, then reduce to two or three after legal, tax, visa, and neighborhood checks."),
@@ -387,7 +387,7 @@ SEO_PAGES = [
         "keyword": "buying property abroad for retirement",
         "theme": "retirement buyer framework",
         "intent": "retirement-oriented buyers comparing healthcare, daily convenience, ownership practicality, and future resale flexibility before choosing a long-stay market",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "hakone-izu", "lake-como", "m-laga-costa-del-sol"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "crete", "hakone-izu", "lake-como", "malaga-costa-del-sol"],
         "faqs": [
             ("What should retirees verify before buying abroad?", "Retirement buyers should verify healthcare access, visa and tax planning needs, daily convenience, title clarity, insurance, building condition, and future resale demand before focusing on lifestyle appeal."),
             ("Should retirement buyers prioritize rental income?", "Rental income can offset carrying costs, but a retirement property should not depend on fragile short-term-rental assumptions or a structure the buyer cannot comfortably manage."),
@@ -417,7 +417,7 @@ SEO_PAGES = [
         "keyword": "overseas property investment",
         "theme": "investment underwriting",
         "intent": "investors comparing income, appreciation, governance, and the ability to exit cleanly",
-        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "m-laga-costa-del-sol", "da-nang-hoi-an", "phuket-koh-samui", "bali", "croatia-istria-dalmatia", "costa-brava-girona"],
+        "destination_ids": ["fukuoka-itoshima", "algarve-cascais", "malaga-costa-del-sol", "da-nang-hoi-an", "phuket-koh-samui", "bali", "croatia-istria-dalmatia", "costa-brava-girona"],
         "faqs": [
             ("What is a good overseas property investment?", "A good investment combines realistic net income, legal clarity, demand durability, price discipline, and a broad future buyer pool."),
             ("Should I chase the highest yield?", "No. High yield can signal regulatory, seasonality, management, title, or liquidity risk."),
@@ -432,7 +432,7 @@ SEO_PAGES = [
         "keyword": "foreign property investment risks",
         "theme": "risk framework",
         "intent": "buyers searching for a disciplined risk checklist before committing capital to property abroad",
-        "destination_ids": ["phuket-koh-samui", "bali", "da-nang-hoi-an", "croatia-istria-dalmatia", "m-laga-costa-del-sol", "algarve-cascais", "lake-como", "andermatt"],
+        "destination_ids": ["phuket-koh-samui", "bali", "da-nang-hoi-an", "croatia-istria-dalmatia", "malaga-costa-del-sol", "algarve-cascais", "lake-como", "andermatt"],
         "faqs": [
             ("What are the biggest risks of buying property abroad?", "The major risks are unclear title, foreign-ownership restrictions, changing rental rules, tax surprises, currency movement, weak management, poor building condition, and thin resale liquidity."),
             ("How do currency and tax risks affect returns?", "Currency and taxes can change the real return even when the local property performs well, so buyers should model acquisition costs, annual costs, income taxation, exit costs, and FX movement separately."),
@@ -447,7 +447,7 @@ SEO_PAGES = [
         "keyword": "Portugal vs Spain retirement property",
         "theme": "country comparison",
         "intent": "retirement buyers choosing between Iberian lifestyle, value, and legal-market depth",
-        "destination_ids": ["algarve-cascais", "madeira", "valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
+        "destination_ids": ["algarve-cascais", "madeira", "valencia", "malaga-costa-del-sol", "costa-brava-girona", "mallorca"],
         "faqs": [
             ("Is Portugal or Spain better for retirement property?", "The better choice depends on tax, residency, healthcare access, local price discipline, and whether you prefer smaller resort markets or deeper city-region liquidity."),
             ("Which has stronger resale liquidity?", "Spain generally offers deeper regional buyer pools in major coastal and city markets, while Portugal can offer focused demand in established expat corridors."),
@@ -495,7 +495,7 @@ SEO_PAGES = [
         "keyword": "Spain retirement property for foreign buyers",
         "theme": "Spain retirement buyer guide",
         "intent": "foreign buyers deciding whether Spain fits their long-term residence, healthcare, lifestyle and property plan",
-        "destination_ids": ["valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
+        "destination_ids": ["valencia", "malaga-costa-del-sol", "costa-brava-girona", "mallorca"],
         "author": "Global Home Atlas Research Team",
         "date_published": "2026-08-21",
         "faqs": [
@@ -543,7 +543,7 @@ SEO_PAGES = [
         "keyword": "where can foreigners buy property",
         "theme": "foreign ownership map",
         "intent": "early-stage global buyers looking for a practical map of foreign-buyer access and markets worth researching first",
-        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "m-laga-costa-del-sol", "madeira", "crete", "lake-como", "hakone-izu", "phuket-koh-samui", "da-nang-hoi-an"],
+        "destination_ids": ["fukuoka-itoshima", "valencia", "algarve-cascais", "malaga-costa-del-sol", "madeira", "crete", "lake-como", "hakone-izu", "phuket-koh-samui", "da-nang-hoi-an"],
         "faqs": [
             ("Can foreigners buy freehold property abroad?", "In some markets foreigners can buy freehold property, while others rely on leasehold, condominium rules, local companies, or special structures. The practical answer must be verified locally before purchase."),
             ("Which markets are hardest for foreign buyers?", "Markets become harder when land ownership is restricted, financing is limited, tax treatment is unclear, rental permits are uncertain, or the transaction structure requires assumptions the buyer cannot verify."),
@@ -675,7 +675,6 @@ CITY_DESTINATION_IDS = {
     "innsbruck-tyrol",
     "los-angeles-orange-county",
     "malaga-costa-del-sol",
-    "m-laga-costa-del-sol",
     "miami-fort-lauderdale",
     "perth-margaret-river",
     "sydney-melbourne",
@@ -2186,7 +2185,7 @@ def destination_osm_maps(dest: dict) -> dict[str, dict] | None:
             "location": {"bbox": (-10.2, 36.5, -6.0, 42.3), "marker": (37.0194, -7.9304), "caption": "Marker anchors the Algarve; Cascais sits farther north near Lisbon."},
             "area": {"bbox": (-9.55, 36.85, -7.35, 39.05), "marker": (37.0194, -7.9304), "caption": "Compare Algarve resort towns with the Lisbon/Cascais corridor."},
         },
-        "m-laga-costa-del-sol": {
+        "malaga-costa-del-sol": {
             "location": {"bbox": (-10.0, 35.2, 4.8, 44.2), "marker": (36.7213, -4.4214), "caption": "Marker shows Malaga on Spain's southern Mediterranean coast."},
             "area": {"bbox": (-5.40, 36.42, -3.55, 37.08), "marker": (36.7213, -4.4214), "caption": "Compare Malaga city, airport access, and the Costa del Sol resort corridor."},
         },
@@ -3954,7 +3953,7 @@ SPAIN_RETIREMENT_DESTINATION_GUIDANCE = {
         "diligence": "Neighborhood heat, flood exposure, community rules and local rental permissions",
         "rental": "Prefer durable residential demand over a tourist-only income case",
     },
-    "m-laga-costa-del-sol": {
+    "malaga-costa-del-sol": {
         "best_for": "International retirement infrastructure, flights and established coastal communities",
         "daily_life": "Easy to enter socially, but the coast varies sharply by municipality",
         "diligence": "Planning history, water and heat exposure, community approval and municipal tourist-use rules",
