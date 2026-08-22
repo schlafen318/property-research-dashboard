@@ -1623,10 +1623,10 @@
     "country": "New Zealand",
     "category": "Mountain + Water",
     "overall_score": 3.78,
-    "usd_per_m2": 4200.0,
+    "usd_per_m2": 6500.0,
     "net_yield_estimate": "2.5–4.5% est. net",
     "quick_metrics": {
-      "usd_m": "$4,200",
+      "usd_m": "$6,500",
       "net_yield": "2.5–4.5% est. net",
       "ownership": "2.3/5",
       "friendly": "3.8/5"
@@ -1726,8 +1726,8 @@
       "adr_occupancy": "$377 / 56.5%",
       "confidence": "High for STR metrics; medium for acquisition yield"
     },
-    "price_basis": "Improved-property/build-cost proxy rather than clean market €/m² equivalent. Queenstown average property value was NZ$1.94m in May 2026, while high-end build-cost proxy is NZ$6,000–8,000/m²; converted at 1 NZD = 0.5737 USD. Land/location premium can push effective cost higher.",
-    "price_confidence": "Low-medium; no clean public sale-price/m² series found",
+    "price_basis": "QV reported a NZ$1,941,732 average Queenstown home value in May 2026. The $6,500/m² display is a rounded median of three direct asking observations captured 22 August 2026 using seller-stated floor area and the ECB cross-rate of 1 NZD = 0.59869 USD. It is asking evidence, not a completed-sale or valuation benchmark; QLDC 2024 rating values provide separate submarket context.",
+    "price_confidence": "Medium-low; current direct asking observations with explicit floor area, bounded by official QV and QLDC value evidence",
     "profit_driver": "Global adventure tourism, scarce lake/mountain land, strong ADR, four-season demand."
   },
   {

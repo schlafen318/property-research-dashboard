@@ -1717,6 +1717,7 @@ ANNECY_DOSSIER = PremiumDossierSpec(
                 "The west shore changes the balance rather than merely lowering the price. Sevrier and Saint-Jorioz have schools, shops, restaurants, cycling and lake access within functioning towns. Some addresses can support a practical routine, but traffic on the main road and the distance between the home, bus stop and services matter. Menthon-Saint-Bernard, Veyrier-du-Lac and Talloires on the east shore offer stronger visual drama and village identity. They also include slopes, narrow roads, smaller service centres and property types whose maintenance and future buyer pool may be more specialised. Test stairs, gradients and parking as seriously as the view.",
                 "Healthcare follows residence and geography. Ownership itself does not create access to France's public system; Assurance Maladie ties PUMa to stable and regular residence or another qualifying basis. The Centre Hospitalier Annecy Genevois site at Epagny Metz-Tessy provides 24-hour emergency services, SAMU and specialist flows, but a lake-shore buyer must measure the door-to-door route in congestion and bad weather. Routine care, pharmacy access and the availability of a regular doctor also matter. Retirement fit is strongest where a household can keep its daily life functioning if driving becomes difficult, not where a summer bicycle ride merely looks possible.",
             ),
+            "winter-access-healthcare",
         ),
         DossierLens(
             "Reach Geneva—and the hospital—without assuming an easy commute",
@@ -1726,7 +1727,6 @@ ANNECY_DOSSIER = PremiumDossierSpec(
                 "Local mobility is equally address-sensitive. Grand Annecy publishes regular lake-shore bus services, with many corridors operating from early morning into the evening, while summer additions are a separate seasonal offer. Do not use July frequency to justify a February purchase. Annecy centre and parts of Annecy-le-Vieux can work without a car for many trips. Sevrier and Saint-Jorioz may combine bus, bicycle and driving. The east shore can be more dependent on the road, particularly from a hillside house. Travel the exact route at the time it will normally be used and add a failed-connection scenario.",
                 "Foreigner fit is helped by Geneva's international economy and by the area's experience with cross-border residents, but administration remains French and often technical. The notaire, bank, copropriété manager, insurer, tax office, utility providers and contractors may require French documents and local follow-through. Cross-border work introduces separate residence, tax, healthcare and social-security questions that a property guide cannot settle. Budget for independent French legal and tax advice, and for a bilingual contact if the household cannot handle notices and building meetings. International access is an asset; it does not remove the need to operate locally.",
             ),
-            "winter-access-healthcare",
         ),
         DossierLens(
             "Own clearly, then read the building and energy file",
@@ -2262,6 +2262,155 @@ CROATIA_ISTRIA_DALMATIA_DOSSIER = PremiumDossierSpec(
 )
 
 
+QUEENSTOWN_DOSSIER = PremiumDossierSpec(
+    destination_id="queenstown",
+    title="Queenstown Retirement Property Dossier",
+    description="Assess Queenstown property through overseas-buyer eligibility, alpine daily life, visitor-accommodation rules, hazards, healthcare, access, value, resale, and current listings.",
+    h1="Queenstown: secure the right to buy before the alpine view",
+    lede="Queenstown can deliver a rare combination of mountain scenery, outdoor life, airport access and an international community. It is also an expensive, supply-constrained market where many overseas people cannot buy ordinary residential land. A credible case begins with legal eligibility, not a listing. The property then has to work through winter roads, steep sites, visitor-accommodation rules, hazard maps, limited local hospital depth and a resale pool that changes sharply between Frankton apartments, Queenstown Hill houses, Arrowtown character homes and Jacks Point new builds.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is positive only for a legally eligible, well-capitalised buyer who will use Queenstown for its ordinary life as well as its scenery. Frankton is the most practical year-round base because the airport, Lakes District Hospital, supermarkets, employment and transport converge there. Queenstown town, Queenstown Hill and Fernhill put the lake and centre closer but add gradients, parking, congestion and winter access questions. Arrowtown and Lake Hayes offer a stronger community rhythm and more space, with a longer service journey. Jacks Point and Hanley's Farm provide newer stock and planned neighbourhoods, but make the household more dependent on a car and the State Highway 6 corridor.",
+        "Pause before browsing if the buyer is an overseas person without a qualifying pathway. LINZ says overseas people usually cannot buy a house or land. New Zealand citizens and ordinarily resident residence-class visa holders can buy without restriction; some residence-class visa holders can apply for consent for one home; temporary visa holders generally cannot. A separate pathway effective 6 March 2026 allows qualifying investor-visa holders to seek consent for an existing dwelling with a purchase price of more than NZ$5 million; when buying land to build, the land purchase and construction prices must together exceed NZ$5 million. The Temporary Retirement Visitor Visa is still a temporary visa and does not itself solve ordinary residential eligibility. Sensitive-land rules can create an additional consent question near lakes, reserves and other protected features.",
+        "Proceed in a strict order. Obtain a written eligibility opinion for the buyer, entity and parcel. Choose the daily-life base before the property. Confirm the record of title, LIM, lawful floor area, building work, body-corporate records, insurance and finance. Check the address in QLDC planning, visitor-accommodation and hazard systems. Drive the hospital, grocery, airport and winter route at peak time. If rent matters, register the property and obtain written confirmation of permitted nights or resource consent. Model rates, insurance, heating, maintenance, management, empty periods and a slower sale. Buy only if the home remains useful without tourist income or automatic capital growth.",
+    ),
+    lenses_intro="The five paired lenses translate Queenstown's ten Atlas dimensions into the legal, daily-life and property choices that can reverse the decision. The complete ten-factor assessment appears once in the score table.",
+    lenses=(
+        DossierLens(
+            "Live through winter, not only the ski week",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Queenstown's lifestyle appeal survives beyond the postcard when the household actively uses the trails, lake, golf, food and community. The test is whether the same address works during a cold inversion, a busy holiday week and a quiet shoulder season. Frankton offers the broadest ordinary routine: supermarkets, medical care, the airport and public transport are close. Queenstown town and Fernhill place restaurants and the lake nearby, but steep walks, visitor traffic and parking can erode convenience. Arrowtown has a calmer resident centre and established social life. Jacks Point and Lake Hayes reward space and mountain access while making errands more deliberate.",
+                "Retirement fit is more selective than lifestyle magnetism. Lakes District Hospital in Frankton has a 24-hour emergency department, primary birthing, district nursing and selected outpatient clinics. Health New Zealand describes it as a smaller rural hospital; tertiary services are centred in Dunedin, with some specialist pathways also involving Southland. A buyer managing cardiac, oncology, neurological or complex surgical care should map the actual referral journey, weather alternative and accommodation plan. Confirm New Zealand healthcare eligibility separately from property ownership and keep suitable private cover where needed. A home near Frankton can reduce routine friction, but it does not create specialist depth.",
+                "The dwelling should make alpine life safer. Prefer sun, insulation, effective heating, mechanical ventilation, a low-slip entry, internal garage access and a main-level bedroom and bathroom where mobility may change. Inspect retaining walls, drainage, roof condition, glazing and freeze exposure. On Queenstown Hill or Fernhill, test the driveway after frost and the walking route with groceries. In Arrowtown, check heritage or character constraints before changing an older house. In Jacks Point and Hanley's Farm, read design controls, service arrangements and owners' obligations. A lake view is not compensation for a dark living room, unsafe stairs or an uninsurable slope.",
+            ),
+        ),
+        DossierLens(
+            "Use the airport advantage without underestimating the last mile",
+            ("global_access", "foreigner_fit"),
+            (
+                "Queenstown Airport is a genuine advantage for a small alpine market. It links directly to New Zealand's three largest cities and Australian destinations; FY26 international passenger movements passed one million and total movements were expected around 2.8 million. That is regional access, not a global hub. Long-haul trips normally connect through Auckland, Christchurch, Sydney, Melbourne or Brisbane, and winter weather can disrupt schedules. Frankton places the terminal minutes from daily services. Arrowtown, Lake Hayes and Jacks Point add road time. Queenstown town can be close in kilometres yet slow when Frankton Road and the town centre are congested.",
+                "Ground transport is inexpensive but uneven by address and time. Orbus currently charges NZ$2.50 for an adult Bee Card trip and serves the airport, town, Frankton, Arrowtown and several residential areas. A timetable is not proof that an isolated street, early flight or specialist appointment is practical without a car. NZTA says Frankton Road carries roughly 25,000 to 30,000 vehicles a day, and freezing conditions constrain winter road construction. Snow and ice can close or slow regional roads, including the Crown Range. Test the exact commute in school, airport and ski peaks; identify an alternative when the household cannot or should not drive.",
+                "Queenstown's international workforce and visitor economy make everyday English-language integration easier than in many resort markets. The harder fit is administrative and legal. Overseas-investment consent, immigration, tax, title, planning, building and body-corporate decisions follow New Zealand systems and must be handled by the buyer's own advisers. A marketing claim that a property is 'AIP eligible' is not a determination for the buyer or parcel. A non-resident owner also needs reliable local oversight after frost, wind, a leak or an alarm. Foreigner fit is strongest for someone willing to establish residence and a local operating network, not for a remote buyer expecting the agent to remain the manager.",
+            ),
+        ),
+        DossierLens(
+            "Clear eligibility, lawful use and the hazard map",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Ownership clarity begins with the Overseas Investment Act rather than the title search. LINZ sets different pathways for citizens, ordinarily resident residence-class visa holders, residence-class holders who need consent, Australians and Singaporeans, qualifying investor-visa holders, and other overseas people. Confirm the buyer's exact status before committing to finance, due diligence or an auction. Then obtain the record of title and check the seller, estate, caveats, easements, access and any sensitive-land issue. The LIM, council property file and building inspection should reconcile every structure and consent. For an apartment, examine body-corporate minutes, long-term maintenance plan, insurance, remediation, levies and visitor-use rules.",
+                "Visitor accommodation is property-specific. QLDC requires residential visitor accommodation to be registered. The number of permitted nights and operating standards depend on the District Plan zone and address; activity beyond permitted standards can require resource consent. A current or former listing on a booking platform does not prove that a new owner may continue. Check the ePlan, registration, consent, conditions, fire requirements, parking, noise rules, rates category and body-corporate or neighbourhood covenants. Obtain written advice for the intended occupancy pattern. If the file is incomplete or an application is merely 'in process', value the property as a private home with no tourist income.",
+                "Natural hazards vary over very short distances. QLDC's official layers include landslide, debris-flow, rockfall, erosion, avalanche, faults and liquefaction; its flood strategy maps inundation areas, and local reserve planning identifies earthquake, debris-flow, rockfall and high wildfire exposure around Queenstown's steep vegetated slopes. Order the current LIM, then commission site-specific geotechnical, drainage, retaining-wall, wildfire and insurance review where the address warrants it. Check emergency access and evacuation, not only the building footprint. A property outside one mapped polygon can still face overland flow, falling material, smoke, road closure or an insurance exclusion.",
+            ),
+            "slope-hazard-diligence",
+        ),
+        DossierLens(
+            "Underwrite rent as a consented operation",
+            ("rental_profit", "capital_upside"),
+            (
+                "Queenstown has powerful visitor demand, but gross nightly rates are not owner return. Start with the lawful calendar for the exact property, then reconcile achieved nights, rates, cancellations and owner use with bank and tax records. Deduct management, cleaning, linen, utilities, heating, platform fees, rates, insurance, body-corporate charges, repairs, furniture replacement and empty periods. A Frankton Road apartment may have a mature accommodation ecosystem but also remediation, management and GST questions. A Queenstown Hill house may have more owner flexibility but higher maintenance and access burden. A Hanley's Farm home-and-income layout still needs lawful-unit and rental-use confirmation.",
+                "Long-term demand provides a second case because Queenstown has a resident workforce and constrained housing supply. That does not make every holiday product a good tenancy. Parking, heating, storage, bedroom legality, commute and lease terms determine resident demand. Compare a normal tenancy, registered visitor accommodation and personal use under the same five-year cash model. Tax treatment can differ: IRD taxes New Zealand rental profit and applies wider land-sale rules; for residential property sold on or after 1 July 2024, the bright-line test generally looks at a two-year period, subject to exclusions and other tax rules. Commission buyer-specific tax advice before relying on a net yield.",
+                "Capital upside is supported by scarcity, global recognition and an expanding resident and visitor economy, but recent evidence is not a straight line. QV reported an average Queenstown home value of NZ$1,941,732 in May 2026 after four months of modest growth; by July its index showed only a 0.2% quarterly gain while the national market weakened. These are broad modelled values, not a candidate valuation. Planning constraints and difficult sites can limit supply, while high construction costs and buyer eligibility can limit demand. Pay for lawful utility and a recognisable buyer case, not a forecast built from tourism growth alone.",
+            ),
+            "planned-community-daily-life",
+        ),
+        DossierLens(
+            "Enter through utility and preserve the buyer pool",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Entry value differs by operating pattern. The current Frankton Road apartment observation is NZ$839,000 for 68 square metres and offers a lower ticket with body-corporate and visitor-use diligence. The Hanley's Farm home-and-income observation is NZ$1.78 million for 237 square metres and adds a separate unit, newer construction and car dependence. The Queenstown Hill observation is NZ$3.49 million for 322 square metres, with slope, new-build and pending visitor-consent questions. Their floor-area comparisons are internally consistent, but land, views, parking, condition, GST and legal use differ. They are asking observations, not valuations or proof of availability.",
+                "Official rating values show the submarket spread without pretending to be sale prices. QLDC's 2024 revaluation reports average residential capital values of NZ$1,711,114 in Frankton, NZ$2,171,809 in Arrowtown and NZ$3,025,016 across Wakatipu Heights, Panorama and Queenstown. These values were assessed for rates using market evidence around 1 September 2024; they are not current valuations, internal-area comparisons or offers. Use them to test whether a listing's submarket story is plausible, then commission matched completed sales and an independent valuation. A single Queenstown-wide dollar-per-square-metre number cannot price an apartment, historic cottage and alpine house.",
+                "Exit liquidity follows legal eligibility, ticket size and ordinary usefulness. A warm, well-run Frankton apartment can reach resident, downsizer and eligible second-home buyers, though body-corporate or visitor-use problems shrink the pool. Arrowtown character reaches lifestyle demand but can be expensive and alteration-sensitive. A practical Jacks Point or Lake Hayes house may appeal to local households; a singular steep-site or NZ$5 million-plus trophy home needs fewer buyers. Before purchase, ask two agents who did not source the listing how they would resell it, which completed sales they would use, and how long the category can take. Model a slow sale and full selling costs.",
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Queenstown combines lake, mountains and year-round outdoor life; Frankton, Arrowtown and Jacks Point produce very different daily rhythms.",
+        "global_access": "Queenstown Airport offers strong domestic and Australian links, while long-haul travel, winter weather and Frankton-road congestion add connection risk.",
+        "ownership_clarity": "Queenstown title systems are clear, but overseas-buyer eligibility and sensitive-land consent can prevent an otherwise ordinary residential purchase.",
+        "regulatory_safety": "Queenstown requires address-level visitor-use, building, body-corporate, landslide, flood, rockfall, wildfire and insurance diligence.",
+        "rental_profit": "Queenstown has deep visitor and resident demand, but lawful nights, management, heating, rates and body-corporate costs control the net return.",
+        "capital_upside": "Queenstown scarcity and recognition support selected homes; high entry prices, buyer restrictions and a patchy 2026 market limit broad upside claims.",
+        "retirement_fit": "Frankton offers emergency care and daily services, but Queenstown's complex specialist treatment can require travel to Dunedin or Southland.",
+        "exit_liquidity": "Frankton and practical family homes reach broader pools; Queenstown Hill trophy properties and compromised alpine sites need fewer eligible buyers.",
+        "foreigner_fit": "Queenstown is internationally familiar, yet residence, overseas-investment consent, tax and remote property management still require local professional support.",
+        "value_entry": "Queenstown entry spans Frankton apartments, Jacks Point houses and premium Wakatipu slopes; lawful utility matters more than one resort average.",
+    },
+    market_anchors=(
+        {"location": "Frankton residential", "evidence": "NZ$1,711,114", "buyer_read": "Average 2024 council capital rating value across 422 residential assets; assessed around 1 September 2024 and not a current property valuation.", "source_label": "QLDC 2024 revaluation", "source_url": "https://www.qldc.govt.nz/services/rates-property/revaluation-and-how-it-affects-rates"},
+        {"location": "Arrowtown residential", "evidence": "NZ$2,171,809", "buyer_read": "Average 2024 council capital rating value across 1,263 residential assets; not a sale median, floor-area comparison or candidate valuation.", "source_label": "QLDC 2024 revaluation", "source_url": "https://www.qldc.govt.nz/services/rates-property/revaluation-and-how-it-affects-rates"},
+        {"location": "Wakatipu Heights / Panorama / Queenstown", "evidence": "NZ$3,025,016", "buyer_read": "Average 2024 council capital rating value across 709 residential assets; broad rating evidence, not a current valuation for Queenstown Hill.", "source_label": "QLDC 2024 revaluation", "source_url": "https://www.qldc.govt.nz/services/rates-property/revaluation-and-how-it-affects-rates"},
+    ),
+    micro_locations_intro="Queenstown is best read as four daily-life patterns rather than one resort average. Confirm buyer eligibility, the exact title, QLDC zone, lawful use, winter route, healthcare access, hazard layers and insurance for every address.",
+    micro_locations=(
+        {"name": "Frankton / Remarkables Park", "best_for": "Most practical year-round base", "daily_life": "Airport, hospital, shops, work and buses", "diligence": "Traffic, airport noise, body corporate and future planning"},
+        {"name": "Queenstown town / Hill / Fernhill", "best_for": "Town access and lake outlook", "daily_life": "Restaurants and visitor energy with steep streets", "diligence": "Slope, frost, parking, noise, retaining walls and visitor use"},
+        {"name": "Arrowtown / Lake Hayes", "best_for": "Community rhythm and space", "daily_life": "Village or suburban life with a longer service trip", "diligence": "Heritage, commute, sun, hazards and transport"},
+        {"name": "Jacks Point / Hanley's Farm", "best_for": "Newer planned-community housing", "daily_life": "Golf, trails and family stock south of Frankton", "diligence": "Car dependence, design controls, services, wind and exit"},
+    ),
+    checklist=(
+        "Obtain a written LINZ eligibility and sensitive-land opinion for the buyer, entity and parcel.",
+        "Confirm the residence, healthcare and tax plan separately from property ownership.",
+        "Choose Frankton, central slopes, Arrowtown / Lake Hayes or Jacks Point daily life first.",
+        "Travel the airport, hospital, grocery and property routes in winter and peak traffic.",
+        "Reconcile title, LIM, lawful floor area, building file, inspection and body-corporate records.",
+        "Overlay QLDC flood, landslide, rockfall, liquefaction and wildfire evidence with insurance.",
+        "Assume zero short-stay income until registration, permitted nights or consent are confirmed.",
+        "Model five-year cash outlay and a slow sale to the next legally eligible buyer.",
+    ),
+    references_intro="Ownership, residence, tax, title, planning, visitor-accommodation, healthcare, transport, hazard, market and listing claims were reviewed on 22 August 2026. Recheck every time-sensitive source no later than 22 February 2027 and immediately after any ownership, residence, tax, planning, rental, listing, transport, hazard, healthcare or market-data change. Obtain current New Zealand legal, tax, immigration, overseas-investment, planning, building, geotechnical, insurance and property-management advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "LINZ: buying residential property to live in", "url": "https://www.linz.govt.nz/guidance/overseas-investment/buying-residential-property-live"},
+        {"label": "LINZ: NZ$5 million-plus house pathway", "url": "https://www.linz.govt.nz/guidance/overseas-investment/ways-invest/pathways-migrants-and-visa-holders/investing-residential-land-over-5-million"},
+        {"label": "LINZ: Overseas Investment Act reform", "url": "https://www.linz.govt.nz/our-work/overseas-investment-regulation/reform-overseas-investment-act"},
+        {"label": "LINZ: residential development pathways", "url": "https://www.linz.govt.nz/guidance/overseas-investment/ways-invest/investing-residential-land-develop"},
+        {"label": "Immigration New Zealand: Temporary Retirement Visitor Visa", "url": "https://www.immigration.govt.nz/visas/temporary-retirement-visitor-visa/"},
+        {"label": "QLDC: short-term visitor accommodation", "url": "https://www.qldc.govt.nz/services/rates-property/short-term-visitor-accommodation"},
+        {"label": "QLDC: resource-consent check", "url": "https://www.qldc.govt.nz/services/resource-consents/do-i-need-a-resource-consent"},
+        {"label": "QLDC: other land-hazard layers", "url": "https://gis.qldc.govt.nz/server/rest/services/Hazards/Other_Land_Hazards/MapServer"},
+        {"label": "QLDC: liquefaction layer", "url": "https://gis.qldc.govt.nz/server/rest/services/Hazards/Liquefaction/MapServer"},
+        {"label": "QLDC: flood management and maps", "url": "https://www.qldc.govt.nz/your-council/council-documents/strategies-and-publications/flood-management-strategy/"},
+        {"label": "QLDC: Ben Lomond and Queenstown Hill reserve hazards", "url": "https://www.qldc.govt.nz/media/kkbl4ds3/te-taumata-o-hakitekura-ben-lomond-and-te-tapunui-queenstown-hill-reserve-management-plan_nov25.pdf"},
+        {"label": "Health New Zealand: Lakes District Hospital", "url": "https://www.healthnz.govt.nz/hospitals-services/hospitals/otago-southland/lakes-district-hospital"},
+        {"label": "Health New Zealand: Otago and Southland hospital network", "url": "https://www.healthnz.govt.nz/careers/locations/otago-and-southland"},
+        {"label": "Queenstown Airport: destinations", "url": "https://www.queenstownairport.co.nz/flights/destinations/"},
+        {"label": "Queenstown Airport: FY26 international milestone", "url": "https://www.queenstownairport.co.nz/corporate/news-media/media-releases/trans-tasman-travel/"},
+        {"label": "Otago Regional Council: Queenstown Orbus fares", "url": "https://www.orc.govt.nz/orbus/fares"},
+        {"label": "NZTA: Queenstown transport package", "url": "https://www.nzta.govt.nz/projects/queenstown-package"},
+        {"label": "QLDC: Crown Range winter-road closures", "url": "https://www.qldc.govt.nz/media/sq2cs0z3/qldc_scuttlebutt_aug-sep-2022_issue150-web.pdf"},
+        {"label": "QV: May 2026 House Price Index", "url": "https://www.qv.co.nz/news/qv-house-price-index-may-2026-southern-centres-gain-ground-in-patchy-property-market/"},
+        {"label": "QV: July 2026 House Price Index", "url": "https://www.qv.co.nz/news/qv-house-price-index-july-2026-winter-chill-settles-over-cautious-housing-market/"},
+        {"label": "QLDC: 2024 residential revaluation", "url": "https://www.qldc.govt.nz/services/rates-property/revaluation-and-how-it-affects-rates"},
+        {"label": "IRD: non-resident property tax", "url": "https://www.ird.govt.nz/international/individuals/tax-for-non-resident-taxpayers"},
+        {"label": "Settled.govt.nz: property due diligence", "url": "https://www.settled.govt.nz/buying-a-home/researching-the-property/doing-your-homework/"},
+        {"label": "Realestate.co.nz: Frankton Road asking observation", "url": "https://www.realestate.co.nz/43093321/residential/sale/unit-606-327-frankton-road-queenstown-central?lid=jyzkx2cbid2g"},
+        {"label": "Listed.co.nz: Hanley's Farm asking observation", "url": "https://www.listed.co.nz/property/5200"},
+        {"label": "Realestate.co.nz: Queenstown Hill asking observation", "url": "https://www.realestate.co.nz/43060560/residential/sale/79-middleton-road-queenstown-hill"},
+        {"label": "European Central Bank: euro reference rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("frankton-daily-life", "/assets/queenstown-frankton-daily-life.webp", "Older residents carrying groceries through Frankton with Lake Wakatipu and mountains beyond", "Frankton makes the strongest year-round case through ordinary services, not resort spectacle.", "hero"),
+        DossierImage("slope-hazard-diligence", "/assets/queenstown-winter-access-healthcare.webp", "Mature couple walking beside a frosty sloping Queenstown street near a parked car", "Winter access, gradients and the hospital route belong in the property decision.", "wide"),
+        DossierImage("planned-community-daily-life", "/assets/queenstown-planned-community-daily-life.webp", "Residents waiting for a local bus in a planned Queenstown alpine neighbourhood", "Jacks Point and Lake Hayes trade central convenience for newer homes, space and driving.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Queenstown through five destination lenses",
+    assessment_intro="Here’s how Queenstown scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current observations show the spread from a Frankton Road apartment through a Hanley's Farm home-and-income property to a Queenstown Hill new build. They are asking evidence—not valuations. Local NZD is primary; USD uses the recorded ECB cross-rate basis.",
+    market_anchors_intro="These official 2024 council capital rating values are broad submarket anchors—not sale prices, floor-area comparisons or current property valuations. Commission matched completed-sales evidence and a candidate-specific valuation.",
+    orientation_groups=(
+        DossierOrientationGroup("Core and western slopes", (("Frankton / Remarkables Park", "Airport, hospital and daily services"), ("Frankton Road", "Lake corridor and traffic"), ("Queenstown town / Hill", "Centre and steep premium slopes"), ("Fernhill", "Western views and gradients"))),
+        DossierOrientationGroup("Basin and southern communities", (("Arrowtown", "Established village centre"), ("Lake Hayes / Shotover Country", "Residential basin"), ("Jacks Point / Hanley's Farm", "Planned communities south of Frankton"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current bus, winter-road and airport service, peak traffic, the exact hospital route and property-level access.",
+    country_guide_url="/countries/new-zealand-property/",
+    country_guide_label="New Zealand property guide",
+    rail_comparison="Compare Queenstown with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -2278,6 +2427,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     ANNECY_DOSSIER.destination_id: ANNECY_DOSSIER,
     MALLORCA_DOSSIER.destination_id: MALLORCA_DOSSIER,
     CROATIA_ISTRIA_DALMATIA_DOSSIER.destination_id: CROATIA_ISTRIA_DALMATIA_DOSSIER,
+    QUEENSTOWN_DOSSIER.destination_id: QUEENSTOWN_DOSSIER,
 }
 
 
@@ -2354,3 +2504,5 @@ validate_premium_dossier(CRETE_DOSSIER)
 validate_premium_dossier(NISEKO_DOSSIER)
 validate_premium_dossier(ANNECY_DOSSIER)
 validate_premium_dossier(MALLORCA_DOSSIER)
+validate_premium_dossier(CROATIA_ISTRIA_DALMATIA_DOSSIER)
+validate_premium_dossier(QUEENSTOWN_DOSSIER)

@@ -13,8 +13,8 @@ class CroatiaDossierContractTests(unittest.TestCase):
     def setUp(self):
         self.spec = get_premium_dossier(DESTINATION_ID)
 
-    def test_registry_contains_fifteen_reviewed_dossiers(self):
-        self.assertEqual(15, len(PREMIUM_DESTINATION_DOSSIERS))
+    def test_registry_contains_sixteen_reviewed_dossiers(self):
+        self.assertEqual(16, len(PREMIUM_DESTINATION_DOSSIERS))
         self.assertIsNotNone(self.spec)
 
     def test_contract_passes_every_bounded_content_gate(self):
