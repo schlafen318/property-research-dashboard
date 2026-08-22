@@ -48,6 +48,7 @@ class PremiumDossierSpec:
     lenses_intro: str
     lenses: tuple[DossierLens, ...]
     score_reads: dict[str, str]
+    market_anchors: tuple[dict[str, str], ...]
     micro_locations_intro: str
     micro_locations: tuple[dict[str, str], ...]
     checklist: tuple[str, ...]
@@ -63,7 +64,7 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
     description="Assess Fukuoka and Itoshima retirement property through daily life, access, foreign ownership, rental rules, value, resale, hazards, and representative listings.",
     h1="Fukuoka / Itoshima: city ease, coast within reach",
     lede=(
-        "Fukuoka / Itoshima is the Atlas’s strongest Japanese proposition for a buyer who wants a home to work on ordinary weekdays, not only on holidays. Fukuoka supplies hospitals, rail, an unusually close airport, food and a large resident economy; Itoshima adds beaches, fields and a slower rhythm west of the city. The pairing is compelling, but it is not interchangeable. A station-area apartment, a Maebaru house and a car-dependent coastal home solve different retirement problems and carry different hazard, maintenance and resale risks."
+        "Fukuoka / Itoshima is Japan’s clearest city-and-coast retirement proposition. Fukuoka offers hospitals, rail, an airport minutes from downtown and a deep resident economy; Itoshima adds beaches, fields and a slower rhythm. The choice is not interchangeable: a station-area apartment, a Maebaru house and a car-dependent coastal home deliver different daily lives, maintenance burdens and resale prospects. This dossier shows where each pattern works—and where the romance needs harder diligence."
     ),
     author="Global Home Atlas Research Team",
     date_published="2026-08-21",
@@ -137,6 +138,29 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
         "foreigner_fit": "Fukuoka provides multilingual support and strong regional access, but property documents, tax notices and ongoing Itoshima management may still operate in Japanese.",
         "value_entry": "Fukuoka apartments, Maebaru houses and premium Itoshima coastal homes span very different price points, maintenance burdens and future buyer pools.",
     },
+    market_anchors=(
+        {
+            "location": "Imashuku station catchment",
+            "evidence": "121,700–132,400 JPY/m²",
+            "buyer_read": "Four normal land comparables in the 2026 MLIT appraisal; the same report places a typical new-build house at about 35–45 million JPY.",
+            "source_label": "MLIT 2026 appraisal",
+            "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/40/2026401350006.html",
+        },
+        {
+            "location": "Eastern Itoshima / Takata",
+            "evidence": "82,900–108,500 JPY/m²",
+            "buyer_read": "Four normal land comparables used in the 2025 MLIT appraisal, with the standard residential site assessed at 96,000 JPY/m².",
+            "source_label": "MLIT 2025 appraisal",
+            "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2025/40/2025402300001.html",
+        },
+        {
+            "location": "Outer Itoshima / Shima and Nijo",
+            "evidence": "7,720–41,400 JPY/m²",
+            "buyer_read": "Selected 2025 residential land benchmarks show how sharply value changes with rail access, settlement and coastal position.",
+            "source_label": "Fukuoka Prefecture 2025 land survey",
+            "source_url": "https://www.pref.fukuoka.lg.jp/uploaded/life/792986_62689081_misc.pdf",
+        },
+    ),
     micro_locations_intro=(
         "The useful comparison is not Fukuoka versus Itoshima in the abstract. It is a progression from fully urban and transit-led living to lower-density coastal living. Boundaries below are decision aids rather than price zones; confirm the exact address, school district, planning designation, hazard layers and transport timetable."
     ),
@@ -167,6 +191,9 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
         {"label": "Ministry of Land: taxes when buying, holding and selling land", "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html"},
         {"label": "Ministry of Land: water-hazard maps in the important-matters explanation", "url": "https://www.mlit.go.jp/totikensangyo/const/sosei_const_fr3_000074.html"},
         {"label": "Ministry of Land: Real Estate Information Library", "url": "https://www.reinfolib.mlit.go.jp/"},
+        {"label": "Ministry of Land: 2026 Imashuku appraisal and comparable land evidence", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/40/2026401350006.html"},
+        {"label": "Ministry of Land: 2025 eastern Itoshima appraisal and comparable land evidence", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2025/40/2025402300001.html"},
+        {"label": "Fukuoka Prefecture: 2025 land-price survey", "url": "https://www.pref.fukuoka.lg.jp/uploaded/life/792986_62689081_misc.pdf"},
         {"label": "Japan Tourism Agency: Private Lodging Business Act", "url": "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html"},
         {"label": "Fukuoka Airport: official access guidance", "url": "https://www.fukuoka-airport.jp/en/access/"},
         {"label": "Fukuoka City: population and municipal statistics", "url": "https://www.city.fukuoka.lg.jp/shisei/toukei/index.html"},
@@ -225,6 +252,13 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
         raise ValueError("premium dossier requires one research read for every decision dimension")
     if any(not research_read.strip() for research_read in spec.score_reads.values()):
         raise ValueError("premium dossier research reads must not be empty")
+
+    if len(spec.market_anchors) != 3:
+        raise ValueError("premium dossier requires exactly three official market anchors")
+    required_anchor_fields = {"location", "evidence", "buyer_read", "source_label", "source_url"}
+    for anchor in spec.market_anchors:
+        if required_anchor_fields - anchor.keys() or any(not anchor[field].strip() for field in required_anchor_fields):
+            raise ValueError("premium dossier market anchors must be complete")
 
     if len(spec.nav_items) > 7:
         raise ValueError("premium dossier navigation may contain at most seven items")

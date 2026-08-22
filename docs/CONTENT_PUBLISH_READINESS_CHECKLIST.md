@@ -80,13 +80,15 @@ Apply this gate to every premium destination dossier in addition to the general 
 - [ ] The narrative explains buyer consequences and does not repeat the score rationales.
 - [ ] The page contains exactly one 10-row score table, its weighted result is derived from the destination dataset rather than overridden in the article, and every row includes a concise destination-specific research read rather than a generic methodology definition. Introductions use plain reader-facing language; the column label is concise and branded (for example, “Atlas read”), not generic academic terminology.
 - [ ] Three to five representative listing observations show distinct buyer cases, use local currency first, record area and price per square metre, include a dated USD basis, link the source, state capture date and confidence, and carry an asking-price disclaimer.
+- [ ] Asking listings are checked against two or more official market anchors—completed transactions, appraisal comparables, or official land benchmarks—with geography, period, asset basis, source, and limitations stated clearly.
 - [ ] The visible benchmark, listing evidence, value-entry assessment, and confidence statement do not materially contradict one another.
 - [ ] One compact micro-location table distinguishes daily-life pattern and primary diligence; it is not duplicated as cards.
+- [ ] A concise orientation schematic shows how the micro-locations relate by rail, road, or ferry when that relationship materially changes daily life; it is labelled as schematic and not to scale.
 - [ ] Six to eight buyer actions appear in investigation order.
 - [ ] Exactly three destination-specific editorial images appear once each: one hero and two images distributed through relevant narrative sections. Do not use a montage.
 - [ ] The rail contains no more than seven anchors, Atlas copy does not hard-code a destination count, and references are the final article section.
 - [ ] Editorial prose is 1,800–2,400 words excluding tables and references; country-wide material is summarized and handed off to the country guide.
-- [ ] Desktop and 390 × 844 mobile review confirm readable body text, contained table scrolling, useful image crops, no page overflow, and no browser-console errors.
+- [ ] Desktop and 390 × 844 mobile review confirm readable body text, useful image crops, no page overflow, and no browser-console errors. Wide score and listing tables become stacked labelled records on mobile rather than requiring horizontal scrolling.
 
 ## 8. Final publication gate
 

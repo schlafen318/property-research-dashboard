@@ -28,6 +28,7 @@ class PremiumDossierContractTests(unittest.TestCase):
         )
         self.assertLessEqual(len(spec.nav_items), 7)
         self.assertEqual(3, len(spec.images))
+        self.assertEqual(3, len(spec.market_anchors))
         self.assertEqual("sources", spec.nav_items[-1][0])
 
 
@@ -68,6 +69,26 @@ class PremiumDossierContentTests(unittest.TestCase):
         words = re.findall(r"\b[\w’'-]+\b", " ".join(prose_fields))
         self.assertGreaterEqual(len(words), 1800)
         self.assertLessEqual(len(words), 2400)
+
+    def test_hero_lede_is_concise_enough_to_reveal_the_story_on_mobile(self) -> None:
+        self.assertLessEqual(len(self.spec.lede.split()), 85)
+        self.assertIn("city-and-coast", self.spec.lede)
+
+    def test_market_anchors_use_official_land_evidence_and_clear_limits(self) -> None:
+        self.assertEqual(3, len(self.spec.market_anchors))
+        anchors = " ".join(
+            " ".join(str(value) for value in anchor.values())
+            for anchor in self.spec.market_anchors
+        )
+        self.assertIn("reinfolib.mlit.go.jp", anchors)
+        self.assertIn("pref.fukuoka.lg.jp", anchors)
+        self.assertRegex(anchors.lower(), r"land|finished-home")
+        for anchor in self.spec.market_anchors:
+            with self.subTest(anchor=anchor["location"]):
+                self.assertTrue(anchor["location"].strip())
+                self.assertTrue(anchor["evidence"].strip())
+                self.assertTrue(anchor["buyer_read"].strip())
+                self.assertTrue(anchor["source_url"].startswith("https://"))
 
     def test_micro_locations_and_checklist_are_complete(self) -> None:
         self.assertEqual(4, len(self.spec.micro_locations))
@@ -167,6 +188,16 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         self.assertIn("31,800,000 JPY", self.fukuoka_html)
         self.assertIn("2026-08-21", self.fukuoka_html)
 
+    def test_property_evidence_adds_official_market_anchors_without_calling_them_home_prices(self) -> None:
+        self.assertIn('id="official-market-anchors"', self.fukuoka_html)
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-market-anchor"'))
+        self.assertIn("121,700–132,400 JPY/m²", self.fukuoka_html)
+        self.assertIn("82,900–108,500 JPY/m²", self.fukuoka_html)
+        self.assertIn("7,720–41,400 JPY/m²", self.fukuoka_html)
+        self.assertIn("land evidence—not finished-home prices", self.fukuoka_html)
+        self.assertIn("reinfolib.mlit.go.jp", self.fukuoka_html)
+        self.assertIn("pref.fukuoka.lg.jp", self.fukuoka_html)
+
     def test_score_table_uses_dossier_specific_research_reads(self) -> None:
         spec = get_premium_dossier("fukuoka-itoshima")
         score_reads = getattr(spec, "score_reads", {})
@@ -209,7 +240,7 @@ class PremiumDossierRenderingTests(unittest.TestCase):
 
     def test_three_images_are_distributed_once_with_accessible_text(self) -> None:
         spec = get_premium_dossier("fukuoka-itoshima")
-        self.assertEqual(3, self.fukuoka_html.count("<figure"))
+        self.assertEqual(3, self.fukuoka_html.count('src="/assets/fukuoka-itoshima-'))
         self.assertNotIn("montage", self.fukuoka_html.lower())
         for image in spec.images:
             self.assertEqual(1, self.fukuoka_html.count(f'src="{image.src}"'))
@@ -222,6 +253,22 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         self.assertIn(".premium-section p, .premium-section li { font-size: 16px; }", self.fukuoka_html)
         self.assertIn("overflow-x: auto", self.fukuoka_html)
         self.assertIn("font-weight: 500", self.fukuoka_html)
+
+    def test_where_to_look_has_an_accessible_four_stop_orientation_schematic(self) -> None:
+        self.assertIn('class="premium-location-orientation"', self.fukuoka_html)
+        self.assertIn("Orientation schematic—not to scale", self.fukuoka_html)
+        self.assertEqual(4, self.fukuoka_html.count('class="premium-location-stop"'))
+        for location in ("Central Fukuoka", "Meinohama corridor", "Maebaru", "Itoshima coast"):
+            self.assertIn(location, self.fukuoka_html)
+
+    def test_score_and_listing_tables_become_labelled_records_on_mobile(self) -> None:
+        self.assertEqual(2, self.fukuoka_html.count('class="premium-table-wrap premium-card-table-wrap"'))
+        self.assertIn('data-label="Score"', self.fukuoka_html)
+        self.assertIn('data-label="Atlas read"', self.fukuoka_html)
+        self.assertIn('data-label="Asking price"', self.fukuoka_html)
+        self.assertIn('data-label="What it represents"', self.fukuoka_html)
+        self.assertIn(".premium-card-table-wrap { overflow: visible;", self.fukuoka_html)
+        self.assertIn(".premium-card-table tbody tr { display: grid;", self.fukuoka_html)
 
 
 class PremiumDossierPublishingRuleTests(unittest.TestCase):
@@ -250,6 +297,9 @@ class PremiumDossierPublishingRuleTests(unittest.TestCase):
         self.assertIn("exactly one 10-row score table", checklist)
         self.assertIn("destination-specific research read", checklist)
         self.assertIn("plain reader-facing language", checklist)
+        self.assertIn("orientation schematic", checklist)
+        self.assertIn("official market anchors", checklist)
+        self.assertIn("stacked labelled records", checklist)
 
 
 if __name__ == "__main__":
