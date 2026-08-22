@@ -2256,8 +2256,8 @@ CROATIA_ISTRIA_DALMATIA_DOSSIER = PremiumDossierSpec(
         DossierOrientationGroup("Central Dalmatia and islands", (("Split", "Year-round regional city"), ("Kaštela / Trogir", "Airport-side mainland coast"), ("Brač", "Frequent ferry-linked island"), ("Hvar", "Premium seasonal island"))),
     ),
     orientation_caption="Orientation schematic—not to scale. Confirm current road, bus, airport and ferry timetables and the exact hospital, service and port journey.",
-    country_guide_url="/guides/",
-    country_guide_label="Buying guides",
+    country_guide_url="/countries/croatia-property/",
+    country_guide_label="Croatia property guide",
     rail_comparison="Compare Croatia with the full Atlas.",
 )
 

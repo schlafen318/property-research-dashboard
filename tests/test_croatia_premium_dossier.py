@@ -107,8 +107,19 @@ class CroatiaRenderingTests(unittest.TestCase):
         self.assertIn('<body class="premium-dossier">', self.html)
         positions = [self.html.index(f'id="{x}"') for x in ("verdict", "lenses", "scores", "listings", "locations", "checklist", "sources")]
         self.assertEqual(sorted(positions), positions)
-        for text in ("Croatia through five destination lenses", "Here’s how Croatia scores", "Compare Croatia with the full Atlas.", "/retirement-abroad-calculator/"):
+        for text in ("Croatia through five destination lenses", "Here’s how Croatia scores", "Compare Croatia with the full Atlas.", "/countries/croatia-property/", "/retirement-abroad-calculator/"):
             self.assertIn(text, self.html)
+
+    def test_country_handoff_points_to_a_rendered_croatia_hub(self):
+        from src.build_unified_app import COUNTRY_HUBS, build_country_hub_page
+
+        hub = next(item for item in COUNTRY_HUBS if item["slug"] == "croatia-property")
+        self.assertEqual("Croatia", hub["country"])
+        self.assertIn(DESTINATION_ID, hub["destination_ids"])
+        destinations = json.loads((ROOT / "data" / "destinations.json").read_text())
+        html = build_country_hub_page(hub, destinations, [])
+        self.assertIn("Croatia Property Guide for Foreign Buyers", html)
+        self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
 
     def test_images_tables_and_orientation_are_complete(self):
         spec = get_premium_dossier(DESTINATION_ID)

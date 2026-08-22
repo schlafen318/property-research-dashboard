@@ -205,6 +205,16 @@ COUNTRY_HUBS = [
         "guide_slugs": ["greece-vs-portugal-retirement-property", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-property-in-europe", "buy-property-abroad"],
     },
     {
+        "slug": "croatia-property",
+        "country": "Croatia",
+        "title": "Croatia Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Assess Croatia property for foreign buyers through Istria and Dalmatia, including residence, ownership eligibility, title, tourist-rental rules, hazards, access, and resale depth.",
+        "h1": "Croatia Property Guide for Foreign Buyers",
+        "thesis": "Croatia can offer compelling Adriatic lifestyle value, but residence, ownership eligibility, title reconciliation, lawful construction, tourist-rental consent, seasonal access, and hazard exposure must be verified separately. The strongest retirement cases begin with a year-round operating base rather than a summer view.",
+        "destination_ids": ["croatia-istria-dalmatia"],
+        "guide_slugs": ["buying-property-abroad-for-retirement", "best-places-to-buy-property-in-europe", "where-can-foreigners-buy-property", "foreign-property-investment-risks"],
+    },
+    {
         "slug": "italy-property",
         "country": "Italy",
         "title": "Italy Property Guide for Foreign Buyers | Global Home Atlas",
