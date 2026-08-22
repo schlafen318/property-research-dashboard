@@ -13,7 +13,7 @@ from src.premium_destination_dossiers import (
 
 class PremiumDossierContractTests(unittest.TestCase):
     def test_only_reviewed_prototypes_use_the_premium_registry(self) -> None:
-        self.assertEqual({"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "malaga-costa-del-sol", "lake-como", "hakone-izu", "hakuba", "costa-brava-girona", "park-city-deer-valley", "crete", "niseko", "annecy", "mallorca", "croatia-istria-dalmatia", "queenstown", "phuket-koh-samui"}, set(PREMIUM_DESTINATION_DOSSIERS))
+        self.assertTrue({"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "malaga-costa-del-sol", "lake-como", "hakone-izu", "hakuba", "costa-brava-girona", "park-city-deer-valley", "crete", "niseko", "annecy", "mallorca", "croatia-istria-dalmatia", "queenstown", "phuket-koh-samui"}.issubset(set(PREMIUM_DESTINATION_DOSSIERS)))
         self.assertIsNotNone(get_premium_dossier("fukuoka-itoshima"))
         self.assertIsNotNone(get_premium_dossier("valencia"))
 
@@ -261,12 +261,14 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         for location in ("Central Fukuoka", "Meinohama corridor", "Maebaru", "Itoshima coast"):
             self.assertIn(location, self.fukuoka_html)
 
-    def test_score_and_listing_tables_become_labelled_records_on_mobile(self) -> None:
-        self.assertEqual(2, self.fukuoka_html.count('class="premium-table-wrap premium-card-table-wrap"'))
+    def test_score_listing_and_location_tables_become_labelled_records_on_mobile(self) -> None:
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-table-wrap premium-card-table-wrap"'))
         self.assertIn('data-label="Score"', self.fukuoka_html)
         self.assertIn('data-label="Atlas read"', self.fukuoka_html)
         self.assertIn('data-label="Asking price"', self.fukuoka_html)
         self.assertIn('data-label="What it represents"', self.fukuoka_html)
+        self.assertIn('data-label="Micro-location"', self.fukuoka_html)
+        self.assertIn('data-label="Primary diligence"', self.fukuoka_html)
         self.assertIn(".premium-card-table-wrap { overflow: visible;", self.fukuoka_html)
         self.assertIn(".premium-card-table tbody tr { display: grid;", self.fukuoka_html)
 

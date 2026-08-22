@@ -180,7 +180,23 @@ COUNTRY_HUBS = [
         "title": "Canada Property Guide for Foreign Buyers | Global Home Atlas",
         "description": "Compare Canada lifestyle property markets for foreign buyers, including Whistler and Vancouver Island across mountain, water, retirement, rental, tax, and policy considerations.",
         "h1": "Canada Property Guide for Foreign Buyers",
-        "thesis": "Canada adds a useful North American lifestyle benchmark: clear institutions, strong livability, and real mountain/water appeal. The caution is policy. Foreign-buyer rules, vacancy and speculation taxes, local rental limits, and high carrying costs can change the practical answer.",
+        "thesis": "Canada offers clear institutions, strong livability and real mountain and water appeal, but residential access for non-Canadians is presently a threshold legal question. Establish the buyer, property type and exact census geography before comparing lifestyle, taxes, rental use or value.",
+        "country_rules": [
+            {"heading": "Purchase prohibition through 1 January 2027", "text": "Most non-Canadians are prohibited from purchasing prescribed residential property in a census metropolitan area or census agglomeration through 1 January 2027 unless a statutory exception applies. A property search should not begin until the actual buyer and asset have been reviewed."},
+            {"heading": "Census geography controls eligibility", "text": "The federal regulations exclude property outside a census metropolitan area or census agglomeration from the prescribed class, but a tourism name, municipality or postal address does not prove the boundary. Confirm the exact Statistics Canada geography and parcel with Canadian counsel."},
+            {"heading": "Residence and healthcare are separate", "text": "Buying a Canadian home does not create immigration status. Provincial healthcare, including B.C. MSP, has separate residence, status, physical-presence and waiting-period rules. Establish the lawful long-stay and interim insurance plan independently."},
+            {"heading": "Foreign-buyer and vacancy taxes stack", "text": "Federal Underused Housing Tax, provincial additional property transfer tax, B.C. speculation and vacancy tax and any local vacancy tax use different definitions, returns and exemptions. Model each regime separately for the buyer and property."},
+        ],
+        "primary_sources": [
+            {"label": "CMHC: purchase prohibition for non-Canadians", "url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/housing-research/consultations/prohibition-purchase-residential-property-non-canadians-act"},
+            {"label": "Justice Laws: enacted extension to the fourth anniversary", "url": "https://laws-lois.justice.gc.ca/eng/AnnualStatutes/2024_17/page-15.html"},
+            {"label": "Justice Laws: properties outside a CMA or CA", "url": "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2022-250/section-3.html"},
+            {"label": "B.C.: additional property transfer tax", "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax"},
+            {"label": "Canada Revenue Agency: Underused Housing Tax", "url": "https://www.canada.ca/en/services/taxes/excise-taxes-duties-and-levies/underused-housing-tax.html"},
+            {"label": "IRCC: immigrate to Canada", "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada.html"},
+            {"label": "B.C.: MSP eligibility", "url": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp/bc-residents/eligibility-and-enrolment/are-you-eligible"},
+            {"label": "B.C.: short-term rental principal-residence requirement", "url": "https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/principal-residence-requirement"},
+        ],
         "destination_ids": ["vancouver-island-victoria", "whistler"],
         "guide_slugs": ["best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "where-can-foreigners-buy-property"],
     },
@@ -7234,10 +7250,10 @@ def premium_dossier_lenses_html(spec: PremiumDossierSpec) -> str:
 def premium_dossier_micro_locations_html(spec: PremiumDossierSpec) -> str:
     rows = "".join(
         '<tr>'
-        f'<th scope="row">{escape(item["name"])}</th>'
-        f'<td>{escape(item["best_for"])}</td>'
-        f'<td>{escape(item["daily_life"])}</td>'
-        f'<td>{escape(item["diligence"])}</td>'
+        f'<th scope="row" data-label="Micro-location">{escape(item["name"])}</th>'
+        f'<td data-label="Best for">{escape(item["best_for"])}</td>'
+        f'<td data-label="Daily life">{escape(item["daily_life"])}</td>'
+        f'<td data-label="Primary diligence">{escape(item["diligence"])}</td>'
         "</tr>"
         for item in spec.micro_locations
     )
@@ -7260,7 +7276,7 @@ def premium_dossier_micro_locations_html(spec: PremiumDossierSpec) -> str:
         f'<div class="premium-orientation-groups">{"".join(groups)}</div>'
         f'<figcaption id="location-orientation-caption">{escape(spec.orientation_caption)}</figcaption>'
         '</figure>'
-        '<div class="premium-table-wrap"><table class="premium-location-table">'
+        '<div class="premium-table-wrap premium-card-table-wrap"><table class="premium-location-table premium-card-table">'
         '<thead><tr><th>Micro-location</th><th>Best for</th><th>Daily life</th><th>Primary diligence</th></tr></thead>'
         f'<tbody>{rows}</tbody></table></div></section>'
     )
@@ -7330,6 +7346,9 @@ def premium_dossier_css() -> str:
     .premium-hero h1 { max-width: 760px; margin: 0; overflow-wrap: anywhere; font-family: var(--serif); font-size: clamp(54px, 6.6vw, 88px); font-weight: 500; line-height: .93; letter-spacing: -.035em; }
     .premium-lede { max-width: 680px; margin: 28px 0 0; color: #4b5651; font-family: var(--serif); font-size: clamp(19px, 2vw, 24px) !important; line-height: 1.42 !important; }
     .premium-byline { margin: 20px 0 0; color: var(--muted); font-size: 12px !important; font-weight: 400; }
+    .premium-hero-copy .access-notice { max-width: 680px; margin: 22px 0 0; padding: 14px 16px; border-left: 3px solid var(--accent); background: rgba(164, 78, 47, .08); }
+    .premium-hero-copy .access-notice strong { display: block; font-size: 13px; font-weight: 600; }
+    .premium-hero-copy .access-notice p { margin: 5px 0 0; color: #59443d; font-size: 13px; line-height: 1.5; }
     .premium-hero-visual { display: grid; grid-template-rows: 1fr auto; min-height: 520px; margin: 0; background: var(--ink); }
     .premium-hero-visual img { display: block; width: 100%; height: 100%; min-height: 0; object-fit: cover; }
     .premium-hero-visual figcaption { padding: 11px 14px; color: #f4efe4; font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
@@ -7447,6 +7466,7 @@ def build_premium_destination_page(
     verdict = "".join(f"<p>{escape(paragraph)}</p>" for paragraph in spec.verdict_paragraphs)
     checklist = "".join(f"<li>{escape(item)}</li>" for item in spec.checklist)
     rail_links = "".join(f'<a href="#{escape(anchor)}">{escape(label)}</a>' for anchor, label in spec.nav_items)
+    access_notice = destination_access_notice_html(dest)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -7462,6 +7482,7 @@ def build_premium_destination_page(
           <h1>{escape(spec.h1)}</h1>
           <p class="premium-lede">{escape(spec.lede)}</p>
           <p class="premium-byline">By {escape(spec.author)} · Published {escape(spec.date_published)} · Reviewed {escape(spec.date_reviewed)}</p>
+          {access_notice}
         </div>
         {premium_dossier_figure(spec.images[0], hero=True)}
       </div>

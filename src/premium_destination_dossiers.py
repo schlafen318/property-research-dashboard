@@ -2559,6 +2559,156 @@ PHUKET_KOH_SAMUI_DOSSIER = PremiumDossierSpec(
 )
 
 
+VANCOUVER_ISLAND_VICTORIA_DOSSIER = PremiumDossierSpec(
+    destination_id="vancouver-island-victoria",
+    title="Vancouver Island and Victoria Property Dossier for Foreign Buyers",
+    description="Assess Vancouver Island and Victoria property through purchase eligibility, census geography, B.C. taxes, residence, healthcare, rentals, hazards, access, prices and resale.",
+    h1="Vancouver Island / Victoria: legal access before island life",
+    lede=(
+        "Vancouver Island / Victoria offers a rare combination of English-language ease, serious healthcare, mild coastal living and year-round city services. Yet for a foreign buyer, the first map is legal rather than scenic. Most non-Canadians are prohibited from buying ordinary residential property inside a census metropolitan area or census agglomeration until January 1, 2027 unless an exception applies. The practical case therefore begins by proving who can buy what, and exactly where, before comparing Victoria, Sidney, Sooke or the central island."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is conditional. Vancouver Island can be an excellent long-term home for a Canadian citizen, permanent resident or other buyer who clearly falls within a statutory exception. It is not presently an open residential market for most non-Canadians. The federal Prohibition on the Purchase of Residential Property by Non-Canadians Act has been extended through 1 January 2027. It generally catches detached houses, attached homes and condominium units in a census metropolitan area or census agglomeration, while property outside those Statistics Canada geographies is excluded from the regulation’s definition. The line is technical: a postal address, tourism label or agent’s description does not establish eligibility. Obtain a written Canadian legal opinion on the buyer, beneficial owners, property type and exact census geography before making an offer or paying a deposit.",
+        "Eligibility does not make the transaction inexpensive. In the Capital Regional District, a foreign national or foreign corporation can face B.C.’s 20% additional property transfer tax on top of the ordinary graduated property transfer tax, unless an exemption applies. A foreign owner may also enter the federal Underused Housing Tax regime, an annual 1% tax with its own filing and exemption tests, and B.C.’s speculation and vacancy tax can apply at a 3% foreign-owner rate for the 2026 tax year. These regimes have different definitions and declarations. They must be checked separately rather than collapsed into a single ‘foreign-buyer tax’ estimate.",
+        "For an eligible buyer who accepts those costs, the strongest pattern is a year-round base chosen for ordinary life, not a seasonal income story. Victoria Core offers the deepest hospitals, culture, transit and resale pool. Sidney and the Saanich Peninsula trade some urban depth for airport, ferry and gentler small-town living. Sooke offers space and coast at a longer driving distance, while Nanaimo, Parksville and Qualicum Beach broaden the island search beyond the Victoria metropolitan market. Establish residence and healthcare separately, test access in winter, and treat short-term rental, hazard and resale diligence as address-level work."
+    ),
+    lenses_intro="Five paired lenses turn the island idea into a buyer sequence: qualify legally, choose a daily-life geography, cost every tax and transport dependency, and preserve a credible exit.",
+    lenses=(
+        DossierLens(
+            "Choose a place that still works on an ordinary Tuesday",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Victoria Core is the most complete retirement proposition on Vancouver Island. Downtown, James Bay, Fairfield, Oak Bay and adjacent neighbourhoods place groceries, culture, waterfront walks, specialists and public transport within a normal urban routine. Royal Jubilee Hospital and Victoria General Hospital give the capital region medical depth that a resort market rarely matches. The city is attractive without being dependent on a short summer season, and its relatively mild coastal winters support walking through much of the year. The trade-offs are high housing costs, wet and dark winter stretches, older strata buildings and a market where a pretty harbour view can obscure noise, wind, reserve-fund or accessibility problems.",
+                "Sidney and the Saanich Peninsula offer a different version of ease. Sidney has a compact centre, level streets, shops, waterfront and proximity to Victoria International Airport and the Swartz Bay ferry terminal. It can suit a buyer who values calm daily life and regional connections over nightlife. Yet the peninsula is not one continuous walkable village. North Saanich and rural pockets often require a car, septic or well diligence and longer trips to major hospitals. Sooke pushes the trade further: dramatic coast, trails and more space, but a constrained road connection toward Victoria and greater dependence on driving, local services and property-level drainage or slope conditions.",
+                "Central Island changes both lifestyle and legal geography. Nanaimo is a service city with ferries, an airport, healthcare and a resident economy; Parksville and Qualicum Beach offer established retirement communities and gentler beach life. They are not substitutes for Victoria Core: specialist care, flights, ferry routes, employment and buyer pools differ. Nor should a buyer assume that ‘outside Victoria’ means outside a census agglomeration. Confirm the exact Statistics Canada boundary first. After eligibility, spend two ordinary weeks in winter, complete the grocery, pharmacy and hospital journeys, and test whether the home remains workable if one household member stops driving."
+            ),
+        ),
+        DossierLens(
+            "Measure the island from the front door, not the brochure",
+            ("global_access", "foreigner_fit"),
+            (
+                "Vancouver Island is connected, but every connection has a last mile. Victoria International Airport sits near Sidney, not downtown Victoria, and the drive can vary with traffic. Swartz Bay provides the principal vehicle-ferry route toward Metro Vancouver, while passenger and vehicle services from Nanaimo create a different access pattern for the central island. Ferries are bookable transport with schedules, fares, weather exposure and peak-period capacity constraints—not a bridge. A household planning frequent international travel should time the complete journey with luggage, a missed sailing and a late arrival, then compare it with living on the mainland.",
+                "Within Greater Victoria, buses can support an urban or peninsula routine, but outer suburbs, Sooke and many rural or coastal homes are car-led. Highway 14 is the critical corridor toward Sooke; an incident, storm or construction can change a nominal commute. Farther north, the island highway links communities efficiently by Canadian standards, yet trips between Nanaimo, Parksville and Victoria are long enough to reshape hospital, airport and family access. Ask where the backup route is, how winter wind affects power and trees, and whether charging, fuel, roadside assistance and contractor capacity fit the property.",
+                "English-language administration and familiar legal institutions improve foreigner fit, but they do not soften the purchase prohibition. A sophisticated local team should include a lawyer who understands the federal Act and its regulations, a B.C. tax adviser, an independent inspector and, where relevant, a strata specialist. Residence is another file. Canada offers permanent-residence pathways for eligible immigrants, but no general visa that grants retirement residence simply because a home was purchased. The practical sequence is immigration advice, purchase-eligibility advice, tax modelling and only then property search. Ease of communication makes diligence possible; it is not evidence that the answer will be yes."
+            ),
+            "island-access",
+        ),
+        DossierLens(
+            "Prove purchase eligibility, then investigate the exact asset",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Canada’s land-registration system can provide clear title, but ownership clarity for a non-Canadian is presently dominated by eligibility. The federal rule covers a non-Canadian’s direct or indirect purchase of prescribed residential property in a census metropolitan area or census agglomeration, subject to defined exceptions. The regulations exclude property outside those geographies and provide exceptions for certain temporary residents, refugees, spouses or common-law partners and other cases. Definitions, control tests and transaction structure matter. Do not rely on a seller, developer or agent to decide them; obtain written advice tied to the actual parties and parcel.",
+                "If eligible, calculate tax from the deed outward. B.C.’s ordinary property transfer tax is graduated by fair market value, with an additional residential rate above CAD 3 million. The 20% additional property transfer tax applies to foreign entities and taxable trustees acquiring residential property in specified areas including the Capital Regional District, subject to exemptions and refund rules. The federal Underused Housing Tax and B.C. speculation and vacancy tax are annual regimes with distinct ownership, use, filing and exemption tests. Municipality-level vacancy taxes and normal property tax may add another layer. A home occupied personally can still create filing work even where an exemption ultimately removes tax.",
+                "Property diligence then divides into strata and detached-home files. For a strata apartment or townhouse, read the depreciation report, contingency reserve, budgets, insurance, deductibles, minutes, litigation, special levies, rental bylaws, age restrictions and accessibility. For a detached or rural home, verify title charges, survey, permits, additions, septic, well, oil tank, drainage, retaining walls, trees and insurability. Coastal and low-lying property needs flood and tsunami review; the wider island adds earthquake, wildfire, wind and landslide exposure. Use current provincial and local maps, but commission property-specific inspection and insurance quotations because a map category is not a condition report."
+            ),
+            "coastal-risk",
+        ),
+        DossierLens(
+            "Underwrite long-term use before tourist income",
+            ("rental_profit", "capital_upside"),
+            (
+                "The base rental case is ordinary housing demand, not nightly tourism. CMHC’s 2025 Victoria evidence reported a 3.3% purpose-built vacancy rate and an average two-bedroom rent of CAD 2,120; the condominium rental universe was tighter at 0.3% vacancy with an average two-bedroom rent of CAD 2,688. Those are market-level observations, not a forecast for a candidate. Strata bylaws, unit condition, parking, tenant rules, management cost and provincial tenancy law determine the actual result. Model a professional long-term tenancy after property tax, strata fees, insurance, maintenance, vacancy, tax compliance and a reserve for major repairs.",
+                "Short-term rental is a constrained operating case. B.C.’s principal-residence requirement applies in many island communities including Victoria, Saanich, Sidney and Sooke and generally limits an operator to the principal residence plus one secondary suite or accessory dwelling unit. Local bylaws, business licences, strata rules and platform registration can be stricter. A second home bought for visitor accommodation may therefore have no lawful nightly-rental route. Before using any tourism revenue, obtain written confirmation for the exact address and operator, then deduct management, cleaning, utilities, consumables, platform fees, tax, insurance and seasonality. Treat zero nightly income as the default until every permission is proved.",
+                "Capital upside is plausible only as a property-specific scenario. Victoria has constrained geography, institutions and a broad resident base, while Sidney, Sooke and retirement-oriented central-island communities offer different demand. Yet high entry costs, policy changes, interest rates and a narrower eligible foreign-buyer pool can offset scarcity. VREB’s July 2026 benchmark of CAD 1,311,000 for a Victoria Core single-family home and CAD 548,600 for a Core condominium describe matched product categories; B.C. Assessment’s CAD 786,000 typical Sooke single-family value is an assessment anchor dated July 1, 2025. None prices a candidate or guarantees appreciation."
+            ),
+        ),
+        DossierLens(
+            "Pay for a future buyer pool, not only a view",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The three asking observations below expose the danger of one island-wide price. A renovated Downtown Victoria strata apartment asks CAD 669,000 for 986 square feet of stated finished area. A new Sidney strata townhouse asks CAD 859,800 for 1,258 square feet. A large Sooke oceanfront strata townhouse asks CAD 1,098,000 for 2,933 square feet. Converted per-square-metre figures differ because the products, land relationship, age, location, services and common obligations differ. They are asking evidence—not valuations, completed transactions or proof that a non-Canadian may purchase them.",
+                "Value entry begins with a matched set. Compare a candidate apartment with completed sales in the same building or immediate micro-market, then adjust for floor, exposure, parking, condition, reserve funding and levies. Compare a Sidney townhouse with similar completed new and resale product, warranty and strata burden. Compare a Sooke coastal home with lawful internal area, site, access, foreshore exposure, insurance and maintenance—not with a Victoria Core detached benchmark. Commission an independent valuation where the price or financing warrants it, and model currency movement because the household’s liabilities and future proceeds may be in CAD while wealth is elsewhere.",
+                "Exit liquidity depends on who can legally and practically buy next. Victoria Core has the broadest local owner-occupier and rental-investor pool, but an older or weakly funded strata can still be difficult. Sidney’s retirement appeal is durable when the home is accessible and near services. Sooke and remote coast assets can take longer because driving, condition, insurance and taste narrow demand. Federal rules may change after January 1, 2027, but do not underwrite an exit on an assumed policy outcome. Ask two agents who did not source the property for completed evidence, likely buyer profile and realistic sale time; model a slow resale with full costs and no appreciation."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Victoria Core combines waterfront, culture and year-round services; Sidney, Sooke and Parksville trade urban depth for quieter coastal routines.",
+        "global_access": "Victoria Airport and Swartz Bay support regional travel, while Sooke and central Vancouver Island add driving, ferry and disruption sensitivity.",
+        "ownership_clarity": "Victoria title can be clear, but most non-Canadians face a federal purchase prohibition whose answer depends on buyer, property and census geography.",
+        "regulatory_safety": "Victoria, Sidney and Sooke restrict short stays through the provincial principal-residence rule, while hazards and strata obligations remain address-specific.",
+        "rental_profit": "Victoria has credible long-term demand, but property tax, strata, insurance and tenancy costs constrain yield; second-home nightly rent may be unavailable.",
+        "capital_upside": "Victoria Core scarcity supports selected assets, while Sooke and central-island appreciation depends more heavily on access, condition and the local buyer pool.",
+        "retirement_fit": "Victoria offers the island’s deepest hospitals and services; Sidney is practical, while Sooke, Nanaimo and Parksville require different transport and care planning.",
+        "exit_liquidity": "Victoria Core reaches the broadest resident pool; specialised Sooke waterfront and remote Vancouver Island homes can take longer to resell.",
+        "foreigner_fit": "English-language ease helps administration, but Victoria-area purchase restrictions, stacked taxes and residence rules materially narrow the foreign-buyer case.",
+        "value_entry": "Downtown Victoria, Sidney and Sooke asking evidence spans unlike strata products, so matched completed sales matter more than one island average.",
+    },
+    market_anchors=(
+        {"location": "Victoria Core single-family", "evidence": "1,311,000 CAD", "buyer_read": "July 2026 VREB HPI benchmark for a matched single-family category; not an asking price or candidate valuation.", "source_label": "Victoria Real Estate Board current statistics", "source_url": "https://www.vreb.org/current-statistics"},
+        {"location": "Victoria Core condominium", "evidence": "548,600 CAD", "buyer_read": "July 2026 VREB HPI benchmark for a matched condominium category; building condition and strata finances still control a candidate.", "source_label": "Victoria Real Estate Board current statistics", "source_url": "https://www.vreb.org/current-statistics"},
+        {"location": "Sooke typical single-family", "evidence": "786,000 CAD", "buyer_read": "B.C. Assessment 2026 roll typical assessed value as of July 1, 2025; not a completed-sale median or candidate valuation.", "source_label": "B.C. Assessment Vancouver Island 2026", "source_url": "https://info.bcassessment.ca/news/Pages/Vancouver-Island-2026-Property-Assessments-Announced.aspx"},
+    ),
+    micro_locations_intro="Use these four operating patterns only after legal geography is confirmed. Victoria Core, the Saanich Peninsula, Sooke and Central Island differ in hospitals, transport, property type, hazards and the future buyer pool.",
+    micro_locations=(
+        {"name": "Victoria Core", "best_for": "Deepest services, hospitals and walkability", "daily_life": "Urban neighbourhoods, transit, waterfront and broad resident demand", "diligence": "Purchase eligibility, strata finances, noise, seismic work and taxes"},
+        {"name": "Sidney / Saanich Peninsula", "best_for": "Calm small-town retirement near airport and ferry", "daily_life": "Walkable Sidney centre with car-led rural peninsula beyond", "diligence": "Census geography, hospital time, septic or well, strata and coastal risk"},
+        {"name": "Sooke / West Shore", "best_for": "More space and dramatic southwest coast", "daily_life": "Car-led living with Highway 14 dependence and local services", "diligence": "Road resilience, drainage, slope, tsunami, insurance and resale depth"},
+        {"name": "Central Island: Nanaimo / Parksville / Qualicum", "best_for": "Retirement communities with a separate service hub", "daily_life": "Nanaimo ferries and healthcare; smaller beach towns farther north", "diligence": "Exact CMA or CA boundary, specialist care, transport, wildfire and exit pool"},
+    ),
+    checklist=(
+        "Obtain written advice on the buyer, beneficial owners, property type and exact CMA or CA geography before offering.",
+        "Confirm residence, tax residence and MSP healthcare eligibility separately from ownership.",
+        "Calculate ordinary property transfer tax, the 20% additional tax, UHT, speculation and vacancy tax, and annual filings separately.",
+        "For strata, read depreciation reports, minutes, insurance, deductibles, levies, bylaws, litigation and accessibility.",
+        "For detached or rural homes, verify permits, survey, septic, well, oil tank, drainage, trees, access and insurability.",
+        "Overlay earthquake, tsunami, flood, wildfire and landslide sources; obtain property-specific inspection and insurance terms.",
+        "Assume zero nightly income until provincial, municipal, strata and operator requirements are confirmed in writing.",
+        "Model winter transport, five-year cash outlay, currency risk and a slow resale to the next eligible buyer.",
+    ),
+    references_intro="Legal, tax, residence, healthcare, rental, hazard, transport, market and listing claims were reviewed on 22 August 2026. Recheck immediately after a purchase-ban, tax, short-term rental, transport, hazard, market-data or listing change, and in all cases before a binding offer. Obtain Canadian legal, tax, immigration, inspection, insurance and strata advice for the actual buyer and property.",
+    references=(
+        {"label": "CMHC: Prohibition on Purchase of Residential Property by Non-Canadians", "url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/housing-research/consultations/prohibition-purchase-residential-property-non-canadians-act"},
+        {"label": "Justice Laws: enacted extension to the fourth anniversary", "url": "https://laws-lois.justice.gc.ca/eng/AnnualStatutes/2024_17/page-15.html"},
+        {"label": "Justice Laws: purchase-prohibition regulations section 3", "url": "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2022-250/section-3.html"},
+        {"label": "Canada Revenue Agency: Underused Housing Tax", "url": "https://www.canada.ca/en/services/taxes/excise-taxes-duties-and-levies/underused-housing-tax.html"},
+        {"label": "B.C.: additional property transfer tax", "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax"},
+        {"label": "B.C.: property transfer tax rates", "url": "https://www2.gov.bc.ca/gov/content?id=B6F43B3AAE394299B03B1F777747A36F"},
+        {"label": "B.C.: speculation and vacancy tax rates", "url": "https://www2.gov.bc.ca/gov/content/taxes/speculation-vacancy-tax/how-tax-works/tax-rates?keyword=2023"},
+        {"label": "B.C.: short-term rental principal-residence requirement", "url": "https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/principal-residence-requirement"},
+        {"label": "IRCC: immigrate to Canada", "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada.html"},
+        {"label": "B.C.: MSP eligibility", "url": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp/bc-residents/eligibility-and-enrolment/are-you-eligible"},
+        {"label": "B.C.: MSP coverage wait period", "url": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp/bc-residents/eligibility-and-enrolment/how-to-enrol/coverage-wait-period"},
+        {"label": "Island Health: Royal Jubilee Hospital", "url": "https://www.islandhealth.ca/locations/hospitals-health-centre-locations/royal-jubilee-hospital-rjh"},
+        {"label": "Island Health: specialized intensive-care sites", "url": "https://www.islandhealth.ca/services/hospital-services/adult-intensive-care-units-icu"},
+        {"label": "PreparedBC: earthquakes and tsunamis", "url": "https://www2.gov.bc.ca/gov/content/safety/emergency-management/preparedbc/know-your-hazards/earthquakes-tsunamis/tsunami"},
+        {"label": "PreparedBC: landslide preparedness", "url": "https://www2.gov.bc.ca/gov/content?id=673B4BF9FE304FA9AC218B0D30D5762B"},
+        {"label": "B.C. flood hazard map", "url": "https://governmentofbc.maps.arcgis.com/apps/webappviewer/index.html?id=1a60c24b82ed41699d8a55338fb11076"},
+        {"label": "BC Wildfire Service: Provincial Strategic Threat Analysis", "url": "https://www2.gov.bc.ca/gov/content/safety/wildfire-status/prevention/fire-fuel-management/psta"},
+        {"label": "B.C.: Highway 14 corridor", "url": "https://www2.gov.bc.ca/gov/content/transportation-projects/other-transportation-projects/highway-14"},
+        {"label": "BC Transit: Victoria schedules and route maps", "url": "https://www.bctransit.com/victoria/schedules-and-maps/"},
+        {"label": "BC Ferries route map", "url": "https://www.bcferries.com/routes-fares/discover-route-map"},
+        {"label": "BC Ferries fares and bookings", "url": "https://www.bcferries.com/routes-fares/ferry-fares"},
+        {"label": "Victoria International Airport", "url": "https://www.victoriaairport.com/"},
+        {"label": "CMHC: 2025 rental market reports", "url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/market-reports/rental-market-reports-major-centres"},
+        {"label": "Victoria Real Estate Board current statistics", "url": "https://www.vreb.org/current-statistics"},
+        {"label": "B.C. Assessment: Vancouver Island 2026 assessments", "url": "https://info.bcassessment.ca/news/Pages/Vancouver-Island-2026-Property-Assessments-Announced.aspx"},
+        {"label": "Downtown Victoria asking observation", "url": "https://www.realtor.ca/real-estate/30169955/403-1015-johnson-st-victoria-downtown"},
+        {"label": "Sidney asking observation", "url": "https://www.realtor.ca/real-estate/29877007/2-2312-orchard-ave-sidney-sidney-south-east"},
+        {"label": "Sooke asking observation", "url": "https://www.realtor.ca/real-estate/29896327/3-6995-nordin-rd-sooke-whiffin-spit"},
+        {"label": "European Central Bank euro reference rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("victoria-daily-life", "/assets/vancouver-island-victoria-daily-life.webp", "Older couple walking beside Victoria harbour near a lived-in waterfront neighbourhood", "Victoria’s case begins with year-round city life, hospitals and a waterfront that works beyond summer.", "hero"),
+        DossierImage("island-access", "/assets/vancouver-island-victoria-island-access.webp", "Coastal ferry approaching Vancouver Island through calm grey water", "Ferries and airports connect the island, but schedules and last-mile travel shape daily life.", "wide"),
+        DossierImage("coastal-risk", "/assets/vancouver-island-victoria-coastal-risk.webp", "Rain-wet coastal road beside forest and homes near Sooke on Vancouver Island", "A scenic coast still needs road, drainage, wind, flood and emergency-access diligence.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Vancouver Island / Victoria through five destination lenses",
+    assessment_intro="Here’s how Vancouver Island / Victoria scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three direct current observations compare a Downtown Victoria apartment, a Sidney townhouse and a Sooke oceanfront townhouse. They are asking evidence—not valuations. Finished internal area is used consistently; CAD is primary and USD uses the recorded ECB cross-rate.",
+    market_anchors_intro="These official VREB and B.C. Assessment figures bound distinct matched products. They are context—not candidate valuations, listing medians or a single island price.",
+    orientation_groups=(DossierOrientationGroup("South to Central Island", (("Victoria Core", "Hospitals, culture and transit"), ("Sidney / Saanich", "Airport, ferry and small-town life"), ("Sooke / West Shore", "Coast and car-led access"), ("Nanaimo", "Central-island service hub"), ("Parksville / Qualicum", "Retirement-oriented beach towns"))),),
+    orientation_caption="Orientation schematic—not to scale. Confirm current census geography, ferry and airport schedules, hospital time, road resilience, hazards and property-level access.",
+    country_guide_url="/countries/canada-property/",
+    country_guide_label="Canada property guide",
+    rail_comparison="Compare Vancouver Island / Victoria with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -2577,6 +2727,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     CROATIA_ISTRIA_DALMATIA_DOSSIER.destination_id: CROATIA_ISTRIA_DALMATIA_DOSSIER,
     QUEENSTOWN_DOSSIER.destination_id: QUEENSTOWN_DOSSIER,
     PHUKET_KOH_SAMUI_DOSSIER.destination_id: PHUKET_KOH_SAMUI_DOSSIER,
+    VANCOUVER_ISLAND_VICTORIA_DOSSIER.destination_id: VANCOUVER_ISLAND_VICTORIA_DOSSIER,
 }
 
 
