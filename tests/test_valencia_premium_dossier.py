@@ -21,6 +21,7 @@ REVIEWED_DOSSIERS = {
     "malaga-costa-del-sol",
     "hakone-izu",
     "lake-como",
+    "hakuba",
 }
 
 
