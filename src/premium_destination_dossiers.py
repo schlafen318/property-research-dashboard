@@ -1693,6 +1693,147 @@ HAKUBA_DOSSIER = PremiumDossierSpec(
 )
 
 
+NISEKO_DOSSIER = PremiumDossierSpec(
+    destination_id="niseko",
+    title="Niseko Retirement Property Dossier",
+    description="Assess Niseko property through Kutchan daily life, resort access, ownership, planning, lodging rules, snow operations, healthcare, value, resale, and current listings.",
+    h1="Niseko: buy the operating reality, not only the powder",
+    lede="Niseko is not one place or one property market. Kutchan is the working town, with the station, hospital, schools, supermarkets and a resident economy. Hirafu and Kabayama form the best-known international resort core. Hanazono is a more planned and premium resort proposition. Niseko Village, Annupuri and Moiwa create a southern arc with different lifts, operators, roads and buyer pools. The powder, Mount Yotei and international recognition are real advantages; so are the snow-clearing bill, seasonal staffing, car dependence, operator contract and narrow exit on the wrong product. This dossier asks whether a home works in February and May—and whether the legal, operational and resale evidence supports the price.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is selective rather than broadly positive. Niseko can be an exceptional second-home or active-retirement base for a buyer who wants winter sport, cool summers, landscape and an established international resort community, and who can carry substantial fixed costs without depending on optimistic rent. Kutchan gives the proposition ordinary services and year-round life that a pure ski village would lack. Hirafu offers the deepest visitor infrastructure and most recognisable address. Hanazono and the southern resort arc can deliver polished accommodation or quieter mountain access. None should be treated as interchangeable, and the premium resort product is not the default recommendation for a long-term resident.",
+        "Property ownership does not create Japanese residence, public-healthcare eligibility or domestic borrowing access. A foreign buyer can generally acquire ordinary Japanese real estate, while a non-resident acquisition may require Foreign Exchange and Foreign Trade Act reporting through the Bank of Japan. Establish the right to live in Japan, healthcare and tax administration before treating a chalet or condo as a retirement home. Then distinguish a private residence from a lodging business. Kutchan and Niseko Town have municipal rules and accommodation taxes; national minpaku, hotel or ryokan routes are separate; a condominium or operator agreement may be stricter again.",
+        "Proceed in an operational sequence. Choose between Kutchan town life, Hirafu or Kabayama, Hanazono, and Niseko Village, Annupuri or Moiwa. Travel the exact New Chitose route in winter and shoulder season. Confirm title, legal road access, planning, building records, snow design, utilities, hazard layers and maintenance. For a managed resort unit, read the operator agreement, owner-use calendar, furniture obligation, common charges, reserve position, consumption-tax treatment and complete rental statements. Model heating, snow clearing, insurance, management, empty periods and a slow resale. Buy only when the home remains useful without a record snow year or a marketing-deck yield.",
+    ),
+    lenses_intro="The five paired lenses below translate Niseko's ten Atlas dimensions into choices between a working town and several resort operating models. The full ten-factor assessment appears once in the score table.",
+    lenses=(
+        DossierLens(
+            "Live beyond the powder calendar",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Niseko's lifestyle magnetism is obvious in winter but must be tested across the year. Hirafu is the most internationally legible base, with restaurants, ski services and visitor energy, yet many businesses shorten hours or close outside peak periods. Hanazono is more planned and resort-led. Niseko Village, Annupuri and Moiwa offer mountain access and a quieter setting, but daily errands are dispersed. Kutchan is different: it is a working town rather than a resort set, with supermarkets, schools, offices, rail and ordinary neighbourhoods. A long-stay buyer should spend November and May locally, not only February, and decide whether calm feels restorative or inconvenient.",
+                "Retirement fit begins with healthcare and physical practicality. Kutchan Kosei Hospital is the regional hospital and lists 234 beds, multiple departments and emergency functions, making Kutchan the most practical base of the resort area. That does not guarantee the required specialist, language support, appointment or insurer treatment. More complex care can mean travel toward Otaru or Sapporo. Identify a regular clinic, pharmacy, emergency route and specialist plan before purchase. In winter, test whether an ambulance, taxi or household driver can reach the property after heavy snow, and whether stairs, icy paths or deep roof shedding create avoidable risk.",
+                "The home itself should reduce, not romanticise, winter work. Prefer a legal main-level bedroom and bathroom, sheltered entry, safe snow-storage area, reliable heating, freeze protection, mechanical ventilation and a clear contractor plan. Ask who clears the drive and roof, by what service level, where snow is placed and what happens during staff shortages. A remote Kabayama, Annupuri or Moiwa house may offer space and quiet but increase driving and response time. A Kutchan house can provide a broader resident rhythm at a lower entry point. A managed Hirafu or Hanazono unit can remove work while replacing it with fees and operator dependence.",
+            ),
+            "winter-snow-operations",
+        ),
+        DossierLens(
+            "Reach the resort—and the hospital—in winter",
+            ("global_access", "foreigner_fit"),
+            (
+                "New Chitose is the principal international gateway, but the final journey is material. Official local guidance presents road, rail, bus and shuttle options, with road trips commonly around two hours in normal conditions and rail closer to three hours with transfers. Winter weather, traffic, missed connections and luggage can extend each. Direct resort buses and local shuttles are seasonal; a timetable useful in February may not exist in May. Drive or ride the actual door-to-door journey, including arrival after the final bus, and price private transfer or parking rather than using an airport-to-area headline.",
+                "Local movement changes by submarket. Kutchan provides the rail station and ordinary services, but the resort areas climb away from town. Hirafu and Kabayama have the largest concentration of visitor infrastructure, yet steep roads and snowbanks change walkability. Hanazono has a purpose-built resort environment and still depends on the operating calendar. Niseko Village, Annupuri and Moiwa stretch along separate roads with limited cross-resort simplicity. A car improves independence but adds winter tyres, covered parking, snow clearing and driving exposure. Confirm current bus and shuttle service for the exact season, stop and owner status; do not assume a hotel guest service extends to a private owner.",
+                "Niseko's international community, bilingual agencies and resort operators improve foreigner fit, but ownership administration remains Japanese. Ministry of Finance reporting is submitted in Japanese. Tax notices, registry documents, planning consultations, contractor discussions and neighbourhood matters may require local support. A branded residence can provide an English-facing interface while binding the owner to a detailed contract. A standalone house provides control while requiring a bilingual lawyer, tax adviser, building inspector and reliable local manager. Future Hokkaido Shinkansen service is a strategic possibility, not current access; the Kutchan tourism plan places later timing beyond the present buying decision.",
+            ),
+        ),
+        DossierLens(
+            "Own clearly, then clear the operating permissions",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Japan generally permits foreign ownership of ordinary land and buildings, but clear market access does not remove property-level risk. Verify the registered owner, boundaries, easements, mortgages, legal road frontage, utilities and every structure against the registry, survey and building records. In deep snow, inspect roof form, structural loading, water ingress, drainage, retaining walls and where neighbouring snow is shed. A renovated Kutchan house needs evidence of permitted and competently executed work. A resort condo needs title, common-area rights, bylaws, reserve position, insurance, litigation and a complete schedule of charges.",
+                "Planning is especially local. Kutchan expanded landscape and development controls in March 2026, requires advance consultation in designated cases and warns that processing can take around three months. Its guidance also identifies areas where hotel, ryokan or simple-lodging uses are prohibited. That does not make an existing home or rental unlawful; it means the exact parcel, building and intended change must be checked against current maps and written municipal advice. A real-estate listing, former guest use or neighbouring lodge is not permission. Confirm whether extensions, change of use, signage, parking or future redevelopment would be allowed before valuing them.",
+                "Short-stay operation has several gates. The national private-lodging route is capped at 180 nights and can require an administrator when the owner is absent. Kutchan publishes additional local restricted areas and periods, including school-related buffers. Hotel and ryokan licensing follows another route. Kutchan and Niseko Town administer their own accommodation taxes, so municipal boundary matters. Condominium bylaws and operator contracts can narrow use further. Obtain written advice that identifies the exact route, manager, fire and safety work, tax registration, reporting, guest response and permitted calendar. If any gate is unclear, underwrite the property as a private home with no tourist income.",
+            ),
+        ),
+        DossierLens(
+            "Treat every rental return as an operator statement",
+            ("rental_profit", "capital_upside"),
+            (
+                "Niseko can produce high nightly rates in strong winter weeks, but gross revenue is not owner profit. Reconcile booked nights, achieved rate, cancellations and owner use with bank deposits and tax filings. Deduct operator commission, cleaning, linen, utilities, heating, snow clearing, repairs, furniture replacement, common charges, reserve contributions, insurance, platform fees and accommodation tax administration. Clarify whether quoted income includes or excludes Japanese consumption tax and whether the sale price is net or tax-inclusive. The MUWA observation below illustrates the issue: the page displays a primary net price and a higher total including JCT.",
+                "Product and operator matter as much as location. A Hirafu condo may benefit from recognisable positioning and a developed rental ecosystem, but building reputation, room layout, management performance and owner-use restrictions drive outcomes. A Hanazono or Niseko Village residence may be tied more closely to a branded operator and development plan. Annupuri or Moiwa can attract buyers seeking quiet and snow access but may have thinner management and dining options. A standalone Kabayama chalet needs dependable staff, transport and guest response. Obtain several years of property-level statements and the full future contract; do not apply a resort-wide yield to a candidate.",
+                "Capital upside is plausible but not assured. International recognition, snow quality and continuing investment support selected assets, while construction cost, planning restrictions and scarcity can constrain supply. The official 2026 Hirafu land appraisal nevertheless describes uncertainty from higher construction costs and regulation and notes an immature standard-site rental market. That is a useful brake on promotional certainty. Future rail and resort expansion may improve access or demand, but they can also bring supply and a long delivery period. Model flat real prices, a weaker winter, higher operating costs and currency movement before paying for an appreciation story.",
+            ),
+            "green-season-mobility",
+        ),
+        DossierLens(
+            "Pay for the future buyer pool, not the brand alone",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Entry value changes dramatically over a short distance. The three official 1 January 2026 MLIT anchors are bare-land appraisals, not finished-home valuations: ¥200,000/m² for a 529 m² Hirafu resort-home site, ¥67,000/m² for a 330 m² central Kutchan residential site and ¥35,000/m² for a 201 m² northern Kutchan residential site. They show the resort premium and the need to identify what the buyer is paying for. Building area, construction quality, furniture, management rights, legal use, view and snow access must be valued separately. A blended Niseko average hides more than it explains.",
+                "The three current asking observations make the same point. The renovated Kutchan house is the working-town entry and includes broker income and yield claims that remain unverified. Kizuna 202 is a smaller Upper Hirafu condo with a resort-location premium and a different management burden. MUWA Niseko 501 is a ski-in/out branded product priced far above both on a per-square-metre basis, with an explicit JCT question. These are dated asking observations, not recommendations, completed sales or proof of value. Commission matched completed evidence and an independent inspection or appraisal where useful.",
+                "Exit liquidity follows the next buyer's use case. A practical Kutchan home can reach local households and long-stay buyers, but an older structure may be valued mainly for land. A well-run Hirafu condo can reach an international resort pool, while high common costs or weak statements shrink that pool. A distinctive chalet or ultra-premium branded unit needs fewer, wealthier buyers and can wait longer. Hanazono and the southern resorts have their own brands and operating ecosystems rather than one seamless resale market. Before purchase, ask two agents who did not source the home who would buy it next, on what completed evidence and after what likely marketing period.",
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Niseko pairs exceptional snow and summer landscape with Kutchan's working-town services; resort life becomes much quieter between peak seasons.",
+        "global_access": "Niseko uses New Chitose road, rail and seasonal bus links, while winter weather and resort last miles weaken headline journey times.",
+        "ownership_clarity": "Niseko follows Japan's generally open ownership framework, but title, road rights, building records and non-resident reporting remain property-specific.",
+        "regulatory_safety": "Kutchan and Niseko layer local planning, lodging and accommodation-tax rules above national minpaku and hotel frameworks.",
+        "rental_profit": "Hirafu, Hanazono and Niseko resort units can earn winter peaks, but operator fees, heating, snow and shoulder seasons compress owner returns.",
+        "capital_upside": "Niseko's international recognition supports selected assets, while construction cost, regulation, future supply and immature evidence prevent blanket forecasts.",
+        "retirement_fit": "Kutchan provides Niseko's hospital and ordinary services; Hirafu, Annupuri and Moiwa add winter access, stairs and driving dependence.",
+        "exit_liquidity": "Kutchan homes reach local buyers, while Niseko's premium condos and singular chalets depend on narrower international and operator-sensitive pools.",
+        "foreigner_fit": "Niseko has bilingual agencies and operators, but Japanese reporting, tax, planning and contractor work still require independent local support.",
+        "value_entry": "Kutchan, Hirafu and branded Niseko products span radically different prices; legal use, management and future buyer pool determine real value.",
+    },
+    market_anchors=(
+        {"location": "Hirafu resort-home site", "evidence": "¥200,000/m²", "buyer_read": "MLIT appraisal for 529 m² of bare land on 1 January 2026, 6.5 km from Kutchan; not a chalet or condo valuation.", "source_label": "MLIT 2026 Hirafu appraisal", "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/01/2026014000003.html"},
+        {"location": "Central Kutchan residential site", "evidence": "¥67,000/m²", "buyer_read": "MLIT appraisal for 330 m² of bare land on 1 January 2026, about 850 m from Kutchan station; improvements are excluded.", "source_label": "MLIT 2026 central Kutchan appraisal", "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/01/2026014000002.html"},
+        {"location": "Northern Kutchan residential site", "evidence": "¥35,000/m²", "buyer_read": "MLIT appraisal for 201 m² of bare land on 1 January 2026, about 1.3 km from Kutchan station; one point, not a town-wide valuation.", "source_label": "MLIT 2026 northern Kutchan appraisal", "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/01/2026014000001.html"},
+    ),
+    micro_locations_intro="Niseko is a chain of daily-life and operating patterns, not one resort average. These groups are orientation aids rather than valuation zones. Confirm the municipal boundary, planning, lawful use, shuttle, snow contract, hazard layers, healthcare journey and completed evidence for every address.",
+    micro_locations=(
+        {"name": "Kutchan town", "best_for": "Year-round services and value entry", "daily_life": "Working town with rail, hospital and shops", "diligence": "Building age, snow, road, neighbourhood and rental permission"},
+        {"name": "Hirafu / Kabayama", "best_for": "International resort depth", "daily_life": "Visitor-led core grading into chalet areas", "diligence": "Operator, planning, walkability, snow, charges and exit premium"},
+        {"name": "Hanazono", "best_for": "Planned premium resort use", "daily_life": "Polished and operator-dependent", "diligence": "Contract, owner use, future supply, transport and resale pool"},
+        {"name": "Niseko Village / Annupuri / Moiwa", "best_for": "Southern mountain access and quiet", "daily_life": "Dispersed resort arc with more driving", "diligence": "Exact lift, road, shuttle, manager, seasonality and emergency access"},
+    ),
+    checklist=(
+        "Confirm residence, healthcare, tax administration and ownership structure.",
+        "Choose Kutchan, Hirafu / Kabayama, Hanazono or the southern resort arc first.",
+        "Travel New Chitose, hospital, grocery and resort routes in winter and shoulder season.",
+        "Verify title, boundaries, road rights, utilities, planning and legal building records.",
+        "Inspect snow load, roof shedding, heating, freeze protection, drainage and hazard layers.",
+        "Clear minpaku or lodging permission, accommodation tax and municipal duties in writing.",
+        "Audit operator contracts, owner use, charges, JCT treatment and complete rental statements.",
+        "Model five-year cash outlay and identify the future resale buyer before signing.",
+    ),
+    references_intro="Legal, tax, planning, lodging, transport, healthcare, hazard, market and listing claims were reviewed on 22 August 2026. Recheck every time-sensitive source no later than 22 February 2027 and immediately after any tax, planning, listing, transport, hazard, operator, market data or building change. Obtain current Japanese legal, immigration, tax, planning, building, insurance and management advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "Japan retirement property guide", "url": "/japan-retirement-property-foreign-buyers/"},
+        {"label": "Ministry of Finance: non-resident real-property reporting", "url": "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html"},
+        {"label": "National Tax Agency: non-residents and Japanese real estate", "url": "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf"},
+        {"label": "Japan Tourism Agency: Private Lodging Business Act", "url": "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html"},
+        {"label": "Kutchan Town: current private-lodging restrictions", "url": "https://www.town.kutchan.hokkaido.jp/news/tourism/2792/"},
+        {"label": "Kutchan Town: 2026 landscape and development controls", "url": "https://www.town.kutchan.hokkaido.jp/town_administration/toshikeikaku/4900/"},
+        {"label": "Kutchan Town: 2026 accommodation-tax guide", "url": "https://www.town.kutchan.hokkaido.jp/file/contents/3494/38162/2026tebiki_eigo.pdf"},
+        {"label": "Niseko Town: accommodation-tax guidance", "url": "https://www.town.niseko.lg.jp/kurashi/tax/syukuhakuzei/zigyousyamuke_syukuhakuzei"},
+        {"label": "Niseko Town: fixed-asset tax", "url": "https://www.town.niseko.lg.jp/kurashi/tax/koteishisan/?wovn=en"},
+        {"label": "Niseko official access guide", "url": "https://niseko.co.jp/access/?hl=en"},
+        {"label": "Kutchan tourism master plan", "url": "https://niseko.co.jp/wp/wp-content/uploads/2025/12/2020-2031_Kutchan-Town-Tourism-Master-Plan-Revised-Edition-Main.pdf"},
+        {"label": "Kutchan Kosei Hospital: official English information", "url": "https://www.dou-kouseiren.com/byouin/kutchan/english/"},
+        {"label": "Kutchan Town: current hazard map", "url": "https://www.town.kutchan.hokkaido.jp/news/living_infomation/3467/"},
+        {"label": "MLIT: 2026 Hirafu bare-land appraisal", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/01/2026014000003.html"},
+        {"label": "MLIT: 2026 central Kutchan bare-land appraisal", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/01/2026014000002.html"},
+        {"label": "MLIT: 2026 northern Kutchan bare-land appraisal", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/01/2026014000001.html"},
+        {"label": "Niseko Real Estate: Kutchan renovated house asking observation", "url": "https://nisekorealestate.com/properties/kutchan-newly-renovated-3br-yotei-view-house"},
+        {"label": "Niseko Real Estate: Kizuna 202 asking observation", "url": "https://nisekorealestate.com/properties/kizuna-202"},
+        {"label": "Niseko Real Estate: MUWA Niseko 501 asking observation", "url": "https://nisekorealestate.com/properties/muwa-niseko-501"},
+    ),
+    images=(
+        DossierImage("working-town", "/assets/niseko-kutchan-working-town.webp", "Kutchan working town beneath Mount Yotei in a calm winter morning", "Kutchan supplies the working-town services behind the resort story.", "hero"),
+        DossierImage("winter-snow-operations", "/assets/niseko-winter-snow-operations.webp", "Residents clearing deep snow around a modest Niseko-area home", "Snow access, heating and maintenance are ordinary ownership costs.", "wide"),
+        DossierImage("green-season-mobility", "/assets/niseko-green-season-mobility.webp", "Mature residents carrying groceries near a rural Niseko bus stop in green season", "Shoulder-season mobility reveals whether the address works beyond winter.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Niseko through five destination lenses",
+    assessment_intro="Here’s how Niseko scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current observations show the spread from a renovated Kutchan house through an Upper Hirafu condo to a branded ski-in/out residence. They are asking evidence—not valuations. Local JPY is primary; USD uses the recorded dataset exchange basis.",
+    market_anchors_intro="These are official bare-land appraisals—not finished-home prices or valuations. They show the resort-to-town gradient and must be reconciled for building, legal use, age, condition, management and exact location.",
+    orientation_groups=(
+        DossierOrientationGroup("Working town to core resort", (("Kutchan station", "Rail and working-town services"), ("Hirafu / Kabayama", "International resort core"), ("Hanazono", "Planned premium resort"))),
+        DossierOrientationGroup("Southern resort arc", (("Hirafu", "Northern reference point"), ("Niseko Village", "Managed resort base"), ("Annupuri", "Quieter mountain access"), ("Moiwa", "Smaller western resort area"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current airport, rail, bus and shuttle timetables, road clearing and the exact winter route.",
+    country_guide_url="/countries/japan-property/",
+    country_guide_label="Japan property guide",
+    rail_comparison="Compare Niseko with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -1705,6 +1846,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     COSTA_BRAVA_GIRONA_DOSSIER.destination_id: COSTA_BRAVA_GIRONA_DOSSIER,
     PARK_CITY_DEER_VALLEY_DOSSIER.destination_id: PARK_CITY_DEER_VALLEY_DOSSIER,
     CRETE_DOSSIER.destination_id: CRETE_DOSSIER,
+    NISEKO_DOSSIER.destination_id: NISEKO_DOSSIER,
 }
 
 
@@ -1778,3 +1920,4 @@ validate_premium_dossier(HAKUBA_DOSSIER)
 validate_premium_dossier(COSTA_BRAVA_GIRONA_DOSSIER)
 validate_premium_dossier(PARK_CITY_DEER_VALLEY_DOSSIER)
 validate_premium_dossier(CRETE_DOSSIER)
+validate_premium_dossier(NISEKO_DOSSIER)

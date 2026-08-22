@@ -25,6 +25,7 @@ REVIEWED_DOSSIERS = {
     "costa-brava-girona",
     "park-city-deer-valley",
     "crete",
+    "niseko",
 }
 
 
