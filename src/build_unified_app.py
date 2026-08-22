@@ -7146,7 +7146,7 @@ def premium_dossier_listing_table(rows: list[dict]) -> str:
             f'<td data-label="Type">{escape(row["property_type"])}</td>'
             f'<td class="premium-number" data-label="Asking price">{float(row["local_price"]):,.0f} {escape(row["local_currency"])}</td>'
             f'<td class="premium-number" data-label="USD comparison">{money(row["usd_price"])}</td>'
-            f'<td class="premium-number" data-label="Area">{float(row["size_m2"]):,.1f} m²</td>'
+            f'<td class="premium-number" data-label="Area / basis">{float(row["size_m2"]):,.1f} m²<br><span class="premium-area-basis">{escape(row.get("area_basis", "Portal-stated area"))}</span></td>'
             f'<td class="premium-number" data-label="USD/m²">{money(row["usd_per_m2"])}/m²</td>'
             f'<td data-label="Source / captured"><a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a><br><span>{escape(row["captured_date"])}</span></td>'
             f'<td data-label="Confidence">{escape(row["confidence"])}</td>'
@@ -7155,7 +7155,7 @@ def premium_dossier_listing_table(rows: list[dict]) -> str:
         )
     return (
         '<div class="premium-table-wrap premium-card-table-wrap"><table class="premium-listing-table premium-card-table">'
-        '<thead><tr><th>Observation</th><th>Type</th><th>Asking price</th><th>USD comparison</th><th>Area</th><th>USD/m²</th><th>Source / captured</th><th>Confidence</th><th>What it represents</th></tr></thead>'
+        '<thead><tr><th>Observation</th><th>Type</th><th>Asking price</th><th>USD comparison</th><th>Area / basis</th><th>USD/m²</th><th>Source / captured</th><th>Confidence</th><th>What it represents</th></tr></thead>'
         f'<tbody>{"".join(body)}</tbody></table></div>'
     )
 
@@ -7297,6 +7297,7 @@ def premium_dossier_css() -> str:
     .premium-table-wrap thead th { border-top: 0; color: var(--ink); font-size: 10px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; }
     .premium-table-wrap tbody th { font-weight: 600; }
     .premium-number { white-space: nowrap; font-variant-numeric: tabular-nums; }
+    .premium-area-basis { display: inline-block; max-width: 130px; white-space: normal; font-size: 11px; line-height: 1.35; }
     .premium-table-wrap span { color: var(--muted); }
     .premium-disclaimer { color: var(--muted) !important; font-size: 13px !important; }
     .premium-market-anchors { margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--line); }

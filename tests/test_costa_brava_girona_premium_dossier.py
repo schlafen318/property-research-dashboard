@@ -27,6 +27,7 @@ REVIEWED_DOSSIERS = {
     "crete",
     "niseko",
     "annecy",
+    "mallorca",
 }
 
 

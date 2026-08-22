@@ -17,7 +17,7 @@ REVIEWED_DOSSIERS = {
     "fukuoka-itoshima", "valencia", "algarve-cascais", "madeira",
     "malaga-costa-del-sol", "hakone-izu", "lake-como", "hakuba",
     "costa-brava-girona", "park-city-deer-valley", "crete", "niseko",
-    DESTINATION_ID,
+    DESTINATION_ID, "mallorca",
 }
 
 
@@ -25,7 +25,7 @@ class AnnecyDossierContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.spec = get_premium_dossier(DESTINATION_ID)
 
-    def test_registry_contains_thirteen_reviewed_dossiers(self) -> None:
+    def test_registry_contains_fourteen_reviewed_dossiers(self) -> None:
         self.assertEqual(REVIEWED_DOSSIERS, set(PREMIUM_DESTINATION_DOSSIERS))
         self.assertIsNotNone(self.spec)
 

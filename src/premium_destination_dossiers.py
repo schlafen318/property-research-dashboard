@@ -1976,6 +1976,149 @@ NISEKO_DOSSIER = PremiumDossierSpec(
 )
 
 
+MALLORCA_DOSSIER = PremiumDossierSpec(
+    destination_id="mallorca",
+    title="Mallorca Retirement Property Dossier",
+    description="Assess Mallorca property through year-round life, island access, Spanish ownership, Balearic tourist rules, healthcare, water, hazards, value, resale, and current listings.",
+    h1="Mallorca: buy the year-round address, not the holiday promise",
+    lede="Mallorca is not one retirement market. Palma offers hospitals, markets, culture and public transport within a working city. Santa Catalina, Portixol and Son Armadans deliver different urban lives. Calvià, Santa Ponça and Port d'Andratx form a mature southwest buyer market. Sóller and the Tramuntana trade convenience for landscape. Pollença and Alcúdia provide northern bases, while Santanyí and Manacor anchor different eastern routines. This dossier asks which address remains practical after summer flights thin, restaurants close and a house needs ordinary care.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "Mallorca is a strong lifestyle and retirement contender for a buyer who can establish Spanish residence independently, accept island logistics and purchase without depending on tourist rent. Ownership does not create a residence right or healthcare eligibility. Spain ended new property-linked investor residence applications on 3 April 2025. A non-EU buyer considering the non-lucrative route must meet the current resource, insurance and other requirements, while EU, EEA and Swiss households follow different rules. Confirm the route, tax residence and healthcare position for every household member before a reservation contract makes the property decision emotionally or financially difficult to reverse.",
+        "The broadest year-round case is Palma, where ordinary employment, healthcare, shops and transport support the visitor economy rather than disappear with it. The southwest can work for a higher-budget buyer who values an international service ecosystem and accepts a price already reflecting that recognition. Sóller, Deià and Valldemossa reward a household comfortable with gradients, narrower roads, older buildings and a more selective resale pool. Pollença and Alcúdia offer northern town life with seasonal pressure; Santanyí gives polished village and coastal demand, while Manacor has a deeper resident economy and a different price logic. The right choice begins with daily routine, not the most photogenic listing.",
+        "Proceed in this order: establish residence, healthcare and tax administration; choose a year-round operating pattern; travel the airport, hospital, grocery and maintenance routes in August and winter; then reconcile registry, cadastre, planning, lawful built area, community rules, water and hazards. Assume no new tourist licence and no transferable income stream unless the Consell, Balearic authorities, municipality, community and independent counsel confirm the exact property and owner position in writing. Mallorca works best as a home whose personal value justifies its carrying cost. Any rental or appreciation case should remain a separately verified upside scenario.",
+    ),
+    lenses_intro="The five paired lenses below turn Mallorca's island appeal into ten buyer decisions. Each tests a specific address and operating plan; the score table then presents the complete Atlas assessment once.",
+    lenses=(
+        DossierLens(
+            "Live as a resident after peak season",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Palma provides Mallorca's clearest all-season base. Santa Catalina combines a market, restaurants and a central walkable position, but nightlife, older buildings and visitor pressure vary street by street. Portixol and El Molinar place the waterfront inside an ordinary city routine, with a premium for that convenience. Son Armadans is quieter and established, though gradients and the exact walk to services matter. The test is not whether the neighbourhood feels lively on a spring weekend. Shop for groceries, reach a pharmacy, use public transport and return after dark in the least convenient season before deciding that a car-free life is realistic.",
+                "Outside Palma, every gain has an operating cost. Calvià, Santa Ponça and Bendinat offer managed communities, international services and access to the southwest coast; Port d'Andratx is more exclusive and topographically constrained. Sóller has a real town centre, shops and rail identity, while Deià and Valldemossa are smaller, steeper and more visitor-led. Pollença is an established inland town and Alcúdia adds a historic centre plus coastal settlements. Santanyí has strong village appeal and nearby coves; Manacor is less polished but more rooted in an ordinary regional economy. Visit when shutters are down, rain falls and tradespeople must reach the home.",
+                "Healthcare reinforces the geography. IB-SALUT's public network includes Son Espases and Son Llàtzer around Palma, with hospitals in Inca and Manacor, primary-care centres and the 061 emergency service. That network does not mean every address has the same journey or that ownership creates eligibility. Measure the route to routine and emergency care, identify a nearby pharmacy and ask how language support will work. A Tramuntana house, a north-coast apartment and a Santanyí villa can each be compelling, but retirement fit declines if one partner cannot drive, stairs become difficult or winter services no longer cover everyday needs.",
+            ),
+            "inland-water-daily-life",
+        ),
+        DossierLens(
+            "Fly easily, then account for island dependence",
+            ("global_access", "foreigner_fit"),
+            (
+                "Palma de Mallorca Airport is a major advantage. Aena currently lists 195 destinations operated by 76 companies, and the airport handled 33.8 million passengers in 2025. Those figures demonstrate reach, not year-round frequency. Many routes are seasonal, schedules change and peak volumes create queues and road pressure. Calculate the complete journey from the preferred address with luggage: Palma can be straightforward, the southwest adds road time, Sóller crosses or tunnels through the mountains, and Pollença, Alcúdia, Santanyí or Manacor extend the last mile. Check winter timetables for the connections the household will actually use.",
+                "Island dependence becomes visible when a flight is cancelled, a specialist appointment is on the mainland or a large repair needs a particular contractor. Ferries provide another route and are useful for vehicles and freight, but port, sailing time and onward travel must be included. Imported materials, furniture and specialist labour may carry longer lead times. For a rural or coastal home, ask how quickly a plumber, electrician, pool technician or property manager can attend in August and after a storm. Global access scores well because Mallorca is connected; operating resilience depends on planning for the occasions when that connection is slow or disrupted.",
+                "Mallorca is accustomed to international owners, and Palma plus the southwest have multilingual agencies, advisers and service providers. That lowers friction without changing the legal language or the need for independent representation. Tax notices, registry records, community meetings, municipal files, utility contracts and rural planning evidence may require Spanish or Catalan follow-through. A buyer based abroad needs a named person to receive notices, inspect after severe weather and authorize repairs. Foreigner fit is strongest for someone who can build a local professional network and participate in the resident economy, not someone expecting an English-speaking resort layer to handle every obligation indefinitely.",
+            ),
+        ),
+        DossierLens(
+            "Own clearly, then audit what exists on the land",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Spain generally permits foreign ownership of ordinary residential property, using the notary and Land Registry within an established transaction system. That is only the start of Mallorca diligence. Compare the nota simple, cadastral record, deed, planning file, occupancy evidence and what physically exists. Confirm boundaries, easements, access, utility contracts and any debt or charge. For an apartment, read community statutes, recent minutes, budgets, arrears, planned works, insurance and restrictions on use. A clean registry entry does not prove that every terrace enclosure, pool, guest house or converted storage area was authorised and can be insured or resold as marketed.",
+                "Rural fincas deserve a separate legal and technical audit. Ask an independent architect to measure lawful area and trace permissions for extensions, pools, wells, septic systems, retaining walls and outbuildings. Protected land, agricultural classifications and older enforcement histories can limit renovation or regularisation. In Tramuntana properties, investigate slope, road width, retaining structures, drainage and emergency access. Around Santanyí, Manacor, Pollença and other rural zones, water source and wastewater arrangements matter as much as the view. Do not accept 'old enough to be legal' or a cadastral appearance as a professional conclusion. Put every unresolved discrepancy into the contract or walk away.",
+                "Hazard review must combine maps with the site. Mallorca faces heat, wildfire, flash flooding, coastal exposure and locally difficult terrain. Balearic drought status is published by demand unit and can change monthly; an island-level colour does not establish a property's lawful well, mains pressure or summer capacity. Check flood layers, drainage paths, vegetation management, defensible access, coastal restrictions, insurance terms and any municipal water measures. Visit after heavy rain where possible and ask for prior claims. Regulatory safety is not produced by one certificate. It comes from reconciling the legal file, physical building, current planning position and an insurer willing to cover the intended use.",
+            ),
+            "tramuntana-access",
+        ),
+        DossierLens(
+            "Assume no new tourist licence",
+            ("rental_profit", "capital_upside"),
+            (
+                "Mallorca's visitor demand is obvious; the right to monetize it is not. The Balearic 2025 tourism-containment framework bars new tourist places in multi-family buildings and constrains growth through limited one-for-one exchange mechanisms. Island plans, suspensions, quotas and later resolutions shape what can operate. Start every acquisition model with zero tourist rent. If a seller markets an existing licence, obtain its number and full file, then confirm the property, owner, category, capacity, expiry or renewal position, community rules and whether any transfer or continued operation is lawful. A licence claim in an advertisement is evidence to investigate, not an asset to price.",
+                "A lawful holiday operation still has a business cost. Model management, guest communication, cleaning, linen, utilities, pool and garden care, insurance, tax, platform fees, repairs and empty periods. Compare the net result with a long-term tenancy and with personal use only. Palma residential demand differs from the southwest resort market; a Sóller townhouse, Pollença home or Santanyí villa has a distinct season and operator pool. Community restrictions or municipal enforcement can eliminate the theoretical case. Ask for filed revenue and expense statements, tax returns and booking records, then have an independent adviser reconcile them rather than relying on the agent's gross-yield percentage.",
+                "Capital upside should be treated with the same restraint. Palma's working-city demand and the southwest's international recognition support selected assets, while island planning limits can constrain supply. Those advantages are widely known and reflected in entry prices. Rural scarcity is valuable only if access, lawful area, water and maintenance remain acceptable to a future buyer. Tourism controls can protect residential amenity while reducing an investor's income options. Model flat real prices, higher operating costs and a longer sale before paying for a growth story. The best appreciation defence is a useful, compliant home that another year-round buyer can understand without inheriting unresolved legal or operating risk.",
+            ),
+        ),
+        DossierLens(
+            "Enter a mature market and preserve the exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Official 2025 completed-registration evidence supplies three bounded anchors: €3,988/m² across all Illes Balears homes, €4,086/m² for Palma homes and €4,244/m² for detached homes across the islands. They are not Mallorca-wide asking averages or valuations for a candidate. They combine locations, conditions and legal qualities that cannot be transferred to one apartment, townhouse or finca. The current listing observations below deliberately span a Platja de Palma apartment, a Sóller townhouse and a Santanyí coastal villa. Their asking prices show product dispersion; they do not establish completed value or confirm that the marketed area and rights are legally saleable.",
+                "Value entry is created by matching price to daily utility and the next buyer pool. In Palma, a well-governed apartment near services can reach resident, national and international demand, but tourist streets, noise and building work require discounts. Santa Ponça, Bendinat and Port d'Andratx already carry an international premium; pay it only for documented quality and durable access. Sóller and the Tramuntana reward singular character but can narrow the pool through stairs, parking and renovation. Pollença and Alcúdia have established recognition; Santanyí's polish differs from Manacor's resident base. A sea view never cures unlawful area, poor water or an impossible road.",
+                "Exit liquidity is widest where the home remains understandable in ordinary life. Palma usually offers the deepest pool. Established southwest apartments and villas can reach international buyers, but higher ticket sizes slow matching. A practical town home in Sóller, Pollença or Manacor can attract more buyers than an isolated rural estate, even if the estate receives more online attention. Model five-year cash outlay including taxes, financing, community charges, management, water systems, pool and garden care, insurance, repairs and sale costs. Before signing, ask two agents who did not source the property how they would resell it, to whom, using which completed evidence and over what likely period.",
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Mallorca joins Palma's working-city life with Calvià coast, Sóller landscape and distinct northern and southeast town routines.",
+        "global_access": "Mallorca's Palma airport has exceptional breadth, but seasonal flights and longer last miles weaken access outside the capital and southwest.",
+        "ownership_clarity": "Mallorca follows Spain's established registry and notary system; lawful area, rural additions, easements and community files remain property-specific.",
+        "regulatory_safety": "Mallorca tourist controls, planning, water and hazard rules require written checks with Balearic, island and municipal authorities.",
+        "rental_profit": "Mallorca has deep visitor demand, but constrained tourist places, operator costs and seasonality make zero holiday rent the prudent base case.",
+        "capital_upside": "Palma and established Mallorca submarkets have mature demand; high entry prices and property-level legality limit blanket appreciation claims.",
+        "retirement_fit": "Palma has Mallorca's broadest hospitals, transit and services; Tramuntana and remote coastal homes add driving and emergency-access dependence.",
+        "exit_liquidity": "Palma reaches the broadest buyer pool, while singular Sóller, Santanyí and Port d'Andratx homes depend on narrower budgets and tastes.",
+        "foreigner_fit": "Mallorca has multilingual services and international owners, but Spanish and Catalan tax, planning and community administration still need local support.",
+        "value_entry": "Palma, Calvià, Sóller, Pollença and Manacor occupy different price bands; utility, lawful area and resale depth determine real value.",
+    },
+    market_anchors=(
+        {"location": "Illes Balears all homes", "evidence": "€3,988/m²", "buyer_read": "Average for 2025 completed registrations across all islands and property types; not a Mallorca or property valuation.", "source_label": "Registradores 2025 annual report", "source_url": "https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2025.pdf/f15ee835-3246-6132-11d0-6495dfeee415?t=1774598855046"},
+        {"location": "Palma all homes", "evidence": "€4,086/m²", "buyer_read": "Average for 2025 completed registrations in Palma; district, condition, legal area and outlook still require matched evidence.", "source_label": "Registradores 2025 annual report", "source_url": "https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2025.pdf/f15ee835-3246-6132-11d0-6495dfeee415?t=1774598855046"},
+        {"location": "Illes Balears detached homes", "evidence": "€4,244/m²", "buyer_read": "Average for 2025 completed detached-home registrations across the islands; it does not reconcile land, legality or condition.", "source_label": "Registradores 2025 annual report", "source_url": "https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2025.pdf/f15ee835-3246-6132-11d0-6495dfeee415?t=1774598855046"},
+    ),
+    micro_locations_intro="Mallorca is best read as four operating patterns rather than a single island average. These are orientation aids, not valuation zones. Confirm the municipality, parcel, planning, water, hazard, transport, community and lawful-use position for every address.",
+    micro_locations=(
+        {"name": "Palma", "best_for": "Year-round city services", "daily_life": "Walkable districts, hospitals, culture and airport access", "diligence": "Street noise, building governance, legal area and tourist pressure"},
+        {"name": "Calvià / Santa Ponça / Port d'Andratx", "best_for": "International southwest ecosystem", "daily_life": "Polished coastal services with car-led pockets", "diligence": "Entry premium, community, slope, operator and exit depth"},
+        {"name": "Sóller / Tramuntana", "best_for": "Landscape and town character", "daily_life": "Mountain setting with variable access and services", "diligence": "Road, stairs, retaining walls, water, planning and wildfire"},
+        {"name": "Pollença / Alcúdia / Santanyí / Manacor", "best_for": "Northern and eastern alternatives", "daily_life": "Town-led bases with distinct coastal catchments", "diligence": "Seasonality, exact hospital route, rural legality and water"},
+    ),
+    checklist=(
+        "Confirm residence, healthcare, tax residence and representation before purchase.",
+        "Choose Palma, southwest, Tramuntana/west or north/east daily life first.",
+        "Travel the airport, hospital, grocery and property routes in summer and winter.",
+        "Reconcile registry, cadastre, lawful area, planning, occupancy, easements and community files.",
+        "Verify mains or well water, wastewater, pool, drainage and drought constraints.",
+        "Overlay current flood, wildfire, heat, coastal and terrain hazards with insurance terms.",
+        "Assume zero tourist rent until every property-level permission is confirmed in writing.",
+        "Model five-year cash outlay and identify the future resale buyer before signing.",
+    ),
+    references_intro="Legal, tax, tourism, transport, healthcare, water, hazard, market and listing claims were reviewed on 22 August 2026. Recheck every time-sensitive source no later than 22 February 2027 and immediately after any residence, tax, planning, tourist-place, listing, transport, water, hazard, community or market-data change. Obtain current Spanish and Balearic legal, tax, immigration, planning, building, insurance and property-management advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "Spain retirement property guide", "url": "/spain-retirement-property-foreign-buyers/"},
+        {"label": "Spanish Migration Ministry: non-lucrative residence", "url": "https://www.inclusion.gob.es/en/web/migraciones/w/autorizacion-inicial-de-residencia-temporal-no-lucrativa"},
+        {"label": "Spanish Government: end of property-linked investor residence", "url": "https://www.lamoncloa.gob.es/serviciosdeprensa/notasprensa/vivienda-agenda-urbana/Paginas/2025/020425-fin-golden-visa.aspx"},
+        {"label": "Spanish Tax Agency: tax residence", "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/residencia-personas-fisicas-juridicas/persona-fisica-residente-espana.html"},
+        {"label": "Spanish Tax Agency: non-resident property taxation", "url": "https://sede.agenciatributaria.gob.es/Sede/vivienda-otros-inmuebles/no-residentes-tributacion-inmuebles.html"},
+        {"label": "Spanish Property Registrars: buyer guidance", "url": "https://www.registradores.org/gl/documentacion-y-descargas/guias-rapidas"},
+        {"label": "Registradores: 2025 completed-market evidence", "url": "https://www.registradores.org/documents/33383/148210/ERI%2BAnuario%2B2025.pdf/f15ee835-3246-6132-11d0-6495dfeee415?t=1774598855046"},
+        {"label": "Balearic Government: tourism containment framework", "url": "https://www.caib.es/sites/contencioturistica/ca/contingut"},
+        {"label": "Balearic Official Gazette: Decree-Law 4/2025", "url": "https://caib.es/eboibfront/eli/es-ib/dl/2025/04/11/4/dof/cat/pdf"},
+        {"label": "Balearic Official Gazette: 2026 tourist-place resolution", "url": "https://www.caib.es/eboibfront/pdf/ca/2026/35/1215163"},
+        {"label": "Aena: Palma airport destinations", "url": "https://www.aena.es/en/palma-de-mallorca/airlines-and-destinations/airport-destinations.html"},
+        {"label": "Aena: Palma airport 2025 traffic", "url": "https://www.aena.es/es/prensa/el-aeropuerto-de-palma-de-mallorca-cierra-2025-con-338-millones-de---pasajeros.html"},
+        {"label": "IB-SALUT: Balearic public healthcare network", "url": "https://www.ibsalut.es/"},
+        {"label": "IB-SALUT: Son Espases hospital", "url": "https://www.ibsalut.es/es/servicio-de-salud/recursos-y-centros-sanitarios/centros-sanitarios/hospitales/hospital-universitari-son-espases"},
+        {"label": "Balearic Government: current drought indicators", "url": "https://www.caib.es/sites/aigua/es/index_de_sequera/"},
+        {"label": "Balearic Water Portal: official flood hazard and risk maps", "url": "https://www.caib.es/sites/aigua/ca/planos_inundacia/?tipo=alfa"},
+        {"label": "Balearic spatial service: official forest-fire risk map", "url": "https://ideib.caib.es/geoserveis/rest/services/public/GOIB_RiscIncendi_IB/MapServer"},
+        {"label": "Engel & Völkers: Platja de Palma asking observation", "url": "https://www.engelvoelkers.com/es/en/exposes/07d4ba7b-eafd-5b31-966e-5996db67c3c0"},
+        {"label": "Engel & Völkers: Sóller asking observation", "url": "https://www.engelvoelkers.com/es/en/exposes/b6504ee0-9fc7-5b26-801c-ae124e2a138e"},
+        {"label": "Mayer & Dau: Santanyí asking observation", "url": "https://mayer-dau.es/en/real-estate/detail/?estate=20089&objektnr=9230"},
+        {"label": "European Central Bank: euro reference rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("palma-year-round-life", "/assets/mallorca-palma-year-round-life.webp", "Mature residents walking through a shaded Palma neighbourhood near a market", "Palma's case rests on ordinary year-round city life, not only the waterfront.", "hero"),
+        DossierImage("tramuntana-access", "/assets/mallorca-tramuntana-access.webp", "Older residents walking on a steep stone street in Sóller beneath the Tramuntana", "Tramuntana character comes with gradients, access and maintenance decisions.", "wide"),
+        DossierImage("inland-water-daily-life", "/assets/mallorca-inland-water-daily-life.webp", "Residents carrying groceries along a shaded inland Mallorca street in summer", "Heat, water and ordinary errands reveal whether an inland address works year-round.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Mallorca through five destination lenses",
+    assessment_intro="Here’s how Mallorca scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current observations show the spread from a Platja de Palma apartment through a Sóller townhouse to a Santanyí coastal villa. They are asking evidence—not valuations. Local EUR is primary; USD uses the recorded dataset exchange basis.",
+    market_anchors_intro="These 2025 registered, completed-market averages are broad anchors—not asking prices or property valuations. Reconcile each candidate for municipality, property type, lawful area, condition, land, outlook and rights.",
+    orientation_groups=(
+        DossierOrientationGroup("Palma to the southwest", (("Palma", "Year-round city and hospital base"), ("Calvià / Santa Ponça", "Established southwest coast"), ("Port d'Andratx", "Premium western endpoint"))),
+        DossierOrientationGroup("Mountain, north and east", (("Sóller / Tramuntana", "Mountain access and character"), ("Pollença / Alcúdia", "Northern town and coast"), ("Manacor", "Eastern resident hub"), ("Santanyí", "Southeast village and coves"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current road, bus, ferry and flight timetables and the exact hospital, service and airport journey.",
+    country_guide_url="/countries/spain-property/",
+    country_guide_label="Spain property guide",
+    rail_comparison="Compare Mallorca with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -1990,6 +2133,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     CRETE_DOSSIER.destination_id: CRETE_DOSSIER,
     NISEKO_DOSSIER.destination_id: NISEKO_DOSSIER,
     ANNECY_DOSSIER.destination_id: ANNECY_DOSSIER,
+    MALLORCA_DOSSIER.destination_id: MALLORCA_DOSSIER,
 }
 
 
@@ -2065,3 +2209,4 @@ validate_premium_dossier(PARK_CITY_DEER_VALLEY_DOSSIER)
 validate_premium_dossier(CRETE_DOSSIER)
 validate_premium_dossier(NISEKO_DOSSIER)
 validate_premium_dossier(ANNECY_DOSSIER)
+validate_premium_dossier(MALLORCA_DOSSIER)
