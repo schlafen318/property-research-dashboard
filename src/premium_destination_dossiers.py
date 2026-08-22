@@ -400,9 +400,155 @@ ALGARVE_CASCAIS_DOSSIER = PremiumDossierSpec(
 )
 
 
+MADEIRA_DOSSIER = PremiumDossierSpec(
+    destination_id="madeira",
+    title="Madeira Retirement Property Dossier",
+    description="Assess Madeira retirement property through island access, daily life, healthcare, ownership, rental rules, hazards, value, resale, and current market evidence.",
+    h1="Madeira: year-round island life, with the exit kept in view",
+    lede=(
+        "Madeira combines a mild Atlantic climate, a functioning regional capital and exceptional landscape in a compact island market. Funchal can support an ordinary year-round life; Machico and the south coast offer smaller-town alternatives; Calheta trades services for sun, space and scenery. The proposition is credible, but geography controls it: flights, steep roads, specialist healthcare, site hazards and a narrower resale pool must be treated as part of the property—not footnotes to the view."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "Madeira is a strong retirement shortlist for a lifestyle-first buyer who wants Portugal’s ownership framework and a genuinely year-round island community, and who can accept the operating consequences of living in the Atlantic. The clearest version is a practical home in Funchal or another established south-coast town, within a tested journey of groceries, healthcare and the expressway. A buyer who speaks some Portuguese—or budgets for continuing local professional help—will find the administrative burden more manageable. The case does not require aggressive rent or guaranteed appreciation: daily utility is the primary return.",
+        "Pause or look elsewhere if the property is expected to create residence rights, if dependable mainland specialist healthcare is non-negotiable, if every important trip must work without a car, or if a short-stay licence and quick resale are needed to make the numbers work. Buying Portuguese property does not itself confer residence. Madeira Airport is the island’s main gateway, and weather can affect operations. SESARAM provides regional hospitals and health units, but an island buyer should confirm the exact specialist-care pathway, emergency transfer plan and private cover rather than infer mainland depth from a Funchal address.",
+        "Proceed in order. Confirm residence, tax and healthcare arrangements; choose the daily-life pattern before the property; test airport, hospital and grocery journeys from the exact address; reconcile title, licensed area, access, retaining structures and permitted use; overlay flood, wildfire and slope-risk evidence; then model five-year cost and resale without holiday income. Madeira rewards address-level discipline. The wrong purchase is not necessarily an ugly home—it is a beautiful one whose slope, access, care burden or future buyer pool was discovered after exchange."
+    ),
+    lenses_intro=(
+        "Madeira works differently at island, municipality and street level. These five paired lenses translate the Atlas model into the choices that determine whether an appealing visit becomes a durable home."
+    ),
+    lenses=(
+        DossierLens(
+            "Live on the island, not only in its scenery",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Funchal is the island’s most complete retirement base. The centre, São Martinho and the Lido corridor combine supermarkets, restaurants, seafront walking, buses, clinics and access to SESARAM’s hospital network. That density matters after the novelty of the landscape fades. A central apartment can reduce driving and simplify social life, but one steep block can change the real walkability of an apparently convenient address. Test gradients, shade, crossings, pavement condition, noise and the route home with shopping rather than relying on a flat map radius.",
+                "Machico offers a smaller, flatter town centre with beach, market and airport proximity, while Santa Cruz and Caniço sit in the east-to-Funchal corridor. Câmara de Lobos provides a working town west of the capital but varies sharply between lower neighbourhoods and hillside addresses. Calheta and Ponta do Sol deliver more sun, ocean views and space, yet many homes depend on winding roads and a car for routine errands. The north coast is greener and quieter, with stronger microclimate variation and a smaller everyday service base. These are different retirement systems, not cosmetic neighbourhood choices.",
+                "Healthcare needs a household-specific plan. SESARAM lists hospital and health-centre units across the region, but a directory does not establish appointment speed, language support, specialty availability or the circumstances in which care requires mainland Portugal. Ask the current insurer and a Madeira clinician how existing conditions, prescriptions, emergency transport and complex treatment would work. Then rehearse the trip from the candidate home to the relevant unit. A sunny hillside villa may remain delightful for years, but retirement fit falls quickly if one partner cannot drive or manage its stairs."
+            ),
+            "machico-life",
+        ),
+        DossierLens(
+            "Use the airport advantage without forgetting the island",
+            ("global_access", "foreigner_fit"),
+            (
+                "Cristiano Ronaldo Madeira International Airport in Santa Cruz is the island’s main external gateway. Official tourism guidance places Funchal roughly 20 to 25 minutes away by road and identifies buses, taxis, transfers and rental cars. Machico and Santa Cruz can shorten the last mile; Calheta and the west extend it. Direct European routes are useful, while Lisbon connections broaden the network. The buyer test is door to door: luggage, an early departure, a disrupted arrival and the cost of a taxi when a household car is unavailable.",
+                "Island access is structurally different from mainland access. There is no rail or road alternative when aviation is disrupted, and airport notices periodically warn that adverse weather may affect operations. Keep schedule flexibility for medical appointments and onward international connections, understand airline seasonality, and price a contingency night. Within Madeira, the expressway and tunnel system makes the south coast far more connected than the island’s scale and relief suggest, but local roads can still be steep, narrow and slow. A claimed twenty-minute journey should be driven from the actual gate at the times that matter.",
+                "Madeira is accustomed to international residents and tourism, especially in Funchal, Caniço, Ponta do Sol and Calheta. English can smooth property search and daily commerce, but the binding systems remain Portuguese: contracts, registry records, tax notices, condominium meetings, planning files and municipal decisions. Appoint an independent lawyer and tax adviser, verify translations, and retain a reliable local contact for notices and repairs. Foreigner friendliness means professional capacity exists; it does not mean the buyer can outsource judgment or treat an estate agent as independent counsel."
+            ),
+        ),
+        DossierLens(
+            "Own clearly, then inspect what holds the hillside up",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Portugal provides a legible route to acquire property, but ownership is separate from residence and tax status. Before a reservation or promissory contract becomes hard to unwind, reconcile the land-registry description, tax record, use licence, energy certificate, plans, boundaries, access rights and any extensions. Confirm who pays condominium debts and whether common-area works are planned. For a detached home, verify that pools, annexes, terraces, access roads and retaining walls are licensed and fall within the legal parcel. A sea view does not cure an area mismatch.",
+                "Madeira adds physical diligence that cannot be reduced to a standard survey. The Regional Civil Protection risk assessment covers flash floods, slope movements, wildfire and other hazards; it notes the recurring relationship between rapid flooding and mass movement on steep terrain. Obtain the current municipal planning and hazard layers for the exact coordinates, then have an engineer inspect drainage, cut slopes, retaining structures, rockfall exposure, foundations and vehicle access. Visit after heavy rain if possible and ask how the road, power, water and mobile signal performed in recent severe weather.",
+                "Short-stay operation is a separate permission question. Portugal’s Alojamento Local framework requires registration and allows municipal controls; condominium rules, planning status, insurance and later regulatory changes can narrow the answer. Do not pay for a claimed licence until counsel verifies the live registration, transfer consequences, permitted capacity and building position. Model long-term letting and no rent even when tourism looks strong. Regulatory safety on Madeira comes from matching the precise property, municipality and operating plan—not from the island’s popularity with visitors."
+            ),
+            "calheta-slope",
+        ),
+        DossierLens(
+            "Let resident demand support the case before tourism",
+            ("rental_profit", "capital_upside"),
+            (
+                "Funchal has the island’s broadest ordinary demand: regional government, healthcare, education, commerce and tourism employment create a resident economy beyond holiday arrivals. A practical apartment near services can therefore be tested first against a conventional tenancy and owner-occupier resale. Even there, condominium cost, parking, lift access, legal area and building condition affect net return. The completed-sale median for Funchal is an anchor for context, not evidence that a particular new-build or sea-view unit is correctly priced.",
+                "Tourism is economically important and less seasonal than many European islands, but booking demand is not the same as passive profit. Machico mixes airport access and town life; Calheta and Ponta do Sol can command lifestyle premiums but often add pool, garden, vehicle, cleaning, utility and local-management costs. DREM’s tourism releases show substantial year-round accommodation activity, yet they do not prove a particular home can legally operate or achieve a target occupancy. Separate gross revenue, operating margin and owner-use dates, then stress winter pricing and a regulatory interruption.",
+                "Capital upside should be attached to durable scarcity and a future buyer pool, not to a general island story. Funchal’s service depth and finite buildable land support selected central and Lido-area assets, but high entry prices can already capitalise that appeal. Câmara de Lobos, Santa Cruz and Machico may offer more practical tickets, while southwest villas compete on view, design and condition in a narrower international market. Infrastructure and tourism can support demand; neither guarantees that a singular house, difficult road or overbuilt apartment will resell at the buyer’s timetable."
+            ),
+        ),
+        DossierLens(
+            "Buy for the life you can use—and the buyer who comes next",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Official completed-sale evidence reveals a real hierarchy. DREM reported 2025 medians of 3,100 EUR/m² in Funchal, 2,500 in Santa Cruz and 2,484 in Câmara de Lobos, with premium Funchal parishes above the city figure. Those are municipal medians across transacted family dwellings, not valuations. The three listing observations below deliberately span a Funchal apartment, a Machico apartment and a Calheta house. They show asking dispersion and buyer cases; they do not establish fair value, availability or legal condition.",
+                "Value entry depends on use. A well-located older Funchal apartment may offer stronger service access and resale breadth than a larger hillside home, even if its euro per square metre is higher. Machico can provide a coherent smaller-town alternative when airport proximity and a flatter core matter. Calheta can deliver the landscape many buyers imagine, but a villa premium must compensate for car dependence, structural maintenance and a more specialised exit. Compare only against legally similar homes with comparable altitude, access, view, age and condition.",
+                "Protect liquidity before making the offer. Ask two agents who did not source the home to identify the likely future buyer, normal marketing period and completed evidence. Model sale costs, currency movement and a price reduction after five years. Confirm that an older owner could reach the entrance, parking and principal rooms; accessibility expands both personal utility and the future buyer pool. Madeira’s best property is not the most photographed one. It is the address whose daily function, all-in carrying cost and resale story remain understandable when the sea view is no longer new."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Madeira pairs a mild climate and dramatic landscape with real Funchal city life; Calheta and the north coast trade services for scenery and quiet.",
+        "global_access": "Madeira Airport offers useful European and Lisbon links, but every off-island journey depends on aviation and west-coast homes add a longer road leg.",
+        "ownership_clarity": "Madeira follows Portugal’s clear purchase process, while hillside homes still require exact reconciliation of title, licensed areas, access, pools and retaining structures.",
+        "regulatory_safety": "Madeira buyers must verify municipal short-stay rules and address-level wildfire, flash-flood and slope risk; a national framework does not settle the property answer.",
+        "rental_profit": "Funchal has the broadest resident demand; Machico and Calheta can attract visitors, but management, licence, seasonality and property-care costs reduce headline revenue.",
+        "capital_upside": "Madeira’s limited land and year-round appeal support selected assets, though Funchal premiums and specialised Calheta villas already price in much of the story.",
+        "retirement_fit": "Funchal offers Madeira’s strongest healthcare and service base; steep streets, driving dependence and possible mainland specialist care weaken remote hillside choices.",
+        "exit_liquidity": "Funchal apartments reach Madeira’s broadest buyer pool, while singular Calheta villas and remote north-coast homes can require more time and price flexibility.",
+        "foreigner_fit": "Madeira has experienced international services, especially around Funchal and Calheta, but contracts, tax, planning, condominium and municipal work remain Portuguese-led.",
+        "value_entry": "Funchal, Machico and Câmara de Lobos offer different practical tickets; Madeira’s lowest prices often carry more slope, access, condition or resale risk.",
+    },
+    market_anchors=(
+        {"location": "Funchal", "evidence": "3,100 EUR/m²", "buyer_read": "Median completed sale value for family dwellings in the 12 months to Q4 2025; a municipal anchor, not a valuation for an individual home.", "source_label": "DREM: local house prices, Q4 2025", "source_url": "https://estatistica.madeira.gov.pt/en/download-now-3/economic/const-hab-gb/house-prices-at-local-level/press-release-house-prices/5726-24-04-2026-for-the-4th-quarter-of-2025-drem-publishes-information-on-the-median-price-of-family-dwellings-in-the-autonomous-region-of-madeira.html"},
+        {"location": "Santa Cruz", "evidence": "2,500 EUR/m²", "buyer_read": "Median completed sale value for family dwellings in the 12 months to Q4 2025, covering the airport-side municipality and its varied parishes.", "source_label": "DREM: local house prices, Q4 2025", "source_url": "https://estatistica.madeira.gov.pt/en/download-now-3/economic/const-hab-gb/house-prices-at-local-level/press-release-house-prices/5726-24-04-2026-for-the-4th-quarter-of-2025-drem-publishes-information-on-the-median-price-of-family-dwellings-in-the-autonomous-region-of-madeira.html"},
+        {"location": "Câmara de Lobos", "evidence": "2,484 EUR/m²", "buyer_read": "Median completed sale value for family dwellings in the 12 months to Q4 2025; lower and hillside addresses should not be treated as one product.", "source_label": "DREM: local house prices, Q4 2025", "source_url": "https://estatistica.madeira.gov.pt/en/download-now-3/economic/const-hab-gb/house-prices-at-local-level/press-release-house-prices/5726-24-04-2026-for-the-4th-quarter-of-2025-drem-publishes-information-on-the-median-price-of-family-dwellings-in-the-autonomous-region-of-madeira.html"},
+    ),
+    micro_locations_intro=(
+        "The useful map is organised by daily systems rather than views. Funchal is the service centre; the east controls airport proximity; the lower west remains connected to the capital; the southwest trades convenience for climate and scenery. These are orientation zones, not price boundaries. Confirm parish, altitude, gradient, road width, planning status, hazard layers and real journey time for every address. Visit at different times of day, park the car, and complete the last part on foot. On Madeira, a short vertical distance can separate a walkable town home from a car-dependent hillside one. Ask where residents buy groceries, which health unit they use, how waste is collected, and whether delivery and emergency vehicles can reach the entrance without difficulty."
+    ),
+    micro_locations=(
+        {"name": "Funchal / Lido", "best_for": "Service-rich retirement", "daily_life": "Most urban and least car-dependent", "diligence": "Gradient, building, price and noise"},
+        {"name": "Santa Cruz / Machico", "best_for": "Airport and smaller-town life", "daily_life": "East-coast access with local centres", "diligence": "Aircraft, wind, road and service depth"},
+        {"name": "Câmara de Lobos", "best_for": "Funchal-adjacent value", "daily_life": "Working town with steep variation", "diligence": "Altitude, access, drainage and legal area"},
+        {"name": "Ponta do Sol / Calheta", "best_for": "Sun and landscape", "daily_life": "Car-led southwest lifestyle", "diligence": "Slope, structures, management and exit"},
+    ),
+    checklist=(
+        "Confirm residence, tax, healthcare and insurance arrangements independently of the property purchase.",
+        "Choose a daily-life zone before viewing homes; do not compare Funchal and Calheta as interchangeable inventory.",
+        "Drive the airport, hospital, grocery and social routes from the exact gate in ordinary and adverse conditions.",
+        "Reconcile registry, tax record, use licence, plans, boundaries, access, pools, annexes and condominium records.",
+        "Commission building and engineering review of drainage, slopes, retaining walls, rockfall exposure and vehicle access.",
+        "Confirm live Alojamento Local permission, municipal position, condominium rules and insurance before pricing tourist rent.",
+        "Compare current asking evidence with completed sales of the same legal type, altitude, condition and micro-location.",
+        "Model five-year ownership and a conservative resale, then identify the likely next buyer before exchange.",
+    ),
+    references_intro=(
+        "Legal, tax, residence, health, access, market and hazard claims were reviewed on 22 August 2026 against the primary sources below. The next scheduled review is 22 February 2027, or sooner if a cited law, municipal rule, tax table, transport service, hazard map, healthcare arrangement or statistics release changes. Recheck the live source and obtain independent Portuguese legal, tax, immigration, engineering and insurance advice for the exact buyer and property before signing. Listing observations are dated asking evidence only and do not verify availability, title, condition, permitted use or completed value."
+    ),
+    references=(
+        {"label": "Portugal government: buying and selling property", "url": "https://www.gov.pt/guias/compra-e-venda-de-imoveis-em-portugal-cidadaos-europeus"},
+        {"label": "Portuguese Tax Authority: taxes on buying a home", "url": "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Compra_da_casa/Paginas/default.aspx"},
+        {"label": "Portuguese Tax Authority: annual IMI and AIMI", "url": "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Imposto_anual/Paginas/default.aspx"},
+        {"label": "AIMA: current residence-by-investment routes", "url": "https://aima.gov.pt/pt/viver/autorizacao-de-residencia-para-investimento-art-90-o-a"},
+        {"label": "AIMA: residence documentation and proof of accommodation", "url": "https://aima.gov.pt/pt/decreto-regulamentar-da-lei-de-estrangeiros-alteracoes/perguntas-frequentes"},
+        {"label": "Health Regulatory Authority: foreign residents and the National Health Service", "url": "https://www.ers.pt/pt/utentes/perguntas-frequentes/faq/acesso-de-cidadaos-estrangeiros-a-prestacao-de-cuidados-de-saude-no-servico-nacional-de-saude/"},
+        {"label": "SESARAM: Madeira hospital units", "url": "https://www.sesaram.pt/portal/o-sesaram/o-sesaram/as-nossas-unidades/hospitais"},
+        {"label": "Portugal government: Alojamento Local registration and municipal control", "url": "https://www.gov.pt/guias/alojamento-local"},
+        {"label": "DREM: Madeira local house prices, Q4 2025", "url": "https://estatistica.madeira.gov.pt/en/download-now-3/economic/const-hab-gb/house-prices-at-local-level/press-release-house-prices/5726-24-04-2026-for-the-4th-quarter-of-2025-drem-publishes-information-on-the-median-price-of-family-dwellings-in-the-autonomous-region-of-madeira.html"},
+        {"label": "DREM: Madeira tourism, Q2 2026", "url": "https://estatistica.madeira.gov.pt/download-now/economica/turismo-pt/turismo-noticias-pt/75-noticias/turismo/5943-14-08-2026-no-2-trimestre-de-2026-as-dormidas-dos-residentes-nacionais-no-alojamento-turistico-da-ram-aumentaram-12-3-em-termos-homologos.html"},
+        {"label": "Madeira Tourism Board: how to reach the island", "url": "https://visitmadeira.com/en/travel-info/how-to-get-here/"},
+        {"label": "Madeira Tourism Board: island transport", "url": "https://visitmadeira.com/en/travel-info/how-to-move-around/"},
+        {"label": "Madeira Regional Civil Protection: regional risk assessment", "url": "https://www.procivmadeira.pt/images/prevencao_preparacao/Corpo%20ARRAM_2023.pdf"},
+        {"label": "Madeira Regional Civil Protection: current public warnings", "url": "https://procivmadeira.pt/pt/"},
+        {"label": "European Central Bank: euro reference exchange rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("funchal-hero", "/assets/madeira-funchal-hero.webp", "Funchal neighbourhoods descending toward the harbour", "Funchal is Madeira’s deepest year-round service base—and its broadest resale market.", "hero"),
+        DossierImage("machico-life", "/assets/madeira-machico-daily-life.webp", "Residents on a shaded street in central Machico", "Machico offers a smaller-town daily rhythm close to Madeira Airport.", "wide"),
+        DossierImage("calheta-slope", "/assets/madeira-calheta-slope.webp", "Homes and terraced fields on the steep coast near Calheta", "On the southwest coast, the landscape and the access diligence are the same proposition.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Madeira through five destination lenses",
+    assessment_intro="Here’s how Madeira scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show distinct buyer cases in Funchal, Machico and Calheta. EUR is primary; USD uses the recorded ECB reference basis for comparison only.",
+    market_anchors_intro="These figures are official municipal completed-sale evidence—not asking prices or valuations for the listings above. Match each candidate for parish, altitude, legal area, property type, age, condition and access.",
+    orientation_groups=(
+        DossierOrientationGroup("Airport and urban spine", (("Madeira Airport", "Island gateway"), ("Santa Cruz / Machico", "East-coast towns"), ("Funchal / Lido", "Service centre"))),
+        DossierOrientationGroup("West from Funchal", (("Câmara de Lobos", "Connected working town"), ("Ponta do Sol", "Southwest transition"), ("Calheta", "Car-led lifestyle coast"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. The expressway connects the south coast, but altitude, local roads and weather can change actual journey time sharply.",
+    country_guide_url="/countries/portugal-property/",
+    country_guide_label="Portugal property guide",
+    rail_comparison="Compare Madeira with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
+    MADEIRA_DOSSIER.destination_id: MADEIRA_DOSSIER,
 }
 
 
@@ -468,3 +614,4 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
 
 validate_premium_dossier(FUKUOKA_ITOSHIMA_DOSSIER)
 validate_premium_dossier(ALGARVE_CASCAIS_DOSSIER)
+validate_premium_dossier(MADEIRA_DOSSIER)
