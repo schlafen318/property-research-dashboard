@@ -44,7 +44,7 @@ class SpainRetirementArticleTests(unittest.TestCase):
 
     def test_primary_comparison_contains_four_distinct_spain_destinations(self) -> None:
         self.assertEqual(
-            ["valencia", "m-laga-costa-del-sol", "costa-brava-girona", "mallorca"],
+            ["valencia", "malaga-costa-del-sol", "costa-brava-girona", "mallorca"],
             spain_page()["destination_ids"],
         )
 
