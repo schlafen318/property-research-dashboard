@@ -215,6 +215,16 @@ COUNTRY_HUBS = [
         "guide_slugs": ["buying-property-abroad-for-retirement", "best-places-to-buy-property-in-europe", "where-can-foreigners-buy-property", "foreign-property-investment-risks"],
     },
     {
+        "slug": "new-zealand-property",
+        "country": "New Zealand",
+        "title": "New Zealand Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Assess New Zealand property for foreign buyers through Queenstown, including overseas-buyer eligibility, residence, sensitive land, visitor accommodation, alpine hazards, healthcare, access, and resale depth.",
+        "h1": "New Zealand Property Guide for Foreign Buyers",
+        "thesis": "New Zealand offers strong institutions, safety and exceptional outdoor living, but overseas-buyer eligibility is a controlling constraint rather than a closing detail. The strongest cases establish the buyer's legal pathway first, then reconcile residence, sensitive land, local planning, hazards, healthcare, daily access and the future eligible buyer pool.",
+        "destination_ids": ["queenstown"],
+        "guide_slugs": ["buying-property-abroad-for-retirement", "where-can-foreigners-buy-property", "foreign-property-investment-risks", "best-places-to-buy-a-second-home-abroad"],
+    },
+    {
         "slug": "italy-property",
         "country": "Italy",
         "title": "Italy Property Guide for Foreign Buyers | Global Home Atlas",

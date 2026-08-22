@@ -6,10 +6,11 @@ from pathlib import Path
 from src.premium_destination_dossiers import DECISION_DIMENSION_KEYS, PREMIUM_DESTINATION_DOSSIERS, get_premium_dossier, validate_premium_dossier
 
 ROOT = Path(__file__).parents[1]
-DESTINATION_ID = "croatia-istria-dalmatia"
+DESTINATION_ID = "queenstown"
+FX = 1.1699 / 1.9541
 
 
-class CroatiaDossierContractTests(unittest.TestCase):
+class QueenstownDossierContractTests(unittest.TestCase):
     def setUp(self):
         self.spec = get_premium_dossier(DESTINATION_ID)
 
@@ -27,9 +28,10 @@ class CroatiaDossierContractTests(unittest.TestCase):
     def test_copy_is_locally_specific_and_decision_grade(self):
         prose = " ".join([self.spec.lede, *self.spec.verdict_paragraphs, self.spec.lenses_intro,
                           *(p for lens in self.spec.lenses for p in lens.paragraphs), self.spec.micro_locations_intro])
-        for term in ("Split", "Trogir", "Kaštela", "Rovinj", "Pula", "Poreč", "Hvar", "Brač"):
-            with self.subTest(term=term): self.assertIn(term, prose)
-        for pattern in (r"airport|flight|ferry|island", r"tourist|categoris|rental", r"flood|fire|heat|water", r"hospital|health|emergency", r"resale|exit|season|operator"):
+        for term in ("Frankton", "Queenstown Hill", "Fernhill", "Arrowtown", "Lake Hayes", "Jacks Point"):
+            with self.subTest(term=term):
+                self.assertIn(term, prose)
+        for pattern in (r"overseas|consent|residence", r"visitor accommodation|short.?stay|rental", r"flood|landslide|rockfall|fire", r"hospital|health|emergency", r"resale|exit|buyer pool"):
             self.assertRegex(prose.lower(), pattern)
         words = re.findall(r"\b[\w’'-]+\b", prose)
         self.assertGreaterEqual(len(words), 1800)
@@ -37,64 +39,69 @@ class CroatiaDossierContractTests(unittest.TestCase):
 
     def test_current_sources_cover_high_stakes_and_local_categories(self):
         urls = " ".join(x["url"] for x in self.spec.references)
-        for fragment in ("mup.gov.hr", "gov.hr", "uredjenazemlja.hr", "portal-ispu.gov.hr", "mint.gov.hr", "hzzo.hr", "voda.hr", "hvz.gov.hr", "split-airport.hr", "mpgi.gov.hr"):
-            with self.subTest(fragment=fragment): self.assertIn(fragment, urls)
+        for fragment in ("linz.govt.nz", "immigration.govt.nz", "qldc.govt.nz", "healthnz.govt.nz", "orc.govt.nz", "nzta.govt.nz", "queenstownairport.co.nz", "qv.co.nz", "ird.govt.nz", "settled.govt.nz"):
+            with self.subTest(fragment=fragment):
+                self.assertIn(fragment, urls)
         self.assertEqual("2026-08-22", self.spec.date_reviewed)
         self.assertIn("22 February 2027", self.spec.references_intro)
-        self.assertIn("3,881,186", " ".join(p for lens in self.spec.lenses for p in lens.paragraphs))
 
-    def test_evidence_ledger_records_scope_limits_and_recheck_triggers(self):
-        ledger = (ROOT / "docs/research/croatia-istria-dalmatia-evidence-ledger.md").read_text()
+    def test_evidence_ledger_is_direct_and_maintainable(self):
+        ledger = (ROOT / "docs/research/queenstown-evidence-ledger.md").read_text()
         for heading in ("Claim or topic", "Source owner", "Direct URL", "Source date / status", "Reviewed", "Scope", "Limitation", "Recheck trigger"):
             self.assertIn(heading, ledger)
         self.assertGreaterEqual(ledger.count("2026-08-22"), 14)
         self.assertGreaterEqual(ledger.count("https://"), 18)
-        for trigger in ("residence", "tax", "planning", "listing", "transport", "hazard", "market data"):
+        for trigger in ("ownership", "residence", "tax", "planning", "listing", "transport", "hazard", "market data"):
             self.assertIn(trigger, ledger.lower())
 
-    def test_three_market_anchors_are_bounded_completed_evidence(self):
+    def test_market_anchors_are_explicit_rating_values(self):
         evidence = " ".join(" ".join(str(v) for v in x.values()) for x in self.spec.market_anchors)
-        for value in ("€2,743/m²", "€4,068/m²", "€3,921/m²"): self.assertIn(value, evidence)
-        self.assertRegex(evidence.lower(), r"transaction|completed|median")
-        self.assertIn("2025", evidence)
+        for value in ("NZ$1,711,114", "NZ$2,171,809", "NZ$3,025,016"):
+            self.assertIn(value, evidence)
+        self.assertRegex(evidence.lower(), r"rating|capital value|not a valuation")
+        self.assertIn("2024", evidence)
 
-    def test_atlas_reads_are_concise_and_locally_specific(self):
+    def test_atlas_reads_are_concise_and_local(self):
         self.assertEqual(DECISION_DIMENSION_KEYS, set(self.spec.score_reads))
         for key, read in self.spec.score_reads.items():
             with self.subTest(key=key):
                 self.assertGreaterEqual(len(read.split()), 12)
                 self.assertLessEqual(len(read.split()), 36)
-                self.assertRegex(read, r"Croatia|Split|Trogir|Kaštela|Rovinj|Pula|Poreč|Hvar|Brač|Istria|Dalmatia")
+                self.assertRegex(read, r"Queenstown|Frankton|Arrowtown|Jacks Point|Fernhill|Lake Hayes|Wakatipu")
 
 
-class CroatiaListingTests(unittest.TestCase):
-    def test_three_current_direct_eur_observations_are_complete(self):
+class QueenstownListingTests(unittest.TestCase):
+    def test_three_current_direct_nzd_observations_are_complete(self):
         rows = [x for x in json.loads((ROOT / "data/listings.json").read_text()) if x["destination_id"] == DESTINATION_ID]
         self.assertEqual(3, len(rows))
-        self.assertEqual({"Rovinjsko Selo one-bedroom apartment", "Split prime apartment", "Hvar pool villa"}, {x["listing_name"] for x in rows})
+        self.assertEqual({"Frankton Road lakefront apartment", "Hanley's Farm home and income", "Queenstown Hill new-build house"}, {x["listing_name"] for x in rows})
         self.assertEqual({
-            "https://www.opereta.hr/en/real-estate/apartment/121643-sale-apartment-2-room-istarska-zupanija-rovinjsko-selo",
-            "https://www.croatiapropertysales.com/hr/hrvatska-split-apartman-na-prodaju-5802/",
-            "https://www.croatiapropertysales.com/croatia-hvar-villa-for-sale-5399/",
+            "https://www.realestate.co.nz/43093321/residential/sale/unit-606-327-frankton-road-queenstown-central?lid=jyzkx2cbid2g",
+            "https://www.listed.co.nz/property/5200",
+            "https://www.realestate.co.nz/43060560/residential/sale/79-middleton-road-queenstown-hill",
         }, {x["source_url"] for x in rows})
         for row in rows:
-            self.assertEqual("EUR", row["local_currency"])
+            self.assertEqual("NZD", row["local_currency"])
             self.assertEqual("2026-08-22", row["captured_date"])
-            self.assertIn("1 EUR = 1.1699 USD", row["fx_basis"])
-            self.assertIn("living", row["area_basis"].lower())
-            self.assertAlmostEqual(row["local_price"] * 1.1699, row["usd_price"], places=2)
+            self.assertIn("1 EUR = 1.1699 USD and 1 EUR = 1.9541 NZD", row["fx_basis"])
+            self.assertIn("floor area", row["area_basis"].lower())
+            self.assertAlmostEqual(row["local_price"] * FX, row["usd_price"], places=2)
             self.assertAlmostEqual(row["usd_price"] / row["size_m2"], row["usd_per_m2"], places=2)
-        self.assertEqual({58.32, 79, 170}, {row["size_m2"] for row in rows})
+        self.assertEqual({68, 237, 322}, {row["size_m2"] for row in rows})
 
-    def test_shared_price_basis_uses_current_completed_evidence(self):
+    def test_shared_price_basis_is_transparent_and_current(self):
         destination = next(x for x in json.loads((ROOT / "data/destinations.json").read_text()) if x["id"] == DESTINATION_ID)
-        self.assertEqual(3900.0, destination["usd_per_m2"])
-        self.assertEqual("$3,900", destination["quick_metrics"]["usd_m"])
-        for text in ("€3,333/m²", "completed", "2025", "1.1699"):
+        self.assertEqual(6500.0, destination["usd_per_m2"])
+        self.assertEqual("$6,500", destination["quick_metrics"]["usd_m"])
+        for text in ("NZ$1,941,732", "QV", "asking observations", "0.59869"):
             self.assertIn(text, destination["price_basis"])
+        retirement = next(x for x in json.loads((ROOT / "data/retirement_costs.json").read_text())["destinations"] if x["destination_id"] == DESTINATION_ID)
+        self.assertAlmostEqual(FX, retirement["fx_to_usd"], places=12)
+        self.assertEqual(1065668, retirement["property"]["representative_price_usd"])
+        self.assertIn("asking observations", retirement["property"]["price_basis"])
 
 
-class CroatiaRenderingTests(unittest.TestCase):
+class QueenstownRenderingTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         from src.build_unified_app import build_destination_page, consolidate_destination
@@ -103,29 +110,28 @@ class CroatiaRenderingTests(unittest.TestCase):
         enriched = [consolidate_destination(x) for x in destinations]
         cls.html = build_destination_page(next(x for x in enriched if x["id"] == DESTINATION_ID), listings, enriched, [])
 
-    def test_page_uses_the_premium_sequence_and_local_copy(self):
+    def test_page_uses_premium_sequence_and_new_zealand_handoff(self):
         self.assertIn('<body class="premium-dossier">', self.html)
         positions = [self.html.index(f'id="{x}"') for x in ("verdict", "lenses", "scores", "listings", "locations", "checklist", "sources")]
         self.assertEqual(sorted(positions), positions)
-        for text in ("Croatia through five destination lenses", "Here’s how Croatia scores", "Compare Croatia with the full Atlas.", "/countries/croatia-property/", "/retirement-abroad-calculator/"):
+        for text in ("Queenstown through five destination lenses", "Here’s how Queenstown scores", "Compare Queenstown with the full Atlas.", "/countries/new-zealand-property/", "/retirement-abroad-calculator/"):
             self.assertIn(text, self.html)
 
-    def test_country_handoff_points_to_a_rendered_croatia_hub(self):
+    def test_country_handoff_is_bidirectional(self):
         from src.build_unified_app import COUNTRY_HUBS, build_country_comparison_page, build_country_hub_page
-
-        hub = next(item for item in COUNTRY_HUBS if item["slug"] == "croatia-property")
-        self.assertEqual("Croatia", hub["country"])
+        hub = next(item for item in COUNTRY_HUBS if item["slug"] == "new-zealand-property")
+        self.assertEqual("New Zealand", hub["country"])
         self.assertIn(DESTINATION_ID, hub["destination_ids"])
-        destinations = json.loads((ROOT / "data" / "destinations.json").read_text())
+        destinations = json.loads((ROOT / "data/destinations.json").read_text())
         html = build_country_hub_page(hub, destinations, [])
-        self.assertIn("Croatia Property Guide for Foreign Buyers", html)
+        self.assertIn("New Zealand Property Guide for Foreign Buyers", html)
         self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
         comparison = build_country_comparison_page(destinations, [])
-        self.assertIn('<span>1 destination</span>\n              <h3><a href="/countries/croatia-property/">Croatia</a></h3>', comparison)
+        self.assertIn('<span>1 destination</span>\n              <h3><a href="/countries/new-zealand-property/">New Zealand</a></h3>', comparison)
 
     def test_images_tables_and_orientation_are_complete(self):
         spec = get_premium_dossier(DESTINATION_ID)
-        self.assertEqual(3, self.html.count('src="/assets/croatia-'))
+        self.assertEqual(3, self.html.count('src="/assets/queenstown-'))
         for image in spec.images:
             self.assertEqual(1, self.html.count(f'src="{image.src}"'))
             self.assertIn(f'alt="{image.alt}"', self.html)
@@ -136,11 +142,11 @@ class CroatiaRenderingTests(unittest.TestCase):
         self.assertIn("<th>Atlas read</th>", self.html)
         self.assertIn("<th>Area / basis</th>", self.html)
 
-    def test_quality_review_uses_canonical_scorecard_and_named_approval(self):
-        review = (ROOT / "docs/research/croatia-istria-dalmatia-quality-review.md").read_text()
+    def test_quality_review_uses_canonical_scorecard_fields(self):
+        review = (ROOT / "docs/research/queenstown-quality-review.md").read_text()
         for weight in ("| Decision usefulness | 15 |", "| Evidence and accuracy | 25 |", "| Atlas model integrity | 15 |", "| Property and location evidence | 15 |", "| Editorial quality | 10 |", "| Design, mobile, and accessibility | 10 |", "| SEO and trust | 5 |", "| Build and maintenance | 5 |"):
             self.assertIn(weight, review)
-        for field in ("Reviewer:", "Approval date:", "Console warnings:"):
+        for field in ("Reviewer:", "Approval date:", "Console warnings: 0"):
             self.assertIn(field, review)
 
 
