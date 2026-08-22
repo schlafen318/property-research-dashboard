@@ -1278,10 +1278,10 @@
     "country": "Spain",
     "category": "Water",
     "overall_score": 3.84,
-    "usd_per_m2": 6100.0,
+    "usd_per_m2": 4800.0,
     "net_yield_estimate": "2.5–4% est. net",
     "quick_metrics": {
-      "usd_m": "$6,100",
+      "usd_m": "$4,800",
       "net_yield": "2.5–4% est. net",
       "ownership": "4.3/5",
       "friendly": "3.2/5"
@@ -1381,8 +1381,8 @@
       "adr_occupancy": "N/A / N/A",
       "confidence": "Medium for residential yield; low-medium for STR yield"
     },
-    "price_basis": "Built-property benchmark. 2026 Mallorca references show houses around €4,704/m² and apartments around €5,384/m²; Balearic second-hand data around €5,300/m². Converted at 1 EUR = 1.14784 USD; rounded dashboard figure ~$6,100/m².",
-    "price_confidence": "Medium-high; island average, prime coastal/licensed villas can be much higher",
+    "price_basis": "Completed-property benchmark. Registradores reports €4,086/m² for 2025 completed registrations across all Palma homes. Converted at 1 EUR = 1.1699 USD (ECB reference rate, 2026-08-21) and rounded to ~$4,800/m². This is a city-wide planning anchor, not a Mallorca, district or property valuation.",
+    "price_confidence": "High for the cited 2025 Palma completed-registration average; low for transfer to another municipality, property type or exact address",
     "profit_driver": "European wealth, lifestyle/retirement demand, sailing, beaches, food, long season."
   },
   {

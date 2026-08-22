@@ -44,16 +44,18 @@ class MallorcaDossierContractTests(unittest.TestCase):
 
     def test_current_sources_cover_high_stakes_and_local_categories(self):
         urls = " ".join(x["url"] for x in self.spec.references)
-        for fragment in ("inclusion.gob.es", "agenciatributaria.gob.es", "registradores.org", "caib.es", "aena.es", "ibsalut.es"):
+        for fragment in ("inclusion.gob.es", "agenciatributaria.gob.es", "registradores.org", "caib.es", "aena.es", "ibsalut.es", "planos_inundacia", "GOIB_RiscIncendi"):
             with self.subTest(fragment=fragment): self.assertIn(fragment, urls)
         self.assertEqual("2026-08-22", self.spec.date_reviewed)
         self.assertIn("22 February 2027", self.spec.references_intro)
+        self.assertIn("195 destinations", " ".join(p for lens in self.spec.lenses for p in lens.paragraphs))
 
     def test_evidence_ledger_records_scope_limits_and_recheck_triggers(self):
         ledger = (ROOT / "docs/research/mallorca-evidence-ledger.md").read_text()
-        for heading in ("Claim or topic", "Source owner", "Source date / status", "Reviewed", "Scope", "Limitation", "Recheck trigger"):
+        for heading in ("Claim or topic", "Source owner", "Direct URL", "Source date / status", "Reviewed", "Scope", "Limitation", "Recheck trigger"):
             self.assertIn(heading, ledger)
         self.assertGreaterEqual(ledger.count("2026-08-22"), 12)
+        self.assertGreaterEqual(ledger.count("https://"), 17)
         for trigger in ("tax", "planning", "listing", "transport", "hazard", "market data"):
             self.assertIn(trigger, ledger.lower())
 
@@ -86,8 +88,17 @@ class MallorcaListingTests(unittest.TestCase):
             self.assertEqual("EUR", row["local_currency"])
             self.assertEqual("2026-08-22", row["captured_date"])
             self.assertIn("1 EUR = 1.1699 USD", row["fx_basis"])
+            self.assertIn("internal", row["area_basis"].lower())
             self.assertAlmostEqual(row["local_price"] * 1.1699, row["usd_price"], places=2)
             self.assertAlmostEqual(row["usd_price"] / row["size_m2"], row["usd_per_m2"], places=2)
+        self.assertEqual({74, 161, 259}, {row["size_m2"] for row in rows})
+
+    def test_shared_price_basis_uses_current_completed_evidence(self):
+        destination = next(x for x in json.loads((ROOT / "data/destinations.json").read_text()) if x["id"] == DESTINATION_ID)
+        self.assertEqual(4800.0, destination["usd_per_m2"])
+        self.assertEqual("$4,800", destination["quick_metrics"]["usd_m"])
+        for text in ("€4,086/m²", "completed", "2025", "1.1699"):
+            self.assertIn(text, destination["price_basis"])
 
 
 class MallorcaRenderingTests(unittest.TestCase):
@@ -117,10 +128,19 @@ class MallorcaRenderingTests(unittest.TestCase):
             self.assertEqual(count, self.html.count(marker))
         self.assertIn("asking evidence—not valuations", self.html)
         self.assertIn("<th>Atlas read</th>", self.html)
+        self.assertIn("<th>Area / basis</th>", self.html)
+        self.assertEqual(3, self.html.count('class="premium-area-basis"'))
 
     def test_long_names_cannot_force_mobile_horizontal_overflow(self):
         for css in (".premium-hero-copy { min-width: 0;", "grid-template-columns: minmax(0, 1fr)", "overflow-wrap: anywhere"):
             self.assertIn(css, self.html)
+
+    def test_quality_review_uses_canonical_scorecard_and_named_approval(self):
+        review = (ROOT / "docs/research/mallorca-quality-review.md").read_text()
+        for weight in ("| Decision usefulness | 15 | 15 |", "| Evidence and accuracy | 25 | 25 |", "| Atlas model integrity | 15 | 15 |", "| Property and location evidence | 15 | 15 |", "| Editorial quality | 10 | 10 |", "| Design, mobile, and accessibility | 10 | 10 |", "| SEO and trust | 5 | 5 |", "| Build and maintenance | 5 | 5 |"):
+            self.assertIn(weight, review)
+        for field in ("Reviewer:", "Approval date:", "Console warnings: 0"):
+            self.assertIn(field, review)
 
 
 if __name__ == "__main__":
