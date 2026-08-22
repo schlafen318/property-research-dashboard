@@ -111,7 +111,7 @@ class CroatiaRenderingTests(unittest.TestCase):
             self.assertIn(text, self.html)
 
     def test_country_handoff_points_to_a_rendered_croatia_hub(self):
-        from src.build_unified_app import COUNTRY_HUBS, build_country_hub_page
+        from src.build_unified_app import COUNTRY_HUBS, build_country_comparison_page, build_country_hub_page
 
         hub = next(item for item in COUNTRY_HUBS if item["slug"] == "croatia-property")
         self.assertEqual("Croatia", hub["country"])
@@ -120,6 +120,8 @@ class CroatiaRenderingTests(unittest.TestCase):
         html = build_country_hub_page(hub, destinations, [])
         self.assertIn("Croatia Property Guide for Foreign Buyers", html)
         self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
+        comparison = build_country_comparison_page(destinations, [])
+        self.assertIn('<span>1 destination</span>\n              <h3><a href="/countries/croatia-property/">Croatia</a></h3>', comparison)
 
     def test_images_tables_and_orientation_are_complete(self):
         spec = get_premium_dossier(DESTINATION_ID)

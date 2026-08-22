@@ -2677,6 +2677,7 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
     cards = []
     for hub in COUNTRY_HUBS:
         metrics = country_summary_metrics(hub, destinations)
+        destination_label = "destination" if metrics["count"] == 1 else "destinations"
         rows.append(
             f"""
             <tr>
@@ -2694,7 +2695,7 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
         cards.append(
             f"""
             <article class="page-card">
-              <span>{metrics["count"]} destinations</span>
+              <span>{metrics["count"]} {destination_label}</span>
               <h3><a href="/countries/{escape(hub["slug"])}/">{escape(hub["country"])}</a></h3>
               <p>{escape(hub["description"])}</p>
               <p><strong>{metrics["score"]:.1f}/5</strong> average decision score · <strong>{metrics["ownership"]:.1f}/5</strong> ownership clarity</p>
