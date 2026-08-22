@@ -7170,7 +7170,7 @@ def premium_dossier_lenses_html(spec: PremiumDossierSpec) -> str:
         sections.append(f'<div class="premium-lens"><h3>{escape(lens.heading)}</h3>{paragraphs}{figure}</div>')
     return (
         '<section class="premium-section" id="lenses">'
-        '<h2>Fukuoka / Itoshima through five destination lenses</h2>'
+        f'<h2>{escape(spec.lenses_heading)}</h2>'
         f'<p>{escape(spec.lenses_intro)}</p>{"".join(sections)}</section>'
     )
 
@@ -7185,19 +7185,24 @@ def premium_dossier_micro_locations_html(spec: PremiumDossierSpec) -> str:
         "</tr>"
         for item in spec.micro_locations
     )
-    stops = "".join(
-        '<li class="premium-location-stop">'
-        f'<strong>{escape(item["name"])}</strong><span>{escape(item["daily_life"])}</span>'
-        '</li>'
-        for item in spec.micro_locations
-    )
+    groups = []
+    for group in spec.orientation_groups:
+        stops = "".join(
+            '<li class="premium-location-stop">'
+            f'<strong>{escape(name)}</strong><span>{escape(note)}</span>'
+            '</li>'
+            for name, note in group.stops
+        )
+        groups.append(
+            '<div class="premium-orientation-group">'
+            f'<h3>{escape(group.label)}</h3><ol>{stops}</ol></div>'
+        )
     return (
         '<section class="premium-section" id="locations"><h2>Where to look</h2>'
         f'<p>{escape(spec.micro_locations_intro)}</p>'
         '<figure class="premium-location-orientation" aria-labelledby="location-orientation-caption">'
-        '<div class="premium-location-route"><span>Subway and JR westbound</span><span>Local bus or car beyond the rail spine</span></div>'
-        f'<ol>{stops}</ol>'
-        '<figcaption id="location-orientation-caption">Orientation schematic—not to scale. Confirm the exact route and timetable for every address.</figcaption>'
+        f'<div class="premium-orientation-groups">{"".join(groups)}</div>'
+        f'<figcaption id="location-orientation-caption">{escape(spec.orientation_caption)}</figcaption>'
         '</figure>'
         '<div class="premium-table-wrap"><table class="premium-location-table">'
         '<thead><tr><th>Micro-location</th><th>Best for</th><th>Daily life</th><th>Primary diligence</th></tr></thead>'
@@ -7217,7 +7222,7 @@ def premium_dossier_market_anchors_html(spec: PremiumDossierSpec) -> str:
     return (
         '<div class="premium-market-anchors" id="official-market-anchors">'
         '<h3>Official market anchors</h3>'
-        '<p>These figures are land evidence—not finished-home prices. They provide a public-market check on the asking listings above and must still be matched for location, building, age and condition.</p>'
+        f'<p>{escape(spec.market_anchors_intro)}</p>'
         f'<dl>{anchors}</dl></div>'
     )
 
@@ -7304,8 +7309,10 @@ def premium_dossier_css() -> str:
     .premium-market-anchor dd strong { display: block; margin-bottom: 3px; color: var(--ink); font-size: 17px; font-variant-numeric: tabular-nums; }
     .premium-anchor-source { font-size: 12px !important; }
     .premium-location-orientation { margin: 30px 0 0; padding: 24px 0; border-top: 3px solid var(--ink); border-bottom: 1px solid var(--line); }
-    .premium-location-route { display: flex; justify-content: space-between; gap: 18px; margin-bottom: 20px; color: var(--muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }
-    .premium-location-orientation ol { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 18px; margin: 0; padding: 0; list-style: none; }
+    .premium-orientation-groups { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 34px; }
+    .premium-orientation-group h3 { margin: 0 0 20px; color: var(--muted); font-family: var(--sans); font-size: 11px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+    .premium-location-orientation ol { position: relative; display: grid; grid-template-columns: repeat(var(--stop-count, 4), minmax(0, 1fr)); gap: 18px; margin: 0; padding: 0; list-style: none; }
+    .premium-orientation-group ol { grid-template-columns: repeat(auto-fit, minmax(90px, 1fr)); }
     .premium-location-orientation ol::before { content: ""; position: absolute; top: 8px; right: 8%; left: 8%; height: 1px; background: var(--ink); }
     .premium-location-stop { position: relative; padding-top: 25px; }
     .premium-location-stop::before { content: ""; position: absolute; top: 3px; left: 0; width: 11px; height: 11px; border: 2px solid var(--paper); border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 1px var(--accent); }
@@ -7360,7 +7367,7 @@ def premium_dossier_css() -> str:
       .premium-card-table tbody th { font-size: 16px; }
       .premium-market-anchor { grid-template-columns: 1fr; }
       .premium-market-anchor dt { grid-row: auto; }
-      .premium-location-route { display: grid; }
+      .premium-orientation-groups { grid-template-columns: 1fr; }
       .premium-location-orientation ol { grid-template-columns: 1fr; gap: 0; }
       .premium-location-orientation ol::before { top: 10px; bottom: 18px; left: 6px; width: 1px; height: auto; }
       .premium-location-stop { padding: 0 0 22px 30px; }
@@ -7410,13 +7417,13 @@ def build_premium_destination_page(
         {premium_dossier_lenses_html(spec)}
         <section class="premium-section" id="scores">
           <h2>The Atlas assessment</h2>
-          <p>Here’s how Fukuoka / Itoshima scores on the ten factors that matter most when choosing a long-term home abroad.</p>
+          <p>{escape(spec.assessment_intro)}</p>
           {premium_dossier_score_table(dest, spec)}
           <p class="premium-score-total"><strong>Weighted assessment: {float(dest["decision_score"]):.1f}/5.</strong> Reviewed {escape(spec.date_reviewed)}. <a href="/methodology/">Read the scoring methodology</a>.</p>
         </section>
         <section class="premium-section" id="listings">
           <h2>Representative property evidence</h2>
-          <p>Three observations show the spread between a practical western-Fukuoka apartment, an Itoshima lifestyle house and a higher-end coastal asset. Local asking price is primary; USD uses the recorded dataset exchange basis.</p>
+          <p>{escape(spec.listings_intro)}</p>
           {premium_dossier_listing_table(rows)}
           <p class="premium-disclaimer">Asking-price evidence only. Global Home Atlas has not verified availability, title, legal use, building condition, negotiability, fees or completed transaction value.</p>
           {premium_dossier_market_anchors_html(spec)}
@@ -7425,13 +7432,13 @@ def build_premium_destination_page(
         <section class="premium-section" id="checklist">
           <h2>Buyer checklist—in decision order</h2>
           <ol class="premium-checklist">{checklist}</ol>
-          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="/japan-retirement-property-foreign-buyers/">Japan retirement property guide</a>. To compare the destination with other markets, <a href="/dashboard/">open the full Atlas</a>.</p>
+          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="{escape(spec.country_guide_url)}">{escape(spec.country_guide_label)}</a>. To compare the destination with other markets, <a href="/dashboard/">open the full Atlas</a>.</p>
         </section>
         {premium_dossier_references_html(spec)}
       </article>
       <aside class="premium-rail" aria-label="In this dossier">
         <h2>In this dossier</h2><nav>{rail_links}</nav>
-        <div class="premium-rail-action"><p>Compare Fukuoka / Itoshima with the full Atlas.</p><a class="premium-button" href="/dashboard/">Open the Atlas</a></div>
+        <div class="premium-rail-action"><p>{escape(spec.rail_comparison)}</p><a class="premium-button" href="/dashboard/">Open the Atlas</a></div>
       </aside>
     </div>
   </main>
