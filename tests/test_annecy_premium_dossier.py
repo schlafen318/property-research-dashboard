@@ -12,19 +12,20 @@ from src.premium_destination_dossiers import (
 
 
 ROOT = Path(__file__).parents[1]
-DESTINATION_ID = "park-city-deer-valley"
+DESTINATION_ID = "annecy"
 REVIEWED_DOSSIERS = {
     "fukuoka-itoshima", "valencia", "algarve-cascais", "madeira",
     "malaga-costa-del-sol", "hakone-izu", "lake-como", "hakuba",
-    "costa-brava-girona", DESTINATION_ID, "crete", "niseko", "annecy",
+    "costa-brava-girona", "park-city-deer-valley", "crete", "niseko",
+    DESTINATION_ID,
 }
 
 
-class ParkCityDeerValleyDossierContractTests(unittest.TestCase):
+class AnnecyDossierContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.spec = get_premium_dossier(DESTINATION_ID)
 
-    def test_registry_contains_the_ten_reviewed_dossiers(self) -> None:
+    def test_registry_contains_thirteen_reviewed_dossiers(self) -> None:
         self.assertEqual(REVIEWED_DOSSIERS, set(PREMIUM_DESTINATION_DOSSIERS))
         self.assertIsNotNone(self.spec)
 
@@ -32,10 +33,7 @@ class ParkCityDeerValleyDossierContractTests(unittest.TestCase):
         self.assertIsNotNone(self.spec)
         validate_premium_dossier(self.spec)
         self.assertEqual(5, len(self.spec.lenses))
-        self.assertEqual(
-            DECISION_DIMENSION_KEYS,
-            {key for lens in self.spec.lenses for key in lens.dimension_keys},
-        )
+        self.assertEqual(DECISION_DIMENSION_KEYS, {key for lens in self.spec.lenses for key in lens.dimension_keys})
         self.assertEqual(3, len(self.spec.market_anchors))
         self.assertEqual(4, len(self.spec.micro_locations))
         self.assertEqual(3, len(self.spec.images))
@@ -44,57 +42,47 @@ class ParkCityDeerValleyDossierContractTests(unittest.TestCase):
         self.assertEqual("sources", self.spec.nav_items[-1][0])
 
     def test_copy_is_locally_specific_and_decision_grade(self) -> None:
-        prose = " ".join([
-            self.spec.lede,
-            *self.spec.verdict_paragraphs,
-            self.spec.lenses_intro,
-            *(paragraph for lens in self.spec.lenses for paragraph in lens.paragraphs),
-            self.spec.micro_locations_intro,
-        ])
-        for term in (
-            "Old Town", "Lower Deer Valley", "Upper Deer Valley",
-            "Canyons Village", "Snyderville Basin", "Park Meadows",
-            "Prospector", "Kimball Junction", "Jordanelle",
-        ):
+        prose = " ".join([self.spec.lede, *self.spec.verdict_paragraphs, self.spec.lenses_intro,
+                          *(paragraph for lens in self.spec.lenses for paragraph in lens.paragraphs),
+                          self.spec.micro_locations_intro])
+        for term in ("Annecy centre", "Vieille Ville", "Annecy-le-Vieux", "Albigny", "Sevrier",
+                     "Saint-Jorioz", "Veyrier-du-Lac", "Menthon-Saint-Bernard", "Talloires",
+                     "Epagny Metz-Tessy", "Geneva", "Pringy"):
             with self.subTest(term=term):
                 self.assertIn(term, prose)
-        self.assertRegex(prose.lower(), r"airport|salt lake|transit|bus")
-        self.assertRegex(prose.lower(), r"nightly|short-term|licen[cs]e|zoning")
-        self.assertRegex(prose.lower(), r"wildfire|snow|flood|insurance")
-        self.assertRegex(prose.lower(), r"hospital|emergency|health")
-        self.assertRegex(prose.lower(), r"resale|exit|hoa|manager")
+        self.assertRegex(prose.lower(), r"airport|train|bus|road")
+        self.assertRegex(prose.lower(), r"tourist|change-of-use|quota|rental")
+        self.assertRegex(prose.lower(), r"flood|earthquake|hazard|slope")
+        self.assertRegex(prose.lower(), r"hospital|health|emergency")
+        self.assertRegex(prose.lower(), r"resale|exit|season|operator")
         words = re.findall(r"\b[\w’'-]+\b", prose)
         self.assertGreaterEqual(len(words), 1800)
         self.assertLessEqual(len(words), 2500)
 
-    def test_current_primary_sources_cover_high_stakes_and_local_categories(self) -> None:
+    def test_current_sources_cover_high_stakes_and_local_categories(self) -> None:
         urls = " ".join(item["url"] for item in self.spec.references)
-        for fragment in (
-            "irs.gov", "parkcity.org", "summitcountyutah.gov",
-            "parkcityrealtors.com", "intermountainhealthcare.org",
-        ):
+        for fragment in ("annecy.fr", "grandannecy.fr", "ch-annecygenevois.fr", "georisques.gouv.fr",
+                         "france-visas.gouv.fr", "ameli.fr", "impots.gouv.fr",
+                         "chambre-interdepartementale-de-savoie.notaires.fr"):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, urls)
         self.assertEqual("2026-08-22", self.spec.date_reviewed)
         self.assertIn("22 February 2027", self.spec.references_intro)
 
     def test_evidence_ledger_records_scope_limits_and_recheck_triggers(self) -> None:
-        ledger = (ROOT / "docs/research/park-city-deer-valley-evidence-ledger.md").read_text()
-        for heading in (
-            "Claim or topic", "Source owner", "Source date / status",
-            "Reviewed", "Scope", "Limitation", "Recheck trigger",
-        ):
+        ledger = (ROOT / "docs/research/annecy-evidence-ledger.md").read_text()
+        for heading in ("Claim or topic", "Source owner", "Source date / status", "Reviewed", "Scope", "Limitation", "Recheck trigger"):
             self.assertIn(heading, ledger)
         self.assertGreaterEqual(ledger.count("2026-08-22"), 12)
-        for trigger in ("tax", "zoning", "listing", "transport", "hazard", "market data"):
+        for trigger in ("tax", "planning", "listing", "transport", "hazard", "market data"):
             self.assertIn(trigger, ledger.lower())
 
     def test_three_market_anchors_are_bounded_not_valuations(self) -> None:
         evidence = " ".join(" ".join(str(value) for value in item.values()) for item in self.spec.market_anchors)
-        for value in ("$4.016 million", "$1.34 million", "$2.85 million"):
+        for value in ("€5,140/m²", "€670,000", "€6,550/m²"):
             self.assertIn(value, evidence)
-        self.assertRegex(evidence.lower(), r"median")
-        self.assertRegex(evidence.lower(), r"26 sales|53 sales|q1 2026")
+        self.assertRegex(evidence.lower(), r"completed|sales")
+        self.assertRegex(evidence.lower(), r"31 december 2025")
 
     def test_atlas_reads_are_concise_and_locally_specific(self) -> None:
         self.assertEqual(DECISION_DIMENSION_KEYS, set(self.spec.score_reads))
@@ -102,36 +90,32 @@ class ParkCityDeerValleyDossierContractTests(unittest.TestCase):
             with self.subTest(key=key):
                 self.assertGreaterEqual(len(atlas_read.split()), 12)
                 self.assertLessEqual(len(atlas_read.split()), 36)
-                self.assertRegex(atlas_read, r"Park City|Old Town|Deer Valley|Canyons|Snyderville|Prospector|Kimball|Jordanelle")
+                self.assertRegex(atlas_read, r"Annecy|Albigny|Sevrier|Saint-Jorioz|Veyrier-du-Lac|Talloires|Geneva|Pringy")
 
 
-class ParkCityDeerValleyListingTests(unittest.TestCase):
-    def test_three_current_direct_usd_observations_are_complete(self) -> None:
+class AnnecyListingTests(unittest.TestCase):
+    def test_three_current_direct_eur_observations_are_complete(self) -> None:
         listings = json.loads((ROOT / "data/listings.json").read_text())
         rows = [row for row in listings if row["destination_id"] == DESTINATION_ID]
         self.assertEqual(3, len(rows))
-        self.assertEqual(
-            {"Prospector Carriage House studio", "Canyons Fairway Springs townhouse", "Lower Deer Valley Hidden Oaks home"},
-            {row["listing_name"] for row in rows},
-        )
-        expected_urls = {
-            "https://www.parkcity-realestate.com/property-search/detail/50/12601822/1940-prospector-ave-park-city-ut-84060/",
-            "https://www.parkcity-realestate.com/property-search/detail/50/12603567/4232-fairway-ln-park-city-ut-84098/",
-            "https://www.parkcity-realestate.com/property-search/detail/50/12600813/35-hidden-oaks-ln-park-city-ut-84060/",
-        }
-        self.assertEqual(expected_urls, {row["source_url"] for row in rows})
+        self.assertEqual({"Annecy top-floor one-bedroom apartment", "Saint-Jorioz three-bedroom apartment", "Veyrier-du-Lac traditional house"}, {row["listing_name"] for row in rows})
+        self.assertEqual({
+            "https://www.barnes-montblanc.com/achat-immobilier-luxe/annecy-74000/annecy-ville/appartement-luxe-annecy-74000-3635",
+            "https://www.compimmo.com/fr/acheter/appartement/saint-jorioz-74410/all/all/all/2",
+            "https://agence-clerc.com/fr/propri%C3%A9t%C3%A9/87077856",
+        }, {row["source_url"] for row in rows})
         for row in rows:
-            self.assertEqual("USD", row["local_currency"])
+            self.assertEqual("EUR", row["local_currency"])
             self.assertEqual("2026-08-22", row["captured_date"])
-            self.assertEqual(row["local_price"], row["usd_price"])
+            self.assertIn("1 EUR = 1.1699 USD", row["fx_basis"])
+            self.assertAlmostEqual(row["local_price"] * 1.1699, row["usd_price"], places=2)
             self.assertAlmostEqual(row["usd_price"] / row["size_m2"], row["usd_per_m2"], places=2)
 
 
-class ParkCityDeerValleyRenderingTests(unittest.TestCase):
+class AnnecyRenderingTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         from src.build_unified_app import build_destination_page, consolidate_destination
-
         destinations = json.loads((ROOT / "data/destinations.json").read_text())
         listings = json.loads((ROOT / "data/listings.json").read_text())
         enriched = [consolidate_destination(row) for row in destinations]
@@ -140,19 +124,17 @@ class ParkCityDeerValleyRenderingTests(unittest.TestCase):
 
     def test_page_uses_the_premium_sequence_and_local_copy(self) -> None:
         self.assertIn('<body class="premium-dossier">', self.html)
-        positions = [self.html.index(f'id="{section_id}"') for section_id in (
-            "verdict", "lenses", "scores", "listings", "locations", "checklist", "sources",
-        )]
+        positions = [self.html.index(f'id="{section_id}"') for section_id in ("verdict", "lenses", "scores", "listings", "locations", "checklist", "sources")]
         self.assertEqual(sorted(positions), positions)
-        self.assertIn("Park City / Deer Valley through five destination lenses", self.html)
-        self.assertIn("Here’s how Park City / Deer Valley scores", self.html)
-        self.assertIn("Compare Park City / Deer Valley with the full Atlas.", self.html)
-        self.assertIn("/countries/united-states-property/", self.html)
+        self.assertIn("Annecy through five destination lenses", self.html)
+        self.assertIn("Here’s how Annecy scores", self.html)
+        self.assertIn("Compare Annecy with the full Atlas.", self.html)
+        self.assertIn("/countries/france-property/", self.html)
         self.assertIn("/retirement-abroad-calculator/", self.html)
 
     def test_images_tables_and_orientation_are_complete(self) -> None:
         spec = get_premium_dossier(DESTINATION_ID)
-        self.assertEqual(3, self.html.count('src="/assets/park-city-deer-valley-'))
+        self.assertEqual(3, self.html.count('src="/assets/annecy-'))
         for image in spec.images:
             self.assertEqual(1, self.html.count(f'src="{image.src}"'))
             self.assertIn(f'alt="{image.alt}"', self.html)
@@ -161,7 +143,7 @@ class ParkCityDeerValleyRenderingTests(unittest.TestCase):
         self.assertEqual(3, self.html.count('class="premium-listing-row"'))
         self.assertEqual(3, self.html.count('class="premium-market-anchor"'))
         self.assertEqual(2, self.html.count('class="premium-orientation-group"'))
-        self.assertIn("public market signals—not valuations", self.html)
+        self.assertIn("asking evidence—not valuations", self.html)
         self.assertIn("<th>Atlas read</th>", self.html)
 
     def test_long_names_cannot_force_mobile_horizontal_overflow(self) -> None:

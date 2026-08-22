@@ -26,6 +26,7 @@ REVIEWED_DOSSIERS = {
     "park-city-deer-valley",
     "crete",
     "niseko",
+    "annecy",
 }
 
 
