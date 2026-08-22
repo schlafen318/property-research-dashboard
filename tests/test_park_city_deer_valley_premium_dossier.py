@@ -3,6 +3,8 @@ import re
 import unittest
 from pathlib import Path
 
+from PIL import Image
+
 from src.premium_destination_dossiers import (
     DECISION_DIMENSION_KEYS,
     PREMIUM_DESTINATION_DOSSIERS,
@@ -71,23 +73,54 @@ class ParkCityDeerValleyDossierContractTests(unittest.TestCase):
         urls = " ".join(item["url"] for item in self.spec.references)
         for fragment in (
             "irs.gov", "parkcity.org", "summitcountyutah.gov",
-            "parkcityrealtors.com", "intermountainhealthcare.org",
+            "parkcityrealtors.com", "intermountainhealth.org",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, urls)
-        self.assertEqual("2026-08-22", self.spec.date_reviewed)
-        self.assertIn("22 February 2027", self.spec.references_intro)
+        self.assertEqual("2026-08-23", self.spec.date_reviewed)
+        self.assertIn("23 February 2027", self.spec.references_intro)
+        self.assertIn("/medical-services", urls)
+        self.assertIn("parkcity.gov/services/transit/about/", urls)
+        self.assertIn("parkcity.gov/services/transit/routes_schedules/", urls)
+        self.assertIn("parkcity.gov/services/planning/", urls)
+        self.assertIn("parkcity.gov/services/building/community_code_compliance/", urls)
+        self.assertNotIn("parkcity.org/departments/transit-bus", urls)
+        self.assertNotIn("showpublisheddocument/76542", urls)
+        self.assertNotIn("parkcity.org/departments/planning", urls)
+        self.assertNotIn("parkcity.org/departments/building-department/community-code-compliance", urls)
+        self.assertNotIn("open U.S. ownership", self.spec.score_reads["ownership_clarity"])
+        self.assertIn("restricted foreign entities", self.spec.score_reads["ownership_clarity"])
+        dossier_copy = " ".join(self.spec.verdict_paragraphs) + " " + " ".join(
+            paragraph for lens in self.spec.lenses for paragraph in lens.paragraphs
+        )
+        self.assertNotIn("dependable U.S. ownership", dossier_copy)
+        self.assertNotIn("allowed land-use area", dossier_copy)
 
     def test_evidence_ledger_records_scope_limits_and_recheck_triggers(self) -> None:
         ledger = (ROOT / "docs/research/park-city-deer-valley-evidence-ledger.md").read_text()
         for heading in (
-            "Claim or topic", "Source owner", "Source date / status",
-            "Reviewed", "Scope", "Limitation", "Recheck trigger",
+            "Claim or topic", "Source owner", "Direct URL", "Source date / status",
+            "Reviewed", "Scope", "Limitation", "Recheck trigger", "Destination section(s)",
         ):
             self.assertIn(heading, ledger)
-        self.assertGreaterEqual(ledger.count("2026-08-22"), 12)
+        self.assertGreaterEqual(ledger.count("2026-08-23"), 16)
+        self.assertGreaterEqual(ledger.count("https://"), 18)
         for trigger in ("tax", "zoning", "listing", "transport", "hazard", "market data"):
             self.assertIn(trigger, ledger.lower())
+
+    def test_generated_images_have_a_publication_provenance_record(self) -> None:
+        provenance = (ROOT / "docs/research/park-city-deer-valley-image-provenance.md").read_text()
+        for image in self.spec.images:
+            filename = Path(image.src).name
+            self.assertIn(filename, provenance)
+            with Image.open(ROOT / "src/site_assets" / filename) as rendered:
+                self.assertEqual((1672, 941), rendered.size)
+        for field in (
+            "Generation tool", "Generation date", "Prompt", "Generation output",
+            "Publication-rights basis", "Visual approval",
+        ):
+            self.assertIn(field, provenance)
+        self.assertNotRegex(provenance, r"(?i)pending|unknown|unverified")
 
     def test_three_market_anchors_are_bounded_not_valuations(self) -> None:
         evidence = " ".join(" ".join(str(value) for value in item.values()) for item in self.spec.market_anchors)
@@ -122,9 +155,29 @@ class ParkCityDeerValleyListingTests(unittest.TestCase):
         self.assertEqual(expected_urls, {row["source_url"] for row in rows})
         for row in rows:
             self.assertEqual("USD", row["local_currency"])
-            self.assertEqual("2026-08-22", row["captured_date"])
+            self.assertEqual("2026-08-23", row["captured_date"])
             self.assertEqual(row["local_price"], row["usd_price"])
+            self.assertIn("area_basis", row)
+            self.assertRegex(row["area_basis"], r"(?i)portal|MLS|finished|square feet|sq ft")
             self.assertAlmostEqual(row["usd_price"] / row["size_m2"], row["usd_per_m2"], places=2)
+
+    def test_shared_score_price_and_yield_are_reconciled(self) -> None:
+        from src.build_unified_app import consolidate_destination
+
+        destination = next(
+            row for row in json.loads((ROOT / "data/destinations.json").read_text())
+            if row["id"] == DESTINATION_ID
+        )
+        enriched = consolidate_destination(destination)
+        self.assertEqual(3.83, destination["overall_score"])
+        self.assertEqual(destination["overall_score"], enriched["decision_score"])
+        self.assertEqual(8200.0, destination["usd_per_m2"])
+        self.assertNotIn("clean US ownership", destination["pros"])
+        self.assertIn("three direct", destination["price_basis"])
+        self.assertIn("asking", destination["price_basis"])
+        self.assertNotRegex(destination["net_yield_estimate"], r"\d+(?:\.\d+)?\s*[-–]\s*\d+(?:\.\d+)?%")
+        self.assertEqual(destination["net_yield_estimate"], destination["quick_metrics"]["net_yield"])
+        self.assertEqual(destination["net_yield_estimate"], destination["rental"]["net_yield"])
 
 
 class ParkCityDeerValleyRenderingTests(unittest.TestCase):
@@ -168,6 +221,38 @@ class ParkCityDeerValleyRenderingTests(unittest.TestCase):
         self.assertIn(".premium-hero-copy { min-width: 0;", self.html)
         self.assertIn("grid-template-columns: minmax(0, 1fr)", self.html)
         self.assertIn("overflow-wrap: anywhere", self.html)
+
+    def test_us_country_handoff_is_substantive_and_bidirectional(self) -> None:
+        from src.build_unified_app import COUNTRY_HUBS, build_country_hub_page
+
+        hub = next(item for item in COUNTRY_HUBS if item["slug"] == "united-states-property")
+        self.assertIn(DESTINATION_ID, hub["destination_ids"])
+        self.assertGreaterEqual(len(hub["country_rules"]), 4)
+        source_urls = " ".join(item["url"] for item in hub["primary_sources"])
+        for fragment in ("travel.state.gov", "irs.gov", "le.utah.gov"):
+            self.assertIn(fragment, source_urls)
+        destinations = json.loads((ROOT / "data/destinations.json").read_text())
+        html = build_country_hub_page(hub, destinations, [])
+        self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
+        self.assertIn("Utah restricts defined foreign entities", html)
+
+    def test_quality_review_uses_canonical_scorecard_fields(self) -> None:
+        review = (ROOT / "docs/research/park-city-deer-valley-quality-review.md").read_text()
+        for weight in (
+            "| Decision usefulness | 15 |",
+            "| Evidence and accuracy | 25 |",
+            "| Atlas model integrity | 15 |",
+            "| Property and location evidence | 15 |",
+            "| Editorial quality | 10 |",
+            "| Design, mobile, and accessibility | 10 |",
+            "| SEO and trust | 5 |",
+            "| Build and maintenance | 5 |",
+        ):
+            self.assertIn(weight, review)
+        for field in ("Reviewer:", "Approval date:", "Console warnings:"):
+            self.assertIn(field, review)
+        self.assertNotRegex(review, r"(?i)pending|provisional|not yet approved")
+        self.assertIn("Result: 100/100", review)
 
 
 if __name__ == "__main__":

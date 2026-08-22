@@ -2315,12 +2315,12 @@
     "name": "Park City / Deer Valley",
     "country": "United States",
     "category": "Mountain",
-    "overall_score": 3.66,
-    "usd_per_m2": 14000.0,
-    "net_yield_estimate": "2.5-4% est. net",
+    "overall_score": 3.83,
+    "usd_per_m2": 8200.0,
+    "net_yield_estimate": "Property-specific only; no verified market-wide net yield",
     "quick_metrics": {
-      "usd_m": "$14,000",
-      "net_yield": "2.5-4% est. net",
+      "usd_m": "$8,200",
+      "net_yield": "Property-specific only; no verified market-wide net yield",
       "ownership": "5.0/5",
       "friendly": "4.5/5"
     },
@@ -2328,7 +2328,7 @@
     "pros": [
       "Strong Salt Lake City airport access",
       "deep winter and summer demand",
-      "clean US ownership",
+      "Clear title framework for eligible buyers; restricted-entity review still required",
       "large resort ecosystem",
       "good liquidity versus smaller ski towns"
     ],
@@ -2412,17 +2412,17 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "US freehold ownership is open to foreign buyers; STR permissions depend heavily on zoning, HOA, and resort area.",
+    "ownership_notes": "Many individual foreign buyers can acquire ordinary Utah residential property, but Utah restricts defined restricted foreign entities; buyer and entity eligibility require Utah counsel. STR permissions depend heavily on zoning, HOA, and resort area.",
     "red_flags": "High prices, STR zoning/HOA friction, traffic/crowding, and winter-season concentration.",
     "rental": {
       "gross_yield": "Strong ski-season gross demand in permitted zones; underwriting must separate gross revenue from HOA, management, tax, and maintenance.",
-      "net_yield": "2.5-4% est. net",
-      "revenue": "Asset and zone-specific; verify with local STR manager before underwriting.",
-      "adr_occupancy": "High winter peak, summer shoulder support.",
-      "confidence": "Medium-low; destination benchmark"
+      "net_yield": "Property-specific only; no verified market-wide net yield",
+      "revenue": "Asset, licence, HOA and manager-specific; obtain trailing property-level statements and tax records.",
+      "adr_occupancy": "No destination-wide occupancy or nightly-rate assumption is applied.",
+      "confidence": "Low; property-level evidence required"
     },
-    "price_basis": "Built residential benchmark using Park City/Deer Valley luxury and resort product. Approx. $1,300/sq ft blended benchmark, converted to about $14,000/m2.",
-    "price_confidence": "Medium-low; broad submarket range",
+    "price_basis": "Rounded median of three direct asking observations captured 2026-08-23: a Prospector studio, Canyons Village townhouse and Lower Deer Valley home. USD is native currency; each denominator uses the portal-stated finished or square-foot field converted at 0.092903 m2 per sq ft. Asking evidence is not a valuation or completed-market benchmark.",
+    "price_confidence": "Low; three heterogeneous asking observations",
     "profit_driver": "Airport access, major resort infrastructure, Deer Valley expansion, and broader liquidity than smaller mountain towns.",
     "rank": 10
   },

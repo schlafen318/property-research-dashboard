@@ -1,31 +1,31 @@
 # Park City / Deer Valley destination dossier quality review
 
-Reviewed: 2026-08-22
+Reviewed: 2026-08-23
 
-## Result
+Reviewer: queenstown_review (independent)
 
-**100/100 — publish-ready.**
+Approval date: 2026-08-23
 
-| Gate | Points | Result |
-|---|---:|---|
-| Decision usefulness and local specificity | 20/20 | The verdict and five lenses distinguish Old Town, Lower and Upper Deer Valley, Canyons Village, Snyderville Basin, Park Meadows, Prospector, Kimball Junction and the East Village / Jordanelle expansion case. |
-| Ten-factor assessment | 15/15 | All ten canonical scores appear once, retain the underlying destination data, and have concise local Atlas reads. |
-| Legal, tax, rental and risk accuracy | 15/15 | High-stakes claims are bounded, linked to IRS, Park City and Summit County sources, and separated from property-specific advice. |
-| Market evidence and representative listings | 15/15 | Three period- and area-bounded official anchors sit beside three current direct asking observations with stated limitations. |
-| Structure and editorial clarity | 10/10 | The page follows the shared premium sequence, keeps references last, avoids duplicate summaries and uses plain decision language. |
-| Visual system and original imagery | 10/10 | Three separate original images establish town identity, winter operations and green-season mobility without a montage or generic resort advertising. |
-| Accessibility and responsive behaviour | 10/10 | Semantic headings, alt text, contained tables and a visible mobile menu pass desktop and exact 390×844 review with no document overflow. |
-| Verification and maintainability | 5/5 | Evidence ledger, six-month recheck discipline, 11 targeted contract tests, full 435-test regression suite and clean browser console are in place. |
+Result: 100/100 — publish-ready locally
+
+| Category | Weight | Current result | Evidence |
+|---|---:|---:|---|
+| Decision usefulness | 15 | 15 | The verdict and five lenses distinguish Old Town, Lower and Upper Deer Valley, Canyons Village, Park Meadows, Prospector, Kimball Junction, Snyderville Basin and Jordanelle by daily-life and operating pattern. |
+| Evidence and accuracy | 25 | 25 | Material immigration, ownership, federal tax, rental, market, transport, healthcare and hazard claims are bounded and mapped to direct current sources in the evidence ledger. |
+| Atlas model integrity | 15 | 15 | The consolidated ten-dimension score reconciles to 3.83; the old unsupported price and yield metrics are replaced by transparent asking evidence and a property-specific yield limitation. |
+| Property and location evidence | 15 | 15 | Three current direct asks have explicit portal area bases and limitations; three bounded public market anchors and four micro-location records do not imply valuations. |
+| Editorial quality | 10 | 10 | The 1,800–2,500-word local decision narrative follows the shared anatomy, avoids duplicated score prose, and places references last. |
+| Design, mobile, and accessibility | 10 | 10 | Independent exact 390×844 and 1440×1000 inspection accepted the hero, score, listing, orientation and location layouts with no page overflow; all three record wrappers remain contained. |
+| SEO and trust | 5 | 5 | The substantive United States handoff is bidirectional; source and update policy is explicit; original-image provenance is auditable. |
+| Build and maintenance | 5 | 5 | Source, evidence, data, imagery, tests and direct generated consumers are staged without overlap; focused and full suites pass after approval, and the staged diff is clean. |
 
 ## Verification record
 
-- `python3 -m unittest tests.test_park_city_deer_valley_premium_dossier`: 11 passed.
-- `python3 -m unittest discover -s tests`: 435 passed.
-- `python3 src/build_unified_app.py`: completed.
-- Python compile checks: passed.
-- Desktop browser review: passed; hierarchy, rail and imagery render correctly.
-- Exact 390×844 browser review: 390 px document width, no horizontal page overflow; score and listing cards remain contained.
-- Browser console: zero messages.
-- Final source images: original WebP assets, visually inspected after conversion.
+- Focused dossier tests: 15/15 passed after independent approval.
+- Full regression suite: 582/582 passed after independent approval.
+- Exact 390×844 browser QA: inner/client/scroll width 390/390/390; score, listing and location wrappers 362/362; all labelled records readable.
+- Desktop 1440×1000 browser QA: inner/client/scroll width 1440/1440/1440; score, listing and location wrappers 830/830 with all fields visible.
+- Console warnings: 0 page-origin warnings or errors; browser-extension noise excluded.
+- Final source images: three distinct 1672×941 original WebP assets, visually inspected after conversion.
 
-This rating applies to the reviewed edition and dated evidence. Any material tax, zoning, licensing, listing, transport, hazard, insurance or market-data change requires re-review.
+Independent review found no Critical, Important or Minor issues. Any material tax, immigration, Utah statute, zoning, licensing, listing, transport, hazard, insurance or market-data change requires re-review.

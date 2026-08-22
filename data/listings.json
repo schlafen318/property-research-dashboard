@@ -1051,14 +1051,15 @@
     "usd_price": 375000,
     "local_currency": "USD",
     "local_price": 375000,
-    "fx_basis": "USD is both local and comparison currency; reviewed 2026-08-22",
+    "fx_basis": "USD is both local and comparison currency; reviewed 2026-08-23",
     "size_m2": 45.52247,
+    "area_basis": "Portal/MLS-stated 490 sq ft field, converted at 0.092903 m2 per sq ft; the source does not independently prove measured internal or legal area.",
     "usd_per_m2": 8237.690090190625,
     "source_name": "Park City Real Estate / PCMLS",
     "source_url": "https://www.parkcity-realestate.com/property-search/detail/50/12601822/1940-prospector-ave-park-city-ut-84060/",
-    "note": "Active direct MLS observation for a furnished 490 sq ft studio in Prospector; $430 monthly HOA shown. Availability, permitted rental use, condition and completed value remain unverified.",
+    "note": "Active direct MLS observation for a furnished 490 sq ft Prospector studio; the portal shows a $430 monthly HOA. Verify title, area, HOA documents, condition, lawful rental use and completed value independently.",
     "confidence": "Medium",
-    "captured_date": "2026-08-22"
+    "captured_date": "2026-08-23"
   },
   {
     "destination_id": "park-city-deer-valley",
@@ -1068,14 +1069,15 @@
     "usd_price": 2500000,
     "local_currency": "USD",
     "local_price": 2500000,
-    "fx_basis": "USD is both local and comparison currency; reviewed 2026-08-22",
+    "fx_basis": "USD is both local and comparison currency; reviewed 2026-08-23",
     "size_m2": 170.477005,
+    "area_basis": "Portal/MLS Fin. Sq. Ft. field of 1,835 sq ft, converted at 0.092903 m2 per sq ft; the source does not independently prove measured internal or legal area.",
     "usd_per_m2": 14664.73440215588,
     "source_name": "Park City Real Estate / PCMLS",
     "source_url": "https://www.parkcity-realestate.com/property-search/detail/50/12603567/4232-fairway-ln-park-city-ut-84098/",
-    "note": "Active direct MLS observation for a furnished 1,835 sq ft Canyons Village townhouse; $1,273 monthly HOA shown. Nightly-rental potential, availability, charges and completed value remain unverified.",
+    "note": "Active direct MLS observation for a furnished 1,835 finished-sq-ft Canyons Village townhouse; the portal shows a $3,818 quarterly HOA and a one-day nightly-rental field. That field is not proof of a transferable licence or HOA permission. Verify all charges, use rights, area, condition and completed value.",
     "confidence": "Medium",
-    "captured_date": "2026-08-22"
+    "captured_date": "2026-08-23"
   },
   {
     "destination_id": "park-city-deer-valley",
@@ -1085,14 +1087,15 @@
     "usd_price": 4900000,
     "local_currency": "USD",
     "local_price": 4900000,
-    "fx_basis": "USD is both local and comparison currency; reviewed 2026-08-22",
+    "fx_basis": "USD is both local and comparison currency; reviewed 2026-08-23",
     "size_m2": 605.634657,
+    "area_basis": "Portal/MLS Fin. Sq. Ft. field of 6,519 sq ft, converted at 0.092903 m2 per sq ft; the portal separately states a 969 sq ft garage. Verify composition against plans and title.",
     "usd_per_m2": 8090.686263352331,
     "source_name": "Park City Real Estate / PCMLS",
     "source_url": "https://www.parkcity-realestate.com/property-search/detail/50/12600813/35-hidden-oaks-ln-park-city-ut-84060/",
-    "note": "Active direct MLS observation for a 6,519 sq ft Lower Deer Valley home; $42 monthly HOA shown after a 10.1% price reduction. Availability, condition, shuttle terms and completed value remain unverified.",
+    "note": "Active direct MLS observation for a 6,519 finished-sq-ft Lower Deer Valley home; the portal shows a $500 annual HOA, change-of-ownership fee and long-term-rental field. Verify area composition, title, condition, shuttle and rental terms, all charges and completed value.",
     "confidence": "Medium",
-    "captured_date": "2026-08-22"
+    "captured_date": "2026-08-23"
   },
   {
     "destination_id": "da-nang-hoi-an",
