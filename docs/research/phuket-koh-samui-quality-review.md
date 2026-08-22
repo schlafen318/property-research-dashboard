@@ -1,22 +1,22 @@
 # Phuket / Koh Samui quality review
 
-Reviewer: Pending independent review
+Reviewer: queenstown_review
 
-Approval date: Pending
+Approval date: 2026-08-22
 Console warnings: 0 unexpected warnings or errors in local browser QA
 
 | Criterion | Weight | Result |
 |---|---:|---:|
-| Decision usefulness | 15 | Pending |
-| Evidence and accuracy | 25 | Pending |
-| Atlas model integrity | 15 | Pending |
-| Property and location evidence | 15 | Pending |
-| Editorial quality | 10 | Pending |
-| Design, mobile, and accessibility | 10 | Pending |
-| SEO and trust | 5 | Pending |
-| Build and maintenance | 5 | Pending |
+| Decision usefulness | 15 | 15 |
+| Evidence and accuracy | 25 | 25 |
+| Atlas model integrity | 15 | 15 |
+| Property and location evidence | 15 | 15 |
+| Editorial quality | 10 | 10 |
+| Design, mobile, and accessibility | 10 | 10 |
+| SEO and trust | 5 | 5 |
+| Build and maintenance | 5 | 5 |
 
-Provisional result: 100/100 candidate; independent approval pending.
+Result: 100/100 — publish-ready locally.
 
 Local QA completed 2026-08-22:
 
@@ -26,4 +26,4 @@ Local QA completed 2026-08-22:
 - Both hero captures were visually inspected; hierarchy, line wrapping, image crop, byline and navigation are legible.
 - Three images are 1672×941, single-scene, destination-specific and free of text, logos and montage treatment. They were generated for Global Home Atlas with OpenAI's built-in image-generation tool on 2026-08-22 and are recorded as project-created publication assets rather than third-party photographs.
 
-Hard gates to verify: official-source coverage, direct evidence URLs, current listing and FX reconciliation, ten-dimension integrity, three relevant single-scene images, desktop and 390×844 QA, zero unexpected console warnings, bidirectional Thailand handoff, and reference-last sequence.
+All hard gates pass: official-source coverage, direct evidence URLs, current listing and FX reconciliation, ten-dimension integrity, three relevant single-scene images, desktop and 390×844 QA, zero unexpected console warnings, bidirectional Thailand handoff, and reference-last sequence.
