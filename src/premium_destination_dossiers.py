@@ -1693,6 +1693,148 @@ HAKUBA_DOSSIER = PremiumDossierSpec(
 )
 
 
+ANNECY_DOSSIER = PremiumDossierSpec(
+    destination_id="annecy",
+    title="Annecy Retirement Property Dossier",
+    description="Assess Annecy property through year-round daily life, Geneva access, French ownership, tourist-let quotas, DPE, healthcare, hazards, value, resale, and current listings.",
+    h1="Annecy: buy the year-round address, not only the lake view",
+    lede="Annecy combines a working Alpine city, a celebrated lake and access to Geneva, but those advantages are distributed unevenly. Annecy centre and the Vieille Ville put daily services and the station within reach. Annecy-le-Vieux and Albigny connect established residential life with the north end of the lake. Sevrier and Saint-Jorioz on the west shore offer ordinary town services and a flatter lakeside rhythm. Veyrier-du-Lac, Menthon-Saint-Bernard and Talloires on the east shore sell the most dramatic views, often with steeper access, higher prices and a narrower buyer pool. This dossier tests which address still works in rain, winter traffic and ordinary retirement—not only on a clear summer day.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "Annecy is a premium lifestyle contender, not an effortless investment. The city is safe, useful and beautiful; the lake and mountains remain part of daily life rather than a resort set. Yet the financial case is compressed by high entry prices, modest net yields and a local tourist-let regime designed to protect housing. A foreign buyer can acquire French property, but ownership does not create a visa, residence right or public-healthcare eligibility. Non-EU buyers considering full-time retirement should establish the correct long-stay route first. France-Visas says the visitor route for a private stay over three months requires evidence of resources, accommodation and medical cover and does not permit professional activity. EU and Swiss buyers follow different mobility rules, so one sentence cannot cover every household.",
+        "The strongest fit is a buyer who values year-round services, culture, walking and cycling, accepts a premium for scarcity, and can hold without depending on aggressive rent. Annecy centre, Albigny and Annecy-le-Vieux generally give the broadest daily-life case. The west shore can suit a buyer who wants more space and can test the bus, bicycle and road routine. The east shore suits a higher-budget household willing to exchange convenience and exit depth for outlook and village character. Look elsewhere first if the plan requires the home to create residence, a high non-resident mortgage, uncomplicated short-term letting, or a Geneva commute that never meets congestion, border or timetable friction.",
+        "Proceed in this order: settle residence and healthcare; decide whether the household is city-led, west-shore practical or east-shore premium; travel the hospital, station, airport and grocery routes in ordinary winter conditions; then investigate the title, copropriété, planning, DPE, hazards and permitted use. Price tourist rent only after Grand Annecy confirms the current registration, change-of-use and quota position for the exact address and owner. The right Annecy purchase is not simply the home with the widest lake view. It is the address whose access, building file, carrying cost and future buyer pool remain convincing after the visitors leave.",
+    ),
+    lenses_intro="The five paired lenses below turn the postcard into ten buyer decisions. Each asks what daily life requires at a specific address; the score table then shows the complete Atlas assessment once.",
+    lenses=(
+        DossierLens(
+            "Live with the lake after the visitors leave",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Annecy centre has the most complete year-round proposition. The Vieille Ville, station, markets, shops, restaurants, cultural venues and lakefront can form one walkable routine, although the prettiest lanes also bring visitors, noise and older-building constraints. The area around the gare is less romantic but more useful for rail and buses. Toward Albigny and Annecy-le-Vieux, the rhythm becomes more residential while the lake, parks and local services remain accessible. A buyer should walk the actual route to groceries, pharmacy and transit after dark and in rain; a map pin near the lake does not prove comfortable everyday access.",
+                "The west shore changes the balance rather than merely lowering the price. Sevrier and Saint-Jorioz have schools, shops, restaurants, cycling and lake access within functioning towns. Some addresses can support a practical routine, but traffic on the main road and the distance between the home, bus stop and services matter. Menthon-Saint-Bernard, Veyrier-du-Lac and Talloires on the east shore offer stronger visual drama and village identity. They also include slopes, narrow roads, smaller service centres and property types whose maintenance and future buyer pool may be more specialised. Test stairs, gradients and parking as seriously as the view.",
+                "Healthcare follows residence and geography. Ownership itself does not create access to France's public system; Assurance Maladie ties PUMa to stable and regular residence or another qualifying basis. The Centre Hospitalier Annecy Genevois site at Epagny Metz-Tessy provides 24-hour emergency services, SAMU and specialist flows, but a lake-shore buyer must measure the door-to-door route in congestion and bad weather. Routine care, pharmacy access and the availability of a regular doctor also matter. Retirement fit is strongest where a household can keep its daily life functioning if driving becomes difficult, not where a summer bicycle ride merely looks possible.",
+            ),
+        ),
+        DossierLens(
+            "Reach Geneva—and the hospital—without assuming an easy commute",
+            ("global_access", "foreigner_fit"),
+            (
+                "Annecy's connectivity is real but must be described door to door. The multimodal station anchors regional trains and buses; Grand Annecy's mobility guidance places Pringy about one hour twenty-five minutes from Geneva by rail and Annecy about two hours ten minutes from Lyon in its service examples. An official bus route also connects toward Geneva Airport. Those links are useful for periodic international travel. They are not a guarantee of a frictionless daily Geneva commute once the walk, transfer, border conditions, strike risk, late return and final journey to a lake-shore home are included.",
+                "Local mobility is equally address-sensitive. Grand Annecy publishes regular lake-shore bus services, with many corridors operating from early morning into the evening, while summer additions are a separate seasonal offer. Do not use July frequency to justify a February purchase. Annecy centre and parts of Annecy-le-Vieux can work without a car for many trips. Sevrier and Saint-Jorioz may combine bus, bicycle and driving. The east shore can be more dependent on the road, particularly from a hillside house. Travel the exact route at the time it will normally be used and add a failed-connection scenario.",
+                "Foreigner fit is helped by Geneva's international economy and by the area's experience with cross-border residents, but administration remains French and often technical. The notaire, bank, copropriété manager, insurer, tax office, utility providers and contractors may require French documents and local follow-through. Cross-border work introduces separate residence, tax, healthcare and social-security questions that a property guide cannot settle. Budget for independent French legal and tax advice, and for a bilingual contact if the household cannot handle notices and building meetings. International access is an asset; it does not remove the need to operate locally.",
+            ),
+            "winter-access-healthcare",
+        ),
+        DossierLens(
+            "Own clearly, then read the building and energy file",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "France generally permits a foreigner to acquire ordinary residential property, with the notaire coordinating the authentic deed, searches, registration and transaction funds. That clarity should not be confused with a light diligence file. For an apartment, obtain the copropriété rules, recent meeting minutes, service-charge accounts, arrears, reserve position, planned works, insurance claims, legal disputes, floor-area evidence and any restriction on furnished or tourist use. For a house, verify boundaries, easements, access rights, planning permissions, drainage, retaining structures, roof, insulation and all extensions. A lake-access claim must be documented, not inferred from a photograph.",
+                "Energy performance can change both comfort and lawful rental use. France's DPE schedule restricts the long-term letting of G-rated homes from 2025, with F and E stages scheduled for 2028 and 2034. The current Annecy sample includes an E-rated city apartment and an F-rated Veyrier-du-Lac house, showing why the label must lead to an engineering and cost discussion rather than a footnote. Ask what works are technically possible, whether copropriété approval is needed, what subsidies or restrictions apply, and whether the seller's floor area and diagnostic pack match the asset. A low energy grade can affect bills, rentability and resale.",
+                "Planning and hazards are parcel decisions. Grand Annecy's PLUi-HMB entered force on 12 March 2026 and its interactive map is the starting point for zoning, but the mairie and a qualified adviser should confirm what the current building may lawfully do. Géorisques records flood, earthquake, ground and other natural-risk context for Annecy; shore and hillside properties add drainage, water, slope, retaining-wall and access questions. Review the official address report, seller's risk statement, catastrophe history, insurance terms and physical site. Being outside one coloured zone is not a guarantee against water or movement.",
+            ),
+        ),
+        DossierLens(
+            "Clear the tourist-let quota before underwriting a yield",
+            ("rental_profit", "capital_upside"),
+            (
+                "Annecy's visitor demand is strong, but the legal right to serve it is not an automatic feature of a home. Grand Annecy's change-of-use regime took effect on 1 June 2025, with the transition ending on 1 October 2025. The framework uses registration, local quotas and owner or property limits; secondary residences generally require authorization, while principal residences follow a different route. The applicable zone, legal owner, building rules and current local decisions must be confirmed in writing. A listing described as suitable for seasonal rental is marketing until those checks are complete.",
+                "Even a permitted operation must be underwritten like a small hospitality business. Model platform fees, cleaning, linen, utilities, insurance, tax, accounting, guest communication, maintenance, vacancy and the operator's contract. Then compare it with long-term rent, occasional personal use and no rent. Furnished rental falls within French BIC tax rules, and non-residents can owe French tax on French-source income; the 2026 guidance on professional furnished-rental status reinforces the need for buyer-specific advice. A Geneva-facing long-term tenancy may look less exciting but can be easier to operate than a quota-dependent tourist story.",
+                "Capital upside is plausible only as an address-and-product thesis. The protected landscape, limited supply and international reach can support selected homes, but the starting price already reflects much of that recognition. Annecy centre and established residential areas have deeper ordinary demand. A west-shore apartment near services can appeal to year-round households. A large east-shore villa may be scarce yet depend on a smaller group able to accept the price, slope and renovation burden. Do not use the lake's global name as a substitute for completed sales, condition adjustments and a realistic exit period.",
+            ),
+            "west-shore-daily-life",
+        ),
+        DossierLens(
+            "Pay for daily usefulness, not only a lake view",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Official Notaires des Savoie evidence gives three useful anchors for completed sales to 31 December 2025: old Annecy apartments at a median €5,140/m², old houses at €670,000, and new apartments at €6,550/m². These are broad market signals, not prices for a specific building, lake view or commune. The current asking examples below sit on very different parts of the curve: a compact Annecy apartment, a Saint-Jorioz family apartment and a premium Veyrier-du-Lac house. The spread is the lesson. Reconcile every candidate against the correct property type and completed evidence.",
+                "Value entry comes from avoiding the wrong premium. In Annecy centre, pay for useful walking access, sound copropriété governance and a credible building rather than an unquantified 'near lake' label. Around Albigny and Annecy-le-Vieux, distinguish genuine service access from a car-led hillside address. In Sevrier and Saint-Jorioz, test the road and bus routine and avoid pricing a compromised plot as waterfront scarcity. In Veyrier-du-Lac, Menthon-Saint-Bernard and Talloires, separate protected outlook, documented access and renovation quality from a costly view that brings slope, energy and maintenance work.",
+                "Exit liquidity depends on how many future buyers can use the home. A sensible apartment near the station, lake and services can appeal to local households, French second-home buyers and some international buyers. A well-located west-shore home may retain a credible family market. A singular east-shore house can command attention but take longer to match with a budget, taste and renovation appetite. Model five-year cash outlay including acquisition costs, financing, copropriété contributions, energy works, tax, insurance, repairs and sale costs. Before signing, ask two agents who did not source the property how they would resell it and to whom.",
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Annecy combines a working Alpine city with lake access; Saint-Jorioz and Talloires trade urban ease for more village character.",
+        "global_access": "Annecy station and Pringy rail links support Geneva access, but shore addresses add road, bus and last-mile friction.",
+        "ownership_clarity": "Annecy follows France's established notaire-led ownership system; copropriété records, easements, planning and diagnostics remain property-specific.",
+        "regulatory_safety": "Annecy tourist quotas, DPE rules and Grand Annecy planning require written address-level checks before rental or renovation assumptions.",
+        "rental_profit": "Annecy visitor demand is strong, but quotas, operator costs, tax and high entry prices compress dependable net rental returns.",
+        "capital_upside": "Annecy scarcity and Geneva reach support selected assets, while east-shore premiums leave less room for execution errors.",
+        "retirement_fit": "Annecy centre and Albigny offer services and mobility; remote shore homes require a tested route to Epagny Metz-Tessy healthcare.",
+        "exit_liquidity": "Annecy city apartments reach the broadest buyer pool; singular Veyrier-du-Lac and Talloires houses may need longer exits.",
+        "foreigner_fit": "Annecy is internationally connected through Geneva, but French tax, copropriété and cross-border administration still require local professional support.",
+        "value_entry": "Annecy, Saint-Jorioz and Veyrier-du-Lac occupy distinct price bands; value depends on daily utility, condition and buyer-pool depth.",
+    },
+    market_anchors=(
+        {"location": "Annecy old apartments", "evidence": "€5,140/m²", "buyer_read": "Median for completed old-apartment sales to 31 December 2025; reconcile the exact quarter, building, condition and outlook.", "source_label": "Notaires des Savoie 2026 report", "source_url": "https://chambre-interdepartementale-de-savoie.notaires.fr/wp-content/uploads/2026/04/Observatoire-de-limmo-des-Notaires-des-Savoie-2026.pdf"},
+        {"location": "Annecy old houses", "evidence": "€670,000", "buyer_read": "Median for completed old-house sales to 31 December 2025; it does not price an east-shore lake house or renovation burden.", "source_label": "Notaires des Savoie 2026 report", "source_url": "https://chambre-interdepartementale-de-savoie.notaires.fr/wp-content/uploads/2026/04/Observatoire-de-limmo-des-Notaires-des-Savoie-2026.pdf"},
+        {"location": "Annecy new apartments", "evidence": "€6,550/m²", "buyer_read": "Median for completed new-apartment sales to 31 December 2025; programme, parking, VAT and delivery risk still differ.", "source_label": "Notaires des Savoie 2026 report", "source_url": "https://chambre-interdepartementale-de-savoie.notaires.fr/wp-content/uploads/2026/04/Observatoire-de-limmo-des-Notaires-des-Savoie-2026.pdf"},
+    ),
+    micro_locations_intro="Annecy is best read as four daily-life patterns, not one lake market. These are orientation aids rather than price zones; confirm the commune, parcel, planning, hazard layers, transport and building file for the exact address.",
+    micro_locations=(
+        {"name": "Annecy centre / Vieille Ville", "best_for": "Walkable city and station life", "daily_life": "Services, culture and lake without routine driving", "diligence": "Noise, tourist pressure, older buildings and copropriété"},
+        {"name": "Annecy-le-Vieux / Albigny", "best_for": "Residential city-lake balance", "daily_life": "Established neighbourhoods near the north shore", "diligence": "Slope, transit, exact walkability and building costs"},
+        {"name": "Sevrier / Saint-Jorioz / Duingt", "best_for": "Practical west-shore living", "daily_life": "Town services, cycling and more space", "diligence": "Road congestion, bus frequency and daily driving"},
+        {"name": "Veyrier-du-Lac / Menthon-Saint-Bernard / Talloires", "best_for": "Premium east-shore outlook", "daily_life": "Village and lake life with steeper access", "diligence": "Price, slope, energy works, access rights and exit depth"},
+    ),
+    checklist=(
+        "Confirm the household's French residence, work-right and healthcare route before purchase.",
+        "Choose the city, north-shore, west-shore or east-shore daily-life pattern first.",
+        "Travel the exact station, Geneva Airport, grocery and hospital routes in winter traffic.",
+        "Verify title, easements, cadastral boundaries, planning permissions and lake access rights.",
+        "Read the copropriété file, diagnostics, DPE, planned works, insurance and service charges.",
+        "Overlay current flood, earthquake, slope and other Géorisques evidence for the address.",
+        "Clear registration, change-of-use quota, building rules, operator and tax in writing before pricing rent.",
+        "Model five-year cash outlay and identify the future resale buyer before signing.",
+    ),
+    references_intro="Legal, administrative, market, transport, healthcare, hazard and listing claims were reviewed on 22 August 2026 against the sources below. Recheck every time-sensitive source no later than 22 February 2027, and immediately after any law, municipal quota, tax, transport, hazard-map, planning, DPE, building or listing change. Obtain current French immigration, legal, tax, notarial, building, insurance and healthcare advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "France property guide", "url": "/countries/france-property/"},
+        {"label": "France-Visas: private stay over three months", "url": "https://france-visas.gouv.fr/en/sejour-touristique-de-plus-de-3-mois"},
+        {"label": "Assurance Maladie: universal health protection", "url": "https://www.ameli.fr/assure/droits-demarches/principes/protection-universelle-maladie"},
+        {"label": "Grand Annecy: tourist accommodation rules", "url": "https://www.grandannecy.fr/entreprendre/etre-accompagne/le-tourisme"},
+        {"label": "Ville d'Annecy: 2025 furnished-tourist-let implementation", "url": "https://www.annecy.fr/fileadmin/mediatheque_annecy/Espace_presse/CP_meubl%C3%A9s-application_reglement_%C3%A9t%C3%A9_2025_17.06.25.pdf"},
+        {"label": "Grand Annecy: current furnished-tourist-let regulation", "url": "https://www.grandannecy.fr/fileadmin/mediatheque/kiosque/Espace_presse/CP_meubles_de_tourisme.pdf"},
+        {"label": "Service Public: DPE and rental restrictions", "url": "https://www.service-public.fr/particuliers/vosdroits/F16096"},
+        {"label": "Service Public: tourist-accommodation rule changes", "url": "https://www.service-public.fr/entreprendre/actualites/A17883"},
+        {"label": "French tax administration: non-resident French income", "url": "https://www.impots.gouv.fr/international-particulier/dois-je-declarer-mes-revenus-en-france"},
+        {"label": "French tax administration: non-resident property income", "url": "https://www.impots.gouv.fr/international-particulier/questions/non-resident-i-receive-income-real-property-property-income-or"},
+        {"label": "Service Public: real-estate wealth tax", "url": "https://www.service-public.fr/particuliers/vosdroits/F563"},
+        {"label": "Grand Annecy: PLUi-HMB interactive map", "url": "https://espacecitoyen.grandannecy.fr/actualites/actualite/plui-hmb-cartographie-interactive-en-ligne"},
+        {"label": "Grand Annecy mobility: train", "url": "https://mobilites.grandannecy.fr/train"},
+        {"label": "Grand Annecy mobility: bus", "url": "https://mobilites.grandannecy.fr/bus"},
+        {"label": "Centre Hospitalier Annecy Genevois: emergencies", "url": "https://www.ch-annecygenevois.fr/liste-des-services/urgences/"},
+        {"label": "Géorisques: Annecy municipal risk report", "url": "https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi/rapport2/74010/Annecy/commune/74000"},
+        {"label": "Notaires des Savoie: 2026 property-market observatory", "url": "https://chambre-interdepartementale-de-savoie.notaires.fr/wp-content/uploads/2026/04/Observatoire-de-limmo-des-Notaires-des-Savoie-2026.pdf"},
+        {"label": "Barnes: Annecy apartment asking observation", "url": "https://www.barnes-montblanc.com/achat-immobilier-luxe/annecy-74000/annecy-ville/appartement-luxe-annecy-74000-3635"},
+        {"label": "Compimmo: Saint-Jorioz apartment asking observation", "url": "https://www.compimmo.com/fr/acheter/appartement/saint-jorioz-74410/all/all/all/2"},
+        {"label": "Agence Clerc: Veyrier-du-Lac house asking observation", "url": "https://agence-clerc.com/fr/propri%C3%A9t%C3%A9/87077856"},
+    ),
+    images=(
+        DossierImage("city-lake-daily-life", "/assets/annecy-city-lake-daily-life.webp", "Residents walking and cycling between Annecy city streets and the lake on an ordinary morning", "Annecy works best when the lake and daily services share one routine.", "hero"),
+        DossierImage("winter-access-healthcare", "/assets/annecy-winter-access-healthcare.webp", "Mature residents waiting for a local bus near Annecy during a wet winter morning", "Test transport and healthcare access in ordinary winter conditions.", "wide"),
+        DossierImage("west-shore-daily-life", "/assets/annecy-west-shore-daily-life.webp", "Residents carrying groceries through a west-shore Lake Annecy town", "Saint-Jorioz and Sevrier should be judged as working towns, not summer scenery.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Annecy through five destination lenses",
+    assessment_intro="Here’s how Annecy scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show the spread from a compact Annecy apartment through a Saint-Jorioz family home to a premium Veyrier-du-Lac house. They are asking evidence—not valuations. EUR is primary; USD uses the recorded ECB reference basis.",
+    market_anchors_intro="These are official completed-sale market signals—not valuations. They compare broad Annecy product groups and must be adjusted for commune, exact address, view, condition, building, parking and lawful use.",
+    orientation_groups=(
+        DossierOrientationGroup("City and north shore", (("Annecy station / Vieille Ville", "Walkable city core"), ("Albigny", "Lakefront residential area"), ("Annecy-le-Vieux", "Established north-shore neighbourhoods"), ("Pringy / Epagny Metz-Tessy", "Rail and hospital direction"))),
+        DossierOrientationGroup("Lake-shore choices", (("Sevrier", "Near-city west shore"), ("Saint-Jorioz / Duingt", "West-shore towns"), ("Veyrier-du-Lac / Menthon-Saint-Bernard", "Premium east shore"), ("Talloires", "Village and mountain-end setting"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current train, airport-bus and lake-shore timetables, seasonal service, congestion and the exact hospital route.",
+    country_guide_url="/countries/france-property/",
+    country_guide_label="France property guide",
+    rail_comparison="Compare Annecy with the full Atlas.",
+)
+
+
 NISEKO_DOSSIER = PremiumDossierSpec(
     destination_id="niseko",
     title="Niseko Retirement Property Dossier",
@@ -1847,6 +1989,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     PARK_CITY_DEER_VALLEY_DOSSIER.destination_id: PARK_CITY_DEER_VALLEY_DOSSIER,
     CRETE_DOSSIER.destination_id: CRETE_DOSSIER,
     NISEKO_DOSSIER.destination_id: NISEKO_DOSSIER,
+    ANNECY_DOSSIER.destination_id: ANNECY_DOSSIER,
 }
 
 
@@ -1921,3 +2064,4 @@ validate_premium_dossier(COSTA_BRAVA_GIRONA_DOSSIER)
 validate_premium_dossier(PARK_CITY_DEER_VALLEY_DOSSIER)
 validate_premium_dossier(CRETE_DOSSIER)
 validate_premium_dossier(NISEKO_DOSSIER)
+validate_premium_dossier(ANNECY_DOSSIER)
