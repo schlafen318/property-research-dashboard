@@ -370,6 +370,7 @@ During research, record for every material claim:
 - The browser console must report zero errors and zero warnings caused by the page.
 - All links must resolve to the intended destination.
 - The production build must complete from source without hand-editing generated artifacts.
+- Destination-specific registry tests must prove that the dossier under review and every earlier reviewed dependency remain registered; they must not freeze the registry to an exact historical member set or total that makes the next approved destination look like a regression.
 
 ## 16. Hard publishing gates
 

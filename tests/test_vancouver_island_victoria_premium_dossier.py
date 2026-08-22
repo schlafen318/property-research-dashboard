@@ -12,16 +12,16 @@ from src.premium_destination_dossiers import (
 
 
 ROOT = Path(__file__).parents[1]
-DESTINATION_ID = "phuket-koh-samui"
-FX = 1.1681 / 38.448
+DESTINATION_ID = "vancouver-island-victoria"
+FX = 1.1699 / 1.6074
 
 
-class PhuketKohSamuiDossierContractTests(unittest.TestCase):
+class VancouverIslandVictoriaDossierContractTests(unittest.TestCase):
     def setUp(self):
         self.spec = get_premium_dossier(DESTINATION_ID)
 
-    def test_registry_contains_seventeen_reviewed_dossiers(self):
-        self.assertGreaterEqual(len(PREMIUM_DESTINATION_DOSSIERS), 17)
+    def test_registry_preserves_reviewed_dossiers_and_contains_vancouver_island(self):
+        self.assertGreaterEqual(len(PREMIUM_DESTINATION_DOSSIERS), 18)
         self.assertIsNotNone(self.spec)
 
     def test_contract_passes_every_bounded_content_gate(self):
@@ -32,7 +32,7 @@ class PhuketKohSamuiDossierContractTests(unittest.TestCase):
             {key for lens in self.spec.lenses for key in lens.dimension_keys},
         )
         self.assertEqual(
-            (3, 4, 3, 8, 2),
+            (3, 4, 3, 8, 1),
             (
                 len(self.spec.market_anchors),
                 len(self.spec.micro_locations),
@@ -43,7 +43,7 @@ class PhuketKohSamuiDossierContractTests(unittest.TestCase):
         )
         self.assertEqual("sources", self.spec.nav_items[-1][0])
 
-    def test_copy_is_locally_specific_and_decision_grade(self):
+    def test_copy_leads_with_legal_geography_and_is_locally_specific(self):
         prose = " ".join(
             [
                 self.spec.lede,
@@ -54,25 +54,26 @@ class PhuketKohSamuiDossierContractTests(unittest.TestCase):
             ]
         )
         for term in (
-            "Phuket Town",
-            "Rawai",
-            "Choeng Thale",
-            "Si Sunthon",
-            "Maenam",
-            "Bo Phut",
-            "Lamai",
-            "Koh Samui",
+            "Victoria Core",
+            "Sidney",
+            "Saanich Peninsula",
+            "Sooke",
+            "Nanaimo",
+            "Parksville",
+            "Vancouver Island",
         ):
             with self.subTest(term=term):
                 self.assertIn(term, prose)
         for pattern in (
-            r"49%|foreign quota|land|lease",
-            r"hotel|short.?stay|rental|licen",
-            r"flood|landslide|tsunami|monsoon|drainage",
-            r"hospital|health|emergency",
+            r"1 January 2027|January 1, 2027",
+            r"census metropolitan|census agglomeration|CMA|CA",
+            r"20%|additional property transfer tax",
+            r"principal residence|short.?term rental",
+            r"earthquake|tsunami|flood|wildfire",
+            r"MSP|healthcare|hospital",
             r"resale|exit|buyer pool",
         ):
-            self.assertRegex(prose.lower(), pattern)
+            self.assertRegex(prose, pattern)
         words = re.findall(r"\b[\w’'-]+\b", prose)
         self.assertGreaterEqual(len(words), 1800)
         self.assertLessEqual(len(words), 2500)
@@ -80,23 +81,27 @@ class PhuketKohSamuiDossierContractTests(unittest.TestCase):
     def test_current_sources_cover_high_stakes_and_local_categories(self):
         urls = " ".join(item["url"] for item in self.spec.references)
         for fragment in (
-            "dol.go.th",
-            "ltr.boi.go.th",
-            "multi.dopa.go.th",
-            "rd.go.th",
-            "reic.or.th",
-            "dmr.go.th",
-            "tmd.go.th",
-            "phuket.airportthai.co.th",
-            "samuiairport.com",
-            "bangkokhospital.com",
+            "cmhc-schl.gc.ca",
+            "AnnualStatutes/2024_17/page-15.html",
+            "laws-lois.justice.gc.ca",
+            "canada.ca/en/services/taxes",
+            "www2.gov.bc.ca/gov/content/taxes/property-taxes",
+            "short-term-rentals/principal-residence-requirement",
+            "health-drug-coverage/msp",
+            "preparedbc/know-your-hazards",
+            "islandhealth.ca/locations/hospitals-health-centre-locations/royal-jubilee",
+            "transportation-projects/other-transportation-projects/highway-14",
+            "bctransit.com/victoria/schedules-and-maps",
+            "bcferries.com",
+            "vreb.org/current-statistics",
+            "bcassessment.ca/news",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, urls)
         self.assertEqual("2026-08-22", self.spec.date_reviewed)
 
     def test_evidence_ledger_records_scope_limits_and_recheck_triggers(self):
-        ledger = (ROOT / "docs/research/phuket-koh-samui-evidence-ledger.md").read_text()
+        ledger = (ROOT / "docs/research/vancouver-island-victoria-evidence-ledger.md").read_text()
         for heading in (
             "Claim or topic",
             "Source owner",
@@ -106,15 +111,15 @@ class PhuketKohSamuiDossierContractTests(unittest.TestCase):
             "Scope",
             "Limitation",
             "Recheck trigger",
+            "Destination section(s)",
         ):
             self.assertIn(heading, ledger)
         self.assertGreaterEqual(ledger.count("2026-08-22"), 14)
-        self.assertGreaterEqual(ledger.count("https://"), 18)
+        self.assertGreaterEqual(ledger.count("https://"), 23)
         for trigger in (
-            "ownership",
-            "visa",
+            "purchase ban",
             "tax",
-            "lodging",
+            "short-term rental",
             "listing",
             "transport",
             "hazard",
@@ -122,13 +127,33 @@ class PhuketKohSamuiDossierContractTests(unittest.TestCase):
         ):
             self.assertIn(trigger, ledger.lower())
 
-    def test_three_market_anchors_are_current_and_officially_bounded(self):
+    def test_generated_images_have_a_publication_provenance_record(self):
+        provenance = (
+            ROOT / "docs/research/vancouver-island-victoria-image-provenance.md"
+        ).read_text()
+        for filename in (
+            "vancouver-island-victoria-daily-life.webp",
+            "vancouver-island-victoria-island-access.webp",
+            "vancouver-island-victoria-coastal-risk.webp",
+        ):
+            self.assertIn(filename, provenance)
+        for field in (
+            "Generation tool",
+            "Generation date",
+            "Prompt",
+            "Publication-rights basis",
+            "Visual approval",
+        ):
+            self.assertIn(field, provenance)
+        self.assertNotRegex(provenance, r"(?i)pending|unknown|unverified")
+
+    def test_three_market_anchors_are_current_and_asset_bounded(self):
         evidence = " ".join(" ".join(str(value) for value in item.values()) for item in self.spec.market_anchors)
-        for value in ("1,190 units", "6,087 million THB", "8.3 million THB"):
+        for value in ("1,311,000 CAD", "548,600 CAD", "786,000 CAD"):
             self.assertIn(value, evidence)
-        self.assertRegex(evidence.lower(), r"transfer|asking inventory|province")
-        self.assertIn("2025", evidence)
-        self.assertIn("Q1 2026", evidence)
+        self.assertIn("July 2026", evidence)
+        self.assertIn("July 1, 2025", evidence)
+        self.assertRegex(evidence.lower(), r"benchmark|assessed|not.*candidate")
 
     def test_atlas_reads_are_concise_and_locally_specific(self):
         self.assertEqual(DECISION_DIMENSION_KEYS, set(self.spec.score_reads))
@@ -138,12 +163,12 @@ class PhuketKohSamuiDossierContractTests(unittest.TestCase):
                 self.assertLessEqual(len(atlas_read.split()), 36)
                 self.assertRegex(
                     atlas_read,
-                    r"Phuket|Koh Samui|Samui|Rawai|Choeng Thale|Si Sunthon|Maenam|Bo Phut|Lamai",
+                    r"Victoria|Sidney|Saanich|Sooke|Nanaimo|Parksville|Vancouver Island|Capital Regional District",
                 )
 
 
-class PhuketKohSamuiListingTests(unittest.TestCase):
-    def test_three_current_direct_thb_observations_are_complete(self):
+class VancouverIslandVictoriaListingTests(unittest.TestCase):
+    def test_three_current_direct_cad_observations_are_complete(self):
         rows = [
             item
             for item in json.loads((ROOT / "data/listings.json").read_text())
@@ -152,42 +177,41 @@ class PhuketKohSamuiListingTests(unittest.TestCase):
         self.assertEqual(3, len(rows))
         self.assertEqual(
             {
-                "Rawai foreign-quota resort condominium",
-                "Si Sunthon company-structure pool villa",
-                "Maenam company-sale pool villa",
+                "Downtown Victoria renovated strata apartment",
+                "Sidney new-build strata townhouse",
+                "Sooke oceanfront strata townhouse",
             },
             {item["listing_name"] for item in rows},
         )
         self.assertEqual(
             {
-                "https://www.fazwaz.com/property-sales/2-bedroom-condo-for-sale-at-selina-serenity-resort-residences-in-rawai-phuket-u1944488",
-                "https://www.fazwaz.com/property-sales/4-bedroom-villa-for-sale-at-manor-phuket-in-si-sunthon-phuket-u6144306",
-                "https://www.fazwaz.com/property-sales/3-bedroom-villa-for-sale-in-maenam-surat-thani-u6076824",
+                "https://www.realtor.ca/real-estate/30169955/403-1015-johnson-st-victoria-downtown",
+                "https://www.realtor.ca/real-estate/29877007/2-2312-orchard-ave-sidney-sidney-south-east",
+                "https://www.realtor.ca/real-estate/29896327/3-6995-nordin-rd-sooke-whiffin-spit",
             },
             {item["source_url"] for item in rows},
         )
         for row in rows:
-            self.assertEqual("THB", row["local_currency"])
+            self.assertEqual("CAD", row["local_currency"])
             self.assertEqual("2026-08-22", row["captured_date"])
-            self.assertIn("1 EUR = 1.1681 USD and 1 EUR = 38.448 THB", row["fx_basis"])
-            self.assertIn("indoor area", row["area_basis"].lower())
+            self.assertIn("1 EUR = 1.1699 USD and 1 EUR = 1.6074 CAD", row["fx_basis"])
+            self.assertIn("finished internal area", row["area_basis"].lower())
             self.assertAlmostEqual(row["local_price"] * FX, row["usd_price"], places=2)
             self.assertAlmostEqual(row["usd_price"] / row["size_m2"], row["usd_per_m2"], places=2)
-        self.assertEqual({134, 220, 534}, {row["size_m2"] for row in rows})
-        si_sunthon = next(row for row in rows if row["listing_name"].startswith("Si Sunthon"))
-        self.assertEqual(30900000, si_sunthon["local_price"])
-        maenam = next(row for row in rows if row["listing_name"].startswith("Maenam"))
-        self.assertIn("Sale with Company", maenam["note"])
+        self.assertEqual({91.60239744, 116.87202432, 272.48461632}, {row["size_m2"] for row in rows})
 
-    def test_shared_price_basis_and_calculator_are_reconciled(self):
+    def test_shared_price_basis_access_status_and_calculator_are_reconciled(self):
         destination = next(
             item
             for item in json.loads((ROOT / "data/destinations.json").read_text())
             if item["id"] == DESTINATION_ID
         )
-        self.assertEqual(1800.0, destination["usd_per_m2"])
-        self.assertEqual("$1,800", destination["quick_metrics"]["usd_m"])
-        for text in ("three direct asking observations", "mixed-asset", "0.0303813"):
+        self.assertEqual("restricted", destination["access_status"])
+        self.assertIn("January 1, 2027", destination["access_summary"])
+        self.assertEqual(3.15, destination["overall_score"])
+        self.assertEqual(5300.0, destination["usd_per_m2"])
+        self.assertEqual("$5,300", destination["quick_metrics"]["usd_m"])
+        for text in ("three direct asking observations", "mixed-asset", "0.7278213"):
             self.assertIn(text, destination["price_basis"])
         retirement = next(
             item
@@ -195,16 +219,16 @@ class PhuketKohSamuiListingTests(unittest.TestCase):
             if item["destination_id"] == DESTINATION_ID
         )
         self.assertAlmostEqual(FX, retirement["fx_to_usd"], places=12)
-        self.assertEqual(425338, retirement["property"]["representative_price_usd"])
+        self.assertEqual(625781, retirement["property"]["representative_price_usd"])
         self.assertIn("median of three current direct asking observations", retirement["property"]["price_basis"].lower())
-        self.assertEqual(0.025, retirement["property"]["acquisition_cost_rate"])
-        self.assertIn("2% registration fee", retirement["property"]["acquisition_cost_basis"])
+        self.assertEqual(0.22, retirement["property"]["acquisition_cost_rate"])
+        self.assertIn("20% additional property transfer tax", retirement["property"]["acquisition_cost_basis"])
         source_urls = {source["url"] for source in retirement["sources"]}
-        self.assertIn("https://www.dol.go.th/en/dol-services/public-service-manual/land-registration/fees-taxes-duties/", source_urls)
+        self.assertIn("https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax", source_urls)
         self.assertIn("https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html", source_urls)
 
 
-class PhuketKohSamuiRenderingTests(unittest.TestCase):
+class VancouverIslandVictoriaRenderingTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         from src.build_unified_app import build_destination_page, consolidate_destination
@@ -219,7 +243,7 @@ class PhuketKohSamuiRenderingTests(unittest.TestCase):
             [],
         )
 
-    def test_page_uses_premium_sequence_and_thailand_handoff(self):
+    def test_page_uses_premium_sequence_and_canada_handoff(self):
         self.assertIn('<body class="premium-dossier">', self.html)
         positions = [
             self.html.index(f'id="{anchor}"')
@@ -227,39 +251,41 @@ class PhuketKohSamuiRenderingTests(unittest.TestCase):
         ]
         self.assertEqual(sorted(positions), positions)
         for text in (
-            "Phuket / Koh Samui through five destination lenses",
-            "Here’s how Phuket / Koh Samui scores",
-            "Compare Phuket / Koh Samui with the full Atlas.",
-            "/countries/thailand-property/",
+            "Vancouver Island / Victoria through five destination lenses",
+            "Here’s how Vancouver Island / Victoria scores",
+            "Compare Vancouver Island / Victoria with the full Atlas.",
+            "/countries/canada-property/",
             "/retirement-abroad-calculator/",
+            "Foreign-buyer access restricted",
         ):
             self.assertIn(text, self.html)
 
     def test_country_handoff_is_bidirectional_and_decision_useful(self):
         from src.build_unified_app import COUNTRY_HUBS, build_country_hub_page
 
-        hub = next(item for item in COUNTRY_HUBS if item["slug"] == "thailand-property")
-        self.assertEqual("Thailand", hub["country"])
+        hub = next(item for item in COUNTRY_HUBS if item["slug"] == "canada-property")
+        self.assertEqual("Canada", hub["country"])
         self.assertIn(DESTINATION_ID, hub["destination_ids"])
         destinations = json.loads((ROOT / "data/destinations.json").read_text())
         html = build_country_hub_page(hub, destinations, [])
-        self.assertIn("Thailand Property Guide for Foreign Buyers", html)
+        self.assertIn("Canada Property Guide for Foreign Buyers", html)
         self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
         for text in (
-            "Foreign land ownership",
-            "Foreign-quota condominium",
-            "Residence is separate",
-            "Short stays are an accommodation business",
-            "https://www.dol.go.th/en/dol-services/public-service-manual/land-registration/land-for-foreigners/dol-regulation-foreign-condominium-ownership-2004/",
-            "https://www.dol.go.th/question-answer/Q2601-000065",
-            "https://ltr.boi.go.th/",
-            "https://multi.dopa.go.th/legal/assets/modules/news/uploads/a8fec27695d5ecdb26fe0de8f70040fc5c00b4c6870cd0192022484170852251.pdf",
+            "Purchase prohibition through 1 January 2027",
+            "Census geography controls eligibility",
+            "Residence and healthcare are separate",
+            "Foreign-buyer and vacancy taxes stack",
+            "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/housing-research/consultations/prohibition-purchase-residential-property-non-canadians-act",
+            "https://laws-lois.justice.gc.ca/eng/AnnualStatutes/2024_17/page-15.html",
+            "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2022-250/section-3.html",
+            "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax",
+            "https://www.canada.ca/en/services/taxes/excise-taxes-duties-and-levies/underused-housing-tax.html",
         ):
             self.assertIn(text, html)
 
     def test_images_tables_and_orientation_are_complete(self):
         spec = get_premium_dossier(DESTINATION_ID)
-        self.assertEqual(3, self.html.count('src="/assets/phuket-koh-samui-'))
+        self.assertEqual(3, self.html.count('src="/assets/vancouver-island-victoria-'))
         for image in spec.images:
             self.assertEqual(1, self.html.count(f'src="{image.src}"'))
             self.assertIn(f'alt="{image.alt}"', self.html)
@@ -268,15 +294,18 @@ class PhuketKohSamuiRenderingTests(unittest.TestCase):
             (10, 'class="premium-score-row"'),
             (3, 'class="premium-listing-row"'),
             (3, 'class="premium-market-anchor"'),
-            (2, 'class="premium-orientation-group"'),
+            (1, 'class="premium-orientation-group"'),
         ):
             self.assertEqual(count, self.html.count(marker))
         self.assertIn("asking evidence—not valuations", self.html)
         self.assertIn("<th>Atlas read</th>", self.html)
         self.assertIn("<th>Area / basis</th>", self.html)
+        self.assertEqual(3, self.html.count('class="premium-table-wrap premium-card-table-wrap"'))
+        for label in ("Micro-location", "Best for", "Daily life", "Primary diligence"):
+            self.assertIn(f'data-label="{label}"', self.html)
 
     def test_quality_review_uses_canonical_scorecard_fields(self):
-        review = (ROOT / "docs/research/phuket-koh-samui-quality-review.md").read_text()
+        review = (ROOT / "docs/research/vancouver-island-victoria-quality-review.md").read_text()
         for weight in (
             "| Decision usefulness | 15 |",
             "| Evidence and accuracy | 25 |",
@@ -290,6 +319,8 @@ class PhuketKohSamuiRenderingTests(unittest.TestCase):
             self.assertIn(weight, review)
         for field in ("Reviewer:", "Approval date:", "Console warnings:"):
             self.assertIn(field, review)
+        self.assertNotRegex(review, r"(?i)pending|provisional|not yet approved")
+        self.assertIn("Result: 100/100", review)
 
 
 if __name__ == "__main__":

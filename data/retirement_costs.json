@@ -1324,7 +1324,7 @@
     {
       "destination_id": "vancouver-island-victoria",
       "display_currency": "CAD",
-      "fx_to_usd": 0.70609,
+      "fx_to_usd": 0.7278213263655593,
       "inflation": {
         "general": 0.025,
         "healthcare": 0.05,
@@ -1361,9 +1361,10 @@
         }
       },
       "property": {
-        "representative_price_usd": 741395,
-        "acquisition_cost_rate": 0.04,
-        "price_basis": "Median of three representative Vancouver Island / Victoria listing snapshots captured by Global Home Atlas."
+        "representative_price_usd": 625781,
+        "acquisition_cost_rate": 0.22,
+        "price_basis": "Median of three current direct asking observations captured 2026-08-22; mixed assets, not a market median or valuation.",
+        "acquisition_cost_basis": "Illustrative rounded rate for an otherwise eligible foreign-national purchase inside the Capital Regional District: general B.C. property transfer tax at the representative price plus the 20% additional property transfer tax. Excludes legal, inspection, appraisal, financing and other transaction costs; confirm exemptions and exact liability."
       },
       "confidence": {
         "overall": "medium-high",
@@ -1392,12 +1393,28 @@
           "notes": "Official national index used as a planning proxy, not a forecast."
         },
         {
-          "name": "Realtor.ca / Victoria homes search — property listings",
-          "url": "https://www.realtor.ca/map#ZoomLevel=11&Center=48.4284%2C-123.3656&LatitudeMax=48.61550&LongitudeMax=-123.06485&LatitudeMin=48.24062&LongitudeMin=-123.66635",
+          "name": "Realtor.ca — three direct Vancouver Island / Victoria observations",
+          "url": "https://www.realtor.ca/real-estate/29877007/2-2312-orchard-ave-sidney-sidney-south-east",
           "metric_supported": "Representative property acquisition benchmark",
-          "source_date": "2026-06-25",
-          "accessed_on": "2026-08-18",
-          "notes": "Median of three captured listings; not a market-wide median and availability changes."
+          "source_date": "2026-08-22",
+          "accessed_on": "2026-08-22",
+          "notes": "Median of three current direct asking observations; mixed assets, not a market-wide median, valuation or availability guarantee."
+        },
+        {
+          "name": "B.C. additional property transfer tax",
+          "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax",
+          "metric_supported": "20% additional property transfer tax assumption",
+          "source_date": "Current 2026",
+          "accessed_on": "2026-08-22",
+          "notes": "Applies only when the statutory buyer, property and location tests are met; exemptions must be checked."
+        },
+        {
+          "name": "European Central Bank euro reference exchange rates",
+          "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+          "metric_supported": "CAD-to-USD cross-rate",
+          "source_date": "2026-08-21",
+          "accessed_on": "2026-08-22",
+          "notes": "1 EUR = 1.1699 USD and 1 EUR = 1.6074 CAD; CAD-to-USD cross-rate 0.7278213264."
         }
       ]
     },

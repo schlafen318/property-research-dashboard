@@ -1850,14 +1850,14 @@
     "name": "Vancouver Island / Victoria",
     "country": "Canada",
     "category": "Water",
-    "overall_score": 3.72,
-    "usd_per_m2": 6800.0,
+    "overall_score": 3.15,
+    "usd_per_m2": 5300.0,
     "net_yield_estimate": "2.5-3.8% est. net",
     "quick_metrics": {
-      "usd_m": "$6,800",
+      "usd_m": "$5,300",
       "net_yield": "2.5-3.8% est. net",
-      "ownership": "4.3/5",
-      "friendly": "4.4/5"
+      "ownership": "1.8/5",
+      "friendly": "2.4/5"
     },
     "panel_summary": "A calmer North American water-and-retirement benchmark with healthcare, English-language ease, and lifestyle depth, but Canada foreign-buyer/tax rules and BC housing policy require care.",
     "pros": [
@@ -1883,7 +1883,7 @@
       },
       "airport_access": {
         "label": "Airport access",
-        "score": 3.8,
+      "score": 3.7,
         "weight": 0.07
       },
       "business_hub_access": {
@@ -1898,12 +1898,12 @@
       },
       "ownership_clarity": {
         "label": "Ownership clarity",
-        "score": 4.3,
+      "score": 1.8,
         "weight": 0.11
       },
       "str_regulatory_safety": {
         "label": "STR regulatory safety",
-        "score": 2.7,
+      "score": 2.2,
         "weight": 0.07
       },
       "rental_profit_potential": {
@@ -1928,7 +1928,7 @@
       },
       "chinese_foreigner_friendliness": {
         "label": "Chinese/foreigner friendliness",
-        "score": 4.4,
+      "score": 2.4,
         "weight": 0.06
       },
       "food_quality": {
@@ -1943,11 +1943,13 @@
       },
       "affordability": {
         "label": "Affordability",
-        "score": 3.0,
+      "score": 2.8,
         "weight": 0.11
       }
     },
-    "ownership_notes": "Canada generally has clear title, but foreign-buyer restrictions, vacancy/speculation taxes, and provincial/municipal rules must be checked before assuming eligibility.",
+  "ownership_notes": "Title registration is clear, but most non-Canadians are prohibited from purchasing residential property inside a census metropolitan area or census agglomeration through January 1, 2027 unless an exception applies. Eligibility changes with the buyer, property and exact census geography.",
+  "access_status": "restricted",
+  "access_summary": "Most non-Canadians cannot purchase typical residential property inside the Victoria census metropolitan area or another census metropolitan area/census agglomeration until January 1, 2027 unless a statutory exception applies. Confirm the buyer, property type and exact Statistics Canada geography before viewing a home as purchasable.",
     "red_flags": "Foreign-buyer policy, BC speculation/vacancy taxes, STR restrictions, and lower yield after ownership costs.",
     "rental": {
       "gross_yield": "Long-term rental demand is supported by livability and constrained supply; STR upside is more policy-sensitive.",
@@ -1956,8 +1958,8 @@
       "adr_occupancy": "Moderate year-round demand; summer tourism peak.",
       "confidence": "Medium-low; policy-sensitive benchmark"
     },
-    "price_basis": "Victoria/Vancouver Island built residential benchmark. Approx. US$630/sq ft equivalent, converted to about $6,800/m2; waterfront and Victoria core can be higher.",
-    "price_confidence": "Medium-low; regional benchmark",
+  "price_basis": "Median of three direct asking observations captured 2026-08-22 across Downtown Victoria, Sidney and Sooke. This is mixed-asset evidence, not a market median or valuation. CAD was converted at 0.7278213 USD per CAD using the ECB 2026-08-21 EUR cross-rates.",
+  "price_confidence": "Medium; direct but mixed-asset asking evidence",
     "profit_driver": "Retirement suitability, healthcare/livability, English-language ease, and water-oriented lifestyle scarcity.",
     "rank": 18
   },
