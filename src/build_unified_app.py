@@ -221,6 +221,16 @@ COUNTRY_HUBS = [
         "description": "Assess New Zealand property for foreign buyers through Queenstown, including overseas-buyer eligibility, residence, sensitive land, visitor accommodation, alpine hazards, healthcare, access, and resale depth.",
         "h1": "New Zealand Property Guide for Foreign Buyers",
         "thesis": "New Zealand offers strong institutions, safety and exceptional outdoor living, but overseas-buyer eligibility is a controlling constraint rather than a closing detail. The strongest cases establish the buyer's legal pathway first, then reconcile residence, sensitive land, local planning, hazards, healthcare, daily access and the future eligible buyer pool.",
+        "country_rules": [
+            {"heading": "Who can buy a home", "text": "New Zealand citizens and ordinarily resident residence-class visa holders can generally buy without restriction. Some other residence-class visa holders can seek consent for one home. Temporary visa holders and other overseas people generally cannot buy ordinary residential land."},
+            {"heading": "Investor-visa home pathway", "text": "From 6 March 2026, qualifying investor-visa holders can seek consent for an existing dwelling with a purchase price of more than NZ$5 million. For land to build on, the land purchase and construction prices must together exceed NZ$5 million. Consent remains mandatory."},
+            {"heading": "Residence is a separate decision", "text": "A property purchase does not create residence. The Temporary Retirement Visitor Visa is temporary and does not itself make an overseas buyer eligible to buy an ordinary home."},
+        ],
+        "primary_sources": [
+            {"label": "LINZ: buying residential property to live in", "url": "https://www.linz.govt.nz/guidance/overseas-investment/buying-residential-property-live"},
+            {"label": "LINZ: NZ$5 million-plus house pathway", "url": "https://www.linz.govt.nz/guidance/overseas-investment/ways-invest/pathways-migrants-and-visa-holders/investing-residential-land-over-5-million"},
+            {"label": "Immigration New Zealand: Temporary Retirement Visitor Visa", "url": "https://www.immigration.govt.nz/visas/temporary-retirement-visitor-visa/"},
+        ],
         "destination_ids": ["queenstown"],
         "guide_slugs": ["buying-property-abroad-for-retirement", "where-can-foreigners-buy-property", "foreign-property-investment-risks", "best-places-to-buy-a-second-home-abroad"],
     },
@@ -5651,6 +5661,19 @@ def build_country_hub_page(
     )
     intro = hub.get("generated_intro") or hub["description"]
     generated_link = generated_internal_link_html(hub)
+    country_rules = "".join(
+        f'<h3>{escape(item["heading"])}</h3><p>{escape(item["text"])}</p>'
+        for item in hub.get("country_rules", [])
+    )
+    primary_sources = "".join(
+        f'<li><a href="{escape(item["url"])}">{escape(item["label"])}</a></li>'
+        for item in hub.get("primary_sources", [])
+    )
+    country_research = (
+        f'{country_rules}<h3>Primary sources</h3><ul>{primary_sources}</ul>'
+        if country_rules and primary_sources
+        else ""
+    )
 
     return f"""<!doctype html>
 <html lang="en">
@@ -5701,6 +5724,7 @@ def build_country_hub_page(
             <summary><h2>Country Thesis</h2></summary>
             <p>{escape(hub["thesis"])}</p>
             <p>This page is a country-level filter for global buyers. Use it to decide whether {escape(hub["country"])} deserves deeper local diligence before comparing individual homes, agents, or legal structures.</p>
+            {country_research}
           </details>
           <details class="page-section" id="buyer-fit" open>
             <summary><h2>Buyer Fit</h2></summary>

@@ -99,6 +99,12 @@ class QueenstownListingTests(unittest.TestCase):
         self.assertAlmostEqual(FX, retirement["fx_to_usd"], places=12)
         self.assertEqual(1065668, retirement["property"]["representative_price_usd"])
         self.assertIn("asking observations", retirement["property"]["price_basis"])
+        self.assertEqual(0.005, retirement["property"]["acquisition_cost_rate"])
+        self.assertIn("0.5% planning allowance", retirement["property"]["acquisition_cost_basis"])
+        self.assertIn("no stamp-duty percentage", retirement["property"]["acquisition_cost_basis"])
+        source_urls = {source["url"] for source in retirement["sources"]}
+        self.assertIn("https://www.linz.govt.nz/guidance/overseas-investment/ways-invest/pathways-migrants-and-visa-holders/investing-residential-land-over-5-million", source_urls)
+        self.assertIn("https://www.settled.govt.nz/blog/buying-your-first-home-heres-what-you-need-to-know/", source_urls)
 
 
 class QueenstownRenderingTests(unittest.TestCase):
@@ -126,8 +132,25 @@ class QueenstownRenderingTests(unittest.TestCase):
         html = build_country_hub_page(hub, destinations, [])
         self.assertIn("New Zealand Property Guide for Foreign Buyers", html)
         self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
+        for text in (
+            "Who can buy a home",
+            "Investor-visa home pathway",
+            "Residence is a separate decision",
+            "purchase price of more than NZ$5 million",
+            "land purchase and construction prices must together exceed NZ$5 million",
+            "https://www.linz.govt.nz/guidance/overseas-investment/buying-residential-property-live",
+            "https://www.linz.govt.nz/guidance/overseas-investment/ways-invest/pathways-migrants-and-visa-holders/investing-residential-land-over-5-million",
+            "https://www.immigration.govt.nz/visas/temporary-retirement-visitor-visa/",
+        ):
+            self.assertIn(text, html)
         comparison = build_country_comparison_page(destinations, [])
         self.assertIn('<span>1 destination</span>\n              <h3><a href="/countries/new-zealand-property/">New Zealand</a></h3>', comparison)
+
+    def test_investor_pathway_copy_distinguishes_existing_home_from_land_and_build(self):
+        spec = get_premium_dossier(DESTINATION_ID)
+        copy = " ".join([*spec.verdict_paragraphs, *spec.score_reads.values()])
+        self.assertIn("existing dwelling with a purchase price of more than NZ$5 million", copy)
+        self.assertIn("land purchase and construction prices must together exceed NZ$5 million", copy)
 
     def test_images_tables_and_orientation_are_complete(self):
         spec = get_premium_dossier(DESTINATION_ID)
