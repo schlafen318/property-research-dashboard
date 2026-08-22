@@ -24,6 +24,7 @@ REVIEWED_DOSSIERS = {
     DESTINATION_ID,
     "costa-brava-girona",
     "park-city-deer-valley",
+    "crete",
 }
 
 

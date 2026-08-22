@@ -24,6 +24,7 @@ REVIEWED_DOSSIERS = {
     "hakuba",
     "costa-brava-girona",
     "park-city-deer-valley",
+    "crete",
 }
 
 
