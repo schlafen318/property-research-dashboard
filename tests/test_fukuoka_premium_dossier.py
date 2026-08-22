@@ -13,9 +13,9 @@ from src.premium_destination_dossiers import (
 
 class PremiumDossierContractTests(unittest.TestCase):
     def test_only_reviewed_prototypes_use_the_premium_registry(self) -> None:
-        self.assertEqual({"fukuoka-itoshima", "algarve-cascais", "madeira", "malaga-costa-del-sol", "lake-como", "hakone-izu"}, set(PREMIUM_DESTINATION_DOSSIERS))
+        self.assertEqual({"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "malaga-costa-del-sol", "lake-como", "hakone-izu"}, set(PREMIUM_DESTINATION_DOSSIERS))
         self.assertIsNotNone(get_premium_dossier("fukuoka-itoshima"))
-        self.assertIsNone(get_premium_dossier("valencia"))
+        self.assertIsNotNone(get_premium_dossier("valencia"))
 
     def test_fukuoka_spec_has_the_complete_bounded_contract(self) -> None:
         spec = get_premium_dossier("fukuoka-itoshima")
@@ -231,9 +231,9 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         self.assertLess(self.fukuoka_html.index('id="sources"'), article_end)
         self.assertNotIn("<section", self.fukuoka_html[self.fukuoka_html.index('id="sources"'):article_end])
 
-    def test_other_destinations_keep_the_generic_renderer(self) -> None:
-        self.assertNotIn('<body class="premium-dossier">', self.valencia_html)
-        self.assertNotIn('id="lenses"', self.valencia_html)
+    def test_reviewed_valencia_destination_uses_the_premium_renderer(self) -> None:
+        self.assertIn('<body class="premium-dossier">', self.valencia_html)
+        self.assertIn('id="lenses"', self.valencia_html)
 
     def test_unrelated_site_overrides_do_not_disable_premium_renderer(self) -> None:
         self.assertIn('<body class="premium-dossier">', self.fukuoka_html_with_site_overrides)
