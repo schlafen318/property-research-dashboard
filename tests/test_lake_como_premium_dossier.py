@@ -21,6 +21,7 @@ REVIEWED_DOSSIERS = {
     "malaga-costa-del-sol",
     DESTINATION_ID,
     "hakone-izu",
+    "hakuba",
 }
 
 

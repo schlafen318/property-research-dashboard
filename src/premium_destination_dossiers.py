@@ -1130,6 +1130,154 @@ VALENCIA_DOSSIER = PremiumDossierSpec(
 )
 
 
+HAKUBA_DOSSIER = PremiumDossierSpec(
+    destination_id="hakuba",
+    title="Hakuba Retirement Property Dossier",
+    description="Assess Hakuba retirement property through village life, access, residence, healthcare, ownership, lodging rules, snow operations, value, resale, and current listings.",
+    h1="Hakuba: buy the alpine life—and its operating reality",
+    lede=(
+        "Hakuba offers one of Asia’s most compelling four-season mountain settings, but it is not one seamless resort market. Happo and Wadano concentrate lift access and international hospitality; Echoland and Misorano mix restaurants, forest homes and driving; Iwatake is attracting year-round investment; Kamishiro and Goryu offer a quieter residential rhythm around rail and southern ski areas. A home that works brilliantly for winter holidays may be awkward for ordinary retirement life. This dossier starts with residence, healthcare and daily movement, then tests whether the address, building and operating plan deserve the view."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is selective. Hakuba can be an exceptional base for an active buyer who already has a credible right to live in Japan, enjoys real winter, accepts driving and Japanese-language administration, and values mountain life more than effortless healthcare or a broad resale pool. Foreigners can generally own Japanese real estate, but ownership does not create residence status, public-healthcare eligibility or a retirement visa. Japan’s designated-activities route for long sightseeing is temporary and tightly conditioned, not a permanent-retirement solution. Confirm a renewable residence basis, spouse position, health-insurance route and tax residence before treating any chalet as a long-term home.",
+        "Hakuba is weaker for a buyer who expects a property purchase to solve immigration, needs urban specialist care close by, cannot manage heavy snow, or wants passive holiday income without a licensed local operator. The village has clinics, including the Hakuba clinic in Kamishiro, while broader emergency and specialist care reaches beyond the village to institutions such as Omachi General Hospital and Azumi Hospital. That network is meaningful, but it is not equivalent to living beside a large city hospital. Test the exact clinic, pharmacy and emergency journey in winter, and plan how the household functions if driving becomes difficult.",
+        "Proceed in order. Establish residence and healthcare; choose the village pattern that matches daily life; travel the airport, station, grocery and hospital routes with luggage and bad weather; then verify title, road, water, sewerage, planning, landscape controls, hazards, structure, heating, roof, insulation and snow management. If income matters, establish the lawful lodging route, operator, staffing, fire-safety and 2026 accommodation-tax obligations in writing. Finally, identify the future buyer and model a long sale. Hakuba rewards deliberate ownership; it punishes treating a winter holiday as a year-round operating plan."
+    ),
+    lenses_intro="The five paired lenses below translate Hakuba’s Atlas scores into choices a buyer can make. The score table records the complete ten-factor assessment once; the prose shows how the answer changes between village areas and property types.",
+    lenses=(
+        DossierLens(
+            "Live the mountain after the lifts close",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Hakuba’s strongest case is lifestyle. Winter brings world-class snow, a mature ski culture and a community comfortable with international visitors. Green season adds hiking, cycling, rivers, agriculture and cooler mountain air. Happo and Wadano place an owner near lifts, hotels and restaurants, but the visitor economy can feel intense in peak winter and quieter between seasons. Echoland offers an animated dining strip; Misorano spreads into forested residential pockets. Iwatake has a growing year-round recreation identity. Kamishiro and Goryu feel more local and dispersed. The right choice depends on whether the buyer wants resort energy, privacy or ordinary village life.",
+                "Retirement practicality is more demanding. Hakuba Station and the Hokujo centre provide municipal functions and everyday services, while southern Kamishiro has clinics and rail stops. Yet many desirable homes sit beyond a comfortable walk from groceries, pharmacy or year-round dining. Snowbanks narrow roads, parking needs active clearing, and an address that seems close on a summer map can become car-dependent in February. Test the daily loop at seven in the morning and after dark: front door to cleared road, supermarket, clinic, restaurant and station. Ask who clears the private drive, roof edge and emergency access when the owner is ill or absent.",
+                "Healthcare needs a written sequence. Local clinics can handle primary needs, and Hakuba’s official material lists several village providers. More complex or time-critical care may involve Omachi or Azumi Hospital, so confirm ambulance coverage, winter drive time, department availability and how language support works. Property ownership does not unlock public insurance; eligibility follows residence and enrolment rules. A fit, skiing household may accept that trade-off today, but a retirement home should also work after an injury or reduced mobility. Single-level access, internal stairs, icy approaches, heating reliability and a nearby support person deserve as much attention as the mountain view."
+            ),
+            "winter-daily-life",
+        ),
+        DossierLens(
+            "Measure the whole journey, not the resort transfer",
+            ("global_access", "foreigner_fit"),
+            (
+                "Hakuba is internationally known but not internationally direct. The common approach uses Tokyo airports, rail to Nagano and a bus to Hakuba, or the slower Oito Line through Matsumoto or Itoigawa. Hakuba Village’s current transport plan identifies the Oito Line, seasonal local routes, the Nagano–Hakuba express bus, demand taxis and multiple ski shuttles. That mix creates options, not metro-level redundancy. A buyer should time front door to airport with a missed bus, delayed train, heavy luggage and an evening arrival. Happo bus terminal and Hakuba Station are different gateways; the useful one depends on the exact address.",
+                "Internal movement changes by season. Happo and Wadano can offer lift and hospitality access, yet some slopes and side roads remain difficult on foot. Echoland and Misorano use shuttles in winter but many errands still favour a car. Iwatake lies north of the central village pattern; Kamishiro and Goryu align more closely with southern Oito Line stations but services are dispersed. Seasonal shuttles are designed around skiing, not necessarily medical appointments, grocery bags or late dinners. Read current timetables, ask what operates in May and November, and price a properly equipped vehicle, winter tyres, parking and snow clearing into normal ownership.",
+                "Foreigner fit is relatively strong for a Japanese mountain village because the tourism economy includes English-speaking agents, managers and operators. That does not make the ownership system English-first. Registry documents, tax notices, neighbourhood communication, contractor instructions, planning submissions and accommodation-tax filings can remain Japanese-led. An absentee owner may also depend on staff during the same peak weeks when labour and trades are busiest. Appoint an independent bilingual lawyer and tax adviser, verify the manager’s physical coverage area and response standard, and maintain a local contact who can receive notices and enter the home. International hospitality is not the same as administrative self-sufficiency."
+            ),
+            "green-season-access",
+        ),
+        DossierLens(
+            "Own the house, then prove the site works",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Japan generally allows foreign buyers to acquire ordinary freehold real estate, so Hakuba’s ownership score is strong. The work begins after that headline. Confirm the registered owner, boundaries, easements, legal road connection, utilities, extensions and permits. Hakuba’s current building guidance warns that road status must be checked and that building-confirmation rules apply. The village’s landscape and development framework can affect height, setback, colour and larger projects. A forest lot, converted lodge or older chalet may carry facts that a translated sales summary does not reveal. Use an independent judicial scrivener, lawyer, architect and building inspector before a binding commitment.",
+                "Mountain construction requires a different inspection brief. Check structural records, roof form and snow load, insulation, glazing, heating capacity, frozen-pipe protection, ventilation, moisture, drainage, retaining works, balconies, chimneys and the dry room. Identify the water and wastewater system, confirm year-round access for service vehicles, and obtain actual fuel and electricity history. For managed apartments, read the owner-use rules, service charges, reserve position, operator agreement, furniture obligations, insurance and transfer terms. For detached homes, price roof clearing, driveway clearing, exterior treatment and emergency attendance. A beautiful timber interior does not answer whether the property survives an unattended freeze.",
+                "Hazards are address-specific. Hakuba’s official map covers flood, landslide, earthquake and evacuation information, while the tourist safety manual identifies steep-slope and debris-flow warning areas. The village also records the 2014 Kamishiro Fault earthquake. Snow brings roof shedding, blocked access and avalanche questions near particular terrain; summer rain adds drainage and slope risk. Check the latest maps, walk the evacuation route and inspect retaining structures, culverts and neighbouring slopes. Ask an insurer to quote the exact building and intended use before purchase. Being outside a coloured map area is not proof of zero risk, and a clear title is not proof of a safe site."
+            ),
+        ),
+        DossierLens(
+            "Treat lodging income as a staffed business",
+            ("rental_profit", "capital_upside"),
+            (
+                "Hakuba has powerful winter demand and improving green-season visitation, but gross nightly rates are not net rental profit. A successful operation needs lawful use, guest acquisition, cleaning, linen, snow clearing, heating, key access, repairs, multilingual communication and someone able to respond during storms. Happo and Wadano benefit from recognised resort access; Echoland and Misorano add dining and chalet inventory; Iwatake may benefit from year-round development; Kamishiro and Goryu can offer lower entry and a quieter base. Each area has different occupancy, staffing and transport assumptions. Demand evidence must be property-specific and dated.",
+                "Permission is layered. Japan’s national private-lodging route caps minpaku at 180 nights a year and can be tightened by local, building or management rules; hotel and simple-lodging licences are different routes. From 1 June 2026, Hakuba’s accommodation tax applies to qualifying stays in hotels, ryokan, simple lodgings and private-lodging facilities. Operators collect and remit it, and current village guidance sets registration, records and filing duties. Confirm the exact premises, zoning, building and fire-safety position, notification or licence, absent-owner management, owner-use calendar and tax process before assigning any rental value. A listing’s phrase “rental potential” is not legal clearance.",
+                "Capital upside is plausible but must be separated from promotional momentum. Official appraisals show strong recent movement in selected resort areas, and the village publishes a growing list of hotel and villa projects. That can improve amenities and international attention; it can also intensify construction, traffic, labour competition, infrastructure pressure and entry pricing. Misorano, Echoland and Iwatake do not share one land value, and a new managed unit does not have the same future buyer as an older Kamishiro house. Model flat nominal resale after all costs. Appreciation should reward scarce quality and durable access, not rescue weak condition, unclear use or an overpaid winter story."
+            ),
+        ),
+        DossierLens(
+            "Pay for utility—and preserve a believable exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Hakuba’s value-entry score reflects wide dispersion rather than low prices. Official evidence places a 2026 Misorano resort-home site far above an ordinary residential point near Hakuba Station, while a 2025 Echoland commercial benchmark sits higher again. These are specified bare-land or commercial appraisals, not values for finished homes. The three current listings below show the same fragmentation: a large Misorano chalet, a Kamishiro log home and a managed Happo-area apartment ask buyers to pay for different combinations of space, access, condition and operating infrastructure. Compare land, building and contractual value separately rather than relying on one village average.",
+                "Entry diligence should expose the costs hidden by format. An older detached house may look inexpensive per square metre but require insulation, roof, heating, plumbing and access work. A log home can demand specialised maintenance. A managed ski apartment may cost much more per square metre while transferring some operating burden to an owner contract and shared budget. Neither format is automatically better. Obtain completed transaction evidence where available, inspect the building, reconcile legal floor area, read every recurring charge and build a five-year cash-outlay model including tax, insurance, utilities, snow, management, repairs, currency and eventual selling costs.",
+                "Exit liquidity is the final discipline. A conventional, well-maintained house on a straightforward road near year-round services can reach local residents, Japanese second-home buyers and international purchasers. A large lodge needs an operator or redevelopment buyer. A premium managed apartment depends on the building’s reputation, charges, owner-use rules and rental record. Singular design, remote access or deferred snow damage narrows the pool. Before buying, ask two agents who did not source the property who would buy it next, how long comparable homes took to sell and what discount cleared them. The best Hakuba asset remains useful when the snow year disappoints."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Hakuba combines exceptional winter sport with green-season trails; Happo energy and Kamishiro calm suit distinctly different owners.",
+        "global_access": "Hakuba relies on Nagano buses and the Oito Line; Happo terminal convenience does not remove weather-sensitive last-mile travel.",
+        "ownership_clarity": "Hakuba follows Japan’s open ownership framework, while every chalet still needs title, road, boundary, utility and building verification.",
+        "regulatory_safety": "Hakuba lodging permissions, 2026 accommodation tax, landscape controls and address-level slope or flood hazards require written clearance.",
+        "rental_profit": "Happo and Wadano have strong winter demand, but Hakuba cleaning, staffing, snow operations and permissions reduce headline yield.",
+        "capital_upside": "Misorano, Echoland and Iwatake development support selected sites, yet construction momentum does not guarantee resale appreciation.",
+        "retirement_fit": "Hakuba offers village clinics and active living, but specialist hospitals, winter driving and legal residence constrain easy retirement.",
+        "exit_liquidity": "Hakuba homes near services and clear roads reach more buyers; singular lodges and operator-dependent units need longer exits.",
+        "foreigner_fit": "Happo and Echoland offer English-facing services, while Hakuba tax, planning, contractor and neighbourhood work remains Japanese-led.",
+        "value_entry": "Kamishiro houses can enter below managed Happo apartments, but Hakuba renovation, heating, snow and access costs change the comparison.",
+    },
+    market_anchors=(
+        {"location": "Misorano holiday-home area", "evidence": "27,400 JPY/m²", "buyer_read": "Official 1 January 2026 appraisal for a 999 m² bare-land resort-home site; up 33% year on year, but the report describes a thin, individual market.", "source_label": "MLIT 2026 appraisal", "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/20/2026204850001.html"},
+        {"location": "Hokujo near Hakuba Station", "evidence": "8,930 JPY/m²", "buyer_read": "Official 1 January 2026 appraisal for a 528 m² bare-land residential site about one kilometre east of Hakuba Station; not a resort-home valuation.", "source_label": "MLIT 2026 appraisal", "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/20/2026204850002.html"},
+        {"location": "Echoland commercial strip", "evidence": "67,500 JPY/m²", "buyer_read": "Nagano Prefecture’s 1 July 2025 land-price survey appraisal for a 738 m² commercial site; commercial context means it cannot value a nearby chalet.", "source_label": "Nagano Prefecture 2025 land-price survey", "source_url": "https://www.pref.nagano.lg.jp/kensetsu/infra/tochi/chika/documents/66r7hakuba.pdf"},
+    ),
+    micro_locations_intro="Hakuba is best read as four operating patterns, not one resort average. These are orientation aids rather than price zones. Confirm the exact village address, road status, winter clearing, utilities, planning, hazard layers, nearest services and lawful use before comparing asking prices.",
+    micro_locations=(
+        {"name": "Happo / Wadano", "best_for": "Lift access and international hospitality", "daily_life": "Resort-led, walkable only in selected pockets", "diligence": "Owner contract, peak traffic, slope, snow and service charges"},
+        {"name": "Echoland / Misorano", "best_for": "Restaurants and forest homes", "daily_life": "Mixed walk, shuttle and car pattern", "diligence": "Road, drainage, building condition and lawful lodging use"},
+        {"name": "Iwatake / Shinden / Kirikubo", "best_for": "Earlier-stage year-round mountain case", "daily_life": "Village setting north of the centre", "diligence": "Development pipeline, transport, utilities and future buyer pool"},
+        {"name": "Kamishiro / Goryu", "best_for": "Quieter residential and southern ski access", "daily_life": "Rail-adjacent in places, otherwise car-led", "diligence": "Healthcare route, heating, snow clearing and resale depth"},
+    ),
+    checklist=(
+        "Confirm a renewable Japan residence basis and healthcare route before purchase.",
+        "Choose the Happo, Echoland, Iwatake or Kamishiro daily-life pattern first.",
+        "Travel the exact airport, station, grocery and hospital routes in winter.",
+        "Verify title, boundary, legal road, utilities, planning and landscape controls.",
+        "Inspect structure, roof, snow load, insulation, heating, moisture and freeze protection.",
+        "Overlay current flood, slope, earthquake, snow and evacuation evidence.",
+        "Clear lodging permission, operator, fire safety, staffing and accommodation tax in writing.",
+        "Model five-year cash outlay and name the future resale buyer before signing.",
+    ),
+    references_intro="Legal, administrative, market, transport, healthcare, hazard and listing claims were reviewed on 22 August 2026 against the sources below. Recheck every time-sensitive source no later than 22 February 2027, and immediately after any law, municipal rule, tax, transport, hazard-map, development, operator or listing change. Obtain current Japanese immigration, legal, tax, building, insurance and healthcare advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "Japan retirement property guide", "url": "/japan-retirement-property-foreign-buyers/"},
+        {"label": "Ministry of Foreign Affairs: long sightseeing and recreation status", "url": "https://www.mofa.go.jp/ca/fna/page22e_000738.html"},
+        {"label": "Ministry of Finance: non-resident real-property reporting", "url": "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html"},
+        {"label": "National Tax Agency: non-resident Japanese real estate tax", "url": "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf"},
+        {"label": "Ministry of Land: real-estate tax and transaction guidance", "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html"},
+        {"label": "Japan Tourism Agency: Private Lodging Business Act", "url": "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html"},
+        {"label": "Hakuba Village: residence, building, landscape and development guidance", "url": "https://www.vill.hakuba.lg.jp/gyosei/soshikikarasagasu/kensetsuka/tochiriyou_kenchiku/kenchikukeikankaihatsu/index.html"},
+        {"label": "Hakuba Village: building standards and road checks", "url": "https://www.vill.hakuba.lg.jp/gyosei/soshikikarasagasu/kensetsuka/tochiriyou_kenchiku/kenchikukeikankaihatsu/kenchikukijunhou/index.html"},
+        {"label": "Hakuba Village: current development projects", "url": "https://www.vill.hakuba.lg.jp/gyosei/soshikikarasagasu/kensetsuka/tochiriyou_kenchiku/kenchikukeikankaihatsu/toshikeikakuhou/13382.html"},
+        {"label": "Hakuba Village: hazard map", "url": "https://www.vill.hakuba.lg.jp/gyosei/soshikikarasagasu/somuka/somukakari/11/2_1/861.html"},
+        {"label": "Hakuba Village: tourist disaster manual", "url": "https://www.vill.hakuba.lg.jp/material/files/group/7/bousaimanyuaruen.pdf"},
+        {"label": "Hakuba Village: 2025–2030 public transport plan", "url": "https://www.vill.hakuba.lg.jp/material/files/group/7/2025033101-1.pdf"},
+        {"label": "Hakuba Village: 2026 accommodation tax", "url": "https://www.vill.hakuba.lg.jp/gyosei/soshikikarasagasu/zeimuka/kazeigakari/2/syukuhakuzei/13525.html"},
+        {"label": "Hakuba Village: accommodation-tax operator guidance", "url": "https://www.vill.hakuba.lg.jp/gyosei/soshikikarasagasu/zeimuka/kazeigakari/2/syukuhakuzei/13857.html"},
+        {"label": "Hakuba Village: current village medical providers", "url": "https://www.vill.hakuba.lg.jp/material/files/group/12/kosodategaidobukkuR8.pdf"},
+        {"label": "Azumi Hospital: Hakuba clinic and hospital access", "url": "https://www.azumi-ghp.jp/access/"},
+        {"label": "Azumi Hospital: emergency and specialist hospital role", "url": "https://www.azumi-ghp.jp/about/gaiyou/"},
+        {"label": "Omachi General Hospital: emergency and out-of-hours care", "url": "https://www.omachi-hospital.jp/visit/emergency/"},
+        {"label": "MLIT: 2026 Misorano land appraisal", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/20/2026204850001.html"},
+        {"label": "MLIT: 2026 Hokujo residential land appraisal", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/20/2026204850002.html"},
+        {"label": "Nagano Prefecture: 2025 Hakuba land-price survey appraisals", "url": "https://www.pref.nagano.lg.jp/kensetsu/infra/tochi/chika/documents/66r7hakuba.pdf"},
+        {"label": "Nikota Realty: Misorano Forest Chalet asking observation", "url": "https://www.nikotarealty.com/properties/misorano-forest-chalet"},
+        {"label": "Hakuba Real Estate: Kamishiro Cozy House asking observation", "url": "https://www.hakubarealestate.com/property-listing/kamishiro-cozy-house"},
+        {"label": "Hakuba Real Estate: Miru Residences Hakuba 207 asking observation", "url": "https://www.hakubarealestate.com/property-listing/miru-residences-hakuba-207-south-west-corner-dual-key-2-bedroom"},
+    ),
+    images=(
+        DossierImage("alpine-village", "/assets/hakuba-alpine-village-hero.webp", "Hakuba village homes and fields beneath the Northern Japan Alps", "Hakuba’s appeal is a lived mountain landscape, not only a lift map.", "hero"),
+        DossierImage("winter-daily-life", "/assets/hakuba-winter-daily-life.webp", "A cleared residential street in Hakuba after heavy winter snow", "A retirement home must remain accessible after the snow arrives.", "wide"),
+        DossierImage("green-season-access", "/assets/hakuba-green-season-access.webp", "Residents near a Hakuba village bus stop during green season", "Year-round utility depends on ordinary transport and services between peak seasons.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Hakuba through five destination lenses",
+    assessment_intro="Here’s how Hakuba scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show a Misorano chalet, a Kamishiro log home and a managed Happo-area apartment. JPY is primary; USD uses the recorded repository reference basis for comparison only.",
+    market_anchors_intro="These are public market signals—not valuations. They compare specified bare-land residential and resort sites with an Echoland commercial site; none appraises a finished chalet or apartment.",
+    orientation_groups=(
+        DossierOrientationGroup("Northern and central Hakuba", (("Iwatake / Shinden", "Year-round mountain area"), ("Hakuba Station / Hokujo", "Village service centre"), ("Happo / Wadano", "Lift and hospitality core"), ("Echoland / Misorano", "Dining and forest homes"))),
+        DossierOrientationGroup("Central to southern Hakuba", (("Happo bus terminal", "Nagano bus gateway"), ("Hakuba Station", "Oito Line gateway"), ("Kamishiro / Iimori", "Residential and clinic area"), ("Goryu", "Southern ski base"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current rail, bus and shuttle timetables, road clearing and the exact winter door-to-door route.",
+    country_guide_url="/countries/japan-property/",
+    country_guide_label="Japan property guide",
+    rail_comparison="Compare Hakuba with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -1138,6 +1286,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     LAKE_COMO_DOSSIER.destination_id: LAKE_COMO_DOSSIER,
     HAKONE_IZU_DOSSIER.destination_id: HAKONE_IZU_DOSSIER,
     VALENCIA_DOSSIER.destination_id: VALENCIA_DOSSIER,
+    HAKUBA_DOSSIER.destination_id: HAKUBA_DOSSIER,
 }
 
 
@@ -1207,3 +1356,4 @@ validate_premium_dossier(MADEIRA_DOSSIER)
 validate_premium_dossier(LAKE_COMO_DOSSIER)
 validate_premium_dossier(HAKONE_IZU_DOSSIER)
 validate_premium_dossier(VALENCIA_DOSSIER)
+validate_premium_dossier(HAKUBA_DOSSIER)
