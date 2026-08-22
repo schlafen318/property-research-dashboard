@@ -4,9 +4,9 @@ Reviewed 2026-08-22 against `docs/PREMIUM_DESTINATION_DOSSIER_RULEBOOK.md`.
 
 Reviewer: Independent Codex reviewer (`mallorca_review`)
 
-Approval date: Pending re-review after corrective changes
+Approval date: 2026-08-22
 
-## Provisional result: 100/100 — approval pending
+## Result: 100/100 — publish-ready locally
 
 | Category | Weight | Score | Evidence |
 |---|---:|---:|---|
