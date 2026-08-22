@@ -2892,12 +2892,13 @@
     "name": "Lake Tahoe",
     "country": "United States",
     "category": "Mountain + Water",
-    "overall_score": 3.58,
-    "usd_per_m2": 12400.0,
-    "net_yield_estimate": "2-3.5% est. net",
+    "overall_score": 3.63,
+    "usd_per_m2": 10600.0,
+    "representative_price_usd": 2450000,
+    "net_yield_estimate": "Asset-specific; no verified basin-wide net yield",
     "quick_metrics": {
-      "usd_m": "$12,400",
-      "net_yield": "2-3.5% est. net",
+      "usd_m": "$10,600",
+      "net_yield": "Asset-specific; no verified basin-wide net yield",
       "ownership": "5.0/5",
       "friendly": "4.3/5"
     },
@@ -2906,7 +2907,7 @@
       "Rare lake-and-ski lifestyle",
       "Bay Area and West Coast demand depth",
       "four-season outdoor use",
-      "Nevada-side tax appeal for some buyers",
+      "Nevada-side tax framework may suit some buyers after advice",
       "scarce waterfront inventory"
     ],
     "cons": [
@@ -2914,7 +2915,7 @@
       "fragmented rules across California/Nevada and local jurisdictions",
       "high entry prices for prime lake access",
       "traffic and environmental constraints",
-      "yield can be weak after costs"
+      "no verified basin-wide net yield; high operating costs"
     ],
     "panel_verdict": "Add as the North America mountain-water benchmark, but underwrite risk harder than lifestyle appeal.",
     "scores": {
@@ -2989,17 +2990,17 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "US freehold ownership is open, but rules and tax posture differ materially between California and Nevada sides.",
+  "ownership_notes": "Many foreign individuals can acquire ordinary U.S. residential property, but federal tax and estate exposure, entity eligibility, title, immigration separation, and California/Nevada tax treatment require buyer-specific advice.",
     "red_flags": "Wildfire, insurance availability/cost, STR caps, environmental regulation, and extreme waterfront pricing.",
     "rental": {
       "gross_yield": "Strong peak-season demand where STRs are permitted, but local caps and risk costs can materially reduce net yield.",
-      "net_yield": "2-3.5% est. net",
+    "net_yield": "Asset-specific; no verified basin-wide net yield",
       "revenue": "Highly asset-specific by lake access, ski access, and permit zone.",
       "adr_occupancy": "Dual ski/summer season, shoulder periods vary.",
       "confidence": "Low-medium; requires jurisdiction-level diligence"
     },
-    "price_basis": "Built-property benchmark for prime but not ultra-waterfront Tahoe product. Approx. $1,150/sq ft blended benchmark, converted to about $12,400/m2; waterfront can be far higher.",
-    "price_confidence": "Medium-low; large California/Nevada and waterfront/non-waterfront spread",
+  "price_basis": "Rounded median asking price per square metre from three direct MLS-fed observations captured 2026-08-23 in South Lake Tahoe, Tahoe City and Incline Village. The three asks are evidence samples, not a basin-wide market median or valuation.",
+  "price_confidence": "Medium; three direct asking observations with a large California/Nevada and property-type spread",
     "profit_driver": "Scarce mountain-water lifestyle, West Coast wealth demand, and Nevada-side tax positioning for some buyers.",
     "rank": 19
   },
