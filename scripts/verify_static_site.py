@@ -22,12 +22,12 @@ KEY_PAGES = [
 REQUIRED_MARKERS = {
     ARTIFACTS / "retirement-abroad-calculator" / "index.html": [
         "Retirement Abroad Calculator",
-        "Retirement cost benchmarks by destination",
+        "Compare monthly living expenses",
         "Portfolio dividends and interest",
     ],
     ARTIFACTS / "guides" / "index.html": [
-        "Start with the strongest route",
-        "Ready to turn research into a shortlist?",
+        "Choose the question that matters most to you.",
+        "Country and region hubs",
     ],
     ARTIFACTS / "best-countries-to-buy-property-as-a-foreigner" / "index.html": [
         "Decision Path",
