@@ -2100,9 +2100,9 @@
         }
       },
       "property": {
-        "representative_price_usd": 3500000,
-        "acquisition_cost_rate": 0.04,
-        "price_basis": "Median of three representative Lake Tahoe listing snapshots captured by Global Home Atlas."
+        "representative_price_usd": 2450000,
+        "acquisition_cost_rate": 0.02,
+        "price_basis": "Median price of three direct Lake Tahoe MLS-fed asking observations captured by Global Home Atlas on 2026-08-23; not a market median. The 2% acquisition allowance is a planning assumption for buyer-side title, escrow, legal, inspection and financing costs, not a tax quote."
       },
       "confidence": {
         "overall": "medium-high",
@@ -2131,12 +2131,12 @@
           "notes": "Official national index used as a planning proxy, not a forecast."
         },
         {
-          "name": "Redfin / Tahoe City homes search — property listings",
-          "url": "https://www.redfin.com/city/19401/CA/Tahoe-City",
+          "name": "Three direct Lake Tahoe MLS-fed asking observations",
+          "url": "https://davebest.chaseinternational.com/p/1455-North-Lake-Boulevard-Tahoe-City-CA-96145/dmgid_187698061?oid=216100012",
           "metric_supported": "Representative property acquisition benchmark",
-          "source_date": "2026-06-25",
-          "accessed_on": "2026-08-18",
-          "notes": "Median of three captured listings; not a market-wide median and availability changes."
+          "source_date": "2026-08-23",
+          "accessed_on": "2026-08-23",
+          "notes": "Median of three direct asking observations in South Lake Tahoe, Tahoe City and Incline Village; not a market-wide median or valuation. Availability and price can change."
         }
       ]
     },
