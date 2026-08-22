@@ -22,6 +22,7 @@ REVIEWED_DOSSIERS = {
     "lake-como",
     "hakuba",
     DESTINATION_ID,
+    "costa-brava-girona",
 }
 
 

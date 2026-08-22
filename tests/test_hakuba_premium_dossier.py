@@ -22,6 +22,7 @@ REVIEWED_DOSSIERS = {
     "hakone-izu",
     "lake-como",
     "hakuba",
+    "costa-brava-girona",
 }
 
 

@@ -22,6 +22,7 @@ REVIEWED_DOSSIERS = {
     DESTINATION_ID,
     "hakone-izu",
     "hakuba",
+    "costa-brava-girona",
 }
 
 

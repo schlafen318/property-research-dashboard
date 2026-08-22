@@ -1130,6 +1130,145 @@ VALENCIA_DOSSIER = PremiumDossierSpec(
 )
 
 
+COSTA_BRAVA_GIRONA_DOSSIER = PremiumDossierSpec(
+    destination_id="costa-brava-girona",
+    title="Costa Brava and Girona Retirement Property Dossier",
+    description="Assess Costa Brava and Girona retirement property through daily life, access, ownership, tourism rules, healthcare, hazards, value, resale, and current listings.",
+    h1="Costa Brava / Girona: choose the daily base before the view",
+    lede="Costa Brava / Girona is not one retirement market. Girona is a working city with rail, hospitals and year-round services; Begur, Palafrugell and Pals offer village character close to celebrated coves; Palamós, Sant Feliu de Guíxols and Platja d'Aro provide more complete coastal services; L'Escala, Roses and Cadaqués pull the decision north toward wind, seasonality and longer journeys. The best purchase begins by choosing the life that must work in February, then asking whether the property, rules and eventual buyer pool support it.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is positive but address-selective. Costa Brava / Girona suits a buyer who wants Mediterranean landscape without abandoning a real regional economy, accepts that the famous shoreline is car-led, and can separate personal enjoyment from rental promises. Girona city is the easiest year-round base. Palamós, Sant Feliu de Guíxols and Platja d'Aro can support ordinary coastal life with larger service centres. Begur, Palafrugell, Pals, Cadaqués and the smaller coves offer stronger atmosphere but need closer testing of winter opening, gradients, parking, healthcare and property management.",
+        "Property ownership does not create Spanish residence. Establish the immigration route, tax residence and healthcare position before purchase, particularly where a non-EU buyer may face time limits or where a household expects public cover. Spain permits foreign ownership, but the transaction sits within national rules, Catalan transfer taxes and municipal planning. Short-stay use is a separate business question: Catalonia's tourist-home regime, the affected-municipality licensing framework, local compatibility and community rules can make an apparently rentable home unsuitable for the intended operation.",
+        "Proceed in sequence. Choose city, serviced coast, village hinterland or remote northern coast; travel the airport, rail, supermarket and hospital routes in summer traffic and winter; then verify title, planning, community governance, building condition, water, drainage, coastal exposure and mapped hazards. Obtain a written tax and financing statement, and treat every listing and market statistic as a comparison input rather than a valuation. Finally, identify who would buy the property next. A beautiful view is a benefit only when the address remains usable, lawful and sellable through the whole year."
+    ),
+    lenses_intro="The five paired lenses below turn the Atlas scores into choices between Girona city, the central serviced coast, the Baix Empordà villages and the more remote northern shore. The complete ten-factor assessment appears once in the table that follows.",
+    lenses=(
+        DossierLens(
+            "Live beyond the summer postcard",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Costa Brava earns its appeal honestly: rocky coves, old stone centres, coastal paths, seafood, landscape and a climate that supports outdoor life for much of the year. The mistake is assuming that every attractive town delivers the same retirement. Girona has markets, culture, neighbourhood services and an ordinary resident rhythm. Palafrugell and Palamós retain substantial local life behind the waterfront. Begur and Pals are quieter and more dispersed, while Cadaqués is singular but geographically constrained. Platja d'Aro is more commercial; Sant Feliu de Guíxols offers a mature town fabric. Visit when beach businesses are closed and judge the remaining life.",
+                "Retirement fit depends on mundane distances. Girona puts hospitals, clinics, pharmacies and rail within a compact urban area. On the coast, Palamós has a hospital and larger towns provide primary care, but the correct provider and emergency route vary by address. A hillside home above Sa Riera or Tamariu may require a car for groceries and a steep return walk. Cadaqués and Roses face a longer road connection around the Cap de Creus area; the tramuntana can change comfort and mobility. Confirm ambulance routing, pharmacy hours, specialist referral and whether one household member can manage if the regular driver is unavailable.",
+                "Test the physical home for aging as well as holidays. Old-town stairs, split levels, steep plots, polished terraces and distant parking can become daily constraints. Coastal salt and humidity affect metalwork, façades and unused interiors; shaded stone houses may be cool but damp. In Girona, summer heat, tourist noise and lift access matter. In Palafrugell, Pals and inland villages, verify walkability to year-round food and social life. Spend at least one ordinary winter week and one peak-summer week in the exact neighbourhood. The best retirement home makes healthcare, groceries, shade and companionship routine rather than a driving project."
+            ),
+            "coastal-daily-life",
+        ),
+        DossierLens(
+            "Connect through Girona, then price the coast's last mile",
+            ("global_access", "foreigner_fit"),
+            (
+                "Girona is the transport hinge. The regional R11 rail corridor connects Girona and Figueres with Barcelona, while high-speed services strengthen the city case. Girona-Costa Brava Airport publishes a substantial destination list, but many routes are seasonal, so Barcelona Airport often remains the more dependable international gateway. A buyer should time the entire journey, not quote the nearest runway. Girona city can work with rail and local transport; most Costa Brava addresses require a bus, taxi or car after the station. Friday traffic, summer queues, late arrivals and flight seasonality belong in the access calculation.",
+                "The coast divides into practical corridors. Girona to Palafrugell, Begur and Pals uses roads and buses rather than coastal rail. Palamós, Sant Feliu de Guíxols, S'Agaró and Platja d'Aro share a more populated central-southern band, yet the final kilometres still change by hillside and urbanisation. L'Escala and Roses can connect through Figueres; Cadaqués adds a winding final road exposed to congestion and weather. Record door-to-door times to the preferred airport, hospital and railway station in August and January. If the household plans to stop driving, choose an address where daily life already works on foot rather than hoping services improve.",
+                "Foreigner fit is high in the sales and hospitality layer but more mixed in ownership operations. Agents and lawyers commonly work in several languages, and established expatriate communities exist along the coast. Municipal notices, community meetings, planning files, contractor discussions and healthcare administration can still be Catalan- or Spanish-led. A remote owner also needs someone able to inspect after storms, receive registered notices and manage water, security and repairs. Hire independent legal and tax advisers, insist on translated documents, and test the local manager's response area. An English sales process does not make Begur, Palamós or Cadaqués administratively hands-off."
+            ),
+            "village-access",
+        ),
+        DossierLens(
+            "Own clearly, then clear the exact intended use",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Foreign buyers can generally own Spanish property, but title access is only the starting point. Obtain an independent registry extract, cadastral comparison, planning certificate where appropriate, debt and community evidence, occupancy documentation and a survey. Reconcile legal and physical area, pools, terraces, annexes and conversions. In an apartment, read budgets, minutes, reserve position, arrears, works and restrictions. In a detached home, verify boundaries, retaining structures, access, septic or mains services and building legality. Girona old-town property, a Begur villa and a Platja d'Aro apartment require different briefs even when all appear straightforward in a portal.",
+                "Tax must be priced for the actual transaction. Catalonia applies its current progressive transfer-tax scale to many resale purchases, with different rules and potential rates depending on value, buyer, property and date; new property follows a different national and regional tax path. Add notary, registry, legal, survey, financing, insurance, community and eventual sale costs. Non-resident ownership can create Spanish filings and imputed-income or rental tax, while tax residence changes the frame. Obtain a written buyer-specific completion statement before paying a non-refundable deposit. A round percentage from an old guide is not reliable enough for a Girona apartment or Begur house.",
+                "Tourist letting requires address-level clearance. Catalonia defines a tourist-use dwelling around repeated whole-home stays of 31 days or less. Municipal compatibility, registration, urban planning and community rules apply, and the 2023 decree created an additional five-year urban licence and tourist authorisation framework in affected municipalities. Existing operations may have transitional treatment; none of that makes a licence transferable or guaranteed. Confirm the exact municipality, urbanisation and property before attributing rent. The coastal planning framework also covers many Girona shoreline municipalities. Regulatory safety means written confirmation from the competent authority and community, not a seller's historic booking calendar."
+            ),
+        ),
+        DossierLens(
+            "Underwrite resident demand before holiday demand",
+            ("rental_profit", "capital_upside"),
+            (
+                "Rental profit differs sharply by format. Girona has students, professionals and resident households, giving a city apartment a broader long-term demand base, though building rules and local rent regulation still need checking. Palamós, Sant Feliu de Guíxols and Platja d'Aro have larger year-round populations than small coves, but holiday demand remains seasonal. Begur, Pals and Cadaqués can command high summer rates for scarce, well-presented homes; they also face cleaning, pool, garden, guest support, linen, platform fees, winter vacancy and manager dependence. Model a lawful long-term case and a no-rent case before treating short stays as upside.",
+                "A licence is not a yield. Ask for property-level booking statements, bank-supported revenue, operating invoices and the exact owner calendar. Then deduct tax, management, utilities, community fees, insurance, maintenance, marketing, replacements and vacancy. Verify whether the quoted floor area and bedroom count match authorised documents. A hillside villa near Begur can have attractive weekly rates but costly turnovers and access; a Sant Feliu apartment may trade glamour for easier operations. In Cadaqués, remoteness and peak congestion influence staffing. If the operation depends on one manager or one regulatory interpretation, discount it and make the purchase work without optimistic occupancy.",
+                "Capital upside should be tied to scarcity that remains useful. Girona benefits from a diverse regional economy and transport; central coastal towns have resident demand; protected landscape and constrained sites can support selected premium property. Yet scarcity can also mean planning friction, expensive renovation and a narrow buyer pool. Official registered-sale data confirm price differences between Girona, Platja d'Aro and new homes in Begur, but those categories are not interchangeable. Avoid extrapolating a small new-build sample to an older villa or treating an asking-price surge as completed growth. Model flat nominal resale after all costs and buy only if personal utility carries the case."
+            ),
+        ),
+        DossierLens(
+            "Buy the micro-market—and name the next buyer",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Value entry begins with segmentation. Girona apartments offer the lowest operational complexity in this comparison, though prime old-town renovations can be expensive. Palafrugell and inland Pals may provide year-round services or space without first-line seafront pricing. Begur's coves and villages command lifestyle premiums that vary by view, walkability, road and condition. Palamós and Sant Feliu de Guíxols offer deeper everyday infrastructure; S'Agaró and parts of Platja d'Aro move into prestige territory. L'Escala, Roses, Llançà and Cadaqués each have distinct wind, access and seasonal profiles. A regional average cannot identify which one is good value.",
+                "Use completed evidence before negotiating. The official 2025 registry series reports all-home averages for Girona and Castell d'Aro, Platja d'Aro i S'Agaró, while Begur's highlighted figure covers new homes and only 26 transactions. Those anchors show dispersion, not the value of a candidate. Match municipality, new or used status, legal floor area, age, condition, view, parking, outdoor space and completed date. The three current listings below are direct asking observations for three different buyer cases. They are not recommendations, availability guarantees or appraisals. Commission an independent survey and demand completed local comparables before a binding offer.",
+                "Exit liquidity is strongest when future utility is easy to explain. A lift-served Girona apartment near daily services can reach residents and downsizers. A practical Palamós or Sant Feliu home may attract both local and second-home demand. A singular Begur villa or Cadaqués house asks the next buyer to share the same price, access, maintenance and planning tolerance. Before purchase, ask two agents who did not source the listing who would buy it, typical marketing time and what condition or discount closed comparable sales. Model five-year cash outlay and a long sale. Preserve optionality instead of paying for a view that only one buyer understands."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Girona supports year-round culture and services; Begur, Palafrugell and Cadaqués add exceptional coastal character with sharper seasonality.",
+        "global_access": "Girona has strong rail links, while Begur, Palamós and Cadaqués add a car- or bus-dependent coastal last mile.",
+        "ownership_clarity": "Girona and Costa Brava purchases allow foreign ownership, but every title, cadastral area, planning status and community record needs reconciliation.",
+        "regulatory_safety": "Begur, Palafrugell and Platja d'Aro require municipal tourist-use and planning checks alongside community and address-level hazard review.",
+        "rental_profit": "Girona supports broader resident demand; Begur and Cadaqués may achieve premium summer rates but carry seasonality, staffing and licence risk.",
+        "capital_upside": "Girona's economy and scarce Costa Brava settings support selected homes, but Begur new-build data cannot price older coastal stock.",
+        "retirement_fit": "Girona offers the easiest hospital and service access; hillside Begur and remote Cadaqués require stronger driving and support plans.",
+        "exit_liquidity": "Girona, Palamós and Sant Feliu reach broader buyer pools than singular villas in remote coves around Begur or Cadaqués.",
+        "foreigner_fit": "Girona and established Costa Brava towns offer multilingual advisers, while municipal, community, contractor and healthcare work remains locally administered.",
+        "value_entry": "Palafrugell, Pals and Sant Feliu can offer more practical entry than prestige Begur, S'Agaró or Cadaqués addresses.",
+    },
+    market_anchors=(
+        {"location": "Girona municipality", "evidence": "2,565.82 EUR/m²", "buyer_read": "2025 average for all registered home sales; new and used stock are reported separately, so this is not a district or apartment valuation.", "source_label": "Catalonia 2025 registered sales", "source_url": "https://habitatge.gencat.cat/web/.content/home/dades/estadistiques/01_Estadistiques_de_construccio_i_mercat_immobiliari/02_Compravenda_i_preu_de_venda/02_Compravendes_d_habitatges_registrades_i_el_preu_de_venda/Estadistica_PDF/Compravendes_2025.pdf"},
+        {"location": "Castell d'Aro, Platja d'Aro i S'Agaró", "evidence": "3,525.81 EUR/m²", "buyer_read": "2025 average for all registered homes across the combined municipality; it does not isolate S'Agaró, sea views, age or condition.", "source_label": "Catalonia 2025 registered sales", "source_url": "https://habitatge.gencat.cat/web/.content/home/dades/estadistiques/01_Estadistiques_de_construccio_i_mercat_immobiliari/02_Compravenda_i_preu_de_venda/02_Compravendes_d_habitatges_registrades_i_el_preu_de_venda/Estadistica_PDF/Compravendes_2025.pdf"},
+        {"location": "Begur new homes", "evidence": "4,839.29 EUR/m²", "buyer_read": "2025 average for 26 registered new homes, with a high average size and price; a small new-build sample, not a Begur resale benchmark.", "source_label": "Catalonia 2025 registered sales", "source_url": "https://habitatge.gencat.cat/web/.content/home/dades/estadistiques/01_Estadistiques_de_construccio_i_mercat_immobiliari/02_Compravenda_i_preu_de_venda/02_Compravendes_d_habitatges_registrades_i_el_preu_de_venda/Estadistica_PDF/Compravendes_2025.pdf"},
+    ),
+    micro_locations_intro="The decision is a chain from rail-served Girona to increasingly seasonal and car-dependent coastal settings. These are operating patterns, not price zones. Verify the exact municipality, address, route, service calendar, planning position, hazard layers and completed evidence.",
+    micro_locations=(
+        {"name": "Girona city", "best_for": "Year-round urban retirement", "daily_life": "Walkable services and rail", "diligence": "Building, heat, noise and district comparables"},
+        {"name": "Begur / Palafrugell / Pals", "best_for": "Village and cove character", "daily_life": "Mixed town and car-led coast", "diligence": "Tourist use, gradients, water, planning and winter services"},
+        {"name": "Palamós / Sant Feliu / S'Agaró / Platja d'Aro", "best_for": "Serviced central coast", "daily_life": "Larger towns with seasonal peaks", "diligence": "Community rules, traffic, condition and local pricing"},
+        {"name": "L'Escala / Roses / Llançà / Cadaqués", "best_for": "Northern coast and landscape", "daily_life": "Longer journeys and tramuntana exposure", "diligence": "Access, wind, hazards, management and resale depth"},
+    ),
+    checklist=(
+        "Confirm residence, tax residence and healthcare before purchase.",
+        "Choose Girona, serviced coast, village hinterland or remote northern coast first.",
+        "Travel airport, rail, grocery and hospital routes in summer and winter.",
+        "Reconcile title, cadastre, planning, occupancy, community and physical area.",
+        "Inspect structure, moisture, salt exposure, drainage, utilities and accessibility.",
+        "Overlay current flood, wildfire, coastal and geological hazard evidence.",
+        "Clear tourist use, municipal compatibility, community rules and operator costs in writing.",
+        "Model five-year cash outlay and name the future resale buyer before signing.",
+    ),
+    references_intro="Legal, tax, planning, tourism, market, transport, healthcare, hazard and listing claims were reviewed on 22 August 2026. Recheck each time-sensitive source no later than 22 February 2027 and immediately after any law, municipal, licensing, transport, hazard, market-data or listing change. Obtain current Spanish and Catalan legal, tax, immigration, survey, insurance and healthcare advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "Spain property and retirement guide", "url": "/spain-retirement-property-foreign-buyers/"},
+        {"label": "Spanish administration: residence for EU and non-EU citizens", "url": "https://administracion.gob.es/pag_Home/en/Tu-espacio-europeo/derechos-obligaciones/ciudadanos/residencia.html"},
+        {"label": "Spanish Tax Agency: non-resident property income", "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/irnr-sin-establecimiento-permanente/rentas-inmuebles.html"},
+        {"label": "Catalan Tax Agency: current property transfer tax", "url": "https://atc.gencat.cat/es/tributs/itpajd/operacions/immobles/compravenda-immobles/"},
+        {"label": "Catalonia business portal: tourist-use dwellings", "url": "https://canalempresa.gencat.cat/es/03_sectors_d_activitat/06_hostaleria_i_turisme/establiments_turistics/habitatges_d_us_turistic/"},
+        {"label": "Catalonia business portal: 2023 tourist-home licensing framework", "url": "https://canalempresa.gencat.cat/es/03_sectors_d_activitat/06_hostaleria_i_turisme/establiments_turistics/habitatges_d_us_turistic/DL3_2023/"},
+        {"label": "Catalonia Housing Agency: 2025 registered home sales", "url": "https://habitatge.gencat.cat/web/.content/home/dades/estadistiques/01_Estadistiques_de_construccio_i_mercat_immobiliari/02_Compravenda_i_preu_de_venda/02_Compravendes_d_habitatges_registrades_i_el_preu_de_venda/Estadistica_PDF/Compravendes_2025.pdf"},
+        {"label": "Catalonia Territory: Girona coastal planning framework", "url": "https://territori.gencat.cat/ca/01_departament/05_plans/01_planificacio_territorial/plans_urbanistics/plans_directors_urbanistics/pdu_aprovats/Girona/pdu_sns_litoral_gironi/"},
+        {"label": "Catalonia rail: R11 regional line", "url": "https://rodalies.gencat.cat/ca/sobre-rodalies/linies-i-estacions/servei_regionals/r11/"},
+        {"label": "Aena: Girona-Costa Brava airport destinations", "url": "https://www.aena.es/en/girona-costa-brava/airlines-and-destinations/airport-destinations.html"},
+        {"label": "Aena: Girona-Costa Brava airport bus access", "url": "https://www.aena.es/en/girona-costa-brava/getting-there/bus.html"},
+        {"label": "Girona health service: Trueta Hospital emergency department", "url": "https://icsgirona.cat/htrueta/es/hospital-trueta/servicio-de-urgencias"},
+        {"label": "Catalonia Civil Protection: official risk map", "url": "https://interior.gencat.cat/es/arees_dactuacio/proteccio_civil/mapa_de_proteccio_civil/"},
+        {"label": "ICGC: coastal geological-hazard viewer", "url": "https://www.icgc.cat/es/Ambitos-tematicos/Ambito-litoral/Aplicaciones-y-visores/Peligrosidad-litoral"},
+        {"label": "Engel & Völkers: Girona Cathedral apartment asking observation", "url": "https://www.engelvoelkers.com/es/en/exposes/35d363ca-c155-543a-8ac1-a0e6958ed064"},
+        {"label": "Costa Brava House: Sa Roda house no. 1 asking observation", "url": "https://www.costabravahouse.com/en/luxury-house-begur-sale-pool-sea-view-sa-roda-6170"},
+        {"label": "Lucas Fox: Sant Feliu / S'Agaró penthouse asking observation", "url": "https://www.lucasfox.com/property-for-sale/spain/costa-brava/sant-feliu-de-guixols/apartment/pda66170.html"},
+    ),
+    images=(
+        DossierImage("city", "/assets/costa-brava-girona-city-hero.webp", "Girona riverside neighbourhood and old city in warm morning light", "Girona supplies the year-round urban base behind the coastal proposition.", "hero"),
+        DossierImage("coastal-daily-life", "/assets/costa-brava-girona-coastal-daily-life.webp", "Residents walking beside a lived-in Costa Brava waterfront outside peak summer", "The best coastal addresses continue to function after the visitor season.", "wide"),
+        DossierImage("village-access", "/assets/costa-brava-girona-village-access.webp", "Everyday street in a stone Baix Empordà village with residents and bicycles", "Village character must be tested against access, services and ordinary errands.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Costa Brava / Girona through five destination lenses",
+    assessment_intro="Here’s how Costa Brava / Girona scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show a Girona city apartment, a Begur-area house and a Sant Feliu / S'Agaró penthouse. EUR is primary; USD uses the recorded repository reference basis for comparison only.",
+    market_anchors_intro="These are public market signals—not valuations. The official series mixes all homes, new homes and different municipalities; reconcile every candidate for location, legal area, age, condition and completed comparable evidence.",
+    orientation_groups=(
+        DossierOrientationGroup("Girona to the central coast", (("Girona", "Rail and hospital base"), ("Palafrugell / Pals", "Village service belt"), ("Begur", "Coves and hillside homes"), ("Palamós", "Serviced fishing town"))),
+        DossierOrientationGroup("Southern and northern coast", (("Sant Feliu / S'Agaró", "Mature town and prestige enclave"), ("Platja d'Aro", "Commercial coastal centre"), ("L'Escala / Roses", "Northern service towns"), ("Cadaqués", "Remote Cap de Creus setting"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current rail, bus, driving and seasonal journey times from the exact address.",
+    country_guide_url="/countries/spain-property/",
+    country_guide_label="Spain property guide",
+    rail_comparison="Compare Costa Brava / Girona with the full Atlas.",
+)
+
+
 HAKUBA_DOSSIER = PremiumDossierSpec(
     destination_id="hakuba",
     title="Hakuba Retirement Property Dossier",
@@ -1287,6 +1426,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     HAKONE_IZU_DOSSIER.destination_id: HAKONE_IZU_DOSSIER,
     VALENCIA_DOSSIER.destination_id: VALENCIA_DOSSIER,
     HAKUBA_DOSSIER.destination_id: HAKUBA_DOSSIER,
+    COSTA_BRAVA_GIRONA_DOSSIER.destination_id: COSTA_BRAVA_GIRONA_DOSSIER,
 }
 
 
@@ -1357,3 +1497,4 @@ validate_premium_dossier(LAKE_COMO_DOSSIER)
 validate_premium_dossier(HAKONE_IZU_DOSSIER)
 validate_premium_dossier(VALENCIA_DOSSIER)
 validate_premium_dossier(HAKUBA_DOSSIER)
+validate_premium_dossier(COSTA_BRAVA_GIRONA_DOSSIER)

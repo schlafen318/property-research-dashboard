@@ -13,7 +13,7 @@ from src.premium_destination_dossiers import (
 
 class PremiumDossierContractTests(unittest.TestCase):
     def test_only_reviewed_prototypes_use_the_premium_registry(self) -> None:
-        self.assertEqual({"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "malaga-costa-del-sol", "lake-como", "hakone-izu", "hakuba"}, set(PREMIUM_DESTINATION_DOSSIERS))
+        self.assertEqual({"fukuoka-itoshima", "valencia", "algarve-cascais", "madeira", "malaga-costa-del-sol", "lake-como", "hakone-izu", "hakuba", "costa-brava-girona"}, set(PREMIUM_DESTINATION_DOSSIERS))
         self.assertIsNotNone(get_premium_dossier("fukuoka-itoshima"))
         self.assertIsNotNone(get_premium_dossier("valencia"))
 
