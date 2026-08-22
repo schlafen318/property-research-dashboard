@@ -208,19 +208,36 @@ class PremiumDossierRenderingTests(unittest.TestCase):
     def test_score_and_listing_tables_are_model_and_data_derived(self) -> None:
         self.assertEqual(10, self.fukuoka_html.count('class="premium-score-row"'))
         self.assertIn("4.3/5", self.fukuoka_html)
-        self.assertEqual(3, self.fukuoka_html.count('class="premium-listing-row"'))
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-property-record"'))
         self.assertIn("31,800,000 JPY", self.fukuoka_html)
         self.assertIn("2026-08-21", self.fukuoka_html)
 
-    def test_property_evidence_adds_official_market_anchors_without_calling_them_home_prices(self) -> None:
-        self.assertIn('id="official-market-anchors"', self.fukuoka_html)
-        self.assertEqual(3, self.fukuoka_html.count('class="premium-market-anchor"'))
-        self.assertIn("121,700–132,400 JPY/m²", self.fukuoka_html)
-        self.assertIn("82,900–108,500 JPY/m²", self.fukuoka_html)
-        self.assertIn("7,720–41,400 JPY/m²", self.fukuoka_html)
-        self.assertIn("land evidence—not finished-home prices", self.fukuoka_html)
+    def test_property_evidence_renders_once_with_integrated_local_comparisons(self) -> None:
+        self.assertEqual(1, self.fukuoka_html.count('<section class="premium-section" id="listings">'))
+        self.assertIn("<h2>What homes cost</h2>", self.fukuoka_html)
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-property-record"'))
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-local-comparison"'))
+        self.assertNotIn("Official market anchors", self.fukuoka_html)
+        self.assertNotIn('id="official-market-anchors"', self.fukuoka_html)
+        for value in (
+            "121,700–132,400 JPY/m²",
+            "82,900–108,500 JPY/m²",
+            "7,720–41,400 JPY/m²",
+        ):
+            with self.subTest(value=value):
+                self.assertEqual(1, self.fukuoka_html.count(value))
         self.assertIn("reinfolib.mlit.go.jp", self.fukuoka_html)
         self.assertIn("pref.fukuoka.lg.jp", self.fukuoka_html)
+
+    def test_property_records_use_readable_fields_not_a_wide_desktop_table(self) -> None:
+        self.assertNotIn('<table class="premium-listing-table', self.fukuoka_html)
+        self.assertNotIn("<th>USD comparison</th>", self.fukuoka_html)
+        for label in (
+            "Asking price", "Area", "USD comparison", "Buyer relevance",
+            "Local comparison", "Source",
+        ):
+            with self.subTest(label=label):
+                self.assertIn(label, self.fukuoka_html)
 
     def test_score_table_uses_dossier_specific_research_reads(self) -> None:
         spec = get_premium_dossier("fukuoka-itoshima")
@@ -285,12 +302,13 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         for location in ("Central Fukuoka", "Meinohama corridor", "Maebaru", "Itoshima coast"):
             self.assertIn(location, self.fukuoka_html)
 
-    def test_score_listing_and_location_tables_become_labelled_records_on_mobile(self) -> None:
-        self.assertEqual(3, self.fukuoka_html.count('class="premium-table-wrap premium-card-table-wrap"'))
+    def test_score_property_and_location_evidence_are_readable_records(self) -> None:
+        self.assertEqual(2, self.fukuoka_html.count('class="premium-table-wrap premium-card-table-wrap"'))
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-property-record"'))
         self.assertIn('data-label="Score"', self.fukuoka_html)
         self.assertIn('data-label="Atlas read"', self.fukuoka_html)
-        self.assertIn('data-label="Asking price"', self.fukuoka_html)
-        self.assertIn('data-label="What it represents"', self.fukuoka_html)
+        self.assertIn('<dt>Asking price</dt>', self.fukuoka_html)
+        self.assertIn('<dt>Buyer relevance</dt>', self.fukuoka_html)
         self.assertIn('data-label="Micro-location"', self.fukuoka_html)
         self.assertIn('data-label="Primary diligence"', self.fukuoka_html)
         self.assertIn(".premium-card-table-wrap { overflow: visible;", self.fukuoka_html)

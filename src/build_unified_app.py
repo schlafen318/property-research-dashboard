@@ -7339,6 +7339,75 @@ def premium_dossier_listing_table(rows: list[dict]) -> str:
     )
 
 
+def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec) -> str:
+    required = {
+        "property_type",
+        "listing_name",
+        "local_currency",
+        "local_price",
+        "usd_price",
+        "size_m2",
+        "usd_per_m2",
+        "source_name",
+        "source_url",
+        "captured_date",
+        "confidence",
+        "note",
+        "fx_basis",
+    }
+    if len(rows) != len(spec.property_anchor_indexes):
+        raise ValueError("property records and anchor associations must have the same length")
+
+    records = []
+    matched_indexes = set()
+    for row, anchor_index in zip(rows, spec.property_anchor_indexes):
+        missing = required - row.keys()
+        if missing or any(row[field] in (None, "") for field in required):
+            raise ValueError(f"incomplete representative listing: {sorted(missing)}")
+        area_basis = row.get("area_basis", "Portal-stated area")
+        local_comparison = ""
+        if anchor_index is not None:
+            matched_indexes.add(anchor_index)
+            anchor = spec.market_anchors[anchor_index]
+            local_comparison = (
+                '<p class="premium-local-comparison"><strong>Local comparison:</strong> '
+                f'{escape(anchor["evidence"])}. {escape(anchor["buyer_read"])} '
+                f'<a href="{escape(anchor["source_url"])}" rel="noopener noreferrer">{escape(anchor["source_label"])}</a></p>'
+            )
+        records.append(
+            '<div class="premium-property-record">'
+            f'<h3>{escape(row["listing_name"])}</h3>'
+            '<dl>'
+            f'<div><dt>Asking price</dt><dd>{float(row["local_price"]):,.0f} {escape(row["local_currency"])}</dd></div>'
+            f'<div><dt>Area</dt><dd>{float(row["size_m2"]):,.1f} m²<span>{escape(area_basis)}</span></dd></div>'
+            f'<div><dt>USD comparison</dt><dd>{money(row["usd_price"])}<span>{money(row["usd_per_m2"])}/m²</span></dd></div>'
+            f'<div><dt>Buyer relevance</dt><dd>{escape(row["note"])}</dd></div>'
+            '</dl>'
+            f'{local_comparison}'
+            '<p class="premium-property-source"><strong>Source:</strong> '
+            f'<a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a> '
+            f'· Captured {escape(row["captured_date"])} · {escape(row["confidence"])} confidence</p>'
+            '</div>'
+        )
+
+    unmatched = [
+        anchor for index, anchor in enumerate(spec.market_anchors)
+        if index not in matched_indexes
+    ]
+    market_context = ""
+    if unmatched:
+        context_items = "; ".join(
+            f'{escape(anchor["location"])}: {escape(anchor["evidence"])} — {escape(anchor["buyer_read"])} '
+            f'<a href="{escape(anchor["source_url"])}" rel="noopener noreferrer">{escape(anchor["source_label"])}</a>'
+            for anchor in unmatched
+        )
+        market_context = (
+            '<p class="premium-market-context"><strong>Market context:</strong> '
+            f'{escape(spec.market_anchors_intro)} {context_items}</p>'
+        )
+    return f'<div class="premium-property-records">{"".join(records)}</div>{market_context}'
+
+
 def premium_dossier_lenses_html(spec: PremiumDossierSpec) -> str:
     images = {item.key: item for item in spec.images}
     sections = []
@@ -7491,6 +7560,17 @@ def premium_dossier_css() -> str:
     .premium-desktop-record-table tbody th:first-child, .premium-desktop-record-table tbody td:last-child { grid-column: 1 / -1; }
     .premium-desktop-record-table .premium-area-basis { max-width: none; }
     .premium-disclaimer { color: var(--muted) !important; font-size: 13px !important; }
+    .premium-property-records { display: grid; gap: 30px; min-width: 0; margin-top: 30px; }
+    .premium-property-record { min-width: 0; padding: 24px 0 4px; border-top: 3px solid var(--ink); }
+    .premium-property-record h3 { margin: 0 0 20px; font-family: var(--serif); font-size: clamp(25px, 3vw, 34px); font-weight: 500; line-height: 1.1; }
+    .premium-property-record dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 30px; margin: 0; }
+    .premium-property-record dl > div { min-width: 0; padding: 12px 0; border-top: 1px solid rgba(36, 49, 45, .16); }
+    .premium-property-record dt { margin-bottom: 5px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .premium-property-record dd { margin: 0; overflow-wrap: anywhere; color: var(--ink); font-size: 15px; line-height: 1.5; }
+    .premium-property-record dd span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.4; }
+    .premium-local-comparison { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px !important; }
+    .premium-property-source { margin: 10px 0 0; color: var(--muted) !important; font-size: 12px !important; }
+    .premium-market-context { margin-top: 24px; font-size: 14px !important; }
     .premium-market-anchors { margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--line); }
     .premium-market-anchors h3 { margin: 0 0 10px; font-family: var(--serif); font-size: 30px; font-weight: 500; }
     .premium-market-anchors dl { margin: 24px 0 0; border-top: 3px solid var(--ink); }
@@ -7533,6 +7613,9 @@ def premium_dossier_css() -> str:
       .premium-rail { position: static; order: -1; }
       .premium-rail nav { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .premium-rail nav a:nth-child(2n) { padding-left: 18px; }
+    }
+    @media (max-width: 700px) {
+      .premium-property-record dl { grid-template-columns: 1fr; }
     }
     @media (max-width: 560px) {
       .premium-shell { width: min(100% - 28px, 1220px); }
@@ -7582,6 +7665,23 @@ def build_premium_destination_page(
     checklist = "".join(f"<li>{escape(item)}</li>" for item in spec.checklist)
     rail_links = "".join(f'<a href="#{escape(anchor)}">{escape(label)}</a>' for anchor, label in spec.nav_items)
     access_notice = destination_access_notice_html(dest)
+    if spec.property_anchor_indexes:
+        property_evidence = (
+            '<h2>What homes cost</h2>'
+            f'<p>{escape(spec.listings_intro)}</p>'
+            f'{premium_dossier_property_records(rows, spec)}'
+            '<p class="premium-disclaimer">Current asking evidence, not completed-sale valuations. '
+            'Confirm availability, title, legal use, area, condition, fees and negotiability for the exact property.</p>'
+        )
+    else:
+        property_evidence = (
+            '<h2>Representative property evidence</h2>'
+            f'<p>{escape(spec.listings_intro)}</p>'
+            f'{premium_dossier_listing_table(rows)}'
+            '<p class="premium-disclaimer">Asking-price evidence only. Global Home Atlas has not verified availability, '
+            'title, legal use, building condition, negotiability, fees or completed transaction value.</p>'
+            f'{premium_dossier_market_anchors_html(spec)}'
+        )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -7615,11 +7715,7 @@ def build_premium_destination_page(
           <p class="premium-score-total"><strong>Weighted assessment: {float(dest["decision_score"]):.1f}/5.</strong> Reviewed {escape(spec.date_reviewed)}. <a href="/methodology/">Read the scoring methodology</a>.</p>
         </section>
         <section class="premium-section" id="listings">
-          <h2>Representative property evidence</h2>
-          <p>{escape(spec.listings_intro)}</p>
-          {premium_dossier_listing_table(rows)}
-          <p class="premium-disclaimer">Asking-price evidence only. Global Home Atlas has not verified availability, title, legal use, building condition, negotiability, fees or completed transaction value.</p>
-          {premium_dossier_market_anchors_html(spec)}
+          {property_evidence}
         </section>
         {premium_dossier_micro_locations_html(spec)}
         <section class="premium-section" id="checklist">
