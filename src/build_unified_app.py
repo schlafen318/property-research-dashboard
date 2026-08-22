@@ -292,7 +292,20 @@ COUNTRY_HUBS = [
         "title": "Italy Property Guide for Foreign Buyers | Global Home Atlas",
         "description": "Compare Italy property destinations for foreign buyers, including Lake Como and the Dolomites across prestige, lifestyle, value discipline, and exit liquidity.",
         "h1": "Italy Property Guide for Foreign Buyers",
-        "thesis": "Italy is strongest when the property thesis is lifestyle, prestige, and capital preservation rather than yield maximization. Buyers should separate globally liquid trophy markets from beautiful but thin local resale markets.",
+        "thesis": "Italy is strongest when the property thesis is lifestyle, prestige and durable personal use rather than automatic yield. National ownership access, residence and tax must be cleared for the buyer; regional planning, occupancy, rental and hazard rules must then be cleared for the exact home. Lake Como and the South Tyrol Dolomites show why one Italian-property rulebook is not enough.",
+        "country_rules": [
+            {"heading": "Reciprocity depends on the buyer", "text": "EU and EEA citizens and specified legally resident non-EU citizens are exempt from reciprocity verification. Other non-EU buyers need the notary to confirm reciprocity or the applicable treaty position for the proposed transaction."},
+            {"heading": "Purchase and residence are separate", "text": "Buying a home does not itself create Italian residence. Elective residence is a non-working route for applicants with adequate independent means who genuinely intend to settle; consular requirements and approval remain applicant-specific."},
+            {"heading": "Tax and lawful use depend on the facts", "text": "A private resale commonly carries 9% registration tax on the applicable base unless first-home relief applies; developer sales and luxury categories can differ. Local planning, occupancy, condominium and tourist-let rules must be checked separately."},
+            {"heading": "South Tyrol adds resident-housing controls", "text": "A conventioned dwelling may be bought but cannot simply be used as a holiday home. New resident-housing policy and tourist-let controls make the unit’s exact conventioning and permitted use a controlling Dolomites diligence item."},
+        ],
+        "primary_sources": [
+            {"label": "Italian Foreign Ministry: rights and reciprocity", "url": "https://www.esteri.it/en/temi/diplomazia_giuridica/condizreciprocita/"},
+            {"label": "Italian Notariat: services for foreign buyers", "url": "https://www.notariato.it/en/notaio/notarial-services-for-foreigners/"},
+            {"label": "Italian Revenue Agency: buying a home", "url": "https://www1.agenziaentrate.gov.it/web_app_entrate/guida_acquisto_casa.html"},
+            {"label": "Italian Consulate London: elective residence", "url": "https://conslondra.esteri.it/it/servizi-consolari-e-visti/servizi-per-il-cittadino-straniero/visti/elective-residence/"},
+            {"label": "South Tyrol: conventioned-home FAQ", "url": "https://wohnbauaufsicht.provinz.bz.it/de/faq-frequently-asked-questions"},
+        ],
         "destination_ids": ["lake-como", "dolomites-south-tyrol"],
         "guide_slugs": ["best-places-to-buy-property-in-europe", "best-places-to-buy-vacation-home-abroad", "foreign-property-investment-risks", "buy-property-abroad"],
     },
@@ -7239,19 +7252,19 @@ def premium_dossier_listing_table(rows: list[dict]) -> str:
             raise ValueError(f"incomplete representative listing: {sorted(missing)}")
         body.append(
             '<tr class="premium-listing-row">'
-            f'<th scope="row" data-label="Observation">{escape(row["listing_name"])}</th>'
-            f'<td data-label="Type">{escape(row["property_type"])}</td>'
-            f'<td class="premium-number" data-label="Asking price">{float(row["local_price"]):,.0f} {escape(row["local_currency"])}</td>'
-            f'<td class="premium-number" data-label="USD comparison">{money(row["usd_price"])}</td>'
-            f'<td class="premium-number" data-label="Area / basis">{float(row["size_m2"]):,.1f} m²<br><span class="premium-area-basis">{escape(row.get("area_basis", "Portal-stated area"))}</span></td>'
-            f'<td class="premium-number" data-label="USD/m²">{money(row["usd_per_m2"])}/m²</td>'
-            f'<td data-label="Source / captured"><a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a><br><span>{escape(row["captured_date"])}</span></td>'
-            f'<td data-label="Confidence">{escape(row["confidence"])}</td>'
-            f'<td data-label="What it represents">{escape(row["note"])}</td>'
+            f'<th scope="row" data-label="Observation"><span class="premium-cell-value">{escape(row["listing_name"])}</span></th>'
+            f'<td data-label="Type"><span class="premium-cell-value">{escape(row["property_type"])}</span></td>'
+            f'<td class="premium-number" data-label="Asking price"><span class="premium-cell-value">{float(row["local_price"]):,.0f} {escape(row["local_currency"])}</span></td>'
+            f'<td class="premium-number" data-label="USD comparison"><span class="premium-cell-value">{money(row["usd_price"])}</span></td>'
+            f'<td class="premium-number" data-label="Area / basis"><span class="premium-cell-value">{float(row["size_m2"]):,.1f} m²<br><span class="premium-area-basis">{escape(row.get("area_basis", "Portal-stated area"))}</span></span></td>'
+            f'<td class="premium-number" data-label="USD/m²"><span class="premium-cell-value">{money(row["usd_per_m2"])}/m²</span></td>'
+            f'<td data-label="Source / captured"><span class="premium-cell-value"><a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a><br><span>{escape(row["captured_date"])}</span></span></td>'
+            f'<td data-label="Confidence"><span class="premium-cell-value">{escape(row["confidence"])}</span></td>'
+            f'<td data-label="What it represents"><span class="premium-cell-value">{escape(row["note"])}</span></td>'
             "</tr>"
         )
     return (
-        '<div class="premium-table-wrap premium-card-table-wrap"><table class="premium-listing-table premium-card-table">'
+        '<div class="premium-table-wrap premium-card-table-wrap"><table class="premium-listing-table premium-card-table premium-desktop-record-table">'
         '<thead><tr><th>Observation</th><th>Type</th><th>Asking price</th><th>USD comparison</th><th>Area / basis</th><th>USD/m²</th><th>Source / captured</th><th>Confidence</th><th>What it represents</th></tr></thead>'
         f'<tbody>{"".join(body)}</tbody></table></div>'
     )
@@ -7399,6 +7412,15 @@ def premium_dossier_css() -> str:
     .premium-number { white-space: nowrap; font-variant-numeric: tabular-nums; }
     .premium-area-basis { display: inline-block; max-width: 130px; white-space: normal; font-size: 11px; line-height: 1.35; }
     .premium-table-wrap span { color: var(--muted); }
+    .premium-desktop-record-table { display: block; min-width: 0 !important; }
+    .premium-desktop-record-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap; }
+    .premium-desktop-record-table tbody { display: grid; gap: 24px; }
+    .premium-desktop-record-table tbody tr { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 30px; padding: 18px 0 20px; border-top: 3px solid var(--ink); }
+    .premium-desktop-record-table tbody th, .premium-desktop-record-table tbody td { display: grid; grid-template-columns: minmax(112px, .4fr) minmax(0, 1fr); gap: 14px; padding: 10px 0; border-top: 1px solid rgba(36, 49, 45, .16); }
+    .premium-desktop-record-table tbody th::before, .premium-desktop-record-table tbody td::before { content: attr(data-label); color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .premium-desktop-record-table .premium-cell-value { min-width: 0; color: inherit; }
+    .premium-desktop-record-table tbody th:first-child, .premium-desktop-record-table tbody td:last-child { grid-column: 1 / -1; }
+    .premium-desktop-record-table .premium-area-basis { max-width: none; }
     .premium-disclaimer { color: var(--muted) !important; font-size: 13px !important; }
     .premium-market-anchors { margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--line); }
     .premium-market-anchors h3 { margin: 0 0 10px; font-family: var(--serif); font-size: 30px; font-weight: 500; }

@@ -1969,30 +1969,30 @@
     "rank": 20,
     "country": "Italy",
     "category": "Mountain",
-    "overall_score": 3.7,
-    "usd_per_m2": 14350.0,
+    "overall_score": 3.62,
+    "usd_per_m2": 9800.0,
     "net_yield_estimate": "2–3.8% est. net",
     "quick_metrics": {
-      "usd_m": "$14,350",
+      "usd_m": "$9,800",
       "net_yield": "2–3.8% est. net",
       "ownership": "4.6/5",
       "friendly": "3.3/5"
     },
-    "panel_summary": "This is arguably Europe’s strongest mountain lifestyle candidate on scenery, food and year-round activity. The panel would like the quality but challenge affordability, yields and local restrictions.",
+    "panel_summary": "A world-class mountain-lifestyle candidate whose quality is real, but whose value depends on lawful second-home use, a practical valley system and disciplined entry.",
     "pros": [
       "World-class mountain scenery",
       "excellent food",
       "hiking/skiing/cycling",
       "high standard of living",
-      "strong domestic and European demand."
+      "Brunico and Pusteria valley service depth."
     ],
     "cons": [
       "Expensive",
       "yields are generally low",
-      "permitting and second-home restrictions can be tight",
-      "less straightforward for non-local development."
+      "conventioned housing and tourist-use rules can control the asset",
+      "valley access and alpine hazards are address-specific."
     ],
-    "panel_verdict": "Keep as a premium mountain benchmark. Great lifestyle asset, but financial return depends on buying unusually well.",
+    "panel_verdict": "Positive for a lifestyle-led buyer who clears reciprocity and lawful use first, then chooses the valley for daily life rather than buying the postcard.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -2065,18 +2065,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "Foreigners can generally buy Italian property, but local planning, second-home sentiment, condominium rules and tourist-rental compliance matter.",
-    "red_flags": "Expensive, lower yield, local planning friction, fragmented operating market, high build/specification costs.",
+    "ownership_notes": "EU/EEA buyers and specified legally resident non-EU buyers are exempt from reciprocity checks; other non-EU buyers need case-specific notarial clearance. South Tyrol conventioning and resident-housing rules separately control lawful occupancy and holiday use.",
+    "red_flags": "Conventioned or resident-restricted housing, unclear tourist-use status, portal area mismatch, winter access, alpine hazards, older energy systems and a narrow premium resale pool.",
     "rental": {
       "gross_yield": "Premium alpine gross yields usually compressed by high prices; underwrite as lifestyle-first unless tourist-let permit is strong",
       "net_yield": "2–3.8% est. net",
-      "revenue": "Cortina/Dolomites prime market; UBS 2026 European Alpine Property Focus cites Cortina premium segment just under CHF12,000 / EUR12,500 per m².",
-      "adr_occupancy": "High in peak ski/summer; property-specific / Strong winter and summer, but seasonal",
+      "revenue": "Strong winter and summer demand in Val Gardena and Alta Badia; broader resident and visitor demand around Brunico, Valdaora and San Candido.",
+      "adr_occupancy": "Peak-season strength with property-specific shoulder-season demand and regulated operating eligibility",
       "confidence": "Medium-low"
     },
-    "price_basis": "Premium built-property benchmark. UBS 2026 cites Cortina/Dolomites premium segment just under CHF12,000 / EUR12,500 per m²; dashboard uses EUR12,500 × EUR/USD 1.14784 ≈ $14,348/m².",
-    "price_confidence": "Medium; premium benchmark not all South Tyrol",
-    "profit_driver": "UNESCO scenery, skiing, hiking/cycling, best-in-class food, proximity to Innsbruck/Venice/Verona/Milan corridors."
+    "price_basis": "Median of three direct apartment asking observations captured 2026-08-23 in Ortisei, Selva and Valdaora. The median is about EUR 8,348/m² on portal-stated surface; converted at 1 EUR = 1.1699 USD and rounded to $9,800/m². This is mixed-location asking evidence, not a completed-market median or valuation.",
+    "price_confidence": "Medium-low; direct asks with portal-stated rather than independently measured legal area",
+    "profit_driver": "Exceptional year-round mountain use, constrained lawful second-home stock, strong domestic and European demand, and practical service depth where rail and hospitals are close."
   },
   {
     "id": "bali",

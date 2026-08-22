@@ -2876,6 +2876,155 @@ DUBAI_DOSSIER = PremiumDossierSpec(
 )
 
 
+DOLOMITES_SOUTH_TYROL_DOSSIER = PremiumDossierSpec(
+    destination_id="dolomites-south-tyrol",
+    title="Dolomites and South Tyrol Property Dossier | Global Home Atlas",
+    description="Assess Dolomites and South Tyrol property through resident-housing restrictions, ownership, access, healthcare, tourist letting, hazards, value, resale, and current listings.",
+    h1="Dolomites / South Tyrol: buy the valley, not the postcard",
+    lede=(
+        "The Dolomites can deliver one of Europe’s finest year-round mountain lives, but the address determines whether that life is practical. Ortisei and Selva put the Sella landscape close at a premium; Corvara offers a resort-led Alta Badia rhythm; Brunico and Valdaora connect skiing to rail, named provincial hospitals and ordinary services; San Candido gives the eastern Pusteria valley a smaller but complete base. Ownership eligibility, resident-housing restrictions, tourist-use rights, winter access and resale are property-specific. This dossier separates the durable valley system from the postcard premium."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-23",
+    date_reviewed="2026-08-23",
+    verdict_paragraphs=(
+        "The verdict is positive for a lifestyle-led buyer who chooses a year-round operating base before choosing a view. South Tyrol combines exceptional landscape, food, hiking, cycling and winter sport with functioning towns, public transport and provincial healthcare. Yet the strongest retirement case is not automatically the most famous resort. Ortisei and Selva can support repeat use, but they remain bus-linked valleys with premium entry prices. Corvara is even more road- and tourism-led. Brunico, Valdaora and San Candido offer a different proposition: rail or direct valley-bus access, ordinary commerce and closer connection to hospitals listed by the provincial health authority. The right answer depends on whether the home is for weeks of intense mountain use or months of everyday life.",
+        "Legal access has two layers. Italy’s Foreign Ministry says EU and EEA citizens, and specified non-EU residents with qualifying Italian permits, are exempt from a reciprocity check; other non-EU buyers require a nationality- and transaction-specific assessment by the notary. That national ownership pathway does not override South Tyrol’s use restrictions. A conventioned or resident-housing dwelling can be purchased but cannot simply become a holiday home; it must serve eligible permanent housing. The 2025 provincial reform also reserves new housing zones and new residential volume for residents. A foreign buyer therefore needs written confirmation of both the ability to acquire and the exact unit’s lawful occupancy and letting status.",
+        "Property ownership does not create residence. Italy’s elective-residence route is designed for applicants who intend to settle, have adequate independent income and will not work, but requirements and consular judgment remain applicant-specific. Establish residence, tax and healthcare arrangements first. Then choose the valley, test the hospital and winter route, obtain the land-register, cadastral, planning, energy, condominium and resident-housing records, and inspect the building for roof, moisture, heating, snow and access burdens. Only after that should tourist rent, appreciation or a future foreign buyer enter the model. The Dolomites reward selectivity; they punish the assumption that beauty makes every restriction and carrying cost irrelevant."
+    ),
+    lenses_intro=(
+        "The Atlas groups the ten decision dimensions into five practical questions. The prose explains what the evidence means for a buyer; the complete ten-dimension assessment appears once in the score table below."
+    ),
+    lenses=(
+        DossierLens(
+            "Choose the daily system that still works after ski week",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Ortisei and Selva are the most recognisable Val Gardena choices. They combine dramatic scenery, lifts, restaurants, Ladin culture and a long summer season, but their daily systems are not identical to an urban neighbourhood. Ortisei has the broader village centre and direct valley buses; Selva places the high-mountain experience closer and the international resort identity higher. Both require careful review of gradient, ice, evening transport, grocery distance and the journey to Bressanone or Bolzano for deeper services. A lift-side apartment can be outstanding for active repeat stays and still become inconvenient when walking ability changes or the car cannot reach the building easily in snow.",
+                "Corvara and Alta Badia offer a polished resort environment, strong food culture and exceptional access to the Sella landscape. They are also more dependent on roads and buses for the wider life of the province. This matters in retirement and shoulder season. Test the route to Brunico hospital, the nearest pharmacy and grocery options when visitor services reduce. Ask whether a non-skiing partner has a satisfying week and whether the address works without driving after dark. The destination’s magnetism is unquestioned; retirement fit depends on how much of the household’s routine can be met inside a small tourism-led valley.",
+                "Brunico, Valdaora and San Candido shift the balance. Brunico is a regional service and rail base whose official health district lists primary-care, nursing, dental and public-health services; the provincial health authority also names hospitals in Brunico and San Candido. Valdaora connects a village routine and the Pusteria rail corridor to Kronplatz, while San Candido combines a walkable centre and rail with its named hospital. These facts establish location, not comparative clinical capability or appointment access. Spend an ordinary November week before buying. Make the food, clinic, hospital and social journeys; test heating and daylight; and ask whether one household member could remain independent if the other could no longer drive."
+            ),
+            "village-routine",
+        ),
+        DossierLens(
+            "Treat access as a chain, not an airport claim",
+            ("global_access", "foreigner_fit"),
+            (
+                "South Tyrol has no single gateway that makes every Dolomites address easy. International trips normally combine an airport, mainline rail or motorway, and a final valley leg. Val Gardena connects by buses through Ponte Gardena, Chiusa, Bressanone or Bolzano. Alta Badia connects by road and valley buses toward Brunico. The Pusteria corridor is different: regional trains link Fortezza, Brunico, Valdaora, Dobbiaco and San Candido. Official 2026 timetables show this network, but they do not guarantee a simple luggage journey from a specific home. Measure the complete trip in winter, including transfers, parking, snow and late arrival.",
+                "The Pusteria rail corridor can support a lower-car lifestyle if the address is genuinely walkable to a station and daily services. Valdaora and San Candido benefit from that structure; a hillside development described as near rail may still require a steep walk or local bus. Ortisei and Selva have frequent valley services but remain bus-led. Corvara’s practical range depends even more on roads, buses and season. Inspect the exact last mile in poor weather. Confirm ski storage, step-free access, snow clearance, visitor parking and whether taxis operate when needed. A good regional network cannot repair a difficult building entrance.",
+                "South Tyrol’s German, Italian and Ladin environment is part of the appeal and part of the operating reality. Tourism professionals often support international clients, but the binding transaction, land-register, planning, tax and provincial-housing work remains local. Use an independent bilingual notary and lawyer, and obtain translations where necessary. A buyer who expects English to carry every administrative task will find more friction than a visitor does. Foreigner fit is strongest when the household welcomes local language and institutions, retains professional support, and chooses a community for daily belonging rather than treating it as a managed resort product."
+            ),
+            "pusteria-rail",
+        ),
+        DossierLens(
+            "Clear both the national purchase and the provincial use",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Nationally, the notary must establish that the buyer can complete the legal act. EU and EEA citizens do not require reciprocity verification. Certain legally resident non-EU citizens are also exempt; for other non-EU nationals, reciprocity or an applicable treaty position must be checked case by case. Do not accept a portal’s phrase such as freehold or foreign-buyer friendly as the answer. Confirm nationality, residence status, marital-property position, tax code, source of funds and signing arrangements before paying a non-refundable deposit. The purchase contract should be conditional on the documentary and legal results that matter.",
+                "South Tyrol adds the controlling property-use question. The provincial housing-supervision FAQ says a conventioned dwelling may be bought but cannot be used as a holiday home; it must meet eligible permanent-housing needs. The 2025 reform moves further by reserving new housing zones and new residential volume for residents, with stronger controls against misuse. A listing advertised as new, investment-grade or ideal for a second home may therefore describe very different legal products. Obtain the exact conventioning, occupancy and land-register records, and ask the competent municipality or provincial authority to confirm lawful second-home use in writing.",
+                "Tourist letting is a separate regulated activity. The province requires the certified commencement notification for private room and furnished-holiday-apartment letting, together with classification and price-notification requirements; 2025–2026 reforms add tighter operating and professional-qualification rules. National identification and safety duties may also apply. None of this proves that a particular conventioned apartment, condominium or municipality permits the intended use. Verify the unit, operator, building rules, registration, safety equipment, tax and continuity after sale. If the financial case depends on short stays before these answers exist, the buyer is underwriting a hospitality permission rather than a home."
+            ),
+        ),
+        DossierLens(
+            "Underwrite ordinary demand before the tourism premium",
+            ("rental_profit", "capital_upside"),
+            (
+                "Rental demand is real but uneven. Ortisei, Selva and Corvara can command intense winter and summer interest, while Brunico, Valdaora and San Candido mix visitor demand with more ordinary local use. Gross rates do not reveal the result. Deduct management, cleaning, utilities, heating, condominium charges, maintenance, insurance, furnishing renewal, platform costs, vacancy and tax. Then separate a lawful private-let operation from an apartment that may only be occupied as eligible resident housing. The safest retirement model works with no tourist rent; any compliant income should improve the case rather than rescue it.",
+                "Scarcity supports the long-term story, especially in established resort centres where landscape, planning and limited developable land constrain supply. The resident-housing policy can also protect local occupancy while reducing the stock legally available to second-home buyers. Scarcity is not the same as guaranteed appreciation. Premium markets can reprice when financing costs rise, winter demand changes or a building’s access and energy performance fall behind. Model a flat nominal value after five years and a material discount on sale. A beautiful but legally narrow asset may be scarce and still have a small future buyer pool.",
+                "Climate and infrastructure deserve explicit capital treatment. The province’s Hazard Browser and municipal hazard-zone plans cover flood, debris flow, landslide, rockfall and avalanche information; the correct screen is address-specific, not a valley reputation. Review roof snow load, retaining walls, slope drainage, stream proximity, avalanche exposure, access closure and insurance. Also inspect energy classification, heating system, summer cooling need and the cost of upgrading older alpine construction. A property that remains reachable, efficient and insurable is more likely to preserve usefulness and buyer demand than one whose only durable feature is the view."
+            ),
+        ),
+        DossierLens(
+            "Pay for lawful use and a buyer pool you can name",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Official OMI 2025 H2 ranges show why one Dolomites average is misleading. Normal-condition apartment ranges in selected central zones were 5,100–9,700 EUR/m² in Ortisei, 3,800–7,500 in Corvara and 2,400–4,800 in San Candido, all on the OMI gross-area basis. They are broad zone opinions, not completed-sale evidence or valuations. They also do not capture every premium view, renovation or restriction. Their value is comparative: they reveal a location gradient and force the buyer to identify asset type, condition, lawful use and area basis before accepting a portal comparison.",
+                "The three asking observations below add current product evidence: a 115 m² Ortisei apartment, a 110 m² tourist apartment in Selva and a 50 m² Valdaora apartment advertised for independent second-home use. All use the portal-stated surface denominator; that is not a legal or measured internal-area certificate. Their asking EUR/m² levels differ sharply, and none is a substitute for completed transactions. Reconcile cadastral and physical areas, accessories, parking, energy, conventioning, tourist status, condition and view. A smaller legal second-home unit can be better value than a larger resident-restricted bargain the buyer cannot use as intended.",
+                "Acquisition cost must be property-specific. On a private residential resale, the Italian Revenue Agency’s general baseline is 9% registration tax on the applicable base absent first-home relief; developer or VAT sales, luxury categories and buyer facts can differ, so obtain a written notarial closing statement. Exit liquidity then follows the future audience. A central, lawful second-home apartment with manageable charges, parking and ordinary access can reach domestic, European and international lifestyle buyers. A conventioned apartment reaches an eligibility-defined resident market. A very expensive Selva or Ortisei home requires a narrower buyer who accepts both entry price and carrying cost. Ask two independent agents to identify the next buyer, normal marketing period and completed substitutes. Model sale tax and fees, currency movement, a weaker ski season and a ten-percent price reduction. The best entry is the one whose lawful use and future buyer remain clear without promotional assumptions."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Ortisei, Selva and Corvara deliver exceptional mountain culture; Brunico, Valdaora and San Candido make that lifestyle more repeatable beyond peak weeks.",
+        "global_access": "South Tyrol combines mainline connections with valley buses; Pusteria rail helps Valdaora and San Candido, while Val Gardena and Corvara retain longer last miles.",
+        "ownership_clarity": "Italy’s reciprocity framework is workable, but every South Tyrol buyer must also clear the exact unit’s conventioning and lawful occupancy status.",
+        "regulatory_safety": "South Tyrol resident-housing and tourist-let rules are property-specific; conventioned homes, municipal approvals and alpine hazards require written address-level clearance.",
+        "rental_profit": "Ortisei, Selva and Corvara have strong visitor demand, but lawful-use limits, seasonality, management, heating and maintenance compress the spendable return.",
+        "capital_upside": "Dolomites scarcity and year-round demand support the case, while high entry prices, energy upgrades and restricted buyer pools limit easy appreciation.",
+        "retirement_fit": "The provincial health authority names hospitals in Brunico and San Candido; Valdaora adds rail, while every buyer must verify the required service and real journey from the address.",
+        "exit_liquidity": "Lawful second homes in recognised Dolomites centres reach broad lifestyle buyers; conventioned, inaccessible or extremely expensive stock has a narrower exit.",
+        "foreigner_fit": "South Tyrol is internationally experienced, but German, Italian and Ladin administration means foreign buyers still need bilingual independent professional support.",
+        "value_entry": "Official OMI ranges and current Ortisei, Selva and Valdaora asks show that lawful use, area basis and carrying cost matter more than one regional average.",
+    },
+    market_anchors=(
+        {"location": "Ortisei · B1 central premium zone", "evidence": "5,100–9,700 EUR/m²", "buyer_read": "Agenzia Entrate OMI 2025 H2 range for normal-condition apartments on gross area in the Scurcià, Lusenberg and Via Meisules B1 zone; a zone opinion, not a sale or valuation.", "source_label": "Agenzia Entrate OMI 2025 H2", "source_url": "https://www1.agenziaentrate.gov.it/servizi/Consultazione/ricerca.htm?lingua=DE"},
+        {"location": "Corvara · B1 centre", "evidence": "3,800–7,500 EUR/m²", "buyer_read": "Agenzia Entrate OMI 2025 H2 range for normal-condition apartments on gross area in the Corvara, Pescosta and Colfosco B1 zone; it does not isolate a view, restriction or completed sale.", "source_label": "Agenzia Entrate OMI 2025 H2", "source_url": "https://www1.agenziaentrate.gov.it/servizi/Consultazione/ricerca.htm?lingua=DE"},
+        {"location": "San Candido · B1 centre", "evidence": "2,400–4,800 EUR/m²", "buyer_read": "Agenzia Entrate OMI 2025 H2 range for normal-condition apartments on gross area in central San Candido; it is a broad zone benchmark, not a candidate valuation.", "source_label": "Agenzia Entrate OMI 2025 H2", "source_url": "https://www1.agenziaentrate.gov.it/servizi/Consultazione/ricerca.htm?lingua=DE"},
+    ),
+    micro_locations_intro=(
+        "Use four operating patterns, not one Dolomites average. Ortisei and Selva are the premium Val Gardena pair; Corvara and Alta Badia are resort-led and road-dependent; Brunico and Valdaora combine a service town, rail and Kronplatz; San Candido and Dobbiaco offer a smaller eastern Pusteria base. Confirm exact conventioning, second-home use, station or bus route, gradient, snow clearance, hospital journey, hazards, building costs and future eligible buyer for every address."
+    ),
+    micro_locations=(
+        {"name": "Ortisei / Selva Val Gardena", "best_for": "Premium active mountain life", "daily_life": "Village services and buses inside a high-cost resort valley", "diligence": "Conventioning, gradient, building, parking and exit price"},
+        {"name": "Corvara / Alta Badia", "best_for": "Sella access and polished resort use", "daily_life": "Tourism-led villages with road and bus dependence", "diligence": "Lawful use, winter road, hospital route and seasonality"},
+        {"name": "Brunico / Valdaora", "best_for": "Services, rail and Kronplatz", "daily_life": "Resident economy, named hospital and Pusteria connections", "diligence": "Required clinical service, station walk, conventioning and exact second-home right"},
+        {"name": "San Candido / Dobbiaco", "best_for": "Walkable eastern-valley base", "daily_life": "Rail, a named hospital and year-round town services", "diligence": "Clinical capability, winter access, tourist status and resale depth"},
+    ),
+    checklist=(
+        "Confirm nationality-specific reciprocity, residence, tax and healthcare before treating the property as a retirement home.",
+        "Obtain written land-register, cadastral, planning, condominium, energy and conventioning records for the exact unit.",
+        "Require explicit confirmation that second-home occupancy and any tourist use are lawful and continue after sale.",
+        "Travel the airport, rail or bus, grocery and hospital chain from the exact address in winter and shoulder season.",
+        "Inspect roof, moisture, heating, snow load, retaining structures, access, parking and planned capital work.",
+        "Screen the provincial Hazard Browser and municipal plan for flood, debris flow, landslide, rockfall and avalanche exposure.",
+        "Compare portal surface, legal area and completed substitutes before relying on EUR/m² or a valuation.",
+        "Model five-year carrying and a conservative resale without tourist rent, then identify the future eligible buyer.",
+    ),
+    references_intro=(
+        "Legal, residence, tax, housing, tourism, transport, healthcare, hazard, market, FX and listing claims were reviewed on 23 August 2026. The next scheduled review is 23 February 2027, or sooner if a cited law, provincial rule, OMI release, timetable, hazard source or listing changes. Recheck every live source and obtain independent Italian and South Tyrolean legal, notarial, tax, immigration, planning, engineering and insurance advice for the exact buyer and property. Listing observations are dated asks, not proof of title, lawful use, area, condition, availability or completed value."
+    ),
+    references=(
+        {"label": "Italian Foreign Ministry: rights and reciprocity", "url": "https://www.esteri.it/en/temi/diplomazia_giuridica/condizreciprocita/"},
+        {"label": "Italian Notariat: services for foreign buyers", "url": "https://www.notariato.it/en/notaio/notarial-services-for-foreigners/"},
+        {"label": "Italian Revenue Agency: buying a home and transfer taxes", "url": "https://www1.agenziaentrate.gov.it/web_app_entrate/guida_acquisto_casa.html"},
+        {"label": "Italian Consulate London: elective residence", "url": "https://conslondra.esteri.it/it/servizi-consolari-e-visti/servizi-per-il-cittadino-straniero/visti/elective-residence/"},
+        {"label": "South Tyrol Housing Supervision: conventioned-home FAQ", "url": "https://wohnbauaufsicht.provinz.bz.it/de/faq-frequently-asked-questions"},
+        {"label": "South Tyrol: 2025 resident-housing reform", "url": "https://wohnen.provinz.bz.it/de/mehr-wohnraum"},
+        {"label": "South Tyrol: private rooms and holiday-apartment letting", "url": "https://tourismus.provinz.bz.it/de/gastgewerbe-private-zimmer-ferienwohnungsvermietung"},
+        {"label": "South Tyrol: 2026 private-landlord qualification", "url": "https://news.provinz.bz.it/de/news/private-vermieter-kriterien-fur-berufliche-qualifikation-beschlossen"},
+        {"label": "Agenzia Entrate: OMI quotation search", "url": "https://www1.agenziaentrate.gov.it/servizi/Consultazione/ricerca.htm?lingua=DE"},
+        {"label": "South Tyrol Mobility: current timetables", "url": "https://www.suedtirolmobil.info/en/my-journey/timetables"},
+        {"label": "South Tyrol Mobility: regional network maps", "url": "https://www.suedtirolmobil.info/en/my-journey/network-maps"},
+        {"label": "South Tyrol Health Authority: named hospital laboratories", "url": "https://www.sabes.it/it/laboratori"},
+        {"label": "South Tyrol Health Authority: Brunico district services", "url": "https://www.sabes.it/it/brunico-circondario"},
+        {"label": "South Tyrol natural-hazards portal", "url": "https://naturgefahren.provinz.bz.it/it/home"},
+        {"label": "South Tyrol Hazard Browser", "url": "https://naturgefahren.provinz.bz.it/it/hazard-browser"},
+        {"label": "European Central Bank: euro reference rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+        {"label": "Ortisei Via Minert apartment asking observation", "url": "https://www.immobiliare.it/annunci/123436481/"},
+        {"label": "Selva Strada da Nives apartment asking observation", "url": "https://www.immobiliare.it/annunci/126489173/"},
+        {"label": "Valdaora Residence Plunger apartment asking observation", "url": "https://www.immobiliare.it/annunci/128498934/"},
+    ),
+    images=(
+        DossierImage("val-gardena-life", "/assets/dolomites-south-tyrol-val-gardena-life.webp", "Older couple walking through Ortisei with the Dolomites behind the village", "Val Gardena’s appeal is strongest when village life works beyond the lifts.", "hero"),
+        DossierImage("pusteria-rail", "/assets/dolomites-south-tyrol-pusteria-rail.webp", "Regional train crossing the Pusteria valley near Valdaora", "Pusteria rail changes the daily-life case for Valdaora and San Candido.", "wide"),
+        DossierImage("village-routine", "/assets/dolomites-south-tyrol-village-routine.webp", "Everyday South Tyrol village street with shops, bus stop and mountain backdrop", "A durable mountain home connects scenery to groceries, healthcare and winter access.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Dolomites / South Tyrol through five destination lenses",
+    assessment_intro="Here’s how Dolomites / South Tyrol scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations compare premium Ortisei, tourist-use Selva and second-home Valdaora apartments. EUR is primary; USD uses the recorded ECB reference rate. Portal-stated surface is a comparison denominator, not verified legal internal area.",
+    market_anchors_intro="These official Agenzia Entrate OMI 2025 H2 zone ranges cover normal-condition apartments on gross area. They are broad market opinions—not completed transactions, asking prices or valuations—and must be reconciled for legal use, exact location, condition and area.",
+    orientation_groups=(
+        DossierOrientationGroup("Val Gardena / Alta Badia", (("Bolzano / Bressanone", "Mainline service gateways"), ("Ortisei", "Broader Val Gardena base"), ("Selva", "High resort core"), ("Corvara", "Road-linked Alta Badia"))),
+        DossierOrientationGroup("Pusteria rail corridor", (("Fortezza", "Mainline interchange"), ("Brunico", "Hospital and service town"), ("Valdaora", "Rail and Kronplatz"), ("San Candido", "Eastern valley hospital base"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Val Gardena and Alta Badia are bus- and road-led; the Pusteria corridor has rail. Confirm the exact winter route and last mile.",
+    country_guide_url="/countries/italy-property/",
+    country_guide_label="Italy property guide",
+    rail_comparison="Compare Dolomites / South Tyrol with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -2896,6 +3045,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     PHUKET_KOH_SAMUI_DOSSIER.destination_id: PHUKET_KOH_SAMUI_DOSSIER,
     VANCOUVER_ISLAND_VICTORIA_DOSSIER.destination_id: VANCOUVER_ISLAND_VICTORIA_DOSSIER,
     DUBAI_DOSSIER.destination_id: DUBAI_DOSSIER,
+    DOLOMITES_SOUTH_TYROL_DOSSIER.destination_id: DOLOMITES_SOUTH_TYROL_DOSSIER,
 }
 
 
@@ -2975,3 +3125,4 @@ validate_premium_dossier(MALLORCA_DOSSIER)
 validate_premium_dossier(CROATIA_ISTRIA_DALMATIA_DOSSIER)
 validate_premium_dossier(QUEENSTOWN_DOSSIER)
 validate_premium_dossier(DUBAI_DOSSIER)
+validate_premium_dossier(DOLOMITES_SOUTH_TYROL_DOSSIER)
