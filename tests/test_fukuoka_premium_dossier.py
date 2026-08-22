@@ -301,6 +301,29 @@ class PremiumDossierPublishingRuleTests(unittest.TestCase):
         self.assertIn("official market anchors", checklist)
         self.assertIn("stacked labelled records", checklist)
 
+    def test_premium_dossier_rulebook_defines_the_repeatable_quality_standard(self) -> None:
+        docs_dir = Path(__file__).parents[1] / "docs"
+        checklist = (docs_dir / "CONTENT_PUBLISH_READINESS_CHECKLIST.md").read_text()
+        rulebook = (docs_dir / "PREMIUM_DESTINATION_DOSSIER_RULEBOOK.md").read_text().lower()
+
+        self.assertIn("[Premium Destination Dossier Rule Book](PREMIUM_DESTINATION_DOSSIER_RULEBOOK.md)", checklist)
+        for required_standard in (
+            "definition of an atlas 10/10 dossier",
+            "required content contract",
+            "the five-lens model",
+            "score governance",
+            "official market anchors",
+            "shared visual system",
+            "hard publishing gates",
+            "the 100-point quality scorecard",
+            "desktop and mobile review script",
+            "update policy for future editions",
+            "rollout rule for existing destinations",
+        ):
+            self.assertIn(required_standard, rulebook)
+        self.assertIn("95–100, all hard gates pass", rulebook)
+        self.assertIn("do not bulk-convert pages", rulebook)
+
 
 if __name__ == "__main__":
     unittest.main()
