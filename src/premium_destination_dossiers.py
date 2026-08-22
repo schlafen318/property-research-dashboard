@@ -2709,6 +2709,173 @@ VANCOUVER_ISLAND_VICTORIA_DOSSIER = PremiumDossierSpec(
 )
 
 
+DUBAI_DOSSIER = PremiumDossierSpec(
+    destination_id="dubai",
+    title="Dubai Property Dossier for Foreign Buyers | Global Home Atlas",
+    description="Assess Dubai property through designated freehold ownership, residence, service charges, completed-asset diligence, licensed letting, heat resilience, value and resale depth.",
+    h1="Dubai: buy the finished asset, not the promise",
+    lede=(
+        "Dubai is one of the world’s most accessible property markets for an international buyer, but access is not the same as simplicity. Foreign nationals can own in designated freehold areas, the registration path is well defined, and resident, tenant and visitor demand is substantial. The harder decision is which completed building, service-charge burden and daily-life pattern will remain useful through summer and credible on resale. This dossier separates that durable case from the promotional one."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-23",
+    date_reviewed="2026-08-23",
+    verdict_paragraphs=(
+        "The verdict is positive for a selective buyer, with one controlling rule: choose the completed asset and its operating record before choosing a future story. The Dubai Land Department says foreigners may own freehold property in areas designated for foreign ownership, and every sale must be registered. That is unusually clear access. It does not remove the need to verify the title, seller, developer, building-management record, service-charge statement, permitted use, parking, defects and resale comparables. Nor does a purchase itself create residence. The UAE Golden visa route for real-estate investors has a separate AED 2 million eligibility threshold and application process; a deed below or above that figure is not automatic approval. Establish the household’s lawful residence, insurance and banking route independently.",
+        "Dubai best suits a buyer who values global air access, English-language professional services, strong year-round urban infrastructure and the ability to choose between dense waterfront living and newer inland neighbourhoods. It can work for an owner-occupier who accepts an air-conditioned summer routine, or for an investor who underwrites ordinary residential demand before adding licensed holiday-home income. It is weaker for anyone who needs effortless outdoor life throughout the year, assumes every new tower carries equal quality, depends on an unverified off-plan completion date, or treats a headline gross yield as spendable income. A high service charge, frequent furnishing replacement, vacancy and management can transform an attractive brochure return.",
+        "Proceed in order. First choose the daily-life pattern: Downtown Dubai and Business Bay, Dubai Marina and JBR, Palm Jumeirah, or Dubai Hills Estate. Then confirm residence and health insurance, cash and financing, title and designated-freehold status. For a completed unit, read the DLD record, building accounts, RERA-approved service charge, maintenance history and recent completed transactions. For any off-plan alternative, verify the developer, project status, escrow record, payment schedule, cancellation rights and realistic handover risk through DLD data and independent counsel. Only after that should rent, appreciation or Golden visa eligibility enter the decision."
+    ),
+    lenses_intro=(
+        "Dubai becomes easier to judge when ten factors are paired into five practical questions. The narrative below explains the trade-offs; the complete Atlas assessment appears once in the score table that follows."
+    ),
+    lenses=(
+        DossierLens(
+            "Build a life that still works in August",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Dubai’s attraction is not only spectacle. Downtown Dubai and Business Bay offer restaurants, offices, groceries, pharmacies and urban services close together; Dubai Marina and JBR combine apartment living with a promenade, beach and rail connections; Palm Jumeirah provides resort-like waterfront seclusion; Dubai Hills Estate offers newer parks, schools, clinics and family-scale housing farther inland. These are meaningfully different lives. A waterfront tower can be walkable within its immediate district but frustrating for cross-city errands. A villa can offer privacy and shade while making almost every useful trip dependent on a car. The decision should begin with an ordinary Tuesday, not a weekend view.",
+                "Climate is the main lifestyle constraint. Dubai’s cooler months make outdoor exercise, terraces and beach life unusually pleasant, but summer heat changes the operating model. Dubai Health Authority guidance treats heatstroke as a serious risk and identifies older people among vulnerable groups. Test shaded access from the front door to parking, taxi or Metro; indoor walking options; cooling reliability; balcony usability; pool and common-area maintenance; and the cost of running air conditioning through the hottest period. Dubai Hills’ greenery, Marina’s promenade and Downtown’s connected buildings are not interchangeable forms of resilience. A retirement home should remain convenient when outdoor time contracts.",
+                "Healthcare depth is a strength, but access is administrative and financial rather than created by property ownership. Dubai’s government portal says health insurance is mandatory, with employers responsible for employees and sponsors responsible for dependants. The emirate has a substantial public and private care network, yet provider access, policy limits, exclusions and ongoing premiums still need buyer-specific checking. Before choosing Palm Jumeirah isolation or a Dubai Hills villa, map routine and specialist care at peak traffic. If one household member stops driving, test the replacement routine. The best retirement asset is the one that preserves daily independence, not simply the one with the most dramatic address."
+            ),
+            "summer-shade",
+        ),
+        DossierLens(
+            "Use global access without ignoring the last mile",
+            ("global_access", "foreigner_fit"),
+            (
+                "Dubai International Airport is a structural advantage. Dubai Airports reported 95.2 million guests in 2025, evidence of the network’s scale rather than a promise that every itinerary is simple. Downtown Dubai and Business Bay have relatively direct airport road and Metro access. Dubai Marina and JBR sit much farther west but benefit from Metro and tram connections. Palm Jumeirah adds monorail, taxi and road dependence. Dubai Hills Estate is closer to major roads than to a walk-up rail station. Measure door-to-gate travel at the hours the household will actually fly, including luggage, interchange, parking and the return trip after a long journey.",
+                "Within the city, the Metro is useful where the home, workplace and routine destinations align with it. It does not make the whole emirate car-free. A Business Bay apartment can sit an uncomfortable walk from the nearest station; a Marina tower can be close to rail yet slow to exit by road; Palm Jumeirah’s fronds magnify last-mile time; and Dubai Hills’ internal distances favour a car. Walk the route in daytime heat and after dark, not only on a map. Check taxi availability, visitor parking, delivery access, road noise and construction detours. Access scores well because Dubai offers alternatives, but address-level friction remains decisive.",
+                "Foreigner fit is high because the market, banking, brokerage and professional-services ecosystem routinely serves international clients. English is widely used in commercial transactions, but the legal and administrative framework remains local. Use a DLD-registered broker, independently appointed conveyancing lawyer, qualified tax adviser and building inspector. Verify the title and seller through official channels; do not rely on a screenshot forwarded by an agent. Cross-border buyers should also plan currency transfers, sanctions and source-of-funds checks, estate planning, powers of attorney and document legalisation before the payment deadline. Operational familiarity makes Dubai approachable; it should not make the buyer casual."
+            ),
+            "metro-access",
+        ),
+        DossierLens(
+            "Own in the right zone—and audit the building",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Ownership clarity begins with geography. DLD’s guidance permits foreign freehold ownership in designated areas, so a marketing name or view is not enough: confirm the exact plot, unit and title classification. DLD’s sale-registration service sets out the passport, electronic no-objection certificate and fee process and lists residency status as open to all. It also states a 2% registration fee for the seller and 2% for the buyer, plus trustee, title and map charges where applicable. Obtain a current completion statement for the actual transaction rather than applying a single percentage to every property or corporate structure.",
+                "For a jointly owned building, service charges are part of the asset, not a footnote. DLD directs owners to the RERA-approved Service Charge Index and Mollak system. Request the current approved charge, unit account, arrears, reserve position, insurance, maintenance contracts, owners’ records and history of major work. Compare lifts, chilled-water arrangements, cooling allocation, façade and waterproofing, fire systems, parking, pools and common areas. In Dubai Marina and Business Bay, two similar-looking towers can have very different governance and operating costs. On Palm Jumeirah, waterfront exposure and specialist amenities increase the questions. A low asking price can be the market’s estimate of a building problem.",
+                "Intended use must also be cleared. Dubai regulates holiday homes through a licensing and permitting framework; a residential title or active online listing does not itself prove that a particular unit, operator and stay pattern comply. Verify the current tourism classification, permit, building rules, management contract and tax treatment before adding short-term income. The Federal Tax Authority distinguishes residential real estate from commercial and serviced accommodation, with different VAT treatment, so obtain property-specific advice. For off-plan property, check DLD project, developer and escrow data, construction progress and contractual remedies. Regulatory safety is strongest in a completed, documented building with an ordinary-use case."
+            ),
+        ),
+        DossierLens(
+            "Underwrite resident demand before tourist demand",
+            ("rental_profit", "capital_upside"),
+            (
+                "Dubai has genuine demand depth. DLD reported 1.38 million registered tenancy contracts in 2025 with a total value of AED 126.4 billion. That is system-wide evidence, not a forecast for a particular unit. A completed Business Bay apartment can reach office-linked residents; Dubai Marina and JBR attract tenants seeking waterfront and rail access; Dubai Hills can appeal to longer-stay households wanting newer community infrastructure. Palm Jumeirah competes in a higher-cost, more discretionary segment. Start with documented long-term asking and achieved rents in the same tower or community, then deduct vacancy, agent fees, management, maintenance, cooling, insurance, service charge and periodic refurbishment.",
+                "Holiday-home demand can add flexibility, but it turns the home into a hospitality operation. Model licensing, platform fees, cleaning, linen, utilities, consumables, guest support, furnishing wear, seasonal pricing, management and neighbour or building restrictions. Ask who holds the permit and controls the listing history if an operator is involved. Compare three cases: a conventional annual tenancy, a compliant licensed holiday-home operation, and no income. If the purchase only works under the most optimistic case, it is not a resilient retirement or investment asset. A professionally staged gross-yield claim is not a substitute for bank statements, contracts and actual operating expenses.",
+                "Capital upside should be treated as an asset-selection scenario. DLD’s 2025 summary recorded 147,500 units sold and 937 projects under construction, illustrating both market depth and a large supply pipeline. Population, aviation and business growth can support established districts, but new launches continually compete for attention. A buyer paying a launch premium assumes developer execution, completion, future service charges and resale demand against newer inventory. A completed unit with a proven view, sensible layout, manageable charge and broad tenant pool may be less exciting but easier to evaluate. Never use Dubai’s citywide growth as a guarantee for a compromised building or price."
+            ),
+        ),
+        DossierLens(
+            "Price the exact asset—and know the next buyer",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The official 2024 DLD report gives a useful broad baseline: average residential apartment value of 19,138 AED/m² and average villa value of 14,617 AED/m². Those figures cover broad market activity, including both ready and off-plan segments; they do not value a candidate, establish a 2026 asking price or make an apartment directly comparable with a villa. The three direct asking observations below deliberately span Business Bay, Dubai Marina and Dubai Hills Estate. Their dispersion reflects location, building, view, age, size and property type. Reconcile each candidate with recent completed transactions in the same building or tightly matched community before negotiating.",
+                "Value entry comes from refusing the wrong premium. In Downtown Dubai and Business Bay, distinguish a genuinely useful location from a skyline label, and price traffic, construction, layout and service charge. In Dubai Marina and JBR, test view protection, road access, tower governance and waterfront maintenance. On Palm Jumeirah, separate beachfront scarcity from dated fit-out, exposure and high recurring costs. In Dubai Hills Estate, compare mature sections with ongoing construction and verify the exact built-up area, plot, community fee and route to daily services. A cheaper AED/m² figure can still be poor value when the operating burden and buyer pool are weak.",
+                "Exit liquidity depends on the future audience. A well-managed one- or two-bedroom apartment in a recognised completed tower can appeal to residents, investors and international buyers. An unusual layout, extreme service charge, poor parking or unresolved defect narrows that pool. A large Palm or Dubai Hills home may be scarce but requires a buyer with the right budget, taste and carrying-cost tolerance. Model a five-year sale under flat, weaker and stronger market conditions, including registration, finance, maintenance, furnishing, management, vacancy and selling costs. Before committing, ask two brokers who did not source the unit for completed comparables and an evidence-based resale strategy."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Dubai combines Downtown energy, Marina waterfront life and Dubai Hills greenery, but summer moves much of daily life indoors.",
+        "global_access": "DXB provides exceptional global reach; Marina, Palm Jumeirah and Dubai Hills each add distinct road, rail and last-mile trade-offs.",
+        "ownership_clarity": "DLD registration and designated freehold areas provide clear access, while title, seller, service charges and project status remain asset-specific.",
+        "regulatory_safety": "Dubai holiday-home permits, DLD project records, Mollak charges and building rules require written checks before income or completion assumptions.",
+        "rental_profit": "Business Bay and Dubai Marina have resident demand, but service charges, vacancy, furnishing and licensed-operation costs reduce headline returns.",
+        "capital_upside": "Dubai’s growth and transaction depth support selected completed assets, while 937 projects under construction keep supply and execution risk high.",
+        "retirement_fit": "Dubai offers healthcare, services and security, but mandatory insurance, severe summer heat and car dependence shape long-term suitability.",
+        "exit_liquidity": "Recognised completed Dubai towers reach broad buyer pools; high charges, defects, unusual layouts and promotional pricing weaken resale depth.",
+        "foreigner_fit": "Dubai’s international ecosystem is accessible, yet DLD verification, local legal advice, banking and source-of-funds preparation remain essential.",
+        "value_entry": "Downtown, Marina, Palm Jumeirah and Dubai Hills occupy different price bands; value depends on completed evidence and recurring cost.",
+    },
+    market_anchors=(
+        {"location": "Dubai residential apartments", "evidence": "19,138 AED/m²", "buyer_read": "DLD’s broad 2024 apartment series includes ready and off-plan activity; it is not filtered to a matched completed candidate, 2026 valuation or building comparable.", "source_label": "Dubai Land Department 2024 annual report", "source_url": "https://backoffice.dubailand.gov.ae/en/open-data/research/annual-report-real-estate-sector-performance-2024/"},
+        {"location": "Dubai residential villas", "evidence": "14,617 AED/m²", "buyer_read": "DLD’s broad 2024 villa series includes ready and off-plan activity; it is not filtered to a matched completed candidate, and area basis, community and condition still require matching.", "source_label": "Dubai Land Department 2024 annual report", "source_url": "https://backoffice.dubailand.gov.ae/en/open-data/research/annual-report-real-estate-sector-performance-2024/"},
+        {"location": "Dubai registered tenancy market", "evidence": "1.38 million contracts", "buyer_read": "DLD’s 2025 registered tenancy total across the emirate; it is demand context, not rent or occupancy evidence for a candidate.", "source_label": "Dubai Land Department 2025 rental-sector release", "source_url": "https://backoffice.dubailand.gov.ae/en/news-media/dubai-s-rental-sector-records-strong-growth-in-2025-underscoring-market-stability-and-the-strength-of-the-emirate-s-real-estate-ecosystem/"},
+    ),
+    micro_locations_intro=(
+        "Dubai is not one interchangeable freehold market. These four patterns describe daily life and diligence rather than price zones; verify the exact plot, title, building, service charge, route and nearby construction for every candidate."
+    ),
+    micro_locations=(
+        {"name": "Downtown Dubai / Business Bay", "best_for": "Central urban life", "daily_life": "Offices, services and Metro access with traffic variation", "diligence": "Tower record, construction, layout, parking and service charge"},
+        {"name": "Dubai Marina / JBR", "best_for": "Waterfront apartment living", "daily_life": "Promenade, beach, tram and Metro within a dense district", "diligence": "Road access, tower governance, view protection and cooling"},
+        {"name": "Palm Jumeirah", "best_for": "Premium resort-style ownership", "daily_life": "Waterfront seclusion with higher road and operating dependence", "diligence": "Exposure, recurring costs, fit-out, access and buyer-pool depth"},
+        {"name": "Dubai Hills Estate", "best_for": "Newer family-scale living", "daily_life": "Parks, schools and villas in a more car-led community", "diligence": "Built-up area, plot, construction phase, fees and daily routes"},
+    ),
+    checklist=(
+        "Confirm the household’s residence, health-insurance, banking and estate-planning routes independently of the purchase.",
+        "Verify that the exact plot and unit carry the intended designated-freehold title through DLD records.",
+        "Choose the Downtown, Marina, Palm or Dubai Hills daily-life pattern before comparing finishes.",
+        "For a completed asset, inspect condition, defects, cooling, parking, insurance and the building-management record.",
+        "Obtain the RERA-approved service charge, unit account, reserve information and history of major work.",
+        "For off-plan alternatives, verify developer, project, escrow, progress, payment, cancellation and handover evidence.",
+        "Clear long-term or licensed holiday-home use, management, tax and building rules in writing before pricing income.",
+        "Reconcile completed transactions and model five-year carrying and resale costs before making a binding offer.",
+    ),
+    references_intro=(
+        "Legal, administrative, market, health, climate, transport and listing claims were reviewed on 23 August 2026. Recheck every time-sensitive source and obtain UAE legal, tax, immigration, building, insurance and finance advice for the exact buyer and asset before signing. Listing observations are dated asking evidence only; they do not verify availability, title, condition, negotiability or completed value."
+    ),
+    references=(
+        {"label": "Dubai Land Department: foreign ownership and registration FAQ", "url": "https://dubailand.gov.ae/en/frequently-asked-questions"},
+        {"label": "Dubai Land Department: property sale registration", "url": "https://dubailand.gov.ae/en/eservices/property-sale-registration/"},
+        {"label": "Dubai Land Department: open real-estate data", "url": "https://dubailand.gov.ae/en/open-data/real-estate-data/"},
+        {"label": "Dubai Land Department: 2024 annual real-estate report", "url": "https://backoffice.dubailand.gov.ae/en/open-data/research/annual-report-real-estate-sector-performance-2024/"},
+        {"label": "Dubai Land Department: 2025 rental-sector statistics", "url": "https://backoffice.dubailand.gov.ae/en/news-media/dubai-s-rental-sector-records-strong-growth-in-2025-underscoring-market-stability-and-the-strength-of-the-emirate-s-real-estate-ecosystem/"},
+        {"label": "Dubai Land Department: Service Charge Index guide", "url": "https://dubailand.gov.ae/media/vkcojy4z/service_charge_index_en.pdf"},
+        {"label": "Dubai Land Department: Know Your Rights", "url": "https://dubailand.gov.ae/media/wlzmuycr/know_your_rights.pdf"},
+        {"label": "UAE Government: Golden visa", "url": "https://u.ae/en/information-and-services/visa-and-emirates-id/residence-visas/golden-visa"},
+        {"label": "Dubai legislation: Holiday Homes Decree 41 of 2013", "url": "https://dlp.dubai.gov.ae/Legislation%20Reference/2013/Decree%20No.%20%2841%29%20of%202013.html"},
+        {"label": "Dubai legislation: Holiday Homes Administrative Resolution 1 of 2020", "url": "https://dlp.dubai.gov.ae/Legislation%20Reference/2020/Administrative%20Resolution%20No.%20%281%29%20of%202020.html"},
+        {"label": "Federal Tax Authority: VAT real-estate guide", "url": "https://tax.gov.ae/DownloadOpenTextFile?fileUrl=en%2FVAT_VAT_Guides%2FReal_Estate_Guide%2FReal_Estate_Guide_VATGRE1_EN_19_04_2021_EN.pdf"},
+        {"label": "Dubai Government: healthcare and mandatory insurance", "url": "https://www.dubai.ae/en/web/dubai.ae/healthcare"},
+        {"label": "Dubai Health Authority: summer health guide", "url": "https://www.dha.gov.ae/uploads/072025/Summer%20guide_EN2025751189.pdf"},
+        {"label": "Dubai Airports: main fact file", "url": "https://media.dubaiairports.ae/dubai-airports-main-fact-file/"},
+        {"label": "Dubai RTA: Metro and tram stations map", "url": "https://www.rta.ae/wps/portal/rta/ae/public-transport/metro-stations-map"},
+        {"label": "Dubai RTA: public transport overview", "url": "https://rta.ae/wps/portal/rta/ae/public-transport"},
+        {"label": "Dubai Media Office: April 2024 extreme-weather response", "url": "https://www.mediaoffice.ae/en/news/2024/april/19-04/rta-and-dm"},
+        {"label": "Dubai Media Office: Tasreef rainwater-drainage project", "url": "https://www.mediaoffice.ae/en/news/2024/june/24-06/mohammed-bin-rashid-approves-aed30-billion-tasreef-project"},
+        {"label": "Central Bank of the UAE: domestic market operations and dirham peg", "url": "https://centralbank.ae/en/our-operations/monetary-policy-and-domestic-markets/domestic-market-operations/"},
+        {"label": "Business Bay completed apartment asking observation", "url": "https://www.propertyfinder.ae/en/plp/buy/apartment-for-sale-dubai-business-bay-the-bay-128807897.html"},
+        {"label": "Dubai Marina completed apartment asking observation", "url": "https://www.propertyfinder.ae/en/plp/buy/apartment-for-sale-dubai-dubai-marina-5242-5242-tower-2-129312973.html"},
+        {"label": "Dubai Hills completed villa asking observation", "url": "https://www.propertyfinder.ae/en/plp/buy/villa-for-sale-dubai-dubai-hills-estate-maple-at-dubai-hills-estate-maple-at-dubai-hills-estate-2-131537797.html"},
+    ),
+    images=(
+        DossierImage("waterfront-life", "/assets/dubai-waterfront-daily-life.webp", "Everyday waterfront life in Dubai Marina", "Dubai Marina / JBR: a waterfront routine with real transport and tower trade-offs.", "hero"),
+        DossierImage("metro-access", "/assets/dubai-metro-city-access.webp", "Dubai Metro passing through the city", "Global access is excellent; the last mile still changes by address.", "wide"),
+        DossierImage("summer-shade", "/assets/dubai-hills-summer-shade.webp", "Shaded pedestrian life in Dubai Hills Estate", "Summer suitability depends on shade, cooling, services and short daily routes.", "wide"),
+    ),
+    nav_items=(
+        ("verdict", "Verdict"),
+        ("lenses", "Five destination lenses"),
+        ("scores", "Atlas assessment"),
+        ("listings", "Representative listings"),
+        ("locations", "Where to look"),
+        ("checklist", "Buyer checklist"),
+        ("sources", "References"),
+    ),
+    lenses_heading="Dubai through five destination lenses",
+    assessment_intro="Here’s how Dubai scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three completed asking observations show the spread between Business Bay, Dubai Marina and Dubai Hills Estate. They are asking evidence—not valuations. The apartment sources label size only as Area, and the villa page conflicts on built-up area; local price is primary and USD uses the recorded CBUAE exchange basis.",
+    market_anchors_intro="The official apartment, villa and tenancy figures provide broad context, not candidate pricing. Match property type, completion, district, building, size and condition before drawing a conclusion.",
+    orientation_groups=(
+        DossierOrientationGroup(
+            "Urban waterfront to inland",
+            (
+                ("Downtown Dubai / Business Bay", "Central and dense"),
+                ("Dubai Marina / JBR", "Waterfront and rail-linked"),
+                ("Palm Jumeirah", "Premium and road-dependent"),
+                ("Dubai Hills Estate", "Newer, greener and car-led"),
+            ),
+        ),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact road, Metro, tram and walking route for every address.",
+    country_guide_url="/countries/united-arab-emirates-property/",
+    country_guide_label="United Arab Emirates property guide",
+    rail_comparison="Compare Dubai with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -2728,6 +2895,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     QUEENSTOWN_DOSSIER.destination_id: QUEENSTOWN_DOSSIER,
     PHUKET_KOH_SAMUI_DOSSIER.destination_id: PHUKET_KOH_SAMUI_DOSSIER,
     VANCOUVER_ISLAND_VICTORIA_DOSSIER.destination_id: VANCOUVER_ISLAND_VICTORIA_DOSSIER,
+    DUBAI_DOSSIER.destination_id: DUBAI_DOSSIER,
 }
 
 
@@ -2806,3 +2974,4 @@ validate_premium_dossier(ANNECY_DOSSIER)
 validate_premium_dossier(MALLORCA_DOSSIER)
 validate_premium_dossier(CROATIA_ISTRIA_DALMATIA_DOSSIER)
 validate_premium_dossier(QUEENSTOWN_DOSSIER)
+validate_premium_dossier(DUBAI_DOSSIER)
