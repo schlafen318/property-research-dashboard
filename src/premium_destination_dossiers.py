@@ -693,11 +693,152 @@ MALAGA_COSTA_DEL_SOL_DOSSIER = PremiumDossierSpec(
 )
 
 
+LAKE_COMO_DOSSIER = PremiumDossierSpec(
+    destination_id="lake-como",
+    title="Lake Como Retirement Property Dossier",
+    description="Assess Lake Como property for retirement through daily life, access, ownership, rental rules, hazards, value, resale, and current listings.",
+    h1="Lake Como: choose the everyday lake before the view",
+    lede=(
+        "Lake Como is not one property market or one retirement experience. Como city provides rail, hospitals and an ordinary urban economy; Cernobbio and the lower western shore add polish close to those services; Tremezzina and Menaggio exchange some convenience for the central lake; Varenna and Bellagio create their own rail, ferry and road logic. A beautiful view can therefore sit above very different stairs, winter routines, maintenance burdens and resale pools. This dossier starts with the life and route a home must support, then tests whether the property earns its premium."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is favourable for a lifestyle-led buyer who chooses the practical lake first. Como city is the broadest retirement base because groceries, hospitals, rail and year-round civic life sit beneath the visitor economy. Cernobbio can preserve much of that access at a higher entry price. Menaggio and Tremezzina work for buyers who accept road and ferry dependence, older buildings and thinner winter services. Varenna has the unusual advantage of a rail station on the eastern shore, while Bellagio is more isolated despite its international name. The correct comparison is not simply town against town: it is the exact front door, gradient, parking or station walk, ferry dependency and future buyer pool.",
+        "Property ownership does not create Italian residence or healthcare rights. EU and EEA citizens and several categories of lawfully resident non-EU nationals are exempt from Italy’s reciprocity check; other non-EU buyers may need reciprocity confirmed before purchase. For a non-working retirement route, Italy’s elective residence visa requires stable, sufficient resources and suitable accommodation, and it does not permit employment. A deed can help show accommodation but does not guarantee a visa. Public-healthcare access also follows nationality and residence status, not ownership. Confirm residence, tax and health cover before using the house as the foundation of a move.",
+        "Proceed in this order: decide whether the household needs Como’s urban system, a rail-served eastern shore or the road-and-ferry central lake; test the route in bad weather and outside the visitor season; confirm residence, reciprocity, tax and healthcare; then reconcile title, cadastral plan, planning history, condominium records, utilities, access rights, hazards and insurability. Only after those checks should a buyer underwrite holiday income or pay a view premium. Lake Como can be an exceptional long-hold home, but it punishes buyers who treat scenery as a substitute for access, condition and exit discipline."
+    ),
+    lenses_intro="The five lenses below pair the Atlas’s ten dimensions around the decisions a Lake Como buyer actually makes. They explain the evidence in plain language; the complete score table appears once afterwards.",
+    lenses=(
+        DossierLens(
+            "Live on the lake after the visitors leave",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Lake Como’s appeal is durable: water, mountains, historic centres, walking, food and proximity to Milan create more than a summer postcard. The retirement question is whether that appeal survives an ordinary Tuesday in November. Como city has the deepest year-round mix of shops, cultural life, neighbourhood services and public transport. Cernobbio remains close to that base. Central-lake towns such as Menaggio, Tremezzina and Bellagio retain local communities, but their commercial rhythm is more seasonal and the choice of daily services narrows as the address moves away from a town centre.",
+                "Healthcare reinforces the distinction. ASST Lariana operates the Sant’Anna hospital emergency department at San Fermo della Battaglia, outside Como, around the clock. That is a regional asset, not proof that every lakeside home has an easy hospital journey. A central-lake resident may face a long road transfer, traffic, weather and a difficult final approach from the property. Varenna’s rail link does not solve every medical journey; Bellagio and the western shore remain strongly route-dependent. Test the exact trip to a general practitioner, pharmacy, diagnostic service and emergency care before assuming the lake is one healthcare catchment.",
+                "The house can magnify or reduce those frictions. A lift, level entrance, covered parking, dry cellar, reliable heating and a walkable supermarket may matter more over ten years than an extra balcony. Old stone homes and converted villas can bring irregular stairs, humidity, shared access, weak insulation and complex common works. Hillside properties can turn a short map distance into repeated driving. Spend time at the address in rain and winter, carry groceries from the real parking point and ask whether one person could live there if the other stopped driving. That is the difference between a holiday proposition and a resilient retirement home."
+            ),
+            "daily-life",
+        ),
+        DossierLens(
+            "Buy the route as carefully as the property",
+            ("global_access", "foreigner_fit"),
+            (
+                "Como city has the clearest transport case. Trenord states that direct services from Como San Giovanni reach Milano Centrale in about 40 minutes, with roughly hourly departures on the highlighted route. That makes Milan’s rail network and wider services realistically usable, although the door-to-door airport journey still requires a transfer or road leg. The lower lake also benefits from proximity to the A9 corridor. Cernobbio can be close in kilometres yet slower at peak periods, and a home above town may add narrow roads and parking constraints that disappear from a destination-level access score.",
+                "The central lake works differently. Navigazione Laghi publishes seasonal Lake Como timetables and operates the Bellagio–Cadenabbia–Varenna–Menaggio ferry network. Ferries are a genuine mobility asset and part of the pleasure of living here, but seasonal timetables, weather and the distance from the landing matter. Varenna connects to the eastern-shore railway, while Menaggio and Tremezzina rely more heavily on roads and ferries. Bellagio occupies a celebrated but less direct position between the branches. A route that is delightful in July may be inconvenient with luggage, a missed boat or a medical appointment in winter.",
+                "Foreign buyers will find an established international property and service ecosystem, particularly around Como, Cernobbio, Menaggio and Bellagio. That does not make the transaction English-led. The notarial deed, cadastral records, municipal planning, condominium decisions, tax filings and many contractor relationships remain Italian. Hire an independent notary and legal adviser, obtain translated explanations before commitments become binding, and appoint a local person to monitor notices and urgent work when absent. Foreigner fit is highest where the buyer combines international support with a functioning Italian administrative plan, not where a sales process merely feels familiar."
+            ),
+        ),
+        DossierLens(
+            "Separate the right to buy from the right to use",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Italy permits broad foreign ownership, but nationality and residence status still matter. The Ministry of Foreign Affairs explains that EU and EEA citizens and specified categories of regularly resident non-EU citizens do not need a reciprocity check; other non-EU buyers may need confirmation that Italians enjoy equivalent rights in the buyer’s country. Resolve that before signing a binding proposal. The purchase process then needs the usual Italian controls: title, liens, cadastral conformity, planning permissions, legal floor area, rights of way, condominium debts, energy documentation and the seller’s authority to transfer every element represented in the listing.",
+                "Lake properties add building-specific complications. Villas may include terraces, docks, retaining walls, access roads or outbuildings whose legal status and maintenance responsibility need documentary proof. Apartments in historic buildings require close reading of condominium minutes, reserve decisions, façade and roof plans, allocation tables, heating arrangements and restrictions on alterations or tourist use. A renovated interior does not establish planning conformity, dry construction or sound common parts. Ask a locally experienced surveyor to reconcile the property on site against municipal and cadastral records, and obtain costed answers for anything that remains unresolved.",
+                "Hazards are also address-level. Lombardia’s Geoportal publishes current flood-risk mapping, and municipal geological planning records cover instability that can include floods, landslides and slope conditions. Lakefront levels, streams, steep ground, rockfall, drainage and retaining structures vary within the same village. Review official layers, the Comune’s planning and geological documents, historic claims and an insurer’s terms before exchange. Then inspect how water leaves the site and who owns the road, wall or slope above it. A scenic terrace below a steep catchment needs more diligence than a generic regional risk label can provide."
+            ),
+        ),
+        DossierLens(
+            "Treat rental income as permission plus operations",
+            ("rental_profit", "capital_upside"),
+            (
+                "Lake Como has powerful visitor demand, but a recognisable name does not produce automatic net yield. Occupancy, achievable rate and season length differ between Como city, Cernobbio, Menaggio, Tremezzina, Varenna and Bellagio. Hillside access, parking, air-conditioning, outdoor space and the walk to a ferry or centre influence both bookings and management cost. A premium view can support rates, but staffing, cleaning, linen, guest access, utilities, platform fees, maintenance and empty periods reduce the headline. Underwrite a personally usable home first and treat rental performance as a property-specific operating business.",
+                "The permission stack is national, regional, municipal and building-specific. Italy’s national BDSR system assigns the CIN identification code to tourist accommodation and short lets; Ministry guidance says the code must be displayed and included in advertisements, while regional codes remain relevant. Lombardia also requires its regional process, and the Comune di Como distinguishes non-business tourist letting from business activity and directs operators to the relevant communication or SCIA route. Other lakeside comuni administer their own files. Condominium rules, safety equipment, guest reporting and tax obligations remain separate checks. A CIN is not a substitute for lawful use of the exact property.",
+                "Capital upside should therefore rest on scarcity and daily utility rather than assumed holiday income. Como city benefits from a broad resident and Milan-linked market. Cernobbio and the central lake have global recognition and constrained geography, but high entry prices already capitalise much of that appeal. Singular villas may rise strongly in a favourable market yet require long marketing periods and expensive presentation. Older apartments can offer a lower ticket but may face major works or limited accessibility. Model a flat nominal resale, full buying and selling costs, and a renovation reserve; treat any appreciation as the result of buying the right asset, not a destination guarantee."
+            ),
+            "central-lake",
+        ),
+        DossierLens(
+            "Use public ranges to challenge the asking price",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The official OMI database is useful because it shows how sharply values vary by zone and property type. For 2025’s second half, the normal-condition civil-home range in Como’s Città Murata B1 zone was 2,900–4,200 EUR/m²; Menaggio’s Lungo Lario B5 zone showed 1,750–2,200 EUR/m²; Bellagio’s coastal B1 zone showed 1,350–2,000 EUR/m². Those are administrative zone ranges, not valuations, and they do not capture every view, renovation or trophy premium. Their purpose is to force a clear explanation when an asking price sits far above broad official context.",
+                "The three current listing observations make that comparison concrete. A Como Borghi apartment asks more per square metre than its simple urban description might suggest, but it offers newer construction, a lift and a city service base. A smaller Menaggio apartment also asks well above the broad OMI civil-home range, with renovation and centrality offset by an old building, no lift and weak energy performance. A Tremezzina house offers more space at a lower unit price, but its road setting, completion record, garden, systems and eventual maintenance need closer verification. None is a valuation or recommendation; each shows why property facts matter more than a lake-wide average.",
+                "Exit liquidity follows the same logic. A conventional Como apartment near services and rail can reach residents, commuters, domestic investors and international buyers. A walkable Menaggio or Varenna home may appeal across personal-use and visitor markets if access and condition are straightforward. A remote or highly individual hillside villa depends on a narrower buyer with the budget and appetite for the same compromises. Before buying, name that future buyer, compare the legal area and condition with completed evidence, and estimate the time and discount needed to sell without an exceptional view-led marketing story."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Lake Como combines water, mountains and historic towns; Como city adds the deepest year-round cultural and daily-service base.",
+        "global_access": "Como has direct Milan rail; Varenna has eastern-shore rail, while Menaggio, Tremezzina and Bellagio depend more on road and seasonal ferry links.",
+        "ownership_clarity": "Lake Como follows Italy’s established conveyancing system, but non-EU reciprocity and property-level cadastral, planning and access conformity require confirmation.",
+        "regulatory_safety": "Como and every lakeside comune apply local files within national and Lombardia rules; flood, landslide, slope and tourist-use checks remain address-specific.",
+        "rental_profit": "Lake Como visitor demand is strong, but CIN, regional and municipal compliance, seasonality, access and management costs constrain net rental performance.",
+        "capital_upside": "Como’s resident economy and Lake Como’s global scarcity support demand, although high entry prices already reflect much of the destination premium.",
+        "retirement_fit": "Como city offers the broadest services and hospital access; Menaggio, Tremezzina, Varenna and Bellagio require more route and winter planning.",
+        "exit_liquidity": "Como apartments reach the broadest buyer pool; singular Lake Como villas and car-dependent hillside homes require more time and pricing discipline.",
+        "foreigner_fit": "Lake Como has international advisers and agents, but binding notarial, tax, municipal and condominium work remains Italian-led.",
+        "value_entry": "Como, Menaggio and Bellagio show wide official OMI ranges; view, renovation, lift, access and future buyer depth determine whether a premium is justified.",
+    },
+    market_anchors=(
+        {"location": "Como · Città Murata B1", "evidence": "OMI 2,900–4,200 EUR/m²", "buyer_read": "2025 H2 normal-condition civil-home zone range. Better-condition and prestigious categories run higher; this is not a property valuation.", "source_label": "Agenzia delle Entrate OMI, 2025 H2", "source_url": "https://www1.agenziaentrate.gov.it/servizi/geopoi_omi/index.htm"},
+        {"location": "Menaggio · Lungo Lario B5", "evidence": "OMI 1,750–2,200 EUR/m²", "buyer_read": "2025 H2 normal-condition civil-home zone range. Villas and renovated lake-facing homes use different evidence and can price materially above it.", "source_label": "Agenzia delle Entrate OMI, 2025 H2", "source_url": "https://www1.agenziaentrate.gov.it/servizi/geopoi_omi/index.htm"},
+        {"location": "Bellagio · coastal B1", "evidence": "OMI 1,350–2,000 EUR/m²", "buyer_read": "2025 H2 normal-condition civil-home zone range. The range combines neither trophy views nor verified condition, access and legal conformity.", "source_label": "Agenzia delle Entrate OMI, 2025 H2", "source_url": "https://www1.agenziaentrate.gov.it/servizi/geopoi_omi/index.htm"},
+    ),
+    micro_locations_intro="Use four operating patterns rather than a single Lake Como average. Como city and Cernobbio form the lower-lake service base; Tremezzina and Menaggio are the road-and-ferry western centre; Varenna is the eastern rail-and-ferry hinge; Bellagio is the iconic but less direct central-lake choice. Confirm the exact gradient, parking, station or landing walk, winter services, hospital route, municipal file, hazards and likely future buyer for every address.",
+    micro_locations=(
+        {"name": "Como city / Cernobbio", "best_for": "Year-round services and Milan access", "daily_life": "Urban or lower-lake routine with deepest support", "diligence": "Traffic, parking, flood, lift and price premium"},
+        {"name": "Tremezzina / Menaggio", "best_for": "Central-lake life on the western shore", "daily_life": "Ferry access with stronger road dependence", "diligence": "Seasonality, old buildings, slopes and hospital route"},
+        {"name": "Varenna / eastern shore", "best_for": "Rail-and-ferry central-lake access", "daily_life": "Compact villages linked to the eastern railway", "diligence": "Stairs, parking, train noise, rockfall and winter service"},
+        {"name": "Bellagio", "best_for": "Iconic central-lake personal use", "daily_life": "Strong visitor ecosystem with indirect access", "diligence": "Ferry dependence, road time, premium and resale depth"},
+    ),
+    checklist=(
+        "Confirm nationality-specific reciprocity, residence, tax and healthcare before linking the purchase to an Italian retirement plan.",
+        "Choose Como urban, western road-and-ferry, eastern rail-and-ferry or Bellagio daily life before comparing listings.",
+        "Travel the airport, hospital, grocery, station or ferry route from the exact door in winter, rain and visitor traffic.",
+        "Reconcile title, liens, cadastral plan, planning history, legal floor area, access rights, utilities and every represented outbuilding.",
+        "Read condominium minutes, works, debts, allocation tables, heating, lift and tourist-use rules; survey villas, walls, docks and slopes.",
+        "Check official flood and geological layers, drainage, lake or stream exposure, landslide and rockfall context, then obtain an insurance quotation.",
+        "Obtain a written short-let answer covering CIN, Lombardia, the exact comune, guest reporting, safety, tax and the condominium.",
+        "Compare asking evidence with the correct OMI zone and local transactions, model full five-year costs, and identify the likely resale buyer.",
+    ),
+    references_intro="Legal, tax, residence, healthcare, transport, market, planning, hazard and rental claims were reviewed on 22 August 2026 against the primary sources below. The next scheduled review is 22 February 2027, or sooner if a cited law, municipal rule, tax table, transport service, hazard source, OMI release or listing changes. Recheck every live source and obtain independent Italian notarial, legal, tax, immigration, planning, engineering and insurance advice for the exact buyer and property before signing. Listing observations are dated asking evidence only and do not verify availability, title, condition, legal use, transferability or completed value.",
+    references=(
+        {"label": "Italy property guide", "url": "/countries/italy-property/"},
+        {"label": "Italian Foreign Ministry: reciprocity and foreign buyers", "url": "https://www.esteri.it/en/temi/diplomazia_giuridica/condizreciprocita/"},
+        {"label": "Italian Foreign Ministry: elective residence visa", "url": "https://conslondra.esteri.it/en/servizi-consolari-e-visti/servizi-per-il-cittadino-straniero/visti/elective-residence/"},
+        {"label": "Italian Revenue Agency: guide to buying a home", "url": "https://www1.agenziaentrate.gov.it/web_app_entrate/guida_acquisto_casa.html"},
+        {"label": "Italian Revenue Agency: OMI property-market database", "url": "https://www1.agenziaentrate.gov.it/servizi/geopoi_omi/index.htm"},
+        {"label": "Italian Health Ministry: foreign citizens and the SSN", "url": "https://www.salute.gov.it/new/it/tema/iscrizione-al-ssn/iscrizione-dei-cittadini-stranieri-al-servizio-sanitario-nazionale-ssn/"},
+        {"label": "Italian Tourism Ministry: BDSR and CIN FAQ", "url": "https://www.ministeroturismo.gov.it/faq-banca-dati-strutture-ricettive-bdsr/"},
+        {"label": "Lombardia: non-hotel accommodation and tourist letting", "url": "https://www.regione.lombardia.it/cultura-turismo-e-sport/imprese-e-professioni-turistiche/strutture-ricettive-non-alberghiere"},
+        {"label": "Comune di Como: tourist letting procedure", "url": "https://su.comune.como.it/su_procedimento/turismo-locazione-turistica/"},
+        {"label": "Trenord: Como San Giovanni to Milano Centrale", "url": "https://www.trenord.it/en/routes-and-timetables/most-searched-lines/como-s-giovanni-milano-centrale-route/"},
+        {"label": "Navigazione Laghi: Lake Como timetables", "url": "https://www.navigazionelaghi.it/en/tickets-and-timetables-lake-como/"},
+        {"label": "ASST Lariana: Sant’Anna emergency department", "url": "https://asst-lariana.it/v2/2/uo/?display=0&uo=157"},
+        {"label": "Lombardia Geoportal: current flood-risk mapping", "url": "https://www.geoportale.regione.lombardia.it/it/metadati?_detailSheetMetadata_WAR_gptmetadataportlet_identifier=r_lombar%3A9913a827-9889-4160-a50b-d483fdc5e719&_jsfBridgeRedirect=true&p_p_id=detailSheetMetadata_WAR_gptmetadataportlet&p_p_lifecycle=0&p_p_mode=view&p_p_state=normal"},
+        {"label": "Comune di Como: planning and territorial government", "url": "https://www.comune.como.it/amministrazione-trasparente/pianificazione-e-governo-del-territorio/index.html"},
+        {"label": "Comune di Como: current building regulation", "url": "https://comune.como.it/amministrazione-trasparente/pianificazione-e-governo-del-territorio/regolamento-edilizio.html"},
+        {"label": "European Central Bank: euro reference exchange rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("lower-lake", "/assets/lake-como-lower-lake-hero.webp", "Como city and the lower basin of Lake Como in soft morning light", "The lower lake places urban services and rail beneath the scenery.", "hero"),
+        DossierImage("daily-life", "/assets/lake-como-daily-life.webp", "Residents walking through a Lake Como town near everyday shops", "A workable lake home starts with ordinary errands, access and winter life.", "wide"),
+        DossierImage("central-lake", "/assets/lake-como-central-lake.webp", "A ferry approaching a central Lake Como village beneath steep slopes", "At the central lake, ferries, roads, gradients and the front door form one decision.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Lake Como through five destination lenses",
+    assessment_intro="Here’s how Lake Como scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show distinct buyer cases in Como city, central Menaggio and road-led Tremezzina. EUR is primary; USD uses the recorded ECB reference basis for comparison only.",
+    market_anchors_intro="These are official OMI zone ranges—not property valuations, transaction averages or asking-price targets. They are broad 2025 H2 checks on location and asset type; reconcile every candidate for exact zone, condition, legal area, view, access and completed comparable evidence.",
+    orientation_groups=(
+        DossierOrientationGroup("Western shore and lower-lake road", (("Como city", "Rail and service base"), ("Cernobbio", "Lower-lake premium"), ("Tremezzina", "Road-and-ferry lake"), ("Menaggio", "Central western hub"))),
+        DossierOrientationGroup("Eastern rail and central ferry", (("Lecco", "Eastern service base"), ("Varenna", "Rail-and-ferry hinge"), ("Bellagio", "Central-lake destination"), ("Menaggio", "Cross-lake connection"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Rail, road and ferry usefulness depends on the current timetable, weather, traffic, gradient, parking and exact address.",
+    country_guide_url="/countries/italy-property/",
+    country_guide_label="Italy property guide",
+    rail_comparison="Compare Lake Como with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
     MADEIRA_DOSSIER.destination_id: MADEIRA_DOSSIER,
     MALAGA_COSTA_DEL_SOL_DOSSIER.destination_id: MALAGA_COSTA_DEL_SOL_DOSSIER,
+    LAKE_COMO_DOSSIER.destination_id: LAKE_COMO_DOSSIER,
 }
 
 
@@ -764,3 +905,4 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
 validate_premium_dossier(FUKUOKA_ITOSHIMA_DOSSIER)
 validate_premium_dossier(ALGARVE_CASCAIS_DOSSIER)
 validate_premium_dossier(MADEIRA_DOSSIER)
+validate_premium_dossier(LAKE_COMO_DOSSIER)
