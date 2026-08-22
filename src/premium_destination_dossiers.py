@@ -1269,6 +1269,145 @@ COSTA_BRAVA_GIRONA_DOSSIER = PremiumDossierSpec(
 )
 
 
+CRETE_DOSSIER = PremiumDossierSpec(
+    destination_id="crete",
+    title="Crete Retirement Property Dossier",
+    description="Assess Crete retirement property through daily life, access, residence, ownership, tax, short-term-rental rules, healthcare, hazards, value, resale, and current listings.",
+    h1="Crete: choose the working island, not only the sea view",
+    lede="Crete is large enough to contain several retirement markets that should not be averaged together. Chania offers a polished historic city and western airport; Apokoronas adds villages, space and a greener landscape with more driving; Rethymno balances a walkable university town with access to both sides of the island; Heraklion has the deepest employment, hospital and administrative base; Agios Nikolaos and Elounda trade on eastern-Crete scenery and premium tourism. This dossier tests which version works in winter, heat and ordinary errands—and whether the title, tax, rental, water and exit plan supports it.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is positive with geographic discipline. Crete suits a buyer who wants a warm-climate European base with a real resident economy, food culture, beaches and enough city infrastructure to support long stays. Chania and Rethymno offer the strongest combination of walkable urban life and western-island appeal. Heraklion is the practical choice for major healthcare, administration and year-round employment. Apokoronas works for a buyer who accepts driving and property maintenance in exchange for village life and space. Agios Nikolaos and Elounda offer an attractive eastern base, but entry price, airport distance and a more tourism-led buyer pool require sharper underwriting.",
+        "Buying property does not itself grant a right to live in Greece. EU and other qualifying residents follow their applicable free-movement or national route; third-country nationals need an independent immigration basis or must satisfy the current investor-permit rules. The Ministry of Migration's Golden Visa process is a regulated residence programme, not a general consequence of owning any Cretan home. Separate residence, health insurance and tax residence from the conveyance. A buyer also needs a Greek tax number, transfer-tax handling, independent legal and technical diligence, and a cadastral and planning position that matches the house on the ground.",
+        "Proceed in order. Confirm residence, healthcare and tax structure; choose the working geography; travel the airport, hospital, supermarket and beach routes in August traffic and a winter storm; then verify cadastral identity, title, boundaries, permits, legal floor area, road access, water, wastewater, energy, earthquake condition, wildfire and flood exposure. If rental income matters, establish the lawful short-term-rental route and manager before valuing it. Finally, model renovation, cooling, pool, garden, insurance and a slow resale. Crete's value can be compelling, but an informal extension, weak water plan or isolated exit can overwhelm a low entry price.",
+    ),
+    lenses_intro="The five paired lenses below translate Crete's ten Atlas dimensions into choices between its cities, village belts and resort coast. The complete ten-factor assessment appears once in the score table.",
+    lenses=(
+        DossierLens(
+            "Live on an island that keeps working in winter",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Crete's lifestyle case survives because it is not only a resort. Chania combines a historic harbour, neighbourhood markets, restaurants and a substantial resident population. Rethymno is smaller and more walkable, with university activity and a long urban beach. Heraklion is busier and less postcard-perfect, but it provides the island's broadest concentration of services, commerce and culture. Agios Nikolaos offers a compact waterfront town, while Elounda is more polished and visitor-led. Apokoronas villages such as Armeni, Vamos and Gavalochori add landscape and community, but ordinary life is dispersed. Spend January as well as June before deciding what ‘year-round’ means.",
+                "Healthcare is a geography question. The 7th Health Region lists major hospitals in Chania, Rethymno and Heraklion, including the University Hospital, and an eastern network centred on Agios Nikolaos with connected facilities in Sitia, Ierapetra and Neapoli. A dot on that map is not proof that the needed department, appointment, language support or insurer network is available when required. Heraklion has the deepest specialist base; a remote south-coast or mountain address may add a long, winding transfer. Identify the primary-care doctor, pharmacy, emergency hospital and specialist route, then drive them at night and in poor weather.",
+                "Ageing in place changes the property brief. Historic Chania and Rethymno can provide walkability but also stairs, noise, limited parking and old buildings. Apokoronas and Lasithi homes often provide ground-floor space and gardens but require a car, external maintenance and reliable help. Summer heat, dust and wildfire smoke increase the importance of insulation, shading, efficient cooling, filtration and backup power. A pool, terraced plot or steep lane can become a burden after an injury. Prefer a legal main-level bedroom and bathroom, step-light access, year-round neighbours and a manager who can respond when the owner is absent.",
+            ),
+            "apokoronas-daily-life",
+        ),
+        DossierLens(
+            "Choose the airport and road network with the house",
+            ("global_access", "foreigner_fit"),
+            (
+                "Crete has two principal international gateways, but they serve different property patterns. Chania Airport on Akrotiri supports the western side and publishes current flight and ground-transport information through Fraport Greece. Heraklion Airport operates year-round and sits close to the island's largest city; the Hellenic Civil Aviation Authority identifies it as an international airport and notes its city-centre proximity. The new Heraklion airport remains a construction and future-access story, not a current journey assumption. Flight schedules are seasonal, routes change, and a direct summer service may become an Athens connection in winter. Test the annual travel pattern, not the best timetable week.",
+                "The north-coast road links Chania, Rethymno, Heraklion and Agios Nikolaos, but Crete is long and local roads vary sharply. Rethymno sits between the two existing airports, which adds choice but not a short transfer. Apokoronas villages can be close to the main road yet depend on narrow last-mile lanes. South-coast and inland mountain areas trade tranquillity for slower access to hospitals, airports and major shops. Eastern Crete adds distance from Heraklion, while Elounda and hillside properties can be congested in peak season. Drive the exact route with luggage, after dark and after heavy rain; a map distance does not show road geometry or summer traffic.",
+                "Foreigner fit is supported by Greece's EU framework, established notaries, lawyers, engineers, tax advisers and an international property market. It is not automatic simplicity. The buyer needs an AFM tax number, translated and correctly executed authorities where relevant, independent title and technical advice, a local bank and payment plan, and continuing E9, ENFIA and income-tax administration. Village documents, contractor discussions, condominium meetings and utility matters may proceed in Greek. Appoint independent advisers who owe duties to the buyer, not the agent or developer, and retain a reliable local representative to receive notices, inspect after storms and coordinate urgent work.",
+            ),
+        ),
+        DossierLens(
+            "Own the legal building—not the seller's description",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Greek ownership access is generally workable, and the AADE states that a resident or nonresident buyer needs a Greek tax number and must file and pay transfer tax before the contract. Its current buyer guide states a 3% transfer-tax calculation on the property value, subject to the exact transaction and any applicable regime. That headline is not total closing cost. Budget for notary, registry or cadastre, lawyer, engineer, agent, certificates, translations and later ENFIA and tax filings. New construction, VAT history, company ownership and investor-residence structuring require transaction-specific advice rather than applying the used-home rule mechanically.",
+                "The technical file is often the controlling risk. Match the contract, cadastral record, survey, building permit, plans, energy certificate and actual measured structure. Verify every veranda enclosure, basement conversion, guest room, pool, retaining wall, pergola and access road. A seller's regularisation document does not by itself prove construction quality, planning suitability or future expandability. In villages, confirm boundary monuments, rights of way, shared courtyards, water source, septic or sewer arrangement and whether a renovation can obtain approvals. In historic Chania or Rethymno, add conservation and common-building constraints. Release funds only against a complete lawyer-and-engineer report.",
+                "Short-term letting is a regulated use. AADE requires a property manager using the short-term lease framework to register the property and obtain a Property Register Number, display the required number and file stay information. A tourist accommodation licence or notification follows a different route. Tax, safety and operational requirements can change, while condominium rules and planning may be stricter. Confirm which person will be manager, which legal route applies, whether the exact floor area and bedrooms qualify, and how tax, guest, safety and local-response duties will be met. Do not value a portal calendar or the phrase ‘investment suitable’ as permission.",
+            ),
+        ),
+        DossierLens(
+            "Underwrite heat, water and seasonality before rent",
+            ("rental_profit", "capital_upside"),
+            (
+                "Crete has a long visitor season, but rental profit remains location- and property-specific. Chania old town and accessible coast, Rethymno, selected Heraklion demand and the Agios Nikolaos–Elounda corridor can attract guests; an inland village or remote south-coast house serves a different calendar. Gross revenue must absorb management, cleaning, linen, platform fees, utilities, pool and garden care, air-conditioning, repairs, insurance, tax and owner use. Winter occupancy can fall sharply in visitor-led areas. Obtain property-level statements, bank deposits, filed declarations and the future manager's contract; model a weak shoulder season and no tourist rent.",
+                "Climate operations are part of the income statement. Civil Protection publishes wildfire, flood, heat, earthquake and other hazard guidance and current maps; Crete also publishes water and irrigation information that reflects local scarcity management. The relevant evidence is parcel-level access, vegetation, slope, drainage, water source and network capacity—not a general island reputation. Ask for water bills, pressure history, storage, pool refill rules and summer outage experience. Inspect roof, shutters, cooling, solar hot water, damp, salt corrosion, retaining walls and defensible space. Obtain an insurance quotation that covers the intended occupancy and letting use before the contingency expires.",
+                "Capital upside is supported by demand and a rising Greek market, but should not be inferred from one island average. The Bank of Greece reported continued national apartment-price growth in Q1 2026, including 6.9% year-on-year in ‘other areas of Greece’; that is a broad trend, not a Crete forecast. July portal asking evidence shows meaningful dispersion between the island average, Chania district and Agios Nikolaos. Those are asking indices covering mixed stock, not completed-sale valuations. Airport investment, tourism and scarce legal coastal property may support selected assets, while new supply, informal construction, water pressure and a narrow foreign-buyer pool can undermine others.",
+            ),
+            "eastern-water-heat",
+        ),
+        DossierLens(
+            "Buy the future buyer pool, not the island average",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Crete can offer European value, but entry points represent different products. A Rethymno apartment may provide walkable services and broad local use but need renovation and building diligence. An Apokoronas house offers more space, village life and western access, with driving and maintenance attached. A compact renovated house near Agios Nikolaos can carry a large coast-and-tourism premium despite its small internal area. Chania's most recognisable areas command higher asking evidence; Heraklion may offer more ordinary urban demand at a lower regional average. Compare legal floor area, condition, parking, cooling, outdoor work and daily access—not island-wide price per square metre alone.",
+                "The three listing observations below are deliberately unlike one another. The Armeni house represents a practical village market in Apokoronas. The Rethymno apartment tests an older urban home where renovation and walkability matter more than a pool or view. The Ammoudara / Agios Nikolaos house shows how renovation, a coastal setting and small size can lift the asking price per square metre. None is a recommendation, availability guarantee or valuation. Commission completed comparable evidence for the same legal area and micro-location, then reconcile works, furniture, land, title, pool, parking and energy performance.",
+                "Exit liquidity follows usefulness and documentation. A legal, accessible Chania or Heraklion apartment can reach residents, retirees and investors. A well-positioned Rethymno home can appeal to year-round and holiday buyers. An Apokoronas property needs a buyer who accepts village transport and maintenance. A high-premium Elounda or hillside villa reaches a smaller international pool and can wait longer. Before purchase, ask two agents who did not source the home who would buy it next, what completed evidence they would use and how long a realistic sale could take. Model a flat-price exit after all costs and preserve cash for a long marketing period.",
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Crete combines food, coast and living cities; Chania and Rethymno feel very different from inland Apokoronas or resort-led Elounda.",
+        "global_access": "Chania and Heraklion airports support Crete, while seasonal routes, long island roads and eastern or southern last miles reduce convenience.",
+        "ownership_clarity": "Crete follows Greece's workable ownership system, but cadastral identity, legal floor area, permits and tax administration remain property-specific.",
+        "regulatory_safety": "Crete short-term rentals require the correct AADE registration or tourism route, with planning, safety and condominium limits layered above it.",
+        "rental_profit": "Chania, Rethymno and Agios Nikolaos can earn a long season, but management, cooling, pool care and winter weakness compress net income.",
+        "capital_upside": "Crete benefits from national price growth and infrastructure, while mixed stock, new supply, water pressure and informal works prevent blanket appreciation claims.",
+        "retirement_fit": "Heraklion has Crete's deepest hospital base; Chania and Rethymno support city life, while Apokoronas and Lasithi increase driving dependence.",
+        "exit_liquidity": "Crete city homes reach broader resident buyers than an isolated village house or premium Elounda villa with a narrow international pool.",
+        "foreigner_fit": "Crete has experienced international advisers, but AFM, Greek documents, tax filings, engineering checks and local management still require coordination.",
+        "value_entry": "Heraklion and village Crete can enter below prime Chania or Agios Nikolaos, but condition, access and legal area determine real value.",
+    },
+    market_anchors=(
+        {"location": "Crete residential asking index", "evidence": "€2,579/m²", "buyer_read": "July 2026 average asking price across mixed residential stock; a regional signal, not a completed-sale valuation.", "source_label": "Indomio Crete market trend", "source_url": "https://www.indomio.gr/agora-akiniton/kriti/"},
+        {"location": "Chania regional unit", "evidence": "€3,110/m²", "buyer_read": "July 2026 average residential asking price, the highest of Crete's four regional units in the same portal series.", "source_label": "Indomio Crete market trend", "source_url": "https://www.indomio.gr/agora-akiniton/kriti/"},
+        {"location": "Agios Nikolaos municipality", "evidence": "€4,049/m²", "buyer_read": "July 2026 average residential asking price across the municipality; local zones ranged widely and product mix remains material.", "source_label": "Indomio Agios Nikolaos market trend", "source_url": "https://www.indomio.gr/en/agora-akiniton/kriti/agios-nikolaos/"},
+    ),
+    micro_locations_intro="Crete is a sequence of working patterns rather than one market. These groupings are orientation aids, not valuation zones. Confirm exact municipal planning, cadastral identity, airport and hospital journey, water, hazards, legal use and completed comparables for every address.",
+    micro_locations=(
+        {"name": "Chania / Akrotiri coast", "best_for": "Historic-city life and western airport", "daily_life": "Walkable core with visitor pressure", "diligence": "Parking, conservation, noise, legal area and summer demand"},
+        {"name": "Apokoronas villages", "best_for": "Space, landscape and community", "daily_life": "Car-led village network", "diligence": "Access, title, water, wastewater, wildfire and maintenance"},
+        {"name": "Rethymno / north-coast centre", "best_for": "Compact year-round urban balance", "daily_life": "Walkable centre between airports", "diligence": "Old building, renovation, parking, shared rules and beach exposure"},
+        {"name": "Heraklion to Agios Nikolaos / Elounda", "best_for": "Services or premium eastern coast", "daily_life": "Deep city base grading into resort market", "diligence": "Airport journey, hospital access, price premium, water and exit pool"},
+    ),
+    checklist=(
+        "Confirm residence, healthcare, tax residence and ownership structure.",
+        "Choose the working geography before selecting a sea view.",
+        "Travel airport, hospital, grocery and beach routes in peak and winter conditions.",
+        "Verify AFM, cadastral identity, title, boundaries, road rights and taxes.",
+        "Reconcile permits, legal floor area, energy certificate, pool and every extension.",
+        "Inspect earthquake condition, cooling, water, wastewater, wildfire, flood and salt exposure.",
+        "Clear short-term-rental registration, safety, tax and manager duties in writing.",
+        "Model renovation, five-year cash outlay and a slow resale before signing.",
+    ),
+    references_intro="Legal, tax, residence, cadastral, rental, health, airport, hazard, market and listing claims were reviewed on 22 August 2026. Recheck every time-sensitive source no later than 22 February 2027 and immediately after any tax, residence, planning, cadastral, rental, transport, hazard, water, insurance, market data or listing change. Obtain current Greek legal, immigration, tax, notarial, engineering, planning and insurance advice for the exact buyer and property. Asking evidence is not a valuation or availability guarantee.",
+    references=(
+        {"label": "Greece property guide", "url": "/countries/greece-property/"},
+        {"label": "AADE: before buying a property", "url": "https://www.aade.gr/en/services-information/useful-guides/buying-property/buying-property"},
+        {"label": "AADE: after buying a property", "url": "https://www.aade.gr/en/services-information/useful-guides/buying-property/after-buying-property"},
+        {"label": "AADE: short-term lease registration", "url": "https://www.aade.gr/en/services-information/useful-guides/buying-property/i-want-lease-my-property-short-term-lease"},
+        {"label": "Ministry of Migration: Golden Visa process", "url": "https://migration.gov.gr/en/golden-visa/"},
+        {"label": "Hellenic Cadastre: current property records", "url": "https://www.ktimatologio.gr/e-services/14"},
+        {"label": "Bank of Greece: Q1 2026 residential price indices", "url": "https://www.bankofgreece.gr/en/news-and-media/press-office/news-list/news?announcement=a096eb19-23d0-44e4-9445-10ef088053fb"},
+        {"label": "7th Health Region of Crete: hospitals", "url": "https://www.hc-crete.gr/MonadesYgeias/Home/nosokomeia"},
+        {"label": "Civil Protection: current hazard maps and guidance", "url": "https://civilprotection.gov.gr/thematikoi-xartes-sxediwn-politikis-prostasias"},
+        {"label": "Region of Crete: current water and irrigation bulletins", "url": "https://www.crete.gov.gr/12o-deltio-ardeysis-2026-gia-tin-periodo-06-08-2026-12-08-2026/"},
+        {"label": "Chania Airport: current flights and access", "url": "https://www.chq-airport.gr/en"},
+        {"label": "HCAA: Heraklion Airport", "url": "https://www.hcaa.gr/en/our-airports/kratikos-aerolimenas-hrakleioy-n-kazantzakhs"},
+        {"label": "Indomio: July 2026 Crete asking index", "url": "https://www.indomio.gr/agora-akiniton/kriti/"},
+        {"label": "Indomio: July 2026 Agios Nikolaos asking index", "url": "https://www.indomio.gr/en/agora-akiniton/kriti/agios-nikolaos/"},
+        {"label": "IsleScout: Armeni Apokoronas asking observation", "url": "https://islescout.com/property/house-in-armeni-apokoronas-with-2-bedrooms-127-m2"},
+        {"label": "Terra Real Estate: Rethymno asking observation", "url": "https://www.terrarealestate.gr/en/properties/1820994"},
+        {"label": "Indomio: Ammoudara Agios Nikolaos asking observation", "url": "https://www.indomio.gr/en/aggelies/11086013/"},
+    ),
+    images=(
+        DossierImage("chania", "/assets/crete-chania-hero.webp", "Chania waterfront and living city fabric in calm morning light", "Chania is compelling because the historic harbour sits inside a working western city.", "hero"),
+        DossierImage("apokoronas-daily-life", "/assets/crete-apokoronas-daily-life.webp", "Mature residents walking through an Apokoronas village beside ordinary local homes", "Village life trades urban convenience for space, community and more driving.", "wide"),
+        DossierImage("eastern-water-heat", "/assets/crete-eastern-water-heat.webp", "Resident checking water storage and shade at an eastern Crete home in summer", "Heat, water and absentee maintenance belong in the ownership plan.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Crete through five destination lenses",
+    assessment_intro="Here’s how Crete scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show an Apokoronas village house, a Rethymno urban renovation and a compact renovated home near Agios Nikolaos. EUR figures use the repository reference rate of 1 EUR = 1.14784 USD, dated 22 July 2026.",
+    market_anchors_intro="These are July 2026 asking evidence—not valuations. They cover mixed property types and broad boundaries; reconcile every candidate for exact location, legal area, age, condition, land, parking, energy, permitted use and completed comparable sales.",
+    orientation_groups=(
+        DossierOrientationGroup("Western Crete", (("Chania Airport / Akrotiri", "Western gateway"), ("Chania", "Historic working city"), ("Apokoronas", "Village and coastal belt"), ("Rethymno", "Compact city between gateways"))),
+        DossierOrientationGroup("Central and eastern Crete", (("Heraklion Airport", "Current central gateway"), ("Heraklion / University Hospital", "Deepest service base"), ("Agios Nikolaos", "Compact eastern town"), ("Elounda / Lasithi", "Premium coast and dispersed east"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current flights, road works, public transport and peak-season journey times from the exact address.",
+    country_guide_url="/countries/greece-property/",
+    country_guide_label="Greece property guide",
+    rail_comparison="Compare Crete with the full Atlas.",
+)
+
+
 PARK_CITY_DEER_VALLEY_DOSSIER = PremiumDossierSpec(
     destination_id="park-city-deer-valley",
     title="Park City and Deer Valley Retirement Property Dossier",
@@ -1565,6 +1704,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     HAKUBA_DOSSIER.destination_id: HAKUBA_DOSSIER,
     COSTA_BRAVA_GIRONA_DOSSIER.destination_id: COSTA_BRAVA_GIRONA_DOSSIER,
     PARK_CITY_DEER_VALLEY_DOSSIER.destination_id: PARK_CITY_DEER_VALLEY_DOSSIER,
+    CRETE_DOSSIER.destination_id: CRETE_DOSSIER,
 }
 
 
@@ -1637,3 +1777,4 @@ validate_premium_dossier(VALENCIA_DOSSIER)
 validate_premium_dossier(HAKUBA_DOSSIER)
 validate_premium_dossier(COSTA_BRAVA_GIRONA_DOSSIER)
 validate_premium_dossier(PARK_CITY_DEER_VALLEY_DOSSIER)
+validate_premium_dossier(CRETE_DOSSIER)
