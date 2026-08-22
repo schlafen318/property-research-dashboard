@@ -1,0 +1,26 @@
+# Park City / Deer Valley evidence ledger
+
+This ledger records the decision-grade claims used in the destination dossier. It is not a substitute for property-specific legal, tax, planning, building, insurance or valuation advice.
+
+| Claim or topic | Source owner | Source date / status | Reviewed | Scope | Limitation | Recheck trigger |
+|---|---|---|---|---|---|---|
+| FIRPTA withholding can apply when a foreign person disposes of U.S. real property | Internal Revenue Service | Current guidance | 2026-08-22 | U.S. federal tax | Exceptions and reduced withholding depend on facts and filings | Any federal tax change or buyer/seller structure change |
+| U.S. real estate can be U.S.-situated property for a nonresident estate | Internal Revenue Service | Current guidance | 2026-08-22 | U.S. federal estate tax | Treaty, domicile and ownership structure require specialist advice | Any tax, treaty or ownership-structure change |
+| Park City nightly rentals under 30 days require a city licence where zoning permits | Park City Municipal Corporation | Current programme page | 2026-08-22 | Park City municipal boundary | Does not establish that a particular address or HOA permits the use | Any zoning, licensing, inspection or tax change |
+| Park City planning maps identify relevant nightly-rental and land-use controls | Park City Municipal Corporation | Current planning resources | 2026-08-22 | Park City municipal boundary | Map status and parcel interpretation require confirmation | Any zoning map, ordinance or parcel-status change |
+| In unincorporated Summit County, owner and manager licensing can apply to rentals under 30 days | Summit County | Current business-licensing guidance | 2026-08-22 | Unincorporated Summit County | Land-use, HOA and property facts can impose additional limits | Any licensing, zoning or manager change |
+| Park City building guidance addresses WUI, snow load, soil and permitting | Park City Municipal Corporation | Current building resources | 2026-08-22 | Park City building review | Does not replace parcel hazard data, inspection or insurer underwriting | Any hazard map, code, permit or insurance change |
+| Snow-removal and community-code duties affect winter operations | Park City Municipal Corporation | Current code-compliance guidance | 2026-08-22 | Park City | Responsibility can shift under HOA or management documents | Any code, HOA, management or snow-service change |
+| Park City Transit provides local service; route usefulness is address-specific | Park City Municipal Corporation | Current service page | 2026-08-22 | Park City transit network | Frequency, seasonality and transfers can change | Any transport timetable, route or seasonal-service change |
+| Park City–Salt Lake City commuter service exists on a published timetable | Park City Municipal Corporation | Published timetable | 2026-08-22 | Regional commuter route | Timetable is not a guaranteed airport transfer | Any transport timetable or operator change |
+| Park City Hospital provides local emergency and trauma care | Intermountain Health | Current hospital page | 2026-08-22 | Park City Hospital | Specialist availability, network status and transfer needs vary | Any service, network, insurance or hospital-status change |
+| Park City proper single-family median was $4.016 million across 26 Q1 2026 sales | Park City Board of REALTORS | Q1 2026 statistics | 2026-08-22 | Areas 1–9, single-family, one quarter | Market data is not a valuation and mix can move the median | New quarterly market data or methodology revision |
+| Canyons Village condo median was $1.34 million across 26 Q1 2026 sales | Park City Board of REALTORS | Q1 2026 statistics | 2026-08-22 | Canyons Village condominiums | Product mix and managed-residence terms vary materially | New quarterly market data or area-boundary change |
+| Lower Deer Valley condo median was $2.85 million across 53 trailing-12-month sales | Park City Board of REALTORS | Q1 2026 report, trailing period | 2026-08-22 | Lower Deer Valley condominiums | Period differs from the two Q1-only anchors | New market data or reporting-period change |
+| Prospector Carriage House studio asking observation | PCMLS via Park City Real Estate | Active page; captured 2026-08-22 | 2026-08-22 | One 490 sq ft studio | Asking price, availability, condition and rental use are unverified | Any listing status, price, HOA or source-page change |
+| Canyons Fairway Springs townhouse asking observation | PCMLS via Park City Real Estate | Active page; captured 2026-08-22 | 2026-08-22 | One 1,835 sq ft townhouse | Asking price, charges, licensing and completed value are unverified | Any listing status, price, HOA or source-page change |
+| Lower Deer Valley Hidden Oaks home asking observation | PCMLS via Park City Real Estate | Active page; captured 2026-08-22 | 2026-08-22 | One 6,519 sq ft home | Asking price, condition, shuttle terms and completed value are unverified | Any listing status, price, HOA or source-page change |
+
+## Recheck discipline
+
+Recheck all time-sensitive claims by 2027-02-22 and immediately after a material tax, zoning, licensing, listing, transport, hazard, insurance or market data change. Verify every candidate at parcel, building, HOA and buyer level before commitment.
