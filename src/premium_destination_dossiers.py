@@ -3168,6 +3168,154 @@ DOLOMITES_SOUTH_TYROL_DOSSIER = PremiumDossierSpec(
 )
 
 
+CHAMONIX_DOSSIER = PremiumDossierSpec(
+    destination_id="chamonix",
+    title="Chamonix Retirement Property Dossier",
+    description="Assess Chamonix retirement property through daily life, Geneva access, residence, healthcare, tourist-let rules, alpine hazards, completed-market anchors, value, and resale.",
+    h1="Chamonix: buy the usable valley address, not only the Mont Blanc name",
+    lede=(
+        "Chamonix has a world-famous name, but retirement quality is decided at street level. Chamonix Centre offers shops, trains, buses and a hospital site within an active town. Les Praz and Les Tines trade some convenience for space and calm. Argentière and Le Tour put mountain access first, while Les Houches offers a more residential price point and an easier family buyer pool. The right purchase connects that alpine appeal to lawful use, winter access, healthcare, manageable building costs and a credible exit."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-23",
+    date_reviewed="2026-08-23",
+    verdict_paragraphs=(
+        "Chamonix is a strong lifestyle-led purchase for a buyer who can afford to treat personal use as the principal return. The valley works throughout the year: climbing, hiking, skiing and trail running sit beside supermarkets, schools, restaurants, rail and an established resident economy. Yet the purchase does not create French residence. A non-EU retiree ordinarily needs an appropriate long-stay status, and France-Visas requires a visitor applicant to demonstrate resources, accommodation and medical cover while agreeing not to work. Public healthcare follows separate residence and eligibility rules. Confirm immigration, tax residence and health coverage before the property search becomes binding.",
+        "The second condition is to buy an operating pattern rather than a postcard. Chamonix Centre can support more car-light daily life, but it brings crowds, noise, small apartments and older copropriété buildings. Les Praz and Les Tines can offer calm, sun and rail stops, but the exact walk, gradient and winter route matter. Argentière and Le Tour are compelling for serious mountain users, with greater exposure to snow, seasonal trade and distance from central services. Les Houches is a distinct commune and market: less globally prestigious, often better value, and potentially easier to explain to a permanent household on resale.",
+        "The third condition is regulatory discipline. Since 1 May 2025, the Chamonix valley requires registration for furnished tourist accommodation and, for physical-person owners, change-of-use authorization under its local regime. The municipality also limits the number of authorized properties by commune, while national reforms expand registration, DPE and copropriété controls. A listing's rental history, platform badge or agent forecast does not prove that authorization transfers or that the building permits the use. Underwrite the home without short-stay income until the mairie, copropriété records and independent French counsel confirm the exact position in writing."
+    ),
+    lenses_intro=(
+        "The Atlas pairs ten decision dimensions into five questions. Each lens connects the mountain proposition to the address, legal status, building and future buyer that make it usable."
+    ),
+    lenses=(
+        DossierLens(
+            "Make mountain life repeatable after the holiday week",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Chamonix's magnetism is earned. Few towns combine the Mont Blanc massif, international mountaineering culture and four-season outdoor access with a functioning urban centre. In Chamonix Centre, ordinary life can include a bakery, pharmacy, market, cinema, train, bus and restaurant without a long drive. That concentration matters more in retirement than lift proximity alone. It also brings peak-season congestion, visitor turnover, evening noise and competition for small homes. Spend ordinary weeks in November and during a busy winter period before deciding that a central address is either too intense or exactly the social energy required.",
+                "Healthcare is credible but should not be overstated. Hôpitaux du Pays du Mont-Blanc states that Chamonix is a daytime non-scheduled-care centre opened only during high winter and summer seasons; for the current summer it runs from 11 July to 30 August 2026, 09:00–20:00. Sallanches provides the emergency department that is open all year, alongside the group's wider services. Call 15 before attending urgent care. Test the actual Sallanches route in winter, not the Chamonix hospital name: snow, traffic and driving ability change the answer. A buyer with an existing condition should ask the treating specialist where the required service is delivered and plan coverage outside the seasonal Chamonix opening.",
+                "The micro-location changes retirement fit. Les Praz and Les Tines can combine a quieter residential rhythm with Mont-Blanc Express stops, but some homes sit on narrow roads or away from groceries. Argentière has a village core, rail and mountain identity, yet the upper valley is colder and farther from central services. Le Tour is more specialist still. Les Houches has schools, shops, rail and a broader residential texture, but it is not central Chamonix and travel between neighbourhoods remains weather-sensitive. Walk the grocery, station, doctor and waste route in snow; repeat it after dark and imagine one household member cannot drive."
+            ),
+        ),
+        DossierLens(
+            "Use Geneva access honestly—and choose the last mile",
+            ("global_access", "foreigner_fit"),
+            (
+                "Geneva is a major strength, but it is road-led rather than a seamless airport rail link. Chamonix's official access page gives about 1 hour 15 minutes by road from Geneva and identifies regular coach and shuttle options. That is excellent for a high-alpine town, while border traffic, winter weather, flight timing and a missed transfer can materially lengthen the trip. Obtain a door-to-door plan for the exact address with luggage. A central apartment near Chamonix Sud differs from a chalet above Les Praz or a home in Le Tour even when a brochure gives each the same airport headline.",
+                "Inside the valley, the Mont-Blanc Express is the structural asset. SNCF describes the year-round line between Saint-Gervais and Martigny, and the municipality states that it serves Les Houches, Chamonix, Argentière and Vallorcine. Chamonix Mobilité buses cover the valley from Servoz to Vallorcine with seasonal frequency changes. These networks can reduce car dependence, but they do not make every property transit-oriented. Check the actual timetable, climb, pavement, snow clearance and final distance. A station visible on a map may still be impractical with shopping, skis or limited mobility.",
+                "Foreigner fit is strong at the service layer and more demanding in administration. Chamonix is accustomed to international residents, buyers and visitors, and English is common in the property and tourism economy. French contracts, copropriété minutes, planning documents, tax notices, insurance terms and mairie correspondence remain controlling. Use an independent notaire and, where the facts justify it, separate legal, tax and building advisers. Translation should cover the full documents, not only the agent's summary. The most internationally familiar address can still fail because the purchaser misunderstood a vote, easement, works programme or residence consequence."
+            ),
+            "winter-access",
+        ),
+        DossierLens(
+            "Own the building and lawful use—not the brochure",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "France provides a familiar notarised ownership process, but the notaire is not a substitute for buyer-side investigation. Confirm identity, matrimonial or holding structure, title, easements, boundaries, planning, diagnostics, tax position and source of funds before the deposit becomes non-refundable. For a copropriété, read the règlement, recent meeting minutes, charges, arrears, insurance, reserve position and voted or proposed works. Older alpine buildings can concentrate roof, façade, lift, heating, insulation and water costs. A renovated apartment interior says little about the common fabric that determines comfort and future cash calls.",
+                "Energy performance now has direct operating and rental consequences. Obtain the current DPE, its date, methodology and supporting bills; ask whether any studio correction or national rule change affects the displayed class. Examine heating type, ventilation, glazing, summer comfort and the feasibility of improving a unit inside a protected or jointly governed building. National reforms progressively constrain the letting of poorly performing homes, while a copropriété can limit tourist letting under defined conditions. Treat energy, building governance and intended use as one diligence stream rather than three unrelated checkboxes.",
+                "Alpine hazard work must be address-specific. Géorisques identifies major risks for Chamonix-Mont-Blanc and links the municipal DICRIM, including avalanche, flood and ground-movement concerns. The current PLU became opposable in May 2026 and shapes development and permanent-housing policy. Overlay the official parcel information, planning zone and risk plans; then inspect roof shedding, drainage, retaining structures, access, tree and slope exposure, snow storage and evacuation. Obtain an insurer's written terms before signing. A home outside a dramatic-looking zone can still have access or water problems, while a mapped risk is not automatically uninsurable; the exact evidence controls."
+            ),
+            "building-governance",
+        ),
+        DossierLens(
+            "Treat tourist rent as a permissioned business",
+            ("rental_profit", "capital_upside"),
+            (
+                "Chamonix has real visitor demand, but a resort-wide yield is not decision-grade evidence. Since 1 May 2025, furnished tourist accommodation in the valley must be registered, and physical-person owners need change-of-use authorization under the local system. The municipality states a limit of one authorized property per physical person in Chamonix-Mont-Blanc and Les Houches, with different treatment elsewhere in the valley. National registration, DPE and copropriété rules also matter. Confirm the current rule, applicant, unit, commune, building and transfer position; do not assume an authorization or operating history follows the sale.",
+                "If lawful use is confirmed, build a property-level account from evidence. Start with achieved bookings and bank receipts, then deduct manager commission, cleaning, linen, platform charges, utilities, heating, internet, snow clearing, insurance, taxe foncière, copropriété charges, maintenance, furniture renewal, vacancy and tax. Separate owner-use weeks from rentable inventory. Stress a poor snow period, a closed lift, access disruption and a change in local enforcement. A high gross nightly rate in February can coexist with a modest or negative owner return after a premium purchase price and year-round costs.",
+                "Capital upside is supported by global recognition, limited valley land and a deep international audience, but it is not uniform. The 2026 Notaires observatory records a 9,760 EUR/m² median for old apartments in Chamonix-Mont-Blanc and a 1.776 million EUR median for old houses, while Les Houches old apartments were 7,910 EUR/m². Those completed-market medians show brand and commune differences; they do not value a particular view, building or chalet. Planning restrictions may support scarcity while also narrowing redevelopment and lawful use. Pay only for advantages that a future buyer can verify and finance."
+            ),
+        ),
+        DossierLens(
+            "Enter on completed evidence and preserve the exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The three current asking observations below illustrate product dispersion rather than market value. A 37 m² Savoy apartment asks 450,000 EUR and carries a DPE F. A Les Houches apartment asks 550,000 EUR; the page displays 78 m² but the seller text identifies 75 m² Loi Carrez, which is the comparison denominator used here. That source also conflicts on governance: its prose says a copropriété of 8 lots, while structured fields say the property is not subject to copropriété and separately cite 20 lots. A Les Praz chalet asks 3.2 million EUR; the seller states 342 m² total including a double garage and 290 m² habitable, so the narrower habitable figure is used here. Reconcile every denominator, title, copropriété record and accessory before comparing EUR/m².",
+                "Value entry follows the next credible buyer pool. A well-run Chamonix Centre apartment near daily services can reach international, French and personal-use buyers, but small size, noise, energy class and charges can reduce the audience. Les Praz and Les Tines can attract long-hold lifestyle buyers when sun, access and building quality are real. Argentière and Le Tour appeal strongly to mountain users but form narrower submarkets. Les Houches can be less glamorous and more useful: a practical family apartment near transport may resell to permanent households as well as second-home buyers. The premium should reflect that pool, not an agent's destination average.",
+                "Model the full acquisition-to-exit cash path. Ask the notaire for a written cost estimate for the exact old or new property rather than applying one universal percentage. Include financing and currency costs, diagnostics, surveys, insurance, taxes, copropriété calls, heating, energy works, snow and garden care, vacant-period management and eventual agency and tax consequences. Then model no tourist rent, flat nominal resale and a ten-percent price reduction. Before exchange, ask two agents who did not source the home which completed sales they would use, who would buy it next and how long a normal sale could take. The best Chamonix purchase is the address that remains useful without promotional assumptions."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Chamonix combines a working alpine town with exceptional four-season mountain life; peak-season crowding and upper-valley seasonality change the experience by address.",
+        "global_access": "Geneva road and coach access is unusually strong for the high Alps, while weather, borders and the property’s last mile weaken the headline journey.",
+        "ownership_clarity": "France’s notarised process is familiar, but title, copropriété governance, diagnostics, planning and the buyer’s tax structure remain property-specific.",
+        "regulatory_safety": "Valley registration and change-of-use rules, national DPE controls, copropriété powers and alpine hazards require written clearance for the exact unit.",
+        "rental_profit": "Chamonix has deep visitor demand, but local authorization, high entry price, management, heating and seasonality prevent a credible resort-wide net yield.",
+        "capital_upside": "Global brand and constrained land support selected homes, while planning, energy work and very high entry prices limit blanket appreciation claims.",
+        "retirement_fit": "Chamonix Centre has daily services and a hospital site; Sallanches handles broader care, while upper-valley homes add winter and driving dependence.",
+        "exit_liquidity": "Practical central and Les Houches homes reach broader pools; singular chalets and highly priced upper-valley assets need fewer, wealthier buyers.",
+        "foreigner_fit": "Chamonix is internationally experienced, but French legal, tax, planning and copropriété documents still require independent professional interpretation.",
+        "value_entry": "Notaires medians and current centre, Les Houches and Les Praz asks show that building, lawful use, energy and future audience matter more than one valley average.",
+    },
+    market_anchors=(
+        {"location": "Chamonix-Mont-Blanc · old apartments", "evidence": "9,760 EUR/m²", "buyer_read": "Notaires de France 2025 completed-sale median, up 3.4% in one year. This is a commune median for old apartments, not a candidate valuation.", "source_label": "Notaires des Savoie 2026 observatory", "source_url": "https://chambre-interdepartementale-de-savoie.notaires.fr/wp-content/uploads/2026/04/Observatoire-de-limmo-des-Notaires-des-Savoie-2026.pdf"},
+        {"location": "Chamonix-Mont-Blanc · old houses", "evidence": "1,776,000 EUR", "buyer_read": "Notaires de France 2025 completed-sale median for old houses; no annual change was published. Size, land, condition and micro-location remain unseparated.", "source_label": "Notaires des Savoie 2026 observatory", "source_url": "https://chambre-interdepartementale-de-savoie.notaires.fr/wp-content/uploads/2026/04/Observatoire-de-limmo-des-Notaires-des-Savoie-2026.pdf"},
+        {"location": "Les Houches · old apartments", "evidence": "7,910 EUR/m²", "buyer_read": "Notaires de France 2025 completed-sale median, up 10.1% in one year. It is a separate commune benchmark, not a Chamonix Centre substitute.", "source_label": "Notaires des Savoie 2026 observatory", "source_url": "https://chambre-interdepartementale-de-savoie.notaires.fr/wp-content/uploads/2026/04/Observatoire-de-limmo-des-Notaires-des-Savoie-2026.pdf"},
+    ),
+    micro_locations_intro=(
+        "Use four operating patterns rather than a single Chamonix average. Confirm the commune, train or bus stop, winter walk, sun, noise, healthcare route, tourist-let position, DPE, copropriété, planning and hazards for the exact address."
+    ),
+    micro_locations=(
+        {"name": "Chamonix Centre", "best_for": "Car-light daily life", "daily_life": "Shops, restaurants, buses, rail and hospital site", "diligence": "Noise, DPE, copropriété, charges and tourist-let status"},
+        {"name": "Les Praz / Les Tines", "best_for": "Calmer valley living", "daily_life": "Rail stops, golf and residential streets", "diligence": "Sun, gradient, snow, station walk, planning and building work"},
+        {"name": "Argentière / Le Tour", "best_for": "Mountain-first ownership", "daily_life": "Upper-valley village and specialist outdoor access", "diligence": "Winter access, services, heating, hazards and narrower exit"},
+        {"name": "Les Houches", "best_for": "Residential value and family pool", "daily_life": "Separate commune with shops, schools, rail and bus", "diligence": "Exact neighbourhood, authorization, transport and completed comparables"},
+    ),
+    checklist=(
+        "Confirm French residence, tax residence, healthcare and cross-border estate planning before purchase.",
+        "Choose Chamonix Centre, Les Praz / Les Tines, Argentière / Le Tour or Les Houches by daily routine.",
+        "Obtain title, easements, planning, diagnostics, DPE, copropriété minutes, charges and voted works.",
+        "Clear registration, change-of-use authorization and building rules before underwriting tourist income.",
+        "Travel the Geneva, station, grocery and required hospital route in winter and shoulder season.",
+        "Screen Géorisques, the current PLU and parcel plans for avalanche, flood, slope, access and insurance.",
+        "Reconcile portal Surface, Loi Carrez or habitable area, land, accessories and matched completed sales.",
+        "Model five-year carrying and a conservative resale without tourist rent, then identify the future buyer.",
+    ),
+    references_intro=(
+        "Legal, residence, healthcare, planning, tourist-let, transport, hazard, completed-market, FX and listing claims were reviewed on 23 August 2026. The next scheduled review is 23 February 2027, or sooner after any cited legal, municipal, PLU, DPE, transport, hospital, hazard, market or listing change. Recheck every source and obtain independent French notarial, legal, tax, immigration, planning, building, insurance and healthcare advice for the exact buyer and property. Listings are dated asking observations, not proof of availability, area, title, lawful use, condition or completed value."
+    ),
+    references=(
+        {"label": "France-Visas: long-stay visitor route", "url": "https://france-visas.gouv.fr/en/web/france-visas/tourist-or-private-visit"},
+        {"label": "Assurance Maladie: universal health protection", "url": "https://www.ameli.fr/assure/droits-demarches/principes/protection-universelle-maladie"},
+        {"label": "Chamonix: furnished tourist accommodation rules", "url": "https://www.chamonix.fr/demarches/logement-jhabitat-cham/meubles-de-tourisme-2/"},
+        {"label": "Chamonix: current tourist-let compliance notice", "url": "https://www.chamonix.fr/actualites/mise-en-conformite-des-meubles-de-tourisme-ne-tardez-pas/"},
+        {"label": "Service Public: 2024 furnished-tourist-let reforms", "url": "https://www.service-public.fr/entreprendre/actualites/A17883"},
+        {"label": "Chamonix: current PLU", "url": "https://www.chamonix.fr/demarches/urbanisme/documents-opposables/plu/"},
+        {"label": "Géorisques: Chamonix-Mont-Blanc commune report", "url": "https://www.georisques.gouv.fr/mes-risques/connaitre-les-risques-pres-de-chez-moi/rapport2/74056/CHAMONIX-MONT-BLANC"},
+        {"label": "Hôpitaux du Pays du Mont-Blanc", "url": "https://www.hpmb.fr/hopital/presentation/"},
+        {"label": "Hôpitaux du Pays du Mont-Blanc: Chamonix urgent-care opening", "url": "https://www.hpmb.fr/poles/urgences-medecine-montagne-sport/urgences-chamonix/"},
+        {"label": "Chamonix: urban transport", "url": "https://www.chamonix.fr/demarches/viacham-et-mobilite/transport-urbain/"},
+        {"label": "SNCF TER: Mont-Blanc Express", "url": "https://www.ter.sncf.com/auvergne-rhone-alpes/decouvrir/trains-touristiques/mont-blanc-express"},
+        {"label": "Chamonix: access to the valley", "url": "https://www.chamonix.fr/la-commune/le-territoire/acces-et-deplacement/venir-a-chamonix-mont-blanc/"},
+        {"label": "Notaires des Savoie: 2026 property observatory", "url": "https://chambre-interdepartementale-de-savoie.notaires.fr/wp-content/uploads/2026/04/Observatoire-de-limmo-des-Notaires-des-Savoie-2026.pdf"},
+        {"label": "Immobilier.notaires.fr: Chamonix prices", "url": "https://www.immobilier.notaires.fr/fr/prix-immobilier?codeInsee=74056&neuf=false&typeLocalisation=COMMUNE"},
+        {"label": "European Central Bank: euro reference rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+        {"label": "Chamonix Savoy apartment asking observation", "url": "https://proprietes.lefigaro.fr/annonces/appartement-haute%2Bsavoie-rhone%2Balpes-france/107450633/"},
+        {"label": "Les Houches apartment asking observation", "url": "https://proprietes.lefigaro.fr/annonces/appartement-haute%2Bsavoie-rhone%2Balpes-france/95388787/"},
+        {"label": "Les Praz chalet asking observation", "url": "https://proprietes.lefigaro.fr/annonces/chalet-haute%2Bsavoie-rhone%2Balpes-france/97870885/"},
+    ),
+    images=(
+        DossierImage("valley-life", "/assets/chamonix-valley-life.webp", "Older couple walking through Chamonix Centre with Mont Blanc above the town", "Chamonix works best when the mountain address also supports ordinary daily life.", "hero"),
+        DossierImage("winter-access", "/assets/chamonix-winter-access.webp", "Mont-Blanc Express train serving a snowy Chamonix valley station", "The station, winter walk and last mile matter as much as the valley map.", "wide"),
+        DossierImage("building-governance", "/assets/chamonix-building-governance.webp", "Residents entering a well-kept alpine apartment building in Chamonix", "Copropriété condition, energy and lawful use determine the ownership experience.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Chamonix through five destination lenses",
+    assessment_intro="Here’s how Chamonix scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations compare a small central apartment, a Les Houches family apartment and a Les Praz chalet. EUR is primary; USD uses the recorded ECB reference rate. Each area basis is reproduced and qualified rather than treated as verified legal internal area.",
+    market_anchors_intro="These Notaires de France 2025 completed-sale medians distinguish Chamonix apartments, Chamonix houses and Les Houches apartments. They are broad commune evidence—not current asks or valuations—and do not isolate condition, view, building, lawful use or exact micro-location.",
+    orientation_groups=(
+        DossierOrientationGroup("Lower valley to town", (("Les Houches", "Residential value and rail"), ("Chamonix Centre", "Services and transport core"), ("Les Praz / Les Tines", "Calmer northern neighbourhoods"))),
+        DossierOrientationGroup("Upper valley", (("Argentière", "Village and Grands Montets"), ("Montroc / Le Tour", "Mountain-first outer base"), ("Vallorcine", "Separate commune toward Martigny"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current rail and bus timetables, winter access, the commune boundary and the exact last mile.",
+    country_guide_url="/countries/france-property/",
+    country_guide_label="France property guide",
+    rail_comparison="Compare Chamonix with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -3190,6 +3338,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     DUBAI_DOSSIER.destination_id: DUBAI_DOSSIER,
     BALI_DOSSIER.destination_id: BALI_DOSSIER,
     DOLOMITES_SOUTH_TYROL_DOSSIER.destination_id: DOLOMITES_SOUTH_TYROL_DOSSIER,
+    CHAMONIX_DOSSIER.destination_id: CHAMONIX_DOSSIER,
 }
 
 
@@ -3271,3 +3420,4 @@ validate_premium_dossier(QUEENSTOWN_DOSSIER)
 validate_premium_dossier(DUBAI_DOSSIER)
 validate_premium_dossier(BALI_DOSSIER)
 validate_premium_dossier(DOLOMITES_SOUTH_TYROL_DOSSIER)
+validate_premium_dossier(CHAMONIX_DOSSIER)
