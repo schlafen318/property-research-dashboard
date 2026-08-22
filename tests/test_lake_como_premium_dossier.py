@@ -19,6 +19,7 @@ REVIEWED_DOSSIERS = {
     "madeira",
     "malaga-costa-del-sol",
     DESTINATION_ID,
+    "hakone-izu",
 }
 
 
@@ -26,7 +27,7 @@ class LakeComoDossierContractTests(unittest.TestCase):
     def setUp(self) -> None:
         self.spec = get_premium_dossier(DESTINATION_ID)
 
-    def test_registry_contains_the_five_reviewed_dossiers(self) -> None:
+    def test_registry_contains_the_six_reviewed_dossiers(self) -> None:
         self.assertEqual(REVIEWED_DOSSIERS, set(PREMIUM_DESTINATION_DOSSIERS))
         self.assertIsNotNone(self.spec)
 

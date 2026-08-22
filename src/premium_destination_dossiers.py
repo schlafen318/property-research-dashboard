@@ -693,6 +693,156 @@ MALAGA_COSTA_DEL_SOL_DOSSIER = PremiumDossierSpec(
 )
 
 
+HAKONE_IZU_DOSSIER = PremiumDossierSpec(
+    destination_id="hakone-izu",
+    title="Hakone and Izu Retirement Property Dossier",
+    description="Assess Hakone and Izu retirement property through daily life, access, ownership, rental rules, hazards, value, resale, and current listings.",
+    h1="Hakone / Izu: choose the operating system before the onsen",
+    lede=(
+        "Hakone / Izu is a corridor, not a single retirement market. Atami combines Shinkansen access, hospitals and a steep seaside city; Hakone offers onsen, mountain scenery and frequent use from Tokyo; Ito and Izu-Kogen pair rail with older resort stock; Shimoda delivers the deepest coastal lifestyle with the longest journeys. The same view can therefore sit above very different transport, medical, hazard, maintenance and resale realities. This dossier begins with the life and route a home must support, then tests whether the property earns its price."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is positive for a personal-use-led buyer who selects the address by daily function rather than postcard appeal. Atami is the broadest retirement base: its station sits on the Tokaido Shinkansen and conventional rail network, its centre has ordinary commerce, and International University of Health and Welfare Atami Hospital provides regional emergency and specialist care. Hakone is the stronger repeat-use choice for a Tokyo-based household that accepts buses, gradients and a tourism economy. Ito and Izu-Kogen offer more space and lower-entry older stock along the eastern railway. Shimoda is the most deliberate lifestyle choice because distance, car dependence, healthcare depth and resale narrow toward the peninsula’s south.",
+        "Ownership and residence remain separate. Foreigners can generally acquire ordinary Japanese real estate, but a deed does not create a visa, public-healthcare eligibility or access to domestic borrowing. Japan has no general retirement visa. The official designated-activities route for long sightseeing is limited to qualifying nationalities, financial and insurance conditions, normally six months and at most one year after extension; it is not a permanent retirement solution. A buyer who expects to live here full time needs a different renewable residence basis confirmed before purchase, together with tax and healthcare advice for the actual household.",
+        "Proceed in this order: establish residence and healthcare; choose Atami city, Hakone mountain, Ito/Izu-Kogen rail-and-car life or the deeper Shimoda coast; travel the exact hospital, grocery and station route in poor weather; then reconcile title, road access, planning, utilities, building condition, management obligations, hot-spring arrangements, hazards and lawful use. Underwrite rental income only after the property and local rules are clear. The corridor can be unusually rewarding, but the winning asset is the one whose everyday logistics and future buyer pool remain credible after the view stops being new."
+    ),
+    lenses_intro=(
+        "The Atlas pairs the ten decision dimensions into five practical questions. Each lens explains what the evidence means for a buyer; the complete assessment appears once in the score table below."
+    ),
+    lenses=(
+        DossierLens(
+            "Choose the life that still works on an ordinary Tuesday",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Atami offers the most complete all-season retirement proposition in the corridor. The centre combines a working city, restaurants, shops, rail and a waterfront rather than relying solely on a resort estate. Its major hospital says it supports Atami, Ito, western Kanagawa and the wider Izu Peninsula, with emergency care and multiple specialties. That depth matters more with age than a distant sea view. The qualification is topography: many homes sit on steep roads or steps above the station and coast. A property described as central can still turn groceries, taxis or an urgent hospital journey into a difficult climb.",
+                "Hakone is a collection of small operating environments. Hakone-Yumoto is the rail gateway; Gora has the mountain railway and cable-car connection; Sengokuhara is flatter in places and has everyday shops, but depends heavily on buses and roads. The appeal is real—onsen, museums, forest and proximity to Tokyo—but the town’s visitor economy does not create urban healthcare or effortless late-life mobility. Test winter damp, summer humidity, road disruption, bus frequency after dinner and the route to a full hospital. An onsen home is a specialist lifestyle asset, not a substitute for a service base.",
+                "Ito and Izu-Kogen sit between those cases. Ito has a municipal hospital, a station, shops and a resident economy; Izu-Kogen spreads villas, resort estates and attractions across hills above the Izukyu line. Shimoda adds beaches and a strong coastal identity but makes long journeys part of the bargain. Spend a weekday outside holiday season in every candidate location. Walk or drive to food, pharmacy, clinic and station; check whether one partner could manage alone; and ask what happens when driving is no longer comfortable. Retirement fit is the durability of that routine, not the quality of a weekend."
+            ),
+            "daily-life",
+        ),
+        DossierLens(
+            "Measure the whole journey, then the language burden",
+            ("global_access", "foreigner_fit"),
+            (
+                "Atami has the corridor’s strongest transport hinge because the Tokaido Shinkansen connects it to Tokyo while conventional rail continues toward Ito. That does not make every Atami address easy: the final kilometre may involve a steep bus route, taxi or private car. Hakone-Yumoto is about 80 minutes from Shinjuku on a direct Odakyu Romancecar, after which Gora, Sengokuhara and Lake Ashi require the mountain railway, cable car, bus or road. A buyer should time the door-to-door trip with luggage, a missed connection and evening arrival—not quote the fastest station-to-station headline.",
+                "The eastern Izu rail spine becomes progressively more remote. Izukyu links Ito, Izu-Kogen, Atagawa, Kawazu and Izukyu-Shimoda, but many celebrated villa areas are not walkable from their named station. Izu-Kogen can mean a short station approach or a steep, car-led estate several kilometres away. Shimoda is the line’s southern terminus, not an extension of Atami convenience. Check the current timetable, last practical arrival, taxi availability, parking and road resilience. A home used frequently will expose every weak interchange; a home occupied full time will expose every necessary drive.",
+                "Foreigner fit is strongest where professional help and transport are easiest to assemble, but binding work remains Japanese-led throughout the corridor. Purchase documents, municipal notices, condominium meetings, resort-estate rules, tax administration and contractor coordination may not be available in English. Non-resident property reporting to the Ministry of Finance is submitted in Japanese, and a remote owner needs someone to receive notices and inspect the home after storms. Budget for an independent bilingual lawyer, tax adviser and reliable local manager. International familiarity in a tourism district is useful, but it does not remove the operating language of ownership."
+            ),
+        ),
+        DossierLens(
+            "Own clearly, then investigate the difficult parts",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Japan’s general ability for foreigners to own land and buildings is the simple part. The transaction still requires a property-specific chain of evidence: title, liens, boundaries, legal road access, registered floor area, building approvals, utilities, easements, additions and tax treatment. A non-resident acquisition can require a Foreign Exchange and Foreign Trade Act report through the Bank of Japan within 20 days. Acquisition, registration, annual ownership and disposal can each create taxes; non-resident rental or sale income can require filings, withholding and a Japanese tax agent. Assign every obligation in writing before exchange.",
+                "Older resort stock needs a deeper physical and governance review. For a condominium, read bylaws, reserve balance, arrears, major-repair plan, minutes, insurance, renovation rules, occupancy and any lodging prohibition. For a detached home, commission structural, moisture, termite, roof, retaining-wall, drainage and septic or sewer checks. In a managed villa estate, identify road, water, security and vegetation charges and whether membership or management obligations transfer. Where a listing includes hot-spring supply, verify the source, right or contract, transfer fee, basic charge, maintenance responsibility and interruption terms. A renovated interior proves none of those points.",
+                "Hazards differ sharply by address. Hakone is an active volcanic area; the Japan Meteorological Agency revised its alert-level criteria in 2025, and the town publishes volcanic as well as landslide and flood maps. Atami’s current guide maps tsunami, landslide, flood, storm surge and volcanic risk, while its steep catchments make drainage and retaining structures material. Ito and the eastern coast require tsunami, slope and landslide checks; coastal Shimoda adds evacuation height and route. Overlay current official maps, walk the evacuation path, inspect after rain where possible and obtain an insurer’s terms before a binding offer."
+            ),
+        ),
+        DossierLens(
+            "Treat visitor demand as an operating business",
+            ("rental_profit", "capital_upside"),
+            (
+                "The corridor has substantial tourism, but tourism volume is not net rental yield. Atami can combine leisure demand with a broader urban market; Hakone has a powerful onsen and weekend identity; Izu-Kogen and Shimoda attract seasonal coastal and nature stays. Each also creates operating friction: cleaning travel, key access, linen, guest communication, repairs, utilities, platform fees, vacancy and weather disruption. A home with difficult stairs, weak parking or a remote manager may underperform a less scenic address. Use dated, property-specific occupancy and rate evidence, then deduct every local cost rather than applying a regional headline.",
+                "Permission is layered. Japan’s national private-lodging route caps minpaku at 180 nights a year, but prefectural, municipal, building and management rules can reduce or prevent use. Kanagawa tells prospective Hakone operators to confirm whether the exact home lies in a restricted area, and hot-spring or food service can require separate permissions. Shizuoka requires notification and says its ordinance can reduce the national maximum depending on location. Condominium bylaws and resort-estate contracts remain separate. Obtain a written answer for the address, operator, absence-management plan, fire safety, guest reporting, tax and transfer continuity before underwriting any income.",
+                "Capital upside should come from access, daily utility and scarce property quality—not a generic Tokyo-weekend story. Atami’s rail and service base can support the broadest demand, while Hakone’s globally recognised tourism can support special homes but also produces high operating premiums. Ito and Izu-Kogen may offer inexpensive space, yet old stock, depopulation, deferred maintenance and abundant alternatives can cap appreciation. Shimoda’s beauty attracts committed buyers but its remoteness narrows them. Model a flat nominal resale after full buying, repair and selling costs. If the case fails without appreciation or holiday income, it is not a resilient retirement purchase."
+            ),
+            "coast-access",
+        ),
+        DossierLens(
+            "Use official land evidence to challenge the asking price",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Official 1 January 2026 land-value observations show why a single corridor price is misleading. A high-ground Nishi-Atami villa-area site was assessed at 26,600 JPY/m²; a Hakone Miyagino villa-subdivision site at 20,500 JPY/m²; and a residential site near Ito’s Matsubara station area at 63,200 JPY/m². These are appraisals of specified bare-land sites, not built-home valuations, averages or transaction prices. Building age, legal access, slope, retaining works, utilities, hot-spring arrangements, management obligations and renovation can make a low total price expensive to own.",
+                "The three current listing observations expose those differences. A small Atami apartment near the station asks more per square metre than a larger Hakone house, but the apartment offers a conventional, walkable format and transfers building risk into condominium governance. The Miyagino house provides far more space at a similar total ticket, with age, mountain access and upkeep to investigate. An Izu-Kogen house near the rail area asks a much higher total price and needs its condition, estate charges, route and future buyer justified. These are dated asking observations only; they are comparison prompts, not valuations or recommendations.",
+                "Exit liquidity follows the operating system. A conventional Atami apartment near rail and services can reach retirees, second-home users and domestic buyers. A well-located Hakone home can attract Tokyo households, but singular architecture, access or large maintenance costs narrow the pool. Ito and Izu-Kogen resale improves near stations, services and straightforward roads; isolated or highly customised villas require more time and discount discipline. Shimoda depends on a buyer who wants the same remote coastal compromise. Before purchase, name that future buyer and estimate the marketing period and price reduction needed without an exceptional view-led story."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Atami combines city, coast and onsen; Hakone adds mountain culture, while Ito, Izu-Kogen and Shimoda deepen the nature-led lifestyle.",
+        "global_access": "Atami has Shinkansen access and Hakone-Yumoto has direct Shinjuku trains; Izu-Kogen and Shimoda add progressively longer rail and road journeys.",
+        "ownership_clarity": "Hakone and Izu follow Japan’s generally open ownership framework, while every title, boundary, road, building and non-resident reporting obligation still requires verification.",
+        "regulatory_safety": "Hakone volcano rules and Kanagawa lodging limits differ from Atami, Ito and Shimoda procedures; slope, tsunami and building checks remain address-specific.",
+        "rental_profit": "Atami and Hakone have strong visitor demand, but Ito, Izu-Kogen and Shimoda seasonality, permissions and remote operations constrain reliable net yield.",
+        "capital_upside": "Atami access and Hakone scarcity support selected assets; abundant older Ito and Izu-Kogen stock makes appreciation highly property-specific.",
+        "retirement_fit": "Atami offers the deepest transport and hospital base; Ito remains practical, while Hakone, Izu-Kogen and Shimoda need stronger mobility planning.",
+        "exit_liquidity": "Atami station-area homes reach the broadest pool; specialised Hakone houses and remote Izu-Kogen or Shimoda villas demand more time and pricing discipline.",
+        "foreigner_fit": "Atami and Hakone have tourism-facing services, but legal, tax, municipal, management and contractor work across Ito, Izu-Kogen and Shimoda remains Japanese-led.",
+        "value_entry": "Low Hakone and Izu asking tickets can conceal age, access, estate fees and repairs; Atami’s higher unit price may buy broader daily utility.",
+    },
+    market_anchors=(
+        {"location": "Atami · Nishi-Atami villa area", "evidence": "26,600 JPY/m²", "buyer_read": "Official land value at 1 January 2026 for a 420 m² high-ground residential site 4.2 km west of Atami Station. Bare land only; the appraisal notes a landslide-warning context.", "source_label": "MLIT Real Estate Information Library, 2026", "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/22/2026222050003.html"},
+        {"location": "Hakone · Miyagino villa subdivision", "evidence": "20,500 JPY/m²", "buyer_read": "Official land value at 1 January 2026 for a 485 m² villa-area site about 3.1 km from Gora. Bare land only; national-park and low-rise controls form part of its context.", "source_label": "MLIT Real Estate Information Library, 2026", "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/14/2026143820001.html"},
+        {"location": "Ito · Matsubara station area", "evidence": "63,200 JPY/m²", "buyer_read": "Official land value at 1 January 2026 for an established residential site near Ito Station. Bare land only; it is not an Izu-Kogen villa valuation or a built-home average.", "source_label": "MLIT Real Estate Information Library, 2026", "source_url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/22/2026222080002.html"},
+    ),
+    micro_locations_intro=(
+        "Use four operating patterns rather than one Hakone / Izu average. Atami is the rail-and-hospital base; Hakone-Yumoto, Gora and Sengokuhara are distinct mountain systems; Ito and Izu-Kogen combine a working city with dispersed villa estates; Shimoda and the southern coast trade access for deeper coastal life. Confirm the exact gradient, road, parking, station or bus journey, hospital route, hot-spring or estate contract, hazard layers and likely future buyer for every address."
+    ),
+    micro_locations=(
+        {"name": "Atami", "best_for": "Year-round services and Tokyo access", "daily_life": "Steep seaside city with rail and hospital depth", "diligence": "Slope, landslide, tsunami, building and fees"},
+        {"name": "Hakone-Yumoto / Gora / Sengokuhara", "best_for": "Tokyo-adjacent onsen personal use", "daily_life": "Tourism-led mountain towns linked by rail, bus and road", "diligence": "Volcano, access, hot spring, damp and management"},
+        {"name": "Ito / Izu-Kogen", "best_for": "Lower-entry east-coast space", "daily_life": "Rail spine with dispersed car-led villa estates", "diligence": "Older stock, estate charges, slope and resale"},
+        {"name": "Shimoda / south Izu", "best_for": "Committed beach and nature lifestyle", "daily_life": "Small coastal city at the end of the rail line", "diligence": "Journey time, healthcare, tsunami and exit depth"},
+    ),
+    checklist=(
+        "Confirm a renewable residence route, tax position, healthcare eligibility and private cover independently of the property purchase.",
+        "Choose Atami city, Hakone mountain, Ito/Izu-Kogen or Shimoda daily life before comparing asking prices.",
+        "Travel the exact station, bus, grocery and hospital routes with luggage, in rain and after dark; repeat without a car where relevant.",
+        "Reconcile title, liens, boundaries, legal road access, registered floor area, approvals, utilities, additions and non-resident reporting.",
+        "Read condominium or villa-estate governance, reserves, works, arrears, roads, water, vegetation, insurance and every transferable charge.",
+        "Verify hot-spring rights or contracts, transfer and recurring fees, supply terms, equipment and interruption responsibility in writing.",
+        "Overlay official volcano, landslide, flood and tsunami maps, inspect drainage and retaining structures, test evacuation and obtain insurance terms.",
+        "Obtain a written rental answer, cost full repairs and five-year ownership, compare direct evidence and identify the likely resale buyer.",
+    ),
+    references_intro=(
+        "Legal, tax, residence, healthcare, transport, rental, land-value and hazard claims were reviewed on 22 August 2026 against the primary sources below. The next scheduled review is 22 February 2027, or sooner if a cited law, municipal rule, alert level, transport service, hospital provision, land-value release or listing changes. Recheck every live source and obtain independent Japanese legal, tax, immigration, surveying, engineering, insurance and property-management advice for the exact buyer and address before signing. Listing observations are dated asking evidence only and do not verify availability, title, condition, legal use, transferability or completed value."
+    ),
+    references=(
+        {"label": "Japan property guide", "url": "/countries/japan-property/"},
+        {"label": "MOFA: long stay for sightseeing and recreation", "url": "https://www.mofa.go.jp/ca/fna/page22e_000738.html"},
+        {"label": "Ministry of Finance: non-resident real-property reporting", "url": "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html"},
+        {"label": "National Tax Agency: non-resident real-estate tax", "url": "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf"},
+        {"label": "MLIT: real-estate transaction and tax guidance", "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html"},
+        {"label": "Japan Tourism Agency: Private Lodging Business Act", "url": "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html"},
+        {"label": "Kanagawa Prefecture: private-lodging rules and Hakone confirmation", "url": "https://www.pref.kanagawa.jp/docs/e8z/cnt/f762/p1195197.html"},
+        {"label": "Shizuoka Prefecture: private-lodging rules", "url": "https://www.pref.shizuoka.jp/kenkofukushi/eiseiyakuji/eiseionsen/1040424/1025059.html"},
+        {"label": "Odakyu: Shinjuku to Hakone-Yumoto access", "url": "https://www.odakyu.jp/english/transport/timetable/"},
+        {"label": "Izukyu: Ito, Izu-Kogen and Shimoda railway", "url": "https://www.izukyu.co.jp/global_site/index.php"},
+        {"label": "IUHW Atami Hospital: emergency department", "url": "https://atami.iuhw.ac.jp/clinic/kyukyu.html"},
+        {"label": "Ito Municipal Hospital", "url": "https://ito-shimin-hp.jp/"},
+        {"label": "JMA: Hakone volcano monitoring and alerts", "url": "https://ds.data.jma.go.jp/svd/vois/data/tokyo/315_Hakoneyama/315_index.html"},
+        {"label": "Hakone Town: volcanic hazard map", "url": "https://www.town.hakone.kanagawa.jp/www/genre/1000500000010/index.html"},
+        {"label": "Atami City: current disaster and hazard guide", "url": "https://www.city.atami.lg.jp/kurashi/bousai/1011957/1000585.html"},
+        {"label": "Ito City: tsunami disaster plan and mapping", "url": "https://www.city.ito.shizuoka.jp/material/files/group/5/itousibousai-tsunami-r5.pdf"},
+        {"label": "MLIT: Hakone Miyagino 2026 land appraisal", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/14/2026143820001.html"},
+        {"label": "MLIT: Atami Nishi-Atami 2026 land appraisal", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/22/2026222050003.html"},
+        {"label": "MLIT: Ito Matsubara 2026 land appraisal", "url": "https://www.reinfolib.mlit.go.jp/landPrices_/realEstateAppraisalReport/2026/22/2026222080002.html"},
+        {"label": "European Central Bank: euro reference exchange rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("atami-hero", "/assets/hakone-izu-atami-hero.webp", "Atami city, railway and steep coast in soft morning light", "Atami is the corridor’s most complete rail-and-service base—but the gradient belongs in every property decision.", "hero"),
+        DossierImage("daily-life", "/assets/hakone-izu-daily-life.webp", "Older residents walking near shops and a bus stop in a Hakone onsen town", "In Hakone, ordinary errands and the bus timetable matter as much as the onsen setting.", "wide"),
+        DossierImage("coast-access", "/assets/hakone-izu-coast-access.webp", "Homes, railway and road on the steep eastern Izu coast", "Along eastern Izu, the station, road, slope and front door form one operating system.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Hakone and Izu through five destination lenses",
+    assessment_intro="Here’s how Hakone and Izu score on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show a walkable Atami apartment, an older Hakone house and an Izu-Kogen villa case. JPY is primary; USD uses the recorded ECB-derived reference basis for comparison only.",
+    market_anchors_intro="These are official land-value observations—not built-home valuations, market averages or asking-price targets. Each is a specified bare-land site at 1 January 2026; reconcile every candidate for its exact address, building, access, slope, legal history, utilities, management obligations and completed comparable evidence.",
+    orientation_groups=(
+        DossierOrientationGroup("Tokyo to Hakone mountain system", (("Shinjuku", "Odakyu gateway"), ("Hakone-Yumoto", "Mountain rail gateway"), ("Gora", "Rail and cable-car hub"), ("Sengokuhara", "Bus-and-road plateau"))),
+        DossierOrientationGroup("Tokyo down the eastern Izu spine", (("Tokyo", "Shinkansen origin"), ("Atami", "Rail and service hinge"), ("Ito / Izu-Kogen", "City and villa coast"), ("Shimoda", "Southern terminus"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Journey time and usefulness depend on the current rail or bus timetable, road conditions, weather, luggage, gradient and exact address.",
+    country_guide_url="/countries/japan-property/",
+    country_guide_label="Japan property guide",
+    rail_comparison="Compare Hakone and Izu with the full Atlas.",
+)
+
+
 LAKE_COMO_DOSSIER = PremiumDossierSpec(
     destination_id="lake-como",
     title="Lake Como Retirement Property Dossier",
@@ -839,6 +989,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     MADEIRA_DOSSIER.destination_id: MADEIRA_DOSSIER,
     MALAGA_COSTA_DEL_SOL_DOSSIER.destination_id: MALAGA_COSTA_DEL_SOL_DOSSIER,
     LAKE_COMO_DOSSIER.destination_id: LAKE_COMO_DOSSIER,
+    HAKONE_IZU_DOSSIER.destination_id: HAKONE_IZU_DOSSIER,
 }
 
 
@@ -906,3 +1057,4 @@ validate_premium_dossier(FUKUOKA_ITOSHIMA_DOSSIER)
 validate_premium_dossier(ALGARVE_CASCAIS_DOSSIER)
 validate_premium_dossier(MADEIRA_DOSSIER)
 validate_premium_dossier(LAKE_COMO_DOSSIER)
+validate_premium_dossier(HAKONE_IZU_DOSSIER)
