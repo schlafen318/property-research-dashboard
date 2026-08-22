@@ -2876,6 +2876,149 @@ DUBAI_DOSSIER = PremiumDossierSpec(
 )
 
 
+BALI_DOSSIER = PremiumDossierSpec(
+    destination_id="bali",
+    title="Bali Retirement Property Dossier for Foreign Buyers",
+    description="Assess Bali property through foreign land rights, leasehold, residence, villa licensing, daily life, hazards, value decay, exit and current listings.",
+    h1="Bali: buy the legal interest, not the dream",
+    lede=(
+        "Bali can support an exceptional long-stay life, but the island’s property language is dangerously compressed. A villa advertised as ‘leasehold,’ ‘freehold’ or ‘investment ready’ may involve very different land rights, remaining terms, permits and operating permissions. Sanur, Ubud, Canggu and Uluwatu also solve different daily-life problems. This dossier starts with the legal interest and the life it must support, then tests licensing, infrastructure, hazards, cash flow and what a future buyer will actually acquire."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-23",
+    date_reviewed="2026-08-23",
+    verdict_paragraphs=(
+        "The verdict is conditional. Bali is suitable for a buyer who accepts that Hak Milik freehold land is reserved to Indonesian citizens and who will not use an Indonesian nominee as a substitute. Government Regulation 18/2021 permits qualifying foreigners with immigration documents to own specified residential property through defined rights, including landed houses on Hak Pakai or Hak Pakai over Hak Milik under a formal deed. Yet much of the foreign-facing villa market is not that product: it is a private lease. A lease can be lawful and useful, but it is a wasting contractual asset whose value depends on the land certificate, lessor, executed term, extension formula, assignment, default remedies and treatment of the building at expiry.",
+        "Property and residence must be solved separately. Immigration’s current list includes E33E five-year and E33F one-year retiree special-residency visas, but the E33F detail page currently says its data are not yet available. A seller, agent or lease cannot fill that gap. Confirm the current applicant-specific visa requirements and healthcare plan directly with immigration counsel before treating any home as a retirement base. Bali’s provincial health system lists hospitals across Denpasar, Badung and Gianyar; access is strongest around the southern service corridor, while an attractive inland or cliff address can add substantial time in traffic.",
+        "Proceed only if independent Indonesian counsel can explain in plain language what is acquired, for how long and on what registered land; a planner can confirm land use and building approvals; and a licensed adviser can reconcile residence, tax and operation. A personal-use home may work without tourist income. A rental villa requires a separate lawful business route, property-level permission and conservative economics. If the deal needs an informal nominee, an assumed extension, an unfinished permit or heroic occupancy to make sense, it is not ready."
+    ),
+    lenses_intro="The five lenses below pair the Atlas’s ten dimensions around Bali’s real decision sequence: daily life, access, legal interest, lawful operation and the leasehold exit.",
+    lenses=(
+        DossierLens(
+            "Choose an island routine that still works in rain",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Bali’s lifestyle case is real: strong food, culture, wellness, tropical landscapes and a large international community can make ordinary weeks rewarding. The useful retirement question is narrower. Sanur offers a relatively mature, flatter coastal routine with supermarkets, cafés and hospitals in the wider Denpasar corridor. Ubud offers culture and greenery but brings congestion, hills, damp and longer access to some specialist care. Canggu concentrates restaurants and international services yet can turn a short map distance into a tiring journey. Uluwatu offers cliffs and surf but is more fragmented and car-dependent.",
+                "Healthcare depth is concentrated rather than uniform. Bali’s official health directory lists RSUP Prof. Dr. I.G.N.G. Ngoerah and multiple public and private hospitals in Denpasar, RSUD Bali Mandara near Sanur, Mangusada and Udayana facilities in Badung, and Sanjiwani plus other hospitals in Gianyar. A directory proves facilities exist, not that a preferred specialist, insurance arrangement or emergency pathway will work for the buyer. Test the exact door-to-door trip at busy hours, identify a primary doctor and emergency hospital, and arrange insurance before moving.",
+                "Live in the chosen neighbourhood during the wet season before signing a long lease. Make the grocery, pharmacy, hospital and airport journeys; test drainage, mould, insects, noise, power, internet, water pressure and wastewater; and ask what happens when a driver is unavailable. A pool and open living room can be delightful, but stairs, slippery stone, humidity and constant maintenance matter over years. Bali scores highly for magnetism; retirement fit belongs to the address and household, not the island brand."
+            ),
+            None,
+        ),
+        DossierLens(
+            "Measure access in traffic time, not kilometres",
+            ("global_access", "foreigner_fit"),
+            (
+                "I Gusti Ngurah Rai is an international airport and gives Bali unusually strong regional access for an island, but every property journey crosses a constrained road system. The airport operator identifies DPS as Bali’s international airport; that establishes the gateway, not the final leg. Sanur and parts of southern Denpasar can offer a more predictable airport and hospital relationship. Canggu, Ubud and the Bukit can vary sharply by hour, ceremony, rain and construction. Record actual weekday and weekend travel rather than accepting an agent’s best-case minutes.",
+                "Foreigner fit is high in service availability but lower in legal simplicity. English is common in the sales and hospitality ecosystem, yet the controlling land certificate, spatial plan, tax record, lease, corporate documents and government approvals are Indonesian instruments. Translation by the selling agent is not independent advice. Use a buyer-appointed lawyer or notary, verify identity and authority of every lessor and landholder, and retain signed bilingual documents where appropriate. Confirm who receives official notices and who can act when the owner is abroad.",
+                "The island’s popularity also creates operating friction: road access can be narrow, neighbours can be affected by guest traffic, and construction can change a view or route. Inspect legal road access, parking, refuse collection, water supply, septic or sewer arrangements and the path for tradespeople. In a cliff or rural setting, test emergency response and evacuation. Global connectivity is valuable only when the last mile remains usable for the buyer, staff and eventual resale market."
+            ),
+            "bali-access",
+        ),
+        DossierLens(
+            "Define the right, the term and the permitted use",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Indonesia’s Basic Agrarian Law reserves Hak Milik to Indonesian citizens and identifies foreigners domiciled in Indonesia as eligible for Hak Pakai. Government Regulation 18/2021 adds the current residential framework for foreigners with immigration documents. That does not convert a vendor’s ‘freehold’ advertisement into foreign freehold. Obtain an official land search and independent written opinion covering the land right, registered holder, encumbrances, boundaries, access, disputes, building ownership and the precise route available to this buyer. Reject nominee arrangements that disguise beneficial ownership.",
+                "For leasehold, read the executed instrument rather than the marketing label. Confirm start and expiry dates, prepaid rent, renewal mechanism and price, assignment and subletting, succession, landlord sale or death, taxes, insurance, repairs, reconstruction after casualty, default, dispute forum and what happens to the building and furniture at expiry. ‘Twenty-five plus twenty-five’ is not fifty years unless the later term is enforceable on intelligible economics. Compare price per remaining lease-year as well as price per portal-stated building area. Ask counsel to produce a one-page term schedule from the signed documents, then reconcile it to every date and promise in the advertisement. Record who must consent to assignment, whether the next buyer can inherit the extension right, which currency or index sets extension rent, and whether the lessee can remove or recover value from improvements at expiry. Price any unresolved consent or renewal as absent, not probable.",
+                "Permitted residential use does not establish lawful hospitality use. OSS classifies villa accommodation under KBLI 55193, describing private houses rented to tourists and managed by the owner. The exact project still needs compatible zoning, building approvals, business structure, licences and local compliance. Verify PBG and SLF status, spatial designation, environmental and wastewater obligations, neighbourhood constraints and the operator’s registrations. For each claimed approval, obtain the complete document, issuing authority, parcel or building identifier, approved plans, use category, conditions and current status; match names, coordinates and floor area to the land search and physical building. A receipt, application screenshot or agent statement is not an issued approval. Have the planner identify any mismatch and the lawful remedy before deposit, because a permit ‘in process’ transfers execution, delay and refusal risk to the buyer. A platform listing, Pondok Wisata claim or management forecast is evidence to investigate, not permission."
+            ),
+        ),
+        DossierLens(
+            "Underwrite a hospitality business without borrowing hotel statistics",
+            ("rental_profit", "capital_upside"),
+            (
+                "Bali’s tourism demand is substantial. BPS recorded 578,251 direct foreign arrivals in May 2026 and room occupancy of 61.16% for star hotels and 37.20% for non-star hotels and other accommodation. Those figures support the island-wide demand context; they do not forecast an individual villa. Location, bedroom count, design, licence, reviews, distribution, operator quality, season, road access and new supply can produce very different results. Do not apply a marketed island occupancy rate to the candidate property.",
+                "Build the operating model from source documents: achieved booking statements, bank receipts, platform reports, tax filings, staffing contracts and utility bills. Model management, cleaning, linen, commissions, maintenance, pool and garden care, utilities, insurance, local taxes, replacement reserves and empty periods. Indonesia’s tax authority states that land and building lease income is generally subject to 10% final income tax on the gross rental value; hospitality, foreign ownership and corporate structures can change the analysis, so obtain a written taxpayer-specific opinion.",
+                "Capital upside is also structure-dependent. Bank Indonesia’s Denpasar primary-house index provides a disciplined official context but does not price Bali leasehold villas. Appreciation in underlying land may accrue principally to the landholder, while the lessee’s remaining term declines. Renovation, brand and a favourable extension can create value, but none is automatic. Run a no-rental case, a weak-season case and an exit with five fewer lease years. If the return disappears without perpetual extension or resale at today’s multiple, the underwriting is too optimistic."
+            ),
+            "villa-operation",
+        ),
+        DossierLens(
+            "Price the declining term and preserve an honest exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The three listing observations below are deliberately all leasehold because that is the comparison many foreign buyers actually face. They span Sanur, Canggu and Ubud, but their lease terms and legal readiness differ. The portal’s building-area field is only a denominator; it is not verified legal internal area. Price per square metre without remaining term can mislead, just as a low total price can hide a short lease, unfinished permit or expensive extension.",
+                "Exit liquidity depends on what can be assigned to whom. A future buyer will examine remaining years, extension rights, landholder cooperation, permits, operating records, building condition and the same immigration or entity constraints. Sanur may attract long-stay and retirement demand; Canggu may reach a larger hospitality audience but face supply and traffic pressure; Ubud demand can be strong but access and the specific lease matter. Ask two independent brokers how they would market the exact interest today and after five years.",
+                "Model acquisition through exit. Include legal and notarial work, searches, applicable BPHTB or other transaction taxes, lease-related tax, business setup, permits, insurance, furnishing, maintenance, management, currency and sale costs. The national BPHTB ceiling is 5% on the taxable base after the local non-taxable threshold, but the applicable transaction and Bali locality require a written closing statement. Do not add a generic percentage to every lease. The best entry is the clearest lawful interest at a price that recognises decay, capex and a narrower future buyer pool."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Bali combines culture, food, wellness and tropical scenery, while Sanur, Ubud, Canggu and Uluwatu produce distinctly different routines.",
+        "global_access": "Bali has a major international gateway at DPS, but Canggu, Ubud and Uluwatu journeys are governed by traffic and last-mile roads.",
+        "ownership_clarity": "Bali foreign buyers must distinguish Hak Pakai and other lawful rights from contractual leasehold; Hak Milik nominee arrangements are not a solution.",
+        "regulatory_safety": "Bali villa operation requires property-level zoning, building and OSS licensing checks; an online rental history does not prove lawful use.",
+        "rental_profit": "Bali tourism demand is deep, but BPS hotel occupancy is not a villa forecast and net profit depends on licence, operator and cost evidence.",
+        "capital_upside": "Bali land and tourism demand can support selected assets, while lease decay means underlying appreciation may not accrue fully to the lessee.",
+        "retirement_fit": "Sanur offers Bali’s clearest service corridor; Ubud, Canggu and Uluwatu require sharper traffic, healthcare, humidity and mobility testing.",
+        "exit_liquidity": "Bali resale depth narrows with shorter lease terms, weak extensions, unclear permits and singular villas whose next buyer must accept the same structure.",
+        "foreigner_fit": "Bali has a mature international service ecosystem, but title, planning, tax, lease and licence documents still require independent Indonesian advice.",
+        "value_entry": "Bali leasehold asks can look inexpensive per square metre; remaining years, permit status, extension cost and terminal value determine real entry value.",
+    },
+    market_anchors=(
+        {"location": "Denpasar small primary houses", "evidence": "RPPI 106.52", "buyer_read": "Bank Indonesia Q1 2026 index, 2018=100, based on developer primary-house prices; not a Bali villa price, leasehold benchmark or valuation.", "source_label": "Bank Indonesia Q1 2026 survey", "source_url": "https://www.bi.go.id/en/publikasi/laporan/Documents/Residential-Property-Survey-Quarter-1-2026.pdf"},
+        {"location": "Denpasar medium primary houses", "evidence": "RPPI 106.70", "buyer_read": "Bank Indonesia Q1 2026 index, 2018=100, for developer primary houses; it shows price direction only and is not matched to Sanur, Ubud or Canggu villas.", "source_label": "Bank Indonesia Q1 2026 survey", "source_url": "https://www.bi.go.id/en/publikasi/laporan/Documents/Residential-Property-Survey-Quarter-1-2026.pdf"},
+        {"location": "Denpasar large primary houses", "evidence": "RPPI 104.82", "buyer_read": "Bank Indonesia Q1 2026 index, 2018=100, for developer primary houses; tenure, completed sales, land value and lease years are outside its scope.", "source_label": "Bank Indonesia Q1 2026 survey", "source_url": "https://www.bi.go.id/en/publikasi/laporan/Documents/Residential-Property-Survey-Quarter-1-2026.pdf"},
+    ),
+    micro_locations_intro="Bali is not one property market. Sanur, Ubud, Canggu and Uluwatu support different routines, operating models and future buyer pools, with meaningful street-by-street variation in access, planning, hazards, water and construction. Use the table to choose a routine to test, not a listing. Rent nearby first; repeat essential journeys in traffic and heavy rain; then match the advertised location to the registered parcel, current spatial plan and hazard overlays before pricing personal or hospitality use.",
+    micro_locations=(
+        {"name": "Sanur", "best_for": "Long-stay routine", "daily_life": "Flatter coast, established services and stronger Denpasar hospital access.", "diligence": "Beachside flooding and tsunami layers, lease term, traffic, PBG/SLF and lawful rental use."},
+        {"name": "Ubud", "best_for": "Culture and greenery", "daily_life": "Restaurants, wellness and inland landscapes with congestion and humidity.", "diligence": "Road access, slope and flood risk, mould, water, wastewater, licence and hospital journey."},
+        {"name": "Canggu / Berawa", "best_for": "Hospitality ecosystem", "daily_life": "Dense international amenities alongside heavy traffic and construction.", "diligence": "Supply, noise, access width, drainage, permits, operator evidence and lease decay."},
+        {"name": "Uluwatu / Bukit", "best_for": "Cliff and surf lifestyle", "daily_life": "Dramatic coast with fragmented services and car dependence.", "diligence": "Water, cliff stability, evacuation, road title, construction quality, wastewater and exit pool."},
+    ),
+    checklist=(
+        "Obtain official land and encumbrance searches; identify the registered right, holder, boundaries and legal access.",
+        "Have independent counsel explain the buyer’s lawful structure and reject nominee ownership.",
+        "Reconcile lease commencement, expiry, extension pricing, assignment, succession, default and building ownership.",
+        "Verify spatial designation, PBG, SLF, wastewater, water, environmental and neighbourhood requirements.",
+        "For paid stays, confirm KBLI, business entity, licence, tax and exact property eligibility in writing.",
+        "Test wet-season drainage, mould, traffic, hospital and airport travel, utilities and emergency access.",
+        "Rebuild rental economics from achieved records and include 10% final income tax only where adviser-confirmed.",
+        "Model the exit five years later with fewer lease years, capex, selling costs and a narrower eligible buyer pool.",
+    ),
+    references_intro="Legal and administrative claims use Indonesian government sources reviewed 23 August 2026. The next scheduled review is 23 November 2026. Review sooner if land, immigration, tax, licensing, planning, healthcare, transport or hazard rules change; if a listing or source becomes unavailable; or if the Atlas score changes. The E33F detail page currently provides no requirements. Recheck every linked source and obtain independent Indonesian legal, tax, immigration and planning advice for the exact buyer, parcel, interest and intended use before commitment.",
+    references=(
+        {"label": "ATR/BPN: Basic Agrarian Law", "url": "https://jdih.atrbpn.go.id/peraturan/download/32/Penerjemahan%20UU%20No.%205%20Tahun%201960%20%28UUPA%29.pdf"},
+        {"label": "ATR/BPN: Government Regulation 18/2021", "url": "https://jdih.atrbpn.go.id/peraturan/download/946/Terjemahan%20PP%20No%2018%20Tahun%202021.pdf"},
+        {"label": "ATR/BPN: Ministerial Regulation 18/2021", "url": "https://jdih.atrbpn.go.id/peraturan/download/1030/Permen%20ATR%20KBPN%20No.%2018%20Tahun%202021%20tentang%20Tata%20Cara%20Penetapan%20Hak%20Pengelolaan%20dan%20Hak%20Atas%20Tanah.pdf"},
+        {"label": "Immigration: current visa list", "url": "https://kanwilpapuabarat.imigrasi.go.id/service-proxy/8"},
+        {"label": "Immigration: E33F retiree page", "url": "https://kanwilpapuabarat.imigrasi.go.id/service-proxy/8?url=https%3A%2F%2Fwww.imigrasi.go.id%2Fwna%2Fdaftar-visa-indonesia%2FE33F"},
+        {"label": "OSS: KBLI 55193 villa accommodation", "url": "https://oss.go.id/en/kbli/detail/2eebd4b4-1bf0-43eb-99de-fa767ea4fb18"},
+        {"label": "Directorate General of Taxes: land and building lease income", "url": "https://pajak.go.id/id/pemotongan-pajak-penghasilan-pasal-4-ayat-2-1"},
+        {"label": "Indonesia Law 1/2022: BPHTB ceiling", "url": "https://jdih.kemenkeu.go.id/download/770ecf1d-664b-48a1-88f4-8849b8ca7258/1TAHUN2022UU.pdf"},
+        {"label": "Bank Indonesia: Q1 2026 residential survey", "url": "https://www.bi.go.id/en/publikasi/laporan/Documents/Residential-Property-Survey-Quarter-1-2026.pdf"},
+        {"label": "Bank Indonesia: JISDOR", "url": "https://www.bi.go.id/en/statistik/informasi-kurs/jisdor/Default.aspx"},
+        {"label": "BPS Bali: May 2026 tourism", "url": "https://bali.bps.go.id/id/pressrelease/2026/07/01/718048/perkembangan-pariwisata-provinsi-bali-mei-2026.html"},
+        {"label": "Bali Province: health-facility directory", "url": "https://sik-kbs.baliprov.go.id/pencarian"},
+        {"label": "Bali BPBD: provincial hazard maps", "url": "https://bpbd.baliprov.go.id/article/2888/peta-risiko-bencana-banjir-di-provinsi-bali"},
+        {"label": "Bali BPBD: 2025–2029 risk study", "url": "https://bpbd.baliprov.go.id/article/3402/kajian-risiko-bencana-provinsi-bali-tahun-2023-2027"},
+        {"label": "InJourney Airports: Bali I Gusti Ngurah Rai", "url": "https://www.injourneyairports.id/airport/island/Nusa%20Tenggara"},
+        {"label": "Rumah123: Sanur leasehold observation", "url": "https://www.rumah123.com/properti/denpasar-sanur/beachside-leasehold-villa-in-sanur-285-years-lease-169v-hos41263870/"},
+        {"label": "Rumah123: Canggu leasehold observation", "url": "https://www.rumah123.com/properti/badung-canggu/villa-leasehold-di-canggu-cocok-untuk-investasi-hos40574772/"},
+        {"label": "Rumah123: Ubud leasehold observation", "url": "https://www.rumah123.com/properti/gianyar-ubud/leasehold-tropical-luxury-villa-just-10-minutes-from-ubud-centre-vls111755/"},
+    ),
+    images=(
+        DossierImage("sanur-life", "/assets/bali-sanur-life.webp", "Older couple walking along Sanur promenade in warm morning light", "Sanur makes Bali’s strongest case for a repeatable coastal routine.", "wide"),
+        DossierImage("bali-access", "/assets/bali-access-road.webp", "Ordinary Bali road linking homes, shops and scooters after tropical rain", "On Bali, the last mile often matters more than the map distance.", "wide"),
+        DossierImage("villa-operation", "/assets/bali-villa-operation.webp", "Well-maintained tropical villa courtyard prepared for everyday use", "A villa is an operating asset: water, drainage, staffing and permits sit behind the image.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Bali through five destination lenses",
+    assessment_intro="Here’s how Bali scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three direct seller asks illustrate very different Bali leasehold propositions. IDR is primary; USD uses Bank Indonesia JISDOR. Building area and lease terms are portal claims, not legal verification.",
+    market_anchors_intro="Bank Indonesia’s official Denpasar RPPI series is the most disciplined current direction indicator available here. It covers developer primary houses and is indexed to 2018=100; it does not establish Bali villa prices, leasehold value or completed transactions.",
+    orientation_groups=(
+        DossierOrientationGroup("South and east", (("DPS airport", "International gateway"), ("Sanur", "Long-stay coast"), ("Ubud", "Inland cultural base"))),
+        DossierOrientationGroup("West and Bukit", (("Canggu", "Hospitality and traffic"), ("Jimbaran", "Southern service link"), ("Uluwatu", "Cliff and surf base"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Travel times vary sharply by traffic, rain and exact road access.",
+    country_guide_url="/countries/indonesia-property/",
+    country_guide_label="Indonesia property guide",
+    rail_comparison="Compare Bali with the full Atlas.",
+)
+
+
 DOLOMITES_SOUTH_TYROL_DOSSIER = PremiumDossierSpec(
     destination_id="dolomites-south-tyrol",
     title="Dolomites and South Tyrol Property Dossier | Global Home Atlas",
@@ -3045,6 +3188,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     PHUKET_KOH_SAMUI_DOSSIER.destination_id: PHUKET_KOH_SAMUI_DOSSIER,
     VANCOUVER_ISLAND_VICTORIA_DOSSIER.destination_id: VANCOUVER_ISLAND_VICTORIA_DOSSIER,
     DUBAI_DOSSIER.destination_id: DUBAI_DOSSIER,
+    BALI_DOSSIER.destination_id: BALI_DOSSIER,
     DOLOMITES_SOUTH_TYROL_DOSSIER.destination_id: DOLOMITES_SOUTH_TYROL_DOSSIER,
 }
 
@@ -3125,4 +3269,5 @@ validate_premium_dossier(MALLORCA_DOSSIER)
 validate_premium_dossier(CROATIA_ISTRIA_DALMATIA_DOSSIER)
 validate_premium_dossier(QUEENSTOWN_DOSSIER)
 validate_premium_dossier(DUBAI_DOSSIER)
+validate_premium_dossier(BALI_DOSSIER)
 validate_premium_dossier(DOLOMITES_SOUTH_TYROL_DOSSIER)

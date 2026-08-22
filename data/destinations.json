@@ -2084,16 +2084,16 @@
     "rank": 23,
     "country": "Indonesia",
     "category": "Water",
-    "overall_score": 3.68,
-    "usd_per_m2": 2200.0,
-    "net_yield_estimate": "3.5–6.5% est. net; only attractive with strong operator and conservative lease math",
+    "overall_score": 3.56,
+    "usd_per_m2": 1400.0,
+    "net_yield_estimate": "Property-specific only; no verified island-wide net yield",
     "quick_metrics": {
-      "usd_m": "$2,200",
-      "net_yield": "3.5–6.5% est. net; only attractive with strong operator and conservative lease math",
+      "usd_m": "$1,400",
+      "net_yield": "Property-specific only; no verified island-wide net yield",
       "ownership": "1.8/5",
       "friendly": "4.1/5"
     },
-    "panel_summary": "Bali is high-yield and high-demand, but the ownership structure is the Achilles’ heel. The panel would treat it as a hospitality operating thesis rather than a straightforward property investment.",
+    "panel_summary": "Bali is a compelling lifestyle and hospitality market, but the legal interest, remaining lease term and permitted operation control the investment. Treat it as a specialist operating proposition, not simple foreign freehold.",
     "pros": [
       "Powerful global tourism brand",
       "strong digital-nomad and wellness demand",
@@ -2181,18 +2181,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "Foreigners generally cannot own land freehold. Structures include leasehold, Hak Pakai/HGB through eligible entities, or PT PMA; legal/tax setup is central to the return.",
-    "red_flags": "Leasehold terminal value, oversupply, traffic/infrastructure, regulatory/tax enforcement, operator quality.",
+    "ownership_notes": "Hak Milik is reserved to Indonesian citizens. Eligible foreigners may hold defined residential rights such as Hak Pakai; many Bali villas are contractual leasehold. Verify the registered land right, parties, building approvals, immigration basis and permitted use independently.",
+    "red_flags": "Nominee ownership, unclear land certificate, weak lease drafting, unpriced extension, short remaining term, missing PBG/SLF or business licence, zoning, water and wastewater, traffic, hazard exposure and operator dependence.",
     "rental": {
-      "gross_yield": "High single-digit gross often marketed; 2026 data shows saturation pressure",
-      "net_yield": "3.5–6.5% est. net; only attractive with strong operator and conservative lease math",
-      "revenue": "Airbtics Bali 2026: ADR about IDR1.46m (~$90) and 63% median occupancy; market commentary flags listing growth and yield compression.",
-      "adr_occupancy": "~$90 median / ~63% median",
-      "confidence": "Medium"
+      "gross_yield": "Marketing forecasts are common; no island-wide yield should be applied to an unverified villa",
+      "net_yield": "Property-specific only; no verified island-wide net yield",
+      "revenue": "BPS recorded May 2026 occupancy of 61.16% for star hotels and 37.20% for non-star and other accommodation. Those are broad tourism statistics, not a villa forecast.",
+      "adr_occupancy": "No verified villa-wide benchmark; model the exact licensed asset",
+      "confidence": "Low"
     },
-    "price_basis": "Built-villa benchmark. 2026 Bali sources show villa pricing roughly $1,060–2,480/m² depending on area and quality, with compact apartments sometimes $2,600–3,520/m². Dashboard uses a villa-development-oriented proxy.",
-    "price_confidence": "Medium; leasehold/freehold/entity structure affects true economic value",
-    "profit_driver": "Global nomad/wellness demand, high utilisation in prime zones, brandable villas, strong hospitality ecosystem."
+    "price_basis": "Median of three direct leasehold villa asking observations captured 2026-08-23 in Sanur, Canggu and Ubud. The median is about USD 1,424/m² using portal-stated building area and Bank Indonesia JISDOR of IDR 17,705 per USD, rounded to $1,400/m². Terms vary sharply and this is asking evidence, not a completed-market median, valuation or tenure-adjusted comparison.",
+    "price_confidence": "Low; direct asks but unlike lease terms, locations, permits and portal-stated building areas",
+    "profit_driver": "Durable international tourism and lifestyle demand can reward a lawful, well-located and professionally operated asset, but returns depend on lease decay, compliance, infrastructure and disciplined entry price."
   },
   {
     "id": "chamonix",
