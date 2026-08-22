@@ -1269,6 +1269,143 @@ COSTA_BRAVA_GIRONA_DOSSIER = PremiumDossierSpec(
 )
 
 
+PARK_CITY_DEER_VALLEY_DOSSIER = PremiumDossierSpec(
+    destination_id="park-city-deer-valley",
+    title="Park City and Deer Valley Retirement Property Dossier",
+    description="Assess Park City and Deer Valley retirement property through daily life, access, foreign ownership, tax, nightly-rental rules, snow, wildfire, value, resale, and current listings.",
+    h1="Park City / Deer Valley: buy the mountain town, not only the ski week",
+    lede="Park City / Deer Valley is one of North America's most accessible major ski markets, but the address changes the proposition. Old Town offers walkability and history; Lower and Upper Deer Valley trade at a service-and-ski premium; Canyons Village combines resort operations with heavy HOA dependence; Park Meadows, Prospector and Kimball Junction offer more ordinary daily life. Jordanelle and Deer Valley East Village add new supply and construction risk. This dossier asks which version works after the holiday ends—and whether the ownership, tax, rental and exit plan supports it.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-22",
+    date_reviewed="2026-08-22",
+    verdict_paragraphs=(
+        "The verdict is selectively positive. Park City / Deer Valley suits an active buyer who values dependable U.S. ownership, Salt Lake City airport access, four-season recreation and a deeper resale market than most small ski towns. It works best when the home has a credible year-round use case, the buyer can absorb high carrying costs without optimistic rent, and the exact zoning and HOA permit the intended operation. Old Town is strongest for a walkable mountain-town life; Park Meadows and Prospector are more residential; Lower Deer Valley offers resort proximity; Canyons Village is operationally convenient but contract- and fee-heavy.",
+        "Foreign ownership does not create U.S. immigration status, tax residence or healthcare coverage. A nonresident seller can face FIRPTA withholding, and U.S. real estate can be a U.S.-situated asset for nonresident estate-tax purposes. Those exposures are material at Park City price points and require cross-border tax and estate advice before choosing an ownership structure. The local regulatory question is equally specific: Park City and unincorporated Summit County have different nightly-rental licensing processes, zoning controls and management requirements, while an HOA or resort agreement may be stricter than government rules.",
+        "Proceed in order. Establish the immigration, health-insurance, financing, tax and estate framework; choose the daily-life pattern; travel the airport, hospital, grocery and ski routes in a storm and peak traffic; then verify title, survey, zoning, HOA, rental permissions, building condition, snow systems, wildfire exposure and insurance. Read every recurring charge and special-assessment risk. Finally, identify the next buyer and model a slow exit. Park City can be unusually practical for a mountain market, but no amount of access rescues an overpaid property with unclear use or escalating operations."
+    ),
+    lenses_intro="The five paired lenses below translate the Atlas scores into choices between Park City's historic core, Deer Valley, Canyons Village and the residential basin. The full ten-factor assessment appears once in the score table.",
+    lenses=(
+        DossierLens(
+            "Live well when the lifts are not the plan",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Park City's strongest argument is that it functions beyond skiing. Old Town combines Main Street, restaurants, cultural venues, trails and Park City Mountain access in a compact historic setting. Park Meadows provides larger residential lots and a quieter daily rhythm close to the core. Prospector has apartments, groceries, restaurants, clinics and transit at a more approachable entry point. Kimball Junction has the broadest concentration of everyday retail and services, though it feels suburban rather than like the mining town. Canyons Village and Deer Valley offer polished resort amenities, but ordinary errands often happen elsewhere. Test which environment still feels useful in May and October.",
+                "Retirement practicality is credible but not urban. Park City Hospital at Round Valley provides emergency and trauma care, imaging and multiple specialties, while more complex treatment can require travel to the Salt Lake Valley. Confirm the correct provider network, ambulance route and insurance terms rather than relying on distance alone. Elevation, dry air, winter ice and smoke can affect health and mobility. A steep Old Town staircase, snow-covered Deer Valley drive or multi-level Canyons townhouse may become difficult after an injury. Prioritize a flat entrance, main-level bedroom, reliable heating, air conditioning or filtration and a realistic plan for driving less.",
+                "The year-round social question is address-specific. Old Town stays animated but can be noisy and visitor-led. Prospector and Park Meadows feel more resident-based. Lower Deer Valley sits close to town; Upper Deer Valley and some gated communities can be quiet outside occupancy peaks. Snyderville Basin connects to schools, shops and trails but spreads daily life across roads. Spend ordinary weeks in the least flattering season, shop for groceries, attend appointments and return after dark. Ask who clears the drive and exterior stairs, and whether the household can reach food, care and company if one person cannot ski, drive or manage snow."
+            ),
+            "winter-daily-life",
+        ),
+        DossierLens(
+            "Use the airport advantage without ignoring the canyon",
+            ("global_access", "foreigner_fit"),
+            (
+                "Salt Lake City International Airport is a structural advantage, but the final journey still depends on weather and congestion. Park City is commonly reached through Interstate 80, with Kimball Junction encountered before the historic core. Old Town, Deer Valley and Canyons Village each add different local traffic patterns. Current regional commuter service links Park City and Salt Lake City, while Park City Transit provides fare-free local routes across core neighbourhoods and resort bases. Timetables, transfers and seasonal service must be checked for the exact address. A quoted drive time is not the same as a dependable winter door-to-door journey with luggage.",
+                "Internal access determines whether a car is optional. Old Town can be genuinely walkable if the home is near Main Street and the Town Lift, but steep streets and winter conditions narrow that advantage. Lower Deer Valley connects readily to the core; Upper Deer Valley and gated hillside homes are more vehicle- or shuttle-dependent. Canyons Village can support a resort stay without a car, yet groceries, hospital visits and wider town life add transfers. Prospector benefits from transit and nearby services. Park Meadows and much of Snyderville Basin are more comfortable with a vehicle. Test routes at commuter and ski peaks, not on a quiet summer afternoon.",
+                "Foreigner fit is strong in professional access and weak in automatic simplicity. Park City has agents, lawyers, accountants, managers and resort staff accustomed to international owners. Yet U.S. immigration, federal and state tax, beneficial ownership, estate exposure, banking and insurance can become more complex for a nonresident. HOA documents, title exceptions, inspection reports and nightly-rental agreements are long and consequential even when written in English. Appoint independent counsel rather than relying on the seller's team, and give a trusted local representative authority to receive notices and inspect the home. A familiar legal language does not remove cross-border consequences."
+            ),
+            "summer-transit",
+        ),
+        DossierLens(
+            "Own freely, then prove the address and use",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "The United States generally permits foreign ownership of ordinary residential real estate, which supports Park City's ownership score. The closing still requires exact diligence: title commitment and exceptions, survey, access, easements, water and sewer status, building permits, certificate history, property tax, seller disclosures, inspection and insurance. Condominiums and resort residences add declarations, bylaws, budgets, reserves, insurance allocation, litigation, rental-management terms and transfer fees. Old Town's historic fabric can bring preservation and renovation constraints; newer Canyons or East Village product can bring construction, developer and completion risk. Freehold title is not a substitute for reading the governing package.",
+                "Nightly rentals are a location-and-building privilege, not a general Park City right. Park City requires a licence for stays under 30 days where zoning allows, along with an inspection and state tax handling. Unincorporated Summit County separately licenses both the owner and the manager for rentals under 30 days and requires the property to sit in an allowed land-use area. HOA, condominium hotel, resort and lender rules may be tighter. Confirm the municipal boundary first, then zoning, licence history, inspection, occupancy, parking, local-contact and tax duties. Never rely on a portal calendar or a listing's phrase ‘nightly rentals allowed.’",
+                "Mountain risk is layered. Park City's building guidance addresses Wildland Urban Interface requirements, snow load, soil conditions and permits. Wildfire exposure can raise insurance cost or reduce availability, especially near wooded slopes; winter adds roof shedding, freeze, ice dam, blocked access and power interruption. Localised drainage and flood questions still matter around creeks and lower sites. Obtain current hazard maps, a specialist inspection and an insurance binder for the exact intended use before the contingency period expires. Ask about roof heat, snow retention, driveway grade, defensible space, air filtration and loss history. A resort-managed building can transfer tasks, but it cannot transfer all risk."
+            ),
+        ),
+        DossierLens(
+            "Treat nightly rent as a regulated operation",
+            ("rental_profit", "capital_upside"),
+            (
+                "Park City can produce strong peak revenue, but the gross figure is far from rental profit. Winter holidays, summer recreation and major events support demand, yet occupancy and nightly rate vary by property, access and calendar. Old Town can combine walkability with visitor demand. Lower Deer Valley benefits from resort proximity; Canyons Village offers managed product and amenities; Prospector may enter at a lower price but competes in a different guest segment. Deduct management, housekeeping, platform fees, utilities, hot tub, snow, repairs, insurance, tax, HOA, resort charges, furniture replacement and owner blocks before comparing yield with a long-term tenancy or no rental.",
+                "Operations need documentary evidence. Obtain trailing property-level statements, bank deposits, tax filings, manager invoices and the exact future contract. Reconcile the rentable bedroom count and occupancy with permits and HOA rules. Ask whether the licence follows the owner, the premises or neither after transfer. Confirm response-time obligations and who manages a heating failure during a storm. At Canyons Village, a high monthly HOA may fund useful services but can materially compress net income. In Deer Valley, shuttle or club access may depend on separate terms. Model a poor-snow year, weaker event calendar and higher insurance premium rather than capitalising one exceptional winter.",
+                "Capital upside is credible but segmented. The Park City Board of REALTORS reported a firm Q1 2026 single-family median in Park City proper, a very different Canyons condo median and strong trailing activity in Lower Deer Valley. Those figures show market depth, not guaranteed appreciation. Deer Valley East Village and Jordanelle introduce major new supply and amenities while also changing traffic, construction and future competition. Established Old Town scarcity is different from a new managed residence; Park Meadows is different again. Buy utility and durable access, not a development announcement. Run a flat-price exit after all transaction and carrying costs and require the personal-use case to survive it."
+            ),
+        ),
+        DossierLens(
+            "Pay for a buyer pool you can reach again",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Value entry is relative at Park City prices. A Prospector studio can offer the lowest capital and easier daily services, but size, HOA, building condition and permitted use define the bargain. Old Town commands a walkability and scarcity premium, often in old or heavily rebuilt structures. Lower and Upper Deer Valley price resort access and service. Canyons Village spans modest hotel-style units to luxury residences, with recurring charges and management agreements central to value. Park Meadows provides residential utility; Kimball Junction and Snyderville Basin can offer space and highway access without the same historic or ski premium. Compare like format, boundary and use.",
+                "The official market evidence below is deliberately bounded. Park City proper's Q1 2026 single-family median comes from 26 sales. Canyons Village's condo median comes from 26 sales and a changing mix. Lower Deer Valley's $2.85 million figure covers 53 trailing-12-month condo sales, not one quarter. None values the three asking observations. Match completed sale, property type, legal area, age, renovation, furnishings, parking, view, ski access, HOA and rental rights. Commission an inspection and appraisal where useful. An asking price per square metre can be distorted by outdoor area, hotel services or an unusually small unit.",
+                "Exit liquidity is better than in many specialist ski towns because the airport, U.S. buyer base and variety of product create multiple demand channels. It is still not uniform. A practical Prospector or Park Meadows home can reach residents and second-home buyers. A well-run Canyons unit depends on building reputation, fees and rental evidence. A Deer Valley estate needs a much smaller high-net-worth pool. New East Village supply may compete with existing stock. Before purchase, ask two agents who did not source the property who would buy it next, typical marketing time and the discount needed to clear. Model a long sale and preserve cash reserves."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Old Town combines culture, dining and trails; Deer Valley and Canyons add polished recreation with more resort dependence.",
+        "global_access": "Park City benefits from Salt Lake City airport access, while storms and Interstate 80 traffic still affect the final journey.",
+        "ownership_clarity": "Park City offers open U.S. ownership, but title, HOA, historic rules and cross-border tax structure remain property-specific.",
+        "regulatory_safety": "Park City and Summit County use different nightly-rental licences, with zoning, inspections and HOA limits layered above them.",
+        "rental_profit": "Old Town, Deer Valley and Canyons can earn strong peaks, but management, HOA, snow, tax and insurance compress net results.",
+        "capital_upside": "Park City scarcity and Deer Valley expansion support selected assets, while Jordanelle supply and product mix prevent blanket appreciation claims.",
+        "retirement_fit": "Park City Hospital and local transit support retirement, but elevation, ice, stairs and specialist-care travel require planning.",
+        "exit_liquidity": "Prospector and Park Meadows reach broader buyers than a high-fee Canyons residence or ultra-prime Deer Valley estate.",
+        "foreigner_fit": "Park City has international-owner advisers, while FIRPTA, estate tax, immigration, banking and insurance still demand independent coordination.",
+        "value_entry": "Prospector and Kimball Junction can enter below Old Town or Deer Valley, but HOA, access and lawful use change value.",
+    },
+    market_anchors=(
+        {"location": "Park City proper single-family homes", "evidence": "$4.016 million", "buyer_read": "Q1 2026 median across 26 sales in MLS Areas 1–9; a broad city-limits signal, not an Old Town or Deer Valley valuation.", "source_label": "Park City Board of REALTORS Q1 2026", "source_url": "https://parkcityrealtors.com/2026/04/2026-1st-quarter-statistics/"},
+        {"location": "Canyons Village condominiums", "evidence": "$1.34 million", "buyer_read": "Q1 2026 median across 26 sales generating $48.1 million; the Board cautions that product mix affected the year-on-year change.", "source_label": "Park City Board of REALTORS Q1 2026", "source_url": "https://parkcityrealtors.com/2026/04/2026-1st-quarter-statistics/"},
+        {"location": "Lower Deer Valley condominiums", "evidence": "$2.85 million", "buyer_read": "Trailing 12-month median across 53 sales, not a Q1-only figure; use period and property type before comparing a candidate.", "source_label": "Park City Board of REALTORS Q1 2026", "source_url": "https://parkcityrealtors.com/2026/04/2026-1st-quarter-statistics/"},
+    ),
+    micro_locations_intro="Park City / Deer Valley is a set of operating patterns, not one price band. These groupings are orientation aids rather than valuation zones. Verify the municipal boundary, exact HOA, nightly-rental map, transit, snow access, insurance and completed evidence for every address.",
+    micro_locations=(
+        {"name": "Old Town / Park City core", "best_for": "Walkability and mountain-town life", "daily_life": "Compact, steep and visitor-active", "diligence": "Historic rules, parking, noise, snow and rental zoning"},
+        {"name": "Lower / Upper Deer Valley", "best_for": "Resort service and ski proximity", "daily_life": "Premium and increasingly car or shuttle-led", "diligence": "HOA, shuttle, slope, snow, insurance and resale pool"},
+        {"name": "Canyons Village / Snyderville Basin", "best_for": "Managed resort access and highway connection", "daily_life": "Resort core within a broader suburban basin", "diligence": "Fees, manager, zoning, construction and product competition"},
+        {"name": "Park Meadows / Prospector / Kimball Junction", "best_for": "Year-round resident practicality", "daily_life": "Services, transit and ordinary errands", "diligence": "Exact walkability, building condition, traffic and HOA"},
+    ),
+    checklist=(
+        "Confirm immigration, healthcare, tax residence and cross-border estate structure.",
+        "Choose Old Town, Deer Valley, Canyons or the residential basin first.",
+        "Travel airport, hospital, grocery and resort routes in snow and peak traffic.",
+        "Verify title, survey, permits, municipal boundary, zoning and historic controls.",
+        "Read HOA, reserves, insurance, litigation, management and special-assessment evidence.",
+        "Inspect structure, roof, snow systems, freeze protection, wildfire and drainage exposure.",
+        "Clear nightly-rental licence, inspection, tax, occupancy and local-manager duties in writing.",
+        "Model five-year cash outlay and identify the future resale buyer before signing.",
+    ),
+    references_intro="Legal, tax, licensing, market, transport, healthcare, hazard and listing claims were reviewed on 22 August 2026. Recheck every time-sensitive source no later than 22 February 2027 and immediately after any tax, zoning, HOA, licensing, transport, hazard, insurance, market data or listing change. Obtain current U.S. and Utah legal, immigration, tax, estate, title, building and insurance advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "United States property guide", "url": "/countries/united-states-property/"},
+        {"label": "IRS: FIRPTA withholding", "url": "https://www.irs.gov/individuals/international-taxpayers/firpta-withholding"},
+        {"label": "IRS: nonresident estates with U.S. assets", "url": "https://www.irs.gov/individuals/international-taxpayers/some-nonresidents-with-us-assets-must-file-estate-tax-returns"},
+        {"label": "Park City: nightly-rental licence and inspection", "url": "https://www.parkcity.org/departments/finance-accounting/apply-for-a-business-licenses/nightly-rental-license"},
+        {"label": "Park City: planning and nightly-rental map", "url": "https://parkcity.org/departments/planning"},
+        {"label": "Summit County: owner and manager nightly-rental licensing", "url": "https://summitcountyutah.gov/274/Business-Licensing"},
+        {"label": "Park City: building, snow, soil and Wildland Urban Interface requirements", "url": "https://parkcity.org/departments/building-department/forms-and-other-information"},
+        {"label": "Park City: community code and snow-removal guidance", "url": "https://www.parkcity.org/departments/building-department/community-code-compliance"},
+        {"label": "Park City Transit: current local service", "url": "https://www.parkcity.org/departments/transit-bus"},
+        {"label": "Park City: current Park City–Salt Lake City commuter timetable", "url": "https://www.parkcity.org/home/showpublisheddocument/76542/638690162463430000"},
+        {"label": "Park City Hospital: emergency and trauma care", "url": "https://intermountainhealthcare.org/locations/park-city-hospital/emergency"},
+        {"label": "Park City Board of REALTORS: Q1 2026 market report", "url": "https://parkcityrealtors.com/2026/04/2026-1st-quarter-statistics/"},
+        {"label": "PCMLS: Prospector Carriage House studio asking observation", "url": "https://www.parkcity-realestate.com/property-search/detail/50/12601822/1940-prospector-ave-park-city-ut-84060/"},
+        {"label": "PCMLS: Canyons Fairway Springs townhouse asking observation", "url": "https://www.parkcity-realestate.com/property-search/detail/50/12603567/4232-fairway-ln-park-city-ut-84098/"},
+        {"label": "PCMLS: Lower Deer Valley Hidden Oaks home asking observation", "url": "https://www.parkcity-realestate.com/property-search/detail/50/12600813/35-hidden-oaks-ln-park-city-ut-84060/"},
+    ),
+    images=(
+        DossierImage("town", "/assets/park-city-deer-valley-town-hero.webp", "Park City historic town and surrounding Wasatch mountains in calm morning light", "Park City works best when the mountain town remains useful beyond a ski week.", "hero"),
+        DossierImage("winter-daily-life", "/assets/park-city-deer-valley-winter-daily-life.webp", "Residents clearing a Park City residential street after winter snow", "Snow access, heating and maintenance are part of ordinary ownership.", "wide"),
+        DossierImage("summer-transit", "/assets/park-city-deer-valley-summer-transit.webp", "Mature residents using a Park City bus stop beside a green-season trail", "Year-round utility depends on transport, services and life between winter peaks.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "Representative listings"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Park City / Deer Valley through five destination lenses",
+    assessment_intro="Here’s how Park City / Deer Valley scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asking observations show a Prospector studio, a Canyons Village townhouse and a Lower Deer Valley home. USD is both local and comparison currency; each area figure is converted from the listing's stated square feet.",
+    market_anchors_intro="These are public market signals—not valuations. They cover different property types, areas and periods; reconcile every candidate for exact location, legal area, age, condition, HOA, permitted use and completed comparable evidence.",
+    orientation_groups=(
+        DossierOrientationGroup("Salt Lake City to the historic core", (("Salt Lake City Airport", "International gateway"), ("Kimball Junction", "Highway and service hub"), ("Canyons Village", "Western resort base"), ("Old Town", "Historic walkable core"))),
+        DossierOrientationGroup("Core to Deer Valley and Jordanelle", (("Prospector / Park Meadows", "Residential daily life"), ("Lower Deer Valley", "Town-adjacent resort area"), ("Upper Deer Valley", "Mid-mountain resort area"), ("East Village / Jordanelle", "Expansion and new supply"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current airport, commuter, local transit, shuttle and storm journey times from the exact address.",
+    country_guide_url="/countries/united-states-property/",
+    country_guide_label="United States property guide",
+    rail_comparison="Compare Park City / Deer Valley with the full Atlas.",
+)
+
+
 HAKUBA_DOSSIER = PremiumDossierSpec(
     destination_id="hakuba",
     title="Hakuba Retirement Property Dossier",
@@ -1427,6 +1564,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     VALENCIA_DOSSIER.destination_id: VALENCIA_DOSSIER,
     HAKUBA_DOSSIER.destination_id: HAKUBA_DOSSIER,
     COSTA_BRAVA_GIRONA_DOSSIER.destination_id: COSTA_BRAVA_GIRONA_DOSSIER,
+    PARK_CITY_DEER_VALLEY_DOSSIER.destination_id: PARK_CITY_DEER_VALLEY_DOSSIER,
 }
 
 
@@ -1498,3 +1636,4 @@ validate_premium_dossier(HAKONE_IZU_DOSSIER)
 validate_premium_dossier(VALENCIA_DOSSIER)
 validate_premium_dossier(HAKUBA_DOSSIER)
 validate_premium_dossier(COSTA_BRAVA_GIRONA_DOSSIER)
+validate_premium_dossier(PARK_CITY_DEER_VALLEY_DOSSIER)

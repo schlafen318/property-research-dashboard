@@ -23,6 +23,7 @@ REVIEWED_DOSSIERS = {
     "hakuba",
     DESTINATION_ID,
     "costa-brava-girona",
+    "park-city-deer-valley",
 }
 
 

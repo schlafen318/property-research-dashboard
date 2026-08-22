@@ -23,6 +23,7 @@ REVIEWED_DOSSIERS = {
     "lake-como",
     "hakuba",
     "costa-brava-girona",
+    "park-city-deer-valley",
 }
 
 
