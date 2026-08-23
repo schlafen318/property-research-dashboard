@@ -3,12 +3,17 @@ import json
 import re
 from pathlib import Path
 
+from PIL import Image
+
 from src.premium_destination_dossiers import (
     DECISION_DIMENSION_KEYS,
     PREMIUM_DESTINATION_DOSSIERS,
     get_premium_dossier,
     validate_premium_dossier,
 )
+
+
+ROOT = Path(__file__).parents[1]
 
 
 class PremiumDossierContractTests(unittest.TestCase):
@@ -31,6 +36,32 @@ class PremiumDossierContractTests(unittest.TestCase):
         self.assertEqual(3, len(spec.market_anchors))
         self.assertEqual("sources", spec.nav_items[-1][0])
 
+    def test_fukuoka_declares_property_anchor_associations_and_image_roles(self) -> None:
+        spec = get_premium_dossier("fukuoka-itoshima")
+        self.assertEqual((0, 1, 2), spec.property_anchor_indexes)
+        self.assertEqual(
+            ["defining-place", "built-environment-access", "decision-texture"],
+            [image.role for image in spec.images],
+        )
+
+    def test_fukuoka_images_are_distinct_and_auditable(self) -> None:
+        spec = get_premium_dossier("fukuoka-itoshima")
+        self.assertEqual(3, len({image.src for image in spec.images}))
+
+        provenance = (
+            ROOT / "docs" / "research" / "fukuoka-itoshima-image-provenance.md"
+        ).read_text()
+        for dossier_image in spec.images:
+            filename = Path(dossier_image.src).name
+            with self.subTest(filename=filename):
+                self.assertIn(filename, provenance)
+                with Image.open(ROOT / "src" / "site_assets" / filename) as image:
+                    self.assertGreaterEqual(image.width, 900)
+                    self.assertGreaterEqual(image.height, 600)
+                    self.assertIn(f"{image.width} × {image.height}", provenance)
+
+        self.assertIn("No repeated older-people-walking motif", provenance)
+
 
 class PremiumDossierContentTests(unittest.TestCase):
     def setUp(self) -> None:
@@ -51,6 +82,28 @@ class PremiumDossierContentTests(unittest.TestCase):
         for fragment in required_fragments:
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, urls)
+
+    def test_reader_copy_contains_conclusions_not_production_commentary(self) -> None:
+        reader_copy = " ".join((
+            self.spec.lenses_intro,
+            self.spec.assessment_intro,
+            self.spec.listings_intro,
+            *(paragraph for lens in self.spec.lenses for paragraph in lens.paragraphs),
+        )).lower()
+        for phrase in (
+            "recorded dataset",
+            "the prose below explains",
+            "appears once",
+            "the listings below",
+            "public-market check on the asking listings",
+            "representative property evidence",
+        ):
+            with self.subTest(phrase=phrase):
+                self.assertNotIn(phrase, reader_copy)
+        self.assertIn("¥31.8 million", self.spec.listings_intro)
+        self.assertIn("¥180 million", self.spec.listings_intro)
+        self.assertIn("rail", self.spec.listings_intro.lower())
+        self.assertIn("resale", self.spec.listings_intro.lower())
 
     def test_each_lens_is_destination_specific_and_editorial_length_is_bounded(self) -> None:
         for lens in self.spec.lenses:
@@ -184,19 +237,36 @@ class PremiumDossierRenderingTests(unittest.TestCase):
     def test_score_and_listing_tables_are_model_and_data_derived(self) -> None:
         self.assertEqual(10, self.fukuoka_html.count('class="premium-score-row"'))
         self.assertIn("4.3/5", self.fukuoka_html)
-        self.assertEqual(3, self.fukuoka_html.count('class="premium-listing-row"'))
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-property-record"'))
         self.assertIn("31,800,000 JPY", self.fukuoka_html)
         self.assertIn("2026-08-21", self.fukuoka_html)
 
-    def test_property_evidence_adds_official_market_anchors_without_calling_them_home_prices(self) -> None:
-        self.assertIn('id="official-market-anchors"', self.fukuoka_html)
-        self.assertEqual(3, self.fukuoka_html.count('class="premium-market-anchor"'))
-        self.assertIn("121,700–132,400 JPY/m²", self.fukuoka_html)
-        self.assertIn("82,900–108,500 JPY/m²", self.fukuoka_html)
-        self.assertIn("7,720–41,400 JPY/m²", self.fukuoka_html)
-        self.assertIn("land evidence—not finished-home prices", self.fukuoka_html)
+    def test_property_evidence_renders_once_with_integrated_local_comparisons(self) -> None:
+        self.assertEqual(1, self.fukuoka_html.count('<section class="premium-section" id="listings">'))
+        self.assertIn("<h2>What homes cost</h2>", self.fukuoka_html)
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-property-record"'))
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-local-comparison"'))
+        self.assertNotIn("Official market anchors", self.fukuoka_html)
+        self.assertNotIn('id="official-market-anchors"', self.fukuoka_html)
+        for value in (
+            "121,700–132,400 JPY/m²",
+            "82,900–108,500 JPY/m²",
+            "7,720–41,400 JPY/m²",
+        ):
+            with self.subTest(value=value):
+                self.assertEqual(1, self.fukuoka_html.count(value))
         self.assertIn("reinfolib.mlit.go.jp", self.fukuoka_html)
         self.assertIn("pref.fukuoka.lg.jp", self.fukuoka_html)
+
+    def test_property_records_use_readable_fields_not_a_wide_desktop_table(self) -> None:
+        self.assertNotIn('<table class="premium-listing-table', self.fukuoka_html)
+        self.assertNotIn("<th>USD comparison</th>", self.fukuoka_html)
+        for label in (
+            "Asking price", "Area", "USD comparison", "Buyer relevance",
+            "Local comparison", "Source",
+        ):
+            with self.subTest(label=label):
+                self.assertIn(label, self.fukuoka_html)
 
     def test_score_table_uses_dossier_specific_research_reads(self) -> None:
         spec = get_premium_dossier("fukuoka-itoshima")
@@ -261,12 +331,13 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         for location in ("Central Fukuoka", "Meinohama corridor", "Maebaru", "Itoshima coast"):
             self.assertIn(location, self.fukuoka_html)
 
-    def test_score_listing_and_location_tables_become_labelled_records_on_mobile(self) -> None:
-        self.assertEqual(3, self.fukuoka_html.count('class="premium-table-wrap premium-card-table-wrap"'))
+    def test_score_property_and_location_evidence_are_readable_records(self) -> None:
+        self.assertEqual(2, self.fukuoka_html.count('class="premium-table-wrap premium-card-table-wrap"'))
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-property-record"'))
         self.assertIn('data-label="Score"', self.fukuoka_html)
         self.assertIn('data-label="Atlas read"', self.fukuoka_html)
-        self.assertIn('data-label="Asking price"', self.fukuoka_html)
-        self.assertIn('data-label="What it represents"', self.fukuoka_html)
+        self.assertIn('<dt>Asking price</dt>', self.fukuoka_html)
+        self.assertIn('<dt>Buyer relevance</dt>', self.fukuoka_html)
         self.assertIn('data-label="Micro-location"', self.fukuoka_html)
         self.assertIn('data-label="Primary diligence"', self.fukuoka_html)
         self.assertIn(".premium-card-table-wrap { overflow: visible;", self.fukuoka_html)
