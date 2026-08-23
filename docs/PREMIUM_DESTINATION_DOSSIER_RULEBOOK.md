@@ -97,7 +97,7 @@ The order below is fixed unless a documented user need justifies an exception.
 | 2 | Verdict | Give the answer before the analysis | Approximately 200–300 words across proceed, pause/look-elsewhere, and investigation-order paragraphs |
 | 3 | Five destination lenses | Explain the ten-factor decision through buyer consequences | Approximately 900–1,200 words total; normally two or three paragraphs per lens |
 | 4 | Atlas assessment | Show the complete auditable scoring view | Short plain-language introduction, one ten-row table, weighted result once, methodology link |
-| 5 | Representative property evidence | Show the range of plausible buyer cases | Three to five observations, disclaimer, then exactly three official market anchors |
+| 5 | What homes cost | Show the range of plausible buyer cases in one property-evidence section | Three to five observations; integrate the relevant official Local comparison into each record instead of creating a second market-evidence block |
 | 6 | Where to look | Translate the destination into usable submarket choices | Short introduction, orientation schematic when material, one compact micro-location table |
 | 7 | Buyer checklist | Convert the analysis into an investigation sequence | Six to eight numbered actions; do not repeat the verdict |
 | 8 | Research handoff | Provide the few next pages that materially deepen the decision | Country guide, methodology, and relevant comparison only; one compact handoff |
@@ -129,7 +129,7 @@ If a paragraph could be moved unchanged to another destination, rewrite or remov
 
 - Use sentence case.
 - Prefer a decision or buyer consequence over a methodology label.
-- Keep the fixed major labels where consistency helps: “The verdict,” “The Atlas assessment,” “Representative property evidence,” “Where to look,” “Buyer checklist,” and “References and update policy.”
+- Keep the fixed major labels where consistency helps: “The verdict,” “The Atlas assessment,” “What homes cost,” “Where to look,” “Buyer checklist,” and “References and update policy.”
 - Lens headings should express the local story, not merely repeat dimension names.
 
 ### 6.4 Emphasis and links
@@ -150,6 +150,8 @@ Before build, remove:
 - adjectives unsupported by evidence;
 - precise figures that do not change the decision;
 - promotional language that interrupts risk or diligence information.
+
+Remove process commentary from reader copy. The article should report the conclusion, comparison, limitation, or next action—not explain how the publishing system assembled it. Phrases such as “the listings below,” “local price is primary,” “USD uses the recorded dataset exchange basis,” “appears once,” and “the prose explains” belong in tests, field labels, internal documentation, or nowhere. Retain methodology only where it changes how a reader should interpret the evidence.
 
 ## 7. The five-lens model
 
@@ -199,34 +201,35 @@ Each row receives one concise destination-specific explanation labelled **Atlas 
 - Do not feature the total in the hero or convert score rows into decorative cards on desktop.
 - On narrow screens, transform each row into a labelled record; do not require horizontal scrolling.
 
-## 9. Representative property evidence
+## 9. What homes cost
 
 ### 9.1 Listing sample
 
 Use three to five observations that represent meaningfully different buyer cases—for example, a practical apartment, an ordinary house, and a premium lifestyle property. Do not select only visually attractive or unusually cheap inventory.
 
-Every observation must contain:
+Every observation must appear once in the single property-evidence section and contain:
 
 - descriptive location and property type;
 - local asking price first;
-- dated USD comparison and recorded exchange-rate basis;
+- dated USD comparison; keep the exchange-rate basis in the source/data field unless it materially changes the buyer conclusion;
 - internal area and price per square metre using a consistent area definition;
 - direct source URL and source name;
 - capture date;
 - confidence level;
-- a short statement of what the observation represents.
+- a short Buyer relevance statement that explains the useful conclusion;
+- one compatible official anchor presented as its Local comparison, including source and asset-basis limitation.
 
-The section must say that listings are dated asking-price evidence only and do not verify availability, title, condition, negotiability, fees, legal use, or completed value. Do not use listing photography without confirmed reuse rights.
+The section must say that listings are dated asking-price evidence only and do not verify availability, title, condition, negotiability, fees, legal use, or completed value. Keep that caveat concise and reader-facing. Do not use listing photography without confirmed reuse rights.
 
 ### 9.2 Official market anchors
 
-Use exactly three official anchors after the listings. Prefer:
+Use exactly three official anchors, normally one integrated into each of three property records as **Local comparison**. Do not render a separate “Official market anchors” section or repeat the same figures beneath the property records. Prefer:
 
 1. completed transaction records;
 2. official appraisals or assessment comparables;
 3. official land or housing benchmarks.
 
-For every anchor, state geography, period, currency and unit, asset basis, source, and what the reader may safely infer. Explicitly distinguish land evidence from finished-home prices. Explain material incompatibilities between an anchor and the listing sample rather than averaging unlike evidence.
+For every anchor, state geography, period, currency and unit, asset basis, source, and what the reader may safely infer. Explicitly distinguish land evidence from finished-home prices. Explain material incompatibilities between an anchor and the matched property observation rather than averaging unlike evidence. If no honest one-to-one match exists, add one concise unmatched market-context note after the records; never create a second listing-like section.
 
 ### 9.3 Reconciliation gate
 
@@ -245,21 +248,25 @@ The location section should answer “where does this proposition actually work?
 
 ## 11. Image standard
 
-Use exactly three destination-specific editorial images:
+Use exactly three destination-specific editorial images with distinct roles:
 
-1. a hero image that expresses the core proposition;
-2. an image supporting daily life, access, or the practical base;
-3. an image supporting the destination's contrasting lifestyle, geography, or operating reality.
+1. **defining place:** a hero image that expresses the destination's core proposition;
+2. **built environment and access:** an image showing housing context, streets, transport, services, or the practical base;
+3. **decision texture:** an image revealing a diligence issue or operating reality such as drainage, slope, winter access, building fabric, density, or coastal exposure.
 
 Requirements:
 
 - use a single image in each placement; never create a montage;
 - use imagery with clear rights or generated assets approved for publication;
+- use at least two images without a prominent person unless people are essential to the documented local story;
+- reject sets that repeat the same subject, viewpoint, activity, age group, or stock-lifestyle motif—especially older people walking through otherwise interchangeable streets;
 - avoid generic country symbols when the page is about a specific city or region;
 - write factual alt text describing what is visible;
 - use concise captions that interpret the image's relevance without repeating the alt text;
 - distribute inline images through relevant lens sections rather than clustering them;
 - verify that mobile crops preserve the subject and that captions remain readable.
+
+Record each image's role, source or generation output, dimensions, rights basis, and visual approval. A visually attractive image still fails if it does not add a distinct kind of decision information.
 
 ## 12. Shared visual system
 
@@ -380,13 +387,14 @@ Any failure below blocks publication regardless of the numeric score:
 - the article implies that property ownership grants residency or another unrelated right;
 - the five lenses do not cover every Atlas dimension exactly once;
 - the displayed scores or total are manually overridden or inconsistent with the dataset;
-- listings lack source, capture date, local price, area basis, or asking-price disclaimer;
+- listings lack source, capture date, local price, area basis, asking-price disclaimer, Buyer relevance, or an integrated Local comparison;
 - fewer or more than three official market anchors appear, or an anchor's asset basis is unclear;
+- property observations or official anchors are duplicated across two listing-like sections;
 - narrative, scores, listings, anchors, price basis, or confidence materially contradict one another;
 - References is not the final article section;
 - the page contains broken links, browser-console errors, horizontal page overflow, clipped content, or inaccessible controls;
 - the generated artifact was not reviewed at desktop and 390 × 844 mobile sizes;
-- imagery lacks publication rights, alt text, or useful mobile crops;
+- imagery lacks publication rights, alt text, a distinct editorial role, useful mobile crops, or repeats a generic human-lifestyle motif;
 - the page contains copied destination conclusions, unverified figures, placeholders, or generic framework prose;
 - the visible review date or structured-data date is inaccurate.
 
