@@ -97,7 +97,7 @@ The order below is fixed unless a documented user need justifies an exception.
 | 2 | Verdict | Give the answer before the analysis | Approximately 200–300 words across proceed, pause/look-elsewhere, and investigation-order paragraphs |
 | 3 | Five destination lenses | Explain the ten-factor decision through buyer consequences | Approximately 900–1,200 words total; normally two or three paragraphs per lens |
 | 4 | Atlas assessment | Show the complete auditable scoring view | Short plain-language introduction, one ten-row table, weighted result once, methodology link |
-| 5 | What homes cost | Show the range of plausible buyer cases in one property-evidence section | Three to five observations; integrate the relevant official Local comparison into each record instead of creating a second market-evidence block |
+| 5 | What homes cost | Show the range of plausible buyer cases in one property-evidence section | Three to five observations; integrate relevant official evidence as explicit Price context instead of creating a second market-evidence block |
 | 6 | Where to look | Translate the destination into usable submarket choices | Short introduction, orientation schematic when material, one compact micro-location table |
 | 7 | Buyer checklist | Convert the analysis into an investigation sequence | Six to eight numbered actions; do not repeat the verdict |
 | 8 | Research handoff | Provide the few next pages that materially deepen the decision | Country guide, methodology, and relevant comparison only; one compact handoff |
@@ -217,13 +217,13 @@ Every observation must appear once in the single property-evidence section and c
 - capture date;
 - confidence level;
 - a short Buyer relevance statement that explains the useful conclusion;
-- one compatible official anchor presented as its Local comparison, including source and asset-basis limitation.
+- one compatible official anchor presented as **Price context**, including source, asset-basis limitation, why it helps, and what it cannot establish about the listing.
 
 The section must say that listings are dated asking-price evidence only and do not verify availability, title, condition, negotiability, fees, legal use, or completed value. Keep that caveat concise and reader-facing. Do not use listing photography without confirmed reuse rights.
 
 ### 9.2 Official market anchors
 
-Use exactly three official anchors, normally one integrated into each of three property records as **Local comparison**. Do not render a separate “Official market anchors” section or repeat the same figures beneath the property records. Prefer:
+Use exactly three official anchors, normally one integrated into each of three property records as **Price context**. Do not render a separate “Official market anchors” section or repeat the same figures beneath the property records. Prefer:
 
 1. completed transaction records;
 2. official appraisals or assessment comparables;
@@ -387,7 +387,7 @@ Any failure below blocks publication regardless of the numeric score:
 - the article implies that property ownership grants residency or another unrelated right;
 - the five lenses do not cover every Atlas dimension exactly once;
 - the displayed scores or total are manually overridden or inconsistent with the dataset;
-- listings lack source, capture date, local price, area basis, asking-price disclaimer, Buyer relevance, or an integrated Local comparison;
+- listings lack source, capture date, local price, area basis, asking-price disclaimer, Buyer relevance, or Price context that explains both usefulness and limitation;
 - fewer or more than three official market anchors appear, or an anchor's asset basis is unclear;
 - property observations or official anchors are duplicated across two listing-like sections;
 - narrative, scores, listings, anchors, price basis, or confidence materially contradict one another;

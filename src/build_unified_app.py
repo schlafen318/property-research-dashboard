@@ -7370,10 +7370,15 @@ def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec)
             matched_indexes.add(anchor_index)
             anchor = spec.market_anchors[anchor_index]
             local_comparison = (
-                '<p class="premium-local-comparison"><strong>Local comparison:</strong> '
+                '<p class="premium-price-context"><strong>Price context:</strong> '
                 f'{escape(anchor["evidence"])}. {escape(anchor["buyer_read"])} '
                 f'<a href="{escape(anchor["source_url"])}" rel="noopener noreferrer">{escape(anchor["source_label"])}</a></p>'
             )
+        listing_link_label = (
+            "View listing →"
+            if "/forsale/view/" in row["source_url"]
+            else "Browse source listings →"
+        )
         records.append(
             '<div class="premium-property-record">'
             f'<h3>{escape(row["listing_name"])}</h3>'
@@ -7384,9 +7389,8 @@ def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec)
             f'<div><dt>Buyer relevance</dt><dd>{escape(row["note"])}</dd></div>'
             '</dl>'
             f'{local_comparison}'
-            '<p class="premium-property-source"><strong>Source:</strong> '
-            f'<a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a> '
-            f'· Captured {escape(row["captured_date"])} · {escape(row["confidence"])} confidence</p>'
+            '<p class="premium-property-action">'
+            f'<a href="{escape(row["source_url"])}" rel="noopener noreferrer">{listing_link_label}</a></p>'
             '</div>'
         )
 
@@ -7568,8 +7572,8 @@ def premium_dossier_css() -> str:
     .premium-property-record dt { margin-bottom: 5px; color: var(--muted); font-size: 10px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
     .premium-property-record dd { margin: 0; overflow-wrap: anywhere; color: var(--ink); font-size: 15px; line-height: 1.5; }
     .premium-property-record dd span { display: block; margin-top: 3px; color: var(--muted); font-size: 12px; line-height: 1.4; }
-    .premium-local-comparison { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px !important; }
-    .premium-property-source { margin: 10px 0 0; color: var(--muted) !important; font-size: 12px !important; }
+    .premium-price-context { margin: 18px 0 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 14px !important; }
+    .premium-property-action { margin: 14px 0 0; font-size: 13px !important; }
     .premium-market-context { margin-top: 24px; font-size: 14px !important; }
     .premium-market-anchors { margin-top: 34px; padding-top: 28px; border-top: 1px solid var(--line); }
     .premium-market-anchors h3 { margin: 0 0 10px; font-family: var(--serif); font-size: 30px; font-weight: 500; }
