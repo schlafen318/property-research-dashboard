@@ -3,12 +3,17 @@ import json
 import re
 from pathlib import Path
 
+from PIL import Image
+
 from src.premium_destination_dossiers import (
     DECISION_DIMENSION_KEYS,
     PREMIUM_DESTINATION_DOSSIERS,
     get_premium_dossier,
     validate_premium_dossier,
 )
+
+
+ROOT = Path(__file__).parents[1]
 
 
 class PremiumDossierContractTests(unittest.TestCase):
@@ -38,6 +43,24 @@ class PremiumDossierContractTests(unittest.TestCase):
             ["defining-place", "built-environment-access", "decision-texture"],
             [image.role for image in spec.images],
         )
+
+    def test_fukuoka_images_are_distinct_and_auditable(self) -> None:
+        spec = get_premium_dossier("fukuoka-itoshima")
+        self.assertEqual(3, len({image.src for image in spec.images}))
+
+        provenance = (
+            ROOT / "docs" / "research" / "fukuoka-itoshima-image-provenance.md"
+        ).read_text()
+        for dossier_image in spec.images:
+            filename = Path(dossier_image.src).name
+            with self.subTest(filename=filename):
+                self.assertIn(filename, provenance)
+                with Image.open(ROOT / "src" / "site_assets" / filename) as image:
+                    self.assertGreaterEqual(image.width, 900)
+                    self.assertGreaterEqual(image.height, 600)
+                    self.assertIn(f"{image.width} × {image.height}", provenance)
+
+        self.assertIn("No repeated older-people-walking motif", provenance)
 
 
 class PremiumDossierContentTests(unittest.TestCase):

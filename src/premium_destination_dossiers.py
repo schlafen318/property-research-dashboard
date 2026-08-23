@@ -224,7 +224,7 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
     images=(
         DossierImage("coast", "/assets/fukuoka-itoshima-coast.webp", "Fukuoka and Itoshima coastline", "City access meets the Itoshima coast.", "hero", "defining-place"),
         DossierImage("city-access", "/assets/fukuoka-itoshima-city-access.webp", "Everyday urban access in Fukuoka", "Fukuoka provides the practical urban base.", "wide", "built-environment-access"),
-        DossierImage("seaside-life", "/assets/fukuoka-itoshima-seaside-life.webp", "Everyday seaside life in Itoshima", "Coastal life requires a closer look at access and seasonality.", "wide", "decision-texture"),
+        DossierImage("seaside-life", "/assets/fukuoka-itoshima-seaside-life.webp", "Narrow coastal residential lane in Itoshima with roadside drainage and the sea beyond", "On the Itoshima coast, road width, drainage and salt exposure belong in the ownership decision.", "wide", "decision-texture"),
     ),
     nav_items=(
         ("verdict", "Verdict"),
