@@ -6,10 +6,12 @@
 ## Editorial acceptance
 
 - One section titled **What homes cost** contains all three asking-price observations.
-- Each property record includes its compatible official evidence as **Local comparison**; no second listing-like market-anchor section appears.
+- Each property record includes its compatible official evidence as **Price context**; no second listing-like market-anchor section appears.
 - Reader copy states price range, access, resale and buyer implications. Production commentary about dataset priority, rendering order, or exchange-rate handling is absent.
 - The image set has three distinct roles: defining place, built environment and access, and decision texture.
 - The new Itoshima decision-texture image contains no people and shows the road width, drainage, coastal exposure and housing context discussed in the article.
+
+Follow-up review on 2026-08-23 renamed the benchmark to **Price context** and made its purpose explicit. Every record now states what the official evidence helps explain and what it cannot establish about the individual listing. Reader-facing capture dates and confidence labels were removed; the records now use direct listing actions where available and accurately label search-result links as source listings.
 
 ## Browser QA
 

@@ -239,15 +239,33 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         self.assertIn("4.3/5", self.fukuoka_html)
         self.assertEqual(3, self.fukuoka_html.count('class="premium-property-record"'))
         self.assertIn("31,800,000 JPY", self.fukuoka_html)
-        self.assertIn("2026-08-21", self.fukuoka_html)
 
-    def test_property_evidence_renders_once_with_integrated_local_comparisons(self) -> None:
+    def test_property_records_link_out_without_internal_review_labels(self) -> None:
+        self.assertEqual(1, self.fukuoka_html.count(">View listing →</a>"))
+        self.assertEqual(2, self.fukuoka_html.count(">Browse source listings →</a>"))
+        property_section = self.fukuoka_html[
+            self.fukuoka_html.index('id="listings"'):self.fukuoka_html.index('id="locations"')
+        ]
+        for internal_label in ("Captured 2026-08-21", "Medium confidence", "<strong>Source:</strong>"):
+            with self.subTest(internal_label=internal_label):
+                self.assertNotIn(internal_label, property_section)
+
+    def test_property_evidence_explains_how_each_price_context_helps(self) -> None:
         self.assertEqual(1, self.fukuoka_html.count('<section class="premium-section" id="listings">'))
         self.assertIn("<h2>What homes cost</h2>", self.fukuoka_html)
         self.assertEqual(3, self.fukuoka_html.count('class="premium-property-record"'))
-        self.assertEqual(3, self.fukuoka_html.count('class="premium-local-comparison"'))
+        self.assertEqual(3, self.fukuoka_html.count('class="premium-price-context"'))
+        self.assertEqual(3, self.fukuoka_html.count("<strong>Price context:</strong>"))
+        self.assertNotIn("Local comparison:", self.fukuoka_html)
         self.assertNotIn("Official market anchors", self.fukuoka_html)
         self.assertNotIn('id="official-market-anchors"', self.fukuoka_html)
+        for conclusion in (
+            "This does not value a 1991 apartment",
+            "This does not value the Keya house",
+            "This does not value the finished holiday house",
+        ):
+            with self.subTest(conclusion=conclusion):
+                self.assertIn(conclusion, self.fukuoka_html)
         for value in (
             "121,700–132,400 JPY/m²",
             "82,900–108,500 JPY/m²",
@@ -263,7 +281,7 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         self.assertNotIn("<th>USD comparison</th>", self.fukuoka_html)
         for label in (
             "Asking price", "Area", "USD comparison", "Buyer relevance",
-            "Local comparison", "Source",
+            "Price context",
         ):
             with self.subTest(label=label):
                 self.assertIn(label, self.fukuoka_html)

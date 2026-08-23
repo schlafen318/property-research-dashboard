@@ -11,7 +11,7 @@ class PremiumDossierEditorialContractTests(unittest.TestCase):
     def test_rulebook_requires_one_output_led_property_section(self) -> None:
         rulebook = (ROOT / "docs" / "PREMIUM_DESTINATION_DOSSIER_RULEBOOK.md").read_text()
         self.assertIn("What homes cost", rulebook)
-        self.assertIn("Local comparison", rulebook)
+        self.assertIn("Price context", rulebook)
         self.assertIn("one property-evidence section", rulebook)
         self.assertIn("process commentary", rulebook)
 
