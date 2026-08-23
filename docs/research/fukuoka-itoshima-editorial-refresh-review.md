@@ -29,4 +29,7 @@ Mobile and desktop screenshots were inspected for field hierarchy, wrapping, cap
 
 ## Automated verification
 
-Focused and full-suite results are recorded in the final implementation verification after the generated artifact is staged.
+- Focused editorial, dossier and Japan-guide suite: **47 passed**.
+- Full repository suite: **603 passed**.
+- Production build: completed successfully from source.
+- Intended source, test, documentation and Fukuoka artifact files have no staged/unstaged overlap. The full build refreshed unrelated generated pages in the isolated worktree; those unrelated outputs are excluded from this change.
