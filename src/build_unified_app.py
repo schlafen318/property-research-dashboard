@@ -78,6 +78,9 @@ RETIREMENT_CALCULATOR_DESCRIPTION = (
 )
 RETIREMENT_FINDER_SLUG = "retirement-destination-finder"
 RETIREMENT_FINDER_TITLE = "Retirement Destination Finder | Global Home Atlas"
+PREMIUM_DESTINATION_PEER_OVERRIDES = {
+    "dubai": ["bali", "phuket-koh-samui", "fukuoka-itoshima"],
+}
 RETIREMENT_FINDER_DESCRIPTION = (
     "Project your retirement savings and monthly investing, then compare destinations "
     "you may be able to afford when renting or buying abroad."
@@ -7657,10 +7660,57 @@ def build_premium_destination_page(
     pages: list[dict],
     spec: PremiumDossierSpec,
 ) -> str:
-    del destinations, pages
+    del pages
     validate_premium_dossier(spec)
     canonical = destination_url(dest)
     rows = [row for row in listings if row.get("destination_id") == dest["id"]]
+    peer_destinations: list[dict] = []
+    peer_ids: set[str] = set()
+    country_peers = [
+        item
+        for item in destinations
+        if item.get("country") == dest.get("country")
+        and item.get("id") != dest.get("id")
+        and get_premium_dossier(item.get("id")) is not None
+    ]
+    category_peers = [
+        item
+        for item in destinations
+        if item.get("category") == dest.get("category")
+        and item.get("id") != dest.get("id")
+        and get_premium_dossier(item.get("id")) is not None
+    ]
+    destination_by_id = {item.get("id"): item for item in destinations}
+    override_peers = [
+        destination_by_id[destination_id]
+        for destination_id in PREMIUM_DESTINATION_PEER_OVERRIDES.get(dest.get("id"), [])
+        if destination_id in destination_by_id
+        and get_premium_dossier(destination_id) is not None
+    ]
+    candidates = country_peers or category_peers or override_peers
+    for candidate in candidates:
+        candidate_id = candidate.get("id")
+        if candidate_id == dest.get("id") or candidate_id in peer_ids:
+            continue
+        peer_destinations.append(candidate)
+        peer_ids.add(candidate_id)
+        if len(peer_destinations) == 3:
+            break
+    peer_links = [
+        f'<a href="/destinations/{escape(destination_slug(item))}/">{escape(item["name"])}</a>'
+        for item in peer_destinations
+    ]
+    if len(peer_links) > 1:
+        peer_link_text = f'{", ".join(peer_links[:-1])} and {peer_links[-1]}'
+    elif peer_links:
+        peer_link_text = peer_links[0]
+    else:
+        peer_link_text = ""
+    comparison_handoff = (
+        f'Compare directly with {peer_link_text}, or <a href="/dashboard/">open the full Atlas</a>.'
+        if peer_link_text
+        else 'To compare with other markets, <a href="/dashboard/">open the full Atlas</a>.'
+    )
     verdict = "".join(f"<p>{escape(paragraph)}</p>" for paragraph in spec.verdict_paragraphs)
     checklist = "".join(f"<li>{escape(item)}</li>" for item in spec.checklist)
     rail_links = "".join(f'<a href="#{escape(anchor)}">{escape(label)}</a>' for anchor, label in spec.nav_items)
@@ -7721,7 +7771,7 @@ def build_premium_destination_page(
         <section class="premium-section" id="checklist">
           <h2>Buyer checklist—in decision order</h2>
           <ol class="premium-checklist">{checklist}</ol>
-          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="{escape(spec.country_guide_url)}">{escape(spec.country_guide_label)}</a>. To size the plan, use the <a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="destination page">retirement abroad calculator</a>. To compare the destination with other markets, <a href="/dashboard/">open the full Atlas</a>.</p>
+          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="{escape(spec.country_guide_url)}">{escape(spec.country_guide_label)}</a>. To size the plan, use the <a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="destination page">retirement abroad calculator</a>. {comparison_handoff}</p>
         </section>
         {premium_dossier_references_html(spec)}
       </article>
