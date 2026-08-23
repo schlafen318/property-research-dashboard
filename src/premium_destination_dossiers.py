@@ -32,6 +32,7 @@ class DossierImage:
     alt: str
     caption: str
     placement_class: str
+    role: str = ""
 
 
 @dataclass(frozen=True)
@@ -71,6 +72,7 @@ class PremiumDossierSpec:
     country_guide_url: str
     country_guide_label: str
     rail_comparison: str
+    property_anchor_indexes: tuple[int | None, ...] = ()
 
 
 FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
@@ -90,7 +92,7 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
         "Proceed in this order: confirm residence and healthcare; decide whether daily life is urban, rail-oriented Itoshima or coastal and car-led; obtain written financing and total-cost assumptions; then investigate the exact title, building, management regime, permitted use and hazards. The combination can work unusually well, but only when the city-and-coast idea is translated into a specific address and a realistic operating plan."
     ),
     lenses_intro=(
-        "The Atlas groups the decision into five paired lenses. The prose below explains what the evidence means for a buyer; the complete ten-dimension assessment appears once in the score table that follows."
+        "Five questions determine whether the city-and-coast proposition will remain useful in ordinary life: where daily services sit, how the last mile works, what the exact property permits, whether demand survives outside peak periods, and who is likely to buy on exit."
     ),
     lenses=(
         DossierLens(
@@ -135,7 +137,7 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
             "Enter with discipline and preserve the exit",
             ("value_entry", "exit_liquidity"),
             (
-                "Fukuoka / Itoshima offers several entry points, which is more useful than a single average. An older apartment can provide low-cost access to services but may carry weak reserves or a dated building. A newer house around Maebaru can offer practical space yet needs location and resale testing. A renovated or newly built coastal home can command a substantial lifestyle premium. The representative listings below are asking-price observations, not valuations; they illustrate dispersion rather than establish market value. Compare each candidate with completed transactions in the Ministry of Land’s Real Estate Information Library and commission a property-specific assessment.",
+                "Fukuoka / Itoshima offers several entry points, but they serve different buyer pools. A rail-accessible apartment can provide lower-cost access to services but may carry weak reserves or a dated building. A newer house around Maebaru can offer practical space yet needs location and resale testing. A renovated or newly built coastal home can command a substantial lifestyle premium while reaching fewer year-round buyers. Compare the exact candidate with completed transactions in the Ministry of Land’s Real Estate Information Library and commission a property-specific assessment.",
                 "Value entry is created by matching price to the buyer pool that will exist on exit. Central Fukuoka and established station areas generally offer more potential resident demand, but entry prices and competition can be higher. Meinohama and the western corridor may balance access and space. Maebaru is easier to explain to a year-round household than an isolated coast road. A singular sea-view house may be emotionally liquid and financially illiquid: the eventual buyer must share the taste, budget, maintenance tolerance and transport assumptions. Do not pay a city-level price for a property with a narrow rural exit.",
                 "Model five-year cash outlay rather than purchase price alone. Include brokerage and legal support, registration and acquisition taxes, financing costs, insurance, management, condominium contributions, repairs, equipment replacement, currency movements and sale costs. For a non-resident, add local representation and tax administration. Before exchange, ask two agents who did not source the property how they would resell it, to whom and at what evidence-based range. The best Fukuoka / Itoshima purchase is not necessarily the cheapest or most scenic; it is the asset whose daily utility, carrying cost and future buyer pool remain aligned."
             ),
@@ -220,23 +222,23 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
         {"label": "Itoshima City: current city-planning map", "url": "https://www.city.itoshima.lg.jp/s021/020/010/020/010/tokeizu-h280914.html"},
     ),
     images=(
-        DossierImage("coast", "/assets/fukuoka-itoshima-coast.webp", "Fukuoka and Itoshima coastline", "City access meets the Itoshima coast.", "hero"),
-        DossierImage("city-access", "/assets/fukuoka-itoshima-city-access.webp", "Everyday urban access in Fukuoka", "Fukuoka provides the practical urban base.", "wide"),
-        DossierImage("seaside-life", "/assets/fukuoka-itoshima-seaside-life.webp", "Everyday seaside life in Itoshima", "Coastal life requires a closer look at access and seasonality.", "wide"),
+        DossierImage("coast", "/assets/fukuoka-itoshima-coast.webp", "Fukuoka and Itoshima coastline", "City access meets the Itoshima coast.", "hero", "defining-place"),
+        DossierImage("city-access", "/assets/fukuoka-itoshima-city-access.webp", "Everyday urban access in Fukuoka", "Fukuoka provides the practical urban base.", "wide", "built-environment-access"),
+        DossierImage("seaside-life", "/assets/fukuoka-itoshima-seaside-life.webp", "Narrow coastal residential lane in Itoshima with roadside drainage and the sea beyond", "On the Itoshima coast, road width, drainage and salt exposure belong in the ownership decision.", "wide", "decision-texture"),
     ),
     nav_items=(
         ("verdict", "Verdict"),
         ("lenses", "Five destination lenses"),
         ("scores", "Atlas assessment"),
-        ("listings", "Representative listings"),
+        ("listings", "What homes cost"),
         ("locations", "Where to look"),
         ("checklist", "Buyer checklist"),
         ("sources", "References"),
     ),
     lenses_heading="Fukuoka / Itoshima through five destination lenses",
     assessment_intro="Here’s how Fukuoka / Itoshima scores on the ten factors that matter most when choosing a long-term home abroad.",
-    listings_intro="Three observations show the spread between a practical western-Fukuoka apartment, an Itoshima lifestyle house and a higher-end coastal asset. Local asking price is primary; USD uses the recorded dataset exchange basis.",
-    market_anchors_intro="These figures are land evidence—not finished-home prices. They provide a public-market check on the asking listings above and must still be matched for location, building, age and condition.",
+    listings_intro="The current examples run from about ¥31.8 million for a rail-accessible western-Fukuoka apartment to ¥180 million for a large coastal holiday house. Access to rail and ordinary services matters more to resale depth than proximity to the sea alone.",
+    market_anchors_intro="Public land evidence confirms a steep city-to-coast gradient, but land and finished homes are not interchangeable. Building age, condition, legal area and access can outweigh the headline location.",
     orientation_groups=(
         DossierOrientationGroup(
             "City to coast",
@@ -252,6 +254,7 @@ FUKUOKA_ITOSHIMA_DOSSIER = PremiumDossierSpec(
     country_guide_url="/japan-retirement-property-foreign-buyers/",
     country_guide_label="Japan retirement property guide",
     rail_comparison="Compare Fukuoka / Itoshima with the full Atlas.",
+    property_anchor_indexes=(0, 1, 2),
 )
 
 
@@ -3684,6 +3687,16 @@ def validate_premium_dossier(spec: PremiumDossierSpec) -> None:
     for anchor in spec.market_anchors:
         if required_anchor_fields - anchor.keys() or any(not anchor[field].strip() for field in required_anchor_fields):
             raise ValueError("premium dossier market anchors must be complete")
+
+    if spec.property_anchor_indexes:
+        if len(spec.property_anchor_indexes) != 3:
+            raise ValueError(f"{spec.destination_id} requires three property-anchor associations")
+        indexes = [index for index in spec.property_anchor_indexes if index is not None]
+        if (
+            len(indexes) != len(set(indexes))
+            or any(index < 0 or index >= len(spec.market_anchors) for index in indexes)
+        ):
+            raise ValueError(f"{spec.destination_id} has invalid property-anchor associations")
 
     if len(spec.nav_items) > 7:
         raise ValueError("premium dossier navigation may contain at most seven items")
