@@ -3532,12 +3532,13 @@
     "name": "Perth / Margaret River",
     "country": "Australia",
     "category": "Water",
-    "overall_score": 3.67,
-    "usd_per_m2": 7000.0,
-    "net_yield_estimate": "3-4.5% est. net",
+  "overall_score": 3.61,
+  "usd_per_m2": 9600.0,
+  "representative_price_usd": 1052737.155,
+  "net_yield_estimate": "Asset-specific; no verified destination-wide net yield",
     "quick_metrics": {
-      "usd_m": "$7,000",
-      "net_yield": "3-4.5% est. net",
+    "usd_m": "$9,600",
+    "net_yield": "Asset-specific; no verified destination-wide net yield",
       "ownership": "2.0/5",
       "friendly": "3.1/5"
     },
@@ -3577,13 +3578,13 @@
     "red_flags": "New-build-only foreign-buyer pathway, rapid recent price growth, approval and vacancy fees, statewide short-stay registration, local planning requirements, and thinner Margaret River exit liquidity.",
     "rental": {
       "gross_yield": "Perth rental demand is supported by population growth and tight housing supply; Margaret River is more seasonal and tourism-led.",
-      "net_yield": "3-4.5% est. net",
+    "net_yield": "Asset-specific; no verified destination-wide net yield",
       "revenue": "Underwrite Perth long-stay demand separately from Margaret River holiday accommodation.",
       "adr_occupancy": "Perth is year-round; Margaret River peaks around holidays, events, and wine-tourism periods.",
       "confidence": "Medium for Perth; low-medium for Margaret River"
     },
-    "price_basis": "Foreign-buyer-relevant Perth new-apartment benchmark, with current entry examples from roughly A$595,000 to A$1.83 million. Margaret River established tourism stock is included only as a local operating benchmark, not as an assumed foreign-buyer-eligible purchase. Blended at about A$10,000/m2 and converted at 1 AUD = 0.6997 USD.",
-    "price_confidence": "Medium for Perth new stock; low-medium for regional blend",
+  "price_basis": "Median asking price and rounded median asking USD/m² from three direct new or new-build observations captured 2026-08-23 in East Perth, Como and Margaret River. AUD converted at the RBA 21 August 2026 rate of 0.7145 USD. Each USD/m² comparison uses seller-stated living/internal area and excludes balconies, garages, alfresco areas and porches; this is not a market median, valuation or confirmation of foreign-investment eligibility.",
+  "price_confidence": "Medium: three direct asking observations with a consistent living/internal-area denominator",
     "profit_driver": "Asia-facing connectivity, strong population growth, Perth rental depth, and the differentiated Margaret River coast-food-wine lifestyle.",
     "rank": 21
   },

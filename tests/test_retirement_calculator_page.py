@@ -290,9 +290,9 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Portfolio dividends and interest", self.html)
         self.assertIn("Compare destination retirement costs", self.html)
 
-    def test_calculator_contains_all_thirty_destination_options(self) -> None:
+    def test_calculator_contains_all_thirty_one_destination_options(self) -> None:
         select = self.html.split('id="ret-destination"', 1)[1].split("</select>", 1)[0]
-        self.assertEqual(30, select.count("<option"))
+        self.assertEqual(31, select.count("<option"))
 
     def test_interactive_contract_and_result_targets_are_embedded(self) -> None:
         required_ids = {
