@@ -5,6 +5,25 @@
     "income_source": "overseas"
   },
   "countries": {
+    "Australia": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["AUD"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["Foreign-investment eligibility must be confirmed first; no current first-party lender terms for the default non-resident overseas-income profile were verified."],
+      "confidence": "low",
+      "evidence_date": "2026-08-23",
+      "sources": [
+        {
+          "name": "Australian Treasury — residential land foreign-investment guidance",
+          "url": "https://foreigninvestment.gov.au/guidance/types-investments/residential-land"
+        }
+      ]
+    },
     "Austria": {
       "availability": "research_incomplete",
       "maximum_ltv": null,

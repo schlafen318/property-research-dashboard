@@ -32,7 +32,7 @@ class RetirementCostDataTests(unittest.TestCase):
         }
 
     def test_release_destination_set_is_complete(self) -> None:
-        self.assertEqual(30, len(self.records))
+        self.assertEqual(31, len(self.records))
         self.assertTrue(set(self.records) <= self.destination_ids)
 
     def test_profiles_have_positive_single_and_couple_costs(self) -> None:

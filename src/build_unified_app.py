@@ -87,9 +87,9 @@ RETIREMENT_FINDER_DESCRIPTION = (
 )
 RETIREMENT_DESTINATIONS_SLUG = "retirement-destinations-ranked-by-cost"
 RETIREMENT_DESTINATIONS_TITLE = "Retirement Destinations Ranked by Cost (2026) | Global Home Atlas"
-RETIREMENT_DESTINATIONS_H1 = "30 Retirement Destinations Ranked by How Much You Need"
+RETIREMENT_DESTINATIONS_H1 = "31 Retirement Destinations Ranked by How Much You Need"
 RETIREMENT_DESTINATIONS_DESCRIPTION = (
-    "Compare all 30 Global Home Atlas retirement destinations by required capital, "
+    "Compare all 31 Global Home Atlas retirement destinations by required capital, "
     "annual spending, reserves, and optional property costs using one methodology."
 )
 RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
@@ -222,6 +222,31 @@ COUNTRY_HUBS = [
         ],
         "destination_ids": ["park-city-deer-valley", "lake-tahoe", "jackson-hole", "aspen-snowmass"],
         "guide_slugs": ["best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "overseas-property-investment", "where-can-foreigners-buy-property"],
+    },
+    {
+        "slug": "australia-property",
+        "country": "Australia",
+        "title": "Australia Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Australia property destinations for foreign buyers, including Perth, Margaret River, the Gold Coast, Sunshine Coast, Sydney and Melbourne through acquisition eligibility, residence, tax, rentals, hazards and resale.",
+        "h1": "Australia Property Guide for Foreign Buyers",
+        "thesis": "Australia combines strong institutions, liveable cities and deep domestic buyer pools, but a foreign purchaser's eligible residential stock is presently a threshold legal question. Property ownership does not create residence or Medicare, and state duty, planning, rental and hazard rules must be resolved for the exact address.",
+        "country_rules": [
+            {"heading": "Property and residence are separate", "text": "Buying an Australian home does not create a visa, permanent residence or Medicare entitlement. The former subclass 410 retirement visa is closed to new or first-time applicants. Establish lawful long-stay status, health cover and tax residence independently before treating a purchase as a retirement home."},
+            {"heading": "Established dwellings are generally prohibited for now", "text": "Current federal guidance generally prohibits foreign persons from buying established dwellings from 1 April 2025 through 30 June 2029, subject to limited exceptions. Qualifying new or near-new dwellings and approved vacant residential land remain the main pathways, and generally require notification or approval before acquisition."},
+            {"heading": "Compliance continues after closing", "text": "Foreign owners can have registration, condition-reporting and annual vacancy-fee-return duties. Short stays under 30 days do not count as residential occupation or genuine availability for the federal vacancy-fee test. Keep evidence and obtain buyer-specific Australian tax advice."},
+            {"heading": "State and local rules control cost and use", "text": "Transfer-duty surcharges, planning, short-term-rental registration, strata governance, land tax and hazards vary by state, council, scheme and property. Western Australia adds a 7% foreign buyers duty to applicable residential acquisitions and uses separate metropolitan and regional short-stay planning settings."},
+        ],
+        "primary_sources": [
+            {"label": "Australian Treasury: residential land foreign-investment guidance", "url": "https://foreigninvestment.gov.au/guidance/types-investments/residential-land"},
+            {"label": "Australian Treasury: residential compliance", "url": "https://foreigninvestment.gov.au/guidance/conditions-and-reporting/residential-compliance"},
+            {"label": "ATO: vacancy-fee return for foreign owners", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-investment-in-australia/vacancy-fee-return-for-foreign-owners"},
+            {"label": "Home Affairs: repealed subclass 410 retirement visa", "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/repealed-visas/subclass-410"},
+            {"label": "Services Australia: Medicare enrolment for permanent residents", "url": "https://www.servicesaustralia.gov.au/enrolling-medicare-if-youre-australian-permanent-resident?context=60092"},
+            {"label": "WA Revenue: foreign buyers duty", "url": "https://www.wa.gov.au/service/financial-management/taxation-and-duty/about-foreign-buyers-duty"},
+            {"label": "WA Planning: short-term-rental planning reforms", "url": "https://www.planning.wa.gov.au/planning-reform/short-term-rental-accommodation-planning-reforms"},
+        ],
+        "destination_ids": ["perth-margaret-river", "gold-coast-sunshine-coast", "sydney-melbourne"],
+        "guide_slugs": ["best-places-to-buy-property-abroad-for-retirement", "buying-property-abroad-for-retirement", "foreign-property-investment-risks", "where-can-foreigners-buy-property"],
     },
     {
         "slug": "canada-property",
@@ -1657,12 +1682,17 @@ def country_next_step_html(hub: dict, selected: list[dict], pages: list[dict]) -
     best = selected[0] if selected else None
     guide_links = country_guide_links(hub, pages)
     best_name = best["name"] if best else hub["country"]
+    best_link = (
+        f'<a href="/destinations/{escape(destination_slug(best))}/">{escape(best_name)}</a>'
+        if best
+        else escape(best_name)
+    )
     return f"""
       <section class="buyer-next-step" aria-label="Buyer Next Step">
         <div>
           <p class="page-eyebrow">Buyer Next Step</p>
           <h2>Turn {escape(hub["country"])} research into a shortlist</h2>
-          <p>Start with {escape(best_name)}, compare the related buying guides, then use shortlist review once the buyer profile, holding period, and budget are clear enough for local diligence.</p>
+          <p>Start with {best_link}, compare the related buying guides, then use shortlist review once the buyer profile, holding period, and budget are clear enough for local diligence.</p>
         </div>
         <div class="buyer-next-step__grid">
           <article>
@@ -4527,7 +4557,7 @@ def schema_for_retirement_calculator(canonical: str) -> list[dict]:
 RETIREMENT_DESTINATIONS_FAQS = [
     (
         "What is the lowest-cost retirement destination in this comparison?",
-        "Da Nang / Hoi An has the lowest required retirement capital under this article's standard couple-renting scenario. The comparison covers all 30 destinations currently covered by Global Home Atlas, not every place retirees could choose.",
+        "Da Nang / Hoi An has the lowest required retirement capital under this article's standard couple-renting scenario. The comparison covers all 31 destinations currently covered by Global Home Atlas, not every place retirees could choose.",
     ),
     (
         "Why rank retirement destinations instead of countries?",
@@ -5413,7 +5443,7 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
       <div class="article-layout">
         <article class="article-body">
           <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among the 30 destinations, {escape(lowest_name)} has the lowest modeled requirement at <strong>{money(lowest)}</strong>, while {escape(highest_name)} has the highest at <strong>{money(highest)}</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It compares the 30 Global Home Atlas destinations with complete retirement-cost coverage, using the same researched inputs as our retirement planning model.</p><aside class="article-callout"><div><strong>Make the estimate personal</strong><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p></div><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article callout">Open calculator</a></aside></section>
-          <section class="article-section" id="ranking"><h2>Retirement destinations ranked by savings needed</h2><p>Each row uses today's USD and the same assumptions. The home purchase estimate is optional and does not affect the cost rank. Select a column heading to reorder all 30 destinations.</p><details class="source-more"><summary>How annual cost is estimated</summary><p>Annual cost includes rent, food and household spending, utilities and communications, private healthcare, transport, dining and leisure, travel, visa and administration costs, and contingency. Home purchase costs are separate.</p></details><div class="table-wrap"><table><caption>Estimated retirement savings by destination for a couple renting</caption>{ranking_header}<tbody data-ranking-visible>{visible_rows}</tbody></table></div>
+          <section class="article-section" id="ranking"><h2>Retirement destinations ranked by savings needed</h2><p>Each row uses today's USD and the same assumptions. The home purchase estimate is optional and does not affect the cost rank. Select a column heading to reorder all 31 destinations.</p><details class="source-more"><summary>How annual cost is estimated</summary><p>Annual cost includes rent, food and household spending, utilities and communications, private healthcare, transport, dining and leisure, travel, visa and administration costs, and contingency. Home purchase costs are separate.</p></details><div class="table-wrap"><table><caption>Estimated retirement savings by destination for a couple renting</caption>{ranking_header}<tbody data-ranking-visible>{visible_rows}</tbody></table></div>
             <details class="ranking-more"><summary>View 20 more destinations</summary><div class="table-wrap"><table><caption>Additional retirement destinations</caption>{ranking_header}<tbody data-ranking-additional>{expandable_rows}</tbody></table></div></details>
             <figure class="infographic"><img src="/assets/retirement-destinations-required-capital.png" width="1600" height="900" alt="Lowest-cost 10 of 30 retirement destinations ranked by required capital for a couple renting" loading="eager"><figcaption>This chart shows the lowest-cost 10 of 30. Required capital combines the liquid portfolio and 12-month reserve; property is excluded from rank. Complete ranks 1–30 are in the tables above.</figcaption><a class="download-link" href="/assets/retirement-destinations-required-capital.png" download data-track="infographic_download" data-track-label="required retirement capital ranking">Download this infographic as PNG</a></figure>
           </section>
@@ -5787,6 +5817,9 @@ def build_country_hub_page(
     updated = date.today().isoformat()
     avg_score = sum(float(dest.get("decision_score", 0) or 0) for dest in selected) / max(1, len(selected))
     best = selected[0] if selected else destinations[0]
+    best_destination_link = (
+        f'<a href="/destinations/{escape(destination_slug(best))}/">{escape(best["name"])}</a>'
+    )
     guide_links = country_guide_links(hub, pages)
     peer_country_links = country_hub_links(hub["slug"], limit=6)
     report_title, report_reason = country_report_recommendation(hub)
@@ -5848,7 +5881,7 @@ def build_country_hub_page(
       {sticky_page_nav([("Thesis", "country-thesis"), ("Buyer Fit", "buyer-fit"), ("Brief", "premium-brief"), ("Compare", "destination-comparison"), ("Risk", "risk-posture"), ("Guides", "related-guides")])}
       {mobile_action_strip("#destination-comparison", "Compare", "/shortlist-review/", "Brief")}
       <section class="brief-panel" aria-label="Country briefing">
-        <article><span>Top destination match</span><strong>{escape(best["name"])}</strong><p>{escape(best.get("panel_verdict") or "")}</p></article>
+        <article><span>Top destination match</span><strong>{best_destination_link}</strong><p>{escape(best.get("panel_verdict") or "")}</p></article>
         <article><span>Buyer profile</span><strong>Affluent global planners</strong><p>Best for buyers comparing lifestyle use, legal clarity, tax and ownership friction, rental realism, and future liquidity before local deal work.</p></article>
         <article><span>Risk posture</span><strong>{metric_value(best, "ownership_clarity"):.1f}/5 ownership clarity</strong><p>Use country-level rules as the first screen, then verify title, taxes, rental permissions, and local transaction mechanics by asset.</p></article>
       </section>
@@ -7373,7 +7406,7 @@ def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec)
             matched_indexes.add(anchor_index)
             anchor = spec.market_anchors[anchor_index]
             local_comparison = (
-                '<p class="premium-local-comparison"><strong>Local comparison:</strong> '
+                '<p class="premium-local-comparison"><strong>Local comparison — why it matters:</strong> '
                 f'{escape(anchor["evidence"])}. {escape(anchor["buyer_read"])} '
                 f'<a href="{escape(anchor["source_url"])}" rel="noopener noreferrer">{escape(anchor["source_label"])}</a></p>'
             )
@@ -7387,9 +7420,8 @@ def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec)
             f'<div><dt>Buyer relevance</dt><dd>{escape(row["note"])}</dd></div>'
             '</dl>'
             f'{local_comparison}'
-            '<p class="premium-property-source"><strong>Source:</strong> '
-            f'<a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a> '
-            f'· Captured {escape(row["captured_date"])} · {escape(row["confidence"])} confidence</p>'
+            '<p class="premium-property-source">'
+            f'<a href="{escape(row["source_url"])}" rel="noopener noreferrer">View current listing at {escape(row["source_name"])}</a></p>'
             '</div>'
         )
 

@@ -2061,6 +2061,111 @@
       ]
     },
     {
+      "destination_id": "perth-margaret-river",
+      "display_currency": "AUD",
+      "fx_to_usd": 0.7145,
+      "inflation": {
+        "general": 0.03,
+        "healthcare": 0.05,
+        "property": 0.035
+      },
+      "profiles": {
+        "single": {
+          "categories_usd": {
+            "food_household": 7200,
+            "utilities_communications": 3600,
+            "private_healthcare": 5000,
+            "transport": 5700,
+            "dining_leisure": 7600,
+            "travel": 8500,
+            "visa_admin": 1800,
+            "contingency": 7600
+          },
+          "annual_rent_usd": 25000,
+          "annual_owner_costs_usd": 15000
+        },
+        "couple": {
+          "categories_usd": {
+            "food_household": 10800,
+            "utilities_communications": 4300,
+            "private_healthcare": 10000,
+            "transport": 8000,
+            "dining_leisure": 11400,
+            "travel": 12800,
+            "visa_admin": 2500,
+            "contingency": 11400
+          },
+          "annual_rent_usd": 39000,
+          "annual_owner_costs_usd": 15000
+        }
+      },
+      "property": {
+        "representative_price_usd": 1052737.155,
+        "acquisition_cost_rate": 0.115,
+        "price_basis": "Median asking price of three direct new or new-build observations captured 2026-08-23; each USD/m² comparison uses a seller-stated living/internal-area denominator. This is not a market median, valuation or confirmation of foreign-investment eligibility.",
+        "acquisition_cost_basis": "Illustrative state-duty allowance at the representative A$1,473,390 contract: WA general transfer duty under the current schedule plus the 7% foreign buyers duty is about 11.55%. Rounded to 11.5%; excludes federal foreign-investment fees, legal, inspection, finance, valuation, settlement and any concession or different dutiable value. Obtain a buyer-specific completion statement."
+      },
+      "confidence": {
+        "overall": "medium",
+        "proxy_categories": [
+          "private_healthcare",
+          "visa_admin",
+          "inflation",
+          "owner_costs"
+        ]
+      },
+      "sources": [
+        {
+          "name": "Numbeo — Perth cost of living",
+          "url": "https://www.numbeo.com/cost-of-living/in/Perth",
+          "metric_supported": "Rent, groceries, utilities, transport and dining planning benchmarks",
+          "source_date": "2026",
+          "accessed_on": "2026-08-23",
+          "notes": "Crowd-sourced city proxy; household and regional Margaret River costs can vary materially."
+        },
+        {
+          "name": "Australian Bureau of Statistics — Consumer Price Index",
+          "url": "https://www.abs.gov.au/statistics/economy/price-indexes-and-inflation/consumer-price-index-australia",
+          "metric_supported": "General inflation planning assumption",
+          "source_date": "2026",
+          "accessed_on": "2026-08-23",
+          "notes": "Official national and capital-city index; the calculator assumption is not a forecast."
+        },
+        {
+          "name": "Three direct asking observations",
+          "url": "https://www.realestate.com.au/property-apartment-wa-east%2Bperth-139225267/",
+          "metric_supported": "Representative property acquisition benchmark",
+          "source_date": "2026-08-23",
+          "accessed_on": "2026-08-23",
+          "notes": "Median of direct asks in East Perth, Como and Margaret River from realestate.com.au, Jones Realty & Projects and Celebration Homes; not a valuation or eligibility confirmation."
+        },
+        {
+          "name": "WA Revenue — transfer duty assessment",
+          "url": "https://www.wa.gov.au/organisation/department-of-treasury-and-finance/transfer-duty-assessment",
+          "metric_supported": "General transfer-duty schedule",
+          "source_date": "2026-07-30",
+          "accessed_on": "2026-08-23",
+          "notes": "The exact dutiable value, rate, concessions and transaction structure must be confirmed."
+        },
+        {
+          "name": "WA Revenue — foreign buyers duty",
+          "url": "https://www.wa.gov.au/service/financial-management/taxation-and-duty/about-foreign-buyers-duty",
+          "metric_supported": "7% foreign buyers duty surcharge",
+          "source_date": "2026-06-18",
+          "accessed_on": "2026-08-23",
+          "notes": "Scope depends on the buyer, interest and residential-property tests; announced changes require current legal confirmation."
+        },
+        {
+          "name": "Reserve Bank of Australia — exchange rates",
+          "url": "https://www.rba.gov.au/statistics/frequency/exchange-rates.html",
+          "metric_supported": "AUD-to-USD conversion",
+          "source_date": "2026-08-21",
+          "accessed_on": "2026-08-23",
+          "notes": "1 AUD = 0.7145 USD; a dated comparison input, not a forecast."
+        }
+      ]
+    },
+    {
       "destination_id": "lake-tahoe",
       "display_currency": "USD",
       "fx_to_usd": 1,

@@ -50,25 +50,25 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
             self.html,
         )
         self.assertIn(
-            '<meta name="description" content="Compare all 30 Global Home Atlas retirement destinations by required capital, annual spending, reserves, and optional property costs using one methodology.">',
+            '<meta name="description" content="Compare all 31 Global Home Atlas retirement destinations by required capital, annual spending, reserves, and optional property costs using one methodology.">',
             self.html,
         )
         self.assertIn(
-            "<h1>30 Retirement Destinations Ranked by How Much You Need</h1>",
+            "<h1>31 Retirement Destinations Ranked by How Much You Need</h1>",
             self.html,
         )
         self.assertIn('"@type":"Article"', self.compact_html)
         self.assertIn('"@type":"FAQPage"', self.compact_html)
         self.assertIn('"@type":"ItemList"', self.compact_html)
-        self.assertIn('"numberOfItems":30', self.compact_html)
+        self.assertIn('"numberOfItems":31', self.compact_html)
         self.assertIn('"@type":"ImageObject"', self.compact_html)
 
-    def test_ranking_shows_top_ten_then_expands_ranks_eleven_to_thirty(self) -> None:
+    def test_ranking_shows_top_ten_then_expands_the_remaining_destinations(self) -> None:
         ranking = self.html.split('id="ranking"', 1)[1].split("</section>", 1)[0]
         visible = ranking.split('<details class="ranking-more">', 1)[0]
         expandable = ranking.split('<details class="ranking-more">', 1)[1]
         self.assertEqual(10, visible.count('class="ranking-row"'))
-        self.assertEqual(20, expandable.count('class="ranking-row"'))
+        self.assertEqual(21, expandable.count('class="ranking-row"'))
         self.assertIn("View 20 more destinations", expandable)
         self.assertIn("</details>", expandable)
 
@@ -178,7 +178,7 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         self.assertIn('<details class="source-more">', methodology)
         self.assertIn("<summary>Sources and data notes</summary>", methodology)
         sources = methodology.split('<details class="source-more">', 1)[1].split("</details>", 1)[0]
-        self.assertEqual(30, sources.count("<li>"))
+        self.assertEqual(31, sources.count("<li>"))
 
     def test_two_accessible_infographics_have_downloadable_pngs(self) -> None:
         for asset_name in ASSET_NAMES:

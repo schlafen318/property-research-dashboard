@@ -3476,6 +3476,161 @@ LAKE_TAHOE_DOSSIER = PremiumDossierSpec(
 )
 
 
+PERTH_MARGARET_RIVER_DOSSIER = PremiumDossierSpec(
+    destination_id="perth-margaret-river",
+    title="Perth and Margaret River Retirement Property Dossier",
+    description="Assess Perth and Margaret River retirement property through residence, foreign-investment eligibility, daily life, access, rental rules, value, hazards, resale, and representative listings.",
+    h1="Perth / Margaret River: city confidence, regional escape",
+    lede=(
+        "Perth / Margaret River pairs one of Australia’s most self-contained capitals with a celebrated wine-and-coast region three hours south. Perth supplies hospitals, flights, professional depth and a broad resident economy; Margaret River supplies landscape, food and a slower pace. They are not one interchangeable market. A riverside apartment, an established suburb and a regional house carry different foreign-investment eligibility, transport, rental, hazard and resale questions. This dossier separates the romance from the operating plan."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-23",
+    date_reviewed="2026-08-23",
+    verdict_paragraphs=(
+        "The verdict is conditional rather than broadly positive. Property ownership does not create an Australian visa, permanent residence or Medicare entitlement, and the former subclass 410 retirement visa is not open to new or first-time applicants. A foreign buyer must first establish an independent lawful residence plan. The property route is narrower still: current federal guidance says foreign persons generally need approval before acquiring residential land and, from 1 April 2025 through 30 June 2029, are generally prohibited from buying established dwellings unless a limited exception applies. Qualifying new or near-new dwellings and approved vacant residential land can remain possible, but the exact buyer, developer, title and approval conditions must be confirmed before any deposit becomes non-refundable.",
+        "Within that constraint, Perth / Margaret River suits a buyer who wants Western Australia’s time-zone access to Asia, English-language professional services and a credible year-round urban base, while treating Margaret River as a separate, car-led lifestyle choice rather than a suburb of Perth. It is strongest for someone willing to buy eligible stock, accept a long holding period, fund professional management and choose daily utility over speculative yield. It is weak for anyone expecting an established character home to be automatically available, relying on property to solve immigration or Medicare, needing easy non-resident leverage, or assuming a scenic regional address will produce effortless short-term-rental income.",
+        "Proceed in sequence. Confirm residence, health cover, foreign-investment eligibility and financing; choose whether the real life is metropolitan or regional; obtain a written acquisition-cost and tax statement; then investigate the exact title, strata or construction documents, lawful use, hazards, access and future buyer pool. Perth can be the service and liquidity base while Margaret River remains the retreat, but only if the household can sustain two distinct operating systems. The correct purchase is the one that remains useful without rental income and sale-price growth."
+    ),
+    lenses_intro="Five paired lenses turn the city-and-region idea into a buyer decision. The complete ten-dimension assessment appears once in the table that follows.",
+    lenses=(
+        DossierLens(
+            "Build an ordinary life before choosing the view",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Perth earns its place as a retirement base through ordinary competence. East Perth and South Perth put river walks, groceries, cafés and city services into a repeatable week; Mount Pleasant adds space and established suburban routines; Fremantle offers a more distinctive port-city culture with rail to central Perth. The climate supports outdoor living, but summer heat changes the useful hours of the day and raises cooling, shade and water considerations. The buyer should test the route to food, a pharmacy, a regular doctor and social life in January, not simply admire the Swan River in spring. A premium view is valuable only when the building and neighbourhood still work on an unremarkable Tuesday.",
+                "Healthcare follows residence and location. Property ownership does not create Medicare access. Services Australia ties enrolment to eligible status, so a buyer without confirmed eligibility needs private cover and a plan for exclusions, waiting periods and repatriation. Within metropolitan Perth, Fiona Stanley Hospital provides a 24-hour emergency department and the city supports broad public and private specialist care. That depth is a genuine retirement advantage, but ambulance routes, referral pathways and chosen insurance still need address-level checking. South Perth and Mount Pleasant may feel close to major services on a map; peak traffic, parking and the exact specialist relationship are what matter in practice.",
+                "Margaret River is a different retirement proposition. The town has daily services and Margaret River Hospital provides a 24-hour emergency department and telehealth, but it is not a metropolitan specialist campus. Prevelly and Gnarabup exchange town-centre convenience for coast, wind, salt and more driving. A household must test the hospital trip after dark, identify where specialist appointments would occur and decide who drives if one partner cannot. The region can support a rewarding, active retirement; it is less convincing for someone who needs frequent complex care, dislikes driving or expects visitor-season services to substitute for year-round infrastructure.",
+            ),
+            "city-life",
+        ),
+        DossierLens(
+            "Use Perth's gateway—then price the last mile honestly",
+            ("global_access", "foreigner_fit"),
+            (
+                "Perth Airport is a meaningful Asia-facing gateway. The airport reported 18.3 million passengers in FY2026 and publishes direct international routes across Asia, Africa and New Zealand. Yet the airport is operationally split: Terminals 1 and 2 sit in a different precinct from Terminals 3 and 4, about a ten-minute drive apart, with transfer arrangements that should be included in connection planning. For an East Perth or South Perth owner, the final urban leg is manageable by road, taxi or public transport. For every candidate, time the full door-to-gate trip with luggage rather than using a straight-line distance.",
+                "Margaret River changes access from an airport question into a regional journey. The common road trip from Perth is roughly three hours in good conditions, and the Transwa SW1 coach provides a scheduled link rather than a frequent urban service. A coach can preserve some independence, but it does not remove the need for a car for groceries, beaches, appointments and dispersed social life around Prevelly or Gnarabup. Holiday traffic, fatigue after a long-haul arrival and wildlife after dark all belong in the operating model. Buyers who expect to travel internationally often may be happier keeping Perth as the main home and using Margaret River selectively.",
+                "English-language administration and deep legal, accounting, agency and building professions improve foreigner fit, but they do not eliminate cross-border work. Foreign-investment approval, Australian tax registration, banking, currency transfers, insurance and estate planning must be coordinated with the buyer’s home jurisdiction. Non-resident financing can be narrower and more expensive, while remote ownership needs a dependable local contact. In Margaret River, the operator and trades network is smaller and peak periods can stretch capacity. The disciplined buyer appoints an independent Australian lawyer, tax adviser, building inspector and, where relevant, strata or rental manager before the contract timetable starts controlling the decision.",
+            ),
+        ),
+        DossierLens(
+            "Treat eligibility as the first property characteristic",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Australia’s title system is legible, but a foreign buyer’s eligible asset universe is currently constrained. Federal guidance updated in July 2026 says foreign persons generally must notify the Australian Taxation Office before acquiring residential land, regardless of value. From 1 April 2025 to 30 June 2029 they are generally prohibited from acquiring established dwellings, subject to limited exceptions. New or near-new dwellings and vacant residential land may qualify, often with conditions; vacant land commonly carries a construction deadline. A marketing label such as ‘brand new’ is not an approval. Confirm the developer’s status, prior occupation, title, buyer entity, approval route and conditions in writing before exchange.",
+                "Ongoing compliance matters too. Foreign owners generally register residential interests, and an annual vacancy-fee return can apply. The ATO says a residential property may attract the fee if it is not occupied or genuinely available for at least 183 days in the vacancy year; short stays of fewer than 30 days do not count as residential occupation or genuine availability for that test. That rule can surprise an owner who assumes a busy holiday calendar resolves federal vacancy exposure. Build a calendar and evidence process with the tax adviser, keep lease and availability records, and do not let a rental manager make a federal compliance assumption on the owner’s behalf.",
+                "Property governance is address-specific. In a Perth strata scheme, obtain the scheme plan, bylaws, meeting minutes, budgets, reserve position, insurance, defects, litigation, levies, pet and renovation rules, and any limits on short stays. Landgate’s buyer guidance is a starting point, not a substitute for document review. For a new house-and-land package near Margaret River, verify the land contract and building contract separately, inclusions, escalation clauses, completion security, utilities, wastewater, access, planning and the foreign-investment construction condition. Overlay the current DFES bushfire-prone-area map and the Shire’s coastal-hazard material for the exact address. In exposed locations, confirm evacuation access, building requirements and whether suitable bushfire and coastal insurance is available at an acceptable premium. Regulatory clarity comes from matching the exact acquisition and intended use—not from assuming all new stock is interchangeable.",
+            ),
+            "regional-diligence",
+        ),
+        DossierLens(
+            "Separate residential demand from visitor economics",
+            ("rental_profit", "capital_upside"),
+            (
+                "Perth’s rental case begins with a real resident economy: employment, universities, hospitals, migration and constrained housing supply create demand that is broader than tourism. That is supportive, not a net-yield forecast. A new East Perth apartment and a boutique Como home face different tenant pools, strata costs, leasing periods and eventual buyers. Underwrite the exact achievable long-term rent with two independent managers, then subtract vacancy, management, strata, rates, insurance, repairs, furnishing and tax. Do not import a headline gross yield from a suburb page into a specific high-service-charge building or assume recent price growth will repeat.",
+                "Short-term accommodation adds two regulatory layers. Western Australia requires short-term rental accommodation to be registered annually. Hosted and unhosted uses then meet different planning rules: the state framework provides a metropolitan exemption for unhosted use up to 90 nights in a 12-month period, while use beyond that threshold requires local planning approval; regional local governments can set their own approach. The 90-night rule is not a universal licence and does not override strata bylaws, federal vacancy-fee tests, tax, safety or local conditions. Obtain written planning and strata confirmation for the exact Perth address before assigning any value to visitor income.",
+                "In the Shire of Augusta Margaret River, unhosted short-term rental accommodation requires planning approval and is normally approved for a limited period, commonly one year, with state registration also required. The Shire highlights wastewater, potable water and site-specific requirements. Visitor demand may be strong, but cleaning, linen, local contact, maintenance, seasonality, owner blocks and neighbour tolerance determine the actual result. Capital upside is equally segmented: Perth’s population and infrastructure can support selected metropolitan assets; Margaret River’s scarcity and brand can support selected regional properties. Neither protects an ineligible purchase, an overpaid package, weak construction or an operating permission that changes.",
+            ),
+        ),
+        DossierLens(
+            "Price the whole ownership cycle and preserve the exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Entry price is only the first cash demand. Western Australia imposes ordinary transfer duty and, for a foreign person, a seven-percent foreign buyers duty surcharge; federal foreign-investment fees, legal work, inspections, finance, valuation and settlement charges can also apply. There is no single statutory acquisition percentage that fits every buyer and property. Obtain a written completion statement for the exact contract, entity, residency and approval route. Then model five years of strata or building maintenance, council and water charges, insurance, cooling, management, travel, tax and currency movement. A lower regional ask can carry higher transport and operating friction than a better-connected metropolitan home.",
+                "The three asking observations below deliberately span eligible-looking new stock rather than pretending established homes are presently open to every foreign buyer. East Perth shows a larger apartment under construction; Como shows a smaller boutique apartment nearing completion; Margaret River shows a house-and-land package whose advertised starting price, land availability, building contract, inclusions, escalation and approval conditions require separate verification. The comparison is now like-for-like on space: each unit rate uses living or internal area and excludes balconies, garages, alfresco areas and porches. That makes the spread useful—about US$4,300/m² in Margaret River, US$9,600/m² in Como and US$12,500/m² in East Perth—without turning three observations into a valuation or market average.",
+                "Exit liquidity follows the next buyer’s eligibility and daily-life needs. East Perth can reach residents and investors who value the city and airport, but apartment supply, levies and building quality matter. South Perth and Mount Pleasant attract owner-occupiers seeking river access and space, yet a premium or unusual layout narrows the pool. Fremantle has character and rail but building condition and local use rules vary. Margaret River town homes may reach local families and lifestyle buyers; Prevelly and Gnarabup coastal properties can be more taste-, insurance- and car-dependent. Ask two agents who did not source the property how they would resell it under a slower market and to which buyer pool.",
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Perth combines river, coast and year-round city culture; Margaret River adds food, wine and landscape with a distinctly car-led rhythm.",
+        "global_access": "Perth Airport is a credible Asia-facing gateway, while Margaret River adds a roughly three-hour road or scheduled-coach last mile.",
+        "ownership_clarity": "WA title is legible, but foreign buyers face approval and a temporary established-dwelling prohibition that sharply narrows eligible stock.",
+        "regulatory_safety": "Perth strata, WA rental registration and Augusta Margaret River planning create address- and use-specific obligations beyond acquisition approval.",
+        "rental_profit": "Perth has broad resident demand; Margaret River visitor income is more seasonal and permission-, operator- and property-dependent without a verified destination-wide yield.",
+        "capital_upside": "Perth infrastructure and population support selected assets, while Margaret River scarcity may help distinctive homes but does not guarantee appreciation.",
+        "retirement_fit": "Perth offers metropolitan healthcare and services; Margaret River provides a local emergency base but adds driving and specialist-care journeys.",
+        "exit_liquidity": "Perth urban homes reach broader resident pools; distinctive Prevelly, Gnarabup and rural Margaret River properties can require a slower specialist exit.",
+        "foreigner_fit": "English-language WA professional depth helps, but residence, Medicare, approval, tax, finance and absentee management remain separate cross-border workstreams.",
+        "value_entry": "Perth new apartments and Margaret River packages show a wide living-area price spread, with different operating costs, permissions and future buyer pools.",
+    },
+    market_anchors=(
+        {"location": "Perth metropolitan houses", "evidence": "A$785,000–A$860,000 monthly median range", "buyer_read": "Landgate's 2024–25 settled-sales report records 22,542 house sales and the monthly median range. Broad public market signal—not a valuation.", "source_label": "Landgate Annual Report 2024–25", "source_url": "https://www.landgate.wa.gov.au/siteassets/documents/about-us/strategic-plans-and-annual-reports/landgate-annual-report-2024-25/"},
+        {"location": "South Perth units", "evidence": "A$878,666 median", "buyer_read": "REIWA's 12 months ending July 2026 settled unit signal for South Perth. Property type, condition and building still require matched evidence; not a valuation.", "source_label": "REIWA / Landgate settled sales", "source_url": "https://reiwa.com.au/suburb/south-perth/"},
+        {"location": "Augusta–Margaret River houses", "evidence": "A$921,665 median", "buyer_read": "The 2024–25 regional snapshot reports 313 house sales. It mainly reflects completed stock, not a new house-and-land valuation.", "source_label": "South West Development Commission housing snapshot", "source_url": "https://swdc.wa.gov.au/wp-content/uploads/2026/04/2026-02-01-Construction-Housing-Snapshot-February-2026-Release-Final-South-West-.pdf"},
+    ),
+    property_anchor_indexes=(None, 1, 2),
+    micro_locations_intro="Choose the daily-life system before the property. These four patterns are decision aids, not price zones; confirm the exact title, foreign-investment eligibility, planning, strata, hazard, transport and service position.",
+    micro_locations=(
+        {"name": "East Perth / South Perth", "best_for": "River-oriented urban retirement", "daily_life": "Walkable pockets, city services and comparatively direct airport and hospital access.", "diligence": "New-dwelling eligibility, strata defects and levies, ferry or road routine, summer heat and resale supply."},
+        {"name": "Mount Pleasant / riverside south", "best_for": "More space with metropolitan services", "daily_life": "Established suburban shopping and river access; generally more driving than the inner city.", "diligence": "Internal-area basis, construction completion, strata governance, traffic, cooling costs and buyer depth."},
+        {"name": "Fremantle", "best_for": "Character, coast and rail", "daily_life": "A distinct port-city centre with markets, culture and rail to Perth.", "diligence": "Building age, heritage or planning limits, strata, noise, parking, salt exposure and lawful rental use."},
+        {"name": "Margaret River / Prevelly / Gnarabup", "best_for": "Regional town or coastal lifestyle", "daily_life": "Margaret River town has the strongest services; coast pockets add scenery and driving.", "diligence": "Contract structure, wastewater, bushfire and coastal layers, STRA approval, insurance, roads and specialist care."},
+    ),
+    checklist=(
+        "Confirm lawful residence, Medicare or private cover, Australian tax and estate advice before treating property as a retirement solution.",
+        "Obtain written foreign-investment advice for the exact buyer, entity, title and dwelling status before paying a non-refundable deposit.",
+        "Reconcile ordinary WA transfer duty, the seven-percent foreign buyers duty, federal fees and all professional costs in a buyer-specific statement.",
+        "For strata, review bylaws, minutes, budgets, reserves, defects, insurance, litigation, levies, pets, renovations and rental restrictions.",
+        "For house-and-land, reconcile land and build contracts, title, inclusions, escalation, completion, utilities, wastewater and approval conditions.",
+        "Obtain written STRA registration, local planning and strata confirmation; model long-term rent and no rent before visitor income.",
+        "Overlay current bushfire and coastal information; test evacuation, insurance, cooling, drainage and the hospital route.",
+        "Compare matched completed sales, model five-year cash outlay and a slower resale, then ask two independent agents to identify the future buyer pool.",
+    ),
+    references_intro="Legal, residence, healthcare, foreign-investment, tax, planning, rental, transport, hazard, market, FX and listing claims were reviewed on 23 August 2026. Recheck every time-sensitive source no later than 23 February 2027 and immediately after any foreign-investment, immigration, Medicare, duty, planning, STRA, hazard, transport, healthcare, market-data or listing change. Obtain current Australian federal and Western Australian legal, tax, planning, title, insurance and immigration advice for the exact buyer, entity, property and intended use. Asking evidence and public market signals are not valuations or availability guarantees.",
+    references=(
+        {"label": "Australia property guide", "url": "/countries/australia-property/"},
+        {"label": "Australian Treasury: residential land foreign-investment guidance", "url": "https://foreigninvestment.gov.au/guidance/types-investments/residential-land"},
+        {"label": "Australian Treasury: residential compliance", "url": "https://foreigninvestment.gov.au/guidance/conditions-and-reporting/residential-compliance"},
+        {"label": "ATO: vacancy-fee return for foreign owners", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-investment-in-australia/vacancy-fee-return-for-foreign-owners"},
+        {"label": "Home Affairs: repealed subclass 410 retirement visa", "url": "https://immi.homeaffairs.gov.au/visas/getting-a-visa/visa-listing/repealed-visas/subclass-410"},
+        {"label": "Home Affairs: permanent-resident entitlements", "url": "https://immi.homeaffairs.gov.au/visas/permanent-resident/entitlements"},
+        {"label": "Services Australia: Medicare enrolment for permanent residents", "url": "https://www.servicesaustralia.gov.au/enrolling-medicare-if-youre-australian-permanent-resident?context=60092"},
+        {"label": "WA Revenue: foreign buyers duty", "url": "https://www.wa.gov.au/service/financial-management/taxation-and-duty/about-foreign-buyers-duty"},
+        {"label": "WA Planning: short-term-rental planning reforms", "url": "https://www.planning.wa.gov.au/planning-reform/short-term-rental-accommodation-planning-reforms"},
+        {"label": "WA Government: what short-term rentals must be registered", "url": "https://www.wa.gov.au/organisation/department-of-local-government-industry-regulation-and-safety/what-needs-be-registered"},
+        {"label": "Augusta Margaret River: short-term-rental accommodation", "url": "https://www.amrshire.wa.gov.au/businesses/permits-and-approvals/short-term-rental-accommodation"},
+        {"label": "Landgate: resources for strata buyers", "url": "https://www.landgate.wa.gov.au/strata-and-community-titles/strata-titles/learn-about-strata/resources-for-strata-buyers/"},
+        {"label": "WA Revenue: transfer duty assessment", "url": "https://www.wa.gov.au/organisation/department-of-treasury-and-finance/transfer-duty-assessment"},
+        {"label": "DFES: current WA bushfire-prone-area map", "url": "https://dfes.wa.gov.au/site/bushfire/bushfireproneareas.html"},
+        {"label": "Augusta Margaret River: coastal hazard adaptation plan", "url": "https://www.amrshire.wa.gov.au/getmedia/c853ae61-f779-48ad-9b03-39c1fd1ef21e/Coastal-Hazard-Risk-Management-and-Adaptation-Plan-2015.pdf"},
+        {"label": "Fiona Stanley Hospital: emergency care", "url": "https://fsfhg.health.wa.gov.au/For-patients-and-visitors/Emergency-care-at-FSH"},
+        {"label": "WA Country Health: South West hospitals", "url": "https://wacountry.health.wa.gov.au/Our-services/South-West/South-West-health-services/hospitals-and-health-services"},
+        {"label": "Margaret River Hospital service directory", "url": "https://wacountry.health.wa.gov.au/~/media/WACHS/Documents/South-West/Margaret_River_Hospital_-_Services_Directory.pdf"},
+        {"label": "Perth Airport FY2026 passenger record", "url": "https://www.perthairport.com.au/home/corporate/articles/2026/07/15/01/44/perth-airport-sets-new-annual-passenger-record-in-fy26"},
+        {"label": "Perth Airport: route maps", "url": "https://www.perthairport.com.au/flights/route-maps"},
+        {"label": "Perth Airport: terminal locations", "url": "https://www.perthairport.com.au/at-the-airport/which-terminal"},
+        {"label": "Transwa: current SW1 coach timetable", "url": "https://www.transwa.wa.gov.au/plan-your-journey/coach-lines/sw1"},
+        {"label": "Landgate Annual Report 2024–25", "url": "https://www.landgate.wa.gov.au/siteassets/documents/about-us/strategic-plans-and-annual-reports/landgate-annual-report-2024-25/"},
+        {"label": "REIWA: South Perth settled sales", "url": "https://reiwa.com.au/suburb/south-perth/"},
+        {"label": "South West Development Commission housing snapshot", "url": "https://swdc.wa.gov.au/wp-content/uploads/2026/04/2026-02-01-Construction-Housing-Snapshot-February-2026-Release-Final-South-West-.pdf"},
+        {"label": "Reserve Bank of Australia: historical exchange rates", "url": "https://www.rba.gov.au/statistics/frequency/exchange-rates.html"},
+        {"label": "East Perth Garden Towers asking observation", "url": "https://www.realestate.com.au/property-apartment-wa-east%2Bperth-139225267/"},
+        {"label": "Como Coterie apartment 302 asking observation", "url": "https://www.joneshq.com.au/property/3-bedroom-apartment-in-como-nearing-completion/"},
+        {"label": "Margaret River Lot 309 house-and-land asking observation", "url": "https://www.celebrationhomes.com.au/package/lot-309-preston-circuit-margaret-river/"},
+        {"label": "Celebration Homes Sandstone 195 floor plan", "url": "https://www.celebrationhomes.com.au/wp-content/uploads/2025/02/Sandstone-195-Brochure.pdf"},
+    ),
+    images=(
+        DossierImage("hero", "/assets/perth-margaret-river-river-hero.webp", "Swan River foreshore, contemporary apartments and the Perth skyline in early-morning light", "Perth's advantage is a real city wrapped around river and coast.", "hero"),
+        DossierImage("city-life", "/assets/perth-margaret-river-city-life.webp", "Shaded riverside residential street in Perth with contemporary low-rise homes and native planting", "Daily-life quality comes from shade, services and an easy ordinary routine.", "wide"),
+        DossierImage("regional-diligence", "/assets/perth-margaret-river-regional-diligence.webp", "Contemporary Margaret River home with water tank, vineyard, native bush and the coast beyond", "Regional appeal needs a practical plan for roads, fire, water and maintenance.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "What homes cost"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Perth / Margaret River through five destination lenses",
+    assessment_intro="Here’s how Perth / Margaret River scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="The current examples range from A$878,300 for a Margaret River house-and-land package to A$1.84 million for a larger East Perth apartment. The Margaret River figure is a builder's from-price, not a fixed final contract price; Como sits between them. All three unit-price comparisons use living or internal area, so balconies, garages and outdoor entertaining space do not make one home look artificially cheaper.",
+    market_anchors_intro="These are public market signals—not valuations. They cover different periods, geographies and property types; none substitutes for matched completed sales, independent valuation or the exact property's foreign-investment eligibility.",
+    orientation_groups=(
+        DossierOrientationGroup("Metropolitan Perth", (("Perth Airport", "Asia-facing gateway"), ("East Perth / CBD", "Urban service base"), ("South Perth / Mount Pleasant", "Riverside residential belt"), ("Fremantle", "Port, coast and rail"))),
+        DossierOrientationGroup("South West", (("Busselton", "Regional gateway and services"), ("Margaret River town", "Strongest daily-life base"), ("Prevelly / Gnarabup", "Coastal and car-led"), ("Augusta", "More remote southern option"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the current airport transfer, road or coach timetable, hospital route and exact last mile.",
+    country_guide_url="/countries/australia-property/",
+    country_guide_label="Australia property guide",
+    rail_comparison="Compare Perth / Margaret River with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -3500,6 +3655,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     DOLOMITES_SOUTH_TYROL_DOSSIER.destination_id: DOLOMITES_SOUTH_TYROL_DOSSIER,
     CHAMONIX_DOSSIER.destination_id: CHAMONIX_DOSSIER,
     LAKE_TAHOE_DOSSIER.destination_id: LAKE_TAHOE_DOSSIER,
+    PERTH_MARGARET_RIVER_DOSSIER.destination_id: PERTH_MARGARET_RIVER_DOSSIER,
 }
 
 
