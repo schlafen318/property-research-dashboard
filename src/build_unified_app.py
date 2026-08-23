@@ -1682,12 +1682,17 @@ def country_next_step_html(hub: dict, selected: list[dict], pages: list[dict]) -
     best = selected[0] if selected else None
     guide_links = country_guide_links(hub, pages)
     best_name = best["name"] if best else hub["country"]
+    best_link = (
+        f'<a href="/destinations/{escape(destination_slug(best))}/">{escape(best_name)}</a>'
+        if best
+        else escape(best_name)
+    )
     return f"""
       <section class="buyer-next-step" aria-label="Buyer Next Step">
         <div>
           <p class="page-eyebrow">Buyer Next Step</p>
           <h2>Turn {escape(hub["country"])} research into a shortlist</h2>
-          <p>Start with {escape(best_name)}, compare the related buying guides, then use shortlist review once the buyer profile, holding period, and budget are clear enough for local diligence.</p>
+          <p>Start with {best_link}, compare the related buying guides, then use shortlist review once the buyer profile, holding period, and budget are clear enough for local diligence.</p>
         </div>
         <div class="buyer-next-step__grid">
           <article>
@@ -5812,6 +5817,9 @@ def build_country_hub_page(
     updated = date.today().isoformat()
     avg_score = sum(float(dest.get("decision_score", 0) or 0) for dest in selected) / max(1, len(selected))
     best = selected[0] if selected else destinations[0]
+    best_destination_link = (
+        f'<a href="/destinations/{escape(destination_slug(best))}/">{escape(best["name"])}</a>'
+    )
     guide_links = country_guide_links(hub, pages)
     peer_country_links = country_hub_links(hub["slug"], limit=6)
     report_title, report_reason = country_report_recommendation(hub)
@@ -5873,7 +5881,7 @@ def build_country_hub_page(
       {sticky_page_nav([("Thesis", "country-thesis"), ("Buyer Fit", "buyer-fit"), ("Brief", "premium-brief"), ("Compare", "destination-comparison"), ("Risk", "risk-posture"), ("Guides", "related-guides")])}
       {mobile_action_strip("#destination-comparison", "Compare", "/shortlist-review/", "Brief")}
       <section class="brief-panel" aria-label="Country briefing">
-        <article><span>Top destination match</span><strong>{escape(best["name"])}</strong><p>{escape(best.get("panel_verdict") or "")}</p></article>
+        <article><span>Top destination match</span><strong>{best_destination_link}</strong><p>{escape(best.get("panel_verdict") or "")}</p></article>
         <article><span>Buyer profile</span><strong>Affluent global planners</strong><p>Best for buyers comparing lifestyle use, legal clarity, tax and ownership friction, rental realism, and future liquidity before local deal work.</p></article>
         <article><span>Risk posture</span><strong>{metric_value(best, "ownership_clarity"):.1f}/5 ownership clarity</strong><p>Use country-level rules as the first screen, then verify title, taxes, rental permissions, and local transaction mechanics by asset.</p></article>
       </section>
@@ -7398,7 +7406,7 @@ def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec)
             matched_indexes.add(anchor_index)
             anchor = spec.market_anchors[anchor_index]
             local_comparison = (
-                '<p class="premium-local-comparison"><strong>Local comparison:</strong> '
+                '<p class="premium-local-comparison"><strong>Local comparison — why it matters:</strong> '
                 f'{escape(anchor["evidence"])}. {escape(anchor["buyer_read"])} '
                 f'<a href="{escape(anchor["source_url"])}" rel="noopener noreferrer">{escape(anchor["source_label"])}</a></p>'
             )
@@ -7412,9 +7420,8 @@ def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec)
             f'<div><dt>Buyer relevance</dt><dd>{escape(row["note"])}</dd></div>'
             '</dl>'
             f'{local_comparison}'
-            '<p class="premium-property-source"><strong>Source:</strong> '
-            f'<a href="{escape(row["source_url"])}" rel="noopener noreferrer">{escape(row["source_name"])}</a> '
-            f'· Captured {escape(row["captured_date"])} · {escape(row["confidence"])} confidence</p>'
+            '<p class="premium-property-source">'
+            f'<a href="{escape(row["source_url"])}" rel="noopener noreferrer">View current listing at {escape(row["source_name"])}</a></p>'
             '</div>'
         )
 

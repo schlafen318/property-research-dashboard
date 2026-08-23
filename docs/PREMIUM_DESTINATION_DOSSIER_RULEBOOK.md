@@ -214,12 +214,11 @@ Every observation must appear once in the single property-evidence section and c
 - dated USD comparison; keep the exchange-rate basis in the source/data field unless it materially changes the buyer conclusion;
 - internal area and price per square metre using a consistent area definition;
 - direct source URL and source name;
-- capture date;
-- confidence level;
+- capture date and confidence in the internal audit data and evidence ledger, not as production commentary in the reader-facing record;
 - a short Buyer relevance statement that explains the useful conclusion;
 - one compatible official anchor presented as its Local comparison, including source and asset-basis limitation.
 
-The section must say that listings are dated asking-price evidence only and do not verify availability, title, condition, negotiability, fees, legal use, or completed value. Keep that caveat concise and reader-facing. Do not use listing photography without confirmed reuse rights.
+The section must say that listings are dated asking-price evidence only and do not verify availability, title, condition, negotiability, fees, legal use, or completed value. Keep that caveat concise and reader-facing. Each record should provide a plainly labelled **View current listing** link; do not display capture dates, confidence labels, or research-process metadata beside it. Do not use listing photography without confirmed reuse rights.
 
 ### 9.2 Official market anchors
 

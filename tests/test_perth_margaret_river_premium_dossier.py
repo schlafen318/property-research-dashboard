@@ -34,6 +34,7 @@ class PerthMargaretRiverDossierContractTests(unittest.TestCase):
             {key for lens in self.spec.lenses for key in lens.dimension_keys},
         )
         self.assertEqual(3, len(self.spec.market_anchors))
+        self.assertEqual((None, 1, 2), self.spec.property_anchor_indexes)
         self.assertEqual(4, len(self.spec.micro_locations))
         self.assertEqual(3, len(self.spec.images))
         self.assertEqual(8, len(self.spec.checklist))
@@ -70,6 +71,7 @@ class PerthMargaretRiverDossierContractTests(unittest.TestCase):
             "servicesaustralia.gov.au", "wa.gov.au", "planning.wa.gov.au",
             "amrshire.wa.gov.au", "landgate.wa.gov.au", "dfes.wa.gov.au",
             "health.wa.gov.au", "perthairport.com.au", "rba.gov.au",
+            "transfer-duty-assessment",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, urls)
@@ -82,6 +84,17 @@ class PerthMargaretRiverDossierContractTests(unittest.TestCase):
         self.assertRegex(dossier_copy.lower(), r"does not (?:create|provide).*visa|property ownership does not")
         self.assertRegex(dossier_copy.lower(), r"90[^.]{0,30}night")
         self.assertNotRegex(dossier_copy.lower(), r"uniform wa short-term|one wa short-term rule")
+        ownership_lens = next(
+            lens for lens in self.spec.lenses if "ownership_clarity" in lens.dimension_keys
+        )
+        ownership_copy = " ".join(ownership_lens.paragraphs).lower()
+        for term in ("bushfire", "coastal", "insurance"):
+            self.assertIn(term, ownership_copy)
+        self.assertNotIn("flood", " ".join(self.spec.checklist).lower())
+        retirement_lens = next(
+            lens for lens in self.spec.lenses if "retirement_fit" in lens.dimension_keys
+        )
+        self.assertNotIn("on-call doctor", " ".join(retirement_lens.paragraphs).lower())
 
     def test_evidence_ledger_records_scope_limits_and_recheck_triggers(self) -> None:
         ledger = (ROOT / "docs/research/perth-margaret-river-evidence-ledger.md").read_text()
@@ -94,6 +107,7 @@ class PerthMargaretRiverDossierContractTests(unittest.TestCase):
         self.assertGreaterEqual(ledger.count("https://"), 20)
         for trigger in ("foreign investment", "tax", "planning", "listing", "transport", "hazard", "market data"):
             self.assertIn(trigger, ledger.lower())
+        self.assertIn("29 August 2023", ledger)
 
     def test_generated_images_have_a_publication_provenance_record(self) -> None:
         provenance = (ROOT / "docs/research/perth-margaret-river-image-provenance.md").read_text()
@@ -200,6 +214,22 @@ class PerthMargaretRiverDataTests(unittest.TestCase):
         self.assertEqual(destination["representative_price_usd"], cost["property"]["representative_price_usd"])
         self.assertEqual(1052737.155, cost["property"]["representative_price_usd"])
         self.assertEqual(0.115, cost["property"]["acquisition_cost_rate"])
+        listings = json.loads((ROOT / "data/listings.json").read_text())
+        regional_listing = next(item for item in listings if "Sandstone 195" in item["listing_name"])
+        self.assertIn("from-price", regional_listing["note"])
+        spec = get_premium_dossier(DESTINATION_ID)
+        self.assertIn("from A$878,300", spec.listings_intro)
+        value_lens = next(lens for lens in spec.lenses if "value_entry" in lens.dimension_keys)
+        self.assertIn("starting price", " ".join(value_lens.paragraphs).lower())
+        property_source = next(
+            source for source in cost["sources"]
+            if source["metric_supported"] == "Representative property acquisition benchmark"
+        )
+        self.assertIn("three direct asking observations", property_source["name"].lower())
+        self.assertNotIn("realestate.com.au", property_source["name"].lower())
+        self.assertNotIn("//", property_source["url"].split("://", 1)[1])
+        self.assertIn("Como", property_source["notes"])
+        self.assertNotIn("Mount Pleasant", property_source["notes"])
 
 
 class PerthMargaretRiverRenderingTests(unittest.TestCase):
@@ -232,8 +262,15 @@ class PerthMargaretRiverRenderingTests(unittest.TestCase):
             self.assertEqual(1, self.html.count(f'src="{image.src}"'))
             self.assertIn(f'alt="{html_module.escape(image.alt, quote=True)}"', self.html)
         self.assertEqual(10, self.html.count('class="premium-score-row"'))
-        self.assertEqual(3, self.html.count('class="premium-listing-row"'))
-        self.assertEqual(3, self.html.count('class="premium-market-anchor"'))
+        self.assertEqual(3, self.html.count('class="premium-property-record"'))
+        self.assertNotIn('class="premium-listing-row"', self.html)
+        self.assertEqual(2, self.html.count('class="premium-local-comparison"'))
+        self.assertEqual(3, self.html.count("View current listing"))
+        listings_section = self.html.split('id="listings"', 1)[1].split('</section>', 1)[0]
+        self.assertNotIn("Captured", listings_section)
+        self.assertNotIn("confidence", listings_section.lower())
+        self.assertNotIn("Official market anchors", self.html)
+        self.assertEqual(1, self.html.count('class="premium-market-context"'))
         self.assertEqual(2, self.html.count('class="premium-orientation-group"'))
         self.assertIn("public market signals—not valuations", self.html)
         self.assertIn("<th>Atlas read</th>", self.html)
@@ -253,6 +290,10 @@ class PerthMargaretRiverRenderingTests(unittest.TestCase):
         destinations = json.loads((ROOT / "data/destinations.json").read_text())
         html = build_country_hub_page(hub, destinations, [])
         self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
+        briefing = html.split('aria-label="Country briefing"', 1)[1].split('</section>', 1)[0]
+        self.assertIn(f'href="/destinations/{DESTINATION_ID}/"', briefing)
+        next_step = html.split('class="buyer-next-step"', 1)[1].split('</section>', 1)[0]
+        self.assertIn(f'href="/destinations/{DESTINATION_ID}/"', next_step)
 
     def test_quality_review_uses_canonical_scorecard_fields(self) -> None:
         review = (ROOT / "docs/research/perth-margaret-river-quality-review.md").read_text()

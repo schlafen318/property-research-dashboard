@@ -2132,12 +2132,12 @@
           "notes": "Official national and capital-city index; the calculator assumption is not a forecast."
         },
         {
-          "name": "Three direct realestate.com.au asking observations",
-          "url": "https://www.realestate.com.au/property-apartment-wa-east%2Bperth-139225267//",
+          "name": "Three direct asking observations",
+          "url": "https://www.realestate.com.au/property-apartment-wa-east%2Bperth-139225267/",
           "metric_supported": "Representative property acquisition benchmark",
           "source_date": "2026-08-23",
           "accessed_on": "2026-08-23",
-          "notes": "Median of direct asks in East Perth, Mount Pleasant and Margaret River; not a valuation or eligibility confirmation."
+          "notes": "Median of direct asks in East Perth, Como and Margaret River from realestate.com.au, Jones Realty & Projects and Celebration Homes; not a valuation or eligibility confirmation."
         },
         {
           "name": "WA Revenue — transfer duty assessment",

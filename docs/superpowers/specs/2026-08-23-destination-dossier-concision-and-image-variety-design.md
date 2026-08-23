@@ -51,7 +51,7 @@ Each example keeps only information that changes a decision:
 - translated USD comparison and USD/m² where denominators are comparable;
 - buyer relevance: daily-life pattern, legal-use issue, condition/completion issue or likely resale pool;
 - local comparison, if claim-fit;
-- source, capture date and confidence.
+- a direct **View current listing** link; capture date and confidence stay in internal audit data and the evidence ledger rather than the reader-facing record.
 
 On desktop, examples render as three readable editorial records rather than a wide nine-column spreadsheet. On mobile, the same records stack without horizontal scrolling.
 
@@ -77,7 +77,7 @@ Production commentary is prohibited in titles, introductions, captions and narra
 Necessary methodology remains available without interrupting the article:
 
 - currency and area basis live in their fields;
-- capture date and confidence live with each example;
+- capture date and confidence remain auditable in source data and the evidence ledger, not as process commentary in the article;
 - conversion date/rate and detailed limitations live in the caveat or references;
 - scoring methodology remains linked from the assessment footer;
 - evidence ledgers remain internal publishing records, not article copy.

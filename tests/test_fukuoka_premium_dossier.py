@@ -263,10 +263,13 @@ class PremiumDossierRenderingTests(unittest.TestCase):
         self.assertNotIn("<th>USD comparison</th>", self.fukuoka_html)
         for label in (
             "Asking price", "Area", "USD comparison", "Buyer relevance",
-            "Local comparison", "Source",
+            "Local comparison", "View current listing",
         ):
             with self.subTest(label=label):
                 self.assertIn(label, self.fukuoka_html)
+        listings_section = self.fukuoka_html.split('id="listings"', 1)[1].split('</section>', 1)[0]
+        self.assertNotIn("Captured", listings_section)
+        self.assertNotIn("confidence", listings_section.lower())
 
     def test_score_table_uses_dossier_specific_research_reads(self) -> None:
         spec = get_premium_dossier("fukuoka-itoshima")
