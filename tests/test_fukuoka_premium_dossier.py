@@ -68,13 +68,19 @@ class PremiumDossierContentTests(unittest.TestCase):
             *(paragraph for lens in self.spec.lenses for paragraph in lens.paragraphs),
         )).lower()
         for phrase in (
-            "recorded dataset exchange basis",
+            "recorded dataset",
             "the prose below explains",
-            "complete ten-dimension assessment appears once",
+            "appears once",
             "the listings below",
+            "public-market check on the asking listings",
+            "representative property evidence",
         ):
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, reader_copy)
+        self.assertIn("¥31.8 million", self.spec.listings_intro)
+        self.assertIn("¥180 million", self.spec.listings_intro)
+        self.assertIn("rail", self.spec.listings_intro.lower())
+        self.assertIn("resale", self.spec.listings_intro.lower())
 
     def test_each_lens_is_destination_specific_and_editorial_length_is_bounded(self) -> None:
         for lens in self.spec.lenses:
