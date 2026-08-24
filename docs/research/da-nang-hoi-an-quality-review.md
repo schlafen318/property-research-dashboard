@@ -2,30 +2,33 @@
 
 Review date: 2026-08-24
 
-Independent reviewer: Pending independent review
+Independent reviewer: Codex independent reviewer (`queenstown_review`)
 
-Approval date: Pending
+Approval date: 2026-08-24
 
-Result: Provisional — independent approval pending
+Result: 100/100 — publish-ready locally
 
 ## Canonical scorecard
 
 | Category | Weight | Score |
 |---|---:|---:|
-| Decision usefulness and editorial quality | 15 | 15 |
-| Evidence, legal precision and source discipline | 25 | 25 |
-| Data, listings and score reconciliation | 15 | 15 |
-| Country handoff, SEO and internal links | 15 | 15 |
-| Images, provenance and page design | 10 | Pending |
-| Responsive and accessibility QA | 10 | Pending |
-| Build and regression verification | 5 | Pending |
-| Independent approval | 5 | Pending |
+| A. Decision usefulness | 15 | 15 |
+| B. Evidence and accuracy | 25 | 25 |
+| C. Atlas model integrity | 15 | 15 |
+| D. Property and location evidence | 15 | 15 |
+| E. Editorial quality | 10 | 10 |
+| F. Design, mobile, and accessibility | 10 | 10 |
+| G. SEO and trust | 5 | 5 |
+| H. Build and maintenance | 5 | 5 |
+| **Total** | **100** | **100** |
 
 ## Hard-gate evidence
 
-- Exact 390×844 visual QA: Pending.
-- Exact 1440×1000 visual QA: Pending.
-- Page-origin warnings/errors: Pending.
-- Focused dossier test: Pending.
-- Full test suite: Pending.
-- Final staged-scope and generated-artifact reconciliation: Pending.
+- Exact 390×844 visual QA: document 390/390 px; score and location wrappers 362/362 px; all three property records readable; no page overflow.
+- Exact 1440×1000 visual QA: document 1440/1440 px; score and location wrappers 830/830 px; all three property records readable; no page overflow.
+- page-origin warnings/errors: 0 at both viewports.
+- Three distinct dossier images decoded at 1672×941 after lazy loading.
+- Focused dossier test before approval: 10/11 passed; sole failure was the deliberately incomplete independent-approval record.
+- Pre-approval full suite: 643/644 passed; sole failure was this deliberately incomplete approval record.
+- Independent content, source, data, image, responsive-layout and artifact review found no remaining Critical, Important or Minor issues.
+- Final focused suite: 11/11 passed. Final full suite: 644/644 passed.

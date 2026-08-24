@@ -65,6 +65,14 @@ class DaNangHoiAnDossierContractTests(unittest.TestCase):
             lower,
             r"local asking price is primary|usd uses|captured 2026|medium confidence|research process|the prose explains",
         )
+        self.assertNotIn("does not offer a general retirement visa", lower)
+        self.assertNotIn("principal public referral anchor", lower)
+        self.assertRegex(prose, r"1,500[–-]2,000")
+        lens_prose = " ".join(
+            paragraph for lens in self.spec.lenses for paragraph in lens.paragraphs
+        )
+        for listing_name in ("Masteri Rivera", "FPT Plaza 2", "Altara Suites"):
+            self.assertNotIn(listing_name, lens_prose)
         words = re.findall(r"\b[\w’'-]+\b", prose)
         self.assertGreaterEqual(len(words), 1800)
         self.assertLessEqual(len(words), 2500)
@@ -73,15 +81,31 @@ class DaNangHoiAnDossierContractTests(unittest.TestCase):
         urls = " ".join(item["url"] for item in self.spec.references)
         for fragment in (
             "vanban.chinhphu.vn", "evisa.gov.vn", "moc.gov.vn",
-            "danangairport.vn", "acv.vn", "soyte.danang.gov.vn",
+            "danangairport.vn", "acv.vn", "benhandientu.moh.gov.vn",
             "danang.gov.vn", "worldbank.org", "whc.unesco.org",
             "mof.gov.vn", "dotproperty.com.vn",
+            "docid=216924", "ChiTietVanBan.aspx?TypeVB=2&vID=656",
+            "docid=215061",
         ):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, urls)
         self.assertEqual("2026-08-24", self.spec.date_reviewed)
         self.assertRegex(self.spec.references_intro, r"24 February 2027")
         self.assertRegex(self.spec.references_intro.lower(), r"lawyer|tax adviser|property adviser")
+
+    def test_market_anchors_are_official_land_benchmarks_not_listing_derivatives(self) -> None:
+        self.assertEqual(3, len(self.spec.market_anchors))
+        self.assertEqual(3, len({anchor["location"] for anchor in self.spec.market_anchors}))
+        for anchor in self.spec.market_anchors:
+            combined = " ".join(anchor.values()).lower()
+            self.assertIn("baodanang.vn", anchor["source_url"])
+            self.assertRegex(combined, r"statutory|official land|residential-land")
+            self.assertRegex(combined, r"position 1|vị trí 1")
+            self.assertRegex(combined, r"not (?:an )?apartment|does not value")
+            self.assertNotRegex(combined, r"dot property|listing|median ask|three direct")
+        reference_urls = {item["url"] for item in self.spec.references}
+        self.assertTrue(any("ItemID=185433" in url for url in reference_urls))
+        self.assertTrue(any("ItemID=178929" in url for url in reference_urls))
 
     def test_atlas_reads_are_plain_local_and_concise(self) -> None:
         self.assertEqual(DECISION_DIMENSION_KEYS, set(self.spec.score_reads))
@@ -149,6 +173,12 @@ class DaNangHoiAnDataTests(unittest.TestCase):
         cost = next(row for row in costs if row["destination_id"] == DESTINATION_ID)
         self.assertIn("three direct", cost["property"]["price_basis"].lower())
         self.assertIn("planning", cost["property"]["acquisition_cost_basis"].lower())
+        self.assertIn("0.5%", cost["property"]["acquisition_cost_basis"])
+        self.assertTrue(any(
+            "registration fee" in source["metric_supported"].lower()
+            and "docid=215061" in source["url"]
+            for source in cost["sources"]
+        ))
 
 
 class DaNangHoiAnGeneratedPageTests(unittest.TestCase):
@@ -177,6 +207,8 @@ class DaNangHoiAnGeneratedPageTests(unittest.TestCase):
         )
         visible = html_module.unescape(page)
         self.assertRegex(visible, r"30%|50 years")
+        self.assertRegex(visible, r"0\.5%|registration fee")
+        self.assertRegex(visible.lower(), r"resale|next eligible buyer")
         self.assertIn("vanban.chinhphu.vn", page)
 
     def test_quality_review_records_completed_hard_gates(self) -> None:

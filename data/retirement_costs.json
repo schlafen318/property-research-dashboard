@@ -1782,7 +1782,7 @@
         "representative_price_usd": 134691,
         "acquisition_cost_rate": 0.05,
         "price_basis": "Median asking price of three direct Da Nang apartment observations captured 2026-08-24—Masteri Rivera, FPT Plaza 2 and Altara Suites. Each USD/m² comparison uses the portal-stated usable area and the Ministry of Finance August 2026 exchange basis. This is not a market median, valuation or proof of foreign eligibility.",
-        "acquisition_cost_basis": "Illustrative 5% buyer-side planning allowance for independent legal review, translation, registration and administrative work, inspection, finance and contingency. It is not a statutory tax estimate and excludes furnishing, project-specific charges and any tax or fee embedded in the contract. Obtain a buyer-specific closing statement from Vietnamese legal and tax advisers."
+        "acquisition_cost_basis": "A 5% buyer-side planning reserve. It includes the official general 0.5% house-and-land registration-fee baseline plus an unpriced reserve for independent legal review, translation, registration work, inspection, finance and contingency. The 5% is not a statutory total-cost rate and excludes furnishing, project-specific charges and contract-specific taxes or fees. Obtain a buyer-specific closing statement from Vietnamese legal and tax advisers."
       },
       "confidence": {
         "overall": "medium-high",
@@ -1825,6 +1825,14 @@
           "source_date": "2026-08",
           "accessed_on": "2026-08-24",
           "notes": "25,243 VND per USD for August 2026 statistical conversion; not a transaction quote."
+        },
+        {
+          "name": "Vietnam Ministry of Finance — consolidated registration-fee guidance",
+          "url": "https://vanban.chinhphu.vn/?classid=0&docid=215061&pageid=27160",
+          "metric_supported": "General 0.5% registration fee baseline for houses and land",
+          "source_date": "2025-08-21",
+          "accessed_on": "2026-08-24",
+          "notes": "The taxable base, exemptions and all other taxes, charges and professional costs remain buyer- and transaction-specific; this source does not support the full 5% planning reserve."
         }
       ]
     },
