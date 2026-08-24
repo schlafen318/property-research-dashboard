@@ -1742,7 +1742,7 @@
     {
       "destination_id": "da-nang-hoi-an",
       "display_currency": "VND",
-      "fx_to_usd": 0.0000380084,
+      "fx_to_usd": 0.000039614942752666,
       "inflation": {
         "general": 0.035,
         "healthcare": 0.055,
@@ -1779,9 +1779,10 @@
         }
       },
       "property": {
-        "representative_price_usd": 133029,
-        "acquisition_cost_rate": 0.08,
-        "price_basis": "Median of three representative Da Nang / Hoi An listing snapshots captured by Global Home Atlas."
+        "representative_price_usd": 134691,
+        "acquisition_cost_rate": 0.05,
+        "price_basis": "Median asking price of three direct Da Nang apartment observations captured 2026-08-24—Masteri Rivera, FPT Plaza 2 and Altara Suites. Each USD/m² comparison uses the portal-stated usable area and the Ministry of Finance August 2026 exchange basis. This is not a market median, valuation or proof of foreign eligibility.",
+        "acquisition_cost_basis": "Illustrative 5% buyer-side planning allowance for independent legal review, translation, registration and administrative work, inspection, finance and contingency. It is not a statutory tax estimate and excludes furnishing, project-specific charges and any tax or fee embedded in the contract. Obtain a buyer-specific closing statement from Vietnamese legal and tax advisers."
       },
       "confidence": {
         "overall": "medium-high",
@@ -1810,12 +1811,20 @@
           "notes": "Official national index used as a planning proxy, not a forecast."
         },
         {
-          "name": "Global Property Guide — property listings",
-          "url": "https://www.globalpropertyguide.com/asia/vietnam/price-history",
+          "name": "Dot Property Vietnam — three direct Da Nang apartment asks",
+          "url": "https://www.dotproperty.com.vn/en/apartments-for-sale/%C4%91%C3%A0-n%E1%BA%B5ng",
           "metric_supported": "Representative property acquisition benchmark",
-          "source_date": "2026-06-21",
-          "accessed_on": "2026-08-18",
-          "notes": "Median of three captured listings; not a market-wide median and availability changes."
+          "source_date": "2026-08-24",
+          "accessed_on": "2026-08-24",
+          "notes": "Median of three live direct asks with portal-stated usable areas; not a market median, valuation, completed sale, title opinion, eligibility confirmation or availability guarantee."
+        },
+        {
+          "name": "Vietnam Ministry of Finance — August 2026 monthly exchange rate",
+          "url": "https://mof.gov.vn/mof/monthly-exchange-rate-1/monthly-exchange-rate-august-2026",
+          "metric_supported": "VND-to-USD comparison basis",
+          "source_date": "2026-08",
+          "accessed_on": "2026-08-24",
+          "notes": "25,243 VND per USD for August 2026 statistical conversion; not a transaction quote."
         }
       ]
     },

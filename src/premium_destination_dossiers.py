@@ -3787,6 +3787,158 @@ MIAMI_FORT_LAUDERDALE_DOSSIER = PremiumDossierSpec(
 )
 
 
+DA_NANG_HOI_AN_DOSSIER = PremiumDossierSpec(
+    destination_id="da-nang-hoi-an",
+    title="Da Nang and Hoi An Retirement Property Dossier",
+    description="Assess Da Nang and Hoi An retirement property through residence, foreign ownership, daily life, healthcare, rental rules, flood risk, value, and representative apartments.",
+    h1="Da Nang / Hoi An: coastal life with legal guardrails",
+    lede=(
+        "Da Nang / Hoi An offers an unusually attractive central-Vietnam combination: a working coastal city, an airport close to the urban core, long beaches, established healthcare and a UNESCO-listed heritage town within the wider region. The proposition is affordable by international-city standards, but it is not legally simple. A foreign buyer needs an eligible commercial-housing project, available foreign quota and a defensible certificate pathway; ownership does not create residence, and a residential apartment is not automatically a lawful short-stay business."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-24",
+    date_reviewed="2026-08-24",
+    verdict_paragraphs=(
+        "The verdict is cautiously positive for a buyer seeking personal use in Da Nang, provided legal eligibility is solved before price. Vietnam's 2023 Housing Law, effective from 1 January 2025, permits eligible foreign individuals who are allowed to enter Vietnam to own specified housing in qualifying commercial-housing projects. The familiar guardrails remain material: foreign ownership in an apartment building is capped at 30% of the units, restricted defence or security areas and project status matter, and the ordinary foreign-individual term is up to 50 years from the certificate with a possible extension under the implementing rules. This is a project-and-unit pathway, not a general right to buy any apartment, house or land advertised online.",
+        "Buying a home does not provide residence. Vietnam's official e-visa currently permits a stay of up to 90 days, single or multiple entry, but it is a visitor permission rather than a retirement residence solution. Vietnam does not offer a general retirement visa. A buyer planning to live in Da Nang for much of the year must establish an independent immigration route, private-health plan and tax position before committing capital. Hoi An should be treated primarily as a heritage and lifestyle catchment in this dossier, not as evidence that a foreigner can acquire any traditional house in or around the old town.",
+        "The strongest use case is therefore a well-documented Da Nang apartment for extended personal stays: an address with ordinary groceries, hospital access, reliable building management, defensible flood and storm exposure, and a future buyer pool that does not depend on nightly tourism. The weakest case is an off-plan or hotel-branded unit bought because a seller promises rent, permanent ownership or automatic eligibility. Proceed only after an independent Vietnamese lawyer confirms the exact project, foreign quota, seller authority, land-use term, certificate route, permitted use, management rules, taxes and exit mechanics in writing."
+    ),
+    lenses_intro=(
+        "Five questions decide whether the central-Vietnam proposition works beyond a holiday: whether ordinary life is comfortable through heat and rain, whether the airport advantage survives the last mile, whether the exact unit is legally available, whether income survives regulation and costs, and whether another eligible buyer will want the asset on exit."
+    ),
+    lenses=(
+        DossierLens(
+            "Build daily life around Da Nang, not the resort brochure",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Da Nang's lifestyle case is broad rather than theatrical. The Han River, My Khe coast, Son Tra peninsula, markets, cafés and strong central-Vietnam food culture provide genuine variety, while the city remains an employment and services centre rather than a seasonal resort. Hai Chau offers the densest everyday network and a short airport journey. My Khe and Phuoc My bring the beach into daily life, but add traffic, salt exposure and a more tourism-shaped streetscape. Ngu Hanh Son and Hoa Hai offer newer development and more space, with longer journeys to established hospitals and central services. Hoi An adds architectural character and a slower rhythm, but it is not a substitute for Da Nang's urban systems.",
+                "Healthcare needs an address-level plan. Da Nang Hospital is the principal public referral anchor in the city and the municipal health directory records a 1,250-bed institution. Da Nang unified its emergency medical number under 115 citywide from October 2025. Those facts improve the retirement case, but they do not guarantee English-language care, insurance acceptance, a chosen specialty or rapid travel from every coastal development. Visit the hospital and preferred private providers, confirm payment and insurer procedures, identify a regular doctor and time the journey in traffic and heavy rain.",
+                "Climate comfort is part of the operating cost. Hot, humid months increase cooling, mould and corrosion risk; the wet and typhoon seasons test drainage, glazing, balconies, backup power and access. In an apartment, ask how the building manages façade leaks, lift outages, water ingress, generators and emergency communications. In Hoi An and low-lying parts of the wider coastal plain, annual flooding is not an abstract hazard: UNESCO itself identifies flooding among the pressures on the heritage property. A good retirement base should remain safe, supplied and socially useful on an ordinary wet weekday, not only in clear-season photographs."
+            ),
+            "residential-coast",
+        ),
+        DossierLens(
+            "Use the airport advantage without confusing access with integration",
+            ("global_access", "foreigner_fit"),
+            (
+                "Da Nang International Airport is close to the city centre, and the operator's current network page lists 13 domestic destinations. Airports Corporation of Vietnam reported 26 domestic and international routes in 2025 and more than 130 flights a day on average. That is a meaningful advantage for regional travel and domestic connections, especially compared with remote island or mountain markets. It does not make every address equally convenient: river bridges, beach traffic, construction and storm disruption can materially change the final journey, while Hoi An adds a longer road transfer.",
+                "Foreigner fit is strongest in the practical urban corridor. International tourism, universities, hospitals and a developed hospitality sector make Da Nang easier to navigate than a small provincial town. English is present in property marketing and visitor services, but the controlling systems—law, land and housing records, tax, condominium governance, utilities and dispute resolution—operate in Vietnamese. Use an independent bilingual lawyer and interpreter whose fees are not contingent on the sale. Translate the reservation, sale agreement, project approvals, land record, foreign-quota evidence, management rules and certificate documents before signing.",
+                "Test access as a resident rather than a passenger. Time the apartment-to-airport journey with luggage; map grocery, pharmacy, hospital and social routes; and learn which trips require a car or ride-hailing service. My Khe can feel close to everything while a river crossing still controls key journeys. Hoa Hai and newer southern districts may offer more modern stock but less mature street-level convenience. Hoi An rewards repeated visits and cultural engagement, yet specialist healthcare and the airport remain tied to Da Nang. The airport supports the proposition; an address with weak ordinary services does not inherit that strength automatically."
+            ),
+        ),
+        DossierLens(
+            "Prove the project, quota and permitted use",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Foreign ownership begins with statutory eligibility and narrows from there. Under the current Housing Law and Decree 95/2024, an eligible foreign individual may acquire specified housing in a qualifying commercial-housing project, subject to entry status, project geography, the 30% apartment-building quota and the applicable term. A listing portal, sales reservation, developer brochure or statement that Vietnamese buyers receive long-term ownership does not establish that a foreign buyer can acquire the particular unit. Require official project eligibility, current foreign-quota confirmation and the certificate pathway for the exact unit from independent counsel and the competent authorities.",
+                "The legal package should answer more than the headline term. Confirm the developer or seller's authority, land-use purpose and remaining term, construction and acceptance records, bank security or release, completion timetable, taxes, maintenance fund, management company, common-property rights, parking, transfer restrictions and what happens if a certificate is delayed. For resale, reconcile the existing certificate with the seller and unit. For off-plan stock, treat incentives, handover dates and marketing renderings as seller claims until supported by approvals and the contract. The Ministry of Construction's 2026 procedure confirms that a foreign owner's extension is an application process rather than an automatic perpetual right.",
+                "Use is a separate legal question. Current government guidance on the 2023 Housing Law states that condominium apartments may not be used for non-residential purposes. Tourism accommodation operates within the Tourism Law, local oversight and business requirements; Da Nang's 2026 programme specifically addresses tourist accommodation and service quality. A residential unit, hotel-style amenity package or seller rental forecast does not prove nightly operation is lawful. Obtain written confirmation of the unit's approved function, building rules, operator licence, tax treatment and any stay restrictions before assigning income to it.",
+                "Hazard and conservation controls also attach to the exact site. World Bank material identifies pluvial and fluvial flooding, storm surge, variable rainfall and sea-level rise as relevant to Da Nang's resilience planning. Hoi An's UNESCO status brings conservation and buffer-zone responsibilities that can restrict alteration and intensify review. Order current planning, flood, drainage and building evidence for the parcel or project; inspect after heavy rain where possible; and obtain insurance terms that address storm, flood, water ingress, contents, liability and vacant periods."
+            ),
+            "heritage-water",
+        ),
+        DossierLens(
+            "Underwrite resident demand before tourist income",
+            ("rental_profit", "capital_upside"),
+            (
+                "Da Nang has real resident and visitor demand, but there is no defensible destination-wide net yield for a foreign-accessible apartment. Long-term demand varies by employment node, building quality, furnishings, parking and access. Tourist demand varies by season, beach position, operator, lawful accommodation status and platform conditions. Begin with matched twelve-month leases in the same building, then deduct vacancy, management, maintenance, common charges, utilities, tax, furnishings, repairs and foreign-owner administration. Model no rent as well as the permitted rental case.",
+                "The three current asking observations illustrate the range. FPT Plaza 2 asks ₫3.2 billion for a portal-stated 70m² usable-area apartment in Hoa Hai; Masteri Rivera asks ₫3.4 billion for 47.4m² in Hoa Cuong Nam and advertises Q3 2026 handover; Altara Suites asks ₫5.02 billion for 56m² in Phuoc My. Using the August 2026 Ministry of Finance exchange rate, they compare at roughly US$127,000, US$135,000 and US$199,000. These are seller asks, not sales or valuations, and none proves foreign quota, title, lawful rental use, completion or availability.",
+                "Portal-level market evidence should be read just as narrowly. Dot Property's current Da Nang apartment page reports a median asking price of about ₫4.243 billion and a median asking unit price of about ₫87.59 million per square metre. The three selected observations have a median ask of ₫3.4 billion and a median usable-area comparison near ₫71.73 million per square metre. Differences in project status, view, furnishing, tenure and buyer eligibility prevent a direct valuation conclusion. Ask an independent valuer and two unrelated agents for matched completed transactions or the closest defensible alternatives.",
+                "Capital upside is plausible where infrastructure, employment and liveability widen the future resident pool, but it should not be purchased as a forecast. New supply can dilute scarcity; certificate delays and project-specific legal status can overwhelm city growth; and a foreign-owned unit may face a narrower eligible resale market. Prefer a building that works for ordinary Vietnamese and eligible foreign residents, not one whose case depends on a guaranteed-rent pitch. Demand evidence, not tourism headlines, should support the exit thesis."
+            ),
+        ),
+        DossierLens(
+            "Pay for a future buyer, not a cheap headline",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Da Nang can look inexpensive beside established Asian gateway cities, but value entry begins after legal and operating adjustments. Compare local-currency price per consistent usable area, then add tax, legal work, translation, registration, maintenance fund, furnishing, common charges, insurance, repairs, financing and currency risk. For off-plan stock, include completion and certificate delay scenarios. A planning allowance for acquisition costs is useful only as a placeholder; obtain a property-specific closing statement from a Vietnamese lawyer and tax adviser before commitment.",
+                "Exit liquidity depends on who can legally and practically buy next. A central, completed apartment with clear records, functioning management and a layout useful to resident households should reach a broader pool than a branded hotel-style unit with uncertain use or an unfinished fringe project. Hoa Cuong Nam offers central access and newer supply; Phuoc My offers beach proximity but more tourist exposure and potentially higher operating costs; Hoa Hai offers larger floorplates at lower unit prices but depends more on the southern growth corridor. Hoi An heritage character does not make a Da Nang apartment liquid, and a traditional-house narrative cannot replace verified ownership eligibility.",
+                "Before exchange, request the current certificate or complete issuance pathway, project approvals, foreign-quota evidence, management accounts, maintenance-fund records, insurance, defects history, handover status, utility debts and any rental or occupancy rules. Ask two agents who did not introduce the unit to identify the likely next buyer, current competing supply and objections that would slow a sale. Preserve every translated document and approval for the next purchaser. A robust purchase is one that remains useful with no tourist rent and explainable when market sentiment is weaker.",
+                "The final choice should reflect the life the buyer will actually lead. Hai Chau and the Han River corridor support urban convenience; My Khe and Son Tra exchange some convenience for immediate coast; Ngu Hanh Son and Hoa Hai offer newer residential options with more last-mile dependence; Hoi An supplies cultural depth but brings heritage, flood and access constraints. The lowest asking price is not automatically value. Value is the combination of lawful acquisition, durable personal use, controllable carrying costs and a credible eligible buyer on exit."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Da Nang combines the Han River, My Khe coast and year-round city life; Hoi An adds heritage character with greater flood and access constraints.",
+        "global_access": "Da Nang airport sits close to the urban core and supports a useful regional network, while Hoi An adds a material road transfer.",
+        "ownership_clarity": "Vietnam permits eligible foreign buyers in qualifying projects, but Da Nang project status, 30% quota, certificate route and 50-year term require written verification.",
+        "regulatory_safety": "Da Nang apartment use, tourist accommodation, project approvals, building governance and flood exposure must all be cleared for the exact unit.",
+        "rental_profit": "Da Nang has resident and visitor demand, but lawful use, seasonality, management costs and foreign-title constraints prevent a credible destination-wide net yield.",
+        "capital_upside": "Da Nang infrastructure and regional growth support selected completed projects, while new supply, certificate risk and seller-led forecasts weaken speculative cases.",
+        "retirement_fit": "Da Nang offers major-city services and hospital access, but residence, private health cover, heat, storm resilience and address-level convenience remain personal constraints.",
+        "exit_liquidity": "Central Da Nang apartments with clear certificates and resident utility should resell more easily than fringe, hotel-style or legally uncertain stock.",
+        "foreigner_fit": "Da Nang is internationally familiar, but Vietnamese-language legal, tax, management and certificate systems make independent bilingual support essential.",
+        "value_entry": "Da Nang asks remain accessible by regional standards, but only consistent usable-area pricing and complete legal and operating costs reveal genuine value.",
+    },
+    market_anchors=(
+        {"location": "Da Nang apartment portal", "evidence": "₫4.243bn median ask", "buyer_read": "Current apartment asking median on 24 August 2026; the portal also reports ₫87.59m/m². Asking inventory—not completed sales or a unit valuation.", "source_label": "Dot Property Da Nang apartments", "source_url": "https://www.dotproperty.com.vn/en/apartments-for-sale/%C4%91%C3%A0-n%E1%BA%B5ng"},
+        {"location": "Three direct apartment observations", "evidence": "₫3.2bn–₫5.02bn", "buyer_read": "Masteri Rivera, FPT Plaza 2 and Altara Suites asks captured 24 August 2026. Different projects and completion stages; foreign eligibility remains unverified.", "source_label": "Three current Dot Property asks", "source_url": "https://www.dotproperty.com.vn/en/apartments-for-sale/%C4%91%C3%A0-n%E1%BA%B5ng"},
+        {"location": "Three-observation usable-area comparison", "evidence": "₫45.71m–₫89.64m/m²", "buyer_read": "Median about ₫71.73m/m² using each portal-stated usable area. Small, deliberately heterogeneous sample—not a market index or valuation.", "source_label": "Direct listing calculations", "source_url": "https://www.dotproperty.com.vn/en/apartments-for-sale/%C4%91%C3%A0-n%E1%BA%B5ng"},
+    ),
+    property_anchor_indexes=(0, 1, 2),
+    micro_locations_intro="Choose the daily operating system before the view. These four areas describe distinct patterns, not investment zones; verify the exact project's foreign eligibility, certificate route, permitted use, flood exposure, healthcare journey and future buyer pool.",
+    micro_locations=(
+        {"name": "Hai Chau / Han River", "best_for": "Urban services and airport access", "daily_life": "Dense groceries, dining, civic services and short cross-city journeys; building and street conditions vary sharply.", "diligence": "Project eligibility, quota, certificate, traffic, noise, drainage, management accounts, parking and future competing supply."},
+        {"name": "My Khe / Phuoc My / Son Tra", "best_for": "Beach-led apartment life", "daily_life": "Immediate coast, cafés and visitor services with a tourism-shaped rhythm and bridge journeys to parts of central Da Nang.", "diligence": "Salt, wind, water ingress, storm access, lawful accommodation use, common charges, operator terms and resident resale depth."},
+        {"name": "Ngu Hanh Son / Hoa Hai", "best_for": "Newer stock and larger floorplates", "daily_life": "Education, technology and beach access in a growing southern corridor, with more last-mile dependence for established city services.", "diligence": "Completion, certificate route, occupancy, empty sites, construction noise, drainage, transport, foreign quota and competing pipeline."},
+        {"name": "Hoi An and approaches", "best_for": "Heritage and slower cultural life", "daily_life": "Walkable historic character and strong visitor economy, but specialist services and the airport remain tied to Da Nang.", "diligence": "Foreign eligibility, heritage and buffer rules, annual flood routes, building alteration, utilities, lawful use and narrower exit pool."},
+    ),
+    checklist=(
+        "Establish the buyer's independent residence, private-health, tax and banking plan before choosing a property.",
+        "Have independent Vietnamese counsel confirm buyer eligibility, project eligibility, restricted-area status and current foreign quota for the exact unit.",
+        "Verify seller or developer authority, land and project approvals, payment security, completion, acceptance, certificate pathway and remaining term.",
+        "Translate and review the sale agreement, management rules, common charges, maintenance fund, parking, defects, insurance, utilities and transfer restrictions.",
+        "Obtain written confirmation of approved residential or accommodation use; do not rely on seller rent, operator or hotel-brand language.",
+        "Overlay current flood, storm-surge and drainage evidence, inspect after heavy rain where possible and bind address-specific insurance before commitment.",
+        "Model five-year costs and three income cases—lawful long-term rent, exact permitted visitor use and no rent—without a destination-wide yield assumption.",
+        "Compare matched completed evidence where available and ask two unrelated agents to identify the future eligible buyer pool and likely exit objections.",
+    ),
+    references_intro="Housing, residence, apartment-use, tourism, airport, healthcare, hazard, heritage, exchange-rate, market and listing claims were reviewed on 24 August 2026. Recheck every time-sensitive source no later than 24 February 2027 and immediately after any housing-law, decree, foreign-quota, immigration, apartment-use, tourism, planning, flood, airport, health-service, market-data or listing change. Obtain current advice from an independent Vietnamese lawyer, tax adviser, property adviser and insurer for the exact buyer, project, unit and intended use. Asking evidence is not a valuation, completed-sale record or availability guarantee.",
+    references=(
+        {"label": "Vietnam property guide", "url": "/countries/vietnam-property/"},
+        {"label": "Vietnam Housing Law 27/2023/QH15", "url": "https://vanban.chinhphu.vn/?classid=1&docid=209627&pageid=27160"},
+        {"label": "Decree 95/2024/NĐ-CP implementing the Housing Law", "url": "https://vanban.chinhphu.vn/?classid=0&docid=210761&pageid=27160"},
+        {"label": "Ministry of Construction: 2026 foreign-owner extension procedure", "url": "https://moc.gov.vn/Images/FileVanBan/BXD_651-QD-BXD_05052026.pdf"},
+        {"label": "Vietnam official e-visa portal", "url": "https://evisa.gov.vn/?option=MO"},
+        {"label": "Government guidance: apartment-use restrictions", "url": "https://xaydungchinhsach.chinhphu.vn/nhung-quy-dinh-moi-cua-luat-nha-o-ve-nha-o-xa-hoi-va-chung-cu-mini-119231231113222784.htm"},
+        {"label": "Vietnam Tourism Law 09/2017/QH14", "url": "https://vanban.chinhphu.vn/?docid=190290&pageid=27160"},
+        {"label": "Da Nang: 2026 tourism-service oversight", "url": "https://danang.gov.vn/web/dng/-/dong-bo-va-nang-cao-chat-luong-dich-vu-du-lich-tren-dia-ban-thanh-pho-nam-2026"},
+        {"label": "Da Nang Airport: current flight routes", "url": "https://danangairport.vn/flights-flight-route"},
+        {"label": "ACV: Da Nang route and flight activity", "url": "https://www.acv.vn/en/tin-tuc/acv-s-activities/da-nang-international-airport-and-chu-lai-airport-sign-strategic-cooperation-agreement-2026-2030-with-the-department-of-culture-sports-and-tourism"},
+        {"label": "ACV: Da Nang airport overview", "url": "https://acv.vn/danangairport/ve-chung-toi"},
+        {"label": "Da Nang Department of Health: Da Nang Hospital", "url": "https://soyte.danang.gov.vn/vi/w/benh-vien-da-nang-2929356"},
+        {"label": "Da Nang: unified emergency number 115", "url": "https://namphuoc.danang.gov.vn/chi-tiet-tin/group/110/nid/4414/da-nang-thong-nhat-dau-so-cap-cuu-115"},
+        {"label": "World Bank: current Vietnam SURGE programme", "url": "https://www.worldbank.org/en/programs/surge/country-programs/vietnam"},
+        {"label": "World Bank: Da Nang water-risk profile", "url": "https://documents1.worldbank.org/curated/en/099555112132211981/pdf/IDU010d4695e04f19048b50b4ba0643022b3bb6f.pdf"},
+        {"label": "UNESCO: Hoi An Ancient Town", "url": "https://whc.unesco.org/en/list/948"},
+        {"label": "UNESCO: Hoi An 2026 conservation assistance", "url": "https://whc.unesco.org/en/list/0948/assistance"},
+        {"label": "Vietnam Ministry of Finance: August 2026 exchange rate", "url": "https://mof.gov.vn/mof/monthly-exchange-rate-1/monthly-exchange-rate-august-2026"},
+        {"label": "Dot Property: Da Nang apartment market", "url": "https://www.dotproperty.com.vn/en/apartments-for-sale/%C4%91%C3%A0-n%E1%BA%B5ng"},
+        {"label": "Masteri Rivera asking observation", "url": "https://www.dotproperty.com.vn/en/ads/1-bedroom-apartment-for-sale-in-hoa-cuong-nam-da-nang_9bf8df737c56-cb91-b472-bcd6-8ac70089"},
+        {"label": "FPT Plaza 2 asking observation", "url": "https://www.dotproperty.com.vn/en/ads/2-bedroom-apartment-for-sale-in-hoa-hai-da-nang_21c083f90124-5aae-f232-6fb4-f570a089"},
+        {"label": "Altara Suites asking observation", "url": "https://www.dotproperty.com.vn/en/ads/1-bedroom-apartment-for-sale-in-phuoc-my-da-nang_4be35a9a72ea-928e-dd72-da67-f5410089"},
+    ),
+    images=(
+        DossierImage("hero", "/assets/da-nang-hoi-an-han-river-hero.webp", "Da Nang Han River skyline, bridges and coast in clear morning light", "Da Nang works best as a real city by the water—not a resort abstraction.", "hero"),
+        DossierImage("residential-coast", "/assets/da-nang-hoi-an-residential-coast.webp", "Green residential street near the Da Nang coast with contemporary apartments and tropical planting", "The right address connects beach appeal to ordinary groceries, healthcare and transport.", "wide"),
+        DossierImage("heritage-water", "/assets/da-nang-hoi-an-heritage-water.webp", "Hoi An riverside heritage buildings after rain with visible drainage and calm water", "Heritage and water create beauty—and require conservation and flood diligence.", "wide"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "What homes cost"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Da Nang / Hoi An through five destination lenses",
+    assessment_intro="Here’s how Da Nang / Hoi An scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current Da Nang apartment asks show how location and project status change the entry point: ₫3.2 billion for 70m² at FPT Plaza 2, ₫3.4 billion for 47.4m² at Masteri Rivera and ₫5.02 billion for 56m² at Altara Suites. Each comparison uses the portal's stated usable area and the official August 2026 exchange basis. The observations illustrate choices; they do not establish foreign eligibility, title, lawful rental use, completion, availability or value.",
+    market_anchors_intro="No current official Da Nang completed-sale series was identified for a matched apartment comparison. These portal asking signals are therefore bounded market context—not valuations—and should be replaced by unit-, building- and project-specific completed evidence before purchase.",
+    orientation_groups=(
+        DossierOrientationGroup("Da Nang core", (("DAD airport", "Close urban gateway"), ("Hai Chau / Han River", "Central services"), ("Da Nang Hospital", "Public referral anchor"), ("My Khe / Son Tra", "Residential coast"))),
+        DossierOrientationGroup("South and heritage", (("Ngu Hanh Son", "Newer residential corridor"), ("Hoa Hai / FPT City", "Technology and education node"), ("Hoi An", "UNESCO heritage town"), ("Coastal plain", "Flood and storm diligence"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm current airport, hospital, flood, bridge, grocery and everyday routes from the exact address in relevant weather and traffic.",
+    country_guide_url="/countries/vietnam-property/",
+    country_guide_label="Vietnam property guide",
+    rail_comparison="Compare Da Nang / Hoi An with the full Atlas.",
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -3813,6 +3965,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     LAKE_TAHOE_DOSSIER.destination_id: LAKE_TAHOE_DOSSIER,
     PERTH_MARGARET_RIVER_DOSSIER.destination_id: PERTH_MARGARET_RIVER_DOSSIER,
     MIAMI_FORT_LAUDERDALE_DOSSIER.destination_id: MIAMI_FORT_LAUDERDALE_DOSSIER,
+    DA_NANG_HOI_AN_DOSSIER.destination_id: DA_NANG_HOI_AN_DOSSIER,
 }
 
 

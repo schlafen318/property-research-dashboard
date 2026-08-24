@@ -2432,34 +2432,37 @@
     "rank": 24,
     "country": "Vietnam",
     "category": "Water",
-    "overall_score": 3.63,
-    "usd_per_m2": 1700.0,
-    "net_yield_estimate": "2.5–4.5% est. net for foreign-accessible units/projects",
+    "overall_score": 3.45,
+    "access_status": "conditional",
+    "access_summary": "Eligible foreign individuals may buy specified homes in qualifying commercial-housing projects, subject to entry status, restricted-area review, project eligibility, the foreign quota and a time-limited certificate pathway.",
+    "usd_per_m2": 2840.0,
+    "net_yield_estimate": "Asset-specific; no verified destination-wide net yield",
     "quick_metrics": {
-      "usd_m": "$1,700",
-      "net_yield": "2.5–4.5% est. net for foreign-accessible units/projects",
+      "usd_m": "$2,840",
+      "net_yield": "Asset-specific; no verified destination-wide net yield",
       "ownership": "2.3/5",
-      "friendly": "4.0/5"
+      "friendly": "3.7/5"
     },
-    "panel_summary": "Da Nang/Hoi An scores well on affordability and regional tourism, but the ownership structure and exit market are weaker. The panel would view it as value-plus-growth, not institutional-quality core.",
+    "panel_summary": "Da Nang combines a real coastal city, useful regional access and accessible apartment entry points. The controlling risks are project-specific foreign eligibility, time-limited ownership, lawful use, flood exposure and a narrower eligible resale pool.",
     "pros": [
-      "Low entry price",
-      "beach and heritage appeal",
-      "improving infrastructure",
-      "regional Asian tourism",
-      "good food and lower cost of living."
+      "Working city with beach access",
+      "airport close to the urban core",
+      "strong central-Vietnam food culture",
+      "major-city healthcare anchor",
+      "accessible apartment entry points"
     ],
     "cons": [
-      "Foreign ownership is quota/leasehold/project-limited",
-      "developer/title risk",
-      "weaker resale depth",
-      "STR rules and building management can change."
+      "Foreign ownership is project-, quota- and term-limited",
+      "ownership does not create residence",
+      "certificate and developer risk",
+      "apartment use and tourist accommodation need separate clearance",
+      "flood, storm and narrower exit-buyer exposure"
     ],
-    "panel_verdict": "Watchlist. Cheap is not enough; only proceed with a very clean title/project and strong operator.",
+    "panel_verdict": "Selective candidate for personal use. Establish residence separately and proceed only when independent counsel verifies the exact project's eligibility, quota, certificate route, permitted use and exit mechanics.",
     "scores": {
       "scenery": {
         "label": "Scenery",
-        "score": 4.0,
+        "score": 4.5,
         "weight": 0.07
       },
       "airport_access": {
@@ -2469,12 +2472,12 @@
       },
       "business_hub_access": {
         "label": "Business hub access",
-        "score": 3.8,
+        "score": 4.1,
         "weight": 0.05
       },
       "year_round_activity": {
         "label": "Year-round activity",
-        "score": 3.8,
+        "score": 4.5,
         "weight": 0.07
       },
       "ownership_clarity": {
@@ -2484,62 +2487,63 @@
       },
       "str_regulatory_safety": {
         "label": "STR regulatory safety",
-        "score": 3.0,
+        "score": 2.7,
         "weight": 0.07
       },
       "rental_profit_potential": {
         "label": "Rental profit potential",
-        "score": 3.4,
+        "score": 3.0,
         "weight": 0.12
       },
       "capital_upside": {
         "label": "Capital upside",
-        "score": 3.8,
+        "score": 3.4,
         "weight": 0.07
       },
       "retirement_suitability": {
         "label": "Retirement suitability",
-        "score": 3.8,
+        "score": 3.6,
         "weight": 0.07
       },
       "exit_liquidity": {
         "label": "Exit liquidity",
-        "score": 2.8,
+        "score": 3.0,
         "weight": 0.06
       },
       "chinese_foreigner_friendliness": {
         "label": "Chinese/foreigner friendliness",
-        "score": 4.0,
+        "score": 3.7,
         "weight": 0.06
       },
       "food_quality": {
         "label": "Food quality",
-        "score": 4.2,
+        "score": 4.5,
         "weight": 0.04
       },
       "standard_of_living": {
         "label": "Standard of living",
-        "score": 3.8,
+        "score": 3.6,
         "weight": 0.03
       },
       "affordability": {
         "label": "Affordability",
-        "score": 4.7,
+        "score": 4.3,
         "weight": 0.11
       }
     },
-    "ownership_notes": "Foreigners can buy in approved commercial residential projects but generally cannot own land; common term is 50-year leasehold with quotas such as 30% of condo units.",
-    "red_flags": "Leasehold/quota limits, weaker exit liquidity, developer/title risk, apartment STR restrictions can change.",
+    "ownership_notes": "Eligible foreign individuals may own specified homes in qualifying commercial-housing projects, subject to entry status, restricted-area review, the 30% apartment-building quota and an ordinary term of up to 50 years from the certificate. Verify the exact project, unit, quota, land position and certificate pathway; buying does not create residence.",
+    "red_flags": "Project and foreign-quota eligibility, time-limited certificate, developer and completion risk, apartment-use restrictions, flood and storm exposure, and a narrower eligible resale pool.",
     "rental": {
-      "gross_yield": "STR demand visible, but foreign-title constraints mean higher required return",
-      "net_yield": "2.5–4.5% est. net for foreign-accessible units/projects",
-      "revenue": "AirROI Da Nang: ~$8,278 annual revenue, $88 ADR, 39.9% occupancy. Airbtics Da Nang/Hoi An cites higher median occupancy around 51–64% depending market.",
-      "adr_occupancy": "$88 Da Nang; Hoi An lower/mid market varies / 39.9% AirROI Da Nang; 51–64% other snapshots",
-      "confidence": "Medium for STR metrics; low-medium for foreign-investor yield"
+      "gross_yield": "Use matched lawful long-term leases for the exact building; tourist demand does not establish apartment permission or net return.",
+      "net_yield": "Asset-specific; no verified destination-wide net yield",
+      "revenue": "Model lawful long-term rent, the exact permitted accommodation use and no rent after management, common charges, tax, vacancy, furnishing and repairs.",
+      "adr_occupancy": "No destination-wide occupancy or nightly-rate assumption is applied.",
+      "confidence": "Low for a destination-wide comparison; property, permission and operator evidence required"
     },
-    "price_basis": "USD-denominated apartment benchmark. Da Nang apartment references around $1,400–2,000/m²; prime beachfront new launches can reach $2,500–3,550/m². Dashboard uses mid-market foreign-accessible apartment proxy.",
-    "price_confidence": "Medium; project/title restrictions matter",
-    "profit_driver": "Beachfront tourism, improving infrastructure, affordability, Korean/Chinese/regional arrivals."
+    "price_basis": "Rounded median unit-price observation from three direct Da Nang apartment asks captured 24 August 2026—Masteri Rivera, FPT Plaza 2 and Altara Suites—using each portal-stated usable area and the Ministry of Finance August 2026 rate of 25,243 VND per USD. Asking evidence only; not a market median, completed sale, valuation or proof of foreign eligibility.",
+    "price_confidence": "Low; three heterogeneous asks with unverified foreign eligibility",
+    "representative_price_usd": 134691,
+    "profit_driver": "Airport proximity, a working coastal city, resident demand, regional tourism and accessible entry prices; project legality and future buyer eligibility control outcomes."
   },
   {
     "id": "whistler",
