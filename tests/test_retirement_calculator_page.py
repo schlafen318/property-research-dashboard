@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 import subprocess
 import unittest
@@ -290,9 +291,10 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Portfolio dividends and interest", self.html)
         self.assertIn("Compare destination retirement costs", self.html)
 
-    def test_calculator_contains_all_thirty_one_destination_options(self) -> None:
+    def test_calculator_contains_every_retirement_cost_destination_option(self) -> None:
         select = self.html.split('id="ret-destination"', 1)[1].split("</select>", 1)[0]
-        self.assertEqual(31, select.count("<option"))
+        retirement_costs = json.loads((ROOT / "data" / "retirement_costs.json").read_text(encoding="utf-8"))
+        self.assertEqual(len(retirement_costs["destinations"]), select.count("<option"))
 
     def test_interactive_contract_and_result_targets_are_embedded(self) -> None:
         required_ids = {

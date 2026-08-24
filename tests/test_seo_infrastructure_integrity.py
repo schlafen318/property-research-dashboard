@@ -91,7 +91,11 @@ class SeoInfrastructureIntegrityTests(unittest.TestCase):
             '<a href="/destinations/park-city-deer-valley/">Park City / Deer Valley</a>',
             lake_tahoe_html,
         )
-        self.assertNotIn('/destinations/miami-fort-lauderdale/', lake_tahoe_html)
+        self.assertIn(
+            '<a href="/destinations/miami-fort-lauderdale/">Miami / Fort Lauderdale</a>',
+            lake_tahoe_html,
+        )
+        self.assertNotIn('/destinations/los-angeles-orange-county/', lake_tahoe_html)
 
         bali = next(item for item in destinations if item["id"] == "bali")
         bali_html = build_unified_app.build_destination_page(
