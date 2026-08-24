@@ -3944,6 +3944,161 @@ DA_NANG_HOI_AN_DOSSIER = PremiumDossierSpec(
 )
 
 
+WHISTLER_DOSSIER = PremiumDossierSpec(
+    destination_id="whistler",
+    title="Whistler Property Dossier for Foreign Buyers",
+    description="Assess Whistler property through federal purchase eligibility, tourist-accommodation zoning, daily life, healthcare, access, wildfire and winter risk, costs, listings and resale.",
+    h1="Whistler: exceptional mountain life, parcel-level rules",
+    lede=(
+        "Whistler is one of the few ski destinations that can function as a real four-season town: the Village, Creekside, lakes, trails, healthcare and transit remain useful beyond winter. Statistics Canada’s 2021 classification places Whistler outside a census metropolitan area or census agglomeration, which matters under the current federal non-Canadian purchase rules. That does not make the purchase simple. Current geography, parcel-level tourist-accommodation zoning, title covenants and high carrying costs still require written review. The right home is a use-led purchase—not a generic resort-income trade."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-24",
+    date_reviewed="2026-08-24",
+    verdict_paragraphs=(
+        "Whistler belongs on a specialist shortlist, with current purchase geography documented first. Canada’s federal prohibition generally prevents a non-Canadian from purchasing prescribed residential property in a census metropolitan area or census agglomeration through January 1, 2027 unless an exception applies. The regulations exclude property outside those geographies, and Statistics Canada’s 2021 classification identifies Whistler census subdivision 5931020 as outside CMAs and CAs. Canadian counsel should still confirm the current classification, actual buyer, ownership vehicle and exact asset before an offer. Buying a home does not create Canadian immigration status, tax residence or B.C. healthcare eligibility.",
+        "If that threshold is cleared, Whistler suits a buyer who will use the home often, accepts a premium for a globally recognised mountain ecosystem and can tolerate weather, maintenance and resort operating costs without depending on rent. It is strongest for an active household that values the Village, Creekside, Valley Trail, lakes and transit across seasons. It is weaker for a price-sensitive retiree, a buyer who needs tertiary care close by, anyone assuming every resort condo permits nightly rental, or an investor whose return requires optimistic occupancy and effortless resale.",
+        "Proceed in this order: obtain a written purchase-eligibility opinion; choose residential use or licensed tourist accommodation; verify zoning, title covenants, strata rules and building records; model B.C. transfer tax and all annual costs; then inspect highway access, healthcare, wildfire, flood, snow and insurance at the exact address. Only after those checks should the asking price, personal-use calendar, rental case and exit buyer pool determine whether Whistler earns its premium."
+    ),
+    lenses_intro=(
+        "Five questions turn Whistler from a famous resort into a property decision: whether ordinary life works outside holiday weeks, whether Highway 99 and local services remain acceptable, what the parcel legally permits, whether operating economics survive full costs, and who can buy the asset later."
+    ),
+    lenses=(
+        DossierLens(
+            "Use the mountain as a town, not a backdrop",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Whistler’s advantage is depth. Whistler Village concentrates groceries, restaurants, pharmacy access, recreation and the Valley Trail, while Creekside provides a smaller base with a gondola, shops and lakes nearby. Summer biking, hiking, golf and lake use keep the calendar broader than a winter-only resort. Benchlands and Blackcomb offer slope proximity but can make ordinary errands more dependent on shuttle timing or steep walks. Nesters and Alpine Meadows feel more residential and place supermarkets, schools and local routines ahead of lift access. A buyer should decide which pattern will still be useful when skiing is unavailable, visitors leave and weather is wet rather than photogenic.",
+                "Healthcare is credible for a mountain town but not equivalent to a full urban hospital network. Vancouver Coastal Health says Whistler Health Care Centre provides urgent and emergency care, diagnostic imaging and laboratory services, with 15 emergency stretchers and a trauma bay. The centre operates daily from 8 a.m. to 10 p.m.; after-hours emergencies use on-call physician and nursing support. Squamish General Hospital provides broader general medicine and surgery, while specialist tertiary care can require travel toward the North Shore or Vancouver. For retirement, test how that hierarchy feels during winter driving conditions and establish primary-care, medication and emergency-transfer plans before purchase.",
+                "Daily usability changes block by block. Village living can minimise driving but brings noise, visitor peaks, loading activity and higher strata costs. Creekside is practical near the gondola and shops, yet some buildings are governed as tourist accommodation rather than ordinary residential homes. Outer residential neighbourhoods offer quiet and storage but make snow clearing, bus frequency and the drive to services more important. Spend an ordinary shoulder-season week in the target neighbourhood, walk the grocery and healthcare routes, take the bus after dark and test whether steep paths, ice and gear storage remain manageable over a decade."
+            ),
+        ),
+        DossierLens(
+            "Treat Highway 99 as part of the property",
+            ("global_access", "foreigner_fit"),
+            (
+                "Whistler has no commercial airport or passenger rail connection. The usual international gateway is Vancouver International Airport, followed by a road transfer along Highway 99 through the Sea-to-Sky corridor. The drive is part of every flight, specialist appointment, furnishing delivery and major repair. DriveBC publishes current conditions and a Whistler Village Gate camera. B.C. separately designates winter-tire and chain routes, with posted requirements and possible restrictions when conditions demand. Check the exact Highway 99 segment, signs and live conditions before travel, and compare door-to-door timing from the property rather than the resort’s map distance from Vancouver.",
+                "Within Whistler, the public-transport proposition is better. BC Transit’s current network links the Village with Benchlands, Creekside, Cheakamus, Spring Creek, Alpine and Emerald, while service patterns change seasonally. The Valley Trail supports walking and cycling across many neighbourhoods but does not remove snow, grade or distance. A Village or Creekside apartment can support a low-car routine; a detached house in Alpine, Emerald or a steep private road may not. Test the actual bus stop, last service, grocery load and winter walk rather than assuming the municipal network makes every address equally connected.",
+                "Foreigner fit is institutional rather than frictionless. Canada offers clear land registration, professional services and English-language administration, but federal purchase eligibility remains a threshold constraint and buying does not establish residence. Provincial healthcare requires separate lawful-status, residence and presence tests, including the applicable MSP waiting period. An overseas owner also needs reliable handling for strata notices, snow events, insurance inspections, tax filings and emergencies. The destination works best when a Canadian lawyer, tax adviser, property manager and local emergency contact are appointed before closing—not assembled after the first winter problem."
+            ),
+            "creekside-access",
+        ),
+        DossierLens(
+            "Verify the legal use of the exact door",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Purchase eligibility and permitted use are separate. An eligible buyer still pays ordinary B.C. property transfer tax and must check whether any buyer-specific federal, provincial or municipal filing applies. Whistler is not currently named on B.C.’s list of specified areas for the 20% additional property transfer tax, but that is a time-sensitive geographic statement, not a permanent exemption. Underused Housing Tax status and filing can also turn on the owner, occupancy and asset. Obtain a written completion statement rather than transferring a Vancouver tax assumption to Whistler or assuming resort status eliminates federal obligations.",
+                "Nightly rental depends on the parcel. The Resort Municipality of Whistler says tourist accommodation is permitted only where zoning lists tourist or temporary accommodation; residential-zoned property and employee housing cannot be marketed to tourists. A qualifying operator needs a municipal business licence and provincial registration, while strata bylaws, Phase 1 or Phase 2 rental-pool covenants and other title instruments can narrow personal use or operating control. Whistler is currently exempt from B.C.’s principal-residence requirement, but that exemption does not legalise tourist use on a residential parcel. Confirm the zoning map, covenant text, licence history, strata rules and any operator agreement in writing.",
+                "Mountain risk belongs in title and building diligence. Provincial wildfire mapping is strategic rather than parcel-specific. In June 2026, the municipality described its FireSmart programme and an update to the Community Wildfire Resiliency Plan, which assesses community risk and sets an action plan; neither is a parcel-level insurance opinion. Flood layers, creek setbacks and drainage vary across the valley, and being outside a mapped area is not proof of zero exposure. Add snow load, roof and balcony drainage, ice dams, steep driveway access, retaining walls, freeze damage and backup heat. Review hazard layers, building files and evacuation access, then obtain insurance terms before making the offer unconditional."
+            ),
+            "winter-diligence",
+        ),
+        DossierLens(
+            "Separate resort revenue from ownership economics",
+            ("rental_profit", "capital_upside"),
+            (
+                "No destination-wide yield belongs in a Whistler purchase model. A Phase I condo with permitted tourist accommodation, a Phase II hotel unit subject to a rental pool, and a residential house are different businesses. For each candidate, obtain dated address-specific revenue and occupancy evidence, then establish the lawful-use regime, owner-use limits, registration and licence costs, management contract, strata fees, cleaning, utilities, platform charges, tourism taxes, furniture replacement and capital projects. Model winter, summer and shoulder seasons separately. If the case fails without aggressive occupancy or appreciation, it is a lifestyle purchase and should be priced as one.",
+                "Do not infer long-term demand from the resort name. Restricted-occupancy units, covenanted housing, unrestricted residential homes and tourist accommodation reach different occupants and follow different rules. A condo near Nesters or a bus route and a detached house may serve different households at very different cash tickets. Never combine tourist accommodation, unrestricted residential and resident-restricted evidence into one yield. Require an address-specific long-term-rent opinion with comparable leases and a separate lawful nightly-rental operating statement where relevant.",
+                "Capital upside should be treated as asset selection, not resort inevitability. B.C. Assessment’s 2026 release places Whistler’s typical single-family assessed value at CAD 2.834 million and its typical strata value at CAD 1.328 million as of July 1, 2025; both are assessment medians, not current sale prices or forecasts. The same table places Squamish’s typical strata assessment at CAD 848,000, showing a higher assessed-value signal in Whistler. None of those figures proves scarcity, future appreciation or candidate value; use completed comparable sales and the exact legal-use regime before forming an upside case."
+            ),
+        ),
+        DossierLens(
+            "Pay for the use pattern—and preserve a buyer pool",
+            ("value_entry", "exit_liquidity"),
+            (
+                "Current asking evidence spans very different propositions: a Nicklaus North strata condo whose seller markets flexible long- and short-term use, a compact detached home near Nesters and a Creekside Phase I resort condo. Their price per square metre is not interchangeable because permitted use, location, fees, land component and operating flexibility differ. The Nicklaus North claim is marketing evidence, not a zoning opinion, and requires independent verification. The shared Atlas benchmark uses the median of those dated observations only as a comparison input. It is not a Whistler market median, valuation or claim that the middle-priced asset is the best retirement home.",
+                "Model the full cash path. At the representative price, ordinary B.C. property transfer tax is only one closing item; legal review, title and covenant analysis, inspection, appraisal, financing, insurance and currency conversion add further cost. Annual ownership can include strata contributions, special levies, snow removal, landscaping, utilities, property tax, tourist-accommodation licensing, management and replacement of resort-grade furnishings. Above CAD 3 million, the additional residential portion of ordinary transfer tax also matters. Obtain a five-year cash statement for the exact asset and run it with no rental income.",
+                "Exit liquidity depends on keeping the proposition legible. A well-located residential condo reaches a different buyer pool from a covenanted resort unit; a compact detached house can be scarce but expensive in absolute dollars; a highly managed tourist unit may be easy to use yet limited by fees and contract terms. Federal rules can alter the non-Canadian buyer pool, while strata condition and lawful-use documentation affect every buyer. Before closing, ask two agents who did not source the listing how they would resell it, which buyer group would qualify and what evidence supports the likely marketing range."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Whistler combines world-class mountain access with lakes, trails and a real village calendar; visitor peaks and resort pricing remain part of daily life.",
+        "global_access": "Whistler depends on Highway 99 from Vancouver and YVR; check current Sea-to-Sky conditions, winter requirements and incidents before travel.",
+        "ownership_clarity": "Statistics Canada classifies Whistler outside current CMA/CA boundaries, but counsel should recheck federal geography before title, strata and covenant diligence.",
+        "regulatory_safety": "Whistler permits tourist accommodation only on qualifying parcels, with municipal licensing, provincial registration and title or strata restrictions layered on top.",
+        "rental_profit": "Whistler has no verified destination-wide yield; Phase I, Phase II and residential assets require separate address-level revenue, cost and lawful-use evidence.",
+        "capital_upside": "Whistler assessment medians show a high-value market, but they do not prove scarcity or appreciation for a selected asset.",
+        "retirement_fit": "Whistler offers year-round activity and an urgent-care centre, but specialist care, icy terrain and Highway 99 travel become more important with age.",
+        "exit_liquidity": "Whistler has a recognised buyer pool, yet price, federal eligibility, covenants and permitted use can narrow resale for a specific property.",
+        "foreigner_fit": "Whistler operates in English with strong professional infrastructure, but a foreign owner still needs lawful residence, purchase eligibility and reliable local management.",
+        "value_entry": "Whistler’s entry cost is high across residential and resort assets; Creekside, Village, Nicklaus North and outer neighbourhoods cannot share one price benchmark.",
+    },
+    market_anchors=(
+        {"location": "Whistler single-family homes", "evidence": "2,834,000 CAD", "buyer_read": "BC Assessment’s 2026 typical single-family assessed value, calculated as a community median as of July 1, 2025; an assessment signal, not a candidate valuation.", "source_label": "BC Assessment 2026 Lower Mainland release", "source_url": "https://info.bcassessment.ca/news/Pages/Lower-Mainland-2026-Property-Assessments-Announced.aspx"},
+        {"location": "Whistler strata homes", "evidence": "1,328,000 CAD", "buyer_read": "BC Assessment’s 2026 typical condo/townhouse assessed value, calculated as a community median as of July 1, 2025; it does not distinguish residential, Phase I or Phase II use.", "source_label": "BC Assessment 2026 Lower Mainland release", "source_url": "https://info.bcassessment.ca/news/Pages/Lower-Mainland-2026-Property-Assessments-Announced.aspx"},
+        {"location": "Squamish strata corridor comparison", "evidence": "848,000 CAD", "buyer_read": "BC Assessment’s 2026 typical Squamish condo/townhouse assessed value as of July 1, 2025; useful only as a Sea-to-Sky corridor comparison, not a Whistler candidate valuation.", "source_label": "BC Assessment 2026 Lower Mainland release", "source_url": "https://info.bcassessment.ca/news/Pages/Lower-Mainland-2026-Property-Assessments-Announced.aspx"},
+    ),
+    micro_locations_intro=(
+        "Whistler works as a sequence of distinct use patterns rather than one resort market. The table prioritises daily life and lawful use; it does not define price zones. Confirm the exact parcel, zoning, title covenants, strata, bus route, hazard layers and winter access."
+    ),
+    micro_locations=(
+        {"name": "Whistler Village / Village North", "best_for": "Walkable services and resort access", "daily_life": "Car-light but busy and strata-led", "diligence": "Noise, fees, zoning, covenants and owner-use limits"},
+        {"name": "Creekside / Nordic", "best_for": "Gondola, shops and lakes", "daily_life": "Smaller village with mixed residential and tourist use", "diligence": "Exact tourist-accommodation permission, slope and highway access"},
+        {"name": "Benchlands / Blackcomb", "best_for": "Slope proximity", "daily_life": "Shuttle and steep-walk dependent in places", "diligence": "Snow, grade, strata projects and rental regime"},
+        {"name": "Nesters / Alpine / Emerald", "best_for": "Residential ownership", "daily_life": "Quieter, storage-friendly and more car dependent", "diligence": "Residential-use limits, bus frequency, wildfire and winter maintenance"},
+    ),
+    checklist=(
+        "Obtain a written federal purchase-eligibility opinion for the buyer and parcel.",
+        "Establish the Canadian residence, tax and healthcare plan separately.",
+        "Choose residential use or licensed tourist accommodation before comparing prices.",
+        "Verify zoning, title covenants, strata rules, rental-pool terms and building files.",
+        "Price transfer tax, legal work, insurance, management, strata and five-year maintenance.",
+        "Inspect wildfire, flood, snow, drainage, slope and evacuation access for the address.",
+        "Test Highway 99, transit, groceries and healthcare in winter and shoulder season.",
+        "Obtain independent rental and resale opinions before making a binding offer.",
+    ),
+    references_intro=(
+        "Material legal, tax, healthcare, rental, access, hazard and market claims were reviewed on 24 August 2026. Federal and provincial rules, census geography, municipal zoning, transport, hazard layers and listings can change. Re-open every source and obtain Canadian legal, tax, immigration, planning, building and insurance advice for the exact buyer and property before signing. The next scheduled review is 24 February 2027, with an immediate recheck after any purchase-ban, tax, short-term-rental, zoning, healthcare, hazard or listing change."
+    ),
+    references=(
+        {"label": "Canada property guide", "url": "/countries/canada-property/"},
+        {"label": "CMHC: non-Canadian residential purchase prohibition", "url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/housing-research/consultations/prohibition-purchase-residential-property-non-canadians-act"},
+        {"label": "Justice Laws: enacted extension to the fourth anniversary", "url": "https://laws-lois.justice.gc.ca/eng/AnnualStatutes/2024_17/page-15.html"},
+        {"label": "Justice Laws: property outside a CMA or census agglomeration", "url": "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2022-250/section-3.html"},
+        {"label": "Statistics Canada: Whistler is outside CMAs and census agglomerations", "url": "https://www23.statcan.gc.ca/imdb/p3VD.pl?CLV=5&CPV=5931020&CST=01012021&CVD=1341558&Function=getVD&MLV=5&TVD=1348372"},
+        {"label": "IRCC: immigrate to Canada", "url": "https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada.html"},
+        {"label": "B.C.: MSP eligibility", "url": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp/bc-residents/eligibility-and-enrolment/are-you-eligible"},
+        {"label": "B.C.: MSP coverage waiting period", "url": "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp/bc-residents/eligibility-and-enrolment/how-to-enrol/coverage-wait-period"},
+        {"label": "B.C.: ordinary property transfer tax", "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax"},
+        {"label": "B.C.: additional property transfer tax and specified areas", "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax"},
+        {"label": "CRA: Underused Housing Tax", "url": "https://www.canada.ca/en/services/taxes/excise-taxes-duties-and-levies/underused-housing-tax.html"},
+        {"label": "B.C.: principal-residence requirement and exempt resort communities", "url": "https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/principal-residence-requirement"},
+        {"label": "Whistler: tourist-accommodation zoning, covenants and licensing", "url": "https://www.whistler.ca/business-development/business-licenses/tourist-accommodation-requirements/"},
+        {"label": "Whistler: business licences", "url": "https://www.whistler.ca/business-development/business-licenses/"},
+        {"label": "Vancouver Coastal Health: Whistler Health Care Centre", "url": "https://www.vch.ca/en/location/whistler-health-care-centre"},
+        {"label": "Vancouver Coastal Health: Sea-to-Sky service hierarchy", "url": "https://www.vch.ca/en/west-vancouver-sea-sky-glance"},
+        {"label": "BC Transit: Whistler routes and schedules", "url": "https://www.bctransit.com/whistler/schedules-and-maps/"},
+        {"label": "DriveBC: Whistler Village Gate and Highway 99 conditions", "url": "https://www.drivebc.ca/cameras/522"},
+        {"label": "B.C.: designated winter tire and chain routes", "url": "https://www2.gov.bc.ca/gov/content/transportation/driving-and-cycling/traveller-information/seasonal/winter-driving/winter-tire-and-chain-up-routes"},
+        {"label": "B.C. Wildfire Service: provincial wildfire threat assessment", "url": "https://www2.gov.bc.ca/gov/content/safety/wildfire-status/prevention/fire-fuel-management/psta"},
+        {"label": "Whistler: 2026 FireSmart and Community Wildfire Resiliency Plan update", "url": "https://engage.whistler.ca/add-your-voice-events/add-your-voice-june-edition"},
+        {"label": "B.C.: provincial flood hazard map", "url": "https://governmentofbc.maps.arcgis.com/apps/webappviewer/index.html?id=1a60c24b82ed41699d8a55338fb11076"},
+        {"label": "BC Assessment: Lower Mainland 2026 property assessments", "url": "https://info.bcassessment.ca/news/Pages/Lower-Mainland-2026-Property-Assessments-Announced.aspx"},
+        {"label": "European Central Bank: euro reference exchange rates", "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("valley-hero", "/assets/whistler-valley-hero.webp", "Whistler valley and forested neighbourhoods beneath Whistler and Blackcomb mountains in summer", "Whistler’s proposition is a complete mountain town, not only a ski week.", "hero", "defining-place"),
+        DossierImage("creekside-access", "/assets/whistler-creekside-access.webp", "Whistler Creekside housing beside a bus stop and paved trail with the mountain behind", "Creekside shows how housing, transit, trails and gondola access meet in ordinary life.", "wide", "built-environment-access"),
+        DossierImage("winter-diligence", "/assets/whistler-winter-diligence.webp", "Snow-covered Whistler residential lane with a steep cleared driveway and roadside drainage", "Snow clearance, drainage and steep access are recurring ownership costs—not seasonal decoration.", "wide", "decision-texture"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "What homes cost"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Whistler through five destination lenses",
+    assessment_intro="Here’s how Whistler scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three current asks show the gap between a Nicklaus North strata condo marketed for flexible use, a compact detached house and a Creekside Phase I resort condo. Seller use claims are not zoning opinions; title, availability, condition, negotiability, lawful use, fees and completed value remain unverified.",
+    market_anchors_intro="Each property record pairs its dated asking observation with a bounded B.C. Assessment signal. Assessment medians are not completed-sale evidence or candidate valuations.",
+    orientation_groups=(
+        DossierOrientationGroup("Sea-to-Sky access", (("YVR / Vancouver", "International gateway and specialist services"), ("Squamish", "Corridor services and hospital"), ("Creekside", "Southern Whistler base"), ("Whistler Village", "Main resort and service centre"))),
+        DossierOrientationGroup("Use pattern", (("Village / Benchlands", "Visitor intensity and strata governance"), ("Creekside", "Mixed residential and tourist accommodation"), ("Nesters / Alpine / Emerald", "Predominantly residential routines"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact Highway 99 journey, transit timetable, zoning, healthcare route, hazard layers and winter access for the property.",
+    country_guide_url="/countries/canada-property/",
+    country_guide_label="Canada property guide",
+    rail_comparison="Compare Whistler with the full Atlas.",
+    property_anchor_indexes=(1, 0, 2),
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -3971,6 +4126,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     PERTH_MARGARET_RIVER_DOSSIER.destination_id: PERTH_MARGARET_RIVER_DOSSIER,
     MIAMI_FORT_LAUDERDALE_DOSSIER.destination_id: MIAMI_FORT_LAUDERDALE_DOSSIER,
     DA_NANG_HOI_AN_DOSSIER.destination_id: DA_NANG_HOI_AN_DOSSIER,
+    WHISTLER_DOSSIER.destination_id: WHISTLER_DOSSIER,
 }
 
 
