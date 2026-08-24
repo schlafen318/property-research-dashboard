@@ -39,6 +39,9 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         )
         cls.html = PAGE.read_text(encoding="utf-8") if PAGE.exists() else ""
         cls.compact_html = re.sub(r"\s+", "", cls.html)
+        cls.destination_count = len(
+            json.loads((ROOT / "data" / "retirement_costs.json").read_text(encoding="utf-8"))["destinations"]
+        )
 
     def test_article_has_indexable_metadata_and_structured_data(self) -> None:
         self.assertIn(
@@ -50,17 +53,17 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
             self.html,
         )
         self.assertIn(
-            '<meta name="description" content="Compare all 31 Global Home Atlas retirement destinations by required capital, annual spending, reserves, and optional property costs using one methodology.">',
+            f'<meta name="description" content="Compare all {self.destination_count} Global Home Atlas retirement destinations by required capital, annual spending, reserves, and optional property costs using one methodology.">',
             self.html,
         )
         self.assertIn(
-            "<h1>31 Retirement Destinations Ranked by How Much You Need</h1>",
+            f"<h1>{self.destination_count} Retirement Destinations Ranked by How Much You Need</h1>",
             self.html,
         )
         self.assertIn('"@type":"Article"', self.compact_html)
         self.assertIn('"@type":"FAQPage"', self.compact_html)
         self.assertIn('"@type":"ItemList"', self.compact_html)
-        self.assertIn('"numberOfItems":31', self.compact_html)
+        self.assertIn(f'"numberOfItems":{self.destination_count}', self.compact_html)
         self.assertIn('"@type":"ImageObject"', self.compact_html)
 
     def test_ranking_shows_top_ten_then_expands_the_remaining_destinations(self) -> None:
@@ -68,8 +71,8 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         visible = ranking.split('<details class="ranking-more">', 1)[0]
         expandable = ranking.split('<details class="ranking-more">', 1)[1]
         self.assertEqual(10, visible.count('class="ranking-row"'))
-        self.assertEqual(21, expandable.count('class="ranking-row"'))
-        self.assertIn("View 20 more destinations", expandable)
+        self.assertEqual(self.destination_count - 10, expandable.count('class="ranking-row"'))
+        self.assertIn(f"View {self.destination_count - 10} more destinations", expandable)
         self.assertIn("</details>", expandable)
 
     def test_every_destination_is_ranked_once_and_only_top_ten_have_notes(self) -> None:
@@ -178,7 +181,7 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         self.assertIn('<details class="source-more">', methodology)
         self.assertIn("<summary>Sources and data notes</summary>", methodology)
         sources = methodology.split('<details class="source-more">', 1)[1].split("</details>", 1)[0]
-        self.assertEqual(31, sources.count("<li>"))
+        self.assertEqual(self.destination_count, sources.count("<li>"))
 
     def test_two_accessible_infographics_have_downloadable_pngs(self) -> None:
         for asset_name in ASSET_NAMES:
@@ -192,14 +195,14 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
                 self.assertIn(f'src="/assets/{asset_name}"', self.html)
                 self.assertIn(f'href="/assets/{asset_name}" download', self.html)
         self.assertIn(
-            'alt="Lowest-cost 10 of 30 retirement destinations ranked by required capital for a couple renting"',
+            f'alt="Lowest-cost 10 of {self.destination_count} retirement destinations ranked by required capital for a couple renting"',
             self.html,
         )
         self.assertIn(
-            'alt="Capital breakdown for the lowest-cost 10 of 30 retirement destinations"',
+            f'alt="Capital breakdown for the lowest-cost 10 of {self.destination_count} retirement destinations"',
             self.html,
         )
-        self.assertIn("lowest-cost 10 of 30", self.html.lower())
+        self.assertIn(f"lowest-cost 10 of {self.destination_count}", self.html.lower())
 
     def test_article_is_connected_to_the_retirement_content_cluster(self) -> None:
         for href in (

@@ -87,9 +87,9 @@ RETIREMENT_FINDER_DESCRIPTION = (
 )
 RETIREMENT_DESTINATIONS_SLUG = "retirement-destinations-ranked-by-cost"
 RETIREMENT_DESTINATIONS_TITLE = "Retirement Destinations Ranked by Cost (2026) | Global Home Atlas"
-RETIREMENT_DESTINATIONS_H1 = "31 Retirement Destinations Ranked by How Much You Need"
+RETIREMENT_DESTINATIONS_H1 = "Retirement Destinations Ranked by How Much You Need"
 RETIREMENT_DESTINATIONS_DESCRIPTION = (
-    "Compare all 31 Global Home Atlas retirement destinations by required capital, "
+    "Compare Global Home Atlas retirement destinations by required capital, "
     "annual spending, reserves, and optional property costs using one methodology."
 )
 RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
@@ -197,15 +197,16 @@ COUNTRY_HUBS = [
         "slug": "united-states-property",
         "country": "United States",
         "title": "United States Property Guide for Foreign Buyers | Global Home Atlas",
-        "description": "Compare United States second-home and resort property markets, including Aspen, Park City, Lake Tahoe, and Jackson Hole across ownership clarity, price discipline, rental rules, and climate risk.",
+        "description": "Compare United States property markets, including Miami, Fort Lauderdale, Aspen, Park City, Lake Tahoe, and Jackson Hole across ownership clarity, price discipline, rental rules, insurance, and climate risk.",
         "h1": "United States Property Guide for Foreign Buyers",
-        "thesis": "The United States offers established title systems and deep luxury-market liquidity, but resort property underwriting is rarely simple. Buyers need to separate trophy scarcity from income potential, then model ownership eligibility, local rental rules, insurance, taxes, and carrying costs market by market.",
+        "thesis": "The United States offers established title systems and deep market liquidity, from Miami and Fort Lauderdale condominiums to western resort homes, but underwriting is rarely simple. Buyers need to separate lifestyle appeal from income potential, then model ownership eligibility, local rental rules, insurance, taxes, building governance and carrying costs market by market.",
         "country_rules": [
             {"heading": "Property and immigration are separate", "text": "Buying a U.S. home does not create immigration status. A B-2 visitor visa is for temporary tourism and does not permit permanent residence. Establish the lawful long-stay route, tax residence and health-insurance plan independently before treating a purchase as a retirement home."},
             {"heading": "Utah restricts defined foreign entities", "text": "Utah's Restrictions on Foreign Acquisitions of Land Act applies to defined restricted foreign entities rather than every foreign individual. Buyer nationality, control, entity structure, land and timing must be checked against the current statute by Utah counsel before commitment."},
             {"heading": "Federal tax and estate exposure can be material", "text": "FIRPTA withholding can apply when a foreign person sells U.S. real property; nonresident rental income has its own federal treatment and elections; U.S. real estate can be U.S.-situated property for estate-tax purposes. Treaties, domicile and ownership structure change the result."},
             {"heading": "Local rules control operation", "text": "Nightly-rental zoning, licensing, inspection, tax and manager requirements are local, while an HOA or resort agreement may be stricter. Insurance, wildfire, snow, flood and recurring charges also attach to the exact property. Underwrite the address and governing documents, not the resort name."},
             {"heading": "Tahoe crosses two states and many rulebooks", "text": "California Civil Code section 671 and Nevada NRS 111.055 provide broad property-holding rights regardless of citizenship or for nonresident aliens, but they do not settle federal, entity, title or tax questions. A Tahoe address can also sit within a city or county with its own tax and short-rental regime, while basin planning may involve the Tahoe Regional Planning Agency. Confirm the buyer, parcel, jurisdiction and permitted use before comparing two homes that appear close on a map."},
+            {"heading": "Florida condominium and buyer rules are address-specific", "text": "Many foreign individuals can acquire Florida homes, but Chapter 692 Part III restricts defined foreign principals and requires buyer-, entity-, parcel- and proximity-specific review. In Miami and Fort Lauderdale, condominium milestone inspections, structural reserves, association governance, flood, insurance and municipal rental rules can materially change the cost and permitted use of two otherwise similar homes."},
         ],
         "primary_sources": [
             {"label": "U.S. Department of State: visitor visa", "url": "https://travel.state.gov/content/travel/en/us-visas/tourism-visit/visitor.html"},
@@ -219,8 +220,11 @@ COUNTRY_HUBS = [
             {"label": "Tahoe Regional Planning Agency: 2024 permitting procedure manual", "url": "https://www.trpa.gov/wp-content/uploads/documents/Permitting-Procedure-Manual.pdf"},
             {"label": "California Board of Equalization: property tax overview", "url": "https://www.boe.ca.gov/pdf/pub800-10.pdf"},
             {"label": "Nevada Department of Taxation: locally assessed property FAQ", "url": "https://tax.nv.gov/faqs/locally-assessed-property-tax-faqs/"},
+            {"label": "Florida Statutes Chapter 692 Part III", "url": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699%2F0692%2F0692PARTIIIContentsIndex.html"},
+            {"label": "Florida DBPR: condominium milestone inspections", "url": "https://condos.myfloridalicense.com/inspections/"},
+            {"label": "Miami-Dade: flood-zone maps", "url": "https://www.miamidade.gov/global/economy/building/flood-protection/flood-zone-maps.page"},
         ],
-        "destination_ids": ["park-city-deer-valley", "lake-tahoe", "jackson-hole", "aspen-snowmass"],
+        "destination_ids": ["miami-fort-lauderdale", "park-city-deer-valley", "lake-tahoe", "jackson-hole", "aspen-snowmass"],
         "guide_slugs": ["best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "overseas-property-investment", "where-can-foreigners-buy-property"],
     },
     {
@@ -4554,10 +4558,11 @@ def schema_for_retirement_calculator(canonical: str) -> list[dict]:
     ]
 
 
-RETIREMENT_DESTINATIONS_FAQS = [
+def retirement_destinations_faqs(destination_count: int) -> list[tuple[str, str]]:
+    return [
     (
         "What is the lowest-cost retirement destination in this comparison?",
-        "Da Nang / Hoi An has the lowest required retirement capital under this article's standard couple-renting scenario. The comparison covers all 31 destinations currently covered by Global Home Atlas, not every place retirees could choose.",
+        f"Da Nang / Hoi An has the lowest required retirement capital under this article's standard couple-renting scenario. The comparison covers all {destination_count} destinations currently covered by Global Home Atlas, not every place retirees could choose.",
     ),
     (
         "Why rank retirement destinations instead of countries?",
@@ -4571,12 +4576,18 @@ RETIREMENT_DESTINATIONS_FAQS = [
         "Is property included in the retirement cost ranking?",
         "No. The ranking assumes renting. Representative property price plus acquisition costs is shown separately because buying decisions can dominate the comparison and depend heavily on property type and micro-location.",
     ),
-]
+    ]
 
 
 def schema_for_retirement_destinations_article(
     canonical: str, rankings: list[dict]
 ) -> list[dict]:
+    destination_count = len(rankings)
+    article_h1 = f"{destination_count} Retirement Destinations Ranked by How Much You Need"
+    article_description = (
+        f"Compare all {destination_count} Global Home Atlas retirement destinations by required capital, "
+        "annual spending, reserves, and optional property costs using one methodology."
+    )
     images = [
         f"{SITE_URL}assets/retirement-destinations-required-capital.png",
         f"{SITE_URL}assets/retirement-destinations-capital-breakdown.png",
@@ -4586,16 +4597,16 @@ def schema_for_retirement_destinations_article(
         {
             "@context": "https://schema.org",
             "@type": "WebPage",
-            "name": RETIREMENT_DESTINATIONS_H1,
+            "name": article_h1,
             "url": canonical,
-            "description": RETIREMENT_DESTINATIONS_DESCRIPTION,
+            "description": article_description,
             "dateModified": date.today().isoformat(),
         },
         {
             "@context": "https://schema.org",
             "@type": "Article",
-            "headline": RETIREMENT_DESTINATIONS_H1,
-            "description": RETIREMENT_DESTINATIONS_DESCRIPTION,
+            "headline": article_h1,
+            "description": article_description,
             "url": canonical,
             "datePublished": "2026-08-18",
             "dateModified": date.today().isoformat(),
@@ -4619,7 +4630,7 @@ def schema_for_retirement_destinations_article(
             "itemListElement": [
                 {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL},
                 {"@type": "ListItem", "position": 2, "name": "Guides", "item": page_url(GUIDE_HUB_SLUG)},
-                {"@type": "ListItem", "position": 3, "name": RETIREMENT_DESTINATIONS_H1, "item": canonical},
+                {"@type": "ListItem", "position": 3, "name": article_h1, "item": canonical},
             ],
         },
         {
@@ -4631,7 +4642,7 @@ def schema_for_retirement_destinations_article(
                     "name": question,
                     "acceptedAnswer": {"@type": "Answer", "text": answer},
                 }
-                for question, answer in RETIREMENT_DESTINATIONS_FAQS
+                for question, answer in retirement_destinations_faqs(destination_count)
             ],
         },
         {
@@ -5310,6 +5321,13 @@ __ANALYTICS__
 def build_retirement_destinations_article(destinations: list[dict], retirement_payload: dict) -> str:
     canonical = page_url(RETIREMENT_DESTINATIONS_SLUG)
     rankings = retirement_destination_rankings(destinations, retirement_payload)
+    destination_count = len(rankings)
+    additional_count = max(0, destination_count - 10)
+    article_h1 = f"{destination_count} Retirement Destinations Ranked by How Much You Need"
+    article_description = (
+        f"Compare all {destination_count} Global Home Atlas retirement destinations by required capital, "
+        "annual spending, reserves, and optional property costs using one methodology."
+    )
     visible_rankings, expandable_rankings = split_rankings(rankings)
     ranking_header = """<thead><tr>
       <th scope="col" aria-sort="none"><button type="button" class="sort-button" data-sort-key="rank"><span>Cost rank</span><span class="sort-indicator" aria-hidden="true">↕</span></button></th>
@@ -5360,12 +5378,12 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
     highest = rankings[-1]["metrics"]["required_capital"]
     lowest_name = rankings[0]["destination"]["name"]
     highest_name = rankings[-1]["destination"]["name"]
-    faq_html = build_faq_html(RETIREMENT_DESTINATIONS_FAQS)
+    faq_html = build_faq_html(retirement_destinations_faqs(destination_count))
     ranking_js = RETIREMENT_RANKING_TABLE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
     html = f"""<!doctype html>
 <html lang="en">
 <head>
-{head_html(RETIREMENT_DESTINATIONS_TITLE, RETIREMENT_DESTINATIONS_DESCRIPTION, canonical, schema_for_retirement_destinations_article(canonical, rankings))}
+{head_html(RETIREMENT_DESTINATIONS_TITLE, article_description, canonical, schema_for_retirement_destinations_article(canonical, rankings))}
   <meta property="og:image" content="{SITE_URL}assets/retirement-destinations-required-capital.png">
   <meta property="og:image:width" content="1600">
   <meta property="og:image:height" content="900">
@@ -5430,8 +5448,8 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
       {primary_nav_html()}
       <div class="page-hero-grid">
         <div>
-          <h1>{RETIREMENT_DESTINATIONS_H1}</h1>
-          <p class="page-lede">All 30 Global Home Atlas retirement destinations compared under one transparent scenario. The rank answers a narrow financial question—how much capital a couple renting would need—not which place offers the best life.</p>
+          <h1>{article_h1}</h1>
+          <p class="page-lede">All {destination_count} Global Home Atlas retirement destinations compared under one transparent scenario. The rank answers a narrow financial question—how much capital a couple renting would need—not which place offers the best life.</p>
           <div class="page-actions"><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article hero">Calculate your plan</a><a class="page-button page-button-secondary" href="/{RETIREMENT_FINDER_SLUG}/">Find destinations I can afford</a><a class="page-button page-button-secondary" href="#ranking">View rankings</a></div>
         </div>
       </div>
@@ -5442,13 +5460,13 @@ def build_retirement_destinations_article(destinations: list[dict], retirement_p
       <nav class="article-toc" aria-label="In this article"><span>In this article</span><a href="#ranking">Ranking</a><a href="#components">What drives the cost</a><a href="#destinations">Destination notes</a><a href="#methodology">Methodology</a><a href="#faq">FAQ</a></nav>
       <div class="article-layout">
         <article class="article-body">
-          <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among the 30 destinations, {escape(lowest_name)} has the lowest modeled requirement at <strong>{money(lowest)}</strong>, while {escape(highest_name)} has the highest at <strong>{money(highest)}</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It compares the 30 Global Home Atlas destinations with complete retirement-cost coverage, using the same researched inputs as our retirement planning model.</p><aside class="article-callout"><div><strong>Make the estimate personal</strong><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p></div><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article callout">Open calculator</a></aside></section>
-          <section class="article-section" id="ranking"><h2>Retirement destinations ranked by savings needed</h2><p>Each row uses today's USD and the same assumptions. The home purchase estimate is optional and does not affect the cost rank. Select a column heading to reorder all 31 destinations.</p><details class="source-more"><summary>How annual cost is estimated</summary><p>Annual cost includes rent, food and household spending, utilities and communications, private healthcare, transport, dining and leisure, travel, visa and administration costs, and contingency. Home purchase costs are separate.</p></details><div class="table-wrap"><table><caption>Estimated retirement savings by destination for a couple renting</caption>{ranking_header}<tbody data-ranking-visible>{visible_rows}</tbody></table></div>
-            <details class="ranking-more"><summary>View 20 more destinations</summary><div class="table-wrap"><table><caption>Additional retirement destinations</caption>{ranking_header}<tbody data-ranking-additional>{expandable_rows}</tbody></table></div></details>
-            <figure class="infographic"><img src="/assets/retirement-destinations-required-capital.png" width="1600" height="900" alt="Lowest-cost 10 of 30 retirement destinations ranked by required capital for a couple renting" loading="eager"><figcaption>This chart shows the lowest-cost 10 of 30. Required capital combines the liquid portfolio and 12-month reserve; property is excluded from rank. Complete ranks 1–30 are in the tables above.</figcaption><a class="download-link" href="/assets/retirement-destinations-required-capital.png" download data-track="infographic_download" data-track-label="required retirement capital ranking">Download this infographic as PNG</a></figure>
+          <section class="article-section" id="quick-answer"><h2>The quick answer</h2><p>Among the {destination_count} destinations, {escape(lowest_name)} has the lowest modeled requirement at <strong>{money(lowest)}</strong>, while {escape(highest_name)} has the highest at <strong>{money(highest)}</strong>. The gap is driven by recurring annual spending because the ranking assumes renting and funds the spending gap from a liquid portfolio.</p><p>This is not a list of every cheap place to retire. It compares the {destination_count} Global Home Atlas destinations with complete retirement-cost coverage, using the same researched inputs as our retirement planning model.</p><aside class="article-callout"><div><strong>Make the estimate personal</strong><p>Add your retirement date, expenses, pension, passive income, and housing plan.</p></div><a class="page-button" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="ranked retirement article callout">Open calculator</a></aside></section>
+          <section class="article-section" id="ranking"><h2>Retirement destinations ranked by savings needed</h2><p>Each row uses today's USD and the same assumptions. The home purchase estimate is optional and does not affect the cost rank. Select a column heading to reorder all {destination_count} destinations.</p><details class="source-more"><summary>How annual cost is estimated</summary><p>Annual cost includes rent, food and household spending, utilities and communications, private healthcare, transport, dining and leisure, travel, visa and administration costs, and contingency. Home purchase costs are separate.</p></details><div class="table-wrap"><table><caption>Estimated retirement savings by destination for a couple renting</caption>{ranking_header}<tbody data-ranking-visible>{visible_rows}</tbody></table></div>
+            <details class="ranking-more"><summary>View {additional_count} more destinations</summary><div class="table-wrap"><table><caption>Additional retirement destinations</caption>{ranking_header}<tbody data-ranking-additional>{expandable_rows}</tbody></table></div></details>
+            <figure class="infographic"><img src="/assets/retirement-destinations-required-capital.png" width="1600" height="900" alt="Lowest-cost 10 of {destination_count} retirement destinations ranked by required capital for a couple renting" loading="eager"><figcaption>This chart shows the lowest-cost 10 of {destination_count}. Required capital combines the liquid portfolio and 12-month reserve; property is excluded from rank. Complete ranks 1–{destination_count} are in the tables above.</figcaption><a class="download-link" href="/assets/retirement-destinations-required-capital.png" download data-track="infographic_download" data-track-label="required retirement capital ranking">Download this infographic as PNG</a></figure>
           </section>
           <section class="article-section" id="components"><h2>Why the capital figures differ</h2><p>Required liquid portfolio capital magnifies differences in annual spending: at a 3.5% withdrawal rate, every additional $10,000 of first-year spending adds about $285,700 to the modeled portfolio. The emergency reserve then adds another year of expenses.</p><p>Property capital tells a different story. It combines the representative purchase price with estimated acquisition costs and can be much higher—or much lower—than the cost rank suggests. It is shown separately because buying is optional and listing samples are not market-wide medians.</p>
-            <figure class="infographic"><img src="/assets/retirement-destinations-capital-breakdown.png" width="1600" height="900" alt="Capital breakdown for the lowest-cost 10 of 30 retirement destinations" loading="lazy"><figcaption>This chart shows the lowest-cost 10 of 30. Living-cost funding and optional property acquisition are separate decisions. Complete ranks 1–30 are in the tables above.</figcaption><a class="download-link" href="/assets/retirement-destinations-capital-breakdown.png" download data-track="infographic_download" data-track-label="retirement capital breakdown">Download the capital breakdown as PNG</a></figure>
+            <figure class="infographic"><img src="/assets/retirement-destinations-capital-breakdown.png" width="1600" height="900" alt="Capital breakdown for the lowest-cost 10 of {destination_count} retirement destinations" loading="lazy"><figcaption>This chart shows the lowest-cost 10 of {destination_count}. Living-cost funding and optional property acquisition are separate decisions. Complete ranks 1–{destination_count} are in the tables above.</figcaption><a class="download-link" href="/assets/retirement-destinations-capital-breakdown.png" download data-track="infographic_download" data-track-label="retirement capital breakdown">Download the capital breakdown as PNG</a></figure>
           </section>
           <section class="article-section" id="destinations"><h2>What to know about the top 10</h2><p>The cost rank is a starting point, not a recommendation. Visa eligibility, taxes, healthcare access, language, neighborhood choice, climate, ownership rules, and resale depth require separate review.</p><ol class="destination-notes">{top_destination_notes}</ol></section>
           <section class="article-section" id="destinations-not-countries"><h2>Destinations, not countries</h2><p>Country averages hide the decision retirees actually make. Valencia and Málaga share Spain's national framework, while Fukuoka / Itoshima and Hakone / Izu share Japan's, but housing, transport, access, and daily routines differ locally. We therefore rank destinations and keep the country visible as legal, tax, visa, and healthcare context.</p><p>The ranking does not rank lifestyle quality. A higher-cost destination may be the better personal fit, and a lower-cost destination can carry trade-offs that matter more than the savings.</p></section>

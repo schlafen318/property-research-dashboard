@@ -2566,6 +2566,36 @@
           "notes": "Median of three captured listings; not a market-wide median and availability changes."
         }
       ]
+    },
+    {
+      "destination_id": "miami-fort-lauderdale",
+      "display_currency": "USD",
+      "fx_to_usd": 1,
+      "inflation": {"general": 0.025, "healthcare": 0.055, "property": 0.035},
+      "profiles": {
+        "single": {
+          "categories_usd": {"food_household": 9000, "utilities_communications": 4800, "private_healthcare": 12000, "transport": 7200, "dining_leisure": 10800, "travel": 9000, "visa_admin": 2200, "contingency": 10800},
+          "annual_rent_usd": 36000,
+          "annual_owner_costs_usd": 36000
+        },
+        "couple": {
+          "categories_usd": {"food_household": 13500, "utilities_communications": 5800, "private_healthcare": 24000, "transport": 10000, "dining_leisure": 16200, "travel": 13500, "visa_admin": 3000, "contingency": 16200},
+          "annual_rent_usd": 54000,
+          "annual_owner_costs_usd": 36000
+        }
+      },
+      "property": {
+        "representative_price_usd": 849000,
+        "acquisition_cost_rate": 0.02,
+        "acquisition_cost_basis": "Two-percent buyer-side planning assumption for title, escrow, legal, inspection and financing work; not a statutory tax quote or property-specific closing statement.",
+        "price_basis": "Median asking price from three direct Miami / Fort Lauderdale observations captured 24 August 2026: Brickell, Galt Ocean and Coral Gables. Asking evidence only."
+      },
+      "confidence": {"overall": "medium", "proxy_categories": ["private_healthcare", "visa_admin", "inflation", "owner_costs", "rent"]},
+      "sources": [
+        {"name": "U.S. Bureau of Labor Statistics — CPI", "url": "https://www.bls.gov/cpi/", "metric_supported": "General inflation planning assumption", "source_date": "2026", "accessed_on": "2026-08-24", "notes": "National official index used as a planning proxy, not a forecast."},
+        {"name": "Medicare — eligibility basics", "url": "https://www.medicare.gov/basics/get-started-with-medicare", "metric_supported": "Healthcare eligibility constraint", "source_date": "Current", "accessed_on": "2026-08-24", "notes": "Private-health allowance is a planning proxy and must be replaced with buyer-specific quotes."},
+        {"name": "Three direct Miami / Fort Lauderdale asking observations", "url": "https://www.coldwellbankerhomes.com/fl/fort-lauderdale/4280-galt-ocean-dr-14k/pid_73165529/", "metric_supported": "Representative property acquisition benchmark", "source_date": "2026-08-24", "accessed_on": "2026-08-24", "notes": "Median of Brickell, Galt Ocean and Coral Gables direct asks; not a market median or valuation."}
+      ]
     }
   ]
 }
