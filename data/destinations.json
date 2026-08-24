@@ -2668,16 +2668,16 @@
     "rank": 26,
     "country": "Switzerland",
     "category": "Mountain",
-    "overall_score": 3.6,
-    "usd_per_m2": 27340.0,
-    "net_yield_estimate": "2–3.5% est. net",
+    "overall_score": 3.55,
+    "usd_per_m2": 30200.0,
+    "net_yield_estimate": "Asset-specific; no destination-wide net yield",
     "quick_metrics": {
-      "usd_m": "$27,340",
-      "net_yield": "2–3.5% est. net",
+      "usd_m": "$30,200",
+      "net_yield": "Asset-specific",
       "ownership": "4.1/5",
       "friendly": "3.8/5"
     },
-    "panel_summary": "Andermatt is the most investable Swiss alpine option for foreigners because of its exemption structure. The panel would still mark it down for valuation and low yields.",
+    "panel_summary": "Andermatt offers unusual foreign-buyer access inside the federally exempt tourism project, but the exemption, residence plan, project contracts and exact property must be verified separately.",
     "pros": [
       "Unusual foreign-buyer accessibility for Switzerland",
       "high infrastructure quality",
@@ -2687,11 +2687,11 @@
     ],
     "cons": [
       "Very expensive",
-      "low net yield",
+      "no verified destination-wide net yield",
       "concentrated resort execution risk",
       "still needs unit/project-specific legal confirmation."
     ],
-    "panel_verdict": "Best Swiss option for a foreign buyer, but more capital-preservation/lifestyle than profit-maximisation.",
+    "panel_verdict": "A premium personal-use Alpine base for buyers who confirm the project-specific legal regime and can carry the home without relying on rent or appreciation.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -2764,18 +2764,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "Andermatt Swiss Alps has special exemption from Lex Koller restrictions for eligible development purchases, making it unusually accessible to non-resident foreign buyers. Verify exact project/unit status.",
-    "red_flags": "Still expensive, development concentration risk, resort execution dependence, low net yield.",
+    "ownership_notes": "The Federal Office of Justice records the original Andermatt tourism-project Lex Koller exemption; Canton Uri states that the exemption has been extended through the end of 2040 and remains the authority for the exact transaction. Confirm the buyer, parcel, project boundary and ownership vehicle in writing; property ownership does not create Swiss residence.",
+    "red_flags": "Very high entry cost, project-boundary and contract risk, specialist healthcare travel, mountain hazards and access, and a narrow high-ticket exit pool.",
     "rental": {
-      "gross_yield": "Better rental optionality than many Swiss resorts but still price-compressed",
-      "net_yield": "2–3.5% est. net",
-      "revenue": "UBS 2026 cites Andermatt around CHF22,000/m². Andermatt is widely cited as a Lex Koller-exempt exception for foreign buyers.",
-      "adr_occupancy": "High in ski season, improving summer / Improving four-season resort demand",
-      "confidence": "Medium"
+      "gross_yield": "Asset-specific; no destination-wide gross yield should be applied",
+      "net_yield": "No destination-wide net yield is supported; model lawful use, owner-use limits, operator terms, common costs, tourism charges and empty periods for the exact unit.",
+      "revenue": "Holiday letting depends on the project, condominium rules, service or rental contract, guest registration and current tourism charges.",
+      "adr_occupancy": "Seasonal resort demand; not a candidate-property forecast",
+      "confidence": "Low without unit-level lawful-use and operating evidence"
     },
-    "price_basis": "Premium resort benchmark. UBS 2026 cites Andermatt around CHF22,000/m² × CHF/USD 1.24288 ≈ $27,343/m².",
-    "price_confidence": "Medium-high",
-    "profit_driver": "Cleaner foreign-buyer access than most Switzerland, strong infrastructure investment, snow/mountain brand."
+    "price_basis": "Rounded USD/m² observation for the Chedi residence using its seller-stated 100 m² living area and the ECB 2026-08-24 CHF/USD cross-rate of 1.2458876308. The Grand Parc and TØVA pages provide only generic portal-area fields, so their per-m² figures are shown separately and are not blended. This is a dated ask, not a market median, completed value or valuation.",
+    "price_confidence": "Medium",
+    "profit_driver": "Project-specific foreign-buyer access and four-season infrastructure support personal use; property-level operating and resale evidence remains required."
   },
   {
     "id": "innsbruck-tyrol",
