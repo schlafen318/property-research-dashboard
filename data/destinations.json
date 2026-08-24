@@ -2551,31 +2551,30 @@
     "rank": 25,
     "country": "Canada",
     "category": "Mountain",
-    "overall_score": 3.61,
-    "usd_per_m2": 10260.0,
-    "net_yield_estimate": "2–4% est. net",
+    "overall_score": 3.55,
+    "usd_per_m2": 13200.0,
+    "net_yield_estimate": "Asset-specific; no destination-wide net yield",
     "quick_metrics": {
-      "usd_m": "$10,260",
-      "net_yield": "2–4% est. net",
+      "usd_m": "$13,200",
+      "net_yield": "Asset-specific",
       "ownership": "3.0/5",
       "friendly": "4.0/5"
     },
-    "panel_summary": "Whistler is an elite resort with real four-season depth, but Canada’s foreign-buyer rules and high price make it difficult for this mandate. The panel would not put it in the top tier for a foreign buyer.",
+    "panel_summary": "Whistler has substantial four-season services and recreation. Statistics Canada’s 2021 classification places Whistler outside a CMA or census agglomeration, but current federal geography, buyer status, parcel use and high entry cost still require written review.",
     "pros": [
-      "World-class ski and summer activity market",
+      "Deep ski and summer activity calendar",
       "Vancouver access",
-      "strong brand",
-      "high ADR",
+      "established four-season visitor economy",
       "good services and safety."
     ],
     "cons": [
-      "Foreign-buyer restrictions/taxes",
+      "Federal geography and buyer-status recheck",
       "high entry price",
-      "compressed yield",
+      "no verified destination-wide yield",
       "zoning and STR constraints",
       "far from Asian business hubs compared with Japan."
     ],
-    "panel_verdict": "Watchlist/specialist. Excellent destination, poor fit unless legal eligibility and price are unusually favourable.",
+    "panel_verdict": "Watchlist/specialist. Excellent destination, but suitable only after current purchase geography, parcel use, full costs and the buyer’s own residence plan are confirmed.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -2648,18 +2647,20 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "Canada’s federal foreign-buyer ban is extended to 1 Jan 2027, but rules apply based on census areas and property types; BC resort exceptions and local zoning need legal confirmation.",
-    "red_flags": "High price compression, vacancy/foreign taxes, zoning limits, political sensitivity.",
+    "access_status": "available",
+    "access_summary": "Statistics Canada’s 2021 statistical-area classification places Whistler outside census metropolitan areas and census agglomerations, while the federal regulations exclude property outside those geographies from the current non-Canadian purchase prohibition. Reconfirm the current geography, buyer, ownership vehicle and exact asset with Canadian counsel before offering.",
+    "ownership_notes": "Property ownership does not create Canadian residence. Statistics Canada’s 2021 classification places Whistler outside CMAs and CAs, but current federal geography, buyer status, ordinary B.C. property transfer tax, title covenants, strata governance and parcel-level permitted use must be reviewed separately. Whistler is not currently listed among the B.C. additional property transfer tax specified areas, but jurisdiction and buyer status must be rechecked at closing.",
+    "red_flags": "Federal purchase eligibility, high entry cost, tourist-accommodation zoning and covenants, operating fees, wildfire and winter-access exposure, and a narrower resort exit pool.",
     "rental": {
-      "gross_yield": "Typically compressed by high prices; underwriting often low-to-mid single digit gross",
-      "net_yield": "2–4% est. net",
-      "revenue": "AirDNA public snapshot: Whistler STR market metrics vary by zone/property; high ADR but expensive entry",
-      "adr_occupancy": "High / Seasonal, strong winter/summer",
-      "confidence": "Medium-low without paid local dataset"
+      "gross_yield": "Asset-specific; no destination-wide gross yield should be applied",
+      "net_yield": "No destination-wide net yield is supported; model the exact zoning, covenant, licence, fees, use pattern and operator contract.",
+      "revenue": "Tourist accommodation is permitted only on qualifying parcels and remains subject to municipal licensing, provincial registration, strata rules and title covenants.",
+      "adr_occupancy": "Seasonal resort demand; not a candidate-property forecast",
+      "confidence": "Low without property-level lawful-use and operating evidence"
     },
-    "price_basis": "Built-property proxy. Whistler price-per-square-foot references of roughly CAD$1,100–1,600/sq ft imply ~$8,350–12,170/m² at 1 CAD = 0.70609 USD; dashboard uses midpoint rounded to ~$10,260/m².",
+    "price_basis": "Median USD/m² of three direct REALTOR.ca asking observations captured 2026-08-24: a Nicklaus North strata condo marketed with flexible long- and short-term use, a compact Nesters detached house and a Creekside Phase I condo. All use portal-stated square footage converted at 0.09290304 m²/sq ft and ECB CAD/USD cross-rate 0.7278213264. Mixed assets with unverified permitted-use claims; not a market median, completed value or valuation.",
     "price_confidence": "Medium",
-    "profit_driver": "Deep global ski brand, Vancouver access, summer biking, institutional-quality resort ecosystem."
+    "profit_driver": "Four-season visitor infrastructure, Vancouver access and summer and winter recreation; property-level operating evidence is still required."
   },
   {
     "id": "andermatt",

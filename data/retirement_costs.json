@@ -1839,7 +1839,7 @@
     {
       "destination_id": "whistler",
       "display_currency": "CAD",
-      "fx_to_usd": 0.70609,
+      "fx_to_usd": 0.7278213263655593,
       "inflation": {
         "general": 0.025,
         "healthcare": 0.05,
@@ -1876,9 +1876,10 @@
         }
       },
       "property": {
-        "representative_price_usd": 1411474,
-        "acquisition_cost_rate": 0.04,
-        "price_basis": "Median of three representative Whistler listing snapshots captured by Global Home Atlas."
+        "representative_price_usd": 1382133,
+        "acquisition_cost_rate": 0.03,
+        "price_basis": "Median of three current direct asking observations captured 2026-08-24; mixed assets and use regimes, not a market median or valuation.",
+        "acquisition_cost_basis": "Illustrative planning allowance covering ordinary B.C. property transfer tax at the representative price plus basic legal, inspection and registration costs. The federal purchase prohibition and any buyer-specific tax or exemption must be resolved separately; obtain a transaction-specific completion statement."
       },
       "confidence": {
         "overall": "medium-high",
@@ -1907,12 +1908,28 @@
           "notes": "Official national index used as a planning proxy, not a forecast."
         },
         {
-          "name": "Zillow — property listings",
-          "url": "https://www.zillow.com/whistler-bc/",
+          "name": "REALTOR.ca — three direct Whistler asking observations",
+          "url": "https://www.realtor.ca/real-estate/30104636/7102-nesters-road-whistler",
           "metric_supported": "Representative property acquisition benchmark",
-          "source_date": "2026-06-21",
-          "accessed_on": "2026-08-18",
-          "notes": "Median of three captured listings; not a market-wide median and availability changes."
+          "source_date": "2026-08-24",
+          "accessed_on": "2026-08-24",
+          "notes": "Median of three current direct asking observations; mixed assets and permitted-use regimes, not a market-wide median, valuation or availability guarantee."
+        },
+        {
+          "name": "B.C. property transfer tax rates",
+          "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax",
+          "metric_supported": "Ordinary acquisition-tax baseline",
+          "source_date": "Current 2026",
+          "accessed_on": "2026-08-24",
+          "notes": "Graduated tax applies to fair market value; additional residential and buyer-specific rules require transaction advice."
+        },
+        {
+          "name": "European Central Bank euro reference exchange rates",
+          "url": "https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html",
+          "metric_supported": "CAD-to-USD cross-rate",
+          "source_date": "2026-08-21",
+          "accessed_on": "2026-08-24",
+          "notes": "1 EUR = 1.1699 USD and 1 EUR = 1.6074 CAD; CAD-to-USD cross-rate 0.7278213264."
         }
       ]
     },
