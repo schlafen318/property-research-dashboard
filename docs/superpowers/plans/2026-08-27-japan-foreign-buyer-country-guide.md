@@ -426,7 +426,6 @@ git commit -m "content: add Japan foreign-buyer acquisition guide"
 **Interfaces:**
 - Consumes: `get_foreign_buyer_country_guide()` and `validate_foreign_buyer_country_guide()` from Task 1.
 - Produces: `build_foreign_buyer_country_guide_page(hub: dict, guide: dict, destinations: list[dict], pages: list[dict], content_overrides: list[dict] | None = None) -> str`
-- Produces: `schema_for_foreign_buyer_country_guide(guide: dict, selected: list[dict], canonical: str) -> list[dict]`
 - `build_country_hub_page()` delegates to the new renderer only when lookup returns a migrated guide.
 
 - [ ] **Step 1: Write failing renderer-selection and section-order tests**
@@ -649,11 +648,6 @@ destination_table, destination_cards = foreign_buyer_destination_comparison_html
 source_labels = {item["url"]: item["label"] for item in guide["primary_sources"]}
 eligibility_html = foreign_buyer_eligibility_html(guide, source_labels)
 checklist = "".join(f"<li>{escape(item)}</li>" for item in guide["buyer_checklist"])
-retirement_link = (
-    '<p class="foreign-buyer-retirement-link">Planning to live in Japan long term? '
-    '<a href="/japan-retirement-property-foreign-buyers/">Read the Japan retirement property guide</a> '
-    'for residence, healthcare and retirement-life planning.</p>'
-)
 section_links = [
     ("Can foreigners buy?", "ownership-answer"),
     ("Purchase process", "purchase-process"),
@@ -672,8 +666,8 @@ rail_links = "".join(
 return f"""<!doctype html>
 <html lang="en">
 <head>
-{head_html(guide["title"], guide["description"], canonical, schema_for_foreign_buyer_country_guide(guide, selected, canonical))}
-<style>{foreign_buyer_country_guide_css()}</style>
+{head_html(guide["title"], guide["description"], canonical, schema_for_country_hub(hub, selected, canonical))}
+<style>{shared_content_css()}</style>
 </head>
 <body class="foreign-buyer-country-guide">
 {site_header_html()}
@@ -688,7 +682,7 @@ return f"""<!doctype html>
 </header>
 <main><div class="foreign-buyer-shell foreign-buyer-layout">
   <article class="foreign-buyer-article">
-    <section id="ownership-answer"><h2>Can foreigners buy property in Japan?</h2>{eligibility_html}{retirement_link}</section>
+    <section id="ownership-answer"><h2>Can foreigners buy property in Japan?</h2>{eligibility_html}</section>
     <section id="purchase-process"><h2>How the purchase works</h2><ol class="foreign-buyer-steps">{foreign_buyer_purchase_steps_html(guide, source_labels)}</ol></section>
     <section id="costs-financing"><h2>Costs and financing</h2>{foreign_buyer_cost_table_html(guide, source_labels)}</section>
     <section id="after-purchase"><h2>Rules after purchase</h2>{foreign_buyer_rules_html(guide, source_labels)}</section>
@@ -840,7 +834,7 @@ from src.site_design_system import (
 )
 ```
 
-Place `<style>{foreign_buyer_country_guide_css()}</style>` in the new renderer head. Use `site_header_html()` and `site_footer_html()` so the pilot matches the approved landing-page chrome.
+Replace the Task 3 `<style>{shared_content_css()}</style>` call with `<style>{foreign_buyer_country_guide_css()}</style>`. Use `site_header_html()` and `site_footer_html()` so the pilot matches the approved landing-page chrome.
 
 - [ ] **Step 5: Run design and landing-regression tests**
 
