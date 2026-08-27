@@ -439,6 +439,34 @@ COUNTRY_HUBS = [
         "guide_slugs": ["best-places-to-buy-property-in-europe", "best-places-to-buy-vacation-home-abroad", "foreign-property-investment-risks", "buy-property-abroad"],
     },
     {
+        "slug": "austria-property",
+        "country": "Austria",
+        "title": "Austria Property Guide for Foreign Buyers | Global Home Atlas",
+        "description": "Assess Austria property for foreign buyers through Innsbruck and Tyrol, including buyer approval, residence, Freizeitwohnsitz rules, title, tax, tourist use, hazards and resale.",
+        "h1": "Austria Property Guide for Foreign Buyers",
+        "thesis": "Austria offers an established land-register system, strong infrastructure and exceptional Alpine daily life, but a purchasable home is not automatically a lawful second residence or tourist accommodation. Establish the buyer, residence plan, province, municipality and exact permitted use first; then reconcile the exact title, building governance, tax, hazards, costs and exit.",
+        "country_rules": [
+            {"heading": "Nationality changes the acquisition route", "text": "EU and EEA nationals and third-country buyers do not necessarily follow the same land-acquisition process. Austria has province-specific land-transfer rules; in Tyrol, obtain buyer- and parcel-specific advice and any required approval before a binding commitment."},
+            {"heading": "Property and residence are separate", "text": "Buying an Austrian home does not create a residence permit, health-cover entitlement or tax status. Establish the lawful long-stay route, actual main-residence plan and insurance independently of the purchase."},
+            {"heading": "Leisure and tourist use require proof", "text": "Tyrol tightly controls Freizeitwohnsitz use, and authorised stock is municipality-specific. Tourist operation can require separate planning, trade, building, registration, tax and condominium compliance. A listing description or seller history is not transferable permission."},
+            {"heading": "Cost and hazards attach to the address", "text": "The general transfer-tax and land-register fees are only the baseline. Legal or notarial work, financing, building reserves, energy, insurance, Alpine hazards and eventual sale costs require an exact completion statement and address-level diligence."},
+        ],
+        "primary_sources": [
+            {"label": "Austria: acquiring property as a foreign national", "url": "https://www.oesterreich.gv.at/en/themen/bauen_und_wohnen/grundstueckskauf_und_grundbuch/grundstueckskauf/1"},
+            {"label": "Austria: third-country authorisation procedure", "url": "https://www.oesterreich.gv.at/en/themen/bauen_und_wohnen/grundstueckskauf_und_grundbuch/grundstueckskauf/1/Seite.200042"},
+            {"label": "Austria: residence-permit, health-cover and accommodation conditions", "url": "https://www.oesterreich.gv.at/en/themen/menschen_aus_anderen_staaten/aufenthalt/3/Seite.120217"},
+            {"label": "Land Tirol: land-transfer and foreign-acquisition law", "url": "https://www.tirol.gv.at/innsbruck/referate/grundverkehr-und-baurecht/grundverkehrsrecht/"},
+            {"label": "Land Tirol: Freizeitwohnsitz register", "url": "https://statistik.tirol.gv.at/homepage/freizeitwohnsitze/index.html"},
+            {"label": "Austria: real-estate transfer-tax rates", "url": "https://www.bmf.gv.at/themen/steuern/immobilien-grundstuecke/grunderwerbsteuer/steuersatz.html"},
+            {"label": "Austria: ownership registration", "url": "https://eausweise.oesterreich.gv.at/de/themen/bauen_und_wohnen/grundstueckskauf_und_grundbuch/grundstueckskauf/Seite.200060"},
+            {"label": "Statistics Austria: property average prices", "url": "https://www.statistik.at/statistiken/volkswirtschaft-und-oeffentliche-finanzen/preise-und-preisindizes/immobilien-durchschnittspreise"},
+            {"label": "Land Tirol: TIRIS natural-hazard map services", "url": "https://www.tirol.gv.at/statistik-budget/tiris/tiris-kartendienste-zu-fachthemen/"},
+            {"label": "Land Tirol: private-room accommodation requirements", "url": "https://www.tirol.gv.at/arbeit-wirtschaft/eap-en/services/WT-TE-UK-PV/"},
+        ],
+        "destination_ids": ["innsbruck-tyrol"],
+        "guide_slugs": ["best-places-to-buy-property-in-europe", "buying-property-abroad-for-retirement", "foreign-property-investment-risks", "where-can-foreigners-buy-property"],
+    },
+    {
         "slug": "switzerland-property",
         "country": "Switzerland",
         "title": "Switzerland Property Guide for Foreign Buyers | Global Home Atlas",
@@ -3322,7 +3350,7 @@ def build_shortlist_review_page(destinations: list[dict], pages: list[dict]) -> 
 
 
 def build_landing_country_tiles() -> str:
-    priority = ["spain-property", "portugal-property", "japan-property", "united-states-property", "canada-property", "italy-property", "greece-property", "thailand-property", "switzerland-property"]
+    priority = ["spain-property", "portugal-property", "japan-property", "united-states-property", "canada-property", "italy-property", "austria-property", "greece-property", "thailand-property", "switzerland-property"]
     by_slug = {hub["slug"]: hub for hub in COUNTRY_HUBS}
     cards = []
     for slug in priority:
@@ -3388,6 +3416,7 @@ def build_landing_explore_links(pages: list[dict]) -> str:
         "italy-property",
         "greece-property",
         "thailand-property",
+        "austria-property",
         "switzerland-property",
     ]
     country_by_slug = {hub["slug"]: hub for hub in COUNTRY_HUBS}

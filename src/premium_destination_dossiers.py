@@ -4209,6 +4209,128 @@ ANDERMATT_DOSSIER = PremiumDossierSpec(
 )
 
 
+INNSBRUCK_TYROL_DOSSIER = PremiumDossierSpec(
+    destination_id="innsbruck-tyrol",
+    title="Innsbruck and Tyrol Property Dossier for Foreign Buyers",
+    description="Assess Innsbruck and Tyrol property through residence, foreign-buyer approval, Freizeitwohnsitz rules, healthcare, access, hazards, costs, current listings and resale.",
+    h1="Innsbruck / Tyrol: buy the lawful use, then the Alpine life",
+    lede=(
+        "Innsbruck is a rare Alpine city rather than a resort assembled around visitors: university life, a major hospital, rail, an airport and ordinary neighbourhoods sit beneath the Nordkette. That strength can disguise the decisive property constraint. A home that is legally purchasable may not be lawful as a Freizeitwohnsitz, tourist rental or occasional base, and third-country buyers can face a separate land-transfer approval. The right shortlist therefore begins with citizenship, residence plan, zoning and permitted use—then moves to the apartment, view and ski access."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "Innsbruck is one of the strongest year-round mountain propositions in the Atlas for a household that can establish a lawful main residence and genuinely wants city life. The Landeskrankenhaus–Universitätskliniken Innsbruck, regional rail and bus network, airport, university, food market and daily services make it much more complete than a high resort. Hötting and the inner districts keep those advantages close; Igls and the Mittelgebirge trade some urban convenience for space and a more village-like rhythm. Seefeld offers a polished plateau alternative, but it is a separate municipality and a different legal, operating and resale case.",
+        "The constraint is use, not scenery. Tyrol’s Grundverkehr rules, designated reservation municipalities and Freizeitwohnsitz regime are address-specific. EU and EEA nationals and third-country buyers do not necessarily follow the same approval pathway. A deed does not create a residence permit, and a residential title does not prove that an owner may leave a home available only for holidays or operate tourist accommodation. Written confirmation from the competent authority, the municipality and the building governance should precede any non-refundable commitment.",
+        "Proceed only if the household can answer four questions in order: who will own, under which residence status, for what exact lawful use, and with what local operating plan? Then compare internal living area, building condition, common costs, energy performance, snow and surface-water exposure, access, parking and exit buyer. Innsbruck deserves a premium when it functions as a durable home. It is a poor speculative shortcut when the plan depends on an assumed holiday-use exemption, generic tourism demand or a future buyer accepting unresolved restrictions."
+    ),
+    lenses_intro="Five questions separate a credible Innsbruck home from an Alpine postcard: whether daily life works all year, how the city and airport connections perform, whether the buyer and intended use are lawful, whether any rental case survives restrictions and costs, and who can buy the property later.",
+    lenses=(
+        DossierLens("Choose a city life with mountains—not a mountain week", ("lifestyle_magnetism", "retirement_fit"), (
+            "Innsbruck’s central advantage is completeness. The old town, university districts, Wilten, Pradl, Hötting and the Inn corridor support groceries, cafés, culture, public transport and social life beyond ski season. Cable cars and trails begin unusually close to urban neighbourhoods, while lakes, cycling and the Mittelgebirge broaden summer use. The buyer should still test the least theatrical month. Spend time in November or spring, compare sunlight and temperature between valley floor and hillside, listen for road and rail noise, and walk the actual grocery, pharmacy and station route. A dramatic view is not compensation for a steep daily climb or a dark ground-floor unit.",
+            "Healthcare is a real strength but should be mapped rather than advertised loosely. Tirol Kliniken operates the Landeskrankenhaus–Universitätskliniken Innsbruck, a major regional hospital complex with emergency and specialist functions. That improves the retirement case, yet a purchase does not create Austrian health-cover entitlement. Residence status, statutory or private insurance and registration remain separate. Ask a local doctor how continuing prescriptions, language, rehabilitation and specialist referrals would work for the household, and test the journey from Igls, Seefeld or a hillside address in winter rather than assuming city-level access everywhere in Tyrol.",
+            "Housing form changes the experience. A lift-served central apartment may minimise driving and snow work but adds co-ownership decisions, shared reserves and noise. Hötting can provide sun and mountain proximity, yet slopes, parking and bus frequency matter. Igls offers a quieter village pattern within the city boundary, but ordinary errands are less immediate. Seefeld has a mature visitor economy and rail connection, though seasonality, tourism intensity and second-home controls deserve separate review. Visit morning and evening, ask what remains open year-round, and decide whether the household wants an active urban base or a managed seasonal environment before comparing prices."
+        )),
+        DossierLens("Underwrite every recurring journey", ("global_access", "foreigner_fit"), (
+            "Innsbruck Hauptbahnhof and the VVT network are the backbone of the access case. Regional rail connects the city with Hall, Seefeld, the Wipptal and other Tyrolean corridors, while long-distance services connect toward Munich, Zurich, Vienna and Italy. The practical test is door to platform: luggage, transfers, late arrival, mobility limitations and service frequency after evening events. A listing described as ‘near Innsbruck’ can sit in a municipality where the last kilometre requires a car, winter parking and snow clearing. Compare the actual timetable and walking route, not a map distance.",
+            "Innsbruck Airport is unusually close to the city, but its network is smaller and more seasonal than Munich or Vienna. The current airport timetable is useful for available routes, not a promise that the same flight will operate next season. Frequent international travellers should compare three plans: a direct Innsbruck flight, rail to Munich or another hub, and a disruption scenario in winter weather. Aircraft noise also varies by neighbourhood and flight path. Visit the property while the airport is operating and ask local residents about ordinary noise rather than relying on a quiet viewing window.",
+            "Foreigner fit depends on nationality and purpose. Austria’s federal guidance distinguishes EU or EEA nationals from third-country nationals, while Tyrol administers its own land-transfer law. A third-country buyer may need approval and evidence that the acquisition serves a recognised interest; entity ownership, family relationships and residence do not remove the need for buyer-specific analysis. Property ownership itself is not a residence permit. Establish the lawful main-residence or other long-stay route, tax residence, financing and health cover independently, then obtain written approval advice for the exact buyer and parcel before signing or transferring a deposit."
+        ), "city-access"),
+        DossierLens("Prove the use before valuing the home", ("ownership_clarity", "regulatory_safety"), (
+            "Tyrol’s property regime makes the intended use a first-order fact. The provincial authority explains foreign-acquisition and land-transfer requirements, while the Freizeitwohnsitz register shows that authorised leisure residences are limited and municipality-specific. An apartment advertised as a holiday home, investment unit or second residence does not prove lawful leisure use. Ask the competent Grundverkehr authority and municipality for written confirmation of the exact title, authorised use and any registration. If the plan requires a main residence, understand the evidence and actual occupancy expected rather than treating an address registration as a formality.",
+            "Building governance can be as restrictive as public law. Obtain the land-register extract, purchase agreement, Wohnungseigentum documents, Nutzwert basis, house rules, meeting minutes, reserve balance, arrears, insurance, planned works and energy certificate. Confirm the exact Wohnfläche from plans and separate it from balconies, terraces, cellars and common space. Review parking and storage as distinct title components. For a renovated older apartment, reconcile permits, invoices and approvals; for new work, check completion, guarantees and snagging. A seller’s prior rental or occasional use is evidence to investigate, not a transferable permission.",
+            "Natural hazards and building exposure are address-specific even inside the city. Tyrol’s TIRIS services publish layers for rivers, avalanches, water, torrents and inundation, but the buyer must connect the current layer to the exact parcel and building file. Hillside drainage, retaining walls, snow load, roof shedding, groundwater, basement moisture, access gradients and emergency routes all affect cost. Visit after heavy rain and snow if possible, obtain a building survey and an insurance quotation, and ask how the condominium handles clearing and extraordinary repairs before the offer becomes unconditional."
+        ), "winter-diligence"),
+        DossierLens("Do not turn tourism into an assumed yield", ("rental_profit", "capital_upside"), (
+            "Tyrol’s visitor economy does not create a universal right to rent. Even the province’s bounded private-room route—no more than ten guest beds in the operator’s own household—requires notification and compliance with building, fire and sanitary rules, and operation cannot begin before the mayor confirms it. Other tourist accommodation can follow different zoning, trade, tax, registration and condominium requirements. A Freizeitwohnsitz authorisation is not automatically a tourist licence. Obtain a written use and licensing opinion for the unit, then confirm the applicable route, guest registration, local levy, house rules and manager requirements before assigning income.",
+            "No destination-wide net yield is supported here. Build any rental case from the exact lease or permitted stay pattern. Use dated achievable rent, realistic vacancy and owner-use periods, then deduct management, utilities, common charges, repairs, insurance, tax administration, marketing, cleaning, furniture and capital reserves. Innsbruck’s students, hospitals and employers may support residential demand, but that general context is not a unit forecast. Rent control, contract duration, tenant protections and the apartment’s legal category require Austrian advice. If the purchase needs tourist rates or appreciation to work, the evidence threshold should be much higher.",
+            "Capital upside should be read through completed evidence and future buyer eligibility. Statistics Austria’s 2025 apartment tables use land-register transactions from 2021–2025 adjusted to the 2025 price level and report geometric means by district, construction period, size and outdoor-space basis. Those official figures are useful context but cannot value a renovated penthouse, a hillside view or a legally scarce Freizeitwohnsitz without matched comparables. Ask for recent completed sales in the same building or micro-market and confirm which buyer and use categories can acquire the property later. Scarcity can support price; it can also narrow liquidity."
+        )),
+        DossierLens("Pay for utility and preserve the next buyer", ("value_entry", "exit_liquidity"), (
+            "The three current asks illustrate ordinary city choices rather than a market average: a Hötting apartment whose buyer package includes a garage, a larger central apartment and a six-room city home. Their asking price per square metre uses seller-stated Wohnfläche, but condition, outdoor space, floor, lift, parking, energy performance and lawful use remain different. Compare each with completed sales of the same construction period, size and exterior-space category. Do not blend a portal ask with an official district mean and call the result fair value.",
+            "Acquisition cost begins with Austria’s general 3.5% real-estate transfer tax and the current 1.1% land-register ownership fee, subject to the exact transaction and any current relief. Contract drafting, signature certification, legal or notarial work, agent fees, financing registration, valuation and translations can add material cost. Annual ownership includes common charges, reserve contributions, energy, insurance, maintenance, property-related taxes and local administration. Obtain a written closing statement and five-year cash model for the buyer and apartment. Test a lift, roof, façade or heating project rather than assuming the current monthly charge is stable.",
+            "Exit quality is the final discipline. A well-located, lift-served Innsbruck apartment with clear residential use and intelligible costs can appeal to a broader domestic market than a remote seasonal home. A high asking price, unresolved Freizeitwohnsitz claim, awkward floor plan, poor energy rating, steep access or unusual governance can reduce that pool. Before signing, ask two agents who did not source the home how they would resell it, which buyer categories could acquire it, what completed evidence supports the range and how long comparable units took to transact. Buy only when the life value remains sufficient without optimistic rent or appreciation."
+        )),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Innsbruck combines a real city, university culture and immediate Alpine recreation; outer Tyrol locations vary sharply in year-round completeness.",
+        "global_access": "Rail and a close airport are unusual Alpine strengths, but the airport network is limited and outer-valley last-mile access can be weather-sensitive.",
+        "ownership_clarity": "Austria has a formal title system, while buyer nationality, Tyrol approval and the exact lawful use must be confirmed before commitment.",
+        "regulatory_safety": "Freizeitwohnsitz, tourist use, condominium governance and address-level flood or avalanche exposure make diligence property-specific.",
+        "rental_profit": "No destination-wide net yield is supported; residential and tourist operation require separate lawful-use and full-cost evidence.",
+        "capital_upside": "Official transaction benchmarks show a deep city market, but micro-location, condition and lawful-use scarcity do not guarantee appreciation.",
+        "retirement_fit": "Innsbruck offers major healthcare, transit and daily services, provided residence, insurance and the actual neighbourhood journey are workable.",
+        "exit_liquidity": "Clear urban apartments can reach a broad domestic pool; high price, unusual use rights and outer-valley seasonality can narrow resale.",
+        "foreigner_fit": "EU and EEA buyers have a clearer pathway than many third-country buyers, while residence, tax, banking and local administration remain separate.",
+        "value_entry": "Entry is expensive; Wohnfläche, parking, outdoor space, building condition, energy performance and all recurring charges must be reconciled."
+    },
+    market_anchors=(
+        {"location":"Innsbruck-Stadt apartments, 1961–1990, 60–84 m², no outdoor area","evidence":"€4,455/m²","buyer_read":"Statistics Austria geometric mean from registered 2021–2025 transactions adjusted to the 2025 price level. It is district and category context, not a candidate valuation.","source_label":"Statistics Austria 2025 apartment prices","source_url":"https://www.statistik.at/fileadmin/pages/222/Wohnungspreise2025.ods"},
+        {"location":"Innsbruck-Stadt apartments, 1961–1990, over 84 m², no outdoor area","evidence":"€4,391/m²","buyer_read":"Official geometric mean for the stated construction, size and no-exterior-space category. Renovation, exact address, floor, condition and rights remain unpriced.","source_label":"Statistics Austria 2025 apartment prices","source_url":"https://www.statistik.at/fileadmin/pages/222/Wohnungspreise2025.ods"},
+        {"location":"Innsbruck-Stadt apartments, from 1991, 60–84 m², with outdoor area","evidence":"€6,793/m²","buyer_read":"Official geometric mean for newer apartments with balcony, terrace or garden. It is unmatched background context and not paired to any example listing.","source_label":"Statistics Austria 2025 apartment prices","source_url":"https://www.statistik.at/fileadmin/pages/222/Wohnungspreise2025.ods"},
+    ),
+    micro_locations_intro="The practical choice is between city completeness and a more seasonal or car-dependent Alpine rhythm. Confirm municipality, lawful use, transit, winter sun, healthcare, hazards and resale evidence before comparing the view.",
+    micro_locations=(
+        {"name":"Innsbruck core / Wilten / Pradl","best_for":"Car-light city living","daily_life":"Hospital, station and ordinary services","diligence":"Noise, building reserves, lift and lawful use"},
+        {"name":"Hötting","best_for":"Sun and Nordkette proximity","daily_life":"Hillside urban neighbourhood","diligence":"Slope, access, parking, drainage and price premium"},
+        {"name":"Igls / Mittelgebirge","best_for":"Quieter village rhythm near the city","daily_life":"Bus-led with more local driving","diligence":"Freizeitwohnsitz status, winter access and services"},
+        {"name":"Seefeld plateau","best_for":"Managed four-season resort life","daily_life":"Rail-linked but visitor-oriented","diligence":"Separate municipality, use rights, seasonality and exit pool"},
+    ),
+    checklist=(
+        "Confirm the buyer’s EU, EEA or third-country status and obtain Tyrol-specific acquisition advice.",
+        "Establish the Austrian residence, tax and health-insurance plan independently of the property.",
+        "Obtain written confirmation of main-residence, Freizeitwohnsitz and any tourist-use status for the exact unit.",
+        "Review the land register, title components, condominium documents, reserves, minutes, insurance and planned works.",
+        "Reconcile Wohnfläche, balcony or terrace, cellar, parking, condition, energy certificate and every mandatory add-on.",
+        "Check current TIRIS and water hazard layers, drainage, snow load, access and an address-specific insurance quotation.",
+        "Model acquisition through exit, including transfer tax, registry fee, advice, common charges and capital reserves.",
+        "Obtain matched completed comparables and an independent resale view from advisers who did not source the home.",
+    ),
+    references_intro="Legal, administrative and market claims were reviewed on 27 August 2026. Recheck immediately if the buyer, entity, residence plan, municipality, intended use, building, listing status, financing or law changes, and in every case before reservation or exchange. The next scheduled editorial review is 27 February 2027. Obtain current Austrian legal, tax, immigration, planning, building and insurance advice for the exact buyer and property.",
+    references=(
+        {"label":"Austria: acquiring property as a foreign national","url":"https://www.oesterreich.gv.at/en/themen/bauen_und_wohnen/grundstueckskauf_und_grundbuch/grundstueckskauf/1"},
+        {"label":"Austria: third-country buyer authorisation procedure","url":"https://www.oesterreich.gv.at/en/themen/bauen_und_wohnen/grundstueckskauf_und_grundbuch/grundstueckskauf/1/Seite.200042"},
+        {"label":"Austria: residence-permit, health-cover and accommodation conditions","url":"https://www.oesterreich.gv.at/en/themen/menschen_aus_anderen_staaten/aufenthalt/3/Seite.120217"},
+        {"label":"Land Tirol: land-transfer and foreign-acquisition law","url":"https://www.tirol.gv.at/innsbruck/referate/grundverkehr-und-baurecht/grundverkehrsrecht/"},
+        {"label":"Land Tirol: current Freizeitwohnsitz register","url":"https://statistik.tirol.gv.at/homepage/freizeitwohnsitze/index.html"},
+        {"label":"Austria: real-estate transfer-tax rates","url":"https://www.bmf.gv.at/themen/steuern/immobilien-grundstuecke/grunderwerbsteuer/steuersatz.html"},
+        {"label":"Austria: land-register ownership entry","url":"https://eausweise.oesterreich.gv.at/de/themen/bauen_und_wohnen/grundstueckskauf_und_grundbuch/grundstueckskauf/Seite.200060"},
+        {"label":"Statistics Austria: 2025 real-estate average prices","url":"https://www.statistik.at/statistiken/volkswirtschaft-und-oeffentliche-finanzen/preise-und-preisindizes/immobilien-durchschnittspreise"},
+        {"label":"Statistics Austria: 2025 apartment-price workbook","url":"https://www.statistik.at/fileadmin/pages/222/Wohnungspreise2025.ods"},
+        {"label":"VVT: Tyrol regional rail network","url":"https://www.vvt.at/data.cfm?vpath=ma-downloads%2Fliniennetzplaene%2Flnp_schienenverkehr_tirol_euregio_2026-02-19"},
+        {"label":"Innsbruck Airport: flight and travel information","url":"https://www.innsbruck-airport.com/passagiere-besucher/fliegen/flug-reise/"},
+        {"label":"Innsbruck Airport: current timetable","url":"https://www.innsbruck-airport.com/fileadmin/userdaten/docs/Flugplan/Flugplan_Homepage_24_06_2026.pdf"},
+        {"label":"Tirol Kliniken: 2026 Landeskrankenhaus Innsbruck patient guide","url":"https://www.tirol-kliniken.at/data.cfm?download=yes&vpath=ma-wartbare-inhalte%2F_publikationen%2F30431-pat-broschuere-2026-web-27526"},
+        {"label":"Tirol Kliniken: Innsbruck trauma emergency service","url":"https://anaesthesie.tirol-kliniken.at/page.cfm?vpath=klinik%2Fanaesthesie%2Funfallchirurgischer-schockraum"},
+        {"label":"Land Tirol: TIRIS natural-hazard map services","url":"https://www.tirol.gv.at/statistik-budget/tiris/tiris-kartendienste-zu-fachthemen/"},
+        {"label":"Land Tirol: water register and flood information","url":"https://www.tirol.gv.at/umwelt/wasser-forst-und-energierecht/wasserbuch/"},
+        {"label":"Land Tirol: tourism and accommodation levy","url":"https://www.tirol.gv.at/tourismus/aufenthaltsabgabe/"},
+        {"label":"Land Tirol: private-room accommodation requirements","url":"https://www.tirol.gv.at/arbeit-wirtschaft/eap-en/services/WT-TE-UK-PV/"},
+        {"label":"European Central Bank: euro reference exchange rates","url":"https://www.ecb.europa.eu/stats/policy_and_exchange_rates/euro_reference_exchange_rates/html/index.en.html"},
+    ),
+    images=(
+        DossierImage("city-hero", "/assets/innsbruck-tyrol-city-hero.webp", "Innsbruck beside the Inn with rail and the Nordkette beyond", "Innsbruck’s advantage is a working city beneath the mountains.", "hero", "defining-place"),
+        DossierImage("city-access", "/assets/innsbruck-tyrol-access.webp", "Innsbruck rail and tram access beside residential streets and the mountains", "Rail, street and last-mile access determine whether Tyrol works every week.", "wide", "built-environment-access"),
+        DossierImage("winter-diligence", "/assets/innsbruck-tyrol-winter-diligence.webp", "Tyrolean hillside homes beside a cleared snow-covered access road", "Snow load, drainage and access belong in the purchase decision.", "wide", "decision-texture"),
+    ),
+    nav_items=(("verdict","Verdict"),("lenses","Five destination lenses"),("scores","Atlas assessment"),("listings","What homes cost"),("locations","Where to look"),("checklist","Buyer checklist"),("sources","References")),
+    lenses_heading="Innsbruck / Tyrol through five destination lenses",
+    assessment_intro="Here’s how Innsbruck and Tyrol score on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three dated Innsbruck asks show different urban propositions. All use seller-stated Wohnfläche; the Hötting buyer package includes the separately priced garage. Availability, title, lawful use, condition, fees, exact area and completed value remain unverified.",
+    market_anchors_intro="Statistics Austria’s official 2025 apartment table provides three registered-transaction benchmarks by district, construction period, size and outdoor-space basis. They are unmatched market context: none is mapped to an example property or presented as its valuation.",
+    orientation_groups=(
+        DossierOrientationGroup("City and plateau", (("Innsbruck Airport","Close regional gateway"),("Innsbruck core","Station, hospital and urban services"),("Hötting / Igls","Hillside and Mittelgebirge choices"),("Seefeld","Rail-linked plateau resort"))),
+        DossierOrientationGroup("Wider connections", (("Munich / Zurich / Vienna","Major international gateways"),("Brenner corridor","Rail and road toward Italy"),("Stubai / Wipptal","Valley living and winter access"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact municipality, rail or bus journey, airport pattern, hospital access, lawful use and hazard layers for the address.",
+    country_guide_url="/countries/austria-property/",
+    country_guide_label="Austria property guide",
+    rail_comparison="Compare Innsbruck and Tyrol with the full Atlas.",
+    property_anchor_indexes=(None, None, None),
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -4238,6 +4360,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     DA_NANG_HOI_AN_DOSSIER.destination_id: DA_NANG_HOI_AN_DOSSIER,
     WHISTLER_DOSSIER.destination_id: WHISTLER_DOSSIER,
     ANDERMATT_DOSSIER.destination_id: ANDERMATT_DOSSIER,
+    INNSBRUCK_TYROL_DOSSIER.destination_id: INNSBRUCK_TYROL_DOSSIER,
 }
 
 
@@ -4330,3 +4453,4 @@ validate_premium_dossier(DUBAI_DOSSIER)
 validate_premium_dossier(BALI_DOSSIER)
 validate_premium_dossier(DOLOMITES_SOUTH_TYROL_DOSSIER)
 validate_premium_dossier(CHAMONIX_DOSSIER)
+validate_premium_dossier(INNSBRUCK_TYROL_DOSSIER)
