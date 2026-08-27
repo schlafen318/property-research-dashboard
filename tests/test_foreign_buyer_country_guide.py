@@ -184,6 +184,27 @@ class ForeignBuyerCountryGuideContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\] requires source_urls$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
+    def test_validator_rejects_blank_nested_source_url(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"][0]["source_urls"] = [""]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a nonblank URL string$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_unregistered_nested_source_url(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"][0]["source_urls"] = ["https://example.gov/unregistered"]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] is not registered in primary_sources$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_malformed_primary_source(self) -> None:
+        guide = valid_guide_fixture()
+        guide["primary_sources"][0]["url"] = ""
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: primary_sources\[0\] requires a valid HTTPS URL$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
     def test_validator_rejects_extra_direct_answer(self) -> None:
         guide = valid_guide_fixture()
         guide["direct_answers"]["tax"] = {"answer": "Answer", "source_urls": ["https://example.gov/source"]}
@@ -234,7 +255,19 @@ class ForeignBuyerCountryGuideContractTests(unittest.TestCase):
             {"heading": "Short rentals", "body": "Recheck lodging authority", "source_urls": ["https://example.gov/source"]},
         ]
 
-        with self.assertRaisesRegex(ValueError, "^japan-property: ownership_rules missing tax and hazard coverage$"):
+        with self.assertRaisesRegex(ValueError, "^japan-property: ownership_rules missing tax coverage$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_ownership_rules_without_hazard_or_insurance_obligation(self) -> None:
+        guide = valid_guide_fixture()
+        guide["ownership_rules"] = [
+            {"heading": "Owner records", "body": "Keep records current", "source_urls": ["https://example.gov/source"]},
+            {"heading": "Condominium repairs", "body": "Fund repairs", "source_urls": ["https://example.gov/source"]},
+            {"heading": "Short rentals", "body": "Recheck lodging authority", "source_urls": ["https://example.gov/source"]},
+            {"heading": "Tax files", "body": "Maintain tax records", "source_urls": ["https://example.gov/source"]},
+        ]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: ownership_rules missing hazard or insurance coverage$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
 

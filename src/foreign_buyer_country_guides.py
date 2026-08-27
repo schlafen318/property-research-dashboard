@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import date
+from urllib.parse import urlsplit
 
 
 REQUIRED_GUIDE_KEYS = {
@@ -35,7 +36,8 @@ REQUIRED_OWNERSHIP_COVERAGE = {
     "owner administration": ("owner", "record", "registration", "address"),
     "building operations": ("condominium", "building", "repair", "management"),
     "rental authority": ("rental", "lodging", "operator"),
-    "tax and hazard": ("tax", "hazard", "insurance"),
+    "tax": ("tax",),
+    "hazard or insurance": ("hazard", "insurance"),
 }
 
 FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
@@ -462,12 +464,13 @@ def validate_foreign_buyer_country_guide(
             raise ValueError(f"{country_hub_slug}: {field} must be a valid ISO date")
     if not isinstance(guide["retirement_guide_slug"], str) or not guide["retirement_guide_slug"].strip():
         raise ValueError(f"{country_hub_slug}: retirement_guide_slug is required")
-    _validate_direct_answers(country_hub_slug, guide["direct_answers"])
-    _validate_sourced_items(country_hub_slug, "eligibility_sections", guide["eligibility_sections"])
-    _validate_sourced_items(country_hub_slug, "purchase_steps", guide["purchase_steps"])
-    _validate_sourced_items(country_hub_slug, "ownership_rules", guide["ownership_rules"])
-    _validate_sourced_items(country_hub_slug, "cost_rows", guide["cost_rows"])
-    _validate_sourced_items(country_hub_slug, "faqs", guide["faqs"])
+    primary_source_urls = _validate_primary_sources(country_hub_slug, guide["primary_sources"])
+    _validate_direct_answers(country_hub_slug, guide["direct_answers"], primary_source_urls)
+    _validate_sourced_items(country_hub_slug, "eligibility_sections", guide["eligibility_sections"], primary_source_urls)
+    _validate_sourced_items(country_hub_slug, "purchase_steps", guide["purchase_steps"], primary_source_urls)
+    _validate_sourced_items(country_hub_slug, "ownership_rules", guide["ownership_rules"], primary_source_urls)
+    _validate_sourced_items(country_hub_slug, "cost_rows", guide["cost_rows"], primary_source_urls)
+    _validate_sourced_items(country_hub_slug, "faqs", guide["faqs"], primary_source_urls)
     for field in ("eligibility_sections", "ownership_rules", "buyer_checklist"):
         if not isinstance(guide[field], list) or not guide[field]:
             raise ValueError(f"{country_hub_slug}: {field} requires at least one item")
@@ -497,15 +500,33 @@ def validate_foreign_buyer_country_guide(
         raise ValueError(f"{country_hub_slug}: primary_sources is required")
 
 
-def _validate_direct_answers(country_hub_slug: str, direct_answers: dict) -> None:
+def _validate_primary_sources(country_hub_slug: str, primary_sources: list[dict]) -> set[str]:
+    if not isinstance(primary_sources, list) or not primary_sources:
+        raise ValueError(f"{country_hub_slug}: primary_sources is required")
+    urls: set[str] = set()
+    for index, source in enumerate(primary_sources):
+        if not isinstance(source, dict) or not isinstance(source.get("label"), str) or not source["label"].strip():
+            raise ValueError(f"{country_hub_slug}: primary_sources[{index}] requires a nonblank label")
+        url = source.get("url")
+        parsed = urlsplit(url) if isinstance(url, str) else None
+        if parsed is None or parsed.scheme != "https" or not parsed.netloc or not url.strip():
+            raise ValueError(f"{country_hub_slug}: primary_sources[{index}] requires a valid HTTPS URL")
+        if url in urls:
+            raise ValueError(f"{country_hub_slug}: primary_sources[{index}] URL must be unique")
+        urls.add(url)
+    return urls
+
+
+def _validate_direct_answers(country_hub_slug: str, direct_answers: dict, primary_source_urls: set[str]) -> None:
     for key, answer in direct_answers.items():
         if not isinstance(answer, dict) or not answer.get("answer"):
             raise ValueError(f"{country_hub_slug}: direct_answers.{key} requires answer")
         if not answer.get("source_urls"):
             raise ValueError(f"{country_hub_slug}: direct_answers.{key} requires source_urls")
+        _validate_source_urls(country_hub_slug, f"direct_answers.{key}", answer["source_urls"], primary_source_urls)
 
 
-def _validate_sourced_items(country_hub_slug: str, field: str, items: list[dict]) -> None:
+def _validate_sourced_items(country_hub_slug: str, field: str, items: list[dict], primary_source_urls: set[str]) -> None:
     if not isinstance(items, list):
         raise ValueError(f"{country_hub_slug}: {field} must be a list")
     for index, item in enumerate(items):
@@ -513,6 +534,22 @@ def _validate_sourced_items(country_hub_slug: str, field: str, items: list[dict]
             raise ValueError(f"{country_hub_slug}: {field}[{index}] must be an object")
         if not item.get("source_urls"):
             raise ValueError(f"{country_hub_slug}: {field}[{index}] requires source_urls")
+        _validate_source_urls(country_hub_slug, f"{field}[{index}]", item["source_urls"], primary_source_urls)
+
+
+def _validate_source_urls(
+    country_hub_slug: str,
+    location: str,
+    source_urls: list[str],
+    primary_source_urls: set[str],
+) -> None:
+    if not isinstance(source_urls, list) or not source_urls:
+        raise ValueError(f"{country_hub_slug}: {location} requires source_urls")
+    for index, url in enumerate(source_urls):
+        if not isinstance(url, str) or not url.strip():
+            raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] must be a nonblank URL string")
+        if url not in primary_source_urls:
+            raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] is not registered in primary_sources")
 
 
 def _validate_coverage(
