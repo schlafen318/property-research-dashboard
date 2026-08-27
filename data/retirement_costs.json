@@ -2522,9 +2522,10 @@
         }
       },
       "property": {
-        "representative_price_usd": 7200000,
-        "acquisition_cost_rate": 0.04,
-        "price_basis": "Median of three representative Aspen / Snowmass listing snapshots captured by Global Home Atlas."
+        "representative_price_usd": 2875000,
+        "acquisition_cost_rate": 0,
+        "acquisition_cost_basis": "Transaction costs are excluded because Aspen, Snowmass Village and unincorporated Pitkin County do not share one buyer charge. City of Aspen purchases can include buyer-paid 0.5% and 1.0% real-estate transfer taxes with transaction-specific exclusions and exemptions; obtain a buyer-specific title and closing statement before relying on the calculator.",
+        "price_basis": "Median of three direct Aspen / Snowmass condominium asking observations captured 2026-08-27; asking-price evidence, not a market-wide median or completed-sale value."
       },
       "confidence": {
         "overall": "medium-high",

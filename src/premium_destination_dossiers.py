@@ -4582,6 +4582,128 @@ INNSBRUCK_TYROL_DOSSIER = PremiumDossierSpec(
 )
 
 
+ASPEN_SNOWMASS_DOSSIER = PremiumDossierSpec(
+    destination_id="aspen-snowmass",
+    title="Aspen and Snowmass Property Dossier for Foreign Buyers",
+    description="Assess Aspen and Snowmass property through residence, access, healthcare, short-term-rental rules, wildfire, insurance, current listings, county sales and resale.",
+    h1="Aspen / Snowmass: buy the life, not the trophy",
+    lede=(
+        "Aspen / Snowmass combines a compact mountain town, a regional hospital, four-season culture and exceptional outdoor access with one of America’s most expensive housing markets. The distinction that matters is not merely Aspen versus Snowmass. It is a walkable, service-rich home with clear use and manageable governance versus a resort or hillside asset whose permit, insurance, access and carrying costs narrow both daily utility and resale. A deed does not create a United States visa, health coverage or a viable rental business, and scarcity does not make every asking price defensible."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "The verdict is positive only for a high-capital buyer who already has a durable United States residence plan and can carry the property without rent or appreciation. Aspen core offers the clearest long-term-home case: Aspen Valley Health, groceries, culture, restaurants and free local transport sit within a compact town. Snowmass Village is more deliberately resort-led, with strong mountain access and local services but greater dependence on building management, Brush Creek Road and the exact condominium or planned-unit regime. In both places, the controlling constraint is the exact lawful and insurable use—not the destination brand.",
+        "Aspen / Snowmass best suits a buyer seeking substantial personal use, four-season mountain life and a scarce international address, with liquidity reserves for transfer tax, HOA charges, maintenance, insurance and major works. It is a poor fit when income must justify the price, when easy diversification or broad resale is required, or when the household expects property ownership to solve immigration or healthcare. A foreign buyer also needs a cross-border tax plan: the Internal Revenue Service applies FIRPTA withholding rules when a foreign person disposes of United States real property, while immigration status follows federal visa law rather than title.",
+        "Proceed in order. Establish immigration, tax and health-cover plans independently. Confirm whether the parcel sits in Aspen, Snowmass Village or unincorporated Pitkin County and obtain the current zoning, STR status and HOA position in writing. Review title, survey, easements, condition, reserves, assessments, wildfire exposure, winter access and replacement-cost insurance. Only then compare the ask with qualified county sales of a compatible asset and test the next-buyer pool. If the home fails without short stays, perpetual peak demand or an exceptional resale price, pause."
+    ),
+    lenses_intro=(
+        "Five questions determine whether Aspen / Snowmass works after the mountain view is priced in: does ordinary life function year-round, can the household reach and integrate, is the exact use lawful and insurable, can the financial case survive full costs, and will another buyer accept the same constraints?"
+    ),
+    lenses=(
+        DossierLens("Choose a year-round base, not a holiday itinerary", ("lifestyle_magnetism", "retirement_fit"), (
+            "Aspen is a small but functioning town rather than a purpose-built resort. The centre combines groceries, municipal services, restaurants, arts programming and free local shuttles with Aspen Valley Health on Castle Creek Road. The hospital’s emergency department operates 24 hours a day and is a Level III Trauma Center, with a helipad when transfer is required. That is meaningful mountain-town infrastructure, but it is not the same as living beside a large tertiary medical system. A household with complex specialty needs should map the actual referral and transfer plan before treating the address as a retirement base.",
+            "Snowmass Village has a year-round clinic backed by Aspen Valley Health, yet daily life is more dispersed and resort-dependent. Base Village, the Mall and hillside condominium clusters differ in grocery access, gradients, shuttle dependence and shoulder-season activity. The free Snowmass Aspen service connects to the wider RFTA network, but transfers, reduced off-season frequencies and winter conditions matter. Test a normal Tuesday rather than a peak ski week: buy groceries, reach the clinic, return after dinner and check how the building handles snow, deliveries and staff shortages.",
+            "Altitude and seasonality are personal operating issues. Aspen sits near 8,000 feet, and many Snowmass addresses are higher; acclimatisation, cardiopulmonary health, ice, dry air and winter driving can change what feels sustainable. Summer brings trail access and cultural life but also construction, smoke risk and heavy visitor periods. Spend time in winter cold, spring shoulder season and late-summer wildfire conditions. A household that needs effortless walking should favour a flat, central route over a dramatic hillside view, and should test that route with luggage and mobility limitations."
+        )),
+        DossierLens("Connect the front door in every season", ("global_access", "foreigner_fit"), (
+            "Aspen/Pitkin County Airport is close enough to make regional air access unusually convenient for a mountain market, but schedule, weather and aircraft constraints can disrupt the advantage. The airport’s live information supports current journey planning, not a promise of a future route. Build three arrival plans: a direct Aspen flight, a connection through Denver, and a winter diversion or road transfer. Then test the candidate address from the terminal. Aspen core, West End, Snowmass Base Village and a remote hillside home produce very different luggage, taxi and car requirements.",
+            "RFTA materially improves the destination’s practical case. Its year-round network links Aspen and Snowmass, and free services cover the Aspen/Snowmass fare zone; seasonal mountain connectors add winter access. Yet a route name is not a household mobility plan. Check the stop gradient, shelter, final walk, evening frequency, off-season service and whether a transfer at Brush Creek is required. For a hillside or gated home, confirm snow clearance, guest parking, delivery access and who maintains the private road. A car-light life is plausible in selected locations, not across the whole destination.",
+            "Foreigner fit is administratively easy only relative to more restrictive ownership jurisdictions. Residential title can be acquired through the ordinary Colorado conveyancing system, but the buyer still needs independent United States immigration, tax, estate-planning, banking and insurance advice. A visitor visa permits a temporary stay for tourism and related purposes; it is not a residence solution, and the deed changes nothing. Use a Colorado real-estate lawyer and tax adviser who understand foreign ownership, entity transparency, FIRPTA and estate exposure. A polished international sales process is not a substitute for buyer-specific federal and state advice."
+        ), "town-access"),
+        DossierLens("Prove the use, governance and wildfire response", ("ownership_clarity", "regulatory_safety"), (
+            "The first local question is jurisdiction. A City of Aspen address follows Aspen’s land-use and short-term-rental system; Snowmass Village has its own permit regime; unincorporated Pitkin County is different again. Aspen requires a permit and business licensing for stays under 30 days. Its Classic permit can serve non-owner-occupied property, but permits are capped in specified residential zone districts, may involve a waitlist and are non-transferable when ownership changes. Owner-Occupied permits require primary-residence evidence and limit rental nights. Never value an Aspen property on the seller’s permit without a written new-owner eligibility answer.",
+            "Snowmass Village also requires a business licence and STR permit, with revised regulations effective 30 December 2025 and a $400 permit fee from 2026. The town’s framework covers occupancy, minimum stay, inspection, insurance, a local representative, HOA compliance and violations. A listing marked short-term rentable or a building with historic rentals does not prove that the exact unit can operate under the buyer’s plan. Obtain the current permit record, zoning, HOA declaration, rental-management agreement, tax position and new-owner process before assigning revenue or paying a resort premium.",
+            "Wildfire and insurance are address-level gates. Pitkin County’s Community Wildfire Protection Plan identifies the West End, Red Butte, ski-run edges and the airport area among Aspen concerns, citing vegetation, topography, winds, access and structure-to-structure exposure. County GIS also maps wildfire hazard. Colorado’s insurance regulator documents a tightening homeowners and HOA market and points consumers toward the FAIR Plan as a last-resort route. Overlay the parcel, obtain written quotes for the dwelling and association, check replacement cost and exclusions, inspect defensible space and egress, and test whether a future buyer can insure the same risk."
+        ), "winter-wildfire"),
+        DossierLens("Do not let peak rent justify the purchase", ("rental_profit", "capital_upside"), (
+            "No destination-wide net yield is supported for Aspen / Snowmass. A central condominium, a Snowmass resort unit and a detached hillside house have different permitted use, owner-stay limits, management contracts, taxes, HOA costs, reserves and insurance. Start with the lawful route, then use dated achievable rent and realistic shoulder-season vacancy. Deduct management, cleaning, utilities, booking costs, furnishing, repairs, insurance, association charges, local lodging and STR taxes, federal and state tax administration and major-work reserves. If the result needs every peak week, it is not a resilient income case.",
+            "Aspen’s permit structure and Snowmass’s separate rules turn rental capability into a property-specific operating right, not a destination characteristic. Aspen Classic permits may be capped and waitlisted in residential zones; permits must be renewed and are not simply transferred with title. Owner-occupied and lodging-exempt categories have different eligibility and night rules. Snowmass requires its own permit and operating compliance. Confirm both public law and private governance. HOA bans, owner-use calendars, hotel-style rental pools or large annual dues can defeat an otherwise legal short-stay thesis.",
+            "Capital resilience comes from scarcity only when the property is legible to the next buyer. Pitkin County’s official 2025/2026 appraisal workbooks record qualified condominium and single-family sales from July 2022 through June 2024, including transaction price, heated area and price per square foot. Those completed records show a real luxury market but also enormous dispersion by building, age, condition and location. A recent ask can sit above older qualified sales because of renovation or scarcity; it can also be optimistic. Use matched completed transactions, not a destination average, and treat new construction without a completed history as a higher-evidence case."
+        )),
+        DossierLens("Pay for utility and preserve the exit", ("value_entry", "exit_liquidity"), (
+            "The current observations span three buyer jobs: a compact Wood Road condominium in Snowmass Village, a three-bedroom Aspen Villas home at the entrance to Aspen, and an under-construction premium residence in Snowmass Base Village. Their asking-price spread is more informative than a single Aspen average. Convert seller-stated living area consistently, then reconcile age, condition, furniture, parking, outdoor space, HOA services, permitted use and exact ownership form. Fractional interests and residence-club weeks must be excluded from ordinary fee-simple comparisons.",
+            "Entry cost is local. The City of Aspen charges two buyer-paid real-estate transfer taxes: 0.5% for arts and culture and 1.0% for affordable housing, with the latter excluding the first $100,000 of consideration, subject to exemptions and the exact transaction. Snowmass and county property may follow a different closing statement. Add title and escrow, legal and tax advice, inspection, survey, financing, insurance, initial repairs and furnishing. Annual cost must include HOA dues, special assessments, property tax, utilities, snow removal, management and a realistic capital reserve. Obtain a buyer-specific completion statement instead of applying one destination percentage.",
+            "Exit liquidity is deepest only in relative terms. A clearly titled, insurable, well-managed Aspen or Snowmass home can attract an affluent domestic and international pool, but the absolute price sharply limits that pool. Untransferable STR permissions, weak reserves, high HOA charges, deferred work, access exposure, unusual ownership structures and ambitious pricing can narrow it further. Ask two agents who did not source the property for qualified completed sales, likely marketing time, financing constraints and the principal resale objection. Buy only when the personal-use value survives a long marketing period and a sale without the current rental story."
+        )),
+    ),
+    score_reads={
+        "lifestyle_magnetism":"Aspen combines culture, four-season recreation and a functioning town; Snowmass is more resort-led and shoulder-season dependent.",
+        "global_access":"A close regional airport and RFTA are unusual mountain strengths, while weather disruption and address-level last-mile access remain material.",
+        "ownership_clarity":"Colorado conveyancing is familiar, but title form, HOA governance, tax structure and intended use require buyer-specific review.",
+        "regulatory_safety":"Aspen, Snowmass Village and Pitkin County apply different STR rules; wildfire, egress and insurance can independently stop the case.",
+        "rental_profit":"No destination-wide net yield is supported; permits, HOA rules, taxes, management and peak-season dependence require unit-level underwriting.",
+        "capital_upside":"Qualified county sales confirm a deep luxury market, but scarcity, condition, new construction and entry price do not guarantee appreciation.",
+        "retirement_fit":"Aspen has a 24-hour Level III trauma centre and compact services; altitude, specialist transfers and Snowmass mobility require planning.",
+        "exit_liquidity":"Prime clear-use homes reach a global pool, but extreme prices, high carrying costs and property-specific constraints narrow actual buyers.",
+        "foreigner_fit":"International buying is established, while immigration, health cover, FIRPTA, estate planning, banking and insurance remain separate systems.",
+        "value_entry":"Even practical condominiums are expensive; living area, HOA cost, lawful use, condition and insurance matter more than a blended average."
+    },
+    market_anchors=(
+        {"location":"Snowmass Village ski-area condominiums near Wood Road","evidence":"Qualified 2022–2024 sales include 400 Wood Road units at $1,090,050 for 860 ft² and $1,331,625 for 855 ft² adjusted sale price","buyer_read":"The $1.595 million, 875 ft² Wood Road ask sits above these older nearby Crestwood records. Building, condition, HOA, exact slope access and legal use differ, so the comparison tests the premium rather than valuing the unit.","source_label":"Pitkin County 2025/2026 condo sales","source_url":"https://pitkincounty.com/DocumentCenter/View/34498"},
+        {"location":"Aspen Villas, 814 W Bleeker Street","evidence":"Four qualified sales from 2022–2024: $1,743–$1,953 per ft² adjusted","buyer_read":"The current Aspen Villas B5 ask is about $2,046 per seller-stated ft², modestly above the county’s same-complex qualified range. Renovation, floor plan, date and condition still require matched inspection and current sales.","source_label":"Pitkin County 2025/2026 condo sales","source_url":"https://pitkincounty.com/DocumentCenter/View/34498"},
+        {"location":"Snowmass Base Village premium condominiums","evidence":"Qualified One Snowmass and Havens sales from 2022–2024 ranged roughly $2,314–$4,316 per ft² adjusted","buyer_read":"The under-construction Stratos ask is about $4,991 per ft², above the official completed range shown for nearby premium product. New construction, future completion and exact amenity package prevent direct valuation; obtain current completed base-village comparables.","source_label":"Pitkin County 2025/2026 condo sales","source_url":"https://pitkincounty.com/DocumentCenter/View/34498"},
+    ),
+    micro_locations_intro="The useful comparison follows everyday services, transit, jurisdiction and building form. Confirm the municipal boundary, STR regime, HOA documents, wildfire layer, winter access and insurance for the exact parcel before comparing views.",
+    micro_locations=(
+        {"name":"Aspen core / downtown","best_for":"Walkable year-round life","daily_life":"Shops, culture, buses and mountain access close together","diligence":"Transfer tax, STR zone, noise, parking, HOA and completed price"},
+        {"name":"West End / Cemetery Lane","best_for":"Residential Aspen near services","daily_life":"Quieter streets with hospital or bus access varying by address","diligence":"Wildfire exposure, egress, ice, redevelopment and price premium"},
+        {"name":"Snowmass Base Village / Wood Road","best_for":"Managed resort convenience","daily_life":"Ski access and shuttles with building-led services","diligence":"HOA, rental regime, construction, gradients and shoulder season"},
+        {"name":"Snowmass Club / outer valley","best_for":"Space and a quieter rhythm","daily_life":"More driving or transfers for Aspen services","diligence":"Jurisdiction, road maintenance, wildfire, insurance and resale depth"},
+    ),
+    checklist=(
+        "Establish the United States immigration, tax, estate and health-cover plan independently of the property.",
+        "Confirm whether the parcel is in Aspen, Snowmass Village or unincorporated Pitkin County and obtain the current zoning and use record.",
+        "Verify the buyer’s own STR eligibility, permit path, taxes, HOA permission and management obligations in writing.",
+        "Review title, survey, easements, parking, association documents, reserves, minutes, insurance and planned assessments.",
+        "Overlay the current wildfire map and inspect defensible space, egress, roof, drainage, snow load and private-road maintenance.",
+        "Obtain dwelling and HOA insurance quotations, replacement-cost terms and any wildfire exclusions before the offer is unconditional.",
+        "Model buyer-paid transfer tax, closing cost, property tax, HOA dues, special assessments and five-year maintenance without rental income.",
+        "Obtain matched qualified sales and an independent resale view covering likely buyer pool, marketing time and principal objection.",
+    ),
+    references_intro="Legal, administrative, market and listing claims were reviewed on 27 August 2026. Recheck immediately if the buyer, entity, immigration plan, municipality, intended use, HOA, permit, listing status, insurance market or law changes, and before reservation or exchange. The next scheduled editorial review is 27 February 2027. Obtain current Colorado legal, federal immigration and tax, planning, title, inspection and insurance advice for the exact buyer and property.",
+    references=(
+        {"label":"United States Department of State: visitor visas","url":"https://travel.state.gov/content/travel/en/us-visas/tourism-visit/visitor.html"},
+        {"label":"IRS: FIRPTA withholding for foreign sellers","url":"https://www.irs.gov/individuals/international-taxpayers/firpta-withholding"},
+        {"label":"City of Aspen: short-term rentals","url":"https://www.aspen.gov/1407/Short-term-Rentals"},
+        {"label":"Town of Snowmass Village: short-term rentals","url":"https://www.tosv.com/str"},
+        {"label":"Town of Snowmass Village: 2026 STR regulations","url":"https://www.tosv.com/DocumentCenter/View/4678/2026-Short-Term-Rental-Regulations-PDF?bidId="},
+        {"label":"City of Aspen: real-estate transfer taxes","url":"https://www.aspen.gov/1428/Real-Estate-Transfer-Taxes"},
+        {"label":"Pitkin County: 2025/2026 condominium sales","url":"https://pitkincounty.com/DocumentCenter/View/34498"},
+        {"label":"Pitkin County: 2025/2026 single-family sales","url":"https://www.pitkincounty.com/DocumentCenter/View/34589"},
+        {"label":"Pitkin County: Community Wildfire Protection Plan","url":"https://www.pitkincounty.com/1567/Community-Wildfire-Protection-Plan"},
+        {"label":"Pitkin County: 2023 wildfire plan","url":"https://www.pitkincounty.com/DocumentCenter/View/31952/County-Wildfire-Protection-Plan-CWPP-Final-10-2023"},
+        {"label":"Pitkin County GIS: wildfire hazard layer","url":"https://maps.pitkincounty.com/arcgis/rest/services/Hosted/BaseOverlay/MapServer"},
+        {"label":"Colorado Division of Insurance: homeowners and HOA insurance toolkit","url":"https://doi.colorado.gov/homeowners-hoainsurancetoolkit"},
+        {"label":"RFTA: Aspen and Snowmass routes","url":"https://www.rfta.com/routes/"},
+        {"label":"RFTA: Snowmass Village service","url":"https://www.rfta.com/routes/snowmass-village/"},
+        {"label":"Aspen/Pitkin County Airport: current operations","url":"https://www.aspenairport.com/"},
+        {"label":"Aspen Valley Health: emergency department","url":"https://aspenvalleyhealth.org/services/emergency-dept/"},
+        {"label":"Aspen Valley Health: Snowmass Village clinic","url":"https://aspenvalleyhealth.org/services/snowmass-village-clinic/"},
+    ),
+    images=(
+        DossierImage("town-hero", "/assets/aspen-snowmass-town-hero.webp", "Aspen town buildings and mature trees below Aspen Mountain in early autumn", "Aspen’s strongest case is a functioning town at the mountain’s edge.", "hero", "defining-place"),
+        DossierImage("town-access", "/assets/aspen-snowmass-access.webp", "An Aspen residential street with a bus stop, local bus and mountains beyond", "Transit and the last walk decide whether a mountain address works every day.", "wide", "built-environment-access"),
+        DossierImage("winter-wildfire", "/assets/aspen-snowmass-winter-wildfire.webp", "A ploughed hillside road beside mountain homes among snow-covered trees", "Egress, drainage, snow clearance and wildfire exposure belong in the offer decision.", "wide", "decision-texture"),
+    ),
+    nav_items=(("verdict","Verdict"),("lenses","Five destination lenses"),("scores","Atlas assessment"),("listings","What homes cost"),("locations","Where to look"),("checklist","Buyer checklist"),("sources","References")),
+    lenses_heading="Aspen / Snowmass through five destination lenses",
+    assessment_intro="Here’s how Aspen and Snowmass score on the ten factors that matter most when choosing a long-term mountain home.",
+    listings_intro="Three dated asks show a compact Snowmass condominium, an ordinary Aspen home and an under-construction Base Village residence. They are asking-price evidence only; availability, title, condition, area, fees, lawful use, negotiability and completed value remain unverified.",
+    market_anchors_intro="Pitkin County’s official 2025/2026 appraisal workbook provides qualified completed condominium sales from July 2022 through June 2024. Each property record below carries the compatible local comparison and explains what remains unmatched.",
+    orientation_groups=(
+        DossierOrientationGroup("Upper valley", (("Aspen/Pitkin County Airport","Regional gateway and weather constraint"),("Aspen core","Hospital, culture and compact services"),("Brush Creek Park & Ride","Network connection"),("Snowmass Village","Resort base and separate regulation"))),
+        DossierOrientationGroup("Wider access", (("Denver","Major airport and winter road alternative"),("Basalt / Carbondale","Down-valley services and housing"),("Glenwood Springs","Regional rail, road and specialist access"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact jurisdiction, current RFTA journey, airport disruption plan, hospital route, winter access and wildfire egress for the address.",
+    country_guide_url="/countries/united-states-property/",
+    country_guide_label="United States property guide",
+    rail_comparison="Compare Aspen and Snowmass with the full Atlas.",
+    property_anchor_indexes=(0, 1, 2),
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -4614,6 +4736,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     INNSBRUCK_TYROL_DOSSIER.destination_id: INNSBRUCK_TYROL_DOSSIER,
     JACKSON_HOLE_DOSSIER.destination_id: JACKSON_HOLE_DOSSIER,
     TICINO_LAKE_LUGANO_DOSSIER.destination_id: TICINO_LAKE_LUGANO_DOSSIER,
+    ASPEN_SNOWMASS_DOSSIER.destination_id: ASPEN_SNOWMASS_DOSSIER,
 }
 
 

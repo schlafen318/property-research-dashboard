@@ -80,6 +80,7 @@ RETIREMENT_FINDER_SLUG = "retirement-destination-finder"
 RETIREMENT_FINDER_TITLE = "Retirement Destination Finder | Global Home Atlas"
 PREMIUM_DESTINATION_PEER_OVERRIDES = {
     "dubai": ["bali", "phuket-koh-samui", "fukuoka-itoshima"],
+    "lake-tahoe": ["park-city-deer-valley", "aspen-snowmass", "miami-fort-lauderdale"],
 }
 RETIREMENT_FINDER_DESCRIPTION = (
     "Project your retirement savings and monthly investing, then compare destinations "
@@ -7836,7 +7837,7 @@ def build_premium_destination_page(
         if destination_id in destination_by_id
         and get_premium_dossier(destination_id) is not None
     ]
-    candidates = country_peers or category_peers or override_peers
+    candidates = override_peers or country_peers or category_peers
     for candidate in candidates:
         candidate_id = candidate.get("id")
         if candidate_id == dest.get("id") or candidate_id in peer_ids:
