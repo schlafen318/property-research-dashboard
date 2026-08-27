@@ -183,6 +183,13 @@ The generated site remains static HTML and CSS. No runtime fetch, hydration, bui
 
 The initiative is delivered in independently deployable batches so a visual regression can be isolated and reversed without holding the whole site.
 
+### Pilot — landing page only
+
+- Build the shared token, foundation, header, footer, and landing-page mode primitives.
+- Apply them only to the root landing page while preserving its research paths, market finder, recommendations, internal links, analytics, and structured data.
+- Review the rendered landing page at desktop, tablet, and mobile widths and deploy it as an isolated production pilot.
+- Stop after the pilot for explicit visual confirmation. No other template family migrates until that confirmation is received.
+
 ### Batch 1 — foundation and editorial pages
 
 - Add the shared module and its tests.
