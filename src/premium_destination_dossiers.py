@@ -5007,6 +5007,118 @@ GOLD_COAST_SUNSHINE_COAST_DOSSIER = PremiumDossierSpec(
 )
 
 
+LOS_ANGELES_ORANGE_COUNTY_DOSSIER = PremiumDossierSpec(
+    destination_id="los-angeles-orange-county",
+    title="Los Angeles and Orange County Retirement Property Dossier",
+    description="Assess Los Angeles and Orange County property through daily life, foreign ownership, tax, insurance, rental rules, hazards, value and resale.",
+    h1="Los Angeles / Orange County: buy the useful coast, not the postcard",
+    lede="Los Angeles and Orange County offer an unusually deep Pacific-coast proposition: major airports, world-class healthcare, year-round culture and a vast domestic buyer pool. They are also a collection of very different cities rather than one market. Santa Monica, Long Beach, Irvine and Newport Coast produce different daily journeys, taxes, association burdens, rental rules and hazard exposures. The strongest purchase is an address that remains useful without a holiday narrative—and insurable without heroic assumptions.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "The verdict is positive for a well-capitalised buyer seeking long-term personal use, institutional depth and a broad eventual resale market. Foreign nationals can generally hold California real estate, but ownership creates no visa, work right, Medicare access or immigration status. Financing can be narrower for a non-resident, California-source rent creates tax and withholding administration, and a foreign seller generally enters the federal FIRPTA regime. Establish residence, healthcare, tax structure and an exit-withholding plan before treating the property as a retirement solution.",
+        "The proposition is strongest in a service-rich, lower-friction submarket: Santa Monica for walkability and health access, Long Beach for a more attainable urban coast, Irvine for planned daily life, or selected Orange County coastal districts for premium personal use. It is weaker for anyone expecting easy short-term-rental income, low carrying costs, comprehensive public transport across the region, or inexpensive insurance in a wildfire-exposed canyon. Los Angeles home sharing is restricted to an eligible registered primary residence; Orange County rules vary city by city and can be narrowed again by an association.",
+        "Proceed in order: establish the immigration and tax plan; choose the daily-life catchment and test it in traffic; obtain an insurance indication before removing contingencies; then investigate title, assessment reset, association finances, seismic and wildfire exposure, local rental permissions and the likely successor buyer. Underwrite the home without short-stay income. Add rent only when the city, building, lender, insurer and tax adviser all support the intended use in writing."
+    ),
+    lenses_intro="Five questions separate a durable Southern California base from an expensive coastal idea: whether ordinary life works, how the last mile behaves, what the property and city permit, whether income survives full costs, and who can buy on exit.",
+    lenses=(
+        DossierLens("Choose a life that survives traffic", ("lifestyle_magnetism", "retirement_fit"), (
+            "The region’s lifestyle strength is real but highly local. Santa Monica can combine groceries, restaurants, Providence Saint John’s, the beach and the E Line in a compact routine. Long Beach offers a working city, waterfront and A Line connection at lower entry points. Irvine provides planned neighbourhoods, hospitals and services with greater car dependence; Newport Coast prioritises privacy, trails and ocean access at a premium. The useful question is not whether Southern California has amenities, but whether the chosen home places the household within a manageable weekly circuit.",
+            "Retirement fit changes with heat, stairs, driving and insurance. Test the supermarket, specialist, airport and evening return from the exact address. In a condominium, confirm lifts, backup systems, parking, accessibility and association rules. In a hillside or canyon house, examine evacuation routes, defensible space and whether a non-driving household member can function. Mild coastal weather and deep healthcare are strong advantages; long journeys and a car-dependent premium address can erode them quickly."
+        ), "daily-life"),
+        DossierLens("Use the gateways—and measure every last mile", ("global_access", "foreigner_fit"), (
+            "LAX gives the region global reach, and the LAX/Metro Transit Center now links C and K rail services and several bus routes to a frequent terminal shuttle. Santa Monica and Long Beach can use rail for part of the journey, but luggage, transfers and service hours still matter. John Wayne Airport is unusually convenient for central Orange County and offers a substantial domestic network plus selected international services, yet many coastal addresses remain car-led. Time both the ordinary airport trip and the congested alternative.",
+            "English-language administration, large immigrant communities and extensive legal, tax and property services improve foreigner fit. The burden is coordination rather than access: federal tax, California withholding, county assessment, city planning, association governance and insurance are separate systems. A non-resident owner needs a US tax adviser, California counsel, a responsive manager and reliable notice handling. Cultural familiarity cannot substitute for an ITIN strategy, compliant rental reporting or a local person who can inspect after an earthquake, fire or water event."
+        )),
+        DossierLens("Own clearly—then price the risk before the view", ("ownership_clarity", "regulatory_safety"), (
+            "California title is established, but the cost basis changes at purchase. A change of ownership generally creates a new assessed value and can produce supplemental property-tax bills in addition to the annual bill. Review the preliminary title report, vesting, transfer disclosures, permits, boundaries, tax estimate and any reassessment consequences. Foreign sellers must also plan for FIRPTA: federal guidance generally requires 15% withholding on the amount realised, subject to exceptions or an approved withholding certificate; this is a cash-flow mechanism, not necessarily the final tax.",
+            "Insurance is a purchase condition, not a post-closing task. Standard homeowners policies generally exclude earthquake damage, while wildfire-exposed homes may face limited admitted-market options. California’s Department of Insurance describes the FAIR Plan as last-resort basic fire coverage that may need a separate difference-in-conditions policy. Obtain quotes for the exact structure, replacement cost and intended occupancy before contingency release. For a condominium, read reserves, minutes, deductibles, master coverage, earthquake position, claims, litigation, balconies, roofs and planned assessments."
+        ), "risk-texture"),
+        DossierLens("Treat rent as a local permission, not a regional yield", ("rental_profit", "capital_upside"), (
+            "There is no defensible destination-wide net yield. Long-term demand is deep, but acquisition price, property tax, association dues, insurance, management, repairs, vacancy and California-source tax can absorb the apparent spread. Los Angeles home sharing is limited to an eligible primary residence with registration; it is not an absentee holiday-rental strategy. Other cities maintain their own ordinances, permit caps or prohibitions, and an HOA can be stricter. Model long-term rent first and obtain written city and association confirmation before underwriting any shorter stay.",
+            "Capital support comes from constrained coastal land, diverse employment and an enormous domestic buyer pool, not from a uniform regional trajectory. FHFA’s repeat-sales data and county assessment rolls are useful direction indicators, but neither values a particular condo or canyon house. Building condition, insurance, taxes and monthly dues increasingly separate resale outcomes. Pay for a conventional layout, useful location and manageable operating record rather than a story that depends on scarcity alone."
+        )),
+        DossierLens("Enter on total cost and preserve the ordinary buyer", ("value_entry", "exit_liquidity"), (
+            "The three asking observations show the regional spread: $389,000 for a 1,083 ft² Long Beach condominium, $825,000 for a 970 ft² Santa Monica condominium and $3.499 million for a 2,530 ft² Newport Coast house. These are dated asks, not valuations. The two Los Angeles County assessor records demonstrate a separate point: assessed values can sit far below current asking prices under California’s acquisition-based system, so the seller’s current tax bill is not a safe forecast of the buyer’s bill.",
+            "Exit depth is strongest for a usable, conventionally priced home near services and employment. A Long Beach condo can reach first-time and downsizing buyers; a Santa Monica unit competes on walkability, parking, building record and dues; a Newport Coast house needs a wealthier pool and insurable risk profile. Model acquisition, supplemental and annual property tax, association dues, insurance, earthquake cover, maintenance and selling withholding. Ask two agents who did not source the property how it would compete after a five-year hold."
+        )),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Coast, food and culture are exceptional, but the usable lifestyle depends on keeping weekly journeys inside one practical catchment.",
+        "global_access": "LAX provides global depth and John Wayne adds Orange County convenience; congestion and transfers still control the door-to-door result.",
+        "ownership_clarity": "Foreign nationals can generally hold title, while immigration, financing, tax reporting and FIRPTA remain separate obligations.",
+        "regulatory_safety": "City rental rules, association governance, seismic condition, wildfire exposure and insurance availability require address-level clearance.",
+        "rental_profit": "Tenant demand is broad, but high entry, tax, dues, insurance and local short-stay restrictions prevent a reliable regional net yield.",
+        "capital_upside": "Employment and coastal scarcity support selected assets; insurance, building quality and property tax increasingly separate winners from laggards.",
+        "retirement_fit": "Healthcare and year-round services are deep, while driving dependence, heat and hazard exposure can undermine an otherwise attractive address.",
+        "exit_liquidity": "The domestic buyer pool is large, especially for conventional homes near services; singular luxury and difficult insurance narrow the exit.",
+        "foreigner_fit": "Professional and multilingual support is extensive, but a non-resident still needs coordinated federal, California and local administration.",
+        "value_entry": "Long Beach broadens the entry range, while Santa Monica and coastal Orange County require strict total-cost and successor-buyer discipline.",
+    },
+    market_anchors=(
+        {"location": "Long Beach", "evidence": "Official assessor record for APN 7272-012-027", "buyer_read": "The county record establishes the condominium parcel and assessment history; its acquisition-based assessed value is not current market value and should not be compared directly with the $389,000 ask.", "source_label": "Los Angeles County Assessor parcel portal", "source_url": "https://portal.assessor.lacounty.gov/parceldetail/7272012027"},
+        {"location": "Santa Monica", "evidence": "Official assessor record for APN 4275-006-089", "buyer_read": "The parcel history provides the tax basis, not a valuation. A purchase normally resets assessed value and may create supplemental bills, so the seller’s tax history understates the likely buyer budget.", "source_label": "Los Angeles County Assessor parcel portal", "source_url": "https://portal.assessor.lacounty.gov/parceldetail/4275006089"},
+        {"location": "Newport Beach", "evidence": "$84.36 billion 2025–26 total assessed roll; 5.59% annual increase", "buyer_read": "This is the official citywide secured-and-unsecured assessment roll, not a house-price index or appraisal of 25 Lyon. It shows scale and taxable-value direction only.", "source_label": "Orange County Assessor 2025–26 roll detail", "source_url": "https://www.ocassessor.gov/sites/assessor/files/2025-07/Press%20Release%202025-070125.pdf"},
+    ),
+    micro_locations_intro="Choose a compact daily-life system before choosing architecture. The coast is not one corridor: rail, airport choice, fire exposure, healthcare and city regulation change materially across the map.",
+    micro_locations=(
+        {"name": "Santa Monica", "best_for": "Walkable west-side daily life", "daily_life": "Beach, healthcare, shopping and E Line access", "diligence": "Association reserves, seismic cover, parking, local rental rules and price"},
+        {"name": "Long Beach", "best_for": "More attainable urban coast", "daily_life": "Working city, waterfront and A Line connection", "diligence": "Block choice, building finances, insurance, parking and commute"},
+        {"name": "Irvine", "best_for": "Planned services and healthcare", "daily_life": "Orderly neighbourhoods with car-led regional access", "diligence": "HOA layers, tax, special assessments, heat and driving"},
+        {"name": "Newport Beach / Costa Mesa", "best_for": "Premium coast with service depth", "daily_life": "Harbour and beach access near John Wayne Airport", "diligence": "Entry price, city use rules, flood/coastal exposure and buyer pool"},
+        {"name": "Newport Coast / Laguna Hills", "best_for": "Privacy, views and trails", "daily_life": "Gated and hillside patterns with greater car dependence", "diligence": "Wildfire, evacuation, insurance, slope, HOA and exit depth"},
+    ),
+    checklist=(
+        "Confirm immigration, healthcare, federal and California tax treatment, ITIN needs and ownership structure.",
+        "Choose the weekly service catchment and time airport, hospital, grocery and evening journeys from the exact address.",
+        "Obtain preliminary title, permit history, disclosures and a buyer-specific property-tax and supplemental-bill estimate.",
+        "Secure homeowners, earthquake and—where relevant—wildfire coverage indications before removing contingencies.",
+        "Inspect structure, drainage, seismic condition, slope, defensible space and evacuation access with appropriate specialists.",
+        "Review association reserves, minutes, insurance, deductibles, claims, litigation, assessments and rental restrictions.",
+        "Confirm long- and short-term rental permissions with the city and association; underwrite the purchase without short stays.",
+        "Model five-year carrying and sale cash flow, including California tax and FIRPTA withholding, then identify the ordinary successor buyer.",
+    ),
+    references_intro="Legal, tax, planning, insurance, transport, assessment and listing claims were reviewed on 27 August 2026. Recheck by 27 February 2027 and immediately after any immigration, federal or California tax, city rental, insurance, hazard, association or listing change. Obtain US immigration and tax advice, California legal and inspection advice, and property-specific insurance quotations. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "United States property guide", "url": "/countries/united-states-property/"},
+        {"label": "IRS: FIRPTA withholding", "url": "https://www.irs.gov/individuals/international-taxpayers/firpta-withholding"},
+        {"label": "California FTB: real estate withholding", "url": "https://www.ftb.ca.gov/pay/withholding/real-estate-withholding.html"},
+        {"label": "California Board of Equalization: supplemental assessment", "url": "https://www.boe.ca.gov/proptaxes/supplemental-assessment/"},
+        {"label": "Los Angeles City Planning: Home-Sharing", "url": "https://planning.lacity.gov/project-review/home-sharing"},
+        {"label": "California Department of Insurance: residential insurance", "url": "https://www.insurance.ca.gov/01-consumers/105-type/5-residential/index.cfm"},
+        {"label": "California Department of Insurance: homeowners and renters guide", "url": "https://www.insurance.ca.gov/01-consumers/105-type/95-guides/03-res/res-ins-guide.cfm"},
+        {"label": "FHFA: 2026 Q2 House Price Index", "url": "https://www.fhfa.gov/reports/house-price-index/2026/Q2"},
+        {"label": "LA Metro: LAX connections", "url": "https://www.metro.net/destinations/lax/"},
+        {"label": "John Wayne Airport: nonstop destinations", "url": "https://www.ocair.com/travelers/flights/non-stop-destinations/"},
+        {"label": "Los Angeles County Assessor parcel portal", "url": "https://portal.assessor.lacounty.gov/"},
+        {"label": "Orange County Assessor 2025–26 roll", "url": "https://www.ocassessor.gov/press/local-assessment-rolls-delivered-15"},
+        {"label": "Redfin: Long Beach asking observation", "url": "https://www.redfin.com/CA/Long-Beach/921-Pacific-Ave-90813/unit-10/home/7615809"},
+        {"label": "Redfin: Santa Monica asking observation", "url": "https://www.redfin.com/CA/Santa-Monica/1440-23rd-St-90404/unit-313/home/6767641"},
+        {"label": "Redfin: Newport Coast asking observation", "url": "https://www.redfin.com/CA/Newport-Coast/25-Lyon-92657/home/4736984"},
+    ),
+    images=(
+        DossierImage("coastal-hero", "/assets/los-angeles-orange-county-hero.webp", "Southern California coastal neighbourhood connecting homes, daily services and the Pacific", "The useful Southern California coast begins with an ordinary daily-life catchment.", "premium-image--hero", "hero"),
+        DossierImage("daily-life", "/assets/los-angeles-orange-county-daily-life.webp", "Long Beach urban waterfront with apartments, shops, transit and bicycles", "Long Beach shows the region’s more attainable, working-city coastal pattern.", "premium-image--wide", "access"),
+        DossierImage("risk-texture", "/assets/los-angeles-orange-county-risk-texture.webp", "Coastal California hillside homes with defensible landscaping and visible access roads", "Slope, evacuation, vegetation and insurance belong in the offer decision.", "premium-image--wide", "diligence"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "What homes cost"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Five questions that decide the coast",
+    assessment_intro="The Atlas score combines the region once; the reads below explain where Los Angeles, Orange County and the exact property diverge.",
+    listings_intro="Three direct asks show a practical Long Beach condominium, a Santa Monica daily-life apartment and a premium Newport Coast house. They are dated asking evidence only; availability, title, condition, negotiability, fees, insurance, lawful use and completed value remain unverified.",
+    market_anchors_intro="Each record carries an official assessor reference. California assessed value is an acquisition-based tax input, not current market value; the comparison is useful for forecasting tax reset and verifying the parcel, not valuing the home.",
+    orientation_groups=(
+        DossierOrientationGroup("Los Angeles County coast", (("LAX / Santa Monica", "global gateway and compact west-side services"), ("South Bay", "coastal neighbourhoods with road-led connections"), ("Long Beach", "working city, waterfront and A Line"))),
+        DossierOrientationGroup("Orange County", (("John Wayne / Irvine", "airport, employment and planned services"), ("Newport Beach / Costa Mesa", "harbour coast and urban amenities"), ("Newport Coast / Laguna", "premium hills, views and higher hazard diligence"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact peak-hour journey, transit route, city boundary, fire and flood mapping, and insurance response for the property.",
+    country_guide_url="/countries/united-states-property/",
+    country_guide_label="United States property guide",
+    rail_comparison="Compare Los Angeles / Orange County with Miami / Fort Lauderdale, Vancouver and the full Atlas.",
+    property_anchor_indexes=(0, 1, 2),
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -5042,6 +5154,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     ASPEN_SNOWMASS_DOSSIER.destination_id: ASPEN_SNOWMASS_DOSSIER,
     SWISS_VALAIS_VAUD_ALPS_DOSSIER.destination_id: SWISS_VALAIS_VAUD_ALPS_DOSSIER,
     GOLD_COAST_SUNSHINE_COAST_DOSSIER.destination_id: GOLD_COAST_SUNSHINE_COAST_DOSSIER,
+    LOS_ANGELES_ORANGE_COUNTY_DOSSIER.destination_id: LOS_ANGELES_ORANGE_COUNTY_DOSSIER,
 }
 
 
