@@ -162,6 +162,7 @@ class RemainingCountryRetirementArticleTests(unittest.TestCase):
                     f"Compare {expected['country']} with every destination in the Atlas.",
                     html,
                 )
+                self.assertNotIn("%26quot", html)
 
     def test_united_states_explains_immigration_tax_healthcare_and_local_rules(self) -> None:
         html = rendered_article("united-states-retirement-property-foreign-buyers")
@@ -196,6 +197,10 @@ class RemainingCountryRetirementArticleTests(unittest.TestCase):
         for source in (
             "https://laws-lois.justice.gc.ca/eng/acts/P-25.2/section-2.html",
             "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax",
+            "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/uhtn15/questions-answers-underused-housing-tax.html",
+            "https://www2.gov.bc.ca/gov/content/taxes/income-taxes/bc-home-flipping-tax",
+            "https://www2.gov.bc.ca/gov/content/health/health-drug-coverage/msp/bc-residents/eligibility-and-enrolment",
+            "https://www2.gov.bc.ca/gov/content/housing-tenancy/strata-housing/operating-a-strata/repairs-and-maintenance/depreciation-reports/depreciation-report-requirements",
             "https://www.victoria.ca/building-business/business-licensing/short-term-rentals",
             "https://www.whistler.ca/business-development/business-licenses/tourist-accomodation-business-licence/",
         ):
@@ -235,6 +240,8 @@ class RemainingCountryRetirementArticleTests(unittest.TestCase):
             "https://apdattikis.gov.gr/en/process/2-2-2-financially-independent-individuals-article-20-paragraph-1-law-4251-14-renewal/",
             "https://stegasi.gov.gr/programs/afxisi-oriou-elachistis-ependysis-se-akinita-gia-apoktisi-golden-visa/",
             "https://aade.gr/en/greeks-abroad-non-residents/property-taxation/real-estate-transfer-tax",
+            "https://minfin.gov.gr/en/tax-policy/tax-guide/income-taxation/",
+            "https://aade.gr/sites/default/files/2025-11/FAQs_omogeneis_en_0.pdf",
             "https://mintour.gov.gr/yperpsifistike-stin-olomeleia-tis-voylis-toy-ypoyrgeioy-toyrismoy/",
         ):
             self.assertIn(source, html)
@@ -251,6 +258,7 @@ class RemainingCountryRetirementArticleTests(unittest.TestCase):
         ):
             self.assertIn(phrase, html)
         for source in (
+            "https://consmiami.esteri.it/wp-content/uploads/2023/10/ELECTIVE_RESIDENCY_VISA_istruzioni_Miami.pdf",
             "https://investorvisa.mise.gov.it/index.php/en/",
             "https://www1.agenziaentrate.gov.it/web_app_entrate/guida_acquisto_casa.html",
             "https://www.ministeroturismo.gov.it/faq-banca-dati-strutture-ricettive-bdsr/",
@@ -272,6 +280,7 @@ class RemainingCountryRetirementArticleTests(unittest.TestCase):
         for source in (
             "https://www.bj.admin.ch/en/acquisition-of-property-by-foreign-non-residents",
             "https://www.sem.admin.ch/dam/sem/en/data/eu/fza/personenfreizuegigkeit/factsheets/fs-nichterwerbstaetige-e.pdf.download.pdf/fs-nichterwerbstaetige-e.pdf",
+            "https://www.sem.admin.ch/sem/en/home/themen/arbeit/uk/faq.html",
             "https://www.ur.ch/wirtschaft/6658",
             "https://www.bag.admin.ch/en/health-insurance-requirement-to-obtain-insurance-for-persons-resident-in-switzerland",
         ):
