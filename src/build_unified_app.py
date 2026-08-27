@@ -156,7 +156,7 @@ COUNTRY_HUBS = [
         "h1": "Portugal Property Guide for Foreign Buyers",
         "thesis": "Portugal remains a core benchmark for retirement and second-home planning. It screens well for foreigner practicality and lifestyle, but buyer returns depend heavily on micro-location, licensing, taxes, and entry-price discipline.",
         "destination_ids": ["algarve-cascais", "madeira"],
-        "guide_slugs": ["portugal-vs-spain-retirement-property", "greece-vs-portugal-retirement-property", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad"],
+        "guide_slugs": ["portugal-retirement-property-foreign-buyers", "portugal-vs-spain-retirement-property", "greece-vs-portugal-retirement-property", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad"],
     },
     {
         "slug": "france-property",
@@ -785,6 +785,24 @@ SEO_PAGES = [
             ("Can foreigners buy property in Spain?", "Foreign buyers can generally acquire Spanish property, but the transaction, financing, taxes, land-registry position, community rules and intended rental use need property-specific review."),
             ("How does healthcare work for foreign retirees in Spain?", "Eligibility depends on residence, social-security coordination and other legal routes, not on owning a home. Confirm the route before moving; some applicants must demonstrate private cover during the residence process."),
             ("Where should retirement buyers compare in Spain?", "Start with Valencia for a balanced year-round city, Málaga and the Costa del Sol for international retirement infrastructure, Costa Brava and Girona for a more seasonal Catalan lifestyle, and Mallorca when island access and premium carrying costs are acceptable."),
+        ],
+    },
+    {
+        "slug": "portugal-retirement-property-foreign-buyers",
+        "title": "Portugal Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Portugal retirement property for foreign buyers across residency, healthcare, ownership, tax, rental rules, climate risk, and two distinct places to retire.",
+        "h1": "Portugal Retirement Property for Foreign Buyers",
+        "keyword": "Portugal retirement property for foreign buyers",
+        "theme": "Portugal retirement buyer guide",
+        "intent": "foreign buyers deciding whether Portugal fits their residence, healthcare, lifestyle and property plan",
+        "destination_ids": ["algarve-cascais", "madeira"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-08-27",
+        "faqs": [
+            ("Does buying property give a foreigner residency in Portugal?", "No. Property ownership and immigration status are separate. Retirees and people living on their own income may have a residence-visa route, but the property itself does not create that right."),
+            ("Can foreigners buy property in Portugal?", "Foreign individuals can generally acquire Portuguese property, but title, planning, tax residence, financing, condominium rules, local-accommodation permission and the exact 2026 IMT treatment require buyer-specific review."),
+            ("How does healthcare work for foreign retirees in Portugal?", "Legal residents can obtain an SNS user number and access public care, subject to registration and entitlement rules. EU coordination, an S1 and private insurance can also matter depending on the household."),
+            ("Where should retirement buyers compare in Portugal?", "Start with the Algarve and Cascais for mainland access and established international services, then compare Madeira when island life, steep terrain and additional travel logistics fit the plan."),
         ],
     },
     {
@@ -4069,8 +4087,16 @@ def is_spain_retirement_guide(page: dict) -> bool:
     return page.get("slug") == "spain-retirement-property-foreign-buyers"
 
 
+def is_portugal_retirement_guide(page: dict) -> bool:
+    return page.get("slug") == "portugal-retirement-property-foreign-buyers"
+
+
 def is_editorial_retirement_guide(page: dict) -> bool:
-    return is_japan_retirement_guide(page) or is_spain_retirement_guide(page)
+    return (
+        is_japan_retirement_guide(page)
+        or is_spain_retirement_guide(page)
+        or is_portugal_retirement_guide(page)
+    )
 
 
 def japan_retirement_fit_html() -> str:
@@ -4376,11 +4402,131 @@ def spain_retirement_references_html() -> str:
     """
 
 
+PORTUGAL_RETIREMENT_DESTINATION_GUIDANCE = {
+    "algarve-cascais": {
+        "best_for": "Mainland retirement with established international services and frequent air access",
+        "daily_life": "Cascais is the more urban, connected base; the Algarve ranges from functioning towns to seasonal resorts",
+        "diligence": "Municipal planning, condominium records, heat, wildfire and flood exposure, water use and local-accommodation rules",
+        "rental": "Prefer a home that works without holiday income; permissions and seasonality vary sharply by municipality",
+    },
+    "madeira": {
+        "best_for": "Temperate island life for buyers comfortable with terrain and air-travel dependence",
+        "daily_life": "Funchal offers the deepest services; smaller coastal settlements require more driving and planning",
+        "diligence": "Slope stability, road access, retaining structures, humidity, water management and legal status of alterations",
+        "rental": "Treat visitor demand as optionality and verify the municipality, building and operating setup before pricing it",
+    },
+}
+
+
+def portugal_retirement_fit_html() -> str:
+    return """
+          <section class="seo-section" id="fit">
+            <h2>Who Portugal suits</h2>
+            <p><strong>Portugal is a strong fit</strong> for buyers who can qualify for an independent residence route, want a mild-climate European base, value safety and international accessibility, and can choose a town for year-round life rather than summer appeal alone.</p>
+            <p><strong>Look elsewhere first</strong> if the property is expected to create residency, the budget assumes the former tax treatment of foreign retirees, short-term rental must carry the purchase, or island and car dependence would become difficult with age.</p>
+            <p>Confirm residence, tax residence, healthcare, financing, title, planning, condominium records, hazards, rental permission and exit demand before committing. Portugal can be easy to enjoy while still demanding precise local diligence.</p>
+          </section>
+    """
+
+
+def portugal_retirement_overview_html() -> str:
+    return f"""
+          <section class="seo-section" id="residency">
+            <p class="seo-eyebrow editorial-section-label">Start here</p>
+            <h2>Buying property does not give you residency</h2>
+            <p>Foreign buyers can generally acquire Portuguese homes, but ownership does not create a visa, residence authorization, permanent residence, public-healthcare entitlement or tax advantage. Portugal's official <a href="https://www.gov.pt/servicos/pedir-um-visto-de-residencia-para-fixacao-de-residencia-de-reformados-religiosos-e-pessoas-que-vivem-de-rendimentos-proprios" rel="noopener noreferrer">residence visa for retirees and people living on their own income</a> is a separate application requiring evidence including accommodation, subsistence, insurance and background documents.</p>
+            <p>The investment-residence regime also remains separate. Following the 2023 housing-law changes, a property purchase is not a qualifying ARI investment. Existing cases and renewals have their own rules; confirm the current categories and procedure with <a href="https://aima.gov.pt/pt/a-aima/perguntas-frequentes-faqs/autorizacao-de-residencia-para-investimento-ari" rel="noopener noreferrer">AIMA's official ARI guidance</a>.</p>
+            <p><strong>Decision rule:</strong> do not reserve a retirement home until the relevant consulate or immigration adviser has confirmed the residence route, family eligibility, evidence, timing and renewal plan.</p>
+          </section>
+
+          {portugal_retirement_fit_html()}
+
+          <section class="seo-section" id="owner-changes">
+            <h2>What changed in 2026</h2>
+            <h3>Non-resident home purchases can face a 7.5% IMT rate</h3>
+            <p><a href="https://diariodarepublica.pt/dr/detalhe/decreto-lei/97-2026-1124493227" rel="noopener noreferrer">Decree-Law 97/2026</a> added a flat <strong>7.5% IMT rate</strong> for a non-resident acquiring an urban home, without the usual reductions or exemptions, subject to stated exceptions. The law provides routes to adjustment where the buyer becomes Portuguese tax resident within two years or places the property into qualifying moderate-rent housing under its conditions. Obtain a written calculation for the buyer, property and intended use before signing.</p>
+            <h3>Administrative access improved, but residence still controls the plan</h3>
+            <p>Portugal now lets eligible foreign residents or applicants request tax, social-security and SNS identifiers together at participating Citizen Spaces. This can simplify setup; it does not replace the residence process or establish healthcare entitlement by itself. See the <a href="https://www.gov.pt/servicos/pedir-os-numeros-de-identificacao-fiscal-seguranca-social-e-nacional-de-utente-saude-para-estrangeiros" rel="noopener noreferrer">government service updated in June 2026</a>.</p>
+          </section>
+
+          <section class="seo-section" id="costs">
+            <h2>Financing and ownership costs</h2>
+            <p>Non-resident mortgages are available, but loan-to-value, age limits, income currency, affordability tests, insurance and eligible property types vary by lender. Secure a written credit decision before a non-refundable deposit and model currency exposure if retirement income is not in euros.</p>
+            <p>At acquisition, the Tax Authority explains that the buyer pays IMT and <a href="https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Compra_da_casa/Paginas/default.aspx" rel="noopener noreferrer"><strong>0.8% stamp duty</strong></a>, with IMT normally calculated on the higher of the contract price or taxable value. Add legal, notarial or authenticated-document, registration, valuation, mortgage and insurance costs. During ownership, budget for <a href="https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Imposto_anual/Paginas/default.aspx" rel="noopener noreferrer">IMI and AIMI</a>, condominium charges, maintenance, utilities and eventual sale tax and fees.</p>
+            <p><strong>Decision rule:</strong> compare the five-year cash requirement under the buyer's actual residence status, including the 2026 IMT rule, rather than applying an old percentage from a property brochure.</p>
+          </section>
+
+          <section class="seo-section" id="practicality">
+            <h2>Retirement practicality beyond the purchase</h2>
+            <h3>Healthcare follows legal residence</h3>
+            <p>A deed does not create SNS entitlement. Portugal's <a href="https://www.gov.pt/guias/migrantes-cuidados-de-saude-em-portugal" rel="noopener noreferrer">official migrant-health guidance</a> says legally resident foreigners can obtain an SNS user number and access public units. Registration, EU coordination, an S1, social-security position and private insurance can still matter. Test access to primary care, emergency care and specialists from the exact town—not only the nearest hospital on a map.</p>
+            <h3>Title, planning and condominium records</h3>
+            <p>Obtain the current <a href="https://justica.gov.pt/Servicos/Pedir-certidao-permanente-predial" rel="noopener noreferrer">permanent land-registry certificate</a>, which shows registered ownership, charges and pending applications. Reconcile it with the tax record, plans, use licence or applicable legal evidence, physical boundaries, alterations and energy certificate. For an apartment or managed development, review condominium statutes, minutes, accounts, arrears, planned works and litigation.</p>
+            <h3>Wildfire, flood and coastal diligence</h3>
+            <p>Portugal's lifestyle markets carry different physical risks. In the Algarve and Madeira, inspect wildfire access, vegetation management, water supply, drainage, heat, coastal or flash-flood exposure and insurance. On Madeira, add slope stability, retaining walls and road access. Use national and municipal mapping as a screen, then commission building- and site-specific inspections.</p>
+            <h3>Local accommodation is municipality-specific</h3>
+            <p>Short-term operation requires an Alojamento Local registration and liability insurance, but registration is not an unrestricted national promise. The current <a href="https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/2024-892307454" rel="noopener noreferrer">local-accommodation framework</a> gives municipalities tools to regulate the activity and define containment or sustainable-growth areas. Verify the current municipal regulation, building position and registration status before assigning any value to tourist income.</p>
+          </section>
+    """
+
+
+def portugal_retirement_comparison_html(destinations: list[dict]) -> str:
+    rows = []
+    for dest in destinations:
+        guidance = PORTUGAL_RETIREMENT_DESTINATION_GUIDANCE[dest["id"]]
+        rows.append(
+            f"""
+            <tr>
+              <td><strong><a href="/destinations/{escape(destination_slug(dest))}/">{escape(dest["name"])}</a></strong></td>
+              <td>{escape(guidance["best_for"])}</td>
+              <td>{escape(guidance["daily_life"])}</td>
+              <td>{escape(guidance["diligence"])}</td>
+              <td>{escape(guidance["rental"])}</td>
+            </tr>
+            """.rstrip()
+        )
+    return f"""
+          <section class="seo-section" id="comparison">
+            <h2>Two Portuguese destinations to compare</h2>
+            <p>Choose the retirement pattern before the property. The Algarve and Cascais offer mainland access and the broadest international service ecosystems; Madeira offers a distinctive year-round island climate when terrain and flight dependence remain comfortable.</p>
+            <div class="seo-table-wrap">
+              <table class="seo-table">
+                <thead><tr><th>Destination</th><th>Best for</th><th>Daily-life read</th><th>Primary diligence</th><th>Rental stance</th></tr></thead>
+                <tbody>{"".join(rows)}</tbody>
+              </table>
+            </div>
+          </section>
+    """
+
+
+def portugal_retirement_references_html() -> str:
+    return """
+          <section class="seo-section" id="sources">
+            <h2>References and update policy</h2>
+            <p>Residence, tax, healthcare, registry and local-accommodation claims use Portuguese government, Tax Authority, AIMA, Justice and Diário da República sources. Municipal plans and property records can be stricter or more specific than national guidance. Recheck every linked source and the exact asset before signing. This guide was substantively reviewed on 27 August 2026.</p>
+            <ul>
+              <li><a href="https://www.gov.pt/servicos/pedir-um-visto-de-residencia-para-fixacao-de-residencia-de-reformados-religiosos-e-pessoas-que-vivem-de-rendimentos-proprios" rel="noopener noreferrer">gov.pt: residence visa for retirees and people living on their own income</a></li>
+              <li><a href="https://aima.gov.pt/pt/a-aima/perguntas-frequentes-faqs/autorizacao-de-residencia-para-investimento-ari" rel="noopener noreferrer">AIMA: investment-residence guidance</a></li>
+              <li><a href="https://diariodarepublica.pt/dr/detalhe/decreto-lei/97-2026-1124493227" rel="noopener noreferrer">Diário da República: Decree-Law 97/2026 and non-resident IMT</a></li>
+              <li><a href="https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Compra_da_casa/Paginas/default.aspx" rel="noopener noreferrer">Tax Authority: IMT and stamp duty when buying a home</a></li>
+              <li><a href="https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Imposto_anual/Paginas/default.aspx" rel="noopener noreferrer">Tax Authority: annual IMI and AIMI</a></li>
+              <li><a href="https://www.gov.pt/guias/migrantes-cuidados-de-saude-em-portugal" rel="noopener noreferrer">gov.pt: healthcare for migrants in Portugal</a></li>
+              <li><a href="https://www.gov.pt/servicos/pedir-os-numeros-de-identificacao-fiscal-seguranca-social-e-nacional-de-utente-saude-para-estrangeiros" rel="noopener noreferrer">gov.pt: identification numbers for foreign residents</a></li>
+              <li><a href="https://justica.gov.pt/Servicos/Pedir-certidao-permanente-predial" rel="noopener noreferrer">Ministry of Justice: permanent land-registry certificate</a></li>
+              <li><a href="https://www.gov.pt/servicos/alojamento-local-registo-da-atividade" rel="noopener noreferrer">gov.pt: registering local accommodation</a></li>
+              <li><a href="https://diariodarepublica.pt/dr/legislacao-consolidada/decreto-lei/2024-892307454" rel="noopener noreferrer">Diário da República: current local-accommodation framework</a></li>
+            </ul>
+          </section>
+    """
+
+
 def seo_overview_html(page: dict, selected: list[dict]) -> str:
     if is_japan_retirement_guide(page):
         return japan_retirement_overview_html()
     if is_spain_retirement_guide(page):
         return spain_retirement_overview_html()
+    if is_portugal_retirement_guide(page):
+        return portugal_retirement_overview_html()
     country_count = len({item.get("country") for item in selected if item.get("country")})
     return f"""
           <section class="seo-section">
@@ -4398,6 +4544,8 @@ def seo_comparison_html(page: dict, selected: list[dict], top: dict, runner_up: 
         return japan_retirement_comparison_html(selected)
     if is_spain_retirement_guide(page):
         return spain_retirement_comparison_html(selected)
+    if is_portugal_retirement_guide(page):
+        return portugal_retirement_comparison_html(selected)
     return f"""
           <section class="seo-section" id="comparison">
             <h2>Best Destinations to Compare First</h2>
@@ -4443,6 +4591,8 @@ def seo_references_html(page: dict) -> str:
         return japan_retirement_references_html()
     if is_spain_retirement_guide(page):
         return spain_retirement_references_html()
+    if is_portugal_retirement_guide(page):
+        return portugal_retirement_references_html()
     return ""
 
 
@@ -6117,6 +6267,7 @@ def build_seo_page(
     updated = date.today().isoformat()
     is_japan_article = is_japan_retirement_guide(page)
     is_spain_article = is_spain_retirement_guide(page)
+    is_portugal_article = is_portugal_retirement_guide(page)
     is_editorial_article = is_editorial_retirement_guide(page)
     country_count = len({item.get("country") for item in selected if item.get("country")})
     author_weight = 400 if is_editorial_article else 750
@@ -6145,6 +6296,7 @@ def build_seo_page(
             "best-places-to-buy-property-abroad-for-retirement",
             "japan-retirement-property-foreign-buyers",
             "spain-retirement-property-foreign-buyers",
+            "portugal-retirement-property-foreign-buyers",
         }
         else ""
     )
@@ -6180,6 +6332,22 @@ def build_seo_page(
         "Mallorca · Island appeal works best with year-round services close by",
         "editorial-inline-visual",
     )
+    portugal_daily_life_figure = destination_editorial_figure_html(
+        {
+            "src": "/assets/algarve-cascais-tavira-daily-life.webp",
+            "alt": "Tavira streets and shaded public space showing ordinary Algarve daily life",
+        },
+        "Tavira · A functioning town, not only a summer address",
+        "editorial-inline-visual",
+    )
+    portugal_island_figure = destination_editorial_figure_html(
+        {
+            "src": "/assets/madeira-funchal-hero.webp",
+            "alt": "Funchal rising from the Atlantic with dense services set against Madeira's steep terrain",
+        },
+        "Funchal · Island life with the archipelago's deepest services",
+        "editorial-inline-visual",
+    )
     editorial_content = ""
     if page["slug"] == "japan-retirement-property-foreign-buyers":
         editorial_content = f"""
@@ -6198,6 +6366,15 @@ def build_seo_page(
           <section class="seo-section"><h2>Own and operate with regional discipline</h2><p>Spain's land-registry and notarial systems provide a recognizable ownership path, but a registry extract is not a substitute for full diligence. The buyer must reconcile title, cadastre, planning status, physical works, occupancy documentation, debts, community records and intended use. Coastal extensions, converted terraces, rural buildings and older planning histories deserve particular scrutiny.</p><p>Operation is regional and local. Transfer taxes differ by autonomous community; tourist-use rules can sit at regional, municipal and building levels; water, flood, wildfire and heat exposure vary by site. A buyer who cannot explain which authority controls each issue is not ready to price the asset.</p></section>
           <section class="seo-section"><h2>Income and upside need a local story</h2><p>Spain has a deep foreign-buyer market, but national demand does not make every home liquid. Registradores reported that foreign purchasers represented 13.8% of Spanish home sales in 2025, with especially high shares in the Balearic Islands and Valencia. That supports international depth; it does not validate a particular price or yield.</p><p>Valencia and Málaga have the broadest mix of local, national and international demand in this shortlist. Mallorca has a powerful international buyer pool but a high entry threshold and more policy sensitivity. Costa Brava and Girona range from globally recognized enclaves to thin, highly seasonal micro-markets. Underwrite long-term value from location quality and ordinary usability, not from a tourist licence whose status may change.</p></section>
           <section class="seo-section"><h2>Preserve the exit—and the life around it</h2><p>Exit quality begins at purchase. Favor understandable title, legal building status, manageable community costs, climate resilience and a layout that appeals beyond one nationality or rental strategy. Avoid paying a premium for informal alterations, assumed licences or a view that comes with difficult access and weak year-round services.</p><p>The retirement conclusion is conditional: choose Valencia for the strongest all-round urban base; Málaga and the Costa del Sol for established international infrastructure; Girona or the Costa Brava for a more selective Catalan life; and Mallorca when premium island living, travel dependence and carrying costs all fit comfortably. The best property is the one that remains useful even if short-term rental income disappears.</p></section>
+        """
+    elif page["slug"] == "portugal-retirement-property-foreign-buyers":
+        editorial_content = f"""
+          <section class="seo-section" id="lenses"><h2>Portugal through five retirement lenses</h2><p>Portugal works best when climate and international familiarity support an ordinary life rather than substitute for one. The central choice is not simply mainland versus island: it is between communities with very different healthcare journeys, transport, seasonality, terrain and buyer depth.</p></section>
+          <section class="seo-section"><h2>Live well beyond the holiday season</h2><p><a class="editorial-destination-link" href="/destinations/algarve-cascais/" data-track="destination_click">Algarve and Cascais</a> cover two distinct mainland propositions. Cascais offers proximity to Lisbon, strong private services, rail access and an international community at a premium entry price. The Algarve provides more climatic and price variety, but a town such as Tavira or Lagos functions differently from a resort enclave once winter arrives. <a class="editorial-destination-link" href="/destinations/madeira/" data-track="destination_click">Madeira</a> offers a temperate island rhythm, dramatic landscape and a substantial center in Funchal, with steeper access and a more concentrated service network elsewhere.</p><p>Judge daily life by walking, groceries, shade, public transport, primary care, specialist access and social life in January as well as August. A useful retirement home should remain comfortable when tourism slows, driving becomes harder and maintenance needs an immediate response.</p>{portugal_daily_life_figure}</section>
+          <section class="seo-section"><h2>Reach Portugal—and choose mainland or island life</h2><p>Cascais benefits from Lisbon's airport and metropolitan services. The Algarve is anchored by Faro Airport, but the full journey varies sharply along the coast and flight schedules are seasonal. Madeira has dependable air links through Funchal, yet every family visit, specialist trip and major delivery begins with island logistics.</p><p>Access within the destination matters just as much. Rail and walkability can make Cascais workable without daily driving. Much of the Algarve and Madeira is easier with a car; Madeira's slopes can turn a short distance into a meaningful constraint. Test the precise route from the property to healthcare, food and the airport rather than relying on regional averages.</p>{portugal_island_figure}</section>
+          <section class="seo-section"><h2>Own and operate with municipal discipline</h2><p>Portugal offers a recognizable freehold and land-registry system, but the certificate alone does not prove that every physical alteration or intended use is lawful. Reconcile the registry, tax record, plans, use status, energy certificate, boundaries and actual building. Coastal homes, rural plots, pools, annexes, enclosed terraces and retaining structures deserve particular attention.</p><p>Operation is increasingly local. Municipalities can shape Alojamento Local registration and containment, while condominium documents can affect what is practical inside a building. The safe assumption is that a current registration, compliant insurance and municipal confirmation are required; do not pay a premium for rental rights until transferability and the exact property position are written down.</p></section>
+          <section class="seo-section"><h2>Income and value need separate cases</h2><p>Cascais has the broadest year-round buyer and tenant logic in this comparison, supported by Lisbon access and ordinary residential demand. The Algarve can combine domestic, European and visitor demand, but the balance changes by town and property type. Madeira's international visibility is strong, while the resale pool becomes narrower outside Funchal and the most established coastal locations.</p><p>A retirement purchase should work on personal utility and carrying costs before any short-term income. Model long-term rent and permitted holiday use separately, after management, vacancy, utilities, condominium charges, insurance, maintenance and tax. A high-season rate is not a yield.</p></section>
+          <section class="seo-section"><h2>Preserve the exit—and future mobility</h2><p>Favor legal building status, comfortable access, manageable maintenance and a layout that appeals to both local and international buyers. A spectacular cliff or hillside view can carry hidden costs in stairs, retaining walls, damp, drainage, insurance and eventual resale friction.</p><p>The retirement conclusion is conditional: choose Cascais when metropolitan access and year-round services justify the price; choose an established Algarve town when climate and a slower mainland rhythm matter most; choose Madeira when island life is the point and its terrain, flights and concentrated services remain comfortable. In every case, buy the home that still works if tax treatment, mobility or rental rules change.</p></section>
         """
     generic_intro = f"""
           <section class="seo-section">
@@ -6220,7 +6397,7 @@ def build_seo_page(
         "seo-page seo-page--japan"
         if is_japan_article
         else "seo-page seo-page--editorial-retirement"
-        if is_spain_article
+        if is_spain_article or is_portugal_article
         else "seo-page"
     )
     editorial_hero_visual = (
@@ -6242,6 +6419,15 @@ def build_seo_page(
             "editorial-hero-visual",
         )
         if is_spain_article
+        else destination_editorial_figure_html(
+            {
+                "src": "/assets/algarve-cascais-coast-hero.webp",
+                "alt": "Cascais waterfront and historic center beside the Atlantic in warm evening light",
+            },
+            "Cascais · Atlantic life within reach of Lisbon",
+            "editorial-hero-visual",
+        )
+        if is_portugal_article
         else hero_aside
     )
     japan_guide_rail = f'''
@@ -6286,6 +6472,27 @@ def build_seo_page(
           <p class="editorial-guide-rail__note">Research inputs only. Verify current legal, tax and immigration rules locally.</p>
         </aside>
     '''
+    portugal_guide_rail = f'''
+        <aside class="seo-aside editorial-guide-rail">
+          <nav aria-label="In this guide">
+            <p class="seo-eyebrow">In this guide</p>
+            <a href="#residency">Residency first</a>
+            <a href="#fit">Who Portugal suits</a>
+            <a href="#owner-changes">2026 changes</a>
+            <a href="#costs">Financing and costs</a>
+            <a href="#practicality">Retirement practicality</a>
+            <a href="#lenses">Five retirement lenses</a>
+            <a href="#comparison">Compare destinations</a>
+            <a href="#faq">Common questions</a>
+            <a href="#sources">References</a>
+          </nav>
+          <div class="editorial-guide-rail__action">
+            <p>Compare Portugal with every destination in the Atlas.</p>
+            <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
+          </div>
+          <p class="editorial-guide-rail__note">Verify current residence, legal and tax rules for your circumstances before acting.</p>
+        </aside>
+    '''
     standard_guide_rail = f'''
         <aside class="seo-aside">
           <section class="seo-aside-card">
@@ -6313,6 +6520,8 @@ def build_seo_page(
         if is_japan_article
         else spain_guide_rail
         if is_spain_article
+        else portugal_guide_rail
+        if is_portugal_article
         else standard_guide_rail
     )
 
