@@ -3247,16 +3247,16 @@
     "name": "Aspen / Snowmass",
     "country": "United States",
     "category": "Mountain",
-    "overall_score": 3.46,
-    "usd_per_m2": 51700.0,
-    "net_yield_estimate": "1.5-2.8% est. net",
+    "overall_score": 3.44,
+    "usd_per_m2": 22000.0,
+    "net_yield_estimate": "Asset-specific; no destination-wide net yield",
     "quick_metrics": {
-      "usd_m": "$51,700",
-      "net_yield": "1.5-2.8% est. net",
+      "usd_m": "$22,000",
+      "net_yield": "Asset-specific",
       "ownership": "5.0/5",
       "friendly": "4.4/5"
     },
-    "panel_summary": "A global trophy-ski benchmark rather than a value case. The panel would use Aspen to calibrate scarcity, liquidity, and ultra-prime pricing, but would not treat it as a yield-led destination.",
+    "panel_summary": "A high-capital personal-use mountain base whose best case combines Aspen's year-round services with clear property use, insurability and a defensible successor-buyer pool.",
     "pros": [
       "World-class ski and summer demand",
       "deep ultra-high-net-worth buyer pool",
@@ -3271,7 +3271,7 @@
       "wildfire and insurance risk",
       "thin inventory and high operating costs"
     ],
-    "panel_verdict": "Keep as a trophy-market benchmark only. Buy for scarcity and personal use, not for income or affordability.",
+    "panel_verdict": "Shortlist only when personal use carries the decision and the exact jurisdiction, STR route, wildfire response, insurance, HOA costs and exit remain workable without rent or appreciation.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -3344,18 +3344,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "US freehold ownership is open to foreign buyers, subject to normal tax, financing, reporting, and estate-planning advice.",
-    "red_flags": "Ultra-prime pricing, low yield, STR limits, wildfire/insurance exposure, and very high carrying costs.",
+    "ownership_notes": "Colorado residential conveyancing is established, but ownership does not create a visa, health cover or rental permission; title, entity, tax, estate and intended-use advice remain buyer-specific.",
+    "red_flags": "Unverified STR eligibility, non-transferable Aspen permits, HOA restrictions, wildfire egress, replacement-cost insurance, extreme carrying cost and a narrow successor-buyer pool.",
     "rental": {
-      "gross_yield": "Prime ski homes can command high nightly rates, but entry prices and management/HOA/tax costs compress yield.",
-      "net_yield": "1.5-2.8% est. net",
-      "revenue": "Treat as asset-specific; trophy homes can show strong gross revenue but low yield on capital value.",
-      "adr_occupancy": "High-season dependent; verify by permit zone and asset type.",
-      "confidence": "Low-medium; benchmark estimate, not listing-level underwriting"
+      "gross_yield": "Property-specific; no destination-wide gross yield is supported",
+      "net_yield": "Asset-specific; no destination-wide net yield",
+      "revenue": "Model the exact lawful use, current permit, HOA position, achievable rent, owner stays, vacancy, local taxes, management, insurance and capital cost.",
+      "adr_occupancy": "Highly seasonal and property-specific; verify Aspen, Snowmass Village or county jurisdiction before underwriting any stay pattern",
+      "confidence": "Low for destination-wide income; medium only after property-level legal and operating verification"
     },
-    "price_basis": "Prime Aspen/Snowmass built-property benchmark. Downtown Aspen can trade around $5,000-$6,000/sq ft for nice single-family product; converted to roughly $51,700/m2. Snowmass and condos can vary materially.",
-    "price_confidence": "Medium for prime benchmark; low-medium across submarkets",
-    "profit_driver": "Scarcity, global trophy demand, ski/summer seasonality, and resilient ultra-prime buyer depth.",
+    "price_basis": "Rounded median unit price across three direct Aspen and Snowmass condominium asking observations captured 2026-08-27; seller-stated living area converted from square feet; not a market-wide median or completed-sale value.",
+    "price_confidence": "Medium for the dated examples; low as a destination-wide level",
+    "profit_driver": "Clear lawful use, year-round utility, manageable HOA and insurance cost, disciplined entry and a successor pool broad enough for the absolute price.",
     "rank": 29
   },
   {
