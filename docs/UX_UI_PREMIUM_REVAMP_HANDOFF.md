@@ -51,6 +51,18 @@ Avoid:
 
 ## Scope
 
+### Foreign-buyer country guide pilot
+
+Japan is the only migrated country hub. Review the local pilot at [http://127.0.0.1:8765/countries/japan-property/?v=foreign-buyer-pilot](http://127.0.0.1:8765/countries/japan-property/?v=foreign-buyer-pilot).
+
+- The acquisition guide covers national foreign-buyer eligibility, process, costs, obligations, and a compact destination comparison.
+- The retirement guide covers residence, healthcare, long-term life, retirement capital, and retirement-location fit.
+- Destination dossiers cover local market and lifestyle analysis, including sample listings and address-level diligence.
+- Atlas pages provide cross-destination comparison and user-specific modelling.
+- Sample listings remain exclusive to destination dossiers.
+- Other countries remain on the legacy renderer pending Japan approval and country-specific evidence review.
+- Generated artifacts are not source files and are not committed with the feature.
+
 ### 1. Homepage Redesign
 
 Create a premium first impression.
