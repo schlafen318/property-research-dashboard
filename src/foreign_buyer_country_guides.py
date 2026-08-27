@@ -8,7 +8,7 @@ import ipaddress
 import re
 import unicodedata
 from urllib.parse import urlsplit
-from urllib.parse import unquote
+from urllib.parse import unquote_to_bytes
 
 
 REQUIRED_GUIDE_KEYS = {
@@ -562,7 +562,13 @@ def _is_valid_source_url(url: object) -> bool:
         return False
     if any(unicodedata.category(character).startswith("C") or character.isspace() for character in url):
         return False
-    if any(unicodedata.category(character).startswith("C") for character in unquote(url)):
+    if re.search(r"%(?![0-9A-Fa-f]{2})", url):
+        return False
+    try:
+        decoded_url = unquote_to_bytes(url).decode("utf-8")
+    except UnicodeDecodeError:
+        return False
+    if any(unicodedata.category(character).startswith("C") for character in decoded_url):
         return False
     try:
         parsed = urlsplit(url)
@@ -586,7 +592,7 @@ def _is_valid_source_url(url: object) -> bool:
         if len(hostname) > 253 or any(
             not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?", label)
             for label in labels
-        ):
+        ) or not re.fullmatch(r"[A-Za-z]{2,63}", labels[-1]):
             return False
     else:
         return False
