@@ -138,6 +138,13 @@ class RemainingCountryRetirementArticleTests(unittest.TestCase):
                 self.assertEqual(3, html.count("destination-editorial-figure"))
                 self.assertNotIn('class="destination-visual-story__grid"', html)
 
+    def test_each_guide_delivers_five_distinct_retirement_lenses(self) -> None:
+        for slug, expected in GUIDES.items():
+            with self.subTest(country=expected["country"]):
+                guide = build_unified_app.COUNTRY_RETIREMENT_GUIDES[slug]
+                self.assertEqual(5, len(guide["lenses"]))
+                self.assertEqual(2, sum("image" in lens for lens in guide["lenses"]))
+
     def test_reader_copy_avoids_internal_process_language(self) -> None:
         forbidden = (
             "research-grade destination intelligence",
