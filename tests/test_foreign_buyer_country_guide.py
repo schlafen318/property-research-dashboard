@@ -406,6 +406,12 @@ class ForeignBuyerCountryGuideDesignTests(unittest.TestCase):
     def test_cost_table_stacks_labelled_rows_on_mobile(self) -> None:
         self.assertIn('data-label="When"', self.html)
         self.assertIn('data-label="What matters"', self.html)
-        self.assertIn(".foreign-buyer-cost-table thead { display: none; }", self.html)
-        self.assertIn(".foreign-buyer-cost-table td::before { content: attr(data-label);", self.html)
+        self.assertIn(".foreign-buyer-cost-table thead { position: absolute;", self.html)
+        self.assertIn(".foreign-buyer-mobile-label { display: block;", self.html)
         self.assertNotIn(".foreign-buyer-cost-table { display: block; overflow-x: auto;", self.html)
+
+    def test_mobile_cost_labels_are_real_text_with_accessible_headers(self) -> None:
+        self.assertIn('<span class="foreign-buyer-mobile-label">When</span>', self.html)
+        self.assertIn('<span class="foreign-buyer-mobile-label">What matters</span>', self.html)
+        self.assertIn(".foreign-buyer-cost-table thead { position: absolute;", self.html)
+        self.assertNotIn(".foreign-buyer-cost-table thead { display: none;", self.html)

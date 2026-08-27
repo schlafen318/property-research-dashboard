@@ -300,6 +300,7 @@ def foreign_buyer_country_guide_css() -> str:
     .foreign-buyer-cost-table thead th, .foreign-buyer-destination-table thead th { color: var(--foreign-buyer-muted); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
     .foreign-buyer-cost-table tbody tr:last-child th, .foreign-buyer-cost-table tbody tr:last-child td, .foreign-buyer-destination-table tbody tr:last-child th, .foreign-buyer-destination-table tbody tr:last-child td { border-bottom: 1px solid var(--foreign-buyer-rule); }
     .foreign-buyer-cost-table th[scope="row"], .foreign-buyer-destination-table th[scope="row"] { font-weight: 600; }
+    .foreign-buyer-mobile-label { display: none; }
     .foreign-buyer-destination-cards { display: none; }
     .foreign-buyer-checklist { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--foreign-buyer-rule); }
     .foreign-buyer-checklist li { max-width: none; padding: 15px 0 15px 28px; border-bottom: 1px solid var(--foreign-buyer-rule); position: relative; }
@@ -352,12 +353,12 @@ def foreign_buyer_country_guide_css() -> str:
       .foreign-buyer-rail { padding-bottom: 28px; margin-bottom: 40px; }
       .foreign-buyer-rail nav { grid-template-columns: 1fr; }
       .foreign-buyer-cost-table, .foreign-buyer-cost-table tbody, .foreign-buyer-cost-table tr, .foreign-buyer-cost-table th, .foreign-buyer-cost-table td { display: block; width: 100%; }
-      .foreign-buyer-cost-table thead { display: none; }
+      .foreign-buyer-cost-table thead { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
       .foreign-buyer-cost-table tr { padding: 17px 0; border-top: 1px solid var(--foreign-buyer-rule); }
       .foreign-buyer-cost-table th, .foreign-buyer-cost-table td { padding: 0; border: 0; }
       .foreign-buyer-cost-table th { margin-bottom: 8px; font-size: 18px; }
       .foreign-buyer-cost-table td + td { margin-top: 10px; }
-      .foreign-buyer-cost-table td::before { content: attr(data-label); display: block; margin-bottom: 3px; color: var(--foreign-buyer-muted); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
+      .foreign-buyer-mobile-label { display: block; margin-bottom: 3px; color: var(--foreign-buyer-muted); font-size: 12px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; }
       .foreign-buyer-cost-table tbody tr:last-child th, .foreign-buyer-cost-table tbody tr:last-child td { border-bottom: 0; }
       .foreign-buyer-destination-table { display: none; }
       .foreign-buyer-destination-cards { display: grid; border-top: 1px solid var(--foreign-buyer-rule); }
