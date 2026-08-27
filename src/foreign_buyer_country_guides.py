@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from datetime import date
 
 
 REQUIRED_GUIDE_KEYS = {
@@ -26,6 +27,16 @@ REQUIRED_GUIDE_KEYS = {
     "retirement_guide_slug",
 }
 REQUIRED_DIRECT_ANSWERS = {"ownership", "residency", "financing", "short_rentals"}
+REQUIRED_COST_COVERAGE = {
+    "acquisition": ("acquisition", "registration tax"),
+    "recurring ownership": ("annual", "ownership", "holding", "management", "repair"),
+}
+REQUIRED_OWNERSHIP_COVERAGE = {
+    "owner administration": ("owner", "record", "registration", "address"),
+    "building operations": ("condominium", "building", "repair", "management"),
+    "rental authority": ("rental", "lodging", "operator"),
+    "tax and hazard": ("tax", "hazard", "insurance"),
+}
 
 FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
     "japan-property": {
@@ -439,6 +450,27 @@ def validate_foreign_buyer_country_guide(
         raise ValueError(
             f"{country_hub_slug}: direct_answers missing {', '.join(missing_answers)}"
         )
+    if set(guide["direct_answers"]) != REQUIRED_DIRECT_ANSWERS:
+        raise ValueError(f"{country_hub_slug}: direct_answers must match required keys")
+    for field in ("date_published", "date_reviewed"):
+        value = guide[field]
+        try:
+            parsed_date = date.fromisoformat(value)
+        except (TypeError, ValueError):
+            parsed_date = None
+        if parsed_date is None or parsed_date.isoformat() != value:
+            raise ValueError(f"{country_hub_slug}: {field} must be a valid ISO date")
+    if not isinstance(guide["retirement_guide_slug"], str) or not guide["retirement_guide_slug"].strip():
+        raise ValueError(f"{country_hub_slug}: retirement_guide_slug is required")
+    _validate_direct_answers(country_hub_slug, guide["direct_answers"])
+    _validate_sourced_items(country_hub_slug, "eligibility_sections", guide["eligibility_sections"])
+    _validate_sourced_items(country_hub_slug, "purchase_steps", guide["purchase_steps"])
+    _validate_sourced_items(country_hub_slug, "ownership_rules", guide["ownership_rules"])
+    _validate_sourced_items(country_hub_slug, "cost_rows", guide["cost_rows"])
+    _validate_sourced_items(country_hub_slug, "faqs", guide["faqs"])
+    for field in ("eligibility_sections", "ownership_rules", "buyer_checklist"):
+        if not isinstance(guide[field], list) or not guide[field]:
+            raise ValueError(f"{country_hub_slug}: {field} requires at least one item")
     missing_destinations = sorted(
         set(expected_destination_ids) - set(guide["destination_reads"])
     )
@@ -452,7 +484,49 @@ def validate_foreign_buyer_country_guide(
         raise ValueError(f"{country_hub_slug}: purchase_steps requires at least five steps")
     if len(guide["cost_rows"]) < 4:
         raise ValueError(f"{country_hub_slug}: cost_rows requires at least four rows")
+    _validate_coverage(country_hub_slug, "cost_rows", guide["cost_rows"], REQUIRED_COST_COVERAGE)
+    _validate_coverage(
+        country_hub_slug,
+        "ownership_rules",
+        guide["ownership_rules"],
+        REQUIRED_OWNERSHIP_COVERAGE,
+    )
     if len(guide["faqs"]) < 3:
         raise ValueError(f"{country_hub_slug}: faqs requires at least three questions")
     if not guide["primary_sources"]:
         raise ValueError(f"{country_hub_slug}: primary_sources is required")
+
+
+def _validate_direct_answers(country_hub_slug: str, direct_answers: dict) -> None:
+    for key, answer in direct_answers.items():
+        if not isinstance(answer, dict) or not answer.get("answer"):
+            raise ValueError(f"{country_hub_slug}: direct_answers.{key} requires answer")
+        if not answer.get("source_urls"):
+            raise ValueError(f"{country_hub_slug}: direct_answers.{key} requires source_urls")
+
+
+def _validate_sourced_items(country_hub_slug: str, field: str, items: list[dict]) -> None:
+    if not isinstance(items, list):
+        raise ValueError(f"{country_hub_slug}: {field} must be a list")
+    for index, item in enumerate(items):
+        if not isinstance(item, dict):
+            raise ValueError(f"{country_hub_slug}: {field}[{index}] must be an object")
+        if not item.get("source_urls"):
+            raise ValueError(f"{country_hub_slug}: {field}[{index}] requires source_urls")
+
+
+def _validate_coverage(
+    country_hub_slug: str,
+    field: str,
+    items: list[dict],
+    categories: dict[str, tuple[str, ...]],
+) -> None:
+    text = " ".join(
+        str(value).lower()
+        for item in items
+        for value in item.values()
+        if isinstance(value, str)
+    )
+    for category, terms in categories.items():
+        if not any(term in text for term in terms):
+            raise ValueError(f"{country_hub_slug}: {field} missing {category} coverage")

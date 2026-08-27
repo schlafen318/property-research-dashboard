@@ -47,10 +47,23 @@ def valid_guide_fixture() -> dict:
             for index in range(1, 6)
         ],
         "cost_rows": [
-            {"cost": f"Cost {index}", "when": "When", "buyer_read": "Read", "source_urls": ["https://example.gov/source"]}
-            for index in range(1, 5)
+            {"cost": label, "when": "When", "buyer_read": "Read", "source_urls": ["https://example.gov/source"]}
+            for label in (
+                "Purchase price",
+                "Acquisition and registration taxes",
+                "Annual ownership costs",
+                "Eventual sale and transfer-out costs",
+            )
         ],
-        "ownership_rules": [deepcopy(sourced)],
+        "ownership_rules": [
+            {"heading": label, "body": "Body", "source_urls": ["https://example.gov/source"]}
+            for label in (
+                "Owner records",
+                "Condominium repairs",
+                "Short-rental authority",
+                "Tax and hazard files",
+            )
+        ],
         "destination_reads": {
             destination_id: {"best_for": "Best", "verify_first": "Verify"}
             for destination_id in ("fukuoka-itoshima", "hakone-izu", "hakuba", "niseko")
@@ -141,6 +154,87 @@ class ForeignBuyerCountryGuideContractTests(unittest.TestCase):
         guide.pop("date_reviewed")
 
         with self.assertRaisesRegex(ValueError, "^japan-property: missing date_reviewed$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_empty_eligibility_sections(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"] = []
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections requires at least one item$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_empty_ownership_rules(self) -> None:
+        guide = valid_guide_fixture()
+        guide["ownership_rules"] = []
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: ownership_rules requires at least one item$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_empty_buyer_checklist(self) -> None:
+        guide = valid_guide_fixture()
+        guide["buyer_checklist"] = []
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: buyer_checklist requires at least one item$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_unsourced_legal_item(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"][0]["source_urls"] = []
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\] requires source_urls$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_extra_direct_answer(self) -> None:
+        guide = valid_guide_fixture()
+        guide["direct_answers"]["tax"] = {"answer": "Answer", "source_urls": ["https://example.gov/source"]}
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: direct_answers must match required keys$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_blank_published_date(self) -> None:
+        guide = valid_guide_fixture()
+        guide["date_published"] = ""
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: date_published must be a valid ISO date$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_invalid_reviewed_date(self) -> None:
+        guide = valid_guide_fixture()
+        guide["date_reviewed"] = "27-08-2026"
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: date_reviewed must be a valid ISO date$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_blank_retirement_guide_slug(self) -> None:
+        guide = valid_guide_fixture()
+        guide["retirement_guide_slug"] = "  "
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: retirement_guide_slug is required$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_cost_rows_without_acquisition_coverage(self) -> None:
+        guide = valid_guide_fixture()
+        guide["cost_rows"][1]["cost"] = "Brokerage and professional work"
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: cost_rows missing acquisition coverage$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_cost_rows_without_recurring_coverage(self) -> None:
+        guide = valid_guide_fixture()
+        guide["cost_rows"][2]["cost"] = "Brokerage and professional work"
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: cost_rows missing recurring ownership coverage$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_ownership_rules_without_tax_obligation(self) -> None:
+        guide = valid_guide_fixture()
+        guide["ownership_rules"] = [
+            {"heading": "Owner records", "body": "Keep records current", "source_urls": ["https://example.gov/source"]},
+            {"heading": "Condominium repairs", "body": "Fund repairs", "source_urls": ["https://example.gov/source"]},
+            {"heading": "Short rentals", "body": "Recheck lodging authority", "source_urls": ["https://example.gov/source"]},
+        ]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: ownership_rules missing tax and hazard coverage$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
 
