@@ -13,6 +13,7 @@ from pathlib import Path
 from urllib.parse import urlparse
 
 try:
+    from src.country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from src.seo_content_overrides import apply_content_override, load_content_overrides
     from src.retirement_destination_finder_page import build_retirement_destination_finder_html
     from src.premium_destination_dossiers import (
@@ -21,6 +22,7 @@ try:
         validate_premium_dossier,
     )
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
+    from country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from seo_content_overrides import apply_content_override, load_content_overrides
     from retirement_destination_finder_page import build_retirement_destination_finder_html
     from premium_destination_dossiers import (
@@ -236,7 +238,7 @@ COUNTRY_HUBS = [
             {"label": "Teton County: regional hazard mitigation plan", "url": "https://www.tetoncountywy.gov/DocumentCenter/View/14355/Wyoming-Region-8-Hazard-Mitigation-Plan"},
         ],
         "destination_ids": ["miami-fort-lauderdale", "park-city-deer-valley", "lake-tahoe", "jackson-hole", "aspen-snowmass"],
-        "guide_slugs": ["best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "overseas-property-investment", "where-can-foreigners-buy-property"],
+        "guide_slugs": ["united-states-retirement-property-foreign-buyers", "best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "overseas-property-investment", "where-can-foreigners-buy-property"],
     },
     {
         "slug": "australia-property",
@@ -287,7 +289,7 @@ COUNTRY_HUBS = [
             {"label": "B.C.: short-term rental principal-residence requirement", "url": "https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/principal-residence-requirement"},
         ],
         "destination_ids": ["vancouver", "vancouver-island-victoria", "whistler"],
-        "guide_slugs": ["best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "where-can-foreigners-buy-property"],
+        "guide_slugs": ["canada-retirement-property-foreign-buyers", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "where-can-foreigners-buy-property"],
     },
     {
         "slug": "united-arab-emirates-property",
@@ -333,7 +335,7 @@ COUNTRY_HUBS = [
             {"label": "Department of Provincial Administration: Hotel Act", "url": "https://multi.dopa.go.th/legal/assets/modules/news/uploads/a8fec27695d5ecdb26fe0de8f70040fc5c00b4c6870cd0192022484170852251.pdf"},
         ],
         "destination_ids": ["phuket-koh-samui"],
-        "guide_slugs": ["thailand-villa-ownership-foreigners", "foreign-property-investment-risks", "where-can-foreigners-buy-property", "overseas-property-investment"],
+        "guide_slugs": ["thailand-retirement-property-foreign-buyers", "thailand-villa-ownership-foreigners", "foreign-property-investment-risks", "where-can-foreigners-buy-property", "overseas-property-investment"],
     },
     {
         "slug": "vietnam-property",
@@ -394,7 +396,7 @@ COUNTRY_HUBS = [
         "h1": "Greece Property Guide for Foreign Buyers",
         "thesis": "Greece can offer lifestyle value and Mediterranean appeal, especially where access and services are strong. The risk is assuming island romance automatically creates year-round livability, healthcare practicality, or deep resale liquidity.",
         "destination_ids": ["crete"],
-        "guide_slugs": ["greece-vs-portugal-retirement-property", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-property-in-europe", "buy-property-abroad"],
+        "guide_slugs": ["greece-retirement-property-foreign-buyers", "greece-vs-portugal-retirement-property", "best-places-to-buy-property-abroad-for-retirement", "best-places-to-buy-property-in-europe", "buy-property-abroad"],
     },
     {
         "slug": "croatia-property",
@@ -447,7 +449,7 @@ COUNTRY_HUBS = [
             {"label": "South Tyrol: conventioned-home FAQ", "url": "https://wohnbauaufsicht.provinz.bz.it/de/faq-frequently-asked-questions"},
         ],
         "destination_ids": ["lake-como", "dolomites-south-tyrol"],
-        "guide_slugs": ["best-places-to-buy-property-in-europe", "best-places-to-buy-vacation-home-abroad", "foreign-property-investment-risks", "buy-property-abroad"],
+        "guide_slugs": ["italy-retirement-property-foreign-buyers", "best-places-to-buy-property-in-europe", "best-places-to-buy-vacation-home-abroad", "foreign-property-investment-risks", "buy-property-abroad"],
     },
     {
         "slug": "austria-property",
@@ -504,7 +506,7 @@ COUNTRY_HUBS = [
             {"label": "Canton Ticino: LAFE overview", "url": "https://www4.ti.ch/di/dg/rf/lafe/lafe"},
         ],
         "destination_ids": ["andermatt", "ticino-lake-lugano", "swiss-valais-vaud-alps"],
-        "guide_slugs": ["where-can-foreigners-buy-property", "foreign-property-investment-risks", "best-places-to-buy-vacation-home-abroad", "overseas-property-investment"],
+        "guide_slugs": ["switzerland-retirement-property-foreign-buyers", "where-can-foreigners-buy-property", "foreign-property-investment-risks", "best-places-to-buy-vacation-home-abroad", "overseas-property-investment"],
     },
 ]
 GA4_MEASUREMENT_ID = os.environ.get("GA4_MEASUREMENT_ID", "").strip()
@@ -803,6 +805,114 @@ SEO_PAGES = [
             ("Can foreigners buy property in Portugal?", "Foreign individuals can generally acquire Portuguese property, but title, planning, tax residence, financing, condominium rules, local-accommodation permission and the exact 2026 IMT treatment require buyer-specific review."),
             ("How does healthcare work for foreign retirees in Portugal?", "Legal residents can obtain an SNS user number and access public care, subject to registration and entitlement rules. EU coordination, an S1 and private insurance can also matter depending on the household."),
             ("Where should retirement buyers compare in Portugal?", "Start with the Algarve and Cascais for mainland access and established international services, then compare Madeira when island life, steep terrain and additional travel logistics fit the plan."),
+        ],
+    },
+    {
+        "slug": "united-states-retirement-property-foreign-buyers",
+        "title": "United States Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Compare United States retirement property for foreign buyers across residency, healthcare, ownership, tax, insurance, rental rules, climate risk, and four mountain destinations.",
+        "h1": "United States Retirement Property for Foreign Buyers",
+        "keyword": "United States retirement property for foreign buyers",
+        "theme": "United States retirement buyer guide",
+        "intent": "foreign buyers deciding whether the United States fits their residence, healthcare, lifestyle and property plan",
+        "destination_ids": ["park-city-deer-valley", "lake-tahoe", "jackson-hole", "aspen-snowmass"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-08-27",
+        "faqs": [
+            ("Does buying property give a foreigner residency in the United States?", "No. Real-estate ownership and immigration status are separate. A buyer needs an independent lawful basis to live in the country."),
+            ("Can foreigners buy property in the United States?", "Foreign buyers can generally acquire residential property, but financing, tax reporting, entity choice, state and local rules, insurance and eventual sale withholding require buyer-specific advice."),
+            ("How does healthcare work for foreign retirees in the United States?", "A home does not create health coverage. Eligibility and cost depend on immigration status, age, state, insurance arrangements and any applicable public-program rules."),
+            ("Which United States mountain markets should retirement buyers compare?", "Compare Park City and Deer Valley, Lake Tahoe, Jackson Hole, and Aspen and Snowmass only after testing altitude, winter access, healthcare, insurance, carrying cost and local rental rules."),
+        ],
+    },
+    {
+        "slug": "canada-retirement-property-foreign-buyers",
+        "title": "Canada Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Canada retirement property for foreign buyers across residency, the federal purchase prohibition, healthcare, tax, rental rules, climate risk, Victoria, and Whistler.",
+        "h1": "Canada Retirement Property for Foreign Buyers",
+        "keyword": "Canada retirement property for foreign buyers",
+        "theme": "Canada retirement buyer guide",
+        "intent": "foreign buyers deciding whether Canada fits their residence, healthcare, lifestyle and property plan",
+        "destination_ids": ["vancouver-island-victoria", "whistler"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-08-27",
+        "faqs": [
+            ("Does buying property give a foreigner residency in Canada?", "No. Property ownership and immigration status are separate, and Canada does not offer a general retirement visa."),
+            ("Can a non-Canadian buy residential property in Canada?", "A federal prohibition applies to many non-Canadians and residential properties through 1 January 2027, with defined exceptions. Provincial taxes and local rules may add further constraints."),
+            ("How does healthcare work for foreign retirees in Canada?", "Public health coverage follows provincial eligibility and lawful residence, not ownership. Waiting periods, covered services and private-insurance needs depend on the province and status."),
+            ("Should retirement buyers compare Victoria or Whistler?", "Victoria offers the deeper year-round service base; Whistler is a specialist mountain proposition with higher operating, insurance and rental-rule sensitivity."),
+        ],
+    },
+    {
+        "slug": "thailand-retirement-property-foreign-buyers",
+        "title": "Thailand Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Thailand retirement property for foreign buyers across visas, healthcare, condominium and villa ownership, tax, rental rules, climate risk, Phuket, and Koh Samui.",
+        "h1": "Thailand Retirement Property for Foreign Buyers",
+        "keyword": "Thailand retirement property for foreign buyers",
+        "theme": "Thailand retirement buyer guide",
+        "intent": "foreign buyers deciding whether Thailand fits their residence, healthcare, lifestyle and property plan",
+        "destination_ids": ["phuket-koh-samui"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-08-27",
+        "faqs": [
+            ("Does buying property give a foreigner residency in Thailand?", "No. Property ownership and immigration status are separate; retirement and long-stay routes have their own age, financial, insurance and reporting conditions."),
+            ("Can foreigners own property in Thailand?", "Foreigners can own qualifying condominium units within the statutory foreign quota. Land, villas, leases and company structures require much more restrictive, structure-specific review."),
+            ("How does healthcare work for foreign retirees in Thailand?", "A home does not create public healthcare entitlement. Most international retirees plan around private insurance and access to suitable private hospitals, subject to visa and policy conditions."),
+            ("Should retirement buyers choose Phuket or Koh Samui?", "Phuket has the deeper service, hospital and flight network; Koh Samui offers a smaller island rhythm with greater dependence on local infrastructure and air or ferry logistics."),
+        ],
+    },
+    {
+        "slug": "greece-retirement-property-foreign-buyers",
+        "title": "Greece Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Greece retirement property for foreign buyers across residency, healthcare, ownership, tax, rental rules, wildfire and seismic risk, and retirement life in Crete.",
+        "h1": "Greece Retirement Property for Foreign Buyers",
+        "keyword": "Greece retirement property for foreign buyers",
+        "theme": "Greece retirement buyer guide",
+        "intent": "foreign buyers deciding whether Greece fits their residence, healthcare, lifestyle and property plan",
+        "destination_ids": ["crete"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-08-27",
+        "faqs": [
+            ("Does buying property give a foreigner residency in Greece?", "No. Ownership and residence are separate, although Greece has immigration routes with their own investment or financially independent person conditions."),
+            ("Can foreigners buy property in Greece?", "Foreign buyers can generally acquire Greek property, subject to nationality, border-area restrictions, title, planning, forestry, archaeology, tax and building-specific review."),
+            ("How does healthcare work for foreign retirees in Greece?", "Healthcare access depends on lawful residence, social-security or coordination rights, and insurance—not on owning a home."),
+            ("Is Crete practical for year-round retirement?", "Crete can work when the home has reliable access to a functioning town, healthcare, flights and services through winter; remote and highly seasonal locations require more resilience."),
+        ],
+    },
+    {
+        "slug": "italy-retirement-property-foreign-buyers",
+        "title": "Italy Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Italy retirement property for foreign buyers across residency, healthcare, ownership, tax, rentals, building risk, Lake Como, and the Dolomites and South Tyrol.",
+        "h1": "Italy Retirement Property for Foreign Buyers",
+        "keyword": "Italy retirement property for foreign buyers",
+        "theme": "Italy retirement buyer guide",
+        "intent": "foreign buyers deciding whether Italy fits their residence, healthcare, lifestyle and property plan",
+        "destination_ids": ["lake-como", "dolomites-south-tyrol"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-08-27",
+        "faqs": [
+            ("Does buying property give a foreigner residency in Italy?", "No. A deed does not create residence. Retirees may consider an elective-residence route where eligible, but it has separate income, accommodation and insurance requirements."),
+            ("Can foreigners buy property in Italy?", "EU buyers generally can. Some non-EU buyers depend on reciprocity or another legal basis, and every acquisition needs title, cadastral, planning and building-conformity checks."),
+            ("How does healthcare work for foreign retirees in Italy?", "Healthcare access follows lawful residence, registration and applicable EU or national rules. Ownership alone creates no entitlement."),
+            ("Should retirement buyers compare Lake Como or the Dolomites?", "Lake Como offers Milan access and an international buyer pool; the Dolomites and South Tyrol offer a mountain lifestyle with different language, winter-access, building and second-home constraints."),
+        ],
+    },
+    {
+        "slug": "switzerland-retirement-property-foreign-buyers",
+        "title": "Switzerland Retirement Property for Foreign Buyers | Global Home Atlas",
+        "description": "Compare Switzerland retirement property for foreign buyers across residence, Lex Koller, healthcare, tax, second-home rules, climate risk, and three Alpine destinations.",
+        "h1": "Switzerland Retirement Property for Foreign Buyers",
+        "keyword": "Switzerland retirement property for foreign buyers",
+        "theme": "Switzerland retirement buyer guide",
+        "intent": "foreign buyers deciding whether Switzerland fits their residence, healthcare, lifestyle and property plan",
+        "destination_ids": ["andermatt", "ticino-lake-lugano", "swiss-valais-vaud-alps"],
+        "author": "Global Home Atlas Research Team",
+        "date_published": "2026-08-27",
+        "faqs": [
+            ("Does buying property give a foreigner residency in Switzerland?", "No. Property ownership and residence permits are separate; retiree routes depend on nationality, canton and personal circumstances."),
+            ("Can foreigners buy property in Switzerland?", "The answer depends on nationality, domicile, residence status, intended use, canton, municipality and the exact asset under Lex Koller and second-home rules."),
+            ("How does healthcare work for foreign retirees in Switzerland?", "Residents generally must arrange compulsory health insurance within three months, subject to coordination rules and exceptions. A property purchase creates no coverage."),
+            ("Which Swiss retirement destinations should buyers compare?", "Compare Andermatt for a compact resort, Ticino and Lake Lugano for an Italian-speaking lake-and-city base, and the Valais and Vaud Alps for a broader set of village and resort choices."),
         ],
     },
     {
@@ -4091,11 +4201,87 @@ def is_portugal_retirement_guide(page: dict) -> bool:
     return page.get("slug") == "portugal-retirement-property-foreign-buyers"
 
 
+def is_structured_country_retirement_guide(page: dict) -> bool:
+    return page.get("slug") in COUNTRY_RETIREMENT_GUIDES
+
+
 def is_editorial_retirement_guide(page: dict) -> bool:
     return (
         is_japan_retirement_guide(page)
         or is_spain_retirement_guide(page)
         or is_portugal_retirement_guide(page)
+        or is_structured_country_retirement_guide(page)
+    )
+
+
+def structured_country_retirement_overview_html(page: dict) -> str:
+    guide = COUNTRY_RETIREMENT_GUIDES[page["slug"]]
+    sections = []
+    for section in guide["overview"]:
+        eyebrow = (
+            f'<p class="seo-eyebrow editorial-section-label">{escape(section["eyebrow"])}</p>'
+            if section.get("eyebrow")
+            else ""
+        )
+        paragraphs = "".join(f"<p>{paragraph}</p>" for paragraph in section["paragraphs"])
+        sections.append(
+            f'<section class="seo-section" id="{escape(section["id"])}">'
+            f'{eyebrow}<h2>{escape(section["heading"])}</h2>{paragraphs}</section>'
+        )
+    return "".join(sections)
+
+
+def structured_country_retirement_editorial_html(page: dict) -> str:
+    guide = COUNTRY_RETIREMENT_GUIDES[page["slug"]]
+    sections = [
+        f'<section class="seo-section" id="lenses"><h2>{escape(guide["country"])} through five retirement lenses</h2><p>{guide["lenses_intro"]}</p></section>'
+    ]
+    for lens in guide["lenses"]:
+        paragraphs = "".join(f"<p>{paragraph}</p>" for paragraph in lens["paragraphs"])
+        figure = ""
+        if lens.get("image"):
+            image = lens["image"]
+            figure = destination_editorial_figure_html(
+                {"src": image["src"], "alt": image["alt"]},
+                image["caption"],
+                "editorial-inline-visual",
+            )
+        sections.append(
+            f'<section class="seo-section"><h2>{escape(lens["heading"])}</h2>{paragraphs}{figure}</section>'
+        )
+    return "".join(sections)
+
+
+def structured_country_retirement_comparison_html(
+    page: dict, destinations: list[dict]
+) -> str:
+    guide = COUNTRY_RETIREMENT_GUIDES[page["slug"]]
+    rows = []
+    for destination in destinations:
+        guidance = guide["destinations"][destination["id"]]
+        rows.append(
+            f'<tr><td><strong><a href="/destinations/{escape(destination_slug(destination))}/">{escape(destination["name"])}</a></strong></td>'
+            f'<td>{escape(guidance["best_for"])}</td><td>{escape(guidance["daily_life"])}</td>'
+            f'<td>{escape(guidance["diligence"])}</td><td>{escape(guidance["rental"])}</td></tr>'
+        )
+    return (
+        f'<section class="seo-section" id="comparison"><h2>{escape(guide["comparison_heading"])}</h2>'
+        f'<p>{guide["comparison_intro"]}</p><div class="seo-table-wrap"><table class="seo-table">'
+        '<thead><tr><th>Destination</th><th>Best for</th><th>Daily-life read</th><th>Primary diligence</th><th>Rental stance</th></tr></thead>'
+        f'<tbody>{"".join(rows)}</tbody></table></div></section>'
+    )
+
+
+def structured_country_retirement_references_html(page: dict) -> str:
+    guide = COUNTRY_RETIREMENT_GUIDES[page["slug"]]
+    links = "".join(
+        f'<li><a href="{escape(url)}" rel="noopener noreferrer">{escape(label)}</a></li>'
+        for label, url in guide["references"]
+    )
+    return (
+        '<section class="seo-section" id="sources"><h2>References and update policy</h2>'
+        f'<p>{guide["references_intro"]} This guide was substantively reviewed on 27 August 2026.</p>'
+        f'<ul>{links}</ul></section>'
     )
 
 
@@ -4527,6 +4713,8 @@ def seo_overview_html(page: dict, selected: list[dict]) -> str:
         return spain_retirement_overview_html()
     if is_portugal_retirement_guide(page):
         return portugal_retirement_overview_html()
+    if is_structured_country_retirement_guide(page):
+        return structured_country_retirement_overview_html(page)
     country_count = len({item.get("country") for item in selected if item.get("country")})
     return f"""
           <section class="seo-section">
@@ -4546,6 +4734,8 @@ def seo_comparison_html(page: dict, selected: list[dict], top: dict, runner_up: 
         return spain_retirement_comparison_html(selected)
     if is_portugal_retirement_guide(page):
         return portugal_retirement_comparison_html(selected)
+    if is_structured_country_retirement_guide(page):
+        return structured_country_retirement_comparison_html(page, selected)
     return f"""
           <section class="seo-section" id="comparison">
             <h2>Best Destinations to Compare First</h2>
@@ -4593,6 +4783,8 @@ def seo_references_html(page: dict) -> str:
         return spain_retirement_references_html()
     if is_portugal_retirement_guide(page):
         return portugal_retirement_references_html()
+    if is_structured_country_retirement_guide(page):
+        return structured_country_retirement_references_html(page)
     return ""
 
 
@@ -6268,6 +6460,7 @@ def build_seo_page(
     is_japan_article = is_japan_retirement_guide(page)
     is_spain_article = is_spain_retirement_guide(page)
     is_portugal_article = is_portugal_retirement_guide(page)
+    is_structured_article = is_structured_country_retirement_guide(page)
     is_editorial_article = is_editorial_retirement_guide(page)
     country_count = len({item.get("country") for item in selected if item.get("country")})
     author_weight = 400 if is_editorial_article else 750
@@ -6297,6 +6490,7 @@ def build_seo_page(
             "japan-retirement-property-foreign-buyers",
             "spain-retirement-property-foreign-buyers",
             "portugal-retirement-property-foreign-buyers",
+            *COUNTRY_RETIREMENT_GUIDES,
         }
         else ""
     )
@@ -6376,6 +6570,8 @@ def build_seo_page(
           <section class="seo-section"><h2>Income and value need separate cases</h2><p>Cascais has the broadest year-round buyer and tenant logic in this comparison, supported by Lisbon access and ordinary residential demand. The Algarve can combine domestic, European and visitor demand, but the balance changes by town and property type. Madeira's international visibility is strong, while the resale pool becomes narrower outside Funchal and the most established coastal locations.</p><p>A retirement purchase should work on personal utility and carrying costs before any short-term income. Model long-term rent and permitted holiday use separately, after management, vacancy, utilities, condominium charges, insurance, maintenance and tax. A high-season rate is not a yield.</p></section>
           <section class="seo-section"><h2>Preserve the exit—and future mobility</h2><p>Favor legal building status, comfortable access, manageable maintenance and a layout that appeals to both local and international buyers. A spectacular cliff or hillside view can carry hidden costs in stairs, retaining walls, damp, drainage, insurance and eventual resale friction.</p><p>The retirement conclusion is conditional: choose Cascais when metropolitan access and year-round services justify the price; choose an established Algarve town when climate and a slower mainland rhythm matter most; choose Madeira when island life is the point and its terrain, flights and concentrated services remain comfortable. In every case, buy the home that still works if tax treatment, mobility or rental rules change.</p></section>
         """
+    elif is_structured_article:
+        editorial_content = structured_country_retirement_editorial_html(page)
     generic_intro = f"""
           <section class="seo-section">
             <h2>How to Read This Shortlist</h2>
@@ -6397,7 +6593,7 @@ def build_seo_page(
         "seo-page seo-page--japan"
         if is_japan_article
         else "seo-page seo-page--editorial-retirement"
-        if is_spain_article or is_portugal_article
+        if is_spain_article or is_portugal_article or is_structured_article
         else "seo-page"
     )
     editorial_hero_visual = (
@@ -6428,6 +6624,15 @@ def build_seo_page(
             "editorial-hero-visual",
         )
         if is_portugal_article
+        else destination_editorial_figure_html(
+            {
+                "src": COUNTRY_RETIREMENT_GUIDES[page["slug"]]["hero"]["src"],
+                "alt": COUNTRY_RETIREMENT_GUIDES[page["slug"]]["hero"]["alt"],
+            },
+            COUNTRY_RETIREMENT_GUIDES[page["slug"]]["hero"]["caption"],
+            "editorial-hero-visual",
+        )
+        if is_structured_article
         else hero_aside
     )
     japan_guide_rail = f'''
@@ -6493,6 +6698,31 @@ def build_seo_page(
           <p class="editorial-guide-rail__note">Verify current residence, legal and tax rules for your circumstances before acting.</p>
         </aside>
     '''
+    structured_guide_rail = ""
+    if is_structured_article:
+        guide = COUNTRY_RETIREMENT_GUIDES[page["slug"]]
+        country = escape(guide["country"])
+        structured_guide_rail = f'''
+        <aside class="seo-aside editorial-guide-rail">
+          <nav aria-label="In this guide">
+            <p class="seo-eyebrow">In this guide</p>
+            <a href="#residency">Residency first</a>
+            <a href="#fit">Who {country} suits</a>
+            <a href="#owner-changes">{escape(guide["change_label"])}</a>
+            <a href="#costs">Financing and costs</a>
+            <a href="#practicality">Retirement practicality</a>
+            <a href="#lenses">Five retirement lenses</a>
+            <a href="#comparison">Compare destinations</a>
+            <a href="#faq">Common questions</a>
+            <a href="#sources">References</a>
+          </nav>
+          <div class="editorial-guide-rail__action">
+            <p>Compare {country} with every destination in the Atlas.</p>
+            <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
+          </div>
+          <p class="editorial-guide-rail__note">Verify current residence, legal and tax rules for your circumstances before acting.</p>
+        </aside>
+        '''
     standard_guide_rail = f'''
         <aside class="seo-aside">
           <section class="seo-aside-card">
@@ -6522,6 +6752,8 @@ def build_seo_page(
         if is_spain_article
         else portugal_guide_rail
         if is_portugal_article
+        else structured_guide_rail
+        if is_structured_article
         else standard_guide_rail
     )
 
