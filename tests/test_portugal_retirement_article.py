@@ -110,8 +110,8 @@ class PortugalRetirementArticleTests(unittest.TestCase):
 
         self.assertEqual(1, html.count('id="sources"'))
         self.assertGreater(html.index('id="sources"'), html.index('id="faq"'))
-        article_end = html.index("</article>")
         sources = html.index('id="sources"')
+        article_end = html.index("</article>", sources)
         self.assertNotIn('<section class="seo-section"', html[sources + 1 : article_end])
 
     def test_article_has_editorial_layout_authorship_and_complete_rail(self) -> None:
