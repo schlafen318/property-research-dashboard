@@ -3761,9 +3761,9 @@
     "overall_score": 3.48,
     "access_status": "restricted",
     "access_summary": "Foreign buyers are generally prohibited from purchasing established homes through June 30, 2029. Eligible new dwellings may still be purchased with approval, so this profile is for comparison unless a specific property qualifies.",
-    "usd_per_m2": 11200.0,
-    "net_yield_estimate": "2.0-3.5% est. net",
-    "quick_metrics": {"usd_m": "$11,200", "net_yield": "2.0-3.5% est. net", "ownership": "2.0/5", "friendly": "3.0/5"},
+    "usd_per_m2": 11235.36,
+    "net_yield_estimate": "No destination-wide net yield; model the eligible new dwelling, lawful tenancy, state taxes, strata costs and owner-specific tax position",
+    "quick_metrics": {"usd_m": "$11,235", "net_yield": "Property-specific", "ownership": "2.0/5", "friendly": "3.0/5"},
     "panel_summary": "Australia’s two deepest global-city markets offer strong lifestyle, services and resale depth, but established homes are generally unavailable to foreign buyers through June 2029.",
     "pros": ["Deep city economies", "major international airports", "strong healthcare and education", "large domestic resale pools", "high long-term livability"],
     "cons": ["Established homes generally unavailable to foreign buyers through June 2029", "foreign-buyer approval required", "high entry prices and surcharges", "new-build stock can carry a premium", "rental rules and costs vary by state and building"],
@@ -3786,9 +3786,9 @@
     },
     "ownership_notes": "From April 1, 2025 to June 30, 2029, foreign investors are generally prohibited from purchasing established dwellings. Eligible new or near-new dwellings remain the main route and normally require approval; vacancy rules and fees can apply.",
     "red_flags": "Established-home ban, approval process, state foreign-buyer surcharges, new-build premium, vacancy fees, high entry price and building-specific rental rules.",
-    "rental": {"gross_yield": "Deep long-stay demand but high acquisition costs compress yield.", "net_yield": "2.0-3.5% est. net", "revenue": "Only model a property after confirming foreign-buyer eligibility and its rental permissions.", "adr_occupancy": "Strong year-round demand.", "confidence": "Medium-low"},
-    "price_basis": "Broad 2026 Sydney and Melbourne city-apartment benchmark, shown for comparison; established homes should not be assumed available to a foreign buyer.",
-    "price_confidence": "Medium-low",
+    "rental": {"gross_yield": "Deep long-stay demand does not establish a property-level return after high acquisition and strata costs.", "net_yield": "No defensible city-pair estimate", "revenue": "Only model a property after confirming foreign-buyer eligibility, lawful tenancy and state and building rules.", "adr_occupancy": "Strong year-round demand, subject to property-level permissions and costs.", "confidence": "Medium"},
+    "price_basis": "Average of three direct new-development asks captured 2026-08-27 in Gordon, St Kilda East and Docklands, converted at the RBA 26 August 2026 AUD/USD rate. Not a valuation or city median.",
+    "price_confidence": "Medium",
     "profit_driver": "Large city economies, population growth, global connectivity, lifestyle quality and deep domestic resale demand."
   }
 ]

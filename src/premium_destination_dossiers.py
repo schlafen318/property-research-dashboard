@@ -5238,6 +5238,120 @@ VANCOUVER_DOSSIER = PremiumDossierSpec(
 )
 
 
+SYDNEY_MELBOURNE_DOSSIER = PremiumDossierSpec(
+    destination_id="sydney-melbourne",
+    title="Sydney and Melbourne Property Dossier for Foreign Buyers",
+    description="Compare eligible Sydney and Melbourne new-dwelling property through daily life, foreign-investment approval, state surcharges, strata risk, rental rules, value and resale.",
+    h1="Sydney / Melbourne: qualify the home before choosing the city",
+    lede="Sydney and Melbourne are Australia’s deepest global-city propositions, with major airports, specialist healthcare, culture, universities and broad domestic resale demand. For a foreign buyer, however, the current market is deliberately narrow: established dwellings are generally unavailable through 30 June 2029, subject to limited exceptions. The useful comparison is therefore not every home in two cities. It is the small set of eligible new dwellings whose location, contract, building and total cost survive disciplined review.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "The verdict is comparison-worthy but eligibility-led. Australia’s May 2026 foreign-investment policy says the temporary ban on foreign purchases of established dwellings runs from 1 April 2025 to 30 June 2029, with limited exceptions tied principally to housing supply. Foreign persons generally need approval before acquiring residential land. New dwellings remain the practical route, but a sales label such as ‘brand new’, ‘off the plan’ or ‘nomination sale’ does not prove that the exact buyer and unit qualify. Obtain written Australian foreign-investment advice and approval before signing or paying a non-refundable amount.",
+        "If the route is clear, Sydney offers the stronger harbour setting, international identity and high-value eastern and northern catchments; Melbourne offers a denser tram-and-culture pattern and, in many apartment submarkets, a lower absolute entry point. Both can support excellent long-term daily life. Neither should be treated as a generic retirement visa, effortless short-stay investment or simple two-city price trade. Immigration and Medicare eligibility are separate from title. New-build risk, state foreign-purchaser surcharges, annual owner taxes, strata governance and local rental rules can change the economic result more than a headline city median.",
+        "Proceed in order: establish immigration and healthcare; confirm the buyer and exact dwelling qualify; compare state duty and ongoing tax; test the neighbourhood without a car; investigate the developer, contract, completion protections and owners corporation; then underwrite long-term rent and resale without assuming short-stay income. The right purchase is a legally eligible, completed or completion-secure apartment in a district that works every week—not an interchangeable exposure to an Australian city name."
+    ),
+    lenses_intro="Five questions turn the Sydney-versus-Melbourne idea into a buyer decision: where ordinary life works, how the international journey ends, whether the exact new dwelling qualifies, what remains after full costs, and who can buy on exit.",
+    lenses=(
+        DossierLens("Choose the weekly life, not the skyline", ("lifestyle_magnetism", "retirement_fit"), (
+            "Sydney’s strongest daily-life patterns sit in distinct catchments. The Lower North Shore can combine rail, harbour access and major hospitals; the eastern suburbs combine beaches, culture and specialist care at a high price; inner-west and selected metro-served centres broaden the entry range. Melbourne’s inner south and east offer trams, parks, hospitals and established high streets, while Southbank and Docklands trade immediate city access for larger-building governance and a more vertical routine. Visit the exact neighbourhood on an ordinary weekday, after rain and after dark.",
+            "Retirement fit depends on gradients, heat, lifts, healthcare journeys and social routine. Sydney can be steep and bus- or ferry-dependent outside rail corridors; Melbourne’s tram grid is useful but not every platform or older stop is equally accessible. In any apartment, test step-free access from street to home, backup lift arrangements, cooling, cross-ventilation, noise and the route to groceries and a hospital. These cities score highly for services; an isolated tower, steep harbour address or car-led fringe can still be a poor long-term home."
+        ), "daily-life"),
+        DossierLens("Measure the whole international arrival", ("global_access", "foreigner_fit"), (
+            "Sydney and Melbourne both provide deep international air networks, but the last mile separates addresses. Sydney Airport has rail access to the city and suburban network; Melbourne Airport remains road-led while the airport-rail project develops, making the bus, taxi and congestion plan more important. Gordon, St Kilda East and Docklands illustrate three different patterns: heavy rail to a suburban centre, tram-led inner-city life, and a central waterfront precinct. Time the real trip with luggage and an evening arrival rather than relying on airport distance.",
+            "Australia is administratively accessible in English and both cities have extensive legal, tax, banking and property services. The difficulty is coordination. Federal approval, immigration, tax residency, state duty, land-tax status, contract review, strata records and local rental rules are separate questions. A non-resident should retain an independent Australian property lawyer, tax adviser and building specialist, and arrange reliable local notice handling. A polished developer sales room is not the buyer’s advisory team."
+        )),
+        DossierLens("Clear eligibility, contract and building before price", ("ownership_clarity", "regulatory_safety"), (
+            "The federal restriction is the first gate. Confirm the buyer is a foreign person for the framework, whether an exception applies, and whether the specific apartment is a new or qualifying near-new dwelling. Obtain approval before acquisition when required and read every approval condition, reporting obligation, vacancy rule and disposal consequence. Then calculate state costs separately: New South Wales surcharge purchaser duty and land-tax surcharge and Victoria’s foreign purchaser additional duty and absentee-owner surcharge use their own definitions and can materially change five-year cash outlay.",
+            "A new apartment shifts rather than removes risk. Review the developer and builder, planning approval, sunset and rescission clauses, deposit protection, design changes, defects process, completion standard and settlement timing. For a completed building, inspect waterproofing, façade and cladding, balconies, fire systems, lifts and plant; read strata or owners-corporation budgets, minutes, insurance, defects, litigation, service contracts and forecast levies. The attractive new-dwelling route can concentrate a foreign buyer in stock carrying a developer premium or immature governance record."
+        ), "building-diligence"),
+        DossierLens("Underwrite long-term demand, not a city-pair yield", ("rental_profit", "capital_upside"), (
+            "There is no defensible Sydney/Melbourne net yield. The outcome depends on the eligible unit, purchase premium, duty, state surcharges, land tax, strata levies, management, insurance, vacancy, repairs and the owner’s tax position. Long-term tenant demand is deep in well-connected districts, but gross rent cannot be compared with an established-home price the foreign buyer cannot acquire. Build the model from the exact new dwelling and a signed local management quotation; test it with no rent during settlement delay and initial defects work.",
+            "Short stays are not a safe default. Greater Sydney’s state framework generally caps non-hosted short-term rental accommodation at 180 days a year and requires registration and fire-safety compliance; strata rules can be stricter. Victoria applies a 7.5% levy to covered stays under 28 consecutive days, with platform or direct-booking obligations, and owners-corporation rules still matter. Capital support comes from city economies and domestic demand, but a new-build premium, high levies or poor floor plan can underperform the city."
+        )),
+        DossierLens("Compare the eligible ask with the ordinary exit market", ("value_entry", "exit_liquidity"), (
+            "The current observations range from AUD1.499 million for 92 m² in St Kilda East to AUD3.13 million for 194 m² in Docklands, with a AUD1.9 million, 131 m² Gordon apartment between them. They are new-development asks, not completed valuations. The official Victorian sales series shows how far a premium new apartment can sit above a broad metropolitan unit median; the NSW property-sales map provides address-level completed evidence. Reconcile internal area, balcony, parking and storage before calculating a square-metre comparison.",
+            "Exit liquidity belongs to the ordinary domestic buyer pool, not the restricted foreign-buyer route alone. A conventional, well-connected apartment with manageable levies and a clean defects record can reach downsizers, professionals and investors. A very large tower unit with luxury facilities and high ongoing charges needs a narrower buyer. Ask two agents who did not source the property for completed comparable sales, likely marketing time and the principal resale objection. Model a flat nominal sale after acquisition costs and selling fees; treat appreciation as upside, not rescue."
+        )),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Harbour life distinguishes Sydney; trams, parks and culture distinguish Melbourne. The exact district determines whether the appeal is usable every week.",
+        "global_access": "Both cities have major international airports; Sydney adds airport rail while Melbourne’s airport journey remains more road-dependent.",
+        "ownership_clarity": "Established dwellings are generally unavailable to foreign buyers through 30 June 2029; an eligible new dwelling still requires buyer- and property-specific approval review.",
+        "regulatory_safety": "Federal conditions, state surcharges, strata governance, building defects and local rental rules must all clear independently.",
+        "rental_profit": "Deep tenant demand does not create a city-pair yield after new-build premiums, duty, owner taxes, strata costs and management.",
+        "capital_upside": "Large economies and domestic demand support selected homes, but developer premium, defects and high levies can overwhelm the city trend.",
+        "retirement_fit": "Healthcare and services are exceptional; gradients, airport last mile, lifts, cooling and the weekly car requirement decide the address.",
+        "exit_liquidity": "Domestic resale depth is broad for conventional, well-connected apartments; oversized or high-cost tower stock reaches a narrower pool.",
+        "foreigner_fit": "English-language professional support is deep, while federal approval, state tax, immigration and local property administration remain separate.",
+        "value_entry": "Melbourne often lowers absolute apartment entry, but only matched completed sales and full five-year costs reveal value in either city.",
+    },
+    market_anchors=(
+        {"location": "Gordon / Sydney North Shore", "evidence": "NSW completed property-sales map", "buyer_read": "Use the official address and suburb search to retrieve completed sales around the 131 m² new-development ask. Match building age, area, parking and station access; land values alone do not value a strata unit.", "source_label": "NSW Valuer General property-sales search", "source_url": "https://www.nsw.gov.au/housing-and-construction/land-values-nsw/how-to-find-property-sales-information"},
+        {"location": "St Kilda East / inner Melbourne", "evidence": "Official 2025 suburb unit-sales series", "buyer_read": "Valuer-General Victoria publishes suburb-level completed unit medians. Compare the 92 m² new ask with St Kilda East sales, then adjust for completion, parking, outdoor area and building quality; a suburb median is not a valuation.", "source_label": "Valuer-General Victoria annual property sales", "source_url": "https://www.land.vic.gov.au/valuations/resources-and-reports/property-sales-statistics"},
+        {"location": "Docklands / metropolitan Melbourne", "evidence": "AUD625,000 metro unit median, September 2025 quarter", "buyer_read": "The official broad median shows the scale of the AUD3.13 million Docklands premium rather than a like-for-like value. Demand matched completed tower sales, total owners-corporation cost and a resale assessment.", "source_label": "Valuer-General Victoria September 2025 report", "source_url": "https://www.land.vic.gov.au/valuations/valuations-news/property-sales-statistics-for-september-2025-quarter-now-available"},
+    ),
+    micro_locations_intro="Treat the pair as six practical catchments rather than two uniform markets. These are decision patterns, not price zones; verify the exact council, station or tram route, hospital journey, state taxes, strata plan and hazard overlays.",
+    micro_locations=(
+        {"name": "Sydney CBD / inner east", "best_for": "Global-city intensity", "daily_life": "Rail, culture and premium services", "diligence": "New-build premium, strata and noise"},
+        {"name": "Lower North Shore / Gordon corridor", "best_for": "Rail and healthcare", "daily_life": "Established centres and suburban calm", "diligence": "Exact station walk and comparable sales"},
+        {"name": "Sydney inner west", "best_for": "Neighbourhood life", "daily_life": "Rail, food and denser high streets", "diligence": "Eligible stock, aircraft noise and flood pockets"},
+        {"name": "Melbourne inner east / south", "best_for": "Tram-and-park living", "daily_life": "High streets, hospitals and culture", "diligence": "Owners corporation and construction quality"},
+        {"name": "Southbank / Docklands", "best_for": "Central apartment life", "daily_life": "Walkable core with large-building amenities", "diligence": "Levies, defects, wind and successor demand"},
+        {"name": "Middle-ring rail centres", "best_for": "Lower entry and space", "daily_life": "Town-centre services with CBD access", "diligence": "New-dwelling availability and last mile"},
+    ),
+    checklist=(
+        "Establish the immigration, healthcare and Australian tax-residency plan.",
+        "Obtain written confirmation that the buyer and exact dwelling qualify under the foreign-investment framework.",
+        "Calculate federal fees, ordinary duty, foreign-purchaser surcharge and annual owner taxes for the correct state.",
+        "Review the developer, contract, approvals, completion protections, defects regime and settlement risk.",
+        "Inspect the building and read strata or owners-corporation finances, insurance, minutes and planned works.",
+        "Test weekly services, hospital access, airport journey and step-free movement from the exact address.",
+        "Underwrite long-term rent only after confirming state, council and building rules; add short stays only when proven.",
+        "Obtain matched completed sales and an independent five-year resale view before commitment.",
+    ),
+    references_intro="Legal, tax, market and listing claims were reviewed on 27 August 2026. Recheck immediately if the buyer, visa, property status, contract, state, council, strata plan, intended use or law changes, and before any reservation or exchange. Obtain current Australian foreign-investment, immigration, tax, conveyancing, building and strata advice for the exact buyer and dwelling.",
+    references=(
+        {"label": "Australian Treasury: Australia’s Foreign Investment Policy, May 2026", "url": "https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2026-05/australias-foreign-investment-policy-may-2026.pdf"},
+        {"label": "Australian Treasury: residential land guidance", "url": "https://foreigninvestment.gov.au/sites/foreigninvestment.gov.au/files/2025-12/guidance-note-6-residential-land-v4.pdf"},
+        {"label": "Australian Treasury: residential compliance", "url": "https://foreigninvestment.gov.au/guidance/conditions-and-reporting/residential-compliance"},
+        {"label": "Australian Taxation Office: vacancy-fee return", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-investment-in-australia/vacancy-fee-return-for-foreign-owners"},
+        {"label": "Revenue NSW: surcharge purchaser duty", "url": "https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty/surcharge-purchaser-duty"},
+        {"label": "Revenue NSW: foreign-person ruling", "url": "https://www.revenue.nsw.gov.au/about/legislation-and-rulings/revenue-rulings/rulings/general/g008"},
+        {"label": "NSW Planning: short-term rental accommodation", "url": "https://www.planning.nsw.gov.au/the-planning-system/housing/short-term-rental-accommodation"},
+        {"label": "NSW Valuer General: property-sales information", "url": "https://www.nsw.gov.au/housing-and-construction/land-values-nsw/how-to-find-property-sales-information"},
+        {"label": "Victoria SRO: foreign purchaser additional duty", "url": "https://www.sro.vic.gov.au/about-us/rates-and-statistics/current-rates/foreign-purchaser-additional-duty-current-rates"},
+        {"label": "Victoria SRO: property ownership costs", "url": "https://sro.vic.gov.au/buying-property/costs-buying-and-owning-property"},
+        {"label": "Victoria SRO: short-stay levy", "url": "https://sro.vic.gov.au/owning-property/short-stay-levy/understanding-short-stay-levy"},
+        {"label": "Valuer-General Victoria: property-sales statistics", "url": "https://www.land.vic.gov.au/valuations/resources-and-reports/property-sales-statistics"},
+        {"label": "Reserve Bank of Australia: exchange rates", "url": "https://www.rba.gov.au/statistics/frequency/exchange-rates.html"},
+        {"label": "realestate.com.au: Gordon direct new-development observation", "url": "https://www.realestate.com.au/property-apartment-nsw-gordon-146149416"},
+        {"label": "realestate.com.au: St Kilda East direct new-development observation", "url": "https://www.realestate.com.au/property-apartment-vic-st%2Bkilda%2Beast-148745888"},
+        {"label": "realestate.com.au: Docklands direct new-development observation", "url": "https://www.realestate.com.au/property-apartment-vic-docklands-152124440"},
+    ),
+    images=(
+        DossierImage("harbour-hero", "/assets/sydney-melbourne-hero.webp", "Sydney Harbour ferry passing residential sandstone buildings and the Harbour Bridge", "Sydney’s strongest case combines a global gateway with a real harbour-side daily life.", "premium-image--hero", "hero"),
+        DossierImage("daily-life", "/assets/sydney-melbourne-daily-life.webp", "Tree-lined inner Melbourne street with apartments, cafe, bicycles, park and tram", "Melbourne earns its appeal where trams, parks and daily services meet at the front door.", "premium-image--wide", "access"),
+        DossierImage("building-diligence", "/assets/sydney-melbourne-building-diligence.webp", "Contemporary Australian coastal apartment building after rain with balconies and drainage visible", "Waterproofing, façade condition, shared systems and owners-corporation governance belong in the offer decision.", "premium-image--wide", "diligence"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "What homes cost"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Five questions that decide Sydney or Melbourne",
+    assessment_intro="The Atlas scores the combined city proposition once. Read every score beside the foreign-buyer restriction, state difference and property-level explanation; none is a forecast or valuation.",
+    listings_intro="Three direct new-development asks show the practical foreign-buyer route in Gordon, St Kilda East and Docklands. They are dated asking evidence only; availability, eligibility, title, area, completion, condition, negotiability, charges and completed value remain unverified.",
+    market_anchors_intro="Each record carries an official completed-sales reference. The comparison shows what to request and why it matters; broad medians and land values cannot value a particular new apartment.",
+    orientation_groups=(
+        DossierOrientationGroup("Sydney patterns", (("Sydney Airport / CBD", "international gateway and rail core"), ("Inner east / inner west", "services, coast and neighbourhood life"), ("Lower North Shore / Gordon", "rail, hospitals and suburban centres"))),
+        DossierOrientationGroup("Melbourne patterns", (("Melbourne Airport / CBD", "road-led gateway and central core"), ("Inner east / St Kilda", "trams, parks and high streets"), ("Southbank / Docklands", "waterfront towers and large-building governance"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact airport journey, station or tram route, council, state tax position, strata plan and hazard overlays for the address.",
+    country_guide_url="/countries/australia-property/",
+    country_guide_label="Australia property guide",
+    rail_comparison="Compare Sydney / Melbourne with Perth / Margaret River, the Gold Coast / Sunshine Coast and the full Atlas.",
+    property_anchor_indexes=(0, 1, 2),
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -5275,6 +5389,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     GOLD_COAST_SUNSHINE_COAST_DOSSIER.destination_id: GOLD_COAST_SUNSHINE_COAST_DOSSIER,
     LOS_ANGELES_ORANGE_COUNTY_DOSSIER.destination_id: LOS_ANGELES_ORANGE_COUNTY_DOSSIER,
     VANCOUVER_DOSSIER.destination_id: VANCOUVER_DOSSIER,
+    SYDNEY_MELBOURNE_DOSSIER.destination_id: SYDNEY_MELBOURNE_DOSSIER,
 }
 
 
@@ -5371,3 +5486,4 @@ validate_premium_dossier(INNSBRUCK_TYROL_DOSSIER)
 validate_premium_dossier(JACKSON_HOLE_DOSSIER)
 validate_premium_dossier(TICINO_LAKE_LUGANO_DOSSIER)
 validate_premium_dossier(SWISS_VALAIS_VAUD_ALPS_DOSSIER)
+validate_premium_dossier(SYDNEY_MELBOURNE_DOSSIER)
