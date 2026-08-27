@@ -6,7 +6,9 @@ from copy import deepcopy
 from datetime import date
 import ipaddress
 import re
+import unicodedata
 from urllib.parse import urlsplit
+from urllib.parse import unquote
 
 
 REQUIRED_GUIDE_KEYS = {
@@ -550,7 +552,7 @@ def _validate_source_urls(
         if not isinstance(url, str) or not url.strip():
             raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] must be a nonblank URL string")
         if not _is_valid_source_url(url):
-            raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] must be a valid HTTP(S) URL")
+            raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] must be a valid HTTPS URL")
         if url not in primary_source_urls:
             raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] is not registered in primary_sources")
 
@@ -558,26 +560,36 @@ def _validate_source_urls(
 def _is_valid_source_url(url: object) -> bool:
     if not isinstance(url, str) or not url or url != url.strip() or "\\" in url:
         return False
-    if any(character.isspace() or ord(character) < 32 or ord(character) == 127 for character in url):
+    if any(unicodedata.category(character).startswith("C") or character.isspace() for character in url):
+        return False
+    if any(unicodedata.category(character).startswith("C") for character in unquote(url)):
         return False
     try:
         parsed = urlsplit(url)
         hostname = parsed.hostname
-        port = parsed.port
     except ValueError:
         return False
-    if parsed.scheme not in {"http", "https"} or not parsed.netloc or not hostname or port is None and parsed.netloc.endswith(":"):
+    if (
+        parsed.scheme != "https"
+        or not parsed.netloc
+        or not hostname
+        or parsed.username is not None
+        or parsed.password is not None
+        or ":" in parsed.netloc
+        or parsed.netloc.casefold() != hostname.casefold()
+    ):
         return False
     try:
         ipaddress.ip_address(hostname)
     except ValueError:
-        if (
-            not re.fullmatch(r"[A-Za-z0-9.-]+", hostname)
-            or hostname.startswith(".")
-            or hostname.endswith(".")
-            or ".." in hostname
+        labels = hostname.split(".")
+        if len(hostname) > 253 or any(
+            not re.fullmatch(r"[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?", label)
+            for label in labels
         ):
             return False
+    else:
+        return False
     return True
 
 

@@ -209,42 +209,77 @@ class ForeignBuyerCountryGuideContractTests(unittest.TestCase):
         guide = valid_guide_fixture()
         guide["eligibility_sections"][0]["source_urls"] = [" https://example.gov/source"]
 
-        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTP\(S\) URL$"):
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
     def test_validator_rejects_trailing_whitespace_in_nested_source_url(self) -> None:
         guide = valid_guide_fixture()
         guide["eligibility_sections"][0]["source_urls"] = ["https://example.gov/source "]
 
-        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTP\(S\) URL$"):
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
     def test_validator_rejects_internal_whitespace_in_nested_source_url(self) -> None:
         guide = valid_guide_fixture()
         guide["eligibility_sections"][0]["source_urls"] = ["https://example.gov/has space"]
 
-        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTP\(S\) URL$"):
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
     def test_validator_rejects_backslash_in_nested_source_url(self) -> None:
         guide = valid_guide_fixture()
         guide["eligibility_sections"][0]["source_urls"] = ["https://example.gov\\source"]
 
-        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTP\(S\) URL$"):
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
     def test_validator_rejects_malformed_authority_in_nested_source_url(self) -> None:
         guide = valid_guide_fixture()
         guide["eligibility_sections"][0]["source_urls"] = ["https://[bad"]
 
-        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTP\(S\) URL$"):
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
     def test_validator_rejects_bad_port_in_nested_source_url(self) -> None:
         guide = valid_guide_fixture()
         guide["eligibility_sections"][0]["source_urls"] = ["https://example.gov:bad/source"]
 
-        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTP\(S\) URL$"):
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_http_nested_source_url(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"][0]["source_urls"] = ["http://example.gov/source"]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_bracket_junk_ipv6_nested_source_url(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"][0]["source_urls"] = ["https://[::1]junk/source"]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_leading_hyphen_dns_nested_source_url(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"][0]["source_urls"] = ["https://-example.gov/source"]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_c1_control_nested_source_url(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"][0]["source_urls"] = ["https://example.gov/\x80source"]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_rejects_percent_encoded_control_nested_source_url(self) -> None:
+        guide = valid_guide_fixture()
+        guide["eligibility_sections"][0]["source_urls"] = ["https://example.gov/source%00"]
+
+        with self.assertRaisesRegex(ValueError, "^japan-property: eligibility_sections\[0\]\.source_urls\[0\] must be a valid HTTPS URL$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
     def test_validator_rejects_extra_direct_answer(self) -> None:
