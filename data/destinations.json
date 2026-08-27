@@ -2783,16 +2783,17 @@
     "rank": 27,
     "country": "Austria",
     "category": "Mountain",
-    "overall_score": 3.6,
-    "usd_per_m2": 8600.0,
-    "net_yield_estimate": "2–3.5% est. net",
+    "overall_score": 3.51,
+    "usd_per_m2": 8800.0,
+    "representative_price_usd": 758160.0,
+    "net_yield_estimate": "Asset-specific; no destination-wide net yield",
     "quick_metrics": {
-      "usd_m": "$8,600",
-      "net_yield": "2–3.5% est. net",
+      "usd_m": "$8,800",
+      "net_yield": "Asset-specific; no destination-wide net yield",
       "ownership": "3.5/5",
       "friendly": "3.2/5"
     },
-    "panel_summary": "Innsbruck/Tyrol is excellent for liveability and alpine access, but Austrian second-home and tourist-let restrictions are a serious barrier. The panel would admire it but keep it below cleaner jurisdictions.",
+    "panel_summary": "Innsbruck is an unusually complete Alpine city, but the buyer, municipality and lawful use must be resolved before the home is valued.",
     "pros": [
       "Real alpine city",
       "airport, hospitals, university and services",
@@ -2802,11 +2803,11 @@
     ],
     "cons": [
       "Second-home and leisure-residence restrictions",
-      "low yields",
+      "No verified destination-wide net yield",
       "expensive property",
       "rental permission is asset-specific and often restrictive."
     ],
-    "panel_verdict": "Keep as a lifestyle benchmark, not a leading development candidate unless a legally rentable asset is identified.",
+    "panel_verdict": "Shortlist for a lawful main-residence plan; do not buy on an assumed holiday-use or tourist-rental case.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -2879,18 +2880,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "Austria is restrictive for second homes and holiday rentals, especially in Tyrol. Confirm main-residence, leisure-residence and tourist-rental status before underwriting.",
-    "red_flags": "Foreign/second-home restrictions, low yields, high prices, limited true tourist-let stock.",
+    "ownership_notes": "Austria distinguishes EU/EEA and third-country acquisition pathways, while Tyrol applies property-transfer and Freizeitwohnsitz controls. Confirm the buyer, parcel, municipality, main-residence or leisure-use status and any tourist operation in writing; ownership does not create residence.",
+    "red_flags": "Buyer-specific approval, Freizeitwohnsitz and tourist-use restrictions, high entry price, building costs, Alpine hazards and narrow use-dependent resale.",
     "rental": {
-      "gross_yield": "Yield compressed; tourist-let permits can create a large value split between rentable and non-rentable stock",
-      "net_yield": "2–3.5% est. net",
-      "revenue": "2026 Tyrol references put Innsbruck apartments around €7,000–7,800/m²; Kitzbühel district >€10,000/m².",
-      "adr_occupancy": "High in ski resorts; Innsbruck more residential / Good year-round urban/alpine occupancy",
-      "confidence": "Medium-low"
+      "gross_yield": "Asset-specific; no destination-wide gross yield should be applied",
+      "net_yield": "No destination-wide net yield is supported; model the exact lawful residential or tourist use, owner-use pattern and full operating costs.",
+      "revenue": "Residential and tourist income are different legal and operating cases; obtain dated unit-level evidence only after use is confirmed.",
+      "adr_occupancy": "Tourism and city demand are context, not a candidate-property forecast",
+      "confidence": "Low without unit-level lawful-use, lease and operating evidence"
     },
-    "price_basis": "Built apartment benchmark. Innsbruck 2026 range €7,000–7,800/m²; dashboard uses ~€7,500 × EUR/USD 1.14784 ≈ $8,609/m².",
+    "price_basis": "Rounded median USD/m² across three dated Innsbruck asking observations using seller-stated Wohnfläche and the ECB 2026-08-24 EUR/USD reference rate of 1.1664. The Hötting buyer package includes its separately priced garage. This is not a market-wide median, completed value or valuation; official Statistics Austria categories are shown separately.",
     "price_confidence": "Medium",
-    "profit_driver": "Real city with airport, university, hospitals and alpine access; strong retirement/liveability case."
+    "profit_driver": "Year-round city utility, hospital access and rail support personal use; property-level lawful-use, cost and resale evidence remains required."
   },
   {
     "id": "lake-tahoe",
