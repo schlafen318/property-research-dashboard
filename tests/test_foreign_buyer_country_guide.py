@@ -55,6 +55,17 @@ def valid_guide_fixture() -> dict:
                 "Eventual sale and transfer-out costs",
             )
         ],
+        "acquisition_example": {
+            "heading": "Worked acquisition example",
+            "intro": "Illustrative example.",
+            "rows": [
+                {"label": label, "amount": "¥1", "note": "Assumption"}
+                for label in ("Purchase price", "Brokerage", "Registration tax", "Acquisition tax")
+            ],
+            "total": "¥50,000,000 plus quoted costs",
+            "caveat": "Not a quote.",
+            "source_urls": ["https://example.gov/source"],
+        },
         "ownership_rules": [
             {"heading": label, "body": "Body", "source_urls": ["https://example.gov/source"]}
             for label in (
@@ -65,9 +76,17 @@ def valid_guide_fixture() -> dict:
             )
         ],
         "destination_reads": {
-            destination_id: {"best_for": "Best", "verify_first": "Verify"}
+            destination_id: {
+                "best_for": "Best",
+                "verify_first": "Verify",
+                "asking_price_context": "Observed range",
+            }
             for destination_id in ("fukuoka-itoshima", "hakone-izu", "hakuba", "niseko")
         },
+        "engagement_links": [
+            {"label": "Calculate retirement capital", "href": "/retirement-abroad-calculator/"},
+            {"label": "View retirement cost rankings", "href": "/retirement-destinations-ranked-by-cost/"},
+        ],
         "buyer_checklist": ["Check"],
         "faqs": [
             {"question": f"Question {index}", "answer": "Answer", "source_urls": ["https://example.gov/source"]}
@@ -142,6 +161,68 @@ class ForeignBuyerCountryGuideContractTests(unittest.TestCase):
         guide["cost_rows"] = guide["cost_rows"][:3]
 
         with self.assertRaisesRegex(ValueError, "^japan-property: cost_rows requires at least four rows$"):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_requires_a_complete_quantified_acquisition_example(self) -> None:
+        guide = valid_guide_fixture()
+        guide["acquisition_example"].pop("total")
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: acquisition_example missing total$",
+        ):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+        guide = valid_guide_fixture()
+        guide["acquisition_example"]["heading"] = " "
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: acquisition_example.heading must be nonblank$",
+        ):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+        guide = valid_guide_fixture()
+        guide["acquisition_example"]["rows"] = guide["acquisition_example"]["rows"][:1]
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: acquisition_example.rows requires at least four items$",
+        ):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_requires_price_context_for_every_destination(self) -> None:
+        guide = valid_guide_fixture()
+        guide["destination_reads"]["niseko"].pop("asking_price_context")
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: destination_reads.niseko requires asking_price_context$",
+        ):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+        guide = valid_guide_fixture()
+        guide["destination_reads"]["niseko"]["asking_price_context"] = " "
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: destination_reads.niseko requires asking_price_context$",
+        ):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+    def test_validator_requires_exactly_two_internal_engagement_links(self) -> None:
+        guide = valid_guide_fixture()
+        guide["engagement_links"] = guide["engagement_links"][:1]
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: engagement_links requires exactly two links$",
+        ):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+        guide = valid_guide_fixture()
+        guide["engagement_links"][0]["href"] = "/unrelated-page/"
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: engagement_links must link to the calculator and rankings$",
+        ):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
     def test_validator_rejects_fewer_than_three_faqs(self) -> None:
@@ -596,7 +677,6 @@ class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
             "Buyer Fit",
             "Recommended Premium Brief",
             "Review my shortlist",
-            "Estimate your retirement capital",
             "Representative property",
             "Asking price",
         ):
@@ -623,6 +703,41 @@ class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
         self.assertLessEqual(len(description), 160)
         self.assertIn("foreigners", description.lower())
         self.assertNotIn("retirement property", description.lower())
+        social_image = "https://globalhomeatlas.com/assets/fukuoka-itoshima-coast.webp"
+        social_alt = "Fukuoka and Itoshima coastline in Japan"
+        self.assertIn(f'<meta property="og:image" content="{social_image}">', self.japan)
+        self.assertIn(f'<meta property="og:image:alt" content="{social_alt}">', self.japan)
+        self.assertIn(f'<meta name="twitter:image" content="{social_image}">', self.japan)
+        self.assertIn(f'<meta name="twitter:image:alt" content="{social_alt}">', self.japan)
+
+    def test_cost_section_includes_a_quantified_worked_example(self) -> None:
+        section = self.japan.split('<section id="costs-financing">', 1)[1].split(
+            "</section>", 1
+        )[0]
+        self.assertIn('class="foreign-buyer-acquisition-example"', section)
+        self.assertIn("¥50,000,000", section)
+        self.assertIn("¥1,716,000", section)
+        self.assertIn("About ¥53.4 million", section)
+        self.assertIn("illustrative", section.lower())
+
+    def test_destination_comparison_adds_dated_asking_price_context(self) -> None:
+        section = self.japan.split('<section id="destinations">', 1)[1].split(
+            "</section>", 1
+        )[0]
+        for observed_range in (
+            "¥31.8m–¥180m",
+            "¥12.3m–¥79.9m",
+            "¥77m–¥152.46m",
+            "¥65m–¥264.44m",
+        ):
+            self.assertIn(observed_range, section)
+        self.assertIn("asking observations, not valuations", section.lower())
+
+    def test_destination_section_links_once_to_each_reader_tool(self) -> None:
+        self.assertEqual(1, self.japan.count('href="/retirement-abroad-calculator/?destination=fukuoka-itoshima&amp;plan=own"'))
+        self.assertEqual(1, self.japan.count('href="/retirement-destinations-ranked-by-cost/"'))
+        self.assertIn("Calculate retirement capital", self.japan)
+        self.assertIn("View retirement cost rankings", self.japan)
 
     def test_visible_faq_and_destination_rows_match_acquisition_schema(self) -> None:
         schema_text = re.search(

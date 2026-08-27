@@ -24,14 +24,20 @@ REQUIRED_GUIDE_KEYS = {
     "eligibility_sections",
     "purchase_steps",
     "cost_rows",
+    "acquisition_example",
     "ownership_rules",
     "destination_reads",
+    "engagement_links",
     "buyer_checklist",
     "faqs",
     "primary_sources",
     "retirement_guide_slug",
 }
 REQUIRED_DIRECT_ANSWERS = {"ownership", "residency", "financing", "short_rentals"}
+REQUIRED_ENGAGEMENT_PATHS = {
+    "/retirement-abroad-calculator/",
+    "/retirement-destinations-ranked-by-cost/",
+}
 REQUIRED_COST_COVERAGE = {
     "acquisition": ("acquisition", "registration tax"),
     "recurring ownership": ("annual", "ownership", "holding", "management", "repair"),
@@ -243,6 +249,23 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
                 ],
             },
         ],
+        "acquisition_example": {
+            "heading": "Worked acquisition example",
+            "intro": "Illustrative cash purchase of a ¥50 million resale apartment. The example assumes fixed-asset assessments of ¥15 million for land and ¥20 million for the building, no mortgage and no tax relief.",
+            "rows": [
+                {"label": "Purchase price", "amount": "¥50,000,000", "note": "Contract price"},
+                {"label": "Brokerage ceiling", "amount": "¥1,716,000", "note": "3% + ¥60,000, then 10% consumption tax"},
+                {"label": "Registration and licence tax", "amount": "¥625,000", "note": "1.5% of assumed land assessment plus 2% of assumed building assessment"},
+                {"label": "Real-estate acquisition tax", "amount": "¥1,050,000", "note": "3% of both assumed assessments before any relief"},
+            ],
+            "total": "About ¥53.4 million before legal, registration-professional, inspection, insurance, remittance and settlement-adjustment quotes.",
+            "caveat": "This is an illustrative stress case, not a closing quote. Actual tax uses the official assessment, transaction facts, applicable relief and rates in force at completion.",
+            "source_urls": [
+                "https://www.mlit.go.jp/sumai_literacy_pf/knowledge02/0005/",
+                "https://www.nta.go.jp/publication/pamph/koho/kurashi/html/05_1.htm",
+                "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000072.html",
+            ],
+        },
         "ownership_rules": [
             {
                 "heading": "Keep the owner record current",
@@ -279,20 +302,34 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
             "fukuoka-itoshima": {
                 "best_for": "Year-round city life with coastal access and broad domestic demand",
                 "verify_first": "Rail or car dependence, building condition, flood exposure, management and resale depth",
+                "asking_price_context": "¥31.8m–¥180m · 3 asking observations · 21 Aug 2026",
             },
             "hakone-izu": {
                 "best_for": "Personal use near Tokyo, onsen life and repeat weekend stays",
                 "verify_first": "Slope, seismic condition, renovation scope, access, permitted use and thin comparable evidence",
+                "asking_price_context": "¥12.3m–¥79.9m · 3 asking observations · 22 Aug 2026",
             },
             "hakuba": {
                 "best_for": "Active alpine use with a lower entry point than Niseko",
                 "verify_first": "Snow load, winter access, staffing, building condition, operating permissions and exit depth",
+                "asking_price_context": "¥77m–¥152.46m · 3 asking observations · 22 Aug 2026",
             },
             "niseko": {
                 "best_for": "Premium international resort use for buyers comfortable with high carrying costs",
                 "verify_first": "Service charges, operator contract, construction quality, owner-use limits and resale depth",
+                "asking_price_context": "¥65m–¥264.44m · 3 asking observations · 22 Aug 2026",
             },
         },
+        "engagement_links": [
+            {
+                "label": "Calculate retirement capital",
+                "href": "/retirement-abroad-calculator/?destination=fukuoka-itoshima&plan=own",
+            },
+            {
+                "label": "View retirement cost rankings",
+                "href": "/retirement-destinations-ranked-by-cost/",
+            },
+        ],
         "buyer_checklist": [
             "Match the contract buyer name to the passport, overseas address evidence accepted by the Legal Affairs Bureau, Japanese translations, bank remittance record, and registration application.",
             "Confirm whether the home can legally support personal use, long-term tenancy, or minpaku against zoning, municipal ordinances, condominium bylaws, leases, and operator agreements.",
@@ -421,6 +458,14 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
                 "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000072.html",
             },
             {
+                "label": "MLIT — home-purchase cost and brokerage guidance",
+                "url": "https://www.mlit.go.jp/sumai_literacy_pf/knowledge02/0005/",
+            },
+            {
+                "label": "National Tax Agency — registration and licence tax rates for a home purchase",
+                "url": "https://www.nta.go.jp/publication/pamph/koho/kurashi/html/05_1.htm",
+            },
+            {
                 "label": "MLIT — taxes on holding land",
                 "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000073.html",
             },
@@ -486,6 +531,9 @@ def validate_foreign_buyer_country_guide(
     _validate_sourced_items(country_hub_slug, "purchase_steps", guide["purchase_steps"], primary_source_urls)
     _validate_sourced_items(country_hub_slug, "ownership_rules", guide["ownership_rules"], primary_source_urls)
     _validate_sourced_items(country_hub_slug, "cost_rows", guide["cost_rows"], primary_source_urls)
+    _validate_acquisition_example(
+        country_hub_slug, guide["acquisition_example"], primary_source_urls
+    )
     _validate_sourced_items(country_hub_slug, "faqs", guide["faqs"], primary_source_urls)
     for field in ("eligibility_sections", "ownership_rules", "buyer_checklist"):
         if not isinstance(guide[field], list) or not guide[field]:
@@ -499,6 +547,17 @@ def validate_foreign_buyer_country_guide(
         )
     if set(guide["destination_reads"]) != set(expected_destination_ids):
         raise ValueError(f"{country_hub_slug}: destination_reads must match destination_ids")
+    for destination_id, destination_read in guide["destination_reads"].items():
+        price_context = (
+            destination_read.get("asking_price_context")
+            if isinstance(destination_read, dict)
+            else None
+        )
+        if not isinstance(price_context, str) or not price_context.strip():
+            raise ValueError(
+                f"{country_hub_slug}: destination_reads.{destination_id} requires asking_price_context"
+            )
+    _validate_engagement_links(country_hub_slug, guide["engagement_links"])
     if len(guide["purchase_steps"]) < 5:
         raise ValueError(f"{country_hub_slug}: purchase_steps requires at least five steps")
     if len(guide["cost_rows"]) < 4:
@@ -514,6 +573,72 @@ def validate_foreign_buyer_country_guide(
         raise ValueError(f"{country_hub_slug}: faqs requires at least three questions")
     if not guide["primary_sources"]:
         raise ValueError(f"{country_hub_slug}: primary_sources is required")
+
+
+def _validate_acquisition_example(
+    country_hub_slug: str,
+    example: dict,
+    primary_source_urls: set[str],
+) -> None:
+    required = {"heading", "intro", "rows", "total", "caveat", "source_urls"}
+    if not isinstance(example, dict):
+        raise ValueError(f"{country_hub_slug}: acquisition_example must be an object")
+    missing = sorted(required - set(example))
+    if missing:
+        raise ValueError(
+            f"{country_hub_slug}: acquisition_example missing {', '.join(missing)}"
+        )
+    for field in ("heading", "intro", "total", "caveat"):
+        if not isinstance(example[field], str) or not example[field].strip():
+            raise ValueError(
+                f"{country_hub_slug}: acquisition_example.{field} must be nonblank"
+            )
+    if not isinstance(example["rows"], list) or len(example["rows"]) < 4:
+        raise ValueError(
+            f"{country_hub_slug}: acquisition_example.rows requires at least four items"
+        )
+    for index, row in enumerate(example["rows"]):
+        if not isinstance(row, dict) or set(row) != {"label", "amount", "note"}:
+            raise ValueError(
+                f"{country_hub_slug}: acquisition_example.rows[{index}] requires label, amount and note"
+            )
+        if any(not isinstance(row[key], str) or not row[key].strip() for key in row):
+            raise ValueError(
+                f"{country_hub_slug}: acquisition_example.rows[{index}] values must be nonblank"
+            )
+    _validate_source_urls(
+        country_hub_slug,
+        "acquisition_example",
+        example["source_urls"],
+        primary_source_urls,
+    )
+
+
+def _validate_engagement_links(country_hub_slug: str, links: list[dict]) -> None:
+    if not isinstance(links, list) or len(links) != 2:
+        raise ValueError(
+            f"{country_hub_slug}: engagement_links requires exactly two links"
+        )
+    paths: set[str] = set()
+    for index, link in enumerate(links):
+        if not isinstance(link, dict) or set(link) != {"label", "href"}:
+            raise ValueError(
+                f"{country_hub_slug}: engagement_links[{index}] requires label and href"
+            )
+        if not isinstance(link["label"], str) or not link["label"].strip():
+            raise ValueError(
+                f"{country_hub_slug}: engagement_links[{index}] requires a nonblank label"
+            )
+        href = link["href"]
+        if not isinstance(href, str) or not href.startswith("/") or href.startswith("//"):
+            raise ValueError(
+                f"{country_hub_slug}: engagement_links[{index}] requires an internal href"
+            )
+        paths.add(urlsplit(href).path)
+    if paths != REQUIRED_ENGAGEMENT_PATHS:
+        raise ValueError(
+            f"{country_hub_slug}: engagement_links must link to the calculator and rankings"
+        )
 
 
 def _validate_primary_sources(country_hub_slug: str, primary_sources: list[dict]) -> set[str]:

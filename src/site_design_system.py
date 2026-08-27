@@ -299,6 +299,17 @@ def foreign_buyer_country_guide_css() -> str:
     .foreign-buyer-cost-table th[scope="row"], .foreign-buyer-destination-table th[scope="row"] { font-weight: 600; }
     .foreign-buyer-mobile-label { display: none; }
     .foreign-buyer-destination-cards { display: none; }
+    .foreign-buyer-acquisition-example { margin-top: 34px; padding: 26px 28px; border: 1px solid var(--foreign-buyer-rule); }
+    .foreign-buyer-acquisition-example h3 { margin-top: 0; }
+    .foreign-buyer-acquisition-example dl { margin: 22px 0 18px; }
+    .foreign-buyer-acquisition-example dl > div { display: grid; grid-template-columns: minmax(0, 1fr) minmax(190px, .9fr); gap: 24px; padding: 12px 0; border-top: 1px solid var(--foreign-buyer-rule); }
+    .foreign-buyer-acquisition-example dt { font-weight: 600; }
+    .foreign-buyer-acquisition-example dd { margin: 0; }
+    .foreign-buyer-acquisition-example dd strong, .foreign-buyer-acquisition-example dd span { display: block; }
+    .foreign-buyer-acquisition-example dd span, .foreign-buyer-acquisition-caveat, .foreign-buyer-price-note { color: var(--foreign-buyer-muted); font-size: 13px; }
+    .foreign-buyer-acquisition-total { padding-top: 16px; border-top: 1px solid var(--foreign-buyer-ink); }
+    .foreign-buyer-reader-tools { display: flex; flex-wrap: wrap; gap: 8px 28px; margin-top: 18px; }
+    .foreign-buyer-reader-tools a { min-height: 44px; display: inline-flex; align-items: center; font-weight: 600; }
     .foreign-buyer-checklist { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--foreign-buyer-rule); }
     .foreign-buyer-checklist li { max-width: none; padding: 15px 0 15px 28px; border-bottom: 1px solid var(--foreign-buyer-rule); position: relative; }
     .foreign-buyer-checklist li::before { position: absolute; left: 1px; color: var(--foreign-buyer-accent); content: "✓"; }
@@ -363,6 +374,10 @@ def foreign_buyer_country_guide_css() -> str:
       .foreign-buyer-destination-cards h3 { margin: 0 0 10px; font-family: var(--foreign-buyer-serif); font-size: 25px; font-weight: 500; }
       .foreign-buyer-destination-cards h3 a { min-height: 44px; display: inline-flex; align-items: center; }
       .foreign-buyer-destination-cards p { margin: 0 0 8px; }
+      .foreign-buyer-acquisition-example { padding: 22px 20px; }
+      .foreign-buyer-acquisition-example dl > div { grid-template-columns: 1fr; gap: 4px; }
+      .foreign-buyer-reader-tools { display: grid; gap: 0; }
+      .foreign-buyer-reader-tools a { border-top: 1px solid var(--foreign-buyer-rule); }
       .foreign-buyer-country-guide .gha-footer__grid, .foreign-buyer-country-guide .gha-footer nav { grid-template-columns: 1fr; }
       .foreign-buyer-country-guide .gha-footer__grid { gap: 32px; }
     }

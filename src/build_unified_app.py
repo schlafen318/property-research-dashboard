@@ -1702,7 +1702,31 @@ def analytics_event_script() -> str:
 """
 
 
-def head_html(title: str, description: str, canonical: str, schema: list[dict]) -> str:
+def head_html(
+    title: str,
+    description: str,
+    canonical: str,
+    schema: list[dict],
+    social_image: str | None = None,
+    social_image_alt: str | None = None,
+) -> str:
+    social_image_tags = []
+    if social_image:
+        social_image_tags.append(
+            f'<meta property="og:image" content="{escape(social_image)}">'
+        )
+        if social_image_alt:
+            social_image_tags.append(
+                f'<meta property="og:image:alt" content="{escape(social_image_alt)}">'
+            )
+        social_image_tags.append(
+            f'<meta name="twitter:image" content="{escape(social_image)}">'
+        )
+        if social_image_alt:
+            social_image_tags.append(
+                f'<meta name="twitter:image:alt" content="{escape(social_image_alt)}">'
+            )
+    social_image_meta = "\n".join(f"  {tag}" for tag in social_image_tags)
     return f"""
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -1715,6 +1739,7 @@ def head_html(title: str, description: str, canonical: str, schema: list[dict]) 
   <meta property="og:title" content="{escape(title)}">
   <meta property="og:description" content="{escape(description)}">
   <meta property="og:url" content="{escape(canonical)}">
+{social_image_meta.rstrip()}
   <meta name="twitter:card" content="summary_large_image">
 {analytics_head_tags()}
   <script type="application/ld+json">{json_ld(schema)}</script>
@@ -6548,6 +6573,21 @@ def foreign_buyer_cost_table_html(guide: dict) -> str:
     )
 
 
+def foreign_buyer_acquisition_example_html(guide: dict) -> str:
+    example = guide["acquisition_example"]
+    rows = "".join(
+        f'<div><dt>{escape(row["label"])}</dt><dd><strong>{escape(row["amount"])}</strong>'
+        f'<span>{escape(row["note"])}</span></dd></div>'
+        for row in example["rows"]
+    )
+    return (
+        '<aside class="foreign-buyer-acquisition-example">'
+        f'<h3>{escape(example["heading"])}</h3><p>{escape(example["intro"])}</p>'
+        f'<dl>{rows}</dl><p class="foreign-buyer-acquisition-total"><strong>{escape(example["total"])}</strong></p>'
+        f'<p class="foreign-buyer-acquisition-caveat">{escape(example["caveat"])}</p></aside>'
+    )
+
+
 def foreign_buyer_rules_html(guide: dict) -> str:
     return "".join(
         f'<section><h3>{escape(rule["heading"])}</h3><p>{escape(rule["body"])}</p></section>'
@@ -6567,19 +6607,32 @@ def foreign_buyer_destination_comparison_html(
         name = escape(destination["name"])
         rows.append(
             f'<tr><th scope="row"><a href="{href}">{name}</a></th>'
+            f'<td>{escape(read["asking_price_context"])}</td>'
             f'<td>{escape(read["best_for"])}</td><td>{escape(read["verify_first"])}</td></tr>'
         )
         cards.append(
             f'<article><h3><a href="{href}">{name}</a></h3>'
+            f'<p><strong>Asking-price context:</strong> {escape(read["asking_price_context"])}</p>'
             f'<p><strong>Best for:</strong> {escape(read["best_for"])}</p>'
             f'<p><strong>Verify first:</strong> {escape(read["verify_first"])}</p></article>'
         )
     table = (
         '<table class="foreign-buyer-destination-table"><thead><tr>'
-        '<th scope="col">Destination</th><th scope="col">Best for</th>'
+        '<th scope="col">Destination</th><th scope="col">Asking-price context</th><th scope="col">Best for</th>'
         f'<th scope="col">Verify first</th></tr></thead><tbody>{"".join(rows)}</tbody></table>'
     )
     return table, f'<div class="foreign-buyer-destination-cards">{"".join(cards)}</div>'
+
+
+def foreign_buyer_engagement_links_html(guide: dict) -> str:
+    links = "".join(
+        f'<a href="{escape(item["href"])}">{escape(item["label"])}</a>'
+        for item in guide["engagement_links"]
+    )
+    return (
+        '<p class="foreign-buyer-price-note">These are dated asking observations, not valuations or market averages.</p>'
+        f'<nav class="foreign-buyer-reader-tools" aria-label="Continue your research">{links}</nav>'
+    )
 
 
 def foreign_buyer_faq_html(guide: dict) -> str:
@@ -6630,7 +6683,7 @@ def build_foreign_buyer_country_guide_page(
     return f"""<!doctype html>
 <html lang="en">
 <head>
-{head_html(guide["title"], guide["description"], canonical, schema_for_foreign_buyer_country_guide(guide, selected, canonical))}
+{head_html(guide["title"], guide["description"], canonical, schema_for_foreign_buyer_country_guide(guide, selected, canonical), f'{SITE_URL.rstrip("/")}{guide["hero_image"]["src"]}', guide["hero_image"]["alt"])}
 <style>{foreign_buyer_country_guide_css()}</style>
 </head>
 <body class="foreign-buyer-country-guide">
@@ -6649,9 +6702,9 @@ def build_foreign_buyer_country_guide_page(
   <article class="foreign-buyer-article">
     <section id="ownership-answer"><h2>Can foreigners buy property in Japan?</h2>{eligibility_html}</section>
     <section id="purchase-process"><h2>How the purchase works</h2><ol class="foreign-buyer-steps">{foreign_buyer_purchase_steps_html(guide)}</ol></section>
-    <section id="costs-financing"><h2>Costs and financing</h2>{foreign_buyer_cost_table_html(guide)}</section>
+    <section id="costs-financing"><h2>Costs and financing</h2>{foreign_buyer_cost_table_html(guide)}{foreign_buyer_acquisition_example_html(guide)}</section>
     <section id="after-purchase"><h2>Rules after purchase</h2>{foreign_buyer_rules_html(guide)}</section>
-    <section id="destinations"><h2>Where to buy</h2>{destination_table}{destination_cards}</section>
+    <section id="destinations"><h2>Where to buy</h2>{destination_table}{destination_cards}{foreign_buyer_engagement_links_html(guide)}</section>
     <section id="buyer-checklist"><h2>Before making an offer</h2><ul class="foreign-buyer-checklist">{checklist}</ul></section>
     <section id="faq"><h2>Frequently asked questions</h2>{foreign_buyer_faq_html(guide)}</section>
     <section id="sources"><h2>References and update policy</h2><p>Rules can change. Recheck every linked source and obtain current professional advice before signing.</p><ul>{foreign_buyer_sources_html(guide)}</ul></section>
