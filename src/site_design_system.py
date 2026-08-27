@@ -142,10 +142,12 @@ def landing_design_css() -> str:
     .gha-mode-landing .recommendation-card { border: 0; border-radius: 0; background: transparent; }
     .gha-mode-landing .recommendation-card__visual { position: relative; height: clamp(210px, 19vw, 265px); display: block; overflow: hidden; background: #e8ede7; }
     .gha-mode-landing .recommendation-card__image { width: 100%; height: 100%; display: block; object-fit: cover; filter: saturate(.72) contrast(.94) brightness(.97) sepia(.06); }
-    .gha-mode-landing .recommendation-card__body { padding: 18px 0 0; }
+    .gha-mode-landing .recommendation-card__body { display: grid; align-content: start; gap: 8px; padding: 18px 0 0; }
     .gha-mode-landing .recommendation-card span, .gha-mode-landing .recommendation-card dt { color: var(--gha-accent); font-weight: 500; }
     .gha-mode-landing .recommendation-card h3 { font-family: var(--gha-display-serif); font-size: 28px; font-weight: 500; }
-    .gha-mode-landing .recommendation-card strong { font-weight: 500; }
+    .gha-mode-landing .recommendation-card strong { display: block; margin-top: 6px; font-size: 22px; font-weight: 500; }
+    .gha-mode-landing .recommendation-card em { display: block; color: #47534e; font-size: 14px; font-style: normal; line-height: 1.5; }
+    .gha-mode-landing .recommendation-card .card-link { display: inline-flex; align-items: center; min-height: 44px; margin-top: 4px; }
     .gha-mode-landing .more-markets { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--gha-rule); font-size: 13px; }
 
     .gha-mode-landing .explore-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0; }
@@ -154,6 +156,7 @@ def landing_design_css() -> str:
     .gha-mode-landing .explore-column ul { display: grid; gap: 10px; margin: 0; padding: 0; list-style: none; }
     .gha-mode-landing .explore-column h3 { font-family: var(--gha-display-serif); font-size: 25px; font-weight: 500; }
     .gha-mode-landing .explore-column a, .gha-mode-landing .explore-column .explore-all, .gha-mode-landing .explore-more summary { font-weight: 500; }
+    .gha-mode-landing .explore-more summary { min-height: 44px; display: inline-flex; align-items: center; cursor: pointer; }
     .gha-mode-landing .method-compact { display: flex; align-items: end; justify-content: space-between; gap: 32px; }
     .gha-mode-landing .method-compact a { flex: none; font-weight: 500; }
     .gha-mode-landing .cta-band { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 24px; align-items: center; margin: 64px 0 80px; padding: 42px; border-radius: 0; background: var(--gha-ink); color: var(--gha-paper); }

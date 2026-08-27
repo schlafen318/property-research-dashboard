@@ -73,6 +73,12 @@ class LandingDesignSystemPilotTests(unittest.TestCase):
             with self.subTest(marker=marker):
                 self.assertIn(marker, self.html)
 
+    def test_disclosures_and_recommendations_remain_scannable_and_tappable(self) -> None:
+        self.assertIn('.gha-mode-landing .explore-more summary { min-height: 44px; display: inline-flex; align-items: center; cursor: pointer;', self.html)
+        self.assertIn('.gha-mode-landing .recommendation-card__body { display: grid; align-content: start; gap: 8px;', self.html)
+        self.assertIn('.gha-mode-landing .recommendation-card em { display: block;', self.html)
+        self.assertIn('.gha-mode-landing .recommendation-card .card-link { display: inline-flex; align-items: center; min-height: 44px;', self.html)
+
 
 if __name__ == "__main__":
     unittest.main()
