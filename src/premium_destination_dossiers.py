@@ -4209,6 +4209,131 @@ ANDERMATT_DOSSIER = PremiumDossierSpec(
 )
 
 
+JACKSON_HOLE_DOSSIER = PremiumDossierSpec(
+    destination_id="jackson-hole",
+    title="Jackson Hole Property Dossier for Foreign Buyers",
+    description="Assess Jackson Hole property through lawful use, residence, healthcare, access, hazards, ownership costs, current listings, county market evidence and resale.",
+    h1="Jackson Hole: buy the legal use, not the mountain myth",
+    lede=(
+        "Jackson Hole combines a working Wyoming town, a small regional health system and direct access to the Tetons with one of America’s most expensive housing markets. The landscape is the easy part to understand. The hard decision is whether the exact parcel supports the intended use, winter access, insurance, utilities and exit buyer—and whether the household can live in the United States independently of the deed. Jackson town, Wilson and The Aspens, Teton Village, and Hoback are not interchangeable retirement propositions."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "Jackson Hole can work as a long-term mountain base for a high-capital household that already has a durable United States residence pathway, can arrange health coverage, and values personal use more than yield. Jackson town offers the clearest daily-life case because St. John’s Health, groceries, restaurants and START transit sit in the same valley hub. Wilson and The Aspens add Westbank access and a quieter rhythm; Teton Village is a resort proposition; Hoback and the southern valley trade price and space against driving, private utilities and winter dependence. The best asset is the one whose ordinary Tuesday works without resort assumptions.",
+        "Look elsewhere if the purchase is expected to create immigration status, if specialist healthcare must be close, or if the budget depends on short-term rent, easy non-resident financing or low carrying costs. A tourist admission is temporary: the State Department says the Visa Waiver Program allows visits of 90 days or less and that visitor status does not permit permanent residence. Marketplace health coverage and Medicare follow separate immigration and eligibility rules. A title deed solves none of those systems. Wyoming also now requires reporting and possible investigation of conveyances near critical-infrastructure zones, so a foreign buyer and entity should receive current state and federal screening advice rather than rely on a generic claim that Wyoming is unrestricted.",
+        "Proceed in a fixed order. Confirm residence, tax, estate-planning and health-cover arrangements. Identify the exact municipal or county jurisdiction, zoning, short-term-rental position, HOA rules and intended occupancy. Then test wildfire, flood, snow load, water, septic, road and insurance exposure before comparing the asking price with completed county evidence and a realistic resale pool. Jackson Hole deserves its premium only when the household can carry the home without rent or appreciation and the property’s lawful use, operating burden and exit remain clear in writing."
+    ),
+    lenses_intro="Five questions turn Jackson Hole from a landscape preference into a property decision: whether life works all year, whether every journey remains tolerable, whether the exact use is lawful and insurable, whether the financial case survives without resort optimism, and who can buy the home later.",
+    lenses=(
+        DossierLens("Choose valley life before choosing the view", ("lifestyle_magnetism", "retirement_fit"), (
+            "Jackson town is the destination’s most complete retirement base. St. John’s Health describes itself as the only health system in Jackson Hole, with a 48-bed acute-care hospital, emergency medicine and a 56-bed long-term-care facility. That is meaningful local infrastructure, but it is not the same as metropolitan specialist depth. A household with complex cardiology, oncology or neurological needs should map the actual referral path and winter journey. Test the walk or drive from the candidate home to groceries, a pharmacy, the hospital and social life in January, not only in a bright summer viewing week.",
+            "Wilson, The Aspens and Teton Village create three different western-valley lives. Wilson has a small community centre and access toward Teton Pass; The Aspens is a planned residential and visitor area with HOA governance; Teton Village is built around the resort and seasonal guests. Each can be attractive, but ordinary services often require a vehicle and traffic can concentrate on WY-22. A buyer who expects ski access to substitute for community may discover that restaurants, staffing and transport vary by season. Spend time before and after lifts operate, check evening services, and ask what remains convenient when one household member cannot drive.",
+            "South Park, Rafter J and Hoback can provide more conventional homes and a stronger sense of local valley life, yet distance, road conditions and private systems matter. The Town of Jackson sits at 6,237 feet and reports average annual snowfall of 71 inches; individual sites can differ. A detached house may add snow removal, irrigation, well or private-water responsibilities, septic maintenance and wildfire-edge work. Retirement fit is therefore less about access to spectacular recreation than the ability to keep the home, body and daily routines functioning through smoke, ice, heavy snow and a long shoulder season."
+        )),
+        DossierLens("Underwrite the last mile in every season", ("global_access", "foreigner_fit"), (
+            "Jackson Hole Airport is a rare commercial gateway inside Grand Teton National Park and publishes a 2026 flight schedule, but the network is domestic and seasonal. A direct summer or winter route should not be treated as year-round infrastructure. Compare three complete journeys: a scheduled nonstop, a connection through a major hub, and a diversion or cancellation scenario. Airport access north of town can also meet wildlife traffic and winter conditions. A household that travels internationally often should price luggage, connections, recovery nights and the absence of a large nearby alternate airport rather than quote drive time from a map.",
+            "The westward route crosses Teton Pass on WY-22, the essential link to Victor and Driggs in Idaho. WYDOT provides live pass conditions because snow, incidents and closures are part of normal planning. Wilson and The Aspens sit before the climb from Jackson, while Idaho housing depends on crossing it for many valley services and jobs. Even within Teton County, congestion can turn a short distance into a long routine. Drive the school and work peaks, the airport trip and the hospital route; ask who clears the private road and whether emergency access, guest parking and snow storage remain adequate after a major storm.",
+            "Foreigner fit is administratively familiar but not automatic. English-language title, tax and professional services are available, yet a non-resident may face limited lending, U.S. tax filings, FIRPTA withholding on a future sale and estate-tax exposure. The IRS says disposition by a foreign person is generally subject to withholding at 15% of the amount realized, subject to exceptions and withholding certificates. An ITIN may be needed for federal tax administration. Use independent U.S. legal and tax advice to choose the buyer and ownership structure; do not let a broker, visa adviser or Wyoming entity filing collapse separate residence, tax and estate decisions into one sales story."
+        ), "town-access"),
+        DossierLens("Prove the address can support the plan", ("ownership_clarity", "regulatory_safety"), (
+            "The first legal split is jurisdiction. The Town of Jackson defines short-term rental as fewer than 30 consecutive days, while its page separately places leases of 31 days or more outside the short-rental rules; confirm the treatment of any proposed 30-day stay. The town’s lodging-overlay route requires approvals, and a property outside the overlay may use the limited route for no more than 60 rental nights in a calendar year, subject to current permit, business-licence and other requirements. In unincorporated Teton County, rentals under 31 days are prohibited except in named approved developments and resort areas. The Aspens and Teton Village appear in the county’s approved geography, but that does not prove a particular unit, HOA or operator qualifies.",
+            "Obtain the current deed, survey, title commitment, easements, zoning confirmation, permits, certificate of occupancy, HOA declaration, rules, budgets, reserves, minutes, insurance and rental history. Confirm whether a guest unit or accessory residential unit carries occupancy or lease-duration restrictions. Seller statements such as ‘short-term rentals allowed’ are leads for diligence, not transferable licences. For a condo, identify the master-policy deductible, reserve projects and responsibility for windows, decks and water damage. For a house, reconcile boundaries, road maintenance, water rights or service, septic records, additions and defensible-space obligations before any contingency expires.",
+            "Hazards are parcel and building questions. Teton County says the whole county is within the Wildland Urban Interface and directs buyers to GIS for floodplain information; its current regional hazard plan covers wildfire and other natural threats. Snow load, roof shedding, frozen pipes, ice dams, drainage, wildfire smoke, evacuation access and power interruption can change insurability and cost. The Natural Resources Overlay effective in 2025 adds tiered review before some physical development or new use. Overlay the latest county and town maps, commission the appropriate inspections, obtain a written insurance quotation, and ask what risk mitigation the HOA or owner must complete."
+        ), "winter-diligence"),
+        DossierLens("Treat rental as a permitted operation, not an amenity", ("rental_profit", "capital_upside"), (
+            "Jackson Hole has strong visitor demand, but no destination-wide net yield is supported here. Legal geography, owner use, HOA rules, seasonality, management, staffing and capital value differ too widely. Build the case from the exact address. Confirm the short-term-rental route in writing, then model achievable nightly or monthly rent, legal occupancy, vacancy, management, booking fees, cleaning, utilities, snow removal, maintenance, insurance, tax and furniture replacement. Run the same property as a 31-day-plus or long-term rental and as a zero-rent personal home. If only the most optimistic nightly-rate case justifies the price, the property is not a resilient retirement purchase.",
+            "County housing evidence is valuable precisely because it separates ordinary segments from trophy headlines. The adopted Housing Supply Plan reports 272 free-market residential sales in 2024. Single-family homes had a median sale price of $3,143,600; condos excluding hotel units had a $1,150,000 median; townhomes had a $1,627,500 median. These are broad county categories, not appraisals of a Hoback house, an Aspens home or a Teton Village condo. They show the entry scale and completed-market spread, while the direct asking examples show what was available on one capture date.",
+            "Capital upside is conditional on scarcity, utility and the next buyer’s willingness to carry the asset. Conservation geography, construction limits and high-income demand can support selected property, but workforce constraints, insurance costs, use restrictions and a thin high-price pool can work in the opposite direction. The county assessor values property annually using prior-year sales in a non-disclosure state, which makes matched evidence and local interpretation important. Ask for completed sales of the same property type, legal-use class and micro-location. Do not turn a famous brand, Wyoming tax narrative or mountain view into a forecast."
+        )),
+        DossierLens("Pay for repeatable utility and preserve the exit", ("value_entry", "exit_liquidity"), (
+            "The three current asks illustrate different buyer jobs. A 1,188-square-foot Hoback-area house is a relatively low-entry direct-home example but adds driving and private-system questions. A 684-square-foot Teton Village condo offers resort access and a seller-stated rental proposition, with material annual HOA dues and a small living-area denominator. A 2,400-square-foot home in The Aspens adds space, public utilities and a location on the county’s approved short-rental list, yet carries a much larger HOA bill and still requires unit-level verification. Asking price per square metre is useful only after those differences are made visible.",
+            "Acquisition cost is more than the contract price. Obtain a buyer-specific statement covering inspection, survey, title insurance, escrow, legal and entity work, financing, recording, insurance and any HOA transfer or working-capital charge. Annual cost includes property tax, HOA dues, utilities, snow and landscape work, repairs, insurance, management and reserves for roof, mechanical and exterior replacement. Teton County explains that residential property is assessed at 9.5% of fair market value before the mill levy is applied. Verify the current assessment, tax bill and any owner-occupancy treatment rather than extrapolating from a listing estimate.",
+            "Exit liquidity depends on price band and clarity. A modest, well-maintained home with conventional use and manageable cost can reach a broader regional pool than a singular estate. A Teton Village or Aspens unit may reach resort buyers, but HOA fees, rental rules, assessments and building condition can narrow demand. A remote house with private utilities or winter access issues needs an especially clear discount and maintenance record. Before signing, ask two agents who did not source the home how they would resell it, which completed sales support the range, who the likely buyer is and what diligence issue most often breaks a Jackson Hole transaction."
+        )),
+    ),
+    score_reads={
+        "lifestyle_magnetism":"Jackson combines a working valley town with exceptional recreation; Teton Village and remote addresses are more seasonal and car-dependent.",
+        "global_access":"Jackson Hole Airport is close but domestic and seasonal, while Teton Pass and winter disruption make the last mile a real planning variable.",
+        "ownership_clarity":"Conventional U.S. title is familiar, but foreign-buyer tax, entity and critical-infrastructure screening should be confirmed for the exact buyer and parcel.",
+        "regulatory_safety":"Town and county rental geography, HOA rules, wildfire, flood, snow load and natural-resource overlays make lawful use and insurability address-specific.",
+        "rental_profit":"No destination-wide net yield is supported; permitted use, HOA cost, management and seasonality can overwhelm strong visitor demand.",
+        "capital_upside":"Scarcity and affluent demand support selected assets, while high entry cost, insurance and a thin luxury pool prevent a general appreciation claim.",
+        "retirement_fit":"Jackson town offers the valley’s hospital and services, but specialist depth, winter mobility and remote-home maintenance remain material constraints.",
+        "exit_liquidity":"Clear conventional homes reach a broader pool; trophy price, private systems, high HOA dues and unresolved rental claims narrow resale.",
+        "foreigner_fit":"English-language systems help, while residence, healthcare, financing, FIRPTA and estate planning remain independent of property ownership.",
+        "value_entry":"Current asks span a small resort condo, a practical Hoback home and an Aspens house; fees and legal use matter more than a blended headline price."
+    },
+    market_anchors=(
+        {"location":"Teton County free-market single-family homes","evidence":"$3,143,600 median sale price in 2024","buyer_read":"Official countywide completed-sale context for 156 single-family transactions. It is not matched to the Hoback example and does not adjust for location, land, condition or private systems.","source_label":"Teton County 2025 Housing Supply Plan","source_url":"https://tetoncountywy.gov/DocumentCenter/View/36565/HSP-2025---ADOPTED-formatted-for-web?bidId="},
+        {"location":"Teton County free-market condos, excluding hotel units","evidence":"$1,150,000 median sale price in 2024","buyer_read":"Official completed-sale context within 116 combined condo and townhome sales. It is broader than Teton Village and does not value the example unit, HOA or rental status.","source_label":"Teton County 2025 Housing Supply Plan","source_url":"https://tetoncountywy.gov/DocumentCenter/View/36565/HSP-2025---ADOPTED-formatted-for-web?bidId="},
+        {"location":"Teton County free-market single-family homes","evidence":"$5,104,729 average sale price in 2024","buyer_read":"Official countywide completed-sale context for 156 single-family transactions. It is compatible by broad property type with the Aspens house but does not adjust for its exact location, HOA, condition or lawful use.","source_label":"Teton County 2025 Housing Supply Plan","source_url":"https://tetoncountywy.gov/DocumentCenter/View/36565/HSP-2025---ADOPTED-formatted-for-web?bidId="},
+    ),
+    micro_locations_intro="The valley is one market name but several operating systems. Choose the daily journey, legal-use geography, utility pattern and exit pool before comparing finishes or views.",
+    micro_locations=(
+        {"name":"Jackson town core","best_for":"Most complete year-round daily life","daily_life":"Hospital, groceries, dining and transit closest together","diligence":"Town zoning, lodging overlay, traffic, noise and building governance"},
+        {"name":"Wilson / The Aspens","best_for":"Westbank access and a quieter residential rhythm","daily_life":"Vehicle-led with services around Wilson and WY-22","diligence":"HOA rules, wetlands or wildlife, Teton Pass traffic and exact rental eligibility"},
+        {"name":"Teton Village","best_for":"Managed resort and lift access","daily_life":"Seasonal visitor economy with Jackson trips for broader services","diligence":"Resort zoning, HOA cost, assessments, lawful rental and unit condition"},
+        {"name":"South Park / Rafter J / Hoback","best_for":"Practical homes and local valley life","daily_life":"Car-dependent southern corridor","diligence":"Roads, snow, wildfire, water or septic, commute and resale depth"},
+    ),
+    checklist=(
+        "Confirm the U.S. residence, tax, estate-planning and health-cover plan independently of the deed.",
+        "Identify town or county jurisdiction, zoning, intended occupancy and the exact lawful rental route in writing.",
+        "Screen the buyer, entity and parcel under current Wyoming critical-infrastructure and federal foreign-investment rules.",
+        "Review title, survey, easements, permits, HOA documents, reserves, insurance, utilities and road obligations.",
+        "Overlay current wildfire, flood, natural-resource and snow-load information and obtain an address-specific insurance quotation.",
+        "Reconcile interior living area, condition, seller claims, HOA dues and every recurring cost for each candidate.",
+        "Compare the ask with matched completed sales and model five-year ownership without rent or appreciation.",
+        "Obtain an independent resale view that identifies the likely buyer pool, marketing period and principal deal risk.",
+    ),
+    references_intro="Legal, administrative and market claims were reviewed on 27 August 2026. Recheck before reservation or exchange and whenever the buyer, entity, parcel, intended use, HOA, listing status, insurance or law changes. The next scheduled editorial review is 27 February 2027. Obtain current U.S., Wyoming, Teton County and Town of Jackson legal, tax, immigration, planning and insurance advice for the exact buyer and property.",
+    references=(
+        {"label":"Town of Jackson: short-term rentals","url":"https://www.jacksonwy.gov/335/Short-Term-Rentals"},
+        {"label":"Teton County: planning and short-term-rental FAQ","url":"https://www.tetoncountywy.gov/2037/Planning-FAQs"},
+        {"label":"Teton County: short-term-rental restrictions","url":"https://www.tetoncountywy.gov/653/Short-Term-Rental-Violations"},
+        {"label":"Teton County: adopted 2025 Housing Supply Plan","url":"https://tetoncountywy.gov/DocumentCenter/View/36565/HSP-2025---ADOPTED-formatted-for-web?bidId="},
+        {"label":"Teton County Assessor","url":"https://www.tetoncountywy.gov/185/Assessor"},
+        {"label":"Teton County property tax","url":"https://www.tetoncountywy.gov/435/Property-Tax"},
+        {"label":"Wyoming 2025 session laws: critical-infrastructure conveyances","url":"https://wyoleg.gov/2025/SessionLaws.pdf"},
+        {"label":"Wyoming 2001 repeal of alien land-conveyance prohibitions","url":"https://wyoleg.gov/2001/enroll/sf0067.htm"},
+        {"label":"IRS: FIRPTA withholding","url":"https://www.irs.gov/individuals/international-taxpayers/firpta-withholding"},
+        {"label":"IRS: ITIN guidance for foreign property buyers and sellers","url":"https://www.irs.gov/individuals/international-taxpayers/itin-guidance-for-foreign-property-buyers-sellers"},
+        {"label":"IRS: estate-tax FAQ for nonresident noncitizens","url":"https://www.irs.gov/businesses/small-businesses-self-employed/frequently-asked-questions-on-estate-taxes-for-nonresidents-not-citizens-of-the-united-states"},
+        {"label":"U.S. State Department: visitor visa","url":"https://travel.state.gov/content/travel/en/us-visas/tourism-visit/visitor.html"},
+        {"label":"U.S. State Department: Visa Waiver Program","url":"https://travel.state.gov/content/travel/en/us-visas/tourism-visit/visa-waiver-program.html"},
+        {"label":"HealthCare.gov: coverage for lawfully present immigrants","url":"https://www.healthcare.gov/immigrants/lawfully-present-immigrants/"},
+        {"label":"Medicare: getting started","url":"https://www.medicare.gov/basics/get-started-with-medicare"},
+        {"label":"St. John’s Health: local health system","url":"https://www.stjohns.health/about/"},
+        {"label":"Jackson Hole Airport: current flight schedule","url":"https://www.jacksonholeairport.com/travelers/flightschedule/"},
+        {"label":"Town of Jackson: START Bus maps and 2026 schedules","url":"https://www.jacksonwy.gov/404/Maps-Schedules"},
+        {"label":"Town of Jackson: elevation and climate","url":"https://www.jacksonwy.gov/214/Location"},
+        {"label":"WYDOT: Teton Pass conditions","url":"https://webcams.wyoroad.info/highway/webcameras/view?site=WYO22TetonPass"},
+        {"label":"Teton County: building, wildfire, flood and snow FAQ","url":"https://www.tetoncountywy.gov/faq.aspx?TID=25"},
+        {"label":"Teton County: 2025–2030 Region 8 Hazard Mitigation Plan","url":"https://www.tetoncountywy.gov/DocumentCenter/View/14355/Wyoming-Region-8-Hazard-Mitigation-Plan"},
+    ),
+    images=(
+        DossierImage("valley-hero","/assets/jackson-hole-valley-hero.webp","Jackson town and valley beneath the Teton Range","Jackson Hole’s strongest proposition is a working valley beneath the mountains.","hero","defining-place"),
+        DossierImage("town-access","/assets/jackson-hole-town-access.webp","Jackson Wyoming town street with ordinary services and the Tetons beyond","Daily access to services matters more than postcard distance.","wide","built-environment-access"),
+        DossierImage("winter-diligence","/assets/jackson-hole-winter-diligence.webp","Jackson Hole homes beside a cleared winter road and snow-covered wildland edge","Snow, wildfire exposure and road access belong in the purchase decision.","wide","decision-texture"),
+    ),
+    nav_items=(("verdict","Verdict"),("lenses","Five destination lenses"),("scores","Atlas assessment"),("listings","What homes cost"),("locations","Where to look"),("checklist","Buyer checklist"),("sources","References")),
+    lenses_heading="Jackson Hole through five destination lenses",
+    assessment_intro="Here’s how Jackson Hole scores on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three dated direct asks show distinct buyer cases: a Hoback-area house, a Teton Village condo and an Aspens home. They are asking-price evidence only; availability, title, condition, negotiability, fees, legal use and completed value remain unverified.",
+    market_anchors_intro="Teton County’s adopted Housing Supply Plan provides 2024 completed-sale median and average values by broad free-market housing type. Each comparison states why that countywide evidence cannot value the example property.",
+    orientation_groups=(
+        DossierOrientationGroup("Valley spine",(("Jackson Hole Airport","Seasonal commercial gateway north of town"),("Jackson town","Hospital and year-round services"),("South Park / Rafter J","Residential southern valley"),("Hoback","More remote road-led living"))),
+        DossierOrientationGroup("West connector",(("Jackson town","WY-22 starting point"),("Wilson / The Aspens","Westbank services and housing"),("Teton Village","Resort base"),("Teton Pass","Weather-sensitive Idaho connection"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact jurisdiction, winter journey, hospital access, road duty, utility pattern, lawful use and hazard layers for the address.",
+    country_guide_url="/countries/united-states-property/",
+    country_guide_label="United States property guide",
+    rail_comparison="Compare Jackson Hole with the full Atlas.",
+    property_anchor_indexes=(0,1,2),
+)
+
+
 INNSBRUCK_TYROL_DOSSIER = PremiumDossierSpec(
     destination_id="innsbruck-tyrol",
     title="Innsbruck and Tyrol Property Dossier for Foreign Buyers",
@@ -4361,6 +4486,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     WHISTLER_DOSSIER.destination_id: WHISTLER_DOSSIER,
     ANDERMATT_DOSSIER.destination_id: ANDERMATT_DOSSIER,
     INNSBRUCK_TYROL_DOSSIER.destination_id: INNSBRUCK_TYROL_DOSSIER,
+    JACKSON_HOLE_DOSSIER.destination_id: JACKSON_HOLE_DOSSIER,
 }
 
 
@@ -4454,3 +4580,4 @@ validate_premium_dossier(BALI_DOSSIER)
 validate_premium_dossier(DOLOMITES_SOUTH_TYROL_DOSSIER)
 validate_premium_dossier(CHAMONIX_DOSSIER)
 validate_premium_dossier(INNSBRUCK_TYROL_DOSSIER)
+validate_premium_dossier(JACKSON_HOLE_DOSSIER)
