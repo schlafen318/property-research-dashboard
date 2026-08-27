@@ -25,7 +25,6 @@ class LandingDesignSystemPilotTests(unittest.TestCase):
     def test_reader_facing_chrome_uses_regular_or_medium_weight(self) -> None:
         required_rules = (
             '.gha-primary-links a { font-weight: 500;',
-            '.gha-eyebrow { font-weight: 500;',
             '.gha-mode-landing .primary-action { font-weight: 500;',
             '.gha-footer { font-weight: 400;',
         )
@@ -67,7 +66,6 @@ class LandingDesignSystemPilotTests(unittest.TestCase):
             'id="finderResults"',
             'id="finderDetailed"',
             'data-track="homepage_start_click"',
-            'data-track="shortlist_review_click"',
             'window.GHA.track("market_finder_change"',
         ):
             with self.subTest(marker=marker):
@@ -79,19 +77,23 @@ class LandingDesignSystemPilotTests(unittest.TestCase):
         self.assertIn('.gha-mode-landing .recommendation-card em { display: block;', self.html)
         self.assertIn('.gha-mode-landing .recommendation-card .card-link { display: inline-flex; align-items: center; min-height: 44px;', self.html)
 
-    def test_hero_copy_aligns_to_the_site_grid_with_a_readable_eyebrow(self) -> None:
+    def test_hero_copy_aligns_to_the_site_grid_without_a_redundant_eyebrow(self) -> None:
         self.assertIn(
             '.gha-mode-landing .hero-grid { width: min(790px, calc(100% - 48px)); max-width: none; margin: 0 auto 0 max(24px, calc((100% - 1220px) / 2));',
-            self.html,
-        )
-        self.assertIn(
-            '.gha-mode-landing .eyebrow { margin: 0 0 20px; color: var(--gha-accent); font-size: 13px;',
             self.html,
         )
         self.assertIn(
             '.gha-mode-landing .hero-grid { width: min(790px, calc(100% - 32px)); margin-left: 16px;',
             self.html,
         )
+        self.assertNotIn('Independent overseas property research', self.html)
+        self.assertNotIn('.gha-eyebrow', self.html)
+
+    def test_landing_omits_the_redundant_shortlist_conversion_band(self) -> None:
+        self.assertNotIn('id="conversion"', self.html)
+        self.assertNotIn('Want help narrowing your shortlist?', self.html)
+        self.assertNotIn('data-track="shortlist_review_click"', self.html)
+        self.assertNotIn('.gha-mode-landing .cta-band', self.html)
 
 
 if __name__ == "__main__":

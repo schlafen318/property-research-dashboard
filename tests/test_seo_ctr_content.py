@@ -192,7 +192,6 @@ class SeoCtrContentTests(unittest.TestCase):
             'id="recommendations"',
             'id="explore"',
             'id="method"',
-            'id="conversion"',
         ]
         positions = [html.find(section_id) for section_id in section_ids]
 
@@ -204,7 +203,7 @@ class SeoCtrContentTests(unittest.TestCase):
         self.assertNotIn('id="mid-conversion"', html)
         self.assertNotIn('id="countries"', html)
         self.assertNotIn('id="guides"', html)
-        self.assertEqual(html.count('href="/shortlist-review/"'), 1)
+        self.assertEqual(html.count('href="/shortlist-review/"'), 0)
         self.assertIn("Explore the research", html)
         self.assertIn("By buying goal", html)
         self.assertIn("By country", html)

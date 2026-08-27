@@ -139,9 +139,6 @@ def main() -> int:
         failures.append(("events", f"missing {event}"))
     if 'id="custom-shortlist-form"' not in contact:
         failures.append(("contact", "missing custom shortlist form"))
-    if 'id="conversion"' not in homepage:
-        failures.append(("homepage", "missing conversion section"))
-
     print(f"sitemap_urls={len(urls)}")
     print(f"tracking_pages={tracking_pages}")
     print(f"expected_events={len(EXPECTED_EVENTS)}")

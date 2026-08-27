@@ -3946,7 +3946,6 @@ def build_landing_page(
   <section class="hero" id="top" aria-labelledby="landing-title">
     <div class="shell hero-grid">
       <div>
-        <p class="eyebrow gha-eyebrow">Independent overseas property research</p>
         <h1 id="landing-title">Global Home Atlas</h1>
         <p class="lede">{escape(content["generated_intro"])}</p>
         {generated_link}
@@ -4028,14 +4027,6 @@ def build_landing_page(
           </div>
           <a href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>
         </div>
-      </section>
-
-      <section class="cta-band" id="conversion">
-        <div>
-          <h2>Want help narrowing your shortlist?</h2>
-          <p>Tell us what you need and we’ll review the destinations on your list.</p>
-        </div>
-        <a class="primary-action" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="landing cta">Review my shortlist</a>
       </section>
     </div>
   </main>
