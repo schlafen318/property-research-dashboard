@@ -2184,48 +2184,176 @@ def destination_by_id(destinations: list[dict], destination_id: str) -> dict | N
 def build_landing_buyer_paths() -> str:
     paths = [
         (
-            "Retirement or lifestyle base",
-            "Find destinations where healthcare, daily ease, culture, and resale depth matter more than headline yield.",
+            "Buy property abroad for retirement",
+            "Compare healthcare practicality, daily life, ownership rules and resale depth before choosing a long-term base.",
             "/best-places-to-buy-property-abroad-for-retirement/",
-            "Retirement",
-            "01",
-            "#8f6f3d",
         ),
         (
-            "Second home abroad",
-            "Compare places that can support regular owner use, family visits, and sensible rental offset.",
+            "Buy a second or vacation home abroad",
+            "Compare access, repeat owner use, carrying costs, rental restrictions and future buyer demand.",
             "/best-places-to-buy-a-second-home-abroad/",
-            "Second homes",
-            "02",
-            "#5f7f72",
         ),
         (
-            "Investment-led shortlist",
-            "Start with yield realism, entry value, regulatory safety, and exit liquidity before falling in love with the place.",
+            "Compare overseas property investments",
+            "Start with realistic net income, entry value, regulatory safety and exit liquidity.",
             "/overseas-property-investment/",
-            "Investment",
-            "03",
-            "#365f6d",
         ),
         (
-            "Destinations with clearer ownership",
-            "Prioritize title clarity, foreigner fit, and governance where cross-border ownership can be explained simply.",
+            "Find countries where foreigners can buy",
+            "Compare legal access, title practicality and the local checks required before making an offer.",
             "/where-can-foreigners-buy-property/",
-            "Ownership",
-            "04",
-            "#7b5f80",
         ),
     ]
     return "\n".join(
         f"""
-        <a class="path-card" href="{href}" data-track="buyer_path_click" data-track-label="{escape(label)}" style="--path-accent: {escape(accent)};">
-          <span><b>{escape(icon)}</b>{escape(kicker)}</span>
-          <strong>{escape(label)}</strong>
+        <article class="intent-item">
+          <h3><a href="{href}" data-track="buyer_path_click" data-track-label="{escape(label)}">{escape(label)}</a></h3>
           <p>{escape(copy)}</p>
-          <em>Open path</em>
-        </a>
+        </article>
         """.rstrip()
-        for label, copy, href, kicker, icon, accent in paths
+        for label, copy, href in paths
+    )
+
+
+def landing_coverage_counts(
+    destinations: list[dict], listings: list[dict], countries: int
+) -> tuple[int, int, int]:
+    country_count = countries or len(
+        {dest.get("country") for dest in destinations if dest.get("country")}
+    )
+    return len(destinations), country_count, len(listings)
+
+
+def build_landing_atlas_tools(
+    destinations: list[dict], listings: list[dict], countries: int
+) -> str:
+    destination_count, country_count, listing_count = landing_coverage_counts(
+        destinations, listings, countries
+    )
+    tools = [
+        (
+            "Global destination rankings",
+            f"Compare {destination_count} destinations across the same ten weighted decision dimensions.",
+            f"Explore rankings across {country_count} countries",
+            "/dashboard/#destinations",
+            "dashboard_open",
+        ),
+        (
+            "Retirement capital rankings",
+            "See how annual spending and required retirement capital change by destination.",
+            "Compare retirement costs",
+            f"/{RETIREMENT_DESTINATIONS_SLUG}/",
+            "retirement_ranking_open",
+        ),
+        (
+            "Retirement-abroad calculator",
+            f"Model your own plan, then compare it with {listing_count} representative property listings.",
+            "Calculate what you need",
+            f"/{RETIREMENT_CALCULATOR_SLUG}/",
+            "retirement_calculator_open",
+        ),
+    ]
+    return "\n".join(
+        f"""
+        <article class="atlas-tool">
+          <h3>{escape(title)}</h3>
+          <p>{escape(copy)}</p>
+          <a class="atlas-tool__link" href="{escape(href)}" data-track="{escape(track)}" data-track-label="landing atlas tools">{escape(link_label)}</a>
+        </article>
+        """.rstrip()
+        for title, copy, link_label, href, track in tools
+    )
+
+
+def build_landing_priority_research(pages: list[dict]) -> str:
+    priority_slugs = [
+        "best-places-to-buy-a-second-home-abroad",
+        "best-places-to-buy-vacation-home-abroad",
+        "best-countries-for-expats-to-buy-property",
+        "where-can-foreigners-buy-property",
+        "best-places-to-buy-property-abroad-for-retirement",
+        "best-countries-to-buy-property-as-a-foreigner",
+    ]
+    page_by_slug = {page["slug"]: page for page in pages}
+    return "\n".join(
+        f"""
+        <article class="research-link">
+          <h3><a href="/{escape(page['slug'])}/" data-track="guide_click" data-track-label="landing priority {escape(page['h1'])}">{escape(page['h1'])}</a></h3>
+          <p>{escape(page.get('description') or '')}</p>
+        </article>
+        """.rstrip()
+        for slug in priority_slugs
+        if (page := page_by_slug.get(slug))
+    )
+
+
+def featured_landing_destinations(destinations: list[dict], limit: int = 8) -> list[dict]:
+    ranked = sorted(
+        destinations,
+        key=lambda dest: (-float(dest.get("decision_score") or 0), dest.get("name") or ""),
+    )
+    selected: list[dict] = []
+    seen_countries: set[str] = set()
+    for dest in ranked:
+        country = dest.get("country") or ""
+        if country and country in seen_countries:
+            continue
+        selected.append(dest)
+        if country:
+            seen_countries.add(country)
+        if len(selected) == limit:
+            return selected
+    for dest in ranked:
+        if dest not in selected:
+            selected.append(dest)
+        if len(selected) == limit:
+            break
+    return selected
+
+
+def build_landing_browse_links(
+    destinations: list[dict], listings: list[dict], countries: int
+) -> str:
+    destination_count, country_count, _ = landing_coverage_counts(
+        destinations, listings, countries
+    )
+    country_links = "".join(
+        f'<li><a href="/{escape(country_path(hub))}/" data-track="country_hub_click" data-track-label="landing browse {escape(hub["country"])}">{escape(hub["country"])} property guide</a></li>'
+        for hub in sorted(COUNTRY_HUBS, key=lambda item: item["country"])
+    )
+    destination_links = "".join(
+        f'<li><a href="/destinations/{escape(destination_slug(dest))}/" data-track="destination_click" data-track-label="landing browse {escape(dest.get("name") or "")}">{escape(dest.get("name") or "")} property dossier</a></li>'
+        for dest in featured_landing_destinations(destinations)
+    )
+    return f"""
+      <div class="browse-column">
+        <h3>Country property guides</h3>
+        <ul>{country_links}</ul>
+        <a class="browse-all" href="/country-comparison/" data-track="country_compare_click" data-track-label="landing browse all countries">Compare all {country_count} countries</a>
+      </div>
+      <div class="browse-column">
+        <h3>Destination dossiers</h3>
+        <ul>{destination_links}</ul>
+        <a class="browse-all" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="landing browse all destinations">Explore all {destination_count} destination rankings</a>
+      </div>
+    """.strip()
+
+
+def build_landing_latest_research(pages: list[dict], limit: int = 3) -> str:
+    dated_pages = sorted(
+        (page for page in pages if page.get("date_published")),
+        key=lambda page: (page["date_published"], page.get("h1") or ""),
+        reverse=True,
+    )[:limit]
+    return "\n".join(
+        f"""
+        <article class="latest-item">
+          <time datetime="{escape(page['date_published'])}">Published {escape(page['date_published'])}</time>
+          <h3><a href="/{escape(page['slug'])}/" data-track="guide_click" data-track-label="landing latest {escape(page['h1'])}">{escape(page['h1'])}</a></h3>
+          <p>{escape(page.get('description') or '')}</p>
+        </article>
+        """.rstrip()
+        for page in dated_pages
     )
 
 
@@ -3668,11 +3796,19 @@ def build_landing_page(
     content_overrides: list[dict] | None = None,
 ) -> str:
     generated = date.today().isoformat()
+    destination_count, country_count, listing_count = landing_coverage_counts(
+        destinations, listings, countries
+    )
+    coverage_intro = (
+        f"Compare {destination_count} destinations across {country_count} countries using foreign ownership, retirement fit, realistic costs, rental rules, resale potential, and {listing_count} representative listings."
+        if destination_count and country_count
+        else "Compare overseas property destinations using foreign ownership, retirement fit, realistic costs, rental rules, resale potential, and representative listings."
+    )
     content = apply_content_override(
         {
-            "title": "Best Places to Buy Property Abroad | Global Property Markets",
-            "description": "Compare the best places to buy property abroad, including global property markets for buying property abroad, vacation homes, second homes, retirement, budget, and exit plan.",
-            "generated_intro": "Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan.",
+            "title": "Compare Property Abroad for Retirement & Second Homes | Global Home Atlas",
+            "description": coverage_intro,
+            "generated_intro": coverage_intro,
         },
         SITE_URL,
         content_overrides or [],
@@ -3946,17 +4082,13 @@ def build_landing_page(
   <section class="hero" id="top" aria-labelledby="landing-title">
     <div class="shell hero-grid">
       <div>
-        <h1 id="landing-title">Global Home Atlas</h1>
+        <h1 id="landing-title">Find the right place to buy property abroad</h1>
         <p class="lede">{escape(content["generated_intro"])}</p>
         {generated_link}
         <div class="hero-actions">
-          <a class="primary-action" href="/{FIND_YOUR_FIT_SLUG}/" data-track="homepage_start_click" data-track-label="hero">Find my best-fit destinations</a>
-          <nav class="hero-secondary-actions" aria-label="Explore Global Home Atlas">
-            <a class="text-action" href="/guides/#country-selection" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
-            <a class="text-action" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="hero">Calculate retirement needs</a>
-            <a class="text-action" href="/{RETIREMENT_FINDER_SLUG}/">Find affordable retirement destinations</a>
-            <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
-          </nav>
+          <a class="primary-action" href="/dashboard/#destinations" data-track="homepage_start_click" data-track-label="hero rankings">Explore the rankings</a>
+          <a class="secondary-action" href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="hero calculator">Calculate retirement needs</a>
+          <a class="text-action" href="/{RETIREMENT_DESTINATIONS_SLUG}/" data-track="retirement_ranking_open" data-track-label="hero retirement ranking">See retirement destinations ranked by required capital</a>
         </div>
       </div>
     </div>
@@ -3964,6 +4096,31 @@ def build_landing_page(
 
   <main>
     <div class="shell">
+      <section class="section" id="atlas-tools">
+        <div class="section-header">
+          <div>
+            <h2>Atlas tools</h2>
+            <p>Start with the rankings, then use the calculator to test the plan against your own resources.</p>
+          </div>
+        </div>
+        <div class="atlas-tool-grid">
+          {build_landing_atlas_tools(destinations, listings, countries)}
+        </div>
+        <p class="atlas-support">Prefer to start with a target budget? <a href="/{RETIREMENT_FINDER_SLUG}/" data-track="retirement_finder_open" data-track-label="landing atlas tools">Find affordable retirement destinations</a>.</p>
+      </section>
+
+      <section class="section" id="intent-paths">
+        <div class="section-header">
+          <div>
+            <h2>Choose your buying path</h2>
+            <p>Start with the question the property needs to answer.</p>
+          </div>
+        </div>
+        <div class="intent-grid">
+          {build_landing_buyer_paths()}
+        </div>
+      </section>
+
       <section class="section section--finder" id="market-finder">
         <div class="finder-map-cue" aria-hidden="true"></div>
         <div class="section-header">
@@ -3993,39 +4150,53 @@ def build_landing_page(
         </div>
       </section>
 
-      <section class="section" id="recommendations">
+      <section class="section" id="priority-research">
         <div class="section-header">
           <div>
-            <h2>Three destinations to start with</h2>
-            <p>Well-rounded options for buyers who are still deciding where to look.</p>
+            <h2>Priority property research</h2>
+            <p>Core guides for the questions international buyers search before choosing a market.</p>
           </div>
-          <a href="/dashboard/" data-track="dashboard_open" data-track-label="recommendations">Compare all destinations</a>
         </div>
-        <div class="recommendation-grid">
-          {build_landing_recommendations(destinations)}
+        <div class="research-grid">
+          {build_landing_priority_research(pages)}
         </div>
-        {build_landing_more_market_links(destinations)}
       </section>
 
-      <section class="section" id="explore">
+      <section class="section" id="browse-atlas">
         <div class="section-header">
           <div>
-            <h2>Explore the research</h2>
-            <p>Browse by what you want to buy, where you want to look or what you need to learn.</p>
+            <h2>Browse the Atlas</h2>
+            <p>Country guides and destination dossiers expand automatically as the research universe grows.</p>
           </div>
         </div>
-        <div class="explore-grid">
-          {build_landing_explore_links(pages)}
+        <div class="browse-grid">
+          {build_landing_browse_links(destinations, listings, countries)}
+        </div>
+      </section>
+
+      <section class="section" id="latest-research">
+        <div class="section-header">
+          <div>
+            <h2>Latest research</h2>
+            <p>The newest country and buyer guides in the Atlas.</p>
+          </div>
+        </div>
+        <div class="latest-grid">
+          {build_landing_latest_research(pages)}
         </div>
       </section>
 
       <section class="section" id="method">
         <div class="method-compact">
           <div>
-            <h2>How we compare destinations</h2>
-            <p>We look at ownership rules, realistic returns, daily life and resale potential.</p>
+            <h2>Research built for real buying decisions</h2>
+            <p class="coverage-line">{destination_count} destinations · {country_count} countries · {listing_count} representative listings · {len(DIMENSIONS)} assessment dimensions</p>
+            <p>We compare ownership rules, retirement fit, realistic costs, rental restrictions and resale potential before property-specific local diligence.</p>
           </div>
-          <a href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>
+          <nav class="method-links" aria-label="Research methodology">
+            <a href="/methodology/" data-track="methodology_click" data-track-label="landing methodology">Scoring methodology</a>
+            <a href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>
+          </nav>
         </div>
       </section>
     </div>

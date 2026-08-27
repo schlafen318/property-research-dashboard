@@ -179,18 +179,21 @@ class SeoCtrContentTests(unittest.TestCase):
     def test_homepage_snippet_includes_global_property_and_vacation_home_intent(self) -> None:
         html = build_unified_app.build_landing_page([], [], [], 0)
 
-        self.assertIn("Global Property Markets", html)
-        self.assertIn("vacation homes", html)
-        self.assertIn("buying property abroad", html)
-        self.assertIn("Best Places to Buy Property Abroad", html)
+        self.assertIn("Compare Property Abroad for Retirement &amp; Second Homes", html)
+        self.assertIn("Find the right place to buy property abroad", html)
+        self.assertIn("foreign ownership", html)
+        self.assertIn("representative listings", html)
 
     def test_homepage_uses_the_consolidated_research_journey(self) -> None:
         html = build_unified_app.build_landing_page([], [], [], 0)
 
         section_ids = [
+            'id="atlas-tools"',
+            'id="intent-paths"',
             'id="market-finder"',
-            'id="recommendations"',
-            'id="explore"',
+            'id="priority-research"',
+            'id="browse-atlas"',
+            'id="latest-research"',
             'id="method"',
         ]
         positions = [html.find(section_id) for section_id in section_ids]
@@ -203,71 +206,61 @@ class SeoCtrContentTests(unittest.TestCase):
         self.assertNotIn('id="mid-conversion"', html)
         self.assertNotIn('id="countries"', html)
         self.assertNotIn('id="guides"', html)
+        self.assertNotIn('id="recommendations"', html)
+        self.assertNotIn('id="explore"', html)
         self.assertEqual(html.count('href="/shortlist-review/"'), 0)
-        self.assertIn("Explore the research", html)
-        self.assertIn("By buying goal", html)
-        self.assertIn("By country", html)
-        self.assertIn("Buying guides", html)
+        self.assertIn("Atlas tools", html)
+        self.assertIn("Choose your buying path", html)
+        self.assertIn("Priority property research", html)
+        self.assertIn("Browse the Atlas", html)
+        self.assertIn("Latest research", html)
 
     def test_homepage_hero_groups_useful_actions_without_a_proof_badge(self) -> None:
         html = build_unified_app.build_landing_page([], [], [], 0)
 
         self.assertNotIn('class="hero-proof"', html)
         self.assertEqual(1, html.count('data-track="homepage_start_click"'))
-        self.assertIn('<nav class="hero-secondary-actions" aria-label="Explore Global Home Atlas">', html)
-        self.assertIn('href="/guides/#country-selection"', html)
+        self.assertIn('href="/dashboard/#destinations"', html)
         self.assertIn('href="/retirement-abroad-calculator/"', html)
-        self.assertIn('href="/methodology/"', html)
+        self.assertIn('href="/retirement-destinations-ranked-by-cost/"', html)
 
-    def test_homepage_limits_editorial_recommendations_to_three(self) -> None:
+    def test_homepage_coverage_and_browse_links_expand_with_the_dataset(self) -> None:
         destinations = [
             {
                 "id": destination_id,
                 "name": destination_id.replace("-", " ").title(),
-                "country": "Test country",
+                "country": country,
                 "category": "Test category",
-                "decision_score": 4.0,
+                "decision_score": score,
             }
-            for destination_id in [
-                "fukuoka-itoshima",
-                "valencia",
-                "algarve-cascais",
-                "lake-como",
-                "madeira",
+            for destination_id, country, score in [
+                ("alpha", "Country A", 4.8),
+                ("beta", "Country B", 4.7),
+                ("gamma", "Country A", 4.6),
             ]
         ]
+        listings = [{"id": str(index)} for index in range(4)]
 
-        html = build_unified_app.build_landing_recommendations(destinations)
+        html = build_unified_app.build_landing_page(destinations, build_unified_app.SEO_PAGES, listings, 2)
 
-        self.assertEqual(html.count('class="recommendation-card"'), 3)
-        self.assertNotIn("<details", html)
+        for copy in ("3 destinations", "2 countries", "4 representative listings", "10 assessment dimensions"):
+            with self.subTest(copy=copy):
+                self.assertIn(copy, html)
+        for destination_id in ("alpha", "beta", "gamma"):
+            self.assertIn(f'href="/destinations/{destination_id}/"', html)
 
-    def test_homepage_preserves_compact_links_to_research_hubs_and_markets(self) -> None:
-        destinations = [
-            {"id": destination_id, "name": name}
-            for destination_id, name in [
-                ("crete", "Crete"),
-                ("lake-como", "Lake Como"),
-                ("madeira", "Madeira"),
-                ("phuket-koh-samui", "Phuket / Koh Samui"),
-                ("queenstown", "Queenstown"),
-                ("whistler", "Whistler"),
-            ]
-        ]
-
-        html = build_unified_app.build_landing_page(destinations, build_unified_app.SEO_PAGES, [], 0)
-
+    def test_homepage_promotes_priority_search_clusters_with_descriptive_links(self) -> None:
+        html = build_unified_app.build_landing_page([], build_unified_app.SEO_PAGES, [], 0)
         required_targets = [
+            "/best-places-to-buy-a-second-home-abroad/",
+            "/best-places-to-buy-vacation-home-abroad/",
+            "/best-countries-for-expats-to-buy-property/",
+            "/where-can-foreigners-buy-property/",
+            "/best-places-to-buy-property-abroad-for-retirement/",
             "/best-countries-to-buy-property-as-a-foreigner/",
             "/countries/greece-property/",
             "/countries/switzerland-property/",
             "/countries/thailand-property/",
-            "/destinations/crete/",
-            "/destinations/lake-como/",
-            "/destinations/madeira/",
-            "/destinations/phuket-koh-samui/",
-            "/destinations/queenstown/",
-            "/destinations/whistler/",
         ]
 
         for target in required_targets:
@@ -288,54 +281,26 @@ class SeoCtrContentTests(unittest.TestCase):
 
         html = build_unified_app.build_landing_page(destinations, build_unified_app.SEO_PAGES, [], 0)
 
-        self.assertNotIn("<details>", build_unified_app.build_landing_recommendations(destinations))
         self.assertNotIn("bulletList(", html)
         self.assertIn('class="finder-signal"', html)
         self.assertNotIn('class="trust-card"', html)
-        self.assertIn("We look at ownership rules, realistic returns, daily life and resale potential.", html)
-        self.assertEqual(html.count('class="explore-primary"'), 9)
-        self.assertEqual(html.count('class="explore-more"'), 3)
-        self.assertIn("More buying goals", html)
-        self.assertIn("More countries", html)
-        self.assertIn("More guides", html)
+        self.assertNotIn('class="recommendation-card"', html)
+        self.assertNotIn('class="explore-more"', html)
+        self.assertIn("ownership rules, retirement fit, realistic costs, rental restrictions and resale potential", html)
         self.assertIn('href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>', html)
 
-    def test_homepage_recommendations_include_editorial_images(self) -> None:
-        destinations = [
-            {
-                "id": destination_id,
-                "name": destination_id.replace("-", " ").title(),
-                "country": "Test country",
-                "category": "Test category",
-                "decision_score": 4.0,
-            }
-            for destination_id in ["fukuoka-itoshima", "valencia", "algarve-cascais"]
+    def test_homepage_latest_research_is_selected_from_page_dates(self) -> None:
+        pages = [
+            {"slug": "older", "h1": "Older guide", "description": "Older", "theme": "Guide", "date_published": "2026-01-01"},
+            {"slug": "newest", "h1": "Newest guide", "description": "Newest", "theme": "Guide", "date_published": "2026-08-27"},
+            {"slug": "middle", "h1": "Middle guide", "description": "Middle", "theme": "Guide", "date_published": "2026-06-01"},
         ]
 
-        html = build_unified_app.build_landing_recommendations(destinations)
+        html = build_unified_app.build_landing_page([], pages, [], 0)
 
-        self.assertEqual(html.count('class="recommendation-card__image"'), 3)
-        self.assertIn('src="/assets/market-fukuoka-itoshima.jpg"', html)
-        self.assertIn('src="/assets/market-valencia.jpg"', html)
-        self.assertIn('src="/assets/market-algarve-cascais.jpg"', html)
-        self.assertEqual(html.count('type="image/webp"'), 3)
-        self.assertIn('/assets/market-fukuoka-itoshima-600.webp 600w', html)
-        self.assertIn('/assets/market-valencia-900.webp 900w', html)
-        self.assertIn('/assets/market-algarve-cascais-900.webp 900w', html)
-        self.assertNotIn('<a class="recommendation-card__visual"', html)
-        self.assertEqual(html.count('<div class="recommendation-card__visual">'), 3)
-        self.assertIn('alt="Fukuoka waterfront and city skyline"', html)
-        self.assertIn('alt="Valencia streetscape opening toward the Mediterranean"', html)
-        self.assertIn('alt="Portuguese coastal town overlooking the Atlantic"', html)
-
-    def test_homepage_recommendation_images_use_a_restrained_shared_treatment(self) -> None:
-        html = build_unified_app.build_landing_page([], [], [], 0)
-
-        self.assertIn(".recommendation-card__visual { position: relative;", html)
-        self.assertIn("height: clamp(210px, 19vw, 265px);", html)
-        self.assertIn("filter: saturate(.72) contrast(.94) brightness(.97) sepia(.06);", html)
-        self.assertNotIn(".recommendation-card__visual::after", html)
-        self.assertIn(".recommendation-card__image { width: 100%; height: 100%;", html)
+        self.assertLess(html.find("Newest guide"), html.find("Middle guide"))
+        self.assertLess(html.find("Middle guide"), html.find("Older guide"))
+        self.assertIn('<time datetime="2026-08-27">Published 2026-08-27</time>', html)
 
     def test_market_finder_uses_consistent_editorial_thumbnails_without_a_decorative_map_cue(self) -> None:
         destinations = [

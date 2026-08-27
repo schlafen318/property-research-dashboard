@@ -71,11 +71,11 @@ class LandingDesignSystemPilotTests(unittest.TestCase):
             with self.subTest(marker=marker):
                 self.assertIn(marker, self.html)
 
-    def test_disclosures_and_recommendations_remain_scannable_and_tappable(self) -> None:
-        self.assertIn('.gha-mode-landing .explore-more summary { min-height: 44px; display: inline-flex; align-items: center; cursor: pointer;', self.html)
-        self.assertIn('.gha-mode-landing .recommendation-card__body { display: grid; align-content: start; gap: 8px;', self.html)
-        self.assertIn('.gha-mode-landing .recommendation-card em { display: block;', self.html)
-        self.assertIn('.gha-mode-landing .recommendation-card .card-link { display: inline-flex; align-items: center; min-height: 44px;', self.html)
+    def test_atlas_tools_and_research_links_remain_scannable_and_tappable(self) -> None:
+        self.assertIn('.gha-mode-landing .atlas-tool-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));', self.html)
+        self.assertIn('.gha-mode-landing .atlas-tool { min-height: 100%; display: grid; align-content: start;', self.html)
+        self.assertIn('.gha-mode-landing .atlas-tool__link { min-height: 44px; display: inline-flex; align-items: center;', self.html)
+        self.assertIn('.gha-mode-landing .research-link a { min-height: 44px; display: inline-flex; align-items: center;', self.html)
 
     def test_hero_copy_aligns_to_the_site_grid_without_a_redundant_eyebrow(self) -> None:
         self.assertIn(

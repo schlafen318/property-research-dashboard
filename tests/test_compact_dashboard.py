@@ -124,9 +124,9 @@ class CompactDashboardTests(unittest.TestCase):
         for expected_copy in (
             "Find your destination fit",
             "three destinations worth comparing",
-            "Compare all destinations",
-            "Three destinations to start with",
-            "More destinations",
+            "Explore the rankings",
+            "Destination dossiers",
+            "Explore all 37 destination rankings",
             "View destination",
         ):
             with self.subTest(surface="landing", expected_copy=expected_copy):

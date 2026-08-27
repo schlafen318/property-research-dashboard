@@ -220,10 +220,10 @@ class RetirementDestinationsArticleTests(unittest.TestCase):
         self.assertIn(f'href="/{SLUG}/"', guides)
         self.assertIn(f'href="/{SLUG}/"', calculator)
 
-    def test_homepage_links_to_ranked_retirement_article_once(self) -> None:
+    def test_homepage_hero_and_tools_link_to_ranked_retirement_article(self) -> None:
         homepage = (ROOT / "artifacts" / "index.html").read_text(encoding="utf-8")
         self.assertIn(f'href="/{SLUG}/"', homepage)
-        self.assertEqual(1, homepage.count(f'href="/{SLUG}/"'))
+        self.assertEqual(2, homepage.count(f'href="/{SLUG}/"'))
 
     def test_sitemap_contains_one_article_url(self) -> None:
         sitemap = (ROOT / "artifacts" / "sitemap.xml").read_text(encoding="utf-8")
