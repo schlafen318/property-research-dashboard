@@ -333,13 +333,12 @@ class SeoCtrContentTests(unittest.TestCase):
         html = build_unified_app.build_landing_page([], [], [], 0)
 
         self.assertIn(".recommendation-card__visual { position: relative;", html)
-        self.assertIn("height: clamp(168px, 16vw, 198px);", html)
+        self.assertIn("height: clamp(210px, 19vw, 265px);", html)
         self.assertIn("filter: saturate(.72) contrast(.94) brightness(.97) sepia(.06);", html)
-        self.assertIn(".recommendation-card__visual::after", html)
-        self.assertIn("background: rgba(244, 238, 226, .08);", html)
-        self.assertIn(".recommendation-card__image { height: 158px;", html)
+        self.assertNotIn(".recommendation-card__visual::after", html)
+        self.assertIn(".recommendation-card__image { width: 100%; height: 100%;", html)
 
-    def test_market_finder_uses_a_subtle_map_cue_and_consistent_compact_thumbnails(self) -> None:
+    def test_market_finder_uses_consistent_editorial_thumbnails_without_a_decorative_map_cue(self) -> None:
         destinations = [
             {
                 "id": destination_id,
@@ -365,8 +364,9 @@ class SeoCtrContentTests(unittest.TestCase):
                 self.assertIn(match["image"], expected_images)
                 self.assertTrue(match["imageAlt"])
         self.assertIn('class="finder-map-cue" aria-hidden="true"', html)
+        self.assertIn(".gha-mode-landing .finder-map-cue { display: none;", html)
         self.assertIn('class="finder-result__thumb"', html)
-        self.assertIn("height: 82px;", html)
+        self.assertIn("height: 112px;", html)
 
     def test_all_destination_profiles_have_responsive_editorial_image_assets(self) -> None:
         destinations = build_unified_app.load_json("destinations.json")

@@ -3678,12 +3678,11 @@ def build_landing_page(
         content_overrides or [],
     )
     generated_link = generated_internal_link_html(content)
-    return f"""<!doctype html>
+    legacy_html = f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta data-design-system="gha-v1">
 {favicon_links_html()}
   <title>{escape(content["title"])}</title>
   <meta name="description" content="{escape(content["description"])}">
@@ -3940,16 +3939,15 @@ def build_landing_page(
       .inspired-visual {{ min-height: 230px; }}
       .atlas-visual {{ min-height: 140px; }}
     }}
-    {landing_design_css()}
   </style>
 </head>
-<body class="gha-mode-landing">
+<body class="gha-mode-landing" data-design-system="gha-v1">
   {site_header_html(PRIMARY_NAV_LINKS)}
-  <header class="hero" id="top">
+  <section class="hero" id="top" aria-labelledby="landing-title">
     <div class="shell hero-grid">
       <div>
         <p class="eyebrow gha-eyebrow">Independent overseas property research</p>
-        <h1>Global Home Atlas</h1>
+        <h1 id="landing-title">Global Home Atlas</h1>
         <p class="lede">{escape(content["generated_intro"])}</p>
         {generated_link}
         <div class="hero-actions">
@@ -3963,7 +3961,7 @@ def build_landing_page(
         </div>
       </div>
     </div>
-  </header>
+  </section>
 
   <main>
     <div class="shell">
@@ -4091,6 +4089,13 @@ def build_landing_page(
 </body>
 </html>
 """
+    return re.sub(
+        r"<style>.*?</style>",
+        f'<style>{landing_design_css()}</style>',
+        legacy_html,
+        count=1,
+        flags=re.DOTALL,
+    )
 
 
 def metric_value(dest: dict, dimension_key: str) -> float:
