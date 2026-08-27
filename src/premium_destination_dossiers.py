@@ -4843,6 +4843,170 @@ SWISS_VALAIS_VAUD_ALPS_DOSSIER = PremiumDossierSpec(
 )
 
 
+GOLD_COAST_SUNSHINE_COAST_DOSSIER = PremiumDossierSpec(
+    destination_id="gold-coast-sunshine-coast",
+    title="Gold Coast and Sunshine Coast Retirement Property Dossier",
+    description="Assess Gold Coast and Sunshine Coast retirement property through daily life, foreign-investment eligibility, Queensland acquisition costs, body-corporate governance, hazards, rentals and resale.",
+    h1="Gold Coast / Sunshine Coast: choose the daily life before the beach view",
+    lede="Southeast Queensland offers two credible warm-coast retirement patterns. The Gold Coast pairs beaches with light rail, major hospitals and a deep metropolitan economy; the Sunshine Coast trades some urban reach for lower-rise towns, river life and a slower rhythm. For a foreign buyer, however, the investable market is much narrower than the lifestyle map: current federal rules generally direct purchases toward approved new dwellings, while Queensland duty, body-corporate costs and property-level climate exposure can materially change the case.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "The verdict is positive for a buyer who wants a long-term coastal base and can accept a new-dwelling-led acquisition route. From 1 April 2025 to 30 June 2029, foreign investors are generally prohibited from purchasing established dwellings, subject to limited exceptions. Residential purchases normally require foreign-investment approval before acquisition, and later registration, vacancy-return and reporting obligations can apply. Buying a home does not provide an Australian visa, tax residence, Medicare eligibility or a right to remain. Establish the immigration and healthcare plan before treating the property as a retirement solution.",
+        "The Gold Coast is the stronger car-light and metropolitan proposition in the G:link corridor, especially around Southport, Broadbeach and selected coastal stations. The Sunshine Coast is more dispersed: Maroochydore and Cotton Tree offer the strongest concentration of services, while Mooloolaba, Caloundra and quieter coastal pockets create different transport and hospital journeys. Both suit a buyer who values beaches, subtropical weather, English-language administration and a large domestic owner-occupier market. They are weaker for anyone seeking cheap beachfront entry, effortless short-stay income, a detached established house under the current foreign-buyer rules, or an address that can be managed remotely without reliable local support.",
+        "Proceed in order. Confirm residence, tax and federal acquisition eligibility; select the daily-life catchment and measure airport, hospital and grocery journeys; calculate standard Queensland transfer duty plus the 8% additional foreign acquirer duty where applicable; then review the contract, new-dwelling status, title, body-corporate records, building envelope, insurance and all address-level flood, storm-tide and coastal overlays. Underwrite long-term personal utility first. Add rental income only after the council, planning approval and body-corporate documents permit the intended use in writing."
+    ),
+    lenses_intro="Five questions separate a durable coastal home from an expensive holiday idea: whether ordinary life works, how the two coastlines connect, which property the buyer may lawfully acquire and operate, whether income survives full costs, and who will buy the asset on exit.",
+    lenses=(
+        DossierLens(
+            "Live where the coast still works on an ordinary Tuesday",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "The Gold Coast’s advantage is not only the beach. In the central corridor, the G:link, frequent buses, shopping, restaurants, universities and major health services sit inside a metropolitan region that functions throughout the year. Southport offers the broadest service base; Broadbeach combines tram access, shopping and a more compact coastal routine; Burleigh and Palm Beach have strong neighbourhood appeal but different prices and, in some pockets, a greater dependence on buses or cars. A high-floor ocean view does not compensate for a difficult grocery trip, a noisy holiday building or a long walk in summer heat.",
+                "The Sunshine Coast asks for a more deliberate location choice. Cotton Tree and Maroochydore put the river, beach, shops, cafes and the emerging city centre close together. Mooloolaba is more visitor-facing; Birtinya and Kawana place health infrastructure and newer housing nearer the centre of the decision; Caloundra offers an established town pattern farther south. The official transport network remains bus-led along much of the coast, with route 600 providing the principal high-frequency coastal spine and route 622 linking Sunshine Coast Airport with Maroochydore and Noosa Junction. Test whether the household can live well if driving becomes difficult.",
+                "Retirement suitability is property-specific even in a strong region. Spend time in humid summer weather, after heavy rain and outside school-holiday peaks. Walk to the supermarket, pharmacy and bus or tram stop; time the trip to the relevant hospital; check shade, lifts, steps, backup power, secure parking and the building’s pet and accessibility rules. On both coasts, a quieter low-rise address may improve sleep but lengthen every essential journey. The best home keeps beach access and ordinary services in the same practical routine."
+            ),
+            "daily-life",
+        ),
+        DossierLens(
+            "Use the airports as gateways—not as proof of easy last miles",
+            ("global_access", "foreigner_fit"),
+            (
+                "Gold Coast Airport is served by Translink routes 777 to Broadbeach South and 760 to Varsity Lakes station. Brisbane Airport connects toward the Gold Coast by Airtrain, while the G:link and bus network handle the final segment. This creates credible regional and international access, but the complete trip changes sharply north and south of the tram corridor. Measure the door-to-terminal journey with luggage, at the hour normally travelled, and keep an alternative for flight disruption or motorway congestion.",
+                "Sunshine Coast Airport is closer to Maroochydore and the northern coast, yet its network is smaller and the ground journey remains bus- or car-dependent for many addresses. Translink route 622 connects the airport with Maroochydore and Noosa Junction, and route 600 continues along the coast between Maroochydore and Caloundra. Brisbane Airport may still be the practical long-haul gateway. A Sunshine Coast purchase should therefore be judged against two travel patterns: the convenient regional flight and the longer Brisbane transfer when the preferred service is unavailable.",
+                "English-language contracts and established professional services improve foreigner fit, but they do not simplify eligibility or remove local administration. Federal approval, Australian Taxation Office reporting, Queensland duty, council planning, body-corporate governance, insurance and tax residence are separate systems. Retain an independent Australian conveyancer or solicitor, tax adviser and building professional. If the owner will be abroad for long periods, appoint someone who can receive notices, inspect after storms and attend to building or tenancy issues before they become expensive."
+            ),
+        ),
+        DossierLens(
+            "Clear federal eligibility, then interrogate the building",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "The controlling ownership rule sits at federal level. Current guidance generally prevents foreign investors from buying established dwellings between 1 April 2025 and 30 June 2029, while new dwellings, near-new dwellings and vacant residential land can follow specific approval routes and conditions. Do not infer eligibility from the words ‘new’ or ‘never lived in’ in an advertisement. Obtain written confirmation of the exact dwelling’s status, developer approval if relied upon, purchase approval, construction history and any conditions before signing an unconditional contract.",
+                "Queensland then changes the acquisition budget. From 1 August 2026, temporary residents are generally ineligible for home concessions and must normally pay transfer duty at standard rates plus the 8% additional foreign acquirer duty on residential land. The dutiable value can be the higher of consideration and unencumbered value. At coastal new-build prices, this is not a closing-cost footnote. Ask a Queensland duty specialist for a written buyer-specific calculation that also addresses ownership structure, residence status and any mixed acquisition.",
+                "For an apartment, the body corporate is part of the asset. Review the disclosure certificate, community management statement, bylaws, insurance, administrative and sinking funds, arrears, recent minutes, defects, litigation, planned capital works, caretaker or letting agreements and restrictions on short stays. Then overlay the exact lot against council flood information and Queensland coastal-hazard mapping. Check storm-tide and erosion exposure, basement and lift vulnerability, facade and balcony condition, drainage, wind-driven rain, insurance exclusions and evacuation access. A new tower can have fewer age defects and still carry substantial governance, weather and service-cost risk."
+            ),
+            "building-diligence",
+        ),
+        DossierLens(
+            "Treat rent as a permitted operating case, not a coastal default",
+            ("rental_profit", "capital_upside"),
+            (
+                "There is no defensible destination-wide net yield for these two markets. Income depends on the exact apartment, lawful use, body-corporate rules, management agreement, season, owner-use calendar, finance and insurance. Long-term residential demand is the safer starting point in well-serviced Gold Coast and Sunshine Coast locations. Model rent after vacancy, agent fees, body-corporate levies, rates, land tax where applicable, insurance, utilities, repairs, furnishing and tax. A gross holiday-rental forecast can look attractive while producing a weak owner result.",
+                "Short-term accommodation requires property-level confirmation. On the Sunshine Coast, council states that short-term accommodation may require a development permit and tells owners to check the Development.i site report and current planning provisions. Gold Coast approval likewise depends on the use, existing approval and address. A body corporate can add another restriction even when planning permits the activity. For a foreign-owned dwelling, the federal vacancy regime also matters: stays of fewer than 30 days do not count toward the residential-occupancy test used for the annual vacancy return. Obtain written planning, body-corporate and tax advice before assigning any short-stay income.",
+                "Capital support comes from population growth, established domestic demand, infrastructure and coastal scarcity, but supply and buyer depth differ by segment. The Gold Coast has a deep apartment pipeline and large owner-occupier market; this helps choice and resale while increasing competition between similar towers. The Sunshine Coast has strong growth but a smaller, more distributed market. Neither story guarantees appreciation. Pay for a dwelling that competes on location, layout, building quality and manageable levies when the next buyer compares it with newer stock."
+            ),
+        ),
+        DossierLens(
+            "Enter on a complete cost—and preserve a domestic exit",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The three current observations show the spread inside the foreign-buyer-relevant new-apartment route. A 100 m² two-bedroom project observation in Surfers Paradise asks A$1.45 million. A 199 m² waterfront three-bedroom apartment in Carrara asks A$2.5281 million, although its description needs a precise internal-versus-balcony reconciliation. A 292 m² never-lived-in Cotton Tree penthouse asks A$5.5 million. These are not interchangeable price points: building stage, area basis, service charges, location and successor buyer pool matter more than a coast-wide average.",
+                "The official land-value anchors below are intentionally not apartment valuations. The Queensland Valuer-General recorded 1 October 2023 median residential land values of A$1.55 million in Surfers Paradise, A$580,000 in Carrara and A$540,000 in Maroochydore. Land-only evidence helps show the underlying location hierarchy, but it excludes buildings and cannot be divided into a strata-unit asking price. Use it to challenge a sales story, then obtain completed comparable apartment sales and a property-specific valuation before commitment.",
+                "Exit liquidity is primarily domestic. A conventional two- or three-bedroom apartment near transport, services and the beach can reach owner-occupiers, downsizers and investors; a huge penthouse, unusual management contract or high-levy resort building needs a narrower buyer. Model five-year cash outlay including federal application fees, standard duty, additional foreign acquirer duty, legal and finance costs, levies, rates, insurance, maintenance, vacancy obligations and selling costs. Before signing, ask two agents who did not source the home how they would resell it against the next wave of new supply."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Both coasts combine beaches and year-round services; the Gold Coast is more urban, while Sunshine Coast appeal depends on a carefully chosen town base.",
+        "global_access": "Gold Coast and Sunshine Coast airports are useful gateways, but long-haul options and the last mile vary materially by address.",
+        "ownership_clarity": "Foreign buyers generally need prior approval and are currently directed toward eligible new or near-new dwellings rather than established homes.",
+        "regulatory_safety": "Federal eligibility, Queensland duty, body-corporate rules, local short-stay approval and address-level hazards all require separate clearance.",
+        "rental_profit": "Long-term demand is credible in serviced locations, but levies, management, lawful use, vacancy and insurance prevent a reliable regional net yield.",
+        "capital_upside": "Population growth and domestic demand support selected assets; large new-apartment pipelines and high entry make gains property-specific.",
+        "retirement_fit": "Healthcare and coastal daily life are strong, with the G:link corridor easier car-light territory than much of the dispersed Sunshine Coast.",
+        "exit_liquidity": "Conventional, well-located apartments reach a broad domestic pool; high-levy, singular or premium units need fewer, wealthier buyers.",
+        "foreigner_fit": "English-language systems and professional depth help, but approval, tax, duty, reporting and remote ownership still require coordinated local advice.",
+        "value_entry": "Foreign-buyer-eligible new stock starts at a premium, and total entry can rise sharply after standard duty and the 8% foreign-buyer surcharge.",
+    },
+    market_anchors=(
+        {
+            "location": "Surfers Paradise",
+            "evidence": "A$1.55 million median residential land value",
+            "buyer_read": "Valuer-General benchmark at 1 October 2023. It captures land only, not a strata apartment or building improvements; use it to understand location scarcity, never to value the A$1.45 million project unit.",
+            "source_label": "Queensland Valuer-General 2024 update",
+            "source_url": "https://www.qld.gov.au/__data/assets/pdf_file/0038/467867/gold-coast-land-valuations.pdf",
+        },
+        {
+            "location": "Carrara",
+            "evidence": "A$580,000 median residential land value",
+            "buyer_read": "Valuer-General benchmark at 1 October 2023. It excludes the apartment, waterfront amenity and shared facilities; the A$2.5281 million ask must be tested against completed comparable units and full levies.",
+            "source_label": "Queensland Valuer-General 2024 update",
+            "source_url": "https://www.qld.gov.au/__data/assets/pdf_file/0038/467867/gold-coast-land-valuations.pdf",
+        },
+        {
+            "location": "Maroochydore",
+            "evidence": "A$540,000 median residential land value",
+            "buyer_read": "Valuer-General benchmark at 1 October 2023. It is land-only evidence across residential sites, not a premium penthouse comparison; require direct high-end apartment sales before judging the A$5.5 million ask.",
+            "source_label": "Queensland Valuer-General 2024 update",
+            "source_url": "https://www.qld.gov.au/__data/assets/pdf_file/0039/467877/sunshine-coast-land-valuations.pdf",
+        },
+    ),
+    micro_locations_intro="Treat the combined destination as a sequence from metropolitan, tram-served coast to smaller, bus- and car-led centres. Confirm the exact planning approval, body-corporate rules, hazard overlays, hospital route and airport journey for the address.",
+    micro_locations=(
+        {"name": "Southport / Main Beach", "best_for": "Services and metropolitan depth", "daily_life": "Tram-led urban coast near major health services", "diligence": "Building governance, noise, flood and tower supply"},
+        {"name": "Broadbeach / Mermaid Beach", "best_for": "Car-light beach access", "daily_life": "G:link, shopping and walkable coastal routine", "diligence": "Entry premium, levies, short-stay rules and coastal exposure"},
+        {"name": "Burleigh / Palm Beach", "best_for": "Neighbourhood coastal life", "daily_life": "Beach, cafes and mixed bus-or-car mobility", "diligence": "Transport, flood overlays, development pipeline and price"},
+        {"name": "Maroochydore / Cotton Tree", "best_for": "Sunshine Coast service base", "daily_life": "River, beach, shops and buses in one centre", "diligence": "Flood and storm-tide risk, body corporate and airport route"},
+        {"name": "Birtinya / Kawana", "best_for": "Healthcare-led practicality", "daily_life": "Newer districts near the hospital precinct", "diligence": "Car dependence, future supply, heat, drainage and levies"},
+        {"name": "Caloundra", "best_for": "Established southern town base", "daily_life": "Town services with a bus-led coastal pattern", "diligence": "Brisbane journey, exact walkability and coastal hazards"},
+    ),
+    checklist=(
+        "Confirm visa, tax residence, healthcare and the intended ownership structure before selecting property.",
+        "Obtain written foreign-investment eligibility for the exact buyer and dwelling before an unconditional contract.",
+        "Calculate standard Queensland transfer duty, the 8% additional foreign acquirer duty and all federal fees.",
+        "Test the airport, hospital, grocery and public-transport journeys in ordinary and adverse conditions.",
+        "Review title, contract, new-dwelling status, survey plan, completion evidence and defect protections.",
+        "Read body-corporate bylaws, minutes, funds, insurance, defects, planned works and management agreements.",
+        "Check council planning, short-stay permissions, flood, storm-tide, erosion, drainage and insurance for the address.",
+        "Model five-year carrying cost without rent, then identify the domestic successor buyer and direct resale comparables.",
+    ),
+    references_intro="Federal acquisition, Queensland duty, body-corporate, transport, planning, hazard, market and listing claims were reviewed on 27 August 2026. Recheck by 27 February 2027 and immediately after any federal foreign-investment, vacancy, Queensland duty, council planning, body-corporate, hazard, insurance or listing change. Obtain Australian legal, tax, immigration, building, planning and insurance advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "Australia property guide", "url": "/countries/australia-property/"},
+        {"label": "Australian Government: foreign investment in residential land", "url": "https://foreigninvestment.gov.au/guidance/types-investments/residential-land"},
+        {"label": "Australian Government: residential compliance and reporting", "url": "https://foreigninvestment.gov.au/guidance/conditions-and-reporting/residential-compliance"},
+        {"label": "Australian Taxation Office: residential property applications", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/residential-property-application-for-foreign-investors"},
+        {"label": "Australian Taxation Office: annual vacancy return and fee", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-investment-in-australia/vacancy-fee-return-for-foreign-owners"},
+        {"label": "Queensland Revenue Office: August 2026 home-concession changes", "url": "https://qro.qld.gov.au/event/changes-to-home-concessions/"},
+        {"label": "Queensland Revenue Office: standard transfer-duty rates", "url": "https://qro.qld.gov.au/duties/transfer-duty/calculate/rates/"},
+        {"label": "Queensland Revenue Office: additional foreign acquirer duty", "url": "https://qro.qld.gov.au/duties/investors/afad/residential-land/"},
+        {"label": "Queensland Government: buying into a body corporate", "url": "https://www.qld.gov.au/housing/body-corporate/legislation-and-bccm/buying-into"},
+        {"label": "Queensland Government: body-corporate records", "url": "https://www.qld.gov.au/housing/body-corporate/records/access-records"},
+        {"label": "Queensland Government: coastal-hazard mapping", "url": "https://www.qld.gov.au/environment/coasts-waterways/plans/hazards"},
+        {"label": "Sunshine Coast Council: flood mapping and information", "url": "https://www.sunshinecoast.qld.gov.au/development/development-tools-and-guidelines/flood-mapping-and-information"},
+        {"label": "Sunshine Coast Council: development compliance and short-term accommodation", "url": "https://www.sunshinecoast.qld.gov.au/development/concerns-complaints-compliance/development-work"},
+        {"label": "Translink: airport services", "url": "https://translink.com.au/travel-with-us/airport-services"},
+        {"label": "Translink: Sunshine Coast travel", "url": "https://translink.com.au/travel-with-us/around-queensland/sunshine-coast"},
+        {"label": "Queensland Valuer-General: Gold Coast 2024 land-valuation update", "url": "https://www.qld.gov.au/__data/assets/pdf_file/0038/467867/gold-coast-land-valuations.pdf"},
+        {"label": "Queensland Valuer-General: Sunshine Coast 2024 land-valuation update", "url": "https://www.qld.gov.au/__data/assets/pdf_file/0039/467877/sunshine-coast-land-valuations.pdf"},
+        {"label": "Reserve Bank of Australia: exchange rates", "url": "https://www.rba.gov.au/statistics/frequency/exchange-rates.html"},
+        {"label": "Domain: Paradiso Place direct asking observation", "url": "https://www.domain.com.au/project/5286/paradiso-place-surfers-paradise-qld/"},
+        {"label": "Queensland Sotheby's: Carrara direct asking observation", "url": "https://goldcoast.queenslandsothebysrealty.com/2302-580-nerang-broadbeach-road-carrara-qld-4211-4113"},
+        {"label": "realestate.com.au: Maroochydore direct asking observation", "url": "https://www.realestate.com.au/property-apartment-qld-maroochydore-150642648"},
+    ),
+    images=(
+        DossierImage("coastal-hero", "/assets/gold-coast-sunshine-coast-hero.webp", "Gold Coast light rail, subtropical streets and the beach at the end of the urban corridor", "The Gold Coast case is strongest where everyday transport and the beach occupy the same map.", "premium-image--hero", "hero"),
+        DossierImage("daily-life", "/assets/gold-coast-sunshine-coast-daily-life.webp", "Cotton Tree riverside path, buses, cafes and apartment buildings after rain", "On the Sunshine Coast, a useful address keeps services, transport and the water close together.", "premium-image--wide", "access"),
+        DossierImage("building-diligence", "/assets/gold-coast-sunshine-coast-building-diligence.webp", "Modern coastal apartment building with wet-weather drainage, balconies and shared service areas", "Drainage, envelope condition, shared systems and insurance belong in the offer decision.", "premium-image--wide", "diligence"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "What homes cost"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Five questions that decide the coast",
+    assessment_intro="The Atlas scores the combined proposition once. Read each score beside the Gold Coast, Sunshine Coast and property-level explanation; none is a forecast or valuation.",
+    listings_intro="Three direct asks show a new Surfers Paradise two-bedroom apartment, a larger Carrara waterfront unit and a premium Cotton Tree penthouse. They are dated asking evidence only; availability, eligibility, title, area, condition, completion, negotiability, fees, lawful use and completed value remain unverified.",
+    market_anchors_intro="Each record carries an official Valuer-General land benchmark for its locality. The comparison explains location scarcity but cannot value a strata apartment because statutory land values exclude buildings and improvements.",
+    orientation_groups=(
+        DossierOrientationGroup("Gold Coast urban spine", (("Brisbane / Gold Coast Airport", "international and regional gateways"), ("Southport / Broadbeach", "tram, health, shopping and services"), ("Burleigh / Palm Beach", "neighbourhood coast with changing last-mile access"))),
+        DossierOrientationGroup("Sunshine Coast centres", (("Sunshine Coast Airport", "regional gateway"), ("Maroochydore / Cotton Tree", "principal service and river-beach base"), ("Birtinya / Caloundra", "health precinct and southern town pattern"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact tram or bus route, airport alternative, hospital journey, council approval and hazard overlays for the address.",
+    country_guide_url="/countries/australia-property/",
+    country_guide_label="Australia property guide",
+    rail_comparison="Compare the Gold Coast / Sunshine Coast with Perth / Margaret River, Sydney / Melbourne and the full Atlas.",
+    property_anchor_indexes=(0, 1, 2),
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -4877,6 +5041,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     TICINO_LAKE_LUGANO_DOSSIER.destination_id: TICINO_LAKE_LUGANO_DOSSIER,
     ASPEN_SNOWMASS_DOSSIER.destination_id: ASPEN_SNOWMASS_DOSSIER,
     SWISS_VALAIS_VAUD_ALPS_DOSSIER.destination_id: SWISS_VALAIS_VAUD_ALPS_DOSSIER,
+    GOLD_COAST_SUNSHINE_COAST_DOSSIER.destination_id: GOLD_COAST_SUNSHINE_COAST_DOSSIER,
 }
 
 
