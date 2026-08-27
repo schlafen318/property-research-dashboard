@@ -3479,11 +3479,12 @@
     "country": "Australia",
     "category": "Water",
     "overall_score": 3.55,
-    "usd_per_m2": 12600.0,
-    "net_yield_estimate": "2.5-4% est. net",
+    "usd_per_m2": 10360.25,
+    "representative_price_usd": 1036025.0,
+    "net_yield_estimate": "No destination-wide net yield; model the exact building, lawful use, levies, management, insurance and vacancy",
     "quick_metrics": {
-      "usd_m": "$12,600",
-      "net_yield": "2.5-4% est. net",
+      "usd_m": "$10,360",
+      "net_yield": "No destination-wide net yield",
       "ownership": "2.0/5",
       "friendly": "3.0/5"
     },
@@ -3523,13 +3524,13 @@
     "red_flags": "New-build-only foreign-buyer pathway, approval and vacancy fees, local short-stay permissions, body corporate costs, flood/cyclone/coastal erosion exposure, and premium pricing.",
     "rental": {
       "gross_yield": "Coastal apartments can support steady holiday and long-stay demand, but gross revenue varies sharply by building permissions and submarket.",
-      "net_yield": "2.5-4% est. net",
+      "net_yield": "No destination-wide net yield; model the exact building, lawful use, levies, management, insurance and vacancy",
       "revenue": "Use long-stay demand as the base case unless the building and council clearly permit short-term accommodation.",
       "adr_occupancy": "Strong year-round leisure demand with peak holiday periods.",
       "confidence": "Medium-low; building, council, and operating-cost sensitive"
     },
-    "price_basis": "Foreign-buyer-relevant new-apartment benchmark across the Gold Coast and Maroochydore pipeline. Current entry examples range from roughly A$825,000 to A$1.61 million, while prime beachfront product is substantially higher; blended at about A$18,000/m2 and converted at 1 AUD = 0.6997 USD.",
-    "price_confidence": "Medium; current new-development asking-price benchmark",
+    "price_basis": "A$1.45 million direct Paradiso Place asking observation for a 100 m² new two-bedroom apartment in Surfers Paradise, converted at the retained RBA 21 August 2026 planning rate of 1 AUD = 0.7145 USD. It is asking evidence, not a completed-sale valuation or a regional median.",
+    "price_confidence": "Medium for the dated direct asking observation; low as a valuation or regional benchmark",
     "profit_driver": "Warm-climate migration, airport and healthcare access, deep domestic resale demand, and a large pipeline of new coastal apartments.",
     "rank": 30
   },
