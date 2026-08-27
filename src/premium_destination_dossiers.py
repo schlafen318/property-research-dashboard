@@ -5119,6 +5119,125 @@ LOS_ANGELES_ORANGE_COUNTY_DOSSIER = PremiumDossierSpec(
 )
 
 
+VANCOUVER_DOSSIER = PremiumDossierSpec(
+    destination_id="vancouver",
+    title="Vancouver Retirement Property Dossier for Foreign Buyers",
+    description="Assess Vancouver property through purchase eligibility, daily life, foreign-buyer taxes, vacancy rules, short stays, hazards, value and resale.",
+    h1="Vancouver: qualify first, then buy the daily-life network",
+    lede="Vancouver combines a serious Pacific gateway, deep healthcare, compact urban neighbourhoods and mountain-and-water access that works beyond a holiday. Yet most non-Canadians cannot currently buy covered residential property, and an eligible foreign buyer can face taxes that transform the entry case. This dossier treats the city as a conditional long-term-home proposition: establish the legal buyer first, then choose the transit, strata, tax and hazard profile that remains useful every week.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "The verdict is pause for most non-Canadian buyers. Canada’s prohibition on purchases of residential property by non-Canadians remains in force until 1 January 2027, with defined exceptions. Vancouver is inside the rule’s urban geography, and ordinary houses and condominium units are covered property. The exception analysis depends on the buyer, beneficial ownership, immigration documents, spouse or partner, transaction and intended development—not on the agent’s description. Obtain a written Canadian legal opinion before signing an offer or paying a deposit. A breach can expose the buyer and anyone who knowingly assists to penalties and a court-ordered sale.",
+        "The proposition becomes credible for a Canadian citizen, permanent resident or non-Canadian who clearly qualifies for an exception and can absorb the full tax stack. An eligible foreign entity buying residential property in Metro Vancouver generally faces B.C.’s 20% additional property transfer tax on its proportionate share, on top of ordinary property transfer tax. Occupancy can also engage the provincial Speculation and Vacancy Tax and, within the City of Vancouver, the separate Empty Homes Tax. For the 2026 calendar year, B.C. increased the speculation and vacancy tax rate to 3% for foreign owners and untaxed worldwide earners. These are not marginal closing details; they can defeat the purchase thesis.",
+        "Proceed in order: prove purchase eligibility and the right to live in Canada; calculate buyer-specific transfer, annual, income and eventual sale tax; choose the weekly service and transport catchment; then inspect title, strata governance, insurance, seismic and flood exposure, permitted tenancy and exit demand. Underwrite personal use or a lawful long-term tenancy. Do not rely on casual short stays: B.C.’s principal-residence floor applies in Vancouver and surrounding large municipalities, with registration and local rules layered above it."
+    ),
+    lenses_intro="Five questions separate a durable Vancouver home from a costly legal or tax mistake: whether ordinary life works, how the gateway connects, who may buy and occupy, whether lawful income survives carrying costs, and which future buyer supports the exit.",
+    lenses=(
+        DossierLens("Choose a neighbourhood that works in rain and without a car", ("lifestyle_magnetism", "retirement_fit"), (
+            "Vancouver’s strongest retirement pattern is compact rather than spectacular. The West End, Yaletown and Fairview can place groceries, seawall walking, rapid transit and daily services inside a short routine. False Creek and the Cambie corridor add access to Vancouver General Hospital and Canada Line stations. Lower Lonsdale offers a North Shore setting with the SeaBus as a dependable downtown connection. Point Grey and West Vancouver deliver space, views and quieter streets, but they shift more journeys to buses or cars and can place a steep walk between the home and ordinary errands.",
+            "Healthcare depth is a genuine advantage once the household is eligible and insured. Vancouver General Hospital is a provincial referral centre for trauma, stroke, burns and other specialised care, but ownership does not create immigration status or Medical Services Plan eligibility. A non-resident can face hospital and diagnostic charges, while a newcomer must confirm the current MSP pathway and any waiting period. Establish residence and coverage before purchase, then test the exact route to a regular clinic, pharmacy, emergency department and specialist in winter rain.",
+            "Building choice can matter more than postcode. Older concrete and wood-frame strata properties vary in envelope history, elevators, accessibility, plumbing, depreciation reports, reserves and earthquake position. In a detached house, stairs, drainage, roof, heating, renovation permits and garden upkeep affect long-term use. Spend ordinary weekdays in the chosen catchment, make the grocery and hospital trips after dark, and ask whether the home still works if one household member stops driving."
+        ), "daily-life"),
+        DossierLens("Use the airport and rapid transit as one connected system", ("global_access", "foreigner_fit"), (
+            "Vancouver International Airport is unusually well integrated with the city. YVR states that the Canada Line reaches downtown Vancouver in under 30 minutes and downtown Richmond in 18 minutes, with the station between the domestic and international terminals. That makes Yaletown, the Cambie corridor and Richmond practical for frequent travel. The benefit becomes less direct in Point Grey, the West End away from a station, and the North Shore, where a bus, SeaBus or road crossing adds another dependency. Time the full trip with luggage and an early departure rather than quoting the rail segment alone.",
+            "Foreigner fit is culturally strong and administratively demanding. English-language services, substantial Chinese and South Asian communities, international schools, banks and experienced legal and tax advisers make Vancouver legible to a global household. The hard part is not finding help; it is coordinating federal purchase eligibility, immigration status, B.C. transfer and vacancy taxes, municipal declarations, strata notices and Canadian tax reporting. A buyer who is overseas for part of the year needs an authorised local contact and a calendar for every declaration and tax deadline.",
+            "Do not confuse familiarity with permission. A work or study permit may support a statutory exception only if the current conditions are met, and a permitted purchase does not guarantee permanent residence, healthcare, mortgage access or favourable tax status. Collect the buyer’s immigration and ownership documents first, then have Canadian counsel map them to the current federal Act and regulations before the search becomes property-specific."
+        )),
+        DossierLens("Clear the legal buyer, then inspect the building and tax stack", ("ownership_clarity", "regulatory_safety"), (
+            "The federal purchase prohibition is the controlling ownership rule through the end of 2026. CMHC’s official guidance identifies limited exceptions, including certain purchases with an eligible spouse or common-law partner and purchases for development. It also warns that a violation can be an offence, carry a fine and lead to a court-ordered sale. Because the rule reaches direct and indirect purchases and controlled entities, a company or trust is not a simple workaround. The offer should be conditional on a buyer- and property-specific legal opinion, with beneficial owners disclosed accurately.",
+            "Eligibility does not remove B.C.’s cost and reporting layers. Ordinary property transfer tax applies at registration; a foreign entity in Metro Vancouver can owe the additional 20% tax unless a specific exemption or refund route applies. The provincial Speculation and Vacancy Tax and Vancouver’s Empty Homes Tax use different definitions, declarations and exemptions. The federal Underused Housing Tax filing requirement was eliminated for 2025 and later years, but earlier-year obligations can still matter to an existing foreign owner. Obtain one written completion and annual-compliance schedule covering every jurisdiction.",
+            "Physical risk is address- and building-specific. Vancouver publishes an earthquake scenario map showing potential concentrations of building damage and a separate designated-floodplain dataset. Neither predicts the fate of a candidate property. Review the strata depreciation report, minutes, reserve plan, insurance deductibles, earthquake coverage, envelope, piping, elevators, balconies and special assessments. For a house, add permits, oil tanks, drainage, foundation, retaining walls, sewer, trees and flood elevation. Confirm the insurer’s response before removing conditions."
+        ), "risk-texture"),
+        DossierLens("Model a lawful long tenancy—not a headline yield", ("rental_profit", "capital_upside"), (
+            "There is no defensible destination-wide net yield. Vancouver has deep tenant demand, but a property-level result depends on purchase price, strata fees, property tax, insurance, repairs, vacancy, management, income tax and the owner’s vacancy-tax position. B.C.’s principal-residence requirement limits short-term rentals in Vancouver and many neighbouring municipalities to the host’s principal residence plus one permitted secondary suite or accessory unit, subject to registration and local bylaws. An absentee holiday-rental case is therefore the wrong base model.",
+            "Use a lawful long-term tenancy as the income case and verify the Residential Tenancy Act, municipal use, strata bylaws, lender terms and insurance. In a strata, read rental restrictions, move fees, minimum terms, furnished-use rules and building management capacity. Within the City of Vancouver, a property rented for residential purposes for at least six months in periods of 30 or more consecutive days may satisfy an Empty Homes Tax occupancy route, but the exact declaration and evidence still matter. The provincial tax has its own rules; one exemption does not settle the other.",
+            "Capital support comes from constrained geography, employment, universities, immigration and a large domestic buyer pool, but current official data argues against effortless appreciation. Greater Vancouver REALTORS reported May 2026 benchmark prices below year-earlier levels across several segments and active listings well above the ten-year seasonal average. That is useful negotiation context, not a forecast. Pay for an ordinary layout, sound building and useful transit catchment rather than assuming scarcity will erase high taxes or deferred maintenance."
+        )),
+        DossierLens("Enter on all-in cost and preserve the Canadian buyer", ("value_entry", "exit_liquidity"), (
+            "The three asks illustrate different buyer cases rather than a market average: a CAD 549,900 Yaletown one-bedroom, a CAD 599,000 Lower Lonsdale two-bedroom and a CAD 2.449 million Point Grey detached house. Their areas, ownership form, strata burden and successor pools are not interchangeable. GVR’s May 2026 benchmarks are paired only as property-type and geography context. A benchmark represents a typical property; it is not a completed-sale comparable or valuation of the observation beside it.",
+            "For an eligible foreign buyer, entry cost begins before renovation or furnishing. Add ordinary and additional property transfer tax, legal and beneficial-ownership work, mortgage friction, strata contributions, insurance and any immediate building programme. Then model the 2026 provincial vacancy-tax exposure and Vancouver’s separate 3% Empty Homes Tax where applicable. A second home used intermittently can be far more expensive than the headline asking price suggests. Calculate the first five years in Canadian dollars and stress both occupancy and exchange rates.",
+            "Exit liquidity is strongest where a conventional Canadian buyer understands the home immediately. A compact Yaletown unit competes on layout, building record, dues and transit. Lower Lonsdale adds SeaBus access but still depends on the exact slope and building. Point Grey reaches a wealthier family and land-value pool, while an unusual luxury view property can be slower and more negotiation-sensitive. Before offering, ask two agents who did not source the listing for likely successor buyers, recent completed sales and a realistic sale timeline after costs."
+        )),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Ocean, mountains, food and compact neighbourhoods are exceptional; rain, price and address-level mobility determine whether the lifestyle remains easy.",
+        "global_access": "YVR and the Canada Line provide unusual gateway depth, while North Shore bridges and outer neighbourhood last miles add variability.",
+        "ownership_clarity": "Most non-Canadians cannot currently buy covered Vancouver homes; defined exceptions require buyer- and property-specific legal clearance.",
+        "regulatory_safety": "Federal eligibility, layered vacancy taxes, strata governance, short-stay rules, seismic risk and flood exposure all require separate checks.",
+        "rental_profit": "Tenant demand is deep, but high entry, tax, strata and management costs prevent a reliable destination-wide net yield.",
+        "capital_upside": "Scarce geography and domestic demand support selected assets; May 2026 benchmarks also show that price direction is neither uniform nor guaranteed.",
+        "retirement_fit": "Healthcare, transit and services are strong for an eligible resident, while coverage, stairs, rain and car dependence can narrow the fit.",
+        "exit_liquidity": "The Canadian buyer pool is broad for conventional homes in useful locations; singular luxury and troubled strata records narrow the exit.",
+        "foreigner_fit": "Multilingual services and advisers are extensive, but purchase eligibility, tax declarations and residence remain administratively demanding.",
+        "value_entry": "Current asks span compact strata units to multi-million-dollar houses; foreign-buyer and vacancy taxes can overwhelm the apparent entry value.",
+    },
+    market_anchors=(
+        {"location": "Vancouver West apartment", "evidence": "CAD 783,300 May 2026 benchmark", "buyer_read": "GVR’s apartment benchmark is an estimated price for a typical Vancouver West apartment, not a valuation or completed comparable for the CAD 549,900 Yaletown observation.", "source_label": "Greater Vancouver REALTORS May 2026 report", "source_url": "https://members.gvrealtors.ca/news/GVR-Stats-Package-May-2026.pdf"},
+        {"location": "North Vancouver apartment", "evidence": "CAD 783,100 May 2026 benchmark", "buyer_read": "This apartment benchmark provides property-type and geography context only. It does not adjust for the Lower Lonsdale unit’s size, condition, building, strata fees or legal buyer.", "source_label": "Greater Vancouver REALTORS May 2026 report", "source_url": "https://members.gvrealtors.ca/news/GVR-Stats-Package-May-2026.pdf"},
+        {"location": "Vancouver West detached", "evidence": "CAD 3,025,000 May 2026 benchmark", "buyer_read": "The detached benchmark describes a typical Vancouver West property, not the Point Grey house. Land, age, permits, condition and lot characteristics require completed local comparables and inspection.", "source_label": "Greater Vancouver REALTORS May 2026 report", "source_url": "https://members.gvrealtors.ca/news/GVR-Stats-Package-May-2026.pdf"},
+    ),
+    micro_locations_intro="Choose the weekly transport and service system before choosing the view. Municipal borders also change taxes and rules, so Vancouver, North Vancouver, West Vancouver and Richmond must not be treated as one legal address.",
+    micro_locations=(
+        {"name": "West End / Coal Harbour", "best_for": "Walkable central daily life", "daily_life": "Seawall, groceries and downtown services with bus-led access", "diligence": "Strata age, envelope, lifts, dues, Empty Homes Tax and hospital route"},
+        {"name": "Yaletown / False Creek", "best_for": "Canada Line and compact urban routine", "daily_life": "Rapid transit, seawall, shops and dense apartment living", "diligence": "Layout, noise, strata reserves, insurance, tenancy rules and entry price"},
+        {"name": "Fairview / Cambie corridor", "best_for": "Healthcare and transit proximity", "daily_life": "VGH, Canada Line and practical neighbourhood services", "diligence": "Construction disruption, building record, accessibility and flood mapping"},
+        {"name": "Lower Lonsdale", "best_for": "North Shore life with downtown access", "daily_life": "SeaBus, waterfront services and mountain access", "diligence": "Municipal rules, slope, bridge alternative, strata and weather exposure"},
+        {"name": "Point Grey / Kitsilano", "best_for": "Family-scale west-side living", "daily_life": "Beaches, UBC access and quieter residential streets", "diligence": "Entry tax, renovation permits, older-house systems, transit and exit depth"},
+    ),
+    checklist=(
+        "Obtain a written Canadian legal opinion confirming the buyer, beneficial owners, transaction and property qualify under the federal purchase prohibition.",
+        "Confirm the immigration path, right to occupy Canada, healthcare coverage and financing before treating ownership as a retirement solution.",
+        "Calculate ordinary and additional property transfer tax, annual property tax, provincial vacancy tax, Vancouver Empty Homes Tax and sale-tax obligations.",
+        "Choose the weekly service catchment and time YVR, hospital, groceries and evening return from the exact address in winter conditions.",
+        "Review title, beneficial-ownership filings, municipal permits, strata bylaws, depreciation report, minutes, reserves, insurance, claims and assessments.",
+        "Inspect seismic, flood, drainage, envelope, piping, roof, accessibility and—where relevant—slope, retaining walls and buried oil tanks.",
+        "Confirm the lawful tenancy route with the Province, municipality, strata, lender and insurer; underwrite without short-stay income.",
+        "Model five-year Canadian-dollar carrying and sale cash flow, then test the successor buyer and completed comparable evidence with independent agents.",
+    ),
+    references_intro="Legal, tax, market, transport, healthcare, hazard and listing claims were reviewed on 27 August 2026. Recheck by 27 February 2027 and immediately after the federal purchase prohibition, tax rates, short-term-rental rules, municipal vacancy rules, strata law, hazard maps or listings change. Obtain Canadian immigration and tax advice, B.C. legal advice and property-specific insurance and inspection work. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label": "Canada property guide", "url": "/countries/canada-property/"},
+        {"label": "Department of Finance Canada: foreign-purchase prohibition extension", "url": "https://www.canada.ca/en/department-finance/news/2024/02/government-announces-two-year-extension-to-ban-on-foreign-ownership-of-canadian-housing.html"},
+        {"label": "CMHC: purchase-prohibition questions and exceptions", "url": "https://www.cmhc-schl.gc.ca/professionals/housing-markets-data-and-research/housing-research/consultations/prohibition-purchase-residential-property-non-canadians-act/faq"},
+        {"label": "B.C.: additional property transfer tax", "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax"},
+        {"label": "B.C.: speculation and vacancy tax rates", "url": "https://www2.gov.bc.ca/gov/content/taxes/speculation-vacancy-tax/how-tax-works/tax-rates"},
+        {"label": "City of Vancouver: Empty Homes Tax", "url": "https://vancouver.ca/home-property-development/empty-homes-tax-frequently-asked-questions.aspx"},
+        {"label": "B.C.: short-term-rental principal-residence requirement", "url": "https://www2.gov.bc.ca/gov/content/housing-tenancy/short-term-rentals/principal-residence-requirement"},
+        {"label": "CRA: Underused Housing Tax update", "url": "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/uhtn1/introduction-underused-housing-tax.html"},
+        {"label": "Greater Vancouver REALTORS: May 2026 market report", "url": "https://members.gvrealtors.ca/news/GVR-Stats-Package-May-2026.pdf"},
+        {"label": "YVR: Canada Line airport access", "url": "https://cm.yvr.ca/en/passengers/transportation/public-transportation"},
+        {"label": "Vancouver Coastal Health: Vancouver General Hospital", "url": "https://www.vch.ca/en/location/vancouver-general-hospital/about"},
+        {"label": "City of Vancouver: earthquake-risk map", "url": "https://vancouver.ca/files/cov/earthquake-risk-map.pdf"},
+        {"label": "City of Vancouver: designated floodplain data", "url": "https://opendata.vancouver.ca/explore/dataset/designated-floodplain/table/"},
+        {"label": "Bank of Canada: daily exchange rates", "url": "https://www.bankofcanada.ca/rates/exchange/daily-exchange-rates/"},
+        {"label": "Redfin: Yaletown asking observation", "url": "https://www.redfin.ca/bc/vancouver/977-Mainland-St-V6B-1T2/unit-502/home/155622841"},
+        {"label": "Redfin: Lower Lonsdale asking observation", "url": "https://www.redfin.ca/bc/north-vancouver/211-3rd-St-W-V7M-1E9/unit-112/home/157366045"},
+        {"label": "Redfin: Point Grey asking observation", "url": "https://www.redfin.ca/bc/vancouver/4549-W-12th-Ave-V6R-2R4/home/155220564"},
+    ),
+    images=(
+        DossierImage("harbour-hero", "/assets/vancouver-hero.webp", "Vancouver neighbourhood, harbour and North Shore mountains in clear coastal light", "The proposition is a working Pacific city connected to water and mountains—not a view in isolation.", "premium-image--hero", "hero"),
+        DossierImage("daily-life", "/assets/vancouver-daily-life.webp", "Vancouver apartment streets, rapid transit and everyday shops near False Creek", "Transit, healthcare and ordinary services determine which Vancouver address works every week.", "premium-image--wide", "daily-life"),
+        DossierImage("risk-texture", "/assets/vancouver-risk-texture.webp", "Rain-wet Vancouver strata building showing drainage, balconies and building envelope details", "Envelope, drainage, reserves and insurance deserve the same attention as location.", "premium-image--wide", "risk-texture"),
+    ),
+    nav_items=(("verdict", "Verdict"), ("lenses", "Five destination lenses"), ("scores", "Atlas assessment"), ("listings", "What homes cost"), ("locations", "Where to look"), ("checklist", "Buyer checklist"), ("sources", "References")),
+    lenses_heading="Five questions that decide Vancouver",
+    assessment_intro="Vancouver’s overall score captures one metropolitan proposition; the Atlas reads show where federal eligibility, municipal boundaries and the exact building change the answer.",
+    listings_intro="Three direct asks show a compact Yaletown condominium, a Lower Lonsdale apartment and a Point Grey house. They are dated asking evidence only; availability, eligibility, title, condition, negotiability, fees, insurance, lawful use and completed value remain unverified.",
+    market_anchors_intro="Each observation is paired with the closest May 2026 GVR benchmark by geography and property type. Benchmarks describe typical properties; they do not value the listing or adjust for its building, size, condition or taxes.",
+    orientation_groups=(
+        DossierOrientationGroup("Airport and urban rail spine", (("YVR / Richmond", "international gateway and Canada Line"), ("Cambie / Fairview", "healthcare and rapid-transit corridor"), ("Yaletown / Downtown", "compact services and interchange"))),
+        DossierOrientationGroup("Harbour and North Shore", (("Waterfront Station", "downtown rail and SeaBus hub"), ("Lower Lonsdale", "North Shore service base"), ("West / North Vancouver", "bus, bridge and more car-led patterns"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact municipality, station or ferry journey, bridge alternative, tax boundary and hazard overlays for the address.",
+    country_guide_url="/countries/canada-property/",
+    country_guide_label="Canada property guide",
+    rail_comparison="Compare Vancouver with Vancouver Island / Victoria, Whistler and the full Atlas.",
+    property_anchor_indexes=(0, 1, 2),
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -5155,6 +5274,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     SWISS_VALAIS_VAUD_ALPS_DOSSIER.destination_id: SWISS_VALAIS_VAUD_ALPS_DOSSIER,
     GOLD_COAST_SUNSHINE_COAST_DOSSIER.destination_id: GOLD_COAST_SUNSHINE_COAST_DOSSIER,
     LOS_ANGELES_ORANGE_COUNTY_DOSSIER.destination_id: LOS_ANGELES_ORANGE_COUNTY_DOSSIER,
+    VANCOUVER_DOSSIER.destination_id: VANCOUVER_DOSSIER,
 }
 
 
