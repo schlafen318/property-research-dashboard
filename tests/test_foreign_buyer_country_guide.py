@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from collections import Counter
 from copy import deepcopy
+import json
+import re
 import unittest
 from urllib.parse import urlsplit
 
@@ -324,6 +326,53 @@ class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
         self.assertEqual(1, self.japan.count('class="foreign-buyer-destination-table"'))
         for destination_id in ("fukuoka-itoshima", "hakone-izu", "hakuba", "niseko"):
             self.assertIn(f"/destinations/{destination_id}/", self.japan)
+
+    def test_metadata_targets_acquisition_intent(self) -> None:
+        self.assertIn(
+            "<title>Buying Property in Japan as a Foreigner | Global Home Atlas</title>",
+            self.japan,
+        )
+        self.assertIn(
+            '<link rel="canonical" href="https://globalhomeatlas.com/countries/japan-property/">',
+            self.japan,
+        )
+        description = re.search(
+            r'<meta name="description" content="([^"]+)">', self.japan
+        ).group(1)
+        self.assertLessEqual(len(description), 160)
+        self.assertIn("foreigners", description.lower())
+        self.assertNotIn("retirement property", description.lower())
+
+    def test_visible_faq_and_destination_rows_match_acquisition_schema(self) -> None:
+        schema_text = re.search(
+            r'<script type="application/ld\+json">(.*?)</script>',
+            self.japan,
+            flags=re.DOTALL,
+        ).group(1)
+        schemas = json.loads(schema_text)
+        schema_types = [item.get("@type") for item in schemas]
+        self.assertIn("Article", schema_types)
+        self.assertIn("FAQPage", schema_types)
+        self.assertIn("ItemList", schema_types)
+        article = next(item for item in schemas if item.get("@type") == "Article")
+        faq = next(item for item in schemas if item.get("@type") == "FAQPage")
+        item_list = next(item for item in schemas if item.get("@type") == "ItemList")
+
+        self.assertEqual(self.japan.count('class="foreign-buyer-faq-item"'), len(faq["mainEntity"]))
+        self.assertEqual(4, len(item_list["itemListElement"]))
+        self.assertEqual("Buying Property in Japan as a Foreigner", article["headline"])
+        self.assertEqual("https://globalhomeatlas.com/countries/japan-property/", article["url"])
+        for field in ("datePublished", "dateModified", "author", "publisher"):
+            self.assertIn(field, article)
+        self.assertNotIn("CollectionPage", schema_types)
+
+    def test_country_guide_links_once_to_the_retirement_guide(self) -> None:
+        href = '/japan-retirement-property-foreign-buyers/'
+        self.assertEqual(1, self.japan.count(href))
+        self.assertIn(
+            "Planning to live in Japan long term? Read the",
+            self.japan,
+        )
 
 
 class ForeignBuyerCountryGuideDesignTests(unittest.TestCase):

@@ -4474,6 +4474,7 @@ def japan_retirement_overview_html() -> str:
             <p class="seo-eyebrow japan-section-label">Start here</p>
             <h2>Buying property does not give you residency</h2>
             <p>Foreign buyers can generally acquire and register a home in Japan, but ownership does not create a visa, a status of residence, permanent residency, or access to public healthcare. Establish a lawful long-stay route before treating a purchase as a retirement home.</p>
+            <p>For the acquisition process, costs and owner obligations, see <a href="/countries/japan-property/">buying property in Japan as a foreigner</a>.</p>
             <p>Japan does not have a general retirement visa. The closest official option for some affluent long-stay visitors is the designated-activities route for sightseeing and recreation. It is limited to nationals of visa-waiver countries or regions, requires savings of at least ¥30 million for the applicant and spouse, normally permits six months, and can reach a maximum of one year after an extension. Dependent children cannot accompany the applicant under this route. See the <a href="https://www.mofa.go.jp/ca/fna/page22e_000738.html" rel="noopener noreferrer">Ministry of Foreign Affairs requirements</a> and the <a href="https://www.moj.go.jp/isa/applications/status/index.html?language=eng" rel="noopener noreferrer">Immigration Services Agency status list</a>.</p>
             <p><strong>Decision rule:</strong> do not buy for full-time retirement until an immigration professional has confirmed the residence path, its renewal limits, and whether a spouse or dependent can use the same plan.</p>
           </section>
@@ -6307,6 +6308,63 @@ def schema_for_country_hub(hub: dict, selected: list[dict], canonical: str) -> l
     ]
 
 
+def schema_for_foreign_buyer_country_guide(
+    guide: dict, selected: list[dict], canonical: str
+) -> list[dict]:
+    return [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "Article",
+            "headline": guide["h1"],
+            "description": guide["description"],
+            "url": canonical,
+            "datePublished": guide["date_published"],
+            "dateModified": guide["date_reviewed"],
+            "author": {
+                "@type": "Organization",
+                "name": "Global Home Atlas Research Team",
+            },
+            "publisher": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL},
+            "mainEntityOfPage": canonical,
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Countries", "item": f"{SITE_URL}guides/"},
+                {"@type": "ListItem", "position": 3, "name": guide["country"], "item": canonical},
+            ],
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": item["question"],
+                    "acceptedAnswer": {"@type": "Answer", "text": item["answer"]},
+                }
+                for item in guide["faqs"]
+            ],
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": index + 1,
+                    "name": destination["name"],
+                    "url": destination_url(destination),
+                }
+                for index, destination in enumerate(selected)
+            ],
+        },
+    ]
+
+
 def country_destination_cards(destinations: list[dict]) -> str:
     cards = []
     for dest in destinations:
@@ -6440,12 +6498,22 @@ def foreign_buyer_direct_answers_html(
         "financing": "Is financing practical?",
         "short_rentals": "What limits short-term rentals?",
     }
-    return "".join(
-        f'<article><h2>{escape(labels[key])}</h2>'
-        f'<p>{escape(guide["direct_answers"][key]["answer"])}</p>'
-        f'<p class="foreign-buyer-source-links">{source_links_html(source_labels, guide["direct_answers"][key]["source_urls"])}</p></article>'
-        for key in ("ownership", "residency", "financing", "short_rentals")
-    )
+    articles = []
+    for key in ("ownership", "residency", "financing", "short_rentals"):
+        retirement_link = (
+            f'<p>Planning to live in {escape(guide["country"])} long term? Read the '
+            f'<a href="/{escape(guide["retirement_guide_slug"])}/">'
+            f'{escape(guide["country"])} retirement property guide</a> for residence, '
+            "healthcare and retirement-life planning.</p>"
+            if key == "residency" and guide.get("retirement_guide_slug")
+            else ""
+        )
+        articles.append(
+            f'<article><h2>{escape(labels[key])}</h2>'
+            f'<p>{escape(guide["direct_answers"][key]["answer"])}</p>{retirement_link}'
+            f'<p class="foreign-buyer-source-links">{source_links_html(source_labels, guide["direct_answers"][key]["source_urls"])}</p></article>'
+        )
+    return "".join(articles)
 
 
 def foreign_buyer_eligibility_html(
@@ -6570,7 +6638,7 @@ def build_foreign_buyer_country_guide_page(
     return f"""<!doctype html>
 <html lang="en">
 <head>
-{head_html(guide["title"], guide["description"], canonical, schema_for_country_hub(hub, selected, canonical))}
+{head_html(guide["title"], guide["description"], canonical, schema_for_foreign_buyer_country_guide(guide, selected, canonical))}
 <style>{foreign_buyer_country_guide_css()}</style>
 </head>
 <body class="foreign-buyer-country-guide">

@@ -48,6 +48,17 @@ class JapanRetirementArticleTests(unittest.TestCase):
             "https://www.mofa.go.jp/ca/fna/page22e_000738.html", html
         )
 
+    def test_residency_section_links_once_to_the_acquisition_guide(self) -> None:
+        html = rendered_article()
+        href = '/countries/japan-property/'
+
+        self.assertEqual(1, html.count(href))
+        self.assertIn(
+            "For the acquisition process, costs and owner obligations, see",
+            html,
+        )
+        self.assertIn("buying property in japan as a foreigner", html.lower())
+
     def test_article_explains_current_nonresident_owner_obligations(self) -> None:
         html = rendered_article()
 
