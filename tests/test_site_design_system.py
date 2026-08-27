@@ -79,6 +79,20 @@ class LandingDesignSystemPilotTests(unittest.TestCase):
         self.assertIn('.gha-mode-landing .recommendation-card em { display: block;', self.html)
         self.assertIn('.gha-mode-landing .recommendation-card .card-link { display: inline-flex; align-items: center; min-height: 44px;', self.html)
 
+    def test_hero_copy_aligns_to_the_site_grid_with_a_readable_eyebrow(self) -> None:
+        self.assertIn(
+            '.gha-mode-landing .hero-grid { width: min(790px, calc(100% - 48px)); max-width: none; margin: 0 auto 0 max(24px, calc((100% - 1220px) / 2));',
+            self.html,
+        )
+        self.assertIn(
+            '.gha-mode-landing .eyebrow { margin: 0 0 20px; color: var(--gha-accent); font-size: 13px;',
+            self.html,
+        )
+        self.assertIn(
+            '.gha-mode-landing .hero-grid { width: min(790px, calc(100% - 32px)); margin-left: 16px;',
+            self.html,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

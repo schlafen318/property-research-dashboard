@@ -98,9 +98,9 @@ def landing_design_css() -> str:
     .gha-mobile-menu nav a:last-child { border-bottom: 0; }
 
     .gha-mode-landing .hero { min-height: 760px; display: grid; align-items: center; padding: 128px 0 92px; background: linear-gradient(90deg, rgba(244, 239, 228, .99) 0 43%, rgba(244, 239, 228, .78) 64%, rgba(244, 239, 228, .28)), url("/assets/atlas-map-coastal-sage.jpg") center / cover; }
-    .gha-mode-landing .hero-grid { max-width: 790px; display: grid; padding-top: 42px; }
+    .gha-mode-landing .hero-grid { width: min(790px, calc(100% - 48px)); max-width: none; margin: 0 auto 0 max(24px, calc((100% - 1220px) / 2)); display: grid; padding-top: 42px; }
     .gha-eyebrow { font-weight: 500; }
-    .gha-mode-landing .eyebrow { margin: 0 0 20px; color: var(--gha-accent); font-size: 11px; font-weight: 500; letter-spacing: .15em; }
+    .gha-mode-landing .eyebrow { margin: 0 0 20px; color: var(--gha-accent); font-size: 13px; font-weight: 500; letter-spacing: .13em; }
     .gha-mode-landing h1 { max-width: 780px; font-family: var(--gha-display-serif); font-size: clamp(58px, 7.8vw, 104px); font-weight: 500; line-height: .91; letter-spacing: -.04em; }
     .gha-mode-landing .lede { max-width: 670px; margin-top: 28px; color: #46524d; font-family: var(--gha-display-serif); font-size: clamp(20px, 2vw, 25px); line-height: 1.42; }
     .gha-mode-landing .hero-actions { display: grid; justify-items: start; margin-top: 32px; gap: 16px; }
@@ -178,7 +178,7 @@ def landing_design_css() -> str:
       .gha-primary-links { display: none; }
       .gha-mobile-menu { display: block; }
       .gha-mode-landing .hero { min-height: 680px; padding: 106px 0 72px; background-position: 62% center; }
-      .gha-mode-landing .hero-grid { padding-top: 28px; }
+      .gha-mode-landing .hero-grid { width: min(790px, calc(100% - 32px)); margin-left: 16px; padding-top: 28px; }
       .gha-mode-landing .section--finder { margin: 48px 0; padding: 28px; }
       .gha-mode-landing .finder-grid { grid-template-columns: 1fr; gap: 22px; }
       .gha-mode-landing .finder-results { grid-template-columns: repeat(3, minmax(0, 1fr)); }
