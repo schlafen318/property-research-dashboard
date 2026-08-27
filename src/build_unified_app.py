@@ -6654,6 +6654,7 @@ def build_foreign_buyer_country_guide_page(
   <div class="foreign-buyer-shell foreign-buyer-answers">{foreign_buyer_direct_answers_html(guide, source_labels)}</div>
 </header>
 <main><div class="foreign-buyer-shell foreign-buyer-layout">
+  <aside class="foreign-buyer-rail"><p>In this guide</p><nav aria-label="In this guide">{rail_links}</nav><a class="foreign-buyer-atlas-link" href="/dashboard/#destinations">Compare every destination</a></aside>
   <article class="foreign-buyer-article">
     <section id="ownership-answer"><h2>Can foreigners buy property in Japan?</h2>{eligibility_html}</section>
     <section id="purchase-process"><h2>How the purchase works</h2><ol class="foreign-buyer-steps">{foreign_buyer_purchase_steps_html(guide, source_labels)}</ol></section>
@@ -6664,7 +6665,6 @@ def build_foreign_buyer_country_guide_page(
     <section id="faq"><h2>Frequently asked questions</h2>{foreign_buyer_faq_html(guide, source_labels)}</section>
     <section id="sources"><h2>References and update policy</h2><p>Rules can change. Recheck every linked source and obtain current professional advice before signing.</p><ul>{foreign_buyer_sources_html(guide)}</ul></section>
   </article>
-  <aside class="foreign-buyer-rail"><p>In this guide</p><nav aria-label="In this guide">{rail_links}</nav><a class="foreign-buyer-atlas-link" href="/dashboard/#destinations">Compare every destination</a></aside>
 </div></main>
 {site_footer_html(SITE_NAME, CONTACT_EMAIL)}
 {analytics_event_script()}

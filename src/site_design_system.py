@@ -277,7 +277,7 @@ def foreign_buyer_country_guide_css() -> str:
     .foreign-buyer-answers .foreign-buyer-source-links { font-family: var(--foreign-buyer-sans); font-size: 12px; line-height: 1.45; }
 
     .foreign-buyer-layout { display: grid; grid-template-columns: minmax(0, 760px) minmax(190px, 238px); justify-content: space-between; gap: clamp(42px, 8vw, 108px); padding: 74px 0 84px; }
-    .foreign-buyer-article { min-width: 0; }
+    .foreign-buyer-article { grid-column: 1; grid-row: 1; min-width: 0; }
     .foreign-buyer-article > section { padding: 0 0 52px; margin: 0 0 52px; border-bottom: 1px solid var(--foreign-buyer-rule); scroll-margin-top: 24px; }
     .foreign-buyer-article > section:last-child { margin-bottom: 0; }
     .foreign-buyer-article h2 { margin: 0 0 22px; font-family: var(--foreign-buyer-serif); font-size: clamp(32px, 4vw, 46px); font-weight: 500; line-height: 1.04; letter-spacing: -.02em; }
@@ -310,7 +310,7 @@ def foreign_buyer_country_guide_css() -> str:
     .foreign-buyer-article #sources ul { margin: 0; padding-left: 20px; }
     .foreign-buyer-article #sources li { margin-bottom: 9px; }
 
-    .foreign-buyer-rail { position: sticky; top: 28px; align-self: start; padding-top: 5px; }
+    .foreign-buyer-rail { position: sticky; grid-column: 2; grid-row: 1; top: 28px; align-self: start; padding-top: 5px; }
     .foreign-buyer-rail > p { margin: 0 0 10px; color: var(--foreign-buyer-muted); font-size: 12px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
     .foreign-buyer-rail nav { border-top: 1px solid var(--foreign-buyer-rule); }
     .foreign-buyer-rail a { min-height: 44px; display: flex; align-items: center; border-bottom: 1px solid var(--foreign-buyer-rule); color: var(--foreign-buyer-ink); font-size: 14px; font-weight: 500; text-decoration: none; }
@@ -322,14 +322,14 @@ def foreign_buyer_country_guide_css() -> str:
     .foreign-buyer-country-guide .gha-footer strong { font-family: var(--foreign-buyer-serif); font-size: 25px; font-weight: 500; }
     .foreign-buyer-country-guide .gha-footer p { max-width: 54ch; color: rgba(243, 239, 229, .74); font-size: 13px; line-height: 1.6; }
     .foreign-buyer-country-guide .gha-footer nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
-    .foreign-buyer-country-guide .gha-footer a { min-height: 30px; display: inline-flex; align-items: center; color: var(--foreign-buyer-paper); font-size: 13px; font-weight: 500; }
+    .foreign-buyer-country-guide .gha-footer a { min-height: 44px; display: inline-flex; align-items: center; color: var(--foreign-buyer-paper); font-size: 13px; font-weight: 500; }
     .foreign-buyer-country-guide .gha-footer__signup { display: grid; align-content: start; gap: 10px; }
 
     @media (max-width: 960px) {
       .foreign-buyer-hero-grid { grid-template-columns: minmax(0, 1fr) minmax(260px, .74fr); gap: 36px; }
       .foreign-buyer-layout { grid-template-columns: 1fr; gap: 0; padding-top: 58px; }
-      .foreign-buyer-article { max-width: 760px; }
-      .foreign-buyer-rail { position: static; order: -1; max-width: 760px; padding: 0 0 38px; margin-bottom: 48px; border-bottom: 1px solid var(--foreign-buyer-rule); }
+      .foreign-buyer-article { grid-column: 1; grid-row: 2; max-width: 760px; }
+      .foreign-buyer-rail { grid-column: 1; grid-row: 1; position: static; max-width: 760px; padding: 0 0 38px; margin-bottom: 48px; border-bottom: 1px solid var(--foreign-buyer-rule); }
       .foreign-buyer-rail nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 22px; }
       .foreign-buyer-rail .foreign-buyer-atlas-link { display: inline-flex; width: fit-content; }
     }
@@ -364,6 +364,7 @@ def foreign_buyer_country_guide_css() -> str:
       .foreign-buyer-destination-cards { display: grid; border-top: 1px solid var(--foreign-buyer-rule); }
       .foreign-buyer-destination-cards article { padding: 20px 0; border-bottom: 1px solid var(--foreign-buyer-rule); }
       .foreign-buyer-destination-cards h3 { margin: 0 0 10px; font-family: var(--foreign-buyer-serif); font-size: 25px; font-weight: 500; }
+      .foreign-buyer-destination-cards h3 a { min-height: 44px; display: inline-flex; align-items: center; }
       .foreign-buyer-destination-cards p { margin: 0 0 8px; }
       .foreign-buyer-country-guide .gha-footer__grid, .foreign-buyer-country-guide .gha-footer nav { grid-template-columns: 1fr; }
       .foreign-buyer-country-guide .gha-footer__grid { gap: 32px; }

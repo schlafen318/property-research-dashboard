@@ -509,3 +509,12 @@ class ForeignBuyerCountryGuideDesignTests(unittest.TestCase):
         self.assertIn('<span class="foreign-buyer-mobile-label">What matters</span>', self.html)
         self.assertIn(".foreign-buyer-cost-table thead { position: absolute;", self.html)
         self.assertNotIn(".foreign-buyer-cost-table thead { display: none;", self.html)
+
+    def test_rail_precedes_article_in_dom_and_mobile_target_rules_are_complete(self) -> None:
+        self.assertLess(
+            self.html.index('<aside class="foreign-buyer-rail">'),
+            self.html.index('<article class="foreign-buyer-article">'),
+        )
+        self.assertNotIn(".foreign-buyer-rail { position: static; order: -1;", self.html)
+        self.assertIn(".foreign-buyer-country-guide .gha-footer a { min-height: 44px;", self.html)
+        self.assertIn(".foreign-buyer-destination-cards h3 a { min-height: 44px;", self.html)
