@@ -324,3 +324,25 @@ class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
         self.assertEqual(1, self.japan.count('class="foreign-buyer-destination-table"'))
         for destination_id in ("fukuoka-itoshima", "hakone-izu", "hakuba", "niseko"):
             self.assertIn(f"/destinations/{destination_id}/", self.japan)
+
+
+class ForeignBuyerCountryGuideDesignTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.html = render_country("japan-property")
+
+    def test_page_uses_premium_editorial_typography_without_heavy_weights(self) -> None:
+        self.assertIn("--foreign-buyer-serif:", self.html)
+        self.assertIn(".foreign-buyer-hero h1", self.html)
+        for weight in ("font-weight: 800", "font-weight: 850", "font-weight: 900"):
+            self.assertNotIn(weight, self.html)
+
+    def test_rail_and_mobile_targets_are_explicit(self) -> None:
+        self.assertIn(".foreign-buyer-rail { position: sticky;", self.html)
+        self.assertIn(".foreign-buyer-rail a { min-height: 44px;", self.html)
+        self.assertIn("@media (max-width: 720px)", self.html)
+
+    def test_comparison_has_desktop_table_and_mobile_cards(self) -> None:
+        self.assertIn('class="foreign-buyer-destination-table"', self.html)
+        self.assertIn('class="foreign-buyer-destination-cards"', self.html)
+        self.assertIn(".foreign-buyer-destination-table { display: none;", self.html)

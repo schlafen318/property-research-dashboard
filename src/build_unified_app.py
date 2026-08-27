@@ -20,7 +20,12 @@ try:
     )
     from src.seo_content_overrides import apply_content_override, load_content_overrides
     from src.retirement_destination_finder_page import build_retirement_destination_finder_html
-    from src.site_design_system import landing_design_css, site_footer_html, site_header_html
+    from src.site_design_system import (
+        foreign_buyer_country_guide_css,
+        landing_design_css,
+        site_footer_html,
+        site_header_html,
+    )
     from src.premium_destination_dossiers import (
         PremiumDossierSpec,
         get_premium_dossier,
@@ -34,7 +39,12 @@ except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.p
     )
     from seo_content_overrides import apply_content_override, load_content_overrides
     from retirement_destination_finder_page import build_retirement_destination_finder_html
-    from site_design_system import landing_design_css, site_footer_html, site_header_html
+    from site_design_system import (
+        foreign_buyer_country_guide_css,
+        landing_design_css,
+        site_footer_html,
+        site_header_html,
+    )
     from premium_destination_dossiers import (
         PremiumDossierSpec,
         get_premium_dossier,
@@ -6561,7 +6571,7 @@ def build_foreign_buyer_country_guide_page(
 <html lang="en">
 <head>
 {head_html(guide["title"], guide["description"], canonical, schema_for_country_hub(hub, selected, canonical))}
-<style>{shared_content_css()}</style>
+<style>{foreign_buyer_country_guide_css()}</style>
 </head>
 <body class="foreign-buyer-country-guide">
 {site_header_html(PRIMARY_NAV_LINKS)}
