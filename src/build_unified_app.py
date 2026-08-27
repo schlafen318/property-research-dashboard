@@ -7526,6 +7526,13 @@ def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec)
             )
         if row["local_currency"] == "USD":
             comparison_html = f'<div><dt>Price / m²</dt><dd>{money(row["usd_per_m2"])}/m²</dd></div>'
+        elif spec.destination_id == "swiss-valais-vaud-alps":
+            local_per_m2 = float(row["local_price"]) / float(row["size_m2"])
+            comparison_html = (
+                f'<div><dt>Price / m²</dt><dd>{local_per_m2:,.0f} {escape(row["local_currency"])}/m²</dd></div>'
+                f'<div><dt>USD comparison</dt><dd>{money(row["usd_price"])}'
+                f'<span>{money(row["usd_per_m2"])}/m²</span></dd></div>'
+            )
         else:
             comparison_html = f'<div><dt>USD comparison</dt><dd>{money(row["usd_price"])}<span>{money(row["usd_per_m2"])}/m²</span></dd></div>'
         records.append(

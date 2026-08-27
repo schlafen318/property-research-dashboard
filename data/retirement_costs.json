@@ -2603,9 +2603,9 @@
         }
       },
       "property": {
-        "representative_price_usd": 4350080,
+        "representative_price_usd": 2883482,
         "acquisition_cost_rate": 0.05,
-        "price_basis": "Median of three representative Swiss Valais / Vaud Alps listing snapshots captured by Global Home Atlas."
+        "price_basis": "Rounded median of three direct Verbier, Crans-Montana and Zermatt apartment asking observations captured 2026-08-27; not a market-wide median or completed-sale value."
       },
       "confidence": {
         "overall": "medium",
@@ -2635,12 +2635,12 @@
           "notes": "Official national index used as a planning proxy, not a forecast."
         },
         {
-          "name": "Savills — property listings",
-          "url": "https://search.savills.com/list/property-for-sale/switzerland/swiss-alps",
+          "name": "Direct Verbier, Crans-Montana and Zermatt listing observations",
+          "url": "https://www.homegate.ch/buy/4003368240",
           "metric_supported": "Representative property acquisition benchmark",
-          "source_date": "2026-06-21",
-          "accessed_on": "2026-08-18",
-          "notes": "Median of three captured listings; not a market-wide median and availability changes."
+          "source_date": "2026-08-27",
+          "accessed_on": "2026-08-27",
+          "notes": "Median of three dated direct asking observations; availability changes and the figure is not a completed-sale valuation."
         }
       ]
     },
