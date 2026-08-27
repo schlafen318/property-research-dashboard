@@ -16,6 +16,7 @@ try:
     from src.country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from src.seo_content_overrides import apply_content_override, load_content_overrides
     from src.retirement_destination_finder_page import build_retirement_destination_finder_html
+    from src.site_design_system import landing_design_css, site_footer_html, site_header_html
     from src.premium_destination_dossiers import (
         PremiumDossierSpec,
         get_premium_dossier,
@@ -25,6 +26,7 @@ except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.p
     from country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from seo_content_overrides import apply_content_override, load_content_overrides
     from retirement_destination_finder_page import build_retirement_destination_finder_html
+    from site_design_system import landing_design_css, site_footer_html, site_header_html
     from premium_destination_dossiers import (
         PremiumDossierSpec,
         get_premium_dossier,
@@ -3681,6 +3683,7 @@ def build_landing_page(
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta data-design-system="gha-v1">
 {favicon_links_html()}
   <title>{escape(content["title"])}</title>
   <meta name="description" content="{escape(content["description"])}">
@@ -3937,14 +3940,15 @@ def build_landing_page(
       .inspired-visual {{ min-height: 230px; }}
       .atlas-visual {{ min-height: 140px; }}
     }}
+    {landing_design_css()}
   </style>
 </head>
-<body>
+<body class="gha-mode-landing">
+  {site_header_html(PRIMARY_NAV_LINKS)}
   <header class="hero" id="top">
-    {topbar_nav_html()}
     <div class="shell hero-grid">
       <div>
-        <p class="eyebrow">Independent overseas property research</p>
+        <p class="eyebrow gha-eyebrow">Independent overseas property research</p>
         <h1>Global Home Atlas</h1>
         <p class="lede">{escape(content["generated_intro"])}</p>
         {generated_link}
@@ -4038,29 +4042,7 @@ def build_landing_page(
     </div>
   </main>
 
-  <footer class="footer">
-    <div class="shell">
-      <div class="footer-grid">
-        <div>
-          <strong>Global Home Atlas</strong>
-          <p>Independent research for overseas property decisions. Research only; verify legal, tax, immigration, and property advice locally.</p>
-          <nav aria-label="Footer">
-            <a href="/dashboard/">Research dashboard</a>
-            <a href="/country-comparison/">Compare countries</a>
-            <a href="/guides/">Guides</a>
-            <a href="/methodology/">Methodology</a>
-            <a href="/research-standards/">Research standards</a>
-            <a href="/contact/">Contact</a>
-          </nav>
-        </div>
-        <div class="footer-signup">
-          <strong>Get destination updates</strong>
-          <p>Ask to be notified when new destination research or country hubs are added.</p>
-          <a class="secondary-action" href="mailto:{escape(CONTACT_EMAIL)}?subject=Global%20Home%20Atlas%20updates" data-track="contact_click" data-track-label="footer updates">Email {escape(CONTACT_EMAIL)}</a>
-        </div>
-      </div>
-    </div>
-  </footer>
+  {site_footer_html(SITE_NAME, CONTACT_EMAIL)}
   <script>
     (function () {{
       const finderData = {build_market_finder_data(destinations)};
