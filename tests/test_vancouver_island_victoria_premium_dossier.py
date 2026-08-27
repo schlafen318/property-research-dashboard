@@ -279,7 +279,7 @@ class VancouverIslandVictoriaRenderingTests(unittest.TestCase):
             "https://laws-lois.justice.gc.ca/eng/AnnualStatutes/2024_17/page-15.html",
             "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2022-250/section-3.html",
             "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax",
-            "https://www.canada.ca/en/services/taxes/excise-taxes-duties-and-levies/underused-housing-tax.html",
+            "https://www.canada.ca/en/revenue-agency/services/forms-publications/publications/uhtn1/introduction-underused-housing-tax.html",
         ):
             self.assertIn(text, html)
 
