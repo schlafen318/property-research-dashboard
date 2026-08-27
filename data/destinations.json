@@ -3015,21 +3015,21 @@
     "name": "Jackson Hole",
     "country": "United States",
     "category": "Mountain",
-    "overall_score": 3.52,
-    "usd_per_m2": 17200.0,
-    "net_yield_estimate": "1.8-3% est. net",
+    "overall_score": 3.47,
+    "usd_per_m2": 13400,
+    "net_yield_estimate": "Asset-specific; no destination-wide net yield",
     "quick_metrics": {
-      "usd_m": "$17,200",
-      "net_yield": "1.8-3% est. net",
+      "usd_m": "$13,400",
+      "net_yield": "Asset-specific",
       "ownership": "5.0/5",
       "friendly": "4.4/5"
     },
-    "panel_summary": "A scarcity and tax-positioning benchmark with exceptional landscape quality, but the panel would be cautious on affordability, liquidity depth below trophy assets, and rental economics.",
+    "panel_summary": "A high-capital personal-use mountain market where daily-life utility, lawful use, insurance and exit depth matter more than a generic scarcity or tax narrative.",
     "pros": [
       "Exceptional scenery and outdoor access",
-      "very limited private land supply",
-      "Wyoming tax appeal",
-      "clean US freehold ownership",
+      "Jackson town healthcare and services",
+      "conventional US title framework",
+      "strong affluent-buyer recognition",
       "strong high-net-worth demand"
     ],
     "cons": [
@@ -3039,7 +3039,7 @@
       "yield often secondary to wealth preservation",
       "airport/weather and seasonality limitations"
     ],
-    "panel_verdict": "Add for scarcity comparison, not as a practical yield market. It is a defensive trophy asset case.",
+    "panel_verdict": "Shortlist only for a high-capital personal-use buyer who has an independent residence and healthcare plan and confirms the exact property’s lawful use and full carrying cost.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -3112,18 +3112,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "US freehold ownership is open; Wyoming tax posture can be attractive, but foreign buyers need US tax and estate advice.",
-    "red_flags": "Extreme scarcity pricing, low yield, thin inventory, and reliance on high-net-worth discretionary demand.",
+    "ownership_notes": "Conventional Wyoming title is familiar, but foreign buyers need current entity, tax, estate, FIRPTA and critical-infrastructure screening for the exact buyer and parcel.",
+    "red_flags": "High entry cost, address-specific rental rules, wildfire and snow exposure, insurance cost, HOA burden, private systems and a thin luxury exit pool.",
     "rental": {
       "gross_yield": "Luxury rental demand exists, but low yield relative to capital value and operating constraints should be assumed.",
-      "net_yield": "1.8-3% est. net",
+      "net_yield": "Asset-specific; no destination-wide net yield",
       "revenue": "Asset-specific; verify local manager data and permit status.",
       "adr_occupancy": "Summer and winter peaks; shoulder-season variability.",
       "confidence": "Low-medium; trophy-market benchmark"
     },
-    "price_basis": "Prime Jackson Hole built-property benchmark. Approx. $1,600/sq ft blended benchmark, converted to about $17,200/m2; trophy estates can be far higher.",
-    "price_confidence": "Medium-low; sales-price opacity and submarket spread",
-    "profit_driver": "Scarce private land, Wyoming tax appeal, elite outdoor lifestyle, and long-term wealth-preservation demand.",
+    "price_basis": "Rounded median asking price per square metre from three direct observations captured 2026-08-27 in Hoback/J-W, Teton Village and The Aspens. The examples are dated evidence, not a market-wide median or valuation.",
+    "price_confidence": "Medium; three direct asks with different property types, legal-use contexts and HOA burdens",
+    "profit_driver": "Personal-use demand, extraordinary recreation and a recognised high-capital buyer pool; any rental case remains property-specific.",
     "rank": 28
   },
   {

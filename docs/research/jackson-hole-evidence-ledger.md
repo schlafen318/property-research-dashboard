@@ -1,0 +1,31 @@
+# Jackson Hole evidence ledger
+
+Reviewed 2026-08-27. Direct official sources support material claims; direct listings support dated asking observations only.
+
+| Claim or topic | Source owner | Direct URL | Source date / status | Reviewed | Scope | Limitation | Recheck trigger | Destination section(s) |
+|---|---|---|---|---|---|---|---|---|
+| Town short-term rentals | Town of Jackson | https://www.jacksonwy.gov/335/Short-Term-Rentals | Current page | 2026-08-27 | Town jurisdiction; fewer than 30 consecutive days, with 31+ leases separately outside | Confirm 30-day treatment, exact permit and overlay | Rule, parcel or use change | Verdict; ownership; checklist |
+| County short-term rentals | Teton County | https://www.tetoncountywy.gov/2037/Planning-FAQs | Current page | 2026-08-27 | Unincorporated county | Development list does not prove unit eligibility | Rule, HOA or property change | Ownership; locations |
+| County rental enforcement | Teton County | https://www.tetoncountywy.gov/653/Short-Term-Rental-Violations | Current page | 2026-08-27 | Unincorporated county | Enforcement summary | Rule change | Ownership |
+| Completed-sale anchors | Teton County | https://tetoncountywy.gov/DocumentCenter/View/36565/HSP-2025---ADOPTED-formatted-for-web?bidId= | Adopted 2025; 2024 sales | 2026-08-27 | County free-market segments | Broad unmatched median and average values | New plan or annual data | Financial case; listings |
+| Assessment method | Teton County Assessor | https://www.tetoncountywy.gov/185/Assessor | Current page | 2026-08-27 | County assessment | Not a valuation of a candidate | Assessment or law change | Financial case |
+| Property tax | Teton County | https://www.tetoncountywy.gov/435/Property-Tax | Current page | 2026-08-27 | County tax | Mill levy and treatment vary | New bill or assessment | Value and exit |
+| Critical-infrastructure conveyances | Wyoming Legislature | https://wyoleg.gov/2025/SessionLaws.pdf | Effective 2025-07-01 | 2026-08-27 | Wyoming | Requires buyer/parcel advice | Statute or designation change | Verdict; ownership |
+| Alien-conveyance repeal | Wyoming Legislature | https://wyoleg.gov/2001/enroll/sf0067.htm | Enacted 2001 | 2026-08-27 | Wyoming | Does not displace later rules | Statute change | Ownership |
+| FIRPTA | IRS | https://www.irs.gov/individuals/international-taxpayers/firpta-withholding | Current page | 2026-08-27 | Foreign seller federal tax | Exceptions and certificates vary | Federal rule or buyer change | Access and integration |
+| ITIN | IRS | https://www.irs.gov/individuals/international-taxpayers/itin-guidance-for-foreign-property-buyers-sellers | Current page | 2026-08-27 | Federal tax administration | Buyer-specific | IRS rule change | Access and integration |
+| Estate tax | IRS | https://www.irs.gov/businesses/small-businesses-self-employed/frequently-asked-questions-on-estate-taxes-for-nonresidents-not-citizens-of-the-united-states | Current page | 2026-08-27 | Nonresident noncitizens | Treaty and structure matter | Buyer or rule change | Access and integration |
+| Visitor status | U.S. State Department | https://travel.state.gov/content/travel/en/us-visas/tourism-visit/visitor.html | Current page | 2026-08-27 | Temporary visits | Not immigration advice | Status or policy change | Verdict |
+| Visa Waiver Program | U.S. State Department | https://travel.state.gov/content/travel/en/us-visas/tourism-visit/visa-waiver-program.html | Current page | 2026-08-27 | Eligible visits up to 90 days | Eligibility varies | Passport or policy change | Verdict |
+| Marketplace health coverage | HealthCare.gov | https://www.healthcare.gov/immigrants/lawfully-present-immigrants/ | Current page | 2026-08-27 | Federal marketplace eligibility | Household-specific | Status or policy change | Verdict; retirement fit |
+| Medicare eligibility | Medicare | https://www.medicare.gov/basics/get-started-with-medicare | Current page | 2026-08-27 | Federal program | Individual eligibility varies | Status or policy change | Verdict; retirement fit |
+| Local hospital system | St. John’s Health | https://www.stjohns.health/about/ | Current page | 2026-08-27 | Jackson Hole | Services change | Clinical need or service change | Retirement fit |
+| Airport schedule | Jackson Hole Airport | https://www.jacksonholeairport.com/travelers/flightschedule/ | 2026 schedule | 2026-08-27 | JAC routes | Seasonal and changeable | Schedule change | Access |
+| START transit routes | Town of Jackson / START | https://www.jacksonwy.gov/404/Maps-Schedules | Summer 2026 schedule | 2026-08-27 | Town, Teton Village and commuter routes | Seasonal schedules change | Schedule or address change | Verdict; retirement fit; access |
+| Elevation and snowfall | Town of Jackson | https://www.jacksonwy.gov/214/Location | Current page | 2026-08-27 | Town elevation and climate | Individual sites differ | Climate page or property change | Retirement fit |
+| Teton Pass conditions | WYDOT | https://webcams.wyoroad.info/highway/webcameras/view?site=WYO22TetonPass | Live page | 2026-08-27 | WY-22 | Conditions are time-specific | Travel or road event | Access |
+| Building, WUI, flood and snow | Teton County | https://www.tetoncountywy.gov/faq.aspx?TID=25 | Current page | 2026-08-27 | County parcels | Exact engineering remains required | Property or map change | Ownership; checklist |
+| Regional hazard plan | Teton County | https://www.tetoncountywy.gov/DocumentCenter/View/14355/Wyoming-Region-8-Hazard-Mitigation-Plan | 2025–2030 | 2026-08-27 | Regional hazards | Not parcel due diligence | Plan or hazard change | Ownership |
+| Hoback direct ask | Zillow | https://www.zillow.com/homedetails/1655-E-J-West-Dr-Jackson-WY-83001/194360964_zpid/ | Captured 2026-08-27 | 2026-08-27 | One listing | Ask only; may change | Listing change | What homes cost |
+| Teton Village direct ask | Zillow | https://www.zillow.com/homedetails/7170-N-Rachel-Way-B-5-Jackson-WY-83001/2057733029_zpid/ | Captured 2026-08-27 | 2026-08-27 | One listing | Seller rental claim unverified | Listing, HOA or permit change | What homes cost |
+| The Aspens direct ask | Zillow | https://www.zillow.com/homedetails/3920-N-Pond-Dr-10-Wilson-WY-83014/119802741_zpid/ | Captured 2026-08-27 | 2026-08-27 | One listing | Seller rental claim unverified | Listing, HOA or permit change | What homes cost |

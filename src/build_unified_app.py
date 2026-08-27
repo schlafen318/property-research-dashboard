@@ -200,6 +200,11 @@ COUNTRY_HUBS = [
         "description": "Compare United States property markets, including Miami, Fort Lauderdale, Aspen, Park City, Lake Tahoe, and Jackson Hole across ownership clarity, price discipline, rental rules, insurance, and climate risk.",
         "h1": "United States Property Guide for Foreign Buyers",
         "thesis": "The United States offers established title systems and deep market liquidity, from Miami and Fort Lauderdale condominiums to western resort homes, but underwriting is rarely simple. Buyers need to separate lifestyle appeal from income potential, then model ownership eligibility, local rental rules, insurance, taxes, building governance and carrying costs market by market.",
+        "destination_spotlight": {
+            "label": "Jackson Hole property dossier",
+            "url": "/destinations/jackson-hole/",
+            "text": "Jackson Hole is the clearest Wyoming stress test: screen the buyer and parcel under current critical-infrastructure rules, distinguish Town of Jackson rental limits from Teton County’s approved resort geography, and underwrite St. John’s Health, seasonal air access, wildfire, snow, HOA and private-system costs address by address.",
+        },
         "country_rules": [
             {"heading": "Property and immigration are separate", "text": "Buying a U.S. home does not create immigration status. A B-2 visitor visa is for temporary tourism and does not permit permanent residence. Establish the lawful long-stay route, tax residence and health-insurance plan independently before treating a purchase as a retirement home."},
             {"heading": "Utah restricts defined foreign entities", "text": "Utah's Restrictions on Foreign Acquisitions of Land Act applies to defined restricted foreign entities rather than every foreign individual. Buyer nationality, control, entity structure, land and timing must be checked against the current statute by Utah counsel before commitment."},
@@ -223,6 +228,11 @@ COUNTRY_HUBS = [
             {"label": "Florida Statutes Chapter 692 Part III", "url": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&URL=0600-0699%2F0692%2F0692PARTIIIContentsIndex.html"},
             {"label": "Florida DBPR: condominium milestone inspections", "url": "https://condos.myfloridalicense.com/inspections/"},
             {"label": "Miami-Dade: flood-zone maps", "url": "https://www.miamidade.gov/global/economy/building/flood-protection/flood-zone-maps.page"},
+            {"label": "Wyoming 2025 session laws: critical-infrastructure conveyances", "url": "https://wyoleg.gov/2025/SessionLaws.pdf"},
+            {"label": "Town of Jackson: short-term rentals", "url": "https://www.jacksonwy.gov/335/Short-Term-Rentals"},
+            {"label": "Teton County: planning and short-term-rental FAQ", "url": "https://www.tetoncountywy.gov/2037/Planning-FAQs"},
+            {"label": "St. John’s Health: Jackson Hole health system", "url": "https://www.stjohns.health/about/"},
+            {"label": "Teton County: regional hazard mitigation plan", "url": "https://www.tetoncountywy.gov/DocumentCenter/View/14355/Wyoming-Region-8-Hazard-Mitigation-Plan"},
         ],
         "destination_ids": ["miami-fort-lauderdale", "park-city-deer-valley", "lake-tahoe", "jackson-hole", "aspen-snowmass"],
         "guide_slugs": ["best-places-to-buy-a-second-home-abroad", "foreign-property-investment-risks", "overseas-property-investment", "where-can-foreigners-buy-property"],
@@ -5906,6 +5916,13 @@ def build_country_hub_page(
     )
     intro = hub.get("generated_intro") or hub["description"]
     generated_link = generated_internal_link_html(hub)
+    destination_spotlight = hub.get("destination_spotlight")
+    destination_spotlight_html = (
+        f'<p><a href="{escape(destination_spotlight["url"])}">{escape(destination_spotlight["label"])}</a>: '
+        f'{escape(destination_spotlight["text"])}</p>'
+        if destination_spotlight
+        else ""
+    )
     country_rules = "".join(
         f'<h3>{escape(item["heading"])}</h3><p>{escape(item["text"])}</p>'
         for item in hub.get("country_rules", [])
@@ -5968,6 +5985,7 @@ def build_country_hub_page(
           <details class="page-section" id="country-thesis" open>
             <summary><h2>Country Thesis</h2></summary>
             <p>{escape(hub["thesis"])}</p>
+            {destination_spotlight_html}
             <p>This page is a country-level filter for global buyers. Use it to decide whether {escape(hub["country"])} deserves deeper local diligence before comparing individual homes, agents, or legal structures.</p>
             {country_research}
           </details>
@@ -5999,6 +6017,7 @@ def build_country_hub_page(
           <details class="page-section" id="destination-comparison" open>
             <summary><h2>Destination Comparison</h2></summary>
             <p>Use this country table to compare score, ownership, retirement practicality, exit liquidity, and the briefing read before opening a destination dossier.</p>
+            {destination_spotlight_html}
             {country_cluster_visual(selected)}
             {country_destination_mobile_cards(selected)}
             {country_destination_table(selected)}
@@ -7485,13 +7504,17 @@ def premium_dossier_property_records(rows: list[dict], spec: PremiumDossierSpec)
                 f'{escape(anchor["evidence"])}. {escape(anchor["buyer_read"])} '
                 f'<a href="{escape(anchor["source_url"])}" rel="noopener noreferrer">{escape(anchor["source_label"])}</a></p>'
             )
+        if row["local_currency"] == "USD":
+            comparison_html = f'<div><dt>Price / m²</dt><dd>{money(row["usd_per_m2"])}/m²</dd></div>'
+        else:
+            comparison_html = f'<div><dt>USD comparison</dt><dd>{money(row["usd_price"])}<span>{money(row["usd_per_m2"])}/m²</span></dd></div>'
         records.append(
             '<div class="premium-property-record">'
             f'<h3>{escape(row["listing_name"])}</h3>'
             '<dl>'
             f'<div><dt>Asking price</dt><dd>{float(row["local_price"]):,.0f} {escape(row["local_currency"])}</dd></div>'
             f'<div><dt>Area</dt><dd>{float(row["size_m2"]):,.1f} m²<span>{escape(area_basis)}</span></dd></div>'
-            f'<div><dt>USD comparison</dt><dd>{money(row["usd_price"])}<span>{money(row["usd_per_m2"])}/m²</span></dd></div>'
+            f'{comparison_html}'
             f'<div><dt>Buyer relevance</dt><dd>{escape(row["note"])}</dd></div>'
             '</dl>'
             f'{local_comparison}'
