@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 import unittest
 
 from src import build_unified_app
@@ -41,6 +42,16 @@ class LandingDesignSystemPilotTests(unittest.TestCase):
         self.assertIn('.gha-mode-landing .primary-action:hover { background: var(--gha-accent); color: var(--gha-paper);', self.html)
         self.assertIn('.gha-mode-landing .hero-secondary-actions a { min-height: 44px;', self.html)
 
+        def relative_luminance(hex_color: str) -> float:
+            channels = [int(hex_color[index:index + 2], 16) / 255 for index in (1, 3, 5)]
+            linear = [value / 12.92 if value <= 0.04045 else ((value + 0.055) / 1.055) ** 2.4 for value in channels]
+            return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2]
+
+        muted = re.search(r'--gha-muted:\s*(#[0-9a-fA-F]{6})', self.html).group(1)
+        paper = re.search(r'--gha-paper:\s*(#[0-9a-fA-F]{6})', self.html).group(1)
+        lighter, darker = sorted((relative_luminance(muted), relative_luminance(paper)), reverse=True)
+        self.assertGreaterEqual((lighter + 0.05) / (darker + 0.05), 4.5)
+
     def test_page_has_one_banner_landmark_and_preserves_footer_copy(self) -> None:
         self.assertEqual(1, self.html.count('<header class="gha-header">'))
         self.assertNotIn('<header class="hero"', self.html)
@@ -76,6 +87,7 @@ class LandingDesignSystemPilotTests(unittest.TestCase):
         self.assertIn('.gha-mode-landing .atlas-tool { min-height: 100%; display: grid; align-content: start;', self.html)
         self.assertIn('.gha-mode-landing .atlas-tool__link { min-height: 44px; display: inline-flex; align-items: center;', self.html)
         self.assertIn('.gha-mode-landing .research-link a { min-height: 44px; display: inline-flex; align-items: center;', self.html)
+        self.assertIn('.gha-mode-landing .browse-column li a { min-height: 44px; display: flex; align-items: center;', self.html)
 
     def test_hero_copy_aligns_to_the_site_grid_without_a_redundant_eyebrow(self) -> None:
         self.assertIn(

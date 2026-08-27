@@ -66,7 +66,7 @@ def landing_design_css() -> str:
       --gha-ink: #24312d;
       --gha-paper: #f4efe4;
       --gha-surface: #fffdf7;
-      --gha-muted: #68726d;
+      --gha-muted: #646e69;
       --gha-rule: rgba(36, 49, 45, .24);
       --gha-accent: #a44e2f;
       --gha-link: #41665a;
@@ -161,8 +161,8 @@ def landing_design_css() -> str:
     .gha-mode-landing .browse-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px; }
     .gha-mode-landing .browse-column h3 { margin: 0 0 14px; font-family: var(--gha-display-serif); font-size: 27px; font-weight: 500; }
     .gha-mode-landing .browse-column ul { columns: 2; column-gap: 24px; margin: 0; padding: 0; list-style: none; }
-    .gha-mode-landing .browse-column li { break-inside: avoid; margin: 0 0 10px; }
-    .gha-mode-landing .browse-column li a { font-size: 14px; font-weight: 500; }
+    .gha-mode-landing .browse-column li { break-inside: avoid; margin: 0; }
+    .gha-mode-landing .browse-column li a { min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; }
     .gha-mode-landing .browse-all { min-height: 44px; display: inline-flex; align-items: center; margin-top: 12px; font-weight: 500; }
 
     .gha-mode-landing .latest-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }

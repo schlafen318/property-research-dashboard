@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import re
 import unittest
 
 from src import build_unified_app
@@ -266,6 +267,17 @@ class SeoCtrContentTests(unittest.TestCase):
         for target in required_targets:
             with self.subTest(target=target):
                 self.assertIn(f'href="{target}"', html)
+
+    def test_homepage_meta_description_is_search_result_length(self) -> None:
+        destinations = [
+            {"id": "alpha", "name": "Alpha", "country": "Example", "decision_score": 4.0}
+        ]
+        html = build_unified_app.build_landing_page(destinations, build_unified_app.SEO_PAGES, [{"id": "1"}], 1)
+        description = re.search(r'<meta name="description" content="([^"]+)">', html).group(1)
+
+        self.assertLessEqual(len(description), 160)
+        self.assertIn("property abroad", description.lower())
+        self.assertIn("retirement", description.lower())
 
     def test_homepage_keeps_explanatory_content_compact(self) -> None:
         destinations = [

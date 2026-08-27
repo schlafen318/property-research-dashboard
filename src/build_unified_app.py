@@ -3804,10 +3804,15 @@ def build_landing_page(
         if destination_count and country_count
         else "Compare overseas property destinations using foreign ownership, retirement fit, realistic costs, rental rules, resale potential, and representative listings."
     )
+    search_description = (
+        f"Compare property abroad for retirement and second homes across {destination_count} destinations, with ownership rules, costs, rankings, listings and a calculator."
+        if destination_count
+        else "Compare property abroad for retirement and second homes using ownership rules, realistic costs, rankings, listings and a calculator."
+    )
     content = apply_content_override(
         {
             "title": "Compare Property Abroad for Retirement & Second Homes | Global Home Atlas",
-            "description": coverage_intro,
+            "description": search_description,
             "generated_intro": coverage_intro,
         },
         SITE_URL,
