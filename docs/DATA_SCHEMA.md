@@ -81,7 +81,7 @@ Each listing object should follow this structure:
     "EUR": 1.14784,
     "CAD": 0.70609,
     "NZD": 0.57370,
-    "CHF": 1.24288,
+    "CHF": 1.2345679012345678,
     "THB": 0.0303905,
     "IDR": 0.000056243,
     "VND": 0.0000380084,
@@ -98,4 +98,3 @@ Suggested columns:
 ```text
 destination,topic,source_name,url,date_accessed,metric_supported,confidence,notes
 ```
-

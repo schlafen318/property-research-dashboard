@@ -286,6 +286,13 @@
       el("ret-housing-guidance").textContent = housingGuidance(plan);
       el("ret-property-field").hidden = !usesPropertyBudget(plan);
       el("ret-property-budget").disabled = !usesPropertyBudget(plan);
+      const acquisitionCostRate = Number(record.property.acquisition_cost_rate || 0);
+      const acquisitionCostBasis = String(record.property.acquisition_cost_basis || "").trim();
+      el("ret-acquisition-cost-guidance").textContent = acquisitionCostBasis || (
+        acquisitionCostRate > 0
+          ? "The model adds a " + (acquisitionCostRate * 100).toFixed(1).replace(/\.0$/, "") + "% acquisition-cost allowance. Obtain a buyer-specific closing statement."
+          : "No acquisition-cost allowance is included. Add a buyer-specific closing-cost estimate before relying on the total."
+      );
       if (resetPropertyBudget) {
         el("ret-property-budget").value = String(Math.round(Number(record.property.representative_price_usd)));
       }

@@ -482,7 +482,26 @@ COUNTRY_HUBS = [
         "title": "Switzerland Property Guide for Foreign Buyers | Global Home Atlas",
         "description": "Compare Switzerland property options for foreign buyers, including Andermatt, Lake Lugano, Valais, and Vaud across ownership limits, liquidity, lifestyle, and entry price.",
         "h1": "Switzerland Property Guide for Foreign Buyers",
-        "thesis": "Switzerland is a capital-preservation and lifestyle market with high entry costs and meaningful foreign-buyer constraints. The strongest cases depend on legal access, liquidity, and whether the buyer accepts lower yield for resilience.",
+        "thesis": "Switzerland can provide exceptional daily life, infrastructure and institutional clarity, but the decisive question is not whether a foreigner likes a home—it is whether this buyer may acquire and use this property in this municipality. Establish nationality, domicile, residence plan, Lex Koller treatment and registered use first. Then test second-home law, building governance, hazards, carrying cost and the future buyer pool.",
+        "destination_spotlight": {
+            "url": "/destinations/ticino-lake-lugano/",
+            "label": "Read the Ticino / Lake Lugano dossier",
+            "text": "See how Lex Koller, residence, second-home use, healthcare, steep-site risk, direct asking evidence and resale work together in one buyer decision.",
+        },
+        "country_rules": [
+            {"heading": "Foreign-buyer status determines the route", "text": "The Lex Koller answer depends on nationality, Swiss domicile, residence status, buyer form, intended use and the exact property. Foreign non-residents generally require authorisation; holiday-home routes are cantonal, location-specific and quota-limited."},
+            {"heading": "Purchase and residence are separate", "text": "A Swiss deed does not create a residence permit or health-cover entitlement. Establish the lawful long-stay route first; residents generally must arrange compulsory health insurance within three months, subject to current coordination rules and exceptions."},
+            {"heading": "Second-home and land-register conditions attach to the unit", "text": "Municipal second-home status, building permits and recorded primary-residence, holiday or tourist-operation restrictions can control use and resale. A portal description or the seller’s history is not a transferable approval."},
+            {"heading": "Cost and hazards are address-specific", "text": "Cantonal transfer charges, building reserves, energy, insurance, snow, flood, rockfall, slope stability and access differ sharply across Swiss destinations. Obtain buyer- and property-specific statements rather than applying a national percentage or resort average."},
+        ],
+        "primary_sources": [
+            {"label": "Federal Office of Justice: Lex Koller questions and answers", "url": "https://www.bj.admin.ch/en/questions-and-answers"},
+            {"label": "Federal Office of Justice: current Lex Koller guide", "url": "https://www.ejpd.admin.ch/dam/bj/en/data/wirtschaft/grundstueckerwerb/lex-e.pdf"},
+            {"label": "Swiss authorities: residence permits", "url": "https://www.ch.ch/en/foreign-nationals-in-switzerland/entry-and-stay-in-switzerland/permits-for-living-in-switzerland/"},
+            {"label": "Federal Office of Public Health: compulsory health insurance", "url": "https://www.bag.admin.ch/en/health-insurance-requirement-to-obtain-insurance-for-persons-resident-in-switzerland"},
+            {"label": "Federal Office for Spatial Development: second homes", "url": "https://www.are.admin.ch/de/zweitwohnungen"},
+            {"label": "Canton Ticino: LAFE overview", "url": "https://www4.ti.ch/di/dg/rf/lafe/lafe"},
+        ],
         "destination_ids": ["andermatt", "ticino-lake-lugano", "swiss-valais-vaud-alps"],
         "guide_slugs": ["where-can-foreigners-buy-property", "foreign-property-investment-risks", "best-places-to-buy-vacation-home-abroad", "overseas-property-investment"],
     },
@@ -5276,7 +5295,7 @@ __HEAD__
           <div class="field"><label for="ret-destination">Destination</label><select id="ret-destination">__OPTIONS__</select><p class="hint"><button class="text-button" id="ret-cost-compare-open" type="button">Compare destination retirement costs</button></p></div>
           <div class="field"><label for="ret-housing-plan">Housing plan</label><select id="ret-housing-plan"><option value="rent" selected>Rent</option><option value="own">Already own</option><option value="buy_now">Buy now</option><option value="buy_retirement">Buy at retirement</option></select></div>
           <div class="field"><label id="ret-monthly-spending-label" for="ret-monthly-spending">Monthly retirement living expenses including rent</label><input id="ret-monthly-spending" type="number" min="0" step="1" value="0"><p class="hint" id="ret-housing-guidance">Monthly retirement living expenses, including rent.</p></div>
-          <div class="field" id="ret-property-field"><label for="ret-property-budget">Home purchase budget today</label><input id="ret-property-budget" type="number" min="0" step="1" value="0"><p class="hint">Prefilled with today's representative destination price. Edit it to match the home you expect to buy; acquisition costs are added separately.</p></div>
+          <div class="field" id="ret-property-field"><label for="ret-property-budget">Home purchase budget today</label><input id="ret-property-budget" type="number" min="0" step="1" value="0"><p class="hint">Prefilled with today's representative destination price. Edit it to match the home you expect to buy.</p><p class="hint" id="ret-acquisition-cost-guidance">The selected destination’s modeled acquisition-cost allowance—or explicit exclusion—is shown here.</p></div>
         </div></fieldset>
         <fieldset><legend>Income you receive now (monthly)</legend><p class="hint">Income rises annually with general inflation and the selected share is invested monthly.</p><div class="field-grid">
           <div class="field"><label for="ret-monthly-income">After-tax monthly income</label><input id="ret-monthly-income" type="number" min="0" step="100" value="0"></div>

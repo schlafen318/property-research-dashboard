@@ -9,7 +9,7 @@ by = defaultdict(list)
 for r in rows:
     by[r['dest']].append(r)
 
-fx_line = 'FX used: JPY/USD 161.305, EUR/USD 1.14784, CAD/USD 0.70609, NZD/USD 0.57370, CHF/USD 1.24288, THB/USD 0.0303905, IDR/USD 0.000056243, VND/USD 0.0000380084. USD listings are unchanged. All headline prices below are converted to USD; original local listing price is retained underneath.'
+fx_line = 'FX used: JPY/USD 161.305, EUR/USD 1.14784, CAD/USD 0.70609, NZD/USD 0.57370, CHF/USD 1.2345679, THB/USD 0.0303905, IDR/USD 0.000056243, VND/USD 0.0000380084. USD listings are unchanged. All headline prices below are converted to USD; original local listing price is retained underneath.'
 
 def usd_price(x):
     if x is None: return 'POA'
