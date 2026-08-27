@@ -4334,6 +4334,132 @@ JACKSON_HOLE_DOSSIER = PremiumDossierSpec(
 )
 
 
+TICINO_LAKE_LUGANO_DOSSIER = PremiumDossierSpec(
+    destination_id="ticino-lake-lugano",
+    title="Ticino and Lake Lugano Property Dossier for Foreign Buyers",
+    description="Assess Ticino and Lake Lugano property through residence, Lex Koller, second-home use, healthcare, access, hazards, current listings, costs and resale.",
+    h1="Ticino / Lake Lugano: qualify before you buy",
+    lede=(
+        "Ticino offers an unusual retirement proposition: Italian-speaking lake life inside Swiss institutions, with Lugano’s hospitals, rail and ordinary services close to hillside villages and the Italian border. The scenery is immediate; the right to buy and use a particular home is not. Citizenship, Swiss domicile, residence status, Lex Koller authorisation, the unit’s registered restrictions and municipal second-home rules can all change the answer. A central Lugano apartment, a steep Castagnola home and a Morcote second residence therefore belong to different legal, practical and resale cases."
+    ),
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "The verdict is positive for a legally eligible buyer who wants a year-round home more than a yield product. Start with nationality, actual domicile and intended use. The Federal Office of Justice says foreign non-residents generally need authorisation, while qualifying holiday homes must be allowed by the canton, located in a designated tourist place and fit within annual quotas. Ticino provides a cantonal route, but the authority decides the exact case. A deed never creates a residence permit. The federal government also opened a Lex Koller tightening proposal in April 2026; it was a consultation, not an enacted rule at this review date, but it raises the recheck burden before a binding offer.",
+        "Ticino best suits an EU/EFTA or otherwise permit-eligible resident, or a non-resident whose lawyer has confirmed a specific authorised holiday-home route. The buyer should value healthcare, safety, rail access, mild-latitude lake living and personal use enough to accept high carrying costs and modest income. Look elsewhere if the purchase is expected to create residence, if permanent holiday-home letting is essential, if easy non-resident finance is required, or if a steep panoramic address must work without driving. The lake view is an amenity; lawful use, ordinary access and a future buyer pool are the investment case.",
+        "Proceed in sequence. Obtain a written residence and Lex Koller opinion for the buyer and intended occupancy. Confirm every land-register use condition and the municipality’s current second-home position. Choose the daily-life geography, not simply the view. Then reconcile title, building governance, access, natural hazards, insurance, tax, financing and resale evidence. This order prevents the common error of paying a scarcity premium for a home that is legally restricted, operationally awkward or marketable to only a narrow successor."
+    ),
+    lenses_intro=(
+        "Five questions decide whether Lake Lugano remains compelling after the first summer: can the buyer lawfully own and occupy this unit, does the address support ordinary life, can the building and hillside be carried, is any rental plan permitted and economical, and who can buy it later?"
+    ),
+    lenses=(
+        DossierLens("Choose a life that works beyond the lakefront", ("lifestyle_magnetism", "retirement_fit"), (
+            "Lugano has the strongest year-round case because it is a working regional city rather than a seasonal resort. Groceries, municipal services, restaurants, rail and the Ospedale Regionale di Lugano sit within an urban network around the lake. The Ospedale Civico is a public multispecialty hospital, and its emergency department is open around the clock and serves as a cantonal referral point for time-critical conditions. That does not remove the need to choose a doctor, understand language and insurance, or plan specialist care, but it gives central Lugano and nearby serviced districts a credible retirement foundation.",
+            "Swiss health cover follows residence, not ownership. The Federal Office of Public Health says a person settling in Switzerland generally must take out compulsory health insurance within three months; each family member is insured individually, subject to coordination rules and exceptions. Establish the residence permit first. EU/EFTA nationals and third-country nationals face different long-stay routes, and a financially comfortable property buyer does not receive a permit merely by completing. Budget premiums, the chosen deductible and co-payments separately from the home, then confirm which hospital, pharmacy and primary-care journey the exact address creates.",
+            "The lifestyle changes quickly outside the centre. Paradiso keeps rail, lakefront and city proximity but adds dense building stock and traffic. Castagnola and Ruvigliana exchange flat walking for sun, views and slopes. Morcote offers a remarkable village and waterfront but fewer ordinary services and more dependence on road or bus. Visit in humid summer, winter rain and an ordinary working week. Carry groceries, test the climb, reach Ospedale Civico without a car, check evening transport and ask how construction noise, tourism and closed-season businesses affect the street."
+        )),
+        DossierLens("Connect the front door—not the destination name", ("global_access", "foreigner_fit"), (
+            "Ticino’s strategic advantage is the north–south rail corridor. Lugano station links the city to Bellinzona and the Gotthard route, and south through Mendrisio and Chiasso toward Milan. This makes northern Italy part of the practical catchment, but a timetable result is not a door-to-door plan. Milan Malpensa, Milan city airports and Zurich Airport create different interchange, luggage and disruption patterns. Record the whole journey from the candidate home, including the uphill last mile, Sunday service and a late arrival. A hillside home ten minutes from Lugano on a map may need a taxi or car every time.",
+            "Local mobility is the more important retirement test. Central Lugano, Cassarate and Paradiso can combine bus, rail, lakefront walking and ordinary services. Collina d’Oro and the upper slopes are more vehicle-led. Castagnola’s narrow roads, limited parking and gradients can turn a beautiful address into a daily constraint. Morcote and lakeside villages require a timetable and parking check in peak periods. Confirm whether a bus stop has a usable gradient, shelter and year-round frequency; whether the station route works with luggage; and whether emergency, delivery and contractor vehicles can reach the building.",
+            "Italian is the administrative language of Ticino, even though an international service economy makes daily communication easier in Lugano. Land-register material, building minutes, tax notices, municipal planning decisions, contractor scope and insurance correspondence can still require professional Italian. Use an independent Ticino notary or lawyer, tax adviser and technical surveyor who answer to the buyer. A multilingual sales process does not prove that the deed, use restriction, building reserve or future dispute has been understood. Foreigner fit is strongest when language support is budgeted as ownership infrastructure."
+        ), "city-access"),
+        DossierLens("Prove the buyer, the use and the hillside", ("ownership_clarity", "regulatory_safety"), (
+            "Lex Koller is the first legal filter. The federal guidance distinguishes resident status, citizenship, main homes, holiday homes and second homes; indirect acquisition through a company is not a shortcut for an authorised holiday home. Ticino’s authority determines whether a transaction requires authorisation and whether the statutory conditions are met. Obtain that determination or approval before the commitment becomes unconditional. Then read the land-register extract for restrictions that follow the unit. A seller’s ability to own or occasionally rent does not prove that a different foreign buyer, ownership vehicle or intended use will be approved.",
+            "Second-home law is a separate layer. The Federal Office for Spatial Development says municipalities above a 20% second-home share generally cannot approve new unrestricted second homes, subject to defined exceptions such as qualifying tourist-managed accommodation. Existing homes may carry first-residence, tourist-operation or other recorded conditions. The municipality’s current inventory and permit file matter more than a portal label. For a holiday home, reconcile Lex Koller approval, federal second-home law, the building permit, condominium bylaws and any local restriction in one written use matrix covering personal stays, periodic rental and resale.",
+            "Natural hazards are address-specific in this lake-and-slope landscape. Ticino’s hazard plans map flooding, lake inundation, debris flow, bank erosion, rockfall and landslide processes; the canton warns that protective works do not remove all risk. On a hillside, commission structural and geotechnical review of retaining walls, drainage, settlement, access and rock or slope protection. By the lake, check flood and surface-water layers, cellars, garages and plant rooms. Obtain an insurability and premium answer before signing, and verify who pays for shared slope, road or drainage works in a condominium or private access arrangement."
+        ), "hillside-diligence"),
+        DossierLens("Treat rent as regulated hospitality, not passive yield", ("rental_profit", "capital_upside"), (
+            "No destination-wide net yield is supported for Ticino / Lake Lugano. A central long-term apartment, an authorised holiday unit and a large hillside villa serve different occupants and absorb different management, vacancy and capital costs. Start with the lawful use. Federal guidance says an authorised holiday home for a person abroad may be rented periodically but not permanently throughout the year. Land-register conditions, municipal planning and condominium rules can narrow the answer further. A listing’s ‘investment’ language is not evidence of a transferable hospitality operation.",
+            "Lugano’s June 2026 municipal response shows that short-stay accommodation is actively administered. Tourism taxes apply regardless of booking channel, an identification number is required for the relevant accommodation register, municipal building services approve or reject requests, and the tourism body monitors online listings. That is evidence of a real visitor market and real compliance cost—not a yield forecast. Before underwriting rent, obtain written confirmation of permitted use, registration, tourism taxes, guest reporting, fire and safety obligations, building consent, management capacity and the treatment of a buyer who will be absent.",
+            "Capital resilience should be anchored in ordinary utility and recorded market evidence. Ticino’s official 2025 statistics recorded 4,918 property transactions worth CHF 4.489 billion, including 2,440 condominium transactions worth CHF 2.0786 billion. The source includes ordinary sales and certain other transfers with financial consideration, so the totals are broader than arm’s-length home sales. They show an active cantonal record but cannot value a Lugano flat or predict appreciation. The most defensible upside belongs to property with clear use, manageable service charges, good condition, rail or service access and a buyer pool extending beyond foreign holiday purchasers. View premiums can endure; they can also be overpaid and difficult to reproduce in the next sale."
+        )),
+        DossierLens("Price the whole ownership and preserve the exit", ("value_entry", "exit_liquidity"), (
+            "Current asks show why a blended Lugano price is misleading. A renovated 90 m² apartment in Lugano at CHF 535,000 is a different job from a 201 m² modern house in Cadro at CHF 1.45 million or a 250 m² Carona villa at CHF 2.6 million that the seller says may be purchased as a secondary residence subject to municipal application. Price per square metre helps expose the spread, but it does not normalize area definitions, construction quality, site, land, parking, legal use, energy performance, renovation or the cost of reaching services.",
+            "Build a buyer-specific completion and five-year budget in CHF. Include the notary and land-register work, transfer-related tax or fee, Lex Koller advice and authorisation, financing, technical survey, insurance, condominium contributions, utilities, heating or cooling, garden and slope work, periodic refurbishment, tax administration and sale costs. Switzerland’s general guidance notes cantonal variation in property transfer charges; obtain the actual Ticino statement rather than applying a national percentage. For a condominium, inspect reserves, planned works, arrears, minutes and responsibility for windows, terraces, roofs, lifts, garages and water intrusion.",
+            "Exit liquidity depends on who is legally and practically able to replace the owner. A conventional primary-residence apartment near Lugano services may reach a broader domestic pool. A unit approved for foreign holiday ownership can gain a specific international pool but may carry restrictions. A singular hillside villa asks the next buyer to accept price, gradients, maintenance, view orientation and legal use at once. Before exchange, ask two agents who did not source the home for matched completed sales, likely buyer nationality and use, realistic marketing period and the issue most likely to stop resale. Buy the view only after preserving the exit."
+        )),
+    ),
+    score_reads={
+        "lifestyle_magnetism":"Lugano combines a real city, lake and Italian-speaking culture; hillside villages trade convenience for views, quiet and steeper daily life.",
+        "global_access":"The Gotthard and Milan rail axes are strong, while international-airport journeys and the uphill last mile remain address-specific.",
+        "ownership_clarity":"Lex Koller treatment depends on domicile, nationality, buyer structure, intended use, quota and the exact property; obtain a written cantonal answer.",
+        "regulatory_safety":"Second-home conditions, municipal planning, condominium rules and flood or slope hazards can change lawful use and insurability.",
+        "rental_profit":"No destination-wide net yield is supported; periodic holiday letting, registrations, taxes, management and building rules require property-level underwriting.",
+        "capital_upside":"Official transaction volume supports an active canton, but appreciation depends on legal clarity, ordinary utility, condition and entry price.",
+        "retirement_fit":"Lugano offers a public multispecialty hospital and services; residence and compulsory health cover must be established independently of ownership.",
+        "exit_liquidity":"Serviced conventional homes reach a broader pool; restricted holiday units and singular steep-site villas narrow the next-buyer set.",
+        "foreigner_fit":"International services help, while Italian-language title, planning, tax and building administration still require independent local professionals.",
+        "value_entry":"Current asks span traditional village stock, practical outer-city homes and lake-view villas; total carrying cost matters more than a headline average."
+    },
+    market_anchors=(
+        {"location":"Ticino condominium transactions (PPP)","evidence":"2,440 recorded transactions; CHF 2.0786bn total in 2025","buyer_read":"The CHF 535,000 Lugano apartment shares the official condominium asset class, whose total implies about CHF 852,000 per recorded transaction across Ticino. The record also includes certain non-sale transfers, and it is not matched for municipality, legal area, condition, parking, charges or lawful use; obtain arm’s-length apartment sales before valuing the unit.","source_label":"Ticino Statistics Office, 2025 transactions","source_url":"https://m3.ti.ch/DFE/DR/USTAT/allegati/news/258243ns_2026-08.pdf"},
+        {"location":"CHF 1.0–1.9 million recorded property transactions","evidence":"CHF 1.1bn total value in 2025; +27.8% from 2024","buyer_read":"The CHF 1.45 million Cadro house sits inside the official band with the strongest reported value increase. The band mixes property types, locations and qualifying transfer types, so it tests recorded activity—not whether this house is correctly priced per square metre.","source_label":"Ticino Statistics Office, 2025 transactions","source_url":"https://m3.ti.ch/DFE/DR/USTAT/allegati/news/258243ns_2026-08.pdf"},
+        {"location":"CHF 2.0–4.9 million recorded property transactions","evidence":"2025 count −8.0%; total value −6.3% from 2024","buyer_read":"The CHF 2.6 million Carona villa sits inside the only official price band where both count and value fell in 2025. The band includes varied properties and qualifying transfer types, so this is a liquidity warning—not a valuation; obtain matched arm’s-length villa sales and test the successor-buyer pool.","source_label":"Ticino Statistics Office, 2025 transactions","source_url":"https://m3.ti.ch/DFE/DR/USTAT/allegati/news/258243ns_2026-08.pdf"},
+    ),
+    micro_locations_intro="The useful comparison follows daily access and site form, not a single Lake Lugano average. Confirm the municipality, land-register restrictions, second-home status, building governance, hazard layers, sun, gradient and transport for the exact address.",
+    micro_locations=(
+        {"name":"Lugano Centro / Cassarate","best_for":"Most complete year-round life","daily_life":"Walk, bus and city services closest together","diligence":"Noise, traffic, building reserves, parking and exact use"},
+        {"name":"Paradiso / Collina d’Oro","best_for":"Rail or hillside prestige near Lugano","daily_life":"Connected below; car-led on upper slopes","diligence":"Gradient, sun, view protection, municipal rules and service charges"},
+        {"name":"Castagnola / Ruvigliana","best_for":"Lake views close to the city","daily_life":"Steep residential streets and bus-dependent access","diligence":"Retaining walls, drainage, rock or landslide risk, parking and resale depth"},
+        {"name":"Melide / Morcote / Bissone","best_for":"Village and waterfront character","daily_life":"Smaller service base with road, bus and selected rail access","diligence":"Second-home status, tourism pressure, flood layers, access and seasonal rhythm"},
+    ),
+    checklist=(
+        "Obtain written residence and Lex Koller advice for the exact buyer, ownership form, property and intended use.",
+        "Confirm the land-register extract, building permit and every primary-residence, second-home, holiday-home or rental condition.",
+        "Review title, easements, boundaries, parking, access, condominium documents, reserves, minutes and planned works.",
+        "Overlay current flood, lake, rockfall and landslide plans and commission structural or geotechnical review where the site requires it.",
+        "Test hospital, grocery, rail, airport and contractor journeys from the front door in ordinary and disrupted conditions.",
+        "Obtain current financing, compulsory-health-cover, tax, insurance and buyer-specific completion-cost statements.",
+        "Model five-year ownership with no rent or appreciation and verify any periodic letting route, registration, tax and management in writing.",
+        "Ask independent agents for matched completed sales, the likely successor buyer, realistic marketing time and principal resale obstacle.",
+    ),
+    references_intro="Legal, administrative and market claims were reviewed on 27 August 2026. Recheck before reservation or exchange and whenever the buyer, domicile, entity, property, intended use, municipality, listing, building, insurance or law changes. The next scheduled editorial review is 27 February 2027. Obtain current Swiss and Ticino legal, tax, residence, planning, technical and insurance advice for the exact case.",
+    references=(
+        {"label":"Federal Office of Justice: Lex Koller questions and answers","url":"https://www.bj.admin.ch/en/questions-and-answers"},
+        {"label":"Federal Office of Justice: current Lex Koller guide","url":"https://www.ejpd.admin.ch/dam/bj/en/data/wirtschaft/grundstueckerwerb/lex-e.pdf"},
+        {"label":"Federal Office of Justice: 2026 Lex Koller revision status","url":"https://www.bj.admin.ch/de/revision-lex-koller"},
+        {"label":"Canton Ticino: LAFE overview","url":"https://www4.ti.ch/di/dg/rf/lafe/lafe"},
+        {"label":"Canton Ticino: LALAFE implementing law","url":"https://www3.ti.ch/CAN/RLeggi/public/raccolta-leggi/legge/numero/4.1.8.1"},
+        {"label":"Canton Ticino: LAFE forms","url":"https://www4.ti.ch/di/dg/sportello/formulari"},
+        {"label":"Swiss authorities: residence permits","url":"https://www.ch.ch/en/foreign-nationals-in-switzerland/entry-and-stay-in-switzerland/permits-for-living-in-switzerland/"},
+        {"label":"Federal Office of Public Health: compulsory health insurance","url":"https://www.bag.admin.ch/en/health-insurance-requirement-to-obtain-insurance-for-persons-resident-in-switzerland"},
+        {"label":"Ospedale Regionale di Lugano: specialties","url":"https://www.eoc.ch/ospedali-e-istituti/ospedale-regionale-di-lugano/civico/specialita.html"},
+        {"label":"EOC: Lugano emergency department","url":"https://www.eoc.ch/en/patients/patient-information/emergency-medicine/emergency-room.html"},
+        {"label":"SBB: 2026 Ticino and Milan timetable changes","url":"https://news.sbb.ch/it/019d7b77-803a-7237-8e21-1f622e4a5574/orario-ffs-2026-cosa-cambia-e-cosa-resta"},
+        {"label":"City of Lugano: public transport network","url":"https://www.lugano.ch/en/la-mia-citta/identita-e-storia/quartieri/centro/trasporti/"},
+        {"label":"Federal Office for Spatial Development: second homes","url":"https://www.are.admin.ch/de/zweitwohnungen"},
+        {"label":"Canton Ticino: natural-hazard plans","url":"https://www4.ti.ch/dt/dc/uca/temi/corsi-dacqua/gestione-delle-acque/pericoli-naturali-e-gestione-dei-rischi/carte-del-pericolo-pzp"},
+        {"label":"Canton Ticino: natural-hazard responsibilities","url":"https://www4.ti.ch/dt/da/sf/temi/pericoli-naturali/pericoli-naturali/pericoli-naturali"},
+        {"label":"Lugano: 2026 short-stay administration and tourism taxes","url":"https://www.lugano.ch/downloadCc?name=RispostaInterrogazione_1576.pdf&type=risposte&unid=B37F65B7EAFE1754C1258E0D00304CF4"},
+        {"label":"Ticino Statistics Office: 2025 property transactions","url":"https://m3.ti.ch/DFE/DR/USTAT/allegati/news/258243ns_2026-08.pdf"},
+        {"label":"Ticino Statistics Office: residential price index","url":"https://m3.ti.ch/DFE/DR/USTAT/allegati/prodima/3705_prezzi.pdf"},
+        {"label":"Swiss National Bank: July 2026 monthly exchange rates","url":"https://data.snb.ch/en/topics/ziredev/cube/devkum"},
+        {"label":"Swiss authorities: real-estate taxation overview","url":"https://www.ch.ch/en/taxes-and-finances/types-of-taxation/taxation-of-real-estate"},
+        {"label":"Swiss authorities: forms of homeownership","url":"https://www.ch.ch/en/housing/homeownership/buying-property/what-is-the-best-form-of-homeownership-for-you"},
+    ),
+    images=(
+        DossierImage("lake-hero","/assets/ticino-lugano-lake-hero.webp","Lugano city and Lake Lugano beneath Monte Brè and San Salvatore","Lugano’s proposition is a working city on a dramatic lake—not scenery alone.","hero","defining-place"),
+        DossierImage("city-access","/assets/ticino-lugano-city-access.webp","Lugano station district and city streets descending toward Lake Lugano","Rail and ordinary services matter more than map distance.","wide","built-environment-access"),
+        DossierImage("hillside-diligence","/assets/ticino-lugano-hillside-diligence.webp","Steep Lake Lugano residential road with retaining walls and hillside homes","Gradient, drainage and retaining structures belong in the purchase decision.","wide","decision-texture"),
+    ),
+    nav_items=(("verdict","Verdict"),("lenses","Five destination lenses"),("scores","Atlas assessment"),("listings","What homes cost"),("locations","Where to look"),("checklist","Buyer checklist"),("sources","References")),
+    lenses_heading="Ticino and Lake Lugano through five destination lenses",
+    assessment_intro="Here’s how Ticino and Lake Lugano score on the ten factors that matter most when choosing a long-term home abroad.",
+    listings_intro="Three dated direct CHF asks show distinct buyer cases: a renovated Lugano apartment, a modern Cadro home and a Carona lake-view villa. They are asking-price evidence only; availability, title, lawful use, area, condition, fees and completed value remain unverified.",
+    market_anchors_intro="Each home is paired with an official 2025 Ticino recorded-transaction reference. The source includes ordinary sales, purchase-right exercises, auctions, adjudications, expropriations, assignments and swaps with a balancing payment. The comparison helps test recorded activity and exit depth; it is not a valuation and does not replace matched arm’s-length sales for the same property type and municipality.",
+    orientation_groups=(
+        DossierOrientationGroup("North–south rail spine", (("Bellinzona","Gotthard and cantonal connection"),("Lugano","Hospital, rail and principal services"),("Mendrisio / Chiasso","Border corridor"),("Milan","Wider international gateway"))),
+        DossierOrientationGroup("Lake and hillside", (("Lugano / Cassarate","Urban lakefront"),("Paradiso / Collina d’Oro","Rail and hillside choices"),("Melide / Morcote","Village lake living"),("Castagnola / Ruvigliana","Steep view-led housing"))),
+    ),
+    orientation_caption="Orientation schematic—not to scale. Confirm the exact municipality, gradient, transport, hospital journey, lawful use, building governance and hazard layers for the address.",
+    country_guide_url="/countries/switzerland-property/",
+    country_guide_label="Switzerland property guide",
+    rail_comparison="Compare Ticino and Lake Lugano with the full Atlas.",
+    property_anchor_indexes=(0, 1, 2),
+)
+
+
 INNSBRUCK_TYROL_DOSSIER = PremiumDossierSpec(
     destination_id="innsbruck-tyrol",
     title="Innsbruck and Tyrol Property Dossier for Foreign Buyers",
@@ -4487,6 +4613,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     ANDERMATT_DOSSIER.destination_id: ANDERMATT_DOSSIER,
     INNSBRUCK_TYROL_DOSSIER.destination_id: INNSBRUCK_TYROL_DOSSIER,
     JACKSON_HOLE_DOSSIER.destination_id: JACKSON_HOLE_DOSSIER,
+    TICINO_LAKE_LUGANO_DOSSIER.destination_id: TICINO_LAKE_LUGANO_DOSSIER,
 }
 
 
@@ -4581,3 +4708,4 @@ validate_premium_dossier(DOLOMITES_SOUTH_TYROL_DOSSIER)
 validate_premium_dossier(CHAMONIX_DOSSIER)
 validate_premium_dossier(INNSBRUCK_TYROL_DOSSIER)
 validate_premium_dossier(JACKSON_HOLE_DOSSIER)
+validate_premium_dossier(TICINO_LAKE_LUGANO_DOSSIER)

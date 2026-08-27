@@ -3132,16 +3132,16 @@
     "rank": 31,
     "country": "Switzerland",
     "category": "Mountain + Water",
-    "overall_score": 3.5,
-    "usd_per_m2": 10400.0,
-    "net_yield_estimate": "1.5–3% est. net",
+    "overall_score": 3.41,
+    "usd_per_m2": 8900.0,
+    "net_yield_estimate": "Asset-specific; no destination-wide net yield",
     "quick_metrics": {
-      "usd_m": "$10,400",
-      "net_yield": "1.5–3% est. net",
+      "usd_m": "$9,000",
+      "net_yield": "No destination-wide net yield",
       "ownership": "2.8/5",
       "friendly": "3.5/5"
     },
-    "panel_summary": "Ticino/Lugano is a strong retirement lifestyle candidate with Swiss safety and Italian flavour. The panel would like it for living quality, but not for yield or easy foreign acquisition.",
+    "panel_summary": "Ticino and Lake Lugano are credible for a legally eligible buyer who values year-round city-and-lake life, healthcare and rail access. The case weakens sharply when lawful use, gradients, carrying cost or resale depth are unresolved.",
     "pros": [
       "Excellent standard of living",
       "lake/mountain scenery",
@@ -3151,12 +3151,12 @@
     ],
     "cons": [
       "Lex Koller/permit constraints",
-      "low yields",
+      "income depends on lawful use, asset condition and total operating cost",
       "high service costs",
       "smaller STR/tourism market than major resorts",
       "affordability is weak."
     ],
-    "panel_verdict": "Specialist retirement/lifestyle candidate. Good to live in, less compelling as a development investment.",
+    "panel_verdict": "Proceed only after buyer-specific Lex Koller, residence and use confirmation; choose service access and a defensible exit before the view.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -3229,18 +3229,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "Foreign-buyer rules still apply unless resident/eligible. Holiday-home permits/quota and Lex Weber/commune rules must be checked.",
-    "red_flags": "Lex Koller/permit risk, low yield, expensive service costs, smaller STR market than Alpine trophy resorts.",
+    "ownership_notes": "Lex Koller treatment depends on nationality, domicile, buyer form, intended use, quota and the exact property. Ownership does not create residence; land-register and second-home conditions must be confirmed in writing.",
+    "red_flags": "Unresolved Lex Koller or residence status, land-register use conditions, unsupported rental assumptions, steep-site hazards, high service costs and a narrow resale pool.",
     "rental": {
-      "gross_yield": "Residential yields are low; retirement/lifestyle and wealth-preservation case dominates",
-      "net_yield": "1.5–3% est. net",
-      "revenue": "RealAdvisor June 2026 Lugano average property price around CHF8,367/m²; apartments around CHF8,877/m².",
-      "adr_occupancy": "Moderate; luxury lake units can price well / Good year-round for long stays",
-      "confidence": "Medium"
+      "gross_yield": "No destination-wide gross yield is supported; underwrite the exact lawful use, rent and full cost base",
+      "net_yield": "Asset-specific; no destination-wide net yield",
+      "revenue": "Model the exact lawful use, rent, vacancy, tourism taxes, management, building fees, insurance, maintenance and tax; do not infer income from visitor demand.",
+      "adr_occupancy": "Property-specific; permanent letting may conflict with an authorised foreign holiday-home use and local or building rules",
+      "confidence": "Low for destination-wide income; medium only after property-level verification"
     },
-    "price_basis": "Built-property benchmark. Lugano average property price CHF8,367/m² × CHF/USD 1.24288 ≈ $10,400/m².",
-    "price_confidence": "Medium-high",
-    "profit_driver": "Swiss safety/healthcare with Italian food/climate feel, Milan access, lake lifestyle."
+    "price_basis": "Rounded median unit price across three direct Lugano-area asking observations captured 2026-08-27, converted at the Swiss National Bank July 2026 monthly average of USD 1 = CHF 0.8100; not a market-wide median or completed-sale value.",
+    "price_confidence": "Medium for the dated examples; low as a destination-wide level",
+    "profit_driver": "Lawful use, year-round service and rail access, manageable building or hillside cost, disciplined entry and a broad successor buyer pool."
   },
   {
     "id": "aspen-snowmass",

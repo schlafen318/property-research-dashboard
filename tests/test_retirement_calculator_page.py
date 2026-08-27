@@ -89,6 +89,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-monthly-spending" type="number" min="0" step="1"', form)
         self.assertIn('for="ret-property-budget">Home purchase budget today</label>', form)
         self.assertIn('id="ret-property-budget" type="number" min="0" step="1"', form)
+        self.assertIn('id="ret-acquisition-cost-guidance"', form)
+        self.assertIn("explicit exclusion", form)
         self.assertIn('id="ret-housing-guidance"', form)
         self.assertIn('<option value="rent" selected>Rent</option>', form)
         self.assertIn('id="ret-cost-compare-open" type="button">Compare destination retirement costs</button>', form)
