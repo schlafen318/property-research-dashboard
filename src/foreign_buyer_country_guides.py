@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from copy import deepcopy
 from datetime import date
+import ipaddress
+import re
 from urllib.parse import urlsplit
 
 
@@ -508,8 +510,7 @@ def _validate_primary_sources(country_hub_slug: str, primary_sources: list[dict]
         if not isinstance(source, dict) or not isinstance(source.get("label"), str) or not source["label"].strip():
             raise ValueError(f"{country_hub_slug}: primary_sources[{index}] requires a nonblank label")
         url = source.get("url")
-        parsed = urlsplit(url) if isinstance(url, str) else None
-        if parsed is None or parsed.scheme != "https" or not parsed.netloc or not url.strip():
+        if not _is_valid_source_url(url):
             raise ValueError(f"{country_hub_slug}: primary_sources[{index}] requires a valid HTTPS URL")
         if url in urls:
             raise ValueError(f"{country_hub_slug}: primary_sources[{index}] URL must be unique")
@@ -548,8 +549,36 @@ def _validate_source_urls(
     for index, url in enumerate(source_urls):
         if not isinstance(url, str) or not url.strip():
             raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] must be a nonblank URL string")
+        if not _is_valid_source_url(url):
+            raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] must be a valid HTTP(S) URL")
         if url not in primary_source_urls:
             raise ValueError(f"{country_hub_slug}: {location}.source_urls[{index}] is not registered in primary_sources")
+
+
+def _is_valid_source_url(url: object) -> bool:
+    if not isinstance(url, str) or not url or url != url.strip() or "\\" in url:
+        return False
+    if any(character.isspace() or ord(character) < 32 or ord(character) == 127 for character in url):
+        return False
+    try:
+        parsed = urlsplit(url)
+        hostname = parsed.hostname
+        port = parsed.port
+    except ValueError:
+        return False
+    if parsed.scheme not in {"http", "https"} or not parsed.netloc or not hostname or port is None and parsed.netloc.endswith(":"):
+        return False
+    try:
+        ipaddress.ip_address(hostname)
+    except ValueError:
+        if (
+            not re.fullmatch(r"[A-Za-z0-9.-]+", hostname)
+            or hostname.startswith(".")
+            or hostname.endswith(".")
+            or ".." in hostname
+        ):
+            return False
+    return True
 
 
 def _validate_coverage(
