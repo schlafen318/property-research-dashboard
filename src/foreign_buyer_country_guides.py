@@ -69,6 +69,10 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
             },
             "residency": {
                 "answer": "No. Buying property does not create a visa or residence rights. Qualify under a separate immigration route before planning to live in Japan long term.",
+                "contextual_link": {
+                    "phrase": "Buying property does not create a visa or residence rights.",
+                    "url": "https://www.city.fukuoka.lg.jp/keizai/k-yuchi/business/documents/english-faq.pdf",
+                },
                 "source_urls": [
                     "https://www.city.fukuoka.lg.jp/keizai/k-yuchi/business/documents/english-faq.pdf",
                     "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
@@ -83,6 +87,10 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
             },
             "short_rentals": {
                 "answer": "Private lodging under the national notification framework is capped at 180 days a year and can be further restricted by local rules, condominium bylaws, or the operator contract.",
+                "contextual_link": {
+                    "phrase": "capped at 180 days a year",
+                    "url": "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html",
+                },
                 "source_urls": [
                     "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html",
                     "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
@@ -170,6 +178,10 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
             {
                 "heading": "Complete non-resident reporting and owner administration",
                 "body": "If the buyer is non-resident, submit the FEFTA acquisition report through the Bank of Japan within 20 days. Put Japanese tax, insurance, utilities, property management, condominium notices and voting, repairs, and future name or address updates onto an operating calendar.",
+                "contextual_link": {
+                    "phrase": "submit the FEFTA acquisition report through the Bank of Japan within 20 days",
+                    "url": "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html",
+                },
                 "source_urls": [
                     "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html",
                     "https://www.moj.go.jp/MINJI/minji05_00693.html",
@@ -282,14 +294,14 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
             },
         },
         "buyer_checklist": [
-            "Match the contract buyer name to passport, address evidence, bank records, and registration documents.",
-            "Confirm the intended use against zoning, local rules, condominium bylaws, leases, and operator agreements.",
-            "Obtain registry records for both land and building and resolve owners, mortgages, seizures, boundaries, and access.",
+            "Match the contract buyer name to the passport, overseas address evidence accepted by the Legal Affairs Bureau, Japanese translations, bank remittance record, and registration application.",
+            "Confirm whether the home can legally support personal use, long-term tenancy, or minpaku against zoning, municipal ordinances, condominium bylaws, leases, and operator agreements.",
+            "Obtain the Japanese land and building registry records and resolve owners, mortgages, seizures, boundaries, and access.",
             "Inspect the structure and services and review flood, inland-water, landslide, tsunami, storm-surge, and seismic exposure.",
-            "Read the Japanese Important Matters Explanation and contract with independent advice before signing.",
-            "Secure lender terms and remittance mechanics before relying on finance.",
-            "Separate purchase price, acquisition taxes, professional fees, annual costs, tax administration, and resale costs.",
-            "Assign settlement, registration, FEFTA reporting, tax-agent, insurance, utility, and property-management responsibilities in writing.",
+            "Have the Japanese Important Matters Explanation and contract independently translated and reviewed before signing.",
+            "For non-resident financing, obtain written lender terms covering loan-to-value, guarantor, income currency, remittance, and property eligibility.",
+            "Separate the price from brokerage, registration and licence tax, real-estate acquisition tax, annual fixed-asset and city-planning tax, management, and later sale costs.",
+            "Before closing, name who will file the Japanese-language FEFTA report within 20 days, act as tax agent, receive owner notices, insure and manage the home, and update the registry after name or address changes.",
         ],
         "faqs": [
             {
@@ -527,6 +539,12 @@ def _validate_direct_answers(country_hub_slug: str, direct_answers: dict, primar
         if not answer.get("source_urls"):
             raise ValueError(f"{country_hub_slug}: direct_answers.{key} requires source_urls")
         _validate_source_urls(country_hub_slug, f"direct_answers.{key}", answer["source_urls"], primary_source_urls)
+        _validate_contextual_link(
+            country_hub_slug,
+            f"direct_answers.{key}",
+            answer,
+            answer["answer"],
+        )
 
 
 def _validate_sourced_items(country_hub_slug: str, field: str, items: list[dict], primary_source_urls: set[str]) -> None:
@@ -538,6 +556,37 @@ def _validate_sourced_items(country_hub_slug: str, field: str, items: list[dict]
         if not item.get("source_urls"):
             raise ValueError(f"{country_hub_slug}: {field}[{index}] requires source_urls")
         _validate_source_urls(country_hub_slug, f"{field}[{index}]", item["source_urls"], primary_source_urls)
+        claim = item.get("body") or item.get("buyer_read") or item.get("answer") or ""
+        _validate_contextual_link(
+            country_hub_slug,
+            f"{field}[{index}]",
+            item,
+            claim,
+        )
+
+
+def _validate_contextual_link(
+    country_hub_slug: str,
+    location: str,
+    item: dict,
+    claim: str,
+) -> None:
+    contextual_link = item.get("contextual_link")
+    if contextual_link is None:
+        return
+    if not isinstance(contextual_link, dict) or set(contextual_link) != {"phrase", "url"}:
+        raise ValueError(
+            f"{country_hub_slug}: {location}.contextual_link requires phrase and URL"
+        )
+    phrase = contextual_link["phrase"]
+    if not isinstance(phrase, str) or not phrase.strip() or phrase not in claim:
+        raise ValueError(
+            f"{country_hub_slug}: {location}.contextual_link phrase must appear in the claim"
+        )
+    if contextual_link["url"] not in item["source_urls"]:
+        raise ValueError(
+            f"{country_hub_slug}: {location}.contextual_link URL must be registered for that claim"
+        )
 
 
 def _validate_source_urls(

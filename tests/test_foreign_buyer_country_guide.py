@@ -100,6 +100,29 @@ class ForeignBuyerCountryGuideContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "^japan-property: direct_answers missing financing$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
 
+    def test_validator_rejects_contextual_links_that_do_not_match_the_claim_evidence(self) -> None:
+        guide = valid_guide_fixture()
+        guide["direct_answers"]["residency"]["contextual_link"] = {
+            "phrase": "Missing claim",
+            "url": "https://example.gov/source",
+        }
+
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: direct_answers.residency.contextual_link phrase must appear in the claim$",
+        ):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+        guide["direct_answers"]["residency"]["contextual_link"] = {
+            "phrase": "Answer",
+            "url": "https://example.gov/unregistered",
+        }
+        with self.assertRaisesRegex(
+            ValueError,
+            "^japan-property: direct_answers.residency.contextual_link URL must be registered for that claim$",
+        ):
+            validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
     def test_validator_requires_one_read_for_every_destination(self) -> None:
         guide = valid_guide_fixture()
         guide["destination_reads"].pop("niseko")
@@ -441,6 +464,18 @@ class JapanForeignBuyerContentTests(unittest.TestCase):
         ):
             self.assertNotIn(phrase, rendered_data)
 
+    def test_offer_checklist_is_specific_to_buying_in_japan(self) -> None:
+        checklist = " ".join(self.guide["buyer_checklist"])
+        for japan_specific_term in (
+            "Legal Affairs Bureau",
+            "minpaku",
+            "Japanese land and building registry",
+            "Important Matters Explanation",
+            "real-estate acquisition tax",
+            "FEFTA report within 20 days",
+        ):
+            self.assertIn(japan_specific_term, checklist)
+
     def test_residency_claim_cites_official_ownership_status_statement(self) -> None:
         source_url = (
             "https://www.city.fukuoka.lg.jp/keizai/k-yuchi/business/documents/"
@@ -620,6 +655,28 @@ class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
             self.japan,
         )
 
+    def test_only_three_high_value_claims_link_inline_to_official_sources(self) -> None:
+        self.assertNotIn('class="foreign-buyer-source-links"', self.japan)
+        self.assertEqual(3, self.japan.count('class="foreign-buyer-contextual-source"'))
+        for claim in (
+            "Buying property does not create a visa or residence rights.",
+            "capped at 180 days a year",
+            "submit the FEFTA acquisition report through the Bank of Japan within 20 days",
+        ):
+            self.assertRegex(
+                self.japan,
+                rf'<a class="foreign-buyer-contextual-source"[^>]*>{re.escape(claim)}</a>',
+            )
+
+    def test_complete_official_reference_list_remains_the_final_section(self) -> None:
+        references = self.japan.split('<section id="sources">', 1)[1].split(
+            "</section>", 1
+        )[0]
+        self.assertEqual(
+            len(FOREIGN_BUYER_COUNTRY_GUIDES["japan-property"]["primary_sources"]),
+            references.count('rel="noopener noreferrer"'),
+        )
+
 
 class ForeignBuyerCountryGuideDesignTests(unittest.TestCase):
     @classmethod
@@ -642,12 +699,12 @@ class ForeignBuyerCountryGuideDesignTests(unittest.TestCase):
         self.assertIn('class="foreign-buyer-destination-cards"', self.html)
         self.assertIn(".foreign-buyer-destination-table { display: none;", self.html)
 
-    def test_source_links_wrap_at_narrow_viewports(self) -> None:
+    def test_contextual_source_links_wrap_at_narrow_viewports(self) -> None:
         self.assertIn(
-            ".foreign-buyer-source-links a { margin-right: 10px; overflow-wrap: anywhere; white-space: normal; }",
+            ".foreign-buyer-contextual-source { overflow-wrap: anywhere; }",
             self.html,
         )
-        self.assertNotIn(".foreign-buyer-source-links a { margin-right: 10px; white-space: nowrap; }", self.html)
+        self.assertNotIn(".foreign-buyer-source-links", self.html)
 
     def test_cost_table_stacks_labelled_rows_on_mobile(self) -> None:
         self.assertIn('data-label="When"', self.html)

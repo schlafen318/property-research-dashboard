@@ -6482,16 +6482,19 @@ def country_guide_links(hub: dict, pages: list[dict]) -> str:
     return "\n".join(links)
 
 
-def source_links_html(labels_by_url: dict[str, str], urls: list[str]) -> str:
-    return " ".join(
-        f'<a href="{escape(url)}" rel="noopener noreferrer">{escape(labels_by_url[url])}</a>'
-        for url in urls
+def foreign_buyer_claim_html(text: str, contextual_link: dict | None = None) -> str:
+    if not contextual_link:
+        return escape(text)
+    phrase = contextual_link["phrase"]
+    before, linked_text, after = text.partition(phrase)
+    return (
+        f'{escape(before)}<a class="foreign-buyer-contextual-source" '
+        f'href="{escape(contextual_link["url"])}" rel="noopener noreferrer">'
+        f'{escape(linked_text)}</a>{escape(after)}'
     )
 
 
-def foreign_buyer_direct_answers_html(
-    guide: dict, source_labels: dict[str, str]
-) -> str:
+def foreign_buyer_direct_answers_html(guide: dict) -> str:
     labels = {
         "ownership": "Can foreigners buy?",
         "residency": "Does ownership create residency?",
@@ -6510,41 +6513,32 @@ def foreign_buyer_direct_answers_html(
         )
         articles.append(
             f'<article><h2>{escape(labels[key])}</h2>'
-            f'<p>{escape(guide["direct_answers"][key]["answer"])}</p>{retirement_link}'
-            f'<p class="foreign-buyer-source-links">{source_links_html(source_labels, guide["direct_answers"][key]["source_urls"])}</p></article>'
+            f'<p>{foreign_buyer_claim_html(guide["direct_answers"][key]["answer"], guide["direct_answers"][key].get("contextual_link"))}</p>{retirement_link}'
+            f'</article>'
         )
     return "".join(articles)
 
 
-def foreign_buyer_eligibility_html(
-    guide: dict, source_labels: dict[str, str]
-) -> str:
+def foreign_buyer_eligibility_html(guide: dict) -> str:
     return "".join(
-        f'<section><h3>{escape(item["heading"])}</h3><p>{escape(item["body"])}</p>'
-        f'<p class="foreign-buyer-source-links">{source_links_html(source_labels, item["source_urls"])}</p></section>'
+        f'<section><h3>{escape(item["heading"])}</h3><p>{escape(item["body"])}</p></section>'
         for item in guide["eligibility_sections"]
     )
 
 
-def foreign_buyer_purchase_steps_html(
-    guide: dict, source_labels: dict[str, str]
-) -> str:
+def foreign_buyer_purchase_steps_html(guide: dict) -> str:
     return "".join(
         f'<li><span>{index}</span><div><h3>{escape(step["heading"])}</h3>'
-        f'<p>{escape(step["body"])}</p><p class="foreign-buyer-source-links">'
-        f'{source_links_html(source_labels, step["source_urls"])}</p></div></li>'
+        f'<p>{foreign_buyer_claim_html(step["body"], step.get("contextual_link"))}</p></div></li>'
         for index, step in enumerate(guide["purchase_steps"], start=1)
     )
 
 
-def foreign_buyer_cost_table_html(
-    guide: dict, source_labels: dict[str, str]
-) -> str:
+def foreign_buyer_cost_table_html(guide: dict) -> str:
     rows = "".join(
         f'<tr><th scope="row" data-label="Cost">{escape(row["cost"])}</th>'
         f'<td data-label="When"><span class="foreign-buyer-mobile-label">When</span>{escape(row["when"])}</td>'
-        f'<td data-label="What matters"><span class="foreign-buyer-mobile-label">What matters</span>{escape(row["buyer_read"])} <span class="foreign-buyer-source-links">'
-        f'{source_links_html(source_labels, row["source_urls"])}</span></td></tr>'
+        f'<td data-label="What matters"><span class="foreign-buyer-mobile-label">What matters</span>{escape(row["buyer_read"])}</td></tr>'
         for row in guide["cost_rows"]
     )
     return (
@@ -6554,10 +6548,9 @@ def foreign_buyer_cost_table_html(
     )
 
 
-def foreign_buyer_rules_html(guide: dict, source_labels: dict[str, str]) -> str:
+def foreign_buyer_rules_html(guide: dict) -> str:
     return "".join(
-        f'<section><h3>{escape(rule["heading"])}</h3><p>{escape(rule["body"])}</p>'
-        f'<p class="foreign-buyer-source-links">{source_links_html(source_labels, rule["source_urls"])}</p></section>'
+        f'<section><h3>{escape(rule["heading"])}</h3><p>{escape(rule["body"])}</p></section>'
         for rule in guide["ownership_rules"]
     )
 
@@ -6589,11 +6582,10 @@ def foreign_buyer_destination_comparison_html(
     return table, f'<div class="foreign-buyer-destination-cards">{"".join(cards)}</div>'
 
 
-def foreign_buyer_faq_html(guide: dict, source_labels: dict[str, str]) -> str:
+def foreign_buyer_faq_html(guide: dict) -> str:
     return "".join(
         f'<article class="foreign-buyer-faq-item"><h3>{escape(item["question"])}</h3>'
-        f'<p>{escape(item["answer"])}</p><p class="foreign-buyer-source-links">'
-        f'{source_links_html(source_labels, item["source_urls"])}</p></article>'
+        f'<p>{escape(item["answer"])}</p></article>'
         for item in guide["faqs"]
     )
 
@@ -6618,8 +6610,7 @@ def build_foreign_buyer_country_guide_page(
     destination_table, destination_cards = foreign_buyer_destination_comparison_html(
         guide, selected
     )
-    source_labels = {item["url"]: item["label"] for item in guide["primary_sources"]}
-    eligibility_html = foreign_buyer_eligibility_html(guide, source_labels)
+    eligibility_html = foreign_buyer_eligibility_html(guide)
     checklist = "".join(f"<li>{escape(item)}</li>" for item in guide["buyer_checklist"])
     section_links = [
         ("Can foreigners buy?", "ownership-answer"),
@@ -6651,18 +6642,18 @@ def build_foreign_buyer_country_guide_page(
     </div>
     <figure><img src="{escape(guide["hero_image"]["src"])}" alt="{escape(guide["hero_image"]["alt"])}"><figcaption>{escape(guide["hero_image"]["caption"])}</figcaption></figure>
   </div>
-  <div class="foreign-buyer-shell foreign-buyer-answers">{foreign_buyer_direct_answers_html(guide, source_labels)}</div>
+  <div class="foreign-buyer-shell foreign-buyer-answers">{foreign_buyer_direct_answers_html(guide)}</div>
 </header>
 <main><div class="foreign-buyer-shell foreign-buyer-layout">
   <aside class="foreign-buyer-rail"><p>In this guide</p><nav aria-label="In this guide">{rail_links}</nav><a class="foreign-buyer-atlas-link" href="/dashboard/#destinations">Compare every destination</a></aside>
   <article class="foreign-buyer-article">
     <section id="ownership-answer"><h2>Can foreigners buy property in Japan?</h2>{eligibility_html}</section>
-    <section id="purchase-process"><h2>How the purchase works</h2><ol class="foreign-buyer-steps">{foreign_buyer_purchase_steps_html(guide, source_labels)}</ol></section>
-    <section id="costs-financing"><h2>Costs and financing</h2>{foreign_buyer_cost_table_html(guide, source_labels)}</section>
-    <section id="after-purchase"><h2>Rules after purchase</h2>{foreign_buyer_rules_html(guide, source_labels)}</section>
+    <section id="purchase-process"><h2>How the purchase works</h2><ol class="foreign-buyer-steps">{foreign_buyer_purchase_steps_html(guide)}</ol></section>
+    <section id="costs-financing"><h2>Costs and financing</h2>{foreign_buyer_cost_table_html(guide)}</section>
+    <section id="after-purchase"><h2>Rules after purchase</h2>{foreign_buyer_rules_html(guide)}</section>
     <section id="destinations"><h2>Where to buy</h2>{destination_table}{destination_cards}</section>
     <section id="buyer-checklist"><h2>Before making an offer</h2><ul class="foreign-buyer-checklist">{checklist}</ul></section>
-    <section id="faq"><h2>Frequently asked questions</h2>{foreign_buyer_faq_html(guide, source_labels)}</section>
+    <section id="faq"><h2>Frequently asked questions</h2>{foreign_buyer_faq_html(guide)}</section>
     <section id="sources"><h2>References and update policy</h2><p>Rules can change. Recheck every linked source and obtain current professional advice before signing.</p><ul>{foreign_buyer_sources_html(guide)}</ul></section>
   </article>
 </div></main>
