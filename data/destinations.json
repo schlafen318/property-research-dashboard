@@ -3365,15 +3365,15 @@
     "country": "Switzerland",
     "category": "Mountain",
     "overall_score": 3.4,
-    "usd_per_m2": 29200.0,
-    "net_yield_estimate": "1.5–3% est. net",
+    "usd_per_m2": 29300.0,
+    "net_yield_estimate": "No destination-wide net yield; model the exact property and lawful use",
     "quick_metrics": {
-      "usd_m": "$29,200",
-      "net_yield": "1.5–3% est. net",
+      "usd_m": "$29,300",
+      "net_yield": "Asset-specific",
       "ownership": "2.6/5",
       "friendly": "3.6/5"
     },
-    "panel_summary": "This is the trophy Swiss alpine cluster: extraordinary quality, but structurally unattractive for yield-focused foreign development. The panel would rank it high for prestige and low for investability.",
+    "panel_summary": "Valais and the Vaud Alps combine exceptional mountain life with unusually property-specific legal and operating constraints. Verbier, Crans-Montana, Zermatt and Villars are different markets; the permit, lawful use, building and future buyer matter more than a regional average.",
     "pros": [
       "Best-in-class alpine scenery",
       "global wealth preservation appeal",
@@ -3387,7 +3387,7 @@
       "very low net yields",
       "second-home limitations."
     ],
-    "panel_verdict": "Do not prioritise for this mandate. Keep only as a luxury benchmark or if personal-use value dominates return objectives.",
+    "panel_verdict": "Proceed only when personal use justifies the carrying cost and the exact home has written foreign-buyer eligibility, lawful occupancy, sound building governance and a credible resale pool.",
     "scores": {
       "scenery": {
         "label": "Scenery",
@@ -3460,18 +3460,18 @@
         "weight": 0.11
       }
     },
-    "ownership_notes": "Non-resident foreign buyers face Lex Koller quotas/permits and Lex Weber second-home caps. Rules are canton- and commune-specific, and 2026 tightening is under consultation.",
-    "red_flags": "Foreign-buyer restrictions, very high price, low yield, second-home caps, proposed tightening.",
+    "ownership_notes": "Non-resident foreign buyers generally need Lex Koller authorization for a holiday home. Canton, commune, quota, buyer, floor area, land area and existing-home status all matter; the federal second-home law separately restricts new second homes in communes above the statutory threshold.",
+    "red_flags": "Permit or quota uncertainty, restricted use, high carrying cost, weak building reserves, mountain access or hazard issues, and a narrow successor-buyer pool.",
     "rental": {
-      "gross_yield": "Very low yield after price/tax/management; mainly capital preservation and lifestyle",
-      "net_yield": "1.5–3% est. net",
-      "revenue": "UBS Alpine Property Focus 2026 cites Verbier around CHF23,500/m² and Zermatt around CHF21,000/m²; Gstaad/St Moritz even higher.",
-      "adr_occupancy": "Very high ADR, but availability/licensing and owner usage matter / Strong winter/summer in top resorts",
-      "confidence": "Medium-low"
+      "gross_yield": "No destination-wide estimate; nightly demand cannot substitute for written confirmation of lawful use and complete operating costs",
+      "net_yield": "No destination-wide net yield; model the exact property and lawful use",
+      "revenue": "UBS Alpine Property Focus 2026 reports high-standard asking benchmarks of CHF23,600/m² in Verbier, CHF21,000/m² in Zermatt and CHF14,700/m² in Crans-Montana.",
+      "adr_occupancy": "Winter and summer demand vary materially by resort, address, property format and owner-use calendar",
+      "confidence": "Medium for dated resort benchmarks; low for any property-level income inference"
     },
-    "price_basis": "Premium alpine benchmark. Verbier CHF23,500/m² × CHF/USD 1.24288 ≈ $29,208/m²; Zermatt CHF21,000/m² ≈ $26,100/m².",
-    "price_confidence": "High for premium resort benchmarks",
-    "profit_driver": "Global trophy liquidity, snow reliability at altitude, healthcare/safety, brand value."
+    "price_basis": "Verbier high-standard asking benchmark of CHF23,600/m² in UBS Alpine Property Focus 2026, converted at the retained planning basis of 1 CHF = 1.24288 USD; this is not a completed-sale valuation or a region-wide median.",
+    "price_confidence": "Medium-high for the dated Verbier benchmark; low as a property valuation",
+    "profit_driver": "Lawful use, durable year-round utility, disciplined entry, well-funded building governance and a successor pool eligible and willing to buy the exact asset."
   },
   {
     "id": "gold-coast-sunshine-coast",

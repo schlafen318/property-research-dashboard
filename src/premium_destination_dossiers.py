@@ -4704,6 +4704,145 @@ ASPEN_SNOWMASS_DOSSIER = PremiumDossierSpec(
 )
 
 
+SWISS_VALAIS_VAUD_ALPS_DOSSIER = PremiumDossierSpec(
+    destination_id="swiss-valais-vaud-alps",
+    title="Swiss Valais and Vaud Alps Retirement Property Dossier",
+    description="Assess retirement property in Verbier, Crans-Montana, Zermatt and the Vaud Alps through daily life, foreign-buyer permits, second-home rules, access, building diligence and resale.",
+    h1="Valais / Vaud Alps: buy the right to use, not just the view",
+    lede="Switzerland’s western Alps can deliver exceptional mountain life, but the label hides four different propositions. Verbier is internationally liquid and expensive; Crans-Montana combines plateau living with resort scale; Zermatt is car-free and scarce; Villars and the Vaud Alps sit closer to the Lake Geneva economy. For a buyer abroad, the first question is not which view wins. It is whether the exact person, commune and property qualify—and whether the home will remain useful outside a holiday week.",
+    author="Global Home Atlas Research Team",
+    date_published="2026-08-27",
+    date_reviewed="2026-08-27",
+    verdict_paragraphs=(
+        "The verdict is attractive but highly selective. Valais and the Vaud Alps suit a buyer who places personal use, safety, infrastructure and durable resort recognition above yield, and who accepts that foreign-buyer permission is property-specific. Under the federal Lex Koller framework, a person abroad generally needs authorization to acquire a holiday home. The official guide describes a normal ceiling of 200 m² of net floor area and 1,000 m² of land, with larger cases requiring justification; cantonal quotas and permitted communes add another filter. A sales description saying ‘available to foreigners’ is a lead, not legal clearance.",
+        "The second-home law is separate. In communes above the statutory 20% second-home threshold, new second homes are generally restricted, while pre-existing lawful homes, tourist-managed units and other exceptions can follow different rules. That makes the legal history, occupancy designation and permitted future use of the exact unit central to value. A foreign buyer should also confirm that the eventual successor pool can acquire the property on the same terms. Scarcity can protect a good home, but restrictions can also narrow exit liquidity.",
+        "Proceed in sequence: establish residence and tax position; obtain written Lex Koller and second-home-law advice for the buyer and cadastral parcel; test daily access, healthcare and winter operations; inspect the building and owners’ association; then compare the asking price with the correct resort benchmark and model five-year carrying costs without assuming rental income. The right purchase is a legally usable, operationally sound home in a village pattern the household will actually live—not a generic Swiss Alps allocation."
+    ),
+    lenses_intro="Five paired questions turn the mountain proposition into a property decision: ordinary life, the complete journey, lawful ownership and use, income and capital assumptions, and the depth of the eventual resale pool.",
+    lenses=(
+        DossierLens(
+            "Choose a village that works after the holiday ends",
+            ("lifestyle_magnetism", "retirement_fit"),
+            (
+                "Verbier, Crans-Montana, Zermatt and Villars do not offer the same daily life. Verbier’s international village and Four Valleys access bring restaurants, services and energy, but steep gradients and peak-season intensity matter. Crans-Montana’s sunnier plateau can make walking and ordinary errands easier in selected central pockets. Zermatt’s car-free core creates a distinctive pedestrian environment, yet every arrival and heavy delivery passes through Täsch and local electric transport. Villars, Gryon and Les Diablerets connect more naturally toward Aigle, Lausanne and Lake Geneva. Choose the weekly pattern before the property format.",
+                "Retirement fit depends on what happens between seasons. Confirm the year-round supermarket, pharmacy, general practitioner, physiotherapy, social life and public transport closest to the front door. Larger hospitals sit down-valley: Hôpital du Valais serves the Valais network, while Hôpital Riviera-Chablais is relevant to the Vaud Alps. Mountain villages are not medically isolated, but an icy road, rail change or valley descent is different from living beside specialist care. Time the real route and establish who assists if the household cannot drive or manage luggage.",
+                "Test altitude, sun, slope and building access in person. A south-facing balcony can be delightful while an uphill approach, exterior steps or shaded winter path becomes a daily burden. Ask what remains open in May and November, how groceries arrive, who clears snow, and whether the home can be occupied comfortably without skiing. The Alps score highly for beauty and quality of life; the exact address earns retirement suitability only when ordinary routines remain easy."
+            ),
+            None,
+        ),
+        DossierLens(
+            "Measure the last mile from Geneva to the front door",
+            ("global_access", "foreigner_fit"),
+            (
+                "Geneva Airport is the principal gateway, but the decisive metric is the full trip. Mainline rail reaches Lausanne, Aigle, Martigny, Sion and Visp; branch railways, buses, gondolas and taxis complete the journey. Verbier commonly involves Le Châble and a final gondola, bus or road segment. Crans-Montana connects through Sierre and a funicular or road transfer. Zermatt requires the rail journey beyond Visp and Täsch. Villars uses the Aigle corridor and mountain rail or road. Test each route with luggage, a delayed flight and an evening arrival.",
+                "A mountain home also needs an internal movement plan. Central Verbier or Crans can reduce car dependence, while hillside chalets may make it unavoidable. Zermatt removes private cars but increases dependence on electric taxis, walking and delivery systems. Vaud resorts can offer better access to the Lake Geneva region, yet dispersed addresses remain car-led. Read current SBB and local timetables, distinguish year-round services from ski shuttles, and check the walk from the stop in snow rather than relying on a map pin.",
+                "International service is strong in major resorts, but the legal and administrative work remains cantonal and often French or German-led. Permit applications, notarial documents, land-register records, condominium minutes, tax filings and contractor coordination require precise local advice. Retain an independent notary or lawyer, tax adviser and technical inspector; do not rely solely on the seller’s agent. A multilingual sales process does not make the buyer’s residence, tax or property eligibility automatic."
+            ),
+            "regional-access",
+        ),
+        DossierLens(
+            "Clear the buyer, commune and property before price",
+            ("ownership_clarity", "regulatory_safety"),
+            (
+                "Lex Koller is not a single yes-or-no rule for the region. The federal guide states that a person abroad generally needs authorization to acquire a holiday home, that the home must be in a designated tourist place, and that cantonal quotas apply. It is normally acquired in the individual’s name, not through a company, and the household may generally hold only one Swiss holiday or secondary home. Vaud and Valais publish their own procedures and competent offices. Obtain a written pre-closing opinion covering nationality, residence, household holdings, commune, quota, floor area, land area and intended use.",
+                "The federal second-home regime answers a different question: whether the unit may exist and how it can be used. Communes with more than 20% second homes generally cannot authorize ordinary new second homes, while old-law residences, tourist-managed accommodation and specific exceptions require document-level analysis. Verify the building permit, land-register annotation, occupancy designation, rental obligations and whether renovation, amalgamation, demolition or rebuilding would change the rights. A chalet marketed as a secondary residence can still be unsuitable for a particular foreign buyer.",
+                "Physical and collective governance are equally important. For an apartment, review the PPE bylaws, minutes, reserve fund, planned works, arrears, insurance, owner-use and rental rules, parking and storage rights. For a chalet, verify legal access, boundaries, services, structure, roof, drainage, retaining works, slope and natural-hazard evidence. Obtain actual heating and service-charge history. In a high-price market, an underfunded façade, lift or roof programme can matter more than a modest discount to asking."
+            ),
+            "building-diligence",
+        ),
+        DossierLens(
+            "Underwrite use first and rent only when proven",
+            ("rental_profit", "capital_upside"),
+            (
+                "There is no defensible destination-wide net yield for this cluster. Rental legality and economics change by commune, building, property designation, owner calendar and management model. A home may be restricted, subject to tourist-management obligations or unable to support the occupancy assumed in a sales forecast. Even where short stays are lawful, deduct agency and platform fees, cleaning, linen, utilities, insurance, maintenance, service charges, local taxes, empty periods and personal-use weeks. Treat rent as a property-level business case, not a characteristic of the resort name.",
+                "UBS Alpine Property Focus 2026 provides a useful pricing frame for high-standard holiday homes: approximately CHF23,600/m² in Verbier, CHF21,000 in Zermatt, CHF14,700 in Crans-Montana and CHF10,500 across Villars-Gryon-Les Diablerets. These are estimated asking levels, not completed-sale valuations, and UBS notes a change in data sources. The dispersion is the point. A regional average cannot value a compact Verbier apartment, a large Crans unit and a scarce Zermatt secondary residence.",
+                "Capital preservation depends on lawful scarcity and successor demand, not a forecast line. International recognition, limited supply and strong infrastructure can support selected homes, while high entry prices, changing demand, currency exposure and a restricted buyer pool can extend the sale. Model a flat nominal resale after purchase costs, annual carrying costs and selling fees. Upside should be a benefit of owning a rare, usable and well-governed asset—not the justification for ignoring its legal or operational weaknesses."
+            ),
+        ),
+        DossierLens(
+            "Compare like with like—and name the next buyer",
+            ("value_entry", "exit_liquidity"),
+            (
+                "The three current observations show why format matters. A CHF1.29 million, 52 m² central Verbier apartment asks roughly CHF24,808/m², close to but above the UBS high-standard Verbier benchmark. A CHF2.32 million Crans-Montana apartment asks about CHF13,647/m² on 170 m² of stated living area, below the resort benchmark before parking and works. A CHF4.07 million Zermatt apartment asks about CHF31,797/m² on 128 m², far above the resort benchmark. These gaps are prompts for diligence, not declarations of value.",
+                "Reconcile net living area, weighted balcony area, storage, parking and any seller use of total floor area before comparing price per square metre. Then adjust for condition, view, sun, centrality, legal designation, foreign-buyer eligibility, service charges and renovation. Request completed transaction evidence from the notary or independent adviser where available. An asking price that looks low beside a resort benchmark may simply reflect extra works or a different measurement basis.",
+                "Exit liquidity is eligibility multiplied by desirability. A future buyer must want the location and property, afford the absolute price, accept the charges and satisfy the applicable acquisition rules. Compact, central and well-managed units may reach a broader pool; singular chalets, very large apartments and homes with operating obligations can take longer. Before signing, ask two agents who did not source the property who the next buyer is, which direct comparables sold, and what discount and marketing period were required."
+            ),
+        ),
+    ),
+    score_reads={
+        "lifestyle_magnetism": "Verbier energy, Crans sunshine, Zermatt’s car-free core and the Vaud Alps’ Lake Geneva access suit different mountain lives.",
+        "global_access": "Geneva and Switzerland’s rail network are strong, but every resort adds a branch line, funicular, gondola, bus or road last mile.",
+        "ownership_clarity": "Non-resident holiday-home purchases require buyer-, commune-, quota- and property-specific Lex Koller clearance before commitment.",
+        "regulatory_safety": "Second-home status, permitted use, PPE rules and address-level mountain hazards must be verified independently for the exact unit.",
+        "rental_profit": "No regional yield is reliable; lawful use, owner weeks, management, service charges and seasonality determine the property result.",
+        "capital_upside": "Scarcity and resort recognition support selected homes, but high entry and restricted successor demand make appreciation asset-specific.",
+        "retirement_fit": "Year-round services and Swiss healthcare are strong, while altitude, slope and down-valley specialist journeys affect the exact address.",
+        "exit_liquidity": "Central, conventional units reach more eligible buyers; singular or high-carrying homes need a narrower, wealthier successor pool.",
+        "foreigner_fit": "International resort services help, but permits, notarial work, tax, PPE governance and contractors remain locally administered.",
+        "value_entry": "Verbier, Crans, Zermatt and Villars have materially different price levels; area basis, condition and legal use drive any comparison.",
+    },
+    market_anchors=(
+        {"location":"Verbier","evidence":"CHF23,600/m²","buyer_read":"UBS 2026 high-standard asking benchmark. The current 52 m² observation asks about CHF24,808/m², so size, condition, parking and permit eligibility must explain the premium.","source_label":"UBS Alpine Property Focus 2026","source_url":"https://www.ubs.com/content/news/fr/2026/06/04/alpine-property-focus-2026/_jcr_content/root/contentarea/mainpar/gridcontrol/col_2/linklistnewlook/link_1963087478.1602596519.file/PS9jb250ZW50L2RhbS9hc3NldHMvbmV3cy8yMDI2LzA2LzA0LzIwMjYwNjA0LWV0dWRlcy11YnMtYWxwaW5lLXByb3BlcnR5LWZvY3VzLTIwMjYtZnIucGRm/20260604-etudes-ubs-alpine-property-focus-2026-fr.pdf"},
+        {"location":"Crans-Montana","evidence":"CHF14,700/m²","buyer_read":"UBS 2026 high-standard asking benchmark. The current 170 m² observation asks about CHF13,647/m² before extra parking and stated kitchen work; confirm area basis and total project cost.","source_label":"UBS Alpine Property Focus 2026","source_url":"https://www.ubs.com/global/en/wealthmanagement/insights/chief-investment-office/life-goals/real-estate/ubs-alpine-property-focus.html"},
+        {"location":"Zermatt","evidence":"CHF21,000/m²","buyer_read":"UBS 2026 high-standard asking benchmark. The current 128 m² observation asks about CHF31,797/m²; verify total versus living area, condition, view and transferable secondary-home rights.","source_label":"UBS Alpine Property Focus 2026","source_url":"https://www.ubs.com/global/en/wealthmanagement/insights/chief-investment-office/life-goals/real-estate/ubs-alpine-property-focus.html"},
+    ),
+    micro_locations_intro="Treat the region as four operating patterns rather than one price zone. Confirm the cadastral parcel, commune, legal use, transport, hazards, services and successor-buyer eligibility for the exact address.",
+    micro_locations=(
+        {"name":"Verbier / Le Châble","best_for":"International resort depth","daily_life":"Steep village above a rail-and-gondola gateway","diligence":"Permit, slope, access, PPE charges and peak-season pressure"},
+        {"name":"Crans-Montana","best_for":"Sunny plateau and year-round scale","daily_life":"Walkable in selected centres, car-led at the edges","diligence":"Area basis, building works, parking and legal use"},
+        {"name":"Zermatt / Täsch","best_for":"Car-free scarcity and iconic mountain setting","daily_life":"Rail, walking, electric taxi and delivery systems","diligence":"Secondary-home rights, logistics, charges and successor pool"},
+        {"name":"Villars / Gryon / Les Diablerets","best_for":"Vaud Alps with Lake Geneva orientation","daily_life":"Village rail and road links toward Aigle","diligence":"Commune eligibility, last mile, building governance and seasonality"},
+    ),
+    checklist=(
+        "Confirm residence, tax residence and financing before treating the home as a retirement base.",
+        "Obtain written Lex Koller eligibility for the buyer, commune, quota and cadastral parcel.",
+        "Verify second-home status, occupancy designation, rental obligations and future renovation rights.",
+        "Travel the complete airport, rail, last-mile, grocery and hospital routes in winter.",
+        "Review PPE bylaws, minutes, reserves, planned works, insurance, charges and owner-use rules.",
+        "Inspect structure, roof, heating, drainage, slope, retaining works, access and natural hazards.",
+        "Model five-year carrying cost without rent, then add only independently cleared income.",
+        "Reconcile area and direct sale evidence, then identify the eligible successor buyer before signing.",
+    ),
+    references_intro="Legal, administrative, market, tax, access, healthcare and listing claims were reviewed on 27 August 2026. Recheck by 27 February 2027 and immediately after any Lex Koller, second-home, cantonal quota, municipal, tax, transport, building, hazard or listing change. Obtain current Swiss legal, notarial, tax, immigration, technical and insurance advice for the exact buyer and property. Listings are dated asking observations, not valuations or availability guarantees.",
+    references=(
+        {"label":"Switzerland property guide","url":"/countries/switzerland-property/"},
+        {"label":"Swiss Federal Office of Justice: acquisition of real estate by persons abroad","url":"https://www.bj.admin.ch/dam/bj/en/data/wirtschaft/grundstueckerwerb/lex.pdf.download.pdf/lex-e.pdf"},
+        {"label":"Canton Valais: acquisition by persons abroad","url":"https://www.vs.ch/en/web/srf/acquisition_etrangers"},
+        {"label":"Canton Vaud: acquisition by persons abroad","url":"https://www.vd.ch/territoire-et-construction/registre-foncier/acquisition-par-des-etrangers"},
+        {"label":"Federal Office for Spatial Development: second homes","url":"https://www.are.admin.ch/fr/residencessecondaires"},
+        {"label":"Canton Vaud: second-home implementation","url":"https://www.vd.ch/territoire-et-construction/cadastre-et-geoinformation/registre-cantonal-des-batiments-rcb/loi-sur-les-residences-secondaires"},
+        {"label":"Swiss federal portal: taxation of real estate","url":"https://www.ch.ch/en/taxes-and-finances/types-of-taxation/taxation-of-real-estate"},
+        {"label":"Canton Vaud: real-estate transfer tax","url":"https://www.vd.ch/etat-droit-finances/impots/impots-pour-les-individus/les-impots-les-differents-types-dimpots/transferts-immobiliers"},
+        {"label":"UBS Alpine Property Focus 2026","url":"https://www.ubs.com/global/en/wealthmanagement/insights/chief-investment-office/life-goals/real-estate/ubs-alpine-property-focus.html"},
+        {"label":"SBB: Swiss public-transport journey planner","url":"https://www.sbb.ch/en"},
+        {"label":"Hôpital du Valais","url":"https://www.hopitalduvalais.ch/"},
+        {"label":"Hôpital Riviera-Chablais","url":"https://www.hopitalrivierachablais.ch/"},
+        {"label":"Homegate: Verbier direct asking observation","url":"https://www.homegate.ch/buy/4003368240"},
+        {"label":"John Taylor: Crans-Montana direct asking observation","url":"https://www.john-taylor.com/switzerland/sale/flat-apartement/swiss-alps/crans-montana/V0319CR/"},
+        {"label":"Engel & Völkers: Zermatt direct asking observation","url":"https://www.engelvoelkers.com/ch/fr/exposes/9cfadd82-1980-531a-9f38-75177da6363c"},
+    ),
+    images=(
+        DossierImage("village-life","/assets/swiss-valais-vaud-alps-village-hero.webp","A functioning Swiss alpine village street with shops, chalets and mountains in autumn","A useful mountain base begins with an ordinary village that remains open between seasons.","premium-image--hero","hero"),
+        DossierImage("regional-access","/assets/swiss-valais-vaud-alps-access.webp","A Swiss mountain railway station with a train, PostBus and travellers","Rail is excellent; the decisive test is the resort transfer and final walk to the property.","premium-image--wide","access"),
+        DossierImage("building-diligence","/assets/swiss-valais-vaud-alps-building-diligence.webp","An alpine condominium inspection focused on drainage, retaining walls and the roof","PPE reserves, drainage, slope and envelope condition can outweigh a small price discount.","premium-image--wide","diligence"),
+    ),
+    nav_items=(("verdict","Verdict"),("lenses","Five destination lenses"),("scores","Atlas assessment"),("listings","What homes cost"),("micro-locations","Where to look"),("checklist","Buyer checklist"),("sources","References")),
+    lenses_heading="Five questions that decide the purchase",
+    assessment_intro="The Atlas scores the regional proposition once. Read each score beside the village, legal and property-level explanation; none is a forecast or substitute for a valuation.",
+    listings_intro="These three direct asking observations show the range from a compact Verbier apartment to a large Crans-Montana unit and a scarce Zermatt secondary residence. Local price is primary; the retained USD planning conversion is for comparison only.",
+    market_anchors_intro="Each listing is paired with the closest UBS 2026 high-standard resort asking benchmark. The benchmark tests the question; it does not value the home.",
+    orientation_groups=(
+        DossierOrientationGroup("Lake Geneva to the Vaud Alps",(("Geneva / Lausanne","international gateway and specialist services"),("Aigle","mainline rail interchange"),("Villars / Gryon / Les Diablerets","Vaud mountain villages"))),
+        DossierOrientationGroup("Valais resort spine",(("Martigny / Sion / Sierre","valley rail and services"),("Verbier / Crans-Montana","road, rail, gondola or funicular last mile"),("Visp / Täsch / Zermatt","rail-led car-free resort approach"))),
+    ),
+    orientation_caption="Swiss mainline rail is the backbone; every alpine address adds a property-specific final segment.",
+    country_guide_url="/countries/switzerland-property/",
+    country_guide_label="Switzerland property guide",
+    rail_comparison="Compare Valais / Vaud Alps with Andermatt, Ticino / Lake Lugano and the full Atlas.",
+    property_anchor_indexes=(0,1,2),
+)
+
+
 PREMIUM_DESTINATION_DOSSIERS = {
     FUKUOKA_ITOSHIMA_DOSSIER.destination_id: FUKUOKA_ITOSHIMA_DOSSIER,
     ALGARVE_CASCAIS_DOSSIER.destination_id: ALGARVE_CASCAIS_DOSSIER,
@@ -4737,6 +4876,7 @@ PREMIUM_DESTINATION_DOSSIERS = {
     JACKSON_HOLE_DOSSIER.destination_id: JACKSON_HOLE_DOSSIER,
     TICINO_LAKE_LUGANO_DOSSIER.destination_id: TICINO_LAKE_LUGANO_DOSSIER,
     ASPEN_SNOWMASS_DOSSIER.destination_id: ASPEN_SNOWMASS_DOSSIER,
+    SWISS_VALAIS_VAUD_ALPS_DOSSIER.destination_id: SWISS_VALAIS_VAUD_ALPS_DOSSIER,
 }
 
 
@@ -4832,3 +4972,4 @@ validate_premium_dossier(CHAMONIX_DOSSIER)
 validate_premium_dossier(INNSBRUCK_TYROL_DOSSIER)
 validate_premium_dossier(JACKSON_HOLE_DOSSIER)
 validate_premium_dossier(TICINO_LAKE_LUGANO_DOSSIER)
+validate_premium_dossier(SWISS_VALAIS_VAUD_ALPS_DOSSIER)
