@@ -346,3 +346,10 @@ class ForeignBuyerCountryGuideDesignTests(unittest.TestCase):
         self.assertIn('class="foreign-buyer-destination-table"', self.html)
         self.assertIn('class="foreign-buyer-destination-cards"', self.html)
         self.assertIn(".foreign-buyer-destination-table { display: none;", self.html)
+
+    def test_source_links_wrap_at_narrow_viewports(self) -> None:
+        self.assertIn(
+            ".foreign-buyer-source-links a { margin-right: 10px; overflow-wrap: anywhere; white-space: normal; }",
+            self.html,
+        )
+        self.assertNotIn(".foreign-buyer-source-links a { margin-right: 10px; white-space: nowrap; }", self.html)

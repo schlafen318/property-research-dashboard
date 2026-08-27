@@ -286,7 +286,7 @@ def foreign_buyer_country_guide_css() -> str:
     .foreign-buyer-article p { margin: 0 0 16px; }
     .foreign-buyer-article section > section + section { margin-top: 30px; padding-top: 1px; }
     .foreign-buyer-source-links { color: var(--foreign-buyer-muted); font-size: 13px !important; line-height: 1.5 !important; }
-    .foreign-buyer-source-links a { margin-right: 10px; white-space: nowrap; }
+    .foreign-buyer-source-links a { margin-right: 10px; overflow-wrap: anywhere; white-space: normal; }
 
     .foreign-buyer-steps { display: grid; gap: 0; margin: 0; padding: 0; list-style: none; counter-reset: foreign-buyer-step; }
     .foreign-buyer-steps li { display: grid; grid-template-columns: 38px minmax(0, 1fr); gap: 18px; max-width: none; padding: 22px 0; border-top: 1px solid var(--foreign-buyer-rule); }
