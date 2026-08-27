@@ -181,6 +181,33 @@ class JapanForeignBuyerContentTests(unittest.TestCase):
         ):
             self.assertNotIn(phrase, rendered_data)
 
+    def test_residency_claim_cites_official_ownership_status_statement(self) -> None:
+        source_url = (
+            "https://www.city.fukuoka.lg.jp/keizai/k-yuchi/business/documents/"
+            "english-faq.pdf"
+        )
+        self.assertIn(
+            source_url,
+            self.guide["direct_answers"]["residency"]["source_urls"],
+        )
+        residency_faq = next(
+            faq
+            for faq in self.guide["faqs"]
+            if faq["question"] == "Does buying a home qualify me to live in Japan?"
+        )
+        self.assertIn(source_url, residency_faq["source_urls"])
+
+    def test_owner_update_rule_cites_current_accessible_moj_guidance(self) -> None:
+        current_url = "https://www.moj.go.jp/MINJI/minji05_00693.html"
+        old_url = "https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html"
+        owner_rule = next(
+            rule
+            for rule in self.guide["ownership_rules"]
+            if rule["heading"] == "Keep the owner record current"
+        )
+        self.assertIn(current_url, owner_rule["source_urls"])
+        self.assertNotIn(old_url, owner_rule["source_urls"])
+
 
 class JapanForeignBuyerSourceIntegrityTests(unittest.TestCase):
     approved_domains = {
@@ -190,6 +217,7 @@ class JapanForeignBuyerSourceIntegrityTests(unittest.TestCase):
         "nta.go.jp",
         "gsi.go.jp",
         "mofa.go.jp",
+        "city.fukuoka.lg.jp",
     }
 
     def setUp(self) -> None:

@@ -53,6 +53,7 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
             "residency": {
                 "answer": "No. Buying property does not create a visa or residence rights. Qualify under a separate immigration route before planning to live in Japan long term.",
                 "source_urls": [
+                    "https://www.city.fukuoka.lg.jp/keizai/k-yuchi/business/documents/english-faq.pdf",
                     "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
                     "https://www.mofa.go.jp/ca/fna/page22e_000738.html",
                 ],
@@ -95,6 +96,7 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
                 "heading": "Residence status is a separate decision",
                 "body": "Choose an immigration route on its own requirements and timetable. The official long-stay sightseeing route, for example, uses nationality or region, age, savings, insurance, and application-document criteria rather than property ownership.",
                 "source_urls": [
+                    "https://www.city.fukuoka.lg.jp/keizai/k-yuchi/business/documents/english-faq.pdf",
                     "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
                     "https://www.mofa.go.jp/ca/fna/page22e_000738.html",
                 ],
@@ -153,7 +155,7 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
                 "body": "If the buyer is non-resident, submit the FEFTA acquisition report through the Bank of Japan within 20 days. Put Japanese tax, insurance, utilities, property management, condominium notices and voting, repairs, and future name or address updates onto an operating calendar.",
                 "source_urls": [
                     "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html",
-                    "https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html",
+                    "https://www.moj.go.jp/MINJI/minji05_00693.html",
                     "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf",
                     "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
                 ],
@@ -217,7 +219,7 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
                 "heading": "Keep the owner record current",
                 "body": "From 2026-04-01, a registered owner must register a name or address change within two years. Overseas owners should arrange a reliable route for receiving notices and handling Japanese filings.",
                 "source_urls": [
-                    "https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html",
+                    "https://www.moj.go.jp/MINJI/minji05_00693.html",
                 ],
             },
             {
@@ -285,6 +287,7 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
                 "question": "Does buying a home qualify me to live in Japan?",
                 "answer": "No property-based residence right is created by the purchase. Residence status has its own legal categories and eligibility. Check the relevant immigration route independently before buying for full-time use.",
                 "source_urls": [
+                    "https://www.city.fukuoka.lg.jp/keizai/k-yuchi/business/documents/english-faq.pdf",
                     "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
                     "https://www.mofa.go.jp/ca/fna/page22e_000738.html",
                 ],
@@ -331,6 +334,10 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
             {
                 "label": "Ministry of Justice — mandatory inheritance and owner name/address registration",
                 "url": "https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html",
+            },
+            {
+                "label": "Ministry of Justice — current owner name/address change registration guidance",
+                "url": "https://www.moj.go.jp/MINJI/minji05_00693.html",
             },
             {
                 "label": "MLIT — land-tax overview",
@@ -403,6 +410,10 @@ FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
             {
                 "label": "Immigration Services Agency — immigration and residence status Q&A",
                 "url": "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
+            },
+            {
+                "label": "Fukuoka City — real-estate ownership and residence or immigration status FAQ",
+                "url": "https://www.city.fukuoka.lg.jp/keizai/k-yuchi/business/documents/english-faq.pdf",
             },
         ],
         "retirement_guide_slug": "japan-retirement-property-foreign-buyers",
