@@ -6541,8 +6541,9 @@ def foreign_buyer_cost_table_html(
     guide: dict, source_labels: dict[str, str]
 ) -> str:
     rows = "".join(
-        f'<tr><th scope="row">{escape(row["cost"])}</th><td>{escape(row["when"])}</td>'
-        f'<td>{escape(row["buyer_read"])} <span class="foreign-buyer-source-links">'
+        f'<tr><th scope="row" data-label="Cost">{escape(row["cost"])}</th>'
+        f'<td data-label="When">{escape(row["when"])}</td>'
+        f'<td data-label="What matters">{escape(row["buyer_read"])} <span class="foreign-buyer-source-links">'
         f'{source_links_html(source_labels, row["source_urls"])}</span></td></tr>'
         for row in guide["cost_rows"]
     )

@@ -402,3 +402,10 @@ class ForeignBuyerCountryGuideDesignTests(unittest.TestCase):
             self.html,
         )
         self.assertNotIn(".foreign-buyer-source-links a { margin-right: 10px; white-space: nowrap; }", self.html)
+
+    def test_cost_table_stacks_labelled_rows_on_mobile(self) -> None:
+        self.assertIn('data-label="When"', self.html)
+        self.assertIn('data-label="What matters"', self.html)
+        self.assertIn(".foreign-buyer-cost-table thead { display: none; }", self.html)
+        self.assertIn(".foreign-buyer-cost-table td::before { content: attr(data-label);", self.html)
+        self.assertNotIn(".foreign-buyer-cost-table { display: block; overflow-x: auto;", self.html)
