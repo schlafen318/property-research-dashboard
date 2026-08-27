@@ -5,11 +5,23 @@ from copy import deepcopy
 import unittest
 from urllib.parse import urlsplit
 
+from src import build_unified_app
 from src.foreign_buyer_country_guides import (
     FOREIGN_BUYER_COUNTRY_GUIDES,
     get_foreign_buyer_country_guide,
     validate_foreign_buyer_country_guide,
 )
+
+
+def render_country(slug: str) -> str:
+    hub = next(item for item in build_unified_app.COUNTRY_HUBS if item["slug"] == slug)
+    destinations = [
+        build_unified_app.consolidate_destination(item)
+        for item in build_unified_app.load_json("destinations.json")
+    ]
+    return build_unified_app.build_country_hub_page(
+        hub, destinations, build_unified_app.SEO_PAGES
+    )
 
 
 def valid_guide_fixture() -> dict:
@@ -261,3 +273,54 @@ class JapanForeignBuyerSourceIntegrityTests(unittest.TestCase):
                 ),
                 source["url"],
             )
+
+
+class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.japan = render_country("japan-property")
+        cls.spain = render_country("spain-property")
+
+    def test_japan_uses_the_acquisition_renderer_only(self) -> None:
+        self.assertIn('<body class="foreign-buyer-country-guide">', self.japan)
+        self.assertNotIn('<body class="foreign-buyer-country-guide">', self.spain)
+        self.assertIn("Spain Property Guide for Foreign Buyers", self.spain)
+
+    def test_japan_sections_follow_the_approved_order(self) -> None:
+        section_ids = [
+            "ownership-answer",
+            "purchase-process",
+            "costs-financing",
+            "after-purchase",
+            "destinations",
+            "buyer-checklist",
+            "faq",
+            "sources",
+        ]
+        positions = [self.japan.index(f'id="{section_id}"') for section_id in section_ids]
+        self.assertEqual(positions, sorted(positions))
+
+    def test_core_article_uses_open_sections(self) -> None:
+        article = self.japan.split('<article class="foreign-buyer-article">', 1)[1].split(
+            "</article>", 1
+        )[0]
+        self.assertNotIn("<details", article)
+        self.assertNotIn("<summary", article)
+
+    def test_japan_excludes_legacy_conversion_content(self) -> None:
+        for forbidden in (
+            "Country Thesis",
+            "Buyer Fit",
+            "Recommended Premium Brief",
+            "Review my shortlist",
+            "Estimate your retirement capital",
+            "Representative property",
+            "Asking price",
+        ):
+            self.assertNotIn(forbidden, self.japan)
+
+    def test_japan_renders_one_destination_comparison_with_dossier_links(self) -> None:
+        self.assertEqual(1, self.japan.count('id="destinations"'))
+        self.assertEqual(1, self.japan.count('class="foreign-buyer-destination-table"'))
+        for destination_id in ("fukuoka-itoshima", "hakone-izu", "hakuba", "niseko"):
+            self.assertIn(f"/destinations/{destination_id}/", self.japan)

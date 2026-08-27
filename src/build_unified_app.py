@@ -14,6 +14,10 @@ from urllib.parse import urlparse
 
 try:
     from src.country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
+    from src.foreign_buyer_country_guides import (
+        get_foreign_buyer_country_guide,
+        validate_foreign_buyer_country_guide,
+    )
     from src.seo_content_overrides import apply_content_override, load_content_overrides
     from src.retirement_destination_finder_page import build_retirement_destination_finder_html
     from src.site_design_system import landing_design_css, site_footer_html, site_header_html
@@ -24,6 +28,10 @@ try:
     )
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
+    from foreign_buyer_country_guides import (
+        get_foreign_buyer_country_guide,
+        validate_foreign_buyer_country_guide,
+    )
     from seo_content_overrides import apply_content_override, load_content_overrides
     from retirement_destination_finder_page import build_retirement_destination_finder_html
     from site_design_system import landing_design_css, site_footer_html, site_header_html
@@ -6406,12 +6414,202 @@ def country_guide_links(hub: dict, pages: list[dict]) -> str:
     return "\n".join(links)
 
 
+def source_links_html(labels_by_url: dict[str, str], urls: list[str]) -> str:
+    return " ".join(
+        f'<a href="{escape(url)}" rel="noopener noreferrer">{escape(labels_by_url[url])}</a>'
+        for url in urls
+    )
+
+
+def foreign_buyer_direct_answers_html(
+    guide: dict, source_labels: dict[str, str]
+) -> str:
+    labels = {
+        "ownership": "Can foreigners buy?",
+        "residency": "Does ownership create residency?",
+        "financing": "Is financing practical?",
+        "short_rentals": "What limits short-term rentals?",
+    }
+    return "".join(
+        f'<article><h2>{escape(labels[key])}</h2>'
+        f'<p>{escape(guide["direct_answers"][key]["answer"])}</p>'
+        f'<p class="foreign-buyer-source-links">{source_links_html(source_labels, guide["direct_answers"][key]["source_urls"])}</p></article>'
+        for key in ("ownership", "residency", "financing", "short_rentals")
+    )
+
+
+def foreign_buyer_eligibility_html(
+    guide: dict, source_labels: dict[str, str]
+) -> str:
+    return "".join(
+        f'<section><h3>{escape(item["heading"])}</h3><p>{escape(item["body"])}</p>'
+        f'<p class="foreign-buyer-source-links">{source_links_html(source_labels, item["source_urls"])}</p></section>'
+        for item in guide["eligibility_sections"]
+    )
+
+
+def foreign_buyer_purchase_steps_html(
+    guide: dict, source_labels: dict[str, str]
+) -> str:
+    return "".join(
+        f'<li><span>{index}</span><div><h3>{escape(step["heading"])}</h3>'
+        f'<p>{escape(step["body"])}</p><p class="foreign-buyer-source-links">'
+        f'{source_links_html(source_labels, step["source_urls"])}</p></div></li>'
+        for index, step in enumerate(guide["purchase_steps"], start=1)
+    )
+
+
+def foreign_buyer_cost_table_html(
+    guide: dict, source_labels: dict[str, str]
+) -> str:
+    rows = "".join(
+        f'<tr><th scope="row">{escape(row["cost"])}</th><td>{escape(row["when"])}</td>'
+        f'<td>{escape(row["buyer_read"])} <span class="foreign-buyer-source-links">'
+        f'{source_links_html(source_labels, row["source_urls"])}</span></td></tr>'
+        for row in guide["cost_rows"]
+    )
+    return (
+        '<table class="foreign-buyer-cost-table"><thead><tr>'
+        '<th scope="col">Cost</th><th scope="col">When</th><th scope="col">What matters</th>'
+        f'</tr></thead><tbody>{rows}</tbody></table>'
+    )
+
+
+def foreign_buyer_rules_html(guide: dict, source_labels: dict[str, str]) -> str:
+    return "".join(
+        f'<section><h3>{escape(rule["heading"])}</h3><p>{escape(rule["body"])}</p>'
+        f'<p class="foreign-buyer-source-links">{source_links_html(source_labels, rule["source_urls"])}</p></section>'
+        for rule in guide["ownership_rules"]
+    )
+
+
+def foreign_buyer_destination_comparison_html(
+    guide: dict, selected: list[dict]
+) -> tuple[str, str]:
+    rows = []
+    cards = []
+    for destination in selected:
+        destination_id = destination["id"]
+        read = guide["destination_reads"][destination_id]
+        href = f'/destinations/{escape(destination_slug(destination))}/'
+        name = escape(destination["name"])
+        rows.append(
+            f'<tr><th scope="row"><a href="{href}">{name}</a></th>'
+            f'<td>{escape(read["best_for"])}</td><td>{escape(read["verify_first"])}</td></tr>'
+        )
+        cards.append(
+            f'<article><h3><a href="{href}">{name}</a></h3>'
+            f'<p><strong>Best for:</strong> {escape(read["best_for"])}</p>'
+            f'<p><strong>Verify first:</strong> {escape(read["verify_first"])}</p></article>'
+        )
+    table = (
+        '<table class="foreign-buyer-destination-table"><thead><tr>'
+        '<th scope="col">Destination</th><th scope="col">Best for</th>'
+        f'<th scope="col">Verify first</th></tr></thead><tbody>{"".join(rows)}</tbody></table>'
+    )
+    return table, f'<div class="foreign-buyer-destination-cards">{"".join(cards)}</div>'
+
+
+def foreign_buyer_faq_html(guide: dict, source_labels: dict[str, str]) -> str:
+    return "".join(
+        f'<article class="foreign-buyer-faq-item"><h3>{escape(item["question"])}</h3>'
+        f'<p>{escape(item["answer"])}</p><p class="foreign-buyer-source-links">'
+        f'{source_links_html(source_labels, item["source_urls"])}</p></article>'
+        for item in guide["faqs"]
+    )
+
+
+def foreign_buyer_sources_html(guide: dict) -> str:
+    return "".join(
+        f'<li><a href="{escape(item["url"])}" rel="noopener noreferrer">{escape(item["label"])}</a></li>'
+        for item in guide["primary_sources"]
+    )
+
+
+def build_foreign_buyer_country_guide_page(
+    hub: dict,
+    guide: dict,
+    destinations: list[dict],
+    pages: list[dict],
+    content_overrides: list[dict] | None = None,
+) -> str:
+    del pages, content_overrides
+    canonical = country_url(hub)
+    selected = destinations_for_ids(hub["destination_ids"], destinations)
+    destination_table, destination_cards = foreign_buyer_destination_comparison_html(
+        guide, selected
+    )
+    source_labels = {item["url"]: item["label"] for item in guide["primary_sources"]}
+    eligibility_html = foreign_buyer_eligibility_html(guide, source_labels)
+    checklist = "".join(f"<li>{escape(item)}</li>" for item in guide["buyer_checklist"])
+    section_links = [
+        ("Can foreigners buy?", "ownership-answer"),
+        ("Purchase process", "purchase-process"),
+        ("Costs and financing", "costs-financing"),
+        ("After purchase", "after-purchase"),
+        ("Where to buy", "destinations"),
+        ("Buyer checklist", "buyer-checklist"),
+        ("FAQ", "faq"),
+        ("References", "sources"),
+    ]
+    rail_links = "".join(
+        f'<a href="#{escape(section_id)}">{escape(label)}</a>'
+        for label, section_id in section_links
+    )
+
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(guide["title"], guide["description"], canonical, schema_for_country_hub(hub, selected, canonical))}
+<style>{shared_content_css()}</style>
+</head>
+<body class="foreign-buyer-country-guide">
+{site_header_html(PRIMARY_NAV_LINKS)}
+<header class="foreign-buyer-hero">
+  <div class="foreign-buyer-shell foreign-buyer-hero-grid">
+    <div><h1>{escape(guide["h1"])}</h1><p>{escape(guide["summary"])}</p>
+      <p class="foreign-buyer-byline">By Global Home Atlas Research Team · Published {escape(guide["date_published"])} · Reviewed {escape(guide["date_reviewed"])}</p>
+    </div>
+    <figure><img src="{escape(guide["hero_image"]["src"])}" alt="{escape(guide["hero_image"]["alt"])}"><figcaption>{escape(guide["hero_image"]["caption"])}</figcaption></figure>
+  </div>
+  <div class="foreign-buyer-shell foreign-buyer-answers">{foreign_buyer_direct_answers_html(guide, source_labels)}</div>
+</header>
+<main><div class="foreign-buyer-shell foreign-buyer-layout">
+  <article class="foreign-buyer-article">
+    <section id="ownership-answer"><h2>Can foreigners buy property in Japan?</h2>{eligibility_html}</section>
+    <section id="purchase-process"><h2>How the purchase works</h2><ol class="foreign-buyer-steps">{foreign_buyer_purchase_steps_html(guide, source_labels)}</ol></section>
+    <section id="costs-financing"><h2>Costs and financing</h2>{foreign_buyer_cost_table_html(guide, source_labels)}</section>
+    <section id="after-purchase"><h2>Rules after purchase</h2>{foreign_buyer_rules_html(guide, source_labels)}</section>
+    <section id="destinations"><h2>Where to buy</h2>{destination_table}{destination_cards}</section>
+    <section id="buyer-checklist"><h2>Before making an offer</h2><ul class="foreign-buyer-checklist">{checklist}</ul></section>
+    <section id="faq"><h2>Frequently asked questions</h2>{foreign_buyer_faq_html(guide, source_labels)}</section>
+    <section id="sources"><h2>References and update policy</h2><p>Rules can change. Recheck every linked source and obtain current professional advice before signing.</p><ul>{foreign_buyer_sources_html(guide)}</ul></section>
+  </article>
+  <aside class="foreign-buyer-rail"><p>In this guide</p><nav aria-label="In this guide">{rail_links}</nav><a class="foreign-buyer-atlas-link" href="/dashboard/#destinations">Compare every destination</a></aside>
+</div></main>
+{site_footer_html(SITE_NAME, CONTACT_EMAIL)}
+{analytics_event_script()}
+</body></html>"""
+
+
 def build_country_hub_page(
     hub: dict,
     destinations: list[dict],
     pages: list[dict],
     content_overrides: list[dict] | None = None,
 ) -> str:
+    migrated_guide = get_foreign_buyer_country_guide(hub["slug"])
+    if migrated_guide:
+        validate_foreign_buyer_country_guide(
+            hub["slug"], migrated_guide, hub["destination_ids"]
+        )
+        return build_foreign_buyer_country_guide_page(
+            hub,
+            migrated_guide,
+            destinations,
+            pages,
+            content_overrides=content_overrides,
+        )
     canonical = country_url(hub)
     hub = apply_content_override(hub, canonical, content_overrides or [])
     selected = destinations_for_ids(hub["destination_ids"], destinations)
