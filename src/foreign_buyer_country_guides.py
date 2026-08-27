@@ -28,7 +28,385 @@ REQUIRED_GUIDE_KEYS = {
 REQUIRED_DIRECT_ANSWERS = {"ownership", "residency", "financing", "short_rentals"}
 
 FOREIGN_BUYER_COUNTRY_GUIDES: dict[str, dict] = {
-    "japan-property": {"country": "Japan"},
+    "japan-property": {
+        "country": "Japan",
+        "title": "Buying Property in Japan as a Foreigner | Global Home Atlas",
+        "description": "Learn how foreigners can buy property in Japan, including ownership rights, the purchase process, taxes, financing, reporting, rental rules, and four markets.",
+        "h1": "Buying Property in Japan as a Foreigner",
+        "summary": "Foreigners can generally own Japanese land and buildings, but the purchase creates no residence rights and non-resident buyers face reporting, financing, tax, management, and property-specific checks.",
+        "date_published": "2026-08-27",
+        "date_reviewed": "2026-08-27",
+        "hero_image": {
+            "src": "/assets/fukuoka-itoshima-coast.webp",
+            "alt": "Fukuoka and Itoshima coastline in Japan",
+            "caption": "Fukuoka / Itoshima · City access and coastal living",
+        },
+        "direct_answers": {
+            "ownership": {
+                "answer": "Yes. Foreign individuals living overseas can generally buy and register Japanese land and buildings. Confirm the title, land category, use controls, and registration documents for the specific asset.",
+                "source_urls": [
+                    "https://www.moj.go.jp/MINJI/minji05_00574.html",
+                    "https://www.moj.go.jp/MINJI/minji05_00589.html",
+                    "https://www.mlit.go.jp/common/001050449.pdf",
+                ],
+            },
+            "residency": {
+                "answer": "No. Buying property does not create a visa or residence rights. Qualify under a separate immigration route before planning to live in Japan long term.",
+                "source_urls": [
+                    "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
+                    "https://www.mofa.go.jp/ca/fna/page22e_000738.html",
+                ],
+            },
+            "financing": {
+                "answer": "Mortgage access is lender-specific. Obtain written terms for residency, income, currency, deposit, guarantor, and property eligibility before making a binding offer.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/common/001050450.pdf",
+                ],
+            },
+            "short_rentals": {
+                "answer": "Private lodging under the national notification framework is capped at 180 days a year and can be further restricted by local rules, condominium bylaws, or the operator contract.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html",
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+        },
+        "eligibility_sections": [
+            {
+                "heading": "Overseas buyers need registration-ready identity evidence",
+                "body": "A foreign buyer without a Japanese resident record should confirm the accepted government or notarized address evidence, passport copy, Japanese translations, and Roman-letter name evidence before signing. The registration professional should match every document to the buyer name used in the contract and remittance trail.",
+                "source_urls": [
+                    "https://www.moj.go.jp/MINJI/minji05_00574.html",
+                    "https://www.moj.go.jp/MINJI/minji05_00589.html",
+                ],
+            },
+            {
+                "heading": "The asset and intended use remain property-specific",
+                "body": "Check the registered land and building records, zoning and use limits, flood and other hazards, access, building condition, condominium bylaws, repair plan, and any operator or lease arrangement. Permission to own is not permission for every use.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/common/001050448.pdf",
+                    "https://www.mlit.go.jp/common/001050449.pdf",
+                    "https://www.mlit.go.jp/totikensangyo/const/sosei_const_fr3_000074.html",
+                    "https://disaportal.gsi.go.jp/",
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+            {
+                "heading": "Residence status is a separate decision",
+                "body": "Choose an immigration route on its own requirements and timetable. The official long-stay sightseeing route, for example, uses nationality or region, age, savings, insurance, and application-document criteria rather than property ownership.",
+                "source_urls": [
+                    "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
+                    "https://www.mofa.go.jp/ca/fna/page22e_000738.html",
+                ],
+            },
+        ],
+        "purchase_steps": [
+            {
+                "heading": "Confirm the buyer and intended use",
+                "body": "Decide who will hold title, whether the home is for personal use, long-term rent, or lodging, and whether financing is needed. Prepare the exact identity, overseas-address, translation, and funds-source record that the contract, bank, and registration will use.",
+                "source_urls": [
+                    "https://www.moj.go.jp/MINJI/minji05_00574.html",
+                    "https://www.moj.go.jp/MINJI/minji05_00589.html",
+                    "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html",
+                ],
+            },
+            {
+                "heading": "Appoint independent advisers",
+                "body": "Before paying a deposit, assign responsibility for title and registration, contract review, tax, building inspection, translation, and settlement. A non-resident should also identify who will make Japanese-language FEFTA filings and whether a Japanese tax agent is required.",
+                "source_urls": [
+                    "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html",
+                    "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf",
+                ],
+            },
+            {
+                "heading": "Check the property before offering",
+                "body": "Obtain the land and building registry records and inspect the site, structure, access, utilities, legal use, hazard layers, boundaries, occupancy, leases, and repair history. For a condominium, read the bylaws, minutes, budget, management fees, reserve balance, long-term repair plan, and any owner-use or rental limits.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/common/001050449.pdf",
+                    "https://www.mlit.go.jp/common/001050450.pdf",
+                    "https://disaportal.gsi.go.jp/",
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+            {
+                "heading": "Review the contract and Important Matters Explanation",
+                "body": "Have the Japanese contract, cancellation terms, deposit treatment, defects, fixtures, possession, tax adjustments, finance condition, and Important Matters Explanation reviewed before signing. Confirm the latest municipal flood map and investigate hazards beyond the mandatory flood-map explanation.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/common/001050448.pdf",
+                    "https://www.mlit.go.jp/common/001050450.pdf",
+                    "https://www.mlit.go.jp/totikensangyo/const/sosei_const_fr3_000074.html",
+                    "https://disaportal.gsi.go.jp/",
+                ],
+            },
+            {
+                "heading": "Settle and register the transfer",
+                "body": "Coordinate verified remittance, final inspection, remaining-price payment, keys and documents, repayment or release of seller security, and transfer registration for the land and building. Registration is essential to assert ownership against third parties.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/common/001050449.pdf",
+                    "https://www.mlit.go.jp/common/001050450.pdf",
+                    "https://www.moj.go.jp/MINJI/minji05_00574.html",
+                    "https://www.moj.go.jp/MINJI/minji05_00589.html",
+                ],
+            },
+            {
+                "heading": "Complete non-resident reporting and owner administration",
+                "body": "If the buyer is non-resident, submit the FEFTA acquisition report through the Bank of Japan within 20 days. Put Japanese tax, insurance, utilities, property management, condominium notices and voting, repairs, and future name or address updates onto an operating calendar.",
+                "source_urls": [
+                    "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html",
+                    "https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html",
+                    "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf",
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+        ],
+        "cost_rows": [
+            {
+                "cost": "Purchase price and settlement adjustments",
+                "when": "Contract and settlement",
+                "buyer_read": "Keep the agreed asset price separate from taxes and fees. Confirm deposit treatment, final payment, and prorated items in the contract and settlement statement.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/common/001050450.pdf",
+                ],
+            },
+            {
+                "cost": "Acquisition and registration taxes",
+                "when": "Registration and after acquisition",
+                "buyer_read": "Budget registration and license tax and real-estate acquisition tax using the asset classification, fixed-asset assessment, buyer facts, relief eligibility, and closing date. They are not part of the purchase price.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html",
+                    "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000072.html",
+                ],
+            },
+            {
+                "cost": "Brokerage and professional work",
+                "when": "Search through settlement",
+                "buyer_read": "Brokerage can arise on a brokered sale. Obtain separate written quotes for brokerage, registration, contract and tax advice, translation, inspection, valuation, banking, and remittance work rather than treating them as taxes.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/common/001050450.pdf",
+                ],
+            },
+            {
+                "cost": "Annual ownership and building costs",
+                "when": "Every year and when work falls due",
+                "buyer_read": "Model fixed-asset and any city-planning tax, insurance, management fees, repair-reserve contributions, utilities, local management, and property repairs. For a condominium, test the reserve plan for future lump-sum calls.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000073.html",
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+            {
+                "cost": "Non-resident withholding and tax administration",
+                "when": "At affected payment, rental operation, filing, or sale",
+                "buyer_read": "Confirm whether a non-resident party causes withholding, Japanese returns, or appointment of a tax agent. The answer depends on the parties, payment path, income, transaction, and available exception.",
+                "source_urls": [
+                    "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf",
+                ],
+            },
+            {
+                "cost": "Eventual sale and transfer-out costs",
+                "when": "Resale or other disposal",
+                "buyer_read": "Treat sale tax, withholding, brokerage, professional advice, loan release, and transfer registration as a later event, not acquisition cost. Tax depends on the seller, gain, holding period, use, transaction expenses, and sale date.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000074.html",
+                    "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf",
+                ],
+            },
+        ],
+        "ownership_rules": [
+            {
+                "heading": "Keep the owner record current",
+                "body": "From 2026-04-01, a registered owner must register a name or address change within two years. Overseas owners should arrange a reliable route for receiving notices and handling Japanese filings.",
+                "source_urls": [
+                    "https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html",
+                ],
+            },
+            {
+                "heading": "Fund condominium operations and repairs",
+                "body": "A unit owner belongs to the management association and must follow its bylaws and pay management fees and repair-reserve contributions. Review the long-term repair plan, reserve adequacy, decisions, and any domestic-manager appointment for an overseas owner.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+            {
+                "heading": "Recheck short-rental authority before operating",
+                "body": "The national private-lodging notification framework allows no more than 180 days a year, but local ordinances, condominium bylaws, and other lodging regimes may be stricter. An absent owner under this framework must entrust specified duties to a registered administrator.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html",
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+            {
+                "heading": "Maintain tax and hazard files",
+                "body": "Retain acquisition, improvement, rental, tax, insurance, management, and sale records. Recheck current municipal and national hazard information when planning works, insurance, occupancy, or resale.",
+                "source_urls": [
+                    "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf",
+                    "https://disaportal.gsi.go.jp/",
+                ],
+            },
+        ],
+        "destination_reads": {
+            "fukuoka-itoshima": {
+                "best_for": "Year-round city life with coastal access and broad domestic demand",
+                "verify_first": "Rail or car dependence, building condition, flood exposure, management and resale depth",
+            },
+            "hakone-izu": {
+                "best_for": "Personal use near Tokyo, onsen life and repeat weekend stays",
+                "verify_first": "Slope, seismic condition, renovation scope, access, permitted use and thin comparable evidence",
+            },
+            "hakuba": {
+                "best_for": "Active alpine use with a lower entry point than Niseko",
+                "verify_first": "Snow load, winter access, staffing, building condition, operating permissions and exit depth",
+            },
+            "niseko": {
+                "best_for": "Premium international resort use for buyers comfortable with high carrying costs",
+                "verify_first": "Service charges, operator contract, construction quality, owner-use limits and resale depth",
+            },
+        },
+        "buyer_checklist": [
+            "Match the contract buyer name to passport, address evidence, bank records, and registration documents.",
+            "Confirm the intended use against zoning, local rules, condominium bylaws, leases, and operator agreements.",
+            "Obtain registry records for both land and building and resolve owners, mortgages, seizures, boundaries, and access.",
+            "Inspect the structure and services and review flood, inland-water, landslide, tsunami, storm-surge, and seismic exposure.",
+            "Read the Japanese Important Matters Explanation and contract with independent advice before signing.",
+            "Secure lender terms and remittance mechanics before relying on finance.",
+            "Separate purchase price, acquisition taxes, professional fees, annual costs, tax administration, and resale costs.",
+            "Assign settlement, registration, FEFTA reporting, tax-agent, insurance, utility, and property-management responsibilities in writing.",
+        ],
+        "faqs": [
+            {
+                "question": "Can a foreigner living outside Japan own Japanese property?",
+                "answer": "Generally, yes. Official registration procedures expressly address overseas foreign individuals becoming registered owners. The buyer still needs accepted identity and address evidence, Japanese translations where required, and property-specific checks.",
+                "source_urls": [
+                    "https://www.moj.go.jp/MINJI/minji05_00574.html",
+                    "https://www.moj.go.jp/MINJI/minji05_00589.html",
+                ],
+            },
+            {
+                "question": "Does buying a home qualify me to live in Japan?",
+                "answer": "No property-based residence right is created by the purchase. Residence status has its own legal categories and eligibility. Check the relevant immigration route independently before buying for full-time use.",
+                "source_urls": [
+                    "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
+                    "https://www.mofa.go.jp/ca/fna/page22e_000738.html",
+                ],
+            },
+            {
+                "question": "What must a non-resident buyer report after closing?",
+                "answer": "Under FEFTA, a non-resident acquiring Japanese real property or rights in it must report through the Bank of Japan within 20 days after acquisition. The buyer or a Japan-resident agent may file, and the report must be in Japanese.",
+                "source_urls": [
+                    "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html",
+                ],
+            },
+            {
+                "question": "Can I run short-term lodging from the property?",
+                "answer": "Only if the chosen legal route and the property permit it. The private-lodging notification framework caps operation at 180 days a year; local ordinances, condominium bylaws, zoning, and operator agreements can impose tighter limits or prohibit it.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html",
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+            {
+                "question": "What should I check in a Japanese condominium?",
+                "answer": "Review the bylaws, recent meeting minutes, management budget, unpaid fees, management charges, repair-reserve balance, long-term repair plan, planned works, rental rules, and owner-use limits. Overseas owners should also decide who receives notices and acts locally.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+                ],
+            },
+            {
+                "question": "What percentage should I add for closing costs?",
+                "answer": "There is no reliable universal percentage. The exact amount depends on the asset, assessed value, buyer, seller, finance, advisers, tax relief, and date. Ask for a line-item estimate separating price, taxes, brokerage, registration, advice, remittance, ownership, and later sale costs.",
+                "source_urls": [
+                    "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html",
+                    "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000072.html",
+                    "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000073.html",
+                    "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000074.html",
+                    "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf",
+                ],
+            },
+        ],
+        "primary_sources": [
+            {
+                "label": "Ministry of Finance — FEFTA reporting for a non-resident acquiring Japanese real property",
+                "url": "https://www.mof.go.jp/english/policy/international_policy/real_property/index.html",
+            },
+            {
+                "label": "Ministry of Justice — mandatory inheritance and owner name/address registration",
+                "url": "https://www.moj.go.jp/EN/MINJI/m_minji07_00004.html",
+            },
+            {
+                "label": "MLIT — land-tax overview",
+                "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000071.html",
+            },
+            {
+                "label": "National Tax Agency — real-estate taxes for non-residents and foreign corporations",
+                "url": "https://www.nta.go.jp/about/organization/sapporo/hikyoju_gaikoku/pdf/02.pdf",
+            },
+            {
+                "label": "MLIT — Japanese announcement of English real-estate transaction materials",
+                "url": "https://www.mlit.go.jp/report/press/totikensangyo13_hh_000269.html",
+            },
+            {
+                "label": "MLIT — flood hazard maps in the Important Matters Explanation",
+                "url": "https://www.mlit.go.jp/totikensangyo/const/sosei_const_fr3_000074.html",
+            },
+            {
+                "label": "MLIT and GSI — Hazard Map Portal Site",
+                "url": "https://disaportal.gsi.go.jp/",
+            },
+            {
+                "label": "MLIT Housing Bureau — Condominium Management in Japan for Foreign Building Unit Owners",
+                "url": "https://www.mlit.go.jp/jutakukentiku/house/content/001978284.pdf",
+            },
+            {
+                "label": "Japan Tourism Agency — Private Lodging Business Act overview",
+                "url": "https://www.mlit.go.jp/kankocho/minpaku/overview/minpaku/law1_en.html",
+            },
+            {
+                "label": "Ministry of Foreign Affairs — designated-activities long-stay visa",
+                "url": "https://www.mofa.go.jp/ca/fna/page22e_000738.html",
+            },
+            {
+                "label": "MLIT — English real-estate transaction materials",
+                "url": "https://www.mlit.go.jp/en/report/press/totikensangyo13_hh_000003.html",
+            },
+            {
+                "label": "MLIT — laws related to real-estate transactions in Japan",
+                "url": "https://www.mlit.go.jp/common/001050448.pdf",
+            },
+            {
+                "label": "MLIT — real property registration system",
+                "url": "https://www.mlit.go.jp/common/001050449.pdf",
+            },
+            {
+                "label": "MLIT — flow of real-estate transactions",
+                "url": "https://www.mlit.go.jp/common/001050450.pdf",
+            },
+            {
+                "label": "MLIT — taxes on land acquisition",
+                "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000072.html",
+            },
+            {
+                "label": "MLIT — taxes on holding land",
+                "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000073.html",
+            },
+            {
+                "label": "MLIT — taxes on land transfers",
+                "url": "https://www.mlit.go.jp/totikensangyo/totikensangyo_tk5_000074.html",
+            },
+            {
+                "label": "Ministry of Justice — address evidence for overseas foreign registered owners",
+                "url": "https://www.moj.go.jp/MINJI/minji05_00574.html",
+            },
+            {
+                "label": "Ministry of Justice — ownership-registration applications from April 2024",
+                "url": "https://www.moj.go.jp/MINJI/minji05_00589.html",
+            },
+            {
+                "label": "Immigration Services Agency — immigration and residence status Q&A",
+                "url": "https://www.moj.go.jp/isa/applications/guide/kanri_qa.html",
+            },
+        ],
+        "retirement_guide_slug": "japan-retirement-property-foreign-buyers",
+    },
 }
 
 

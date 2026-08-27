@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections import Counter
 from copy import deepcopy
 import unittest
+from urllib.parse import urlsplit
 
 from src.foreign_buyer_country_guides import (
     FOREIGN_BUYER_COUNTRY_GUIDES,
@@ -126,3 +128,108 @@ class ForeignBuyerCountryGuideContractTests(unittest.TestCase):
 
         with self.assertRaisesRegex(ValueError, "^japan-property: missing date_reviewed$"):
             validate_foreign_buyer_country_guide("japan-property", guide, self.destination_ids)
+
+
+class JapanForeignBuyerContentTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.guide = FOREIGN_BUYER_COUNTRY_GUIDES["japan-property"]
+
+    def test_direct_answers_are_short_and_decisive(self) -> None:
+        self.assertIn("direct_answers", self.guide)
+        self.assertIn(
+            "generally buy and register",
+            self.guide["direct_answers"]["ownership"]["answer"],
+        )
+        self.assertIn(
+            "does not create",
+            self.guide["direct_answers"]["residency"]["answer"],
+        )
+        self.assertIn(
+            "lender-specific",
+            self.guide["direct_answers"]["financing"]["answer"],
+        )
+        self.assertIn(
+            "180 days",
+            self.guide["direct_answers"]["short_rentals"]["answer"],
+        )
+
+    def test_purchase_sequence_covers_offer_through_registration(self) -> None:
+        self.assertIn("purchase_steps", self.guide)
+        headings = [step["heading"] for step in self.guide["purchase_steps"]]
+        self.assertEqual(
+            [
+                "Confirm the buyer and intended use",
+                "Appoint independent advisers",
+                "Check the property before offering",
+                "Review the contract and Important Matters Explanation",
+                "Settle and register the transfer",
+                "Complete non-resident reporting and owner administration",
+            ],
+            headings,
+        )
+
+    def test_copy_avoids_generic_process_language(self) -> None:
+        rendered_data = repr(self.guide).lower()
+        for phrase in (
+            "this guide helps",
+            "use this page",
+            "country thesis",
+            "buyer fit",
+            "research read",
+            "research inputs",
+            "same ten-dimension model",
+        ):
+            self.assertNotIn(phrase, rendered_data)
+
+
+class JapanForeignBuyerSourceIntegrityTests(unittest.TestCase):
+    approved_domains = {
+        "mof.go.jp",
+        "moj.go.jp",
+        "mlit.go.jp",
+        "nta.go.jp",
+        "gsi.go.jp",
+        "mofa.go.jp",
+    }
+
+    def setUp(self) -> None:
+        self.guide = FOREIGN_BUYER_COUNTRY_GUIDES["japan-property"]
+
+    def referenced_source_urls(self) -> list[str]:
+        sourced_items = list(self.guide["direct_answers"].values())
+        for section_name in (
+            "eligibility_sections",
+            "purchase_steps",
+            "cost_rows",
+            "ownership_rules",
+            "faqs",
+        ):
+            sourced_items.extend(self.guide[section_name])
+        return [
+            url
+            for item in sourced_items
+            for url in item.get("source_urls", [])
+        ]
+
+    def test_referenced_urls_appear_once_in_primary_sources(self) -> None:
+        self.assertIn("primary_sources", self.guide)
+        self.assertIn("direct_answers", self.guide)
+        primary_urls = [source["url"] for source in self.guide["primary_sources"]]
+        counts = Counter(primary_urls)
+
+        self.assertEqual(len(primary_urls), len(counts), "primary source URLs must be unique")
+        for url in self.referenced_source_urls():
+            self.assertEqual(1, counts[url], url)
+
+    def test_primary_sources_use_https_and_approved_official_domains(self) -> None:
+        self.assertIn("primary_sources", self.guide)
+        for source in self.guide["primary_sources"]:
+            parsed = urlsplit(source["url"])
+            self.assertEqual("https", parsed.scheme, source["url"])
+            self.assertTrue(
+                any(
+                    parsed.hostname == domain or parsed.hostname.endswith(f".{domain}")
+                    for domain in self.approved_domains
+                ),
+                source["url"],
+            )
