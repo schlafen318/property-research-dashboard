@@ -6535,10 +6535,10 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     .guide-page-hero .page-hero-grid {{ grid-template-columns: minmax(0, 720px); }}
     .guide-page-layout {{ display: block; max-width: 980px; margin: 0 auto; padding-top: 42px; }}
     .guide-page-layout .page-article {{ gap: 56px; }}
-    .guide-section-nav {{ display: flex; gap: 22px; margin: 0; padding: 15px 0; overflow-x: auto; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 800; letter-spacing: .045em; white-space: nowrap; scrollbar-width: thin; }}
+    .guide-section-nav {{ display: flex; gap: 22px; margin: 0; padding: 15px 0; overflow-x: auto; border-bottom: 1px solid var(--line); font-size: 12px; font-weight: 400; letter-spacing: .045em; white-space: nowrap; scrollbar-width: thin; }}
     .guide-section-nav a {{ color: var(--ink); text-decoration: none; }}
     .guide-section-nav a:hover {{ color: var(--gold); }}
-    .guide-kicker {{ margin: 0 0 12px; color: var(--gold); font-size: 11px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }}
+    .guide-kicker {{ margin: 0 0 12px; color: var(--gold); font-size: 11px; font-weight: 400; letter-spacing: .1em; text-transform: uppercase; }}
     .guide-intro {{ max-width: 720px; }}
     .guide-intro h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4.3vw, 44px); line-height: 1.02; }}
     .journey-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 26px; margin-top: 28px; }}

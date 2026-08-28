@@ -78,6 +78,12 @@ class GuideHubIndexingTests(unittest.TestCase):
             html.index('class="guide-catalog"'),
         )
 
+    def test_guide_navigation_and_kickers_use_regular_weight(self) -> None:
+        html = GUIDE_HUB.read_text(encoding="utf-8")
+
+        self.assertRegex(html, r"\.guide-section-nav\s*\{[^}]*font-weight:\s*400;")
+        self.assertRegex(html, r"\.guide-kicker\s*\{[^}]*font-weight:\s*400;")
+
 
 if __name__ == "__main__":
     unittest.main()
