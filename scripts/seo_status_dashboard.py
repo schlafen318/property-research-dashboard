@@ -265,11 +265,10 @@ def build_html(report: dict, indexnow: dict) -> str:
       <nav aria-label="Primary">
         <a class="brand" href="/" aria-label="Global Home Atlas home"><img src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="nav-links">
-          <a href="/find-your-fit/">Find your fit</a>
-          <a href="/dashboard/">Destinations</a>
-          <a href="/countries/">Countries</a>
-          <a href="/guides/">Guides</a>
-          <a href="/methodology/">Methodology</a>
+          <a href="/dashboard/">Destination Rankings</a>
+          <a href="/retirement-abroad-calculator/">Retirement Calculator</a>
+          <a href="/countries/">Country Guides</a>
+          <a href="/guides/">Buying Guides</a>
         </div>
       </nav>
       <p class="eyebrow">Operational SEO dashboard</p>

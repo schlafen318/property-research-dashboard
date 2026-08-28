@@ -65,9 +65,10 @@ class FindYourFitTests(unittest.TestCase):
         sitemap = (root / "sitemap.xml").read_text(encoding="utf-8")
 
         self.assertTrue(finder.exists())
-        self.assertIn('href="/find-your-fit/"', homepage)
+        self.assertIn('href="/find-your-fit/?goal=', homepage)
         self.assertIn("https://globalhomeatlas.com/find-your-fit/", sitemap)
-        self.assertEqual(("/find-your-fit/", "Find your fit"), build_unified_app.PRIMARY_NAV_LINKS[0])
+        self.assertNotIn(("/find-your-fit/", "Find your fit"), build_unified_app.PRIMARY_NAV_LINKS)
+        self.assertEqual(("/dashboard/", "Destination Rankings"), build_unified_app.PRIMARY_NAV_LINKS[0])
 
     def test_finder_universe_expands_when_a_destination_is_added(self) -> None:
         future = dict(self.destinations[0])

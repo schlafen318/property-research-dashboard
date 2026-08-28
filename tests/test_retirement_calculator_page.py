@@ -57,7 +57,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Portfolio dividends and interest", self.html)
 
     def test_page_uses_the_shared_global_home_atlas_utility_shell(self) -> None:
-        self.assertIn('<body class="gha-mode-utility calculator-page" data-design-system="gha-v1">', self.html)
+        self.assertIn('<body class="gha-mode-utility gha-top-level calculator-page" data-design-system="gha-v1">', self.html)
         self.assertIn('<header class="gha-header">', self.html)
         self.assertIn('class="gha-mobile-menu"', self.html)
         self.assertIn('/assets/global-home-atlas-logo-compact-light.svg', self.html)
@@ -66,7 +66,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
 
     def test_page_uses_shared_editorial_typography_and_restrained_surfaces(self) -> None:
         head = self.html.split("</head>", 1)[0]
-        utility_marker = '<style id="gha-utility-design">'
+        utility_marker = '<style id="gha-top-level-design">'
         self.assertEqual(head.rfind("<style"), head.index(utility_marker))
         utility_css = head.split(utility_marker, 1)[1].split("</style>", 1)[0]
 
@@ -134,6 +134,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         parser = CalculatorMarkupParser()
         parser.feed(self.html)
         expected_controls = {
+            "ret-currency",
             "ret-current-age",
             "ret-retirement-age",
             "ret-horizon",
@@ -157,6 +158,24 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertEqual(2, parser.live_regions)
         self.assertGreaterEqual(parser.noscript_sections, 1)
 
+    def test_form_supports_dated_planning_currency_conversion_including_sgd(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        currency_select = form.split('id="ret-currency"', 1)[1].split("</select>", 1)[0]
+
+        self.assertIn('for="ret-currency">Planning currency</label>', form)
+        for currency in ("USD", "EUR", "GBP", "CAD", "AUD", "CHF", "JPY", "HKD", "SGD"):
+            self.assertIn(f'<option value="{currency}"', currency_select)
+        self.assertIn('id="ret-currency-note"', form)
+        self.assertIn("27 August 2026", form)
+        self.assertIn("presentation currency", form)
+
+        payload = json.loads(
+            self.html.split('<script id="retirement-destination-data" type="application/json">', 1)[1]
+            .split("</script>", 1)[0]
+        )
+        self.assertEqual("2026-08-27", payload["planning_currencies"]["as_of"])
+        self.assertAlmostEqual(0.7866117265603891, payload["planning_currencies"]["rates_to_usd"]["SGD"])
+
     def test_housing_inputs_match_how_retirees_plan(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
         self.assertIn('id="ret-monthly-spending-label" for="ret-monthly-spending">Monthly retirement living expenses including rent</label>', form)
@@ -168,7 +187,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-housing-guidance"', form)
         self.assertIn('<option value="rent" selected>Rent</option>', form)
         self.assertIn('id="ret-cost-compare-open" type="button">Compare destination retirement costs</button>', form)
-        self.assertIn("Leave at $0 when your destination home is for your own use", form)
+        self.assertIn("Leave at zero when your destination home is for your own use", form)
         self.assertNotIn("Annual spending today (USD)", form)
         self.assertNotIn("Destination net rental income", form)
 
@@ -211,7 +230,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Income rises annually with general inflation and the selected share is invested monthly.", form)
 
     def test_page_states_currency_once_and_leads_with_a_decisive_result(self) -> None:
-        self.assertIn("All amounts are in today's USD unless marked “at retirement”", self.html)
+        self.assertIn("Choose your planning currency below", self.html)
+        self.assertIn("Destination data is normalized in today's USD before conversion", self.html)
         results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
         self.assertIn('id="ret-plan-summary"', results)
         self.assertIn('id="ret-sensitivity"', results)
@@ -281,7 +301,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
     def test_current_cost_comparison_does_not_persist_or_transmit_personal_values(self) -> None:
         source = UI_MODULE.read_text(encoding="utf-8")
         self.assertIn('track("retirement_calculator_current_cost_compare")', source)
-        self.assertNotIn("localStorage", source)
+        self.assertIn('localStorage.getItem("gha_planning_currency")', source)
+        self.assertIn('localStorage.setItem("gha_planning_currency", selectedCurrency)', source)
         self.assertNotIn("sessionStorage", source)
         self.assertNotIn("fetch(", source)
         self.assertNotIn("XMLHttpRequest", source)
@@ -401,9 +422,11 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertNotIn("initRetirementBenchmarkTable(\"ret-benchmark-household\"", self.html)
         self.assertLess(self.html.index("window.GHA ="), self.html.index("GHARetirementCalculatorUI.initRetirementCalculator"))
 
-    def test_ui_module_does_not_persist_or_transmit_financial_inputs(self) -> None:
+    def test_ui_module_persists_only_currency_and_does_not_transmit_financial_inputs(self) -> None:
         source = UI_MODULE.read_text(encoding="utf-8")
-        for forbidden in ("localStorage", "sessionStorage", "fetch(", "XMLHttpRequest"):
+        self.assertIn('localStorage.getItem("gha_planning_currency")', source)
+        self.assertIn('localStorage.setItem("gha_planning_currency", selectedCurrency)', source)
+        for forbidden in ("sessionStorage", "fetch(", "XMLHttpRequest"):
             self.assertNotIn(forbidden, source)
         for forbidden_key in ('spending:', 'income:', 'portfolio:', 'property_price:', 'total_capital:'):
             self.assertNotIn(forbidden_key, source)
@@ -444,7 +467,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             'Calculate retirement needs</a>'
         )
         self.assertIn(calculator_link, homepage)
-        self.assertEqual(2, homepage.count('href="/retirement-abroad-calculator/"'))
+        self.assertEqual(2, homepage.count('data-track="retirement_calculator_open"'))
 
     def test_sitemap_contains_one_calculator_url(self) -> None:
         sitemap = (ROOT / "artifacts" / "sitemap.xml").read_text(encoding="utf-8")

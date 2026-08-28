@@ -59,6 +59,36 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertNotIn("900000", href)
         self.assertNotIn("passport", href)
 
+    def test_dossier_href_accepts_only_destination_slugs(self) -> None:
+        self.assertEqual(
+            "/destinations/valencia/",
+            run_ui("safeDossierHref", "valencia"),
+        )
+        self.assertEqual(
+            "/destinations/fukuoka-itoshima/",
+            run_ui("safeDossierHref", "fukuoka-itoshima"),
+        )
+        self.assertEqual("/destinations/", run_ui("safeDossierHref", "../contact"))
+
+    def test_recommendation_list_shows_five_before_expansion(self) -> None:
+        items = list(range(12))
+        self.assertEqual(items[:5], run_ui("recommendationsForDisplay", {"items": items, "expanded": False}))
+        self.assertEqual(items, run_ui("recommendationsForDisplay", {"items": items, "expanded": True}))
+
+    def test_result_summary_explains_the_closest_match_when_none_are_affordable(self) -> None:
+        read = run_ui(
+            "resultSummaryRead",
+            {
+                "withinReachCount": 0,
+                "recommendations": [
+                    {"name": "Fukuoka / Itoshima", "surplusGap": -322418},
+                ],
+            },
+        )
+        self.assertIn("No destinations are within reach yet", read)
+        self.assertIn("Fukuoka / Itoshima is the closest modeled match", read)
+        self.assertIn("$322,418", read)
+
     def test_tier_labels_are_plain_language(self) -> None:
         self.assertEqual("Within reach", run_ui("tierLabel", "within_reach"))
         self.assertEqual("Close", run_ui("tierLabel", "close"))

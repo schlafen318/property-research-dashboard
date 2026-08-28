@@ -842,8 +842,11 @@ class AllCountryForeignBuyerRolloutTests(unittest.TestCase):
     def test_every_country_links_once_to_both_proprietary_tools(self) -> None:
         for slug, html in self.rendered.items():
             with self.subTest(slug=slug):
-                self.assertEqual(1, html.count("/retirement-abroad-calculator/"))
-                self.assertEqual(1, html.count("/retirement-destinations-ranked-by-cost/"))
+                reader_tools = html.split(
+                    'class="foreign-buyer-reader-tools"', 1
+                )[1].split("</nav>", 1)[0]
+                self.assertEqual(1, reader_tools.count("/retirement-abroad-calculator/"))
+                self.assertEqual(1, reader_tools.count("/retirement-destinations-ranked-by-cost/"))
 
     def test_every_country_keeps_references_last(self) -> None:
         for slug, html in self.rendered.items():

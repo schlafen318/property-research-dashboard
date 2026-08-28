@@ -68,11 +68,21 @@ class GuideHubIndexingTests(unittest.TestCase):
     def test_retirement_calculator_callout_precedes_the_full_catalog(self) -> None:
         html = GUIDE_HUB.read_text(encoding="utf-8")
 
-        self.assertEqual(1, html.count('href="/retirement-abroad-calculator/"'))
+        calculator_callout = (
+            'href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" '
+            'data-track-label="guide hub"'
+        )
+        self.assertEqual(1, html.count(calculator_callout))
         self.assertLess(
-            html.index('href="/retirement-abroad-calculator/"'),
+            html.index(calculator_callout),
             html.index('class="guide-catalog"'),
         )
+
+    def test_guide_navigation_and_kickers_use_regular_weight(self) -> None:
+        html = GUIDE_HUB.read_text(encoding="utf-8")
+
+        self.assertRegex(html, r"\.guide-section-nav\s*\{[^}]*font-weight:\s*400;")
+        self.assertRegex(html, r"\.guide-kicker\s*\{[^}]*font-weight:\s*400;")
 
 
 if __name__ == "__main__":

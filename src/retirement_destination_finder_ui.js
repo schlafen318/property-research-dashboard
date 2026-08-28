@@ -35,6 +35,28 @@
       "&housing=" + encodeURIComponent(housingPlan);
   }
 
+  function safeDossierHref(destinationId) {
+    const slug = /^[a-z0-9-]+$/.test(String(destinationId || "")) ? String(destinationId) : "";
+    return "/destinations/" + (slug ? encodeURIComponent(slug) + "/" : "");
+  }
+
+  function recommendationsForDisplay(input) {
+    const items = Array.isArray(input.items) ? input.items : [];
+    return items.slice(0, input.expanded ? 12 : 5);
+  }
+
+  function resultSummaryRead(input) {
+    const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
+    const closest = recommendations[0];
+    if (!closest) return "No destinations could be evaluated under these assumptions.";
+    if (Number(input.withinReachCount) > 0) {
+      return Number(input.withinReachCount) + " destinations are within reach. " +
+        closest.name + " is the strongest modeled match under your preferences.";
+    }
+    return "No destinations are within reach yet. " + closest.name +
+      " is the closest modeled match, with a gap of " + money.format(Math.abs(Number(closest.surplusGap))) + ".";
+  }
+
   function tierLabel(value) {
     return {
       within_reach: "Within reach",
@@ -71,6 +93,9 @@
     const form = document.getElementById("retirement-destination-finder-form");
     const results = document.getElementById("finder-results");
     const errorSummary = document.getElementById("finder-errors");
+    let currentRecommendations = [];
+    let currentUser = null;
+    let recommendationsExpanded = false;
 
     function element(id) { return document.getElementById(id); }
     function numeric(id) { return Number(element(id).value); }
@@ -205,20 +230,40 @@
         ? '<p class="finder-financing"><strong>' + escapeHtml(item.financingStatus) + "</strong>" +
           (item.financingReason ? " — " + escapeHtml(item.financingReason) : "") + "</p>"
         : "";
+      const dossierHref = safeDossierHref(item.destinationId);
+      const detailHref = safeDetailHref({
+        destinationId: item.destinationId,
+        household: user.household,
+        housingPlan: user.housingPlan,
+      });
       return '<article class="finder-result"><header><div><p class="finder-tier">' +
-        escapeHtml(tierLabel(item.tier)) + "</p><h3>" + escapeHtml(item.name) +
+        escapeHtml(tierLabel(item.tier)) + '</p><h3><a href="' + escapeHtml(dossierHref) +
+        '" data-finder-dossier>' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
-        '</p></div><a href="' + escapeHtml(safeDetailHref({
-          destinationId: item.destinationId,
-          household: user.household,
-          housingPlan: user.housingPlan,
-        })) + '" data-finder-detail>Build a detailed plan</a></header><dl>' +
+        '</p></div></header><dl>' +
         '<div><dt>Projected portfolio</dt><dd>' + money.format(item.portfolioAtRetirement) + "</dd></div>" +
         '<div><dt>Retirement target</dt><dd>' + money.format(item.retirementTarget) + "</dd></div>" +
         '<div><dt>Surplus or gap</dt><dd>' + money.format(item.surplusGap) + "</dd></div>" +
         propertyBits + rental + "</dl>" + financing +
-        (item.preferenceMatches.length ? '<p class="finder-matches">' + escapeHtml(item.preferenceMatches.join(" · ")) + "</p>" : "") +
+        (item.preferenceMatches.length ? '<p class="finder-matches"><strong>Preference match:</strong> ' + escapeHtml(item.preferenceMatches.join(" · ")) + "</p>" : "") +
+        '<div class="finder-result-actions"><a href="' + escapeHtml(dossierHref) +
+        '" data-finder-dossier>View destination dossier</a><a href="' + escapeHtml(detailHref) +
+        '" data-finder-detail>Build a detailed plan</a></div>' +
         "</article>";
+    }
+
+    function renderRecommendationList() {
+      const visible = recommendationsForDisplay({
+        items: currentRecommendations,
+        expanded: recommendationsExpanded,
+      });
+      element("finder-recommendations").innerHTML = visible.map(function (item) {
+        return resultRow(item, currentUser);
+      }).join("");
+      const toggle = element("finder-show-all");
+      toggle.hidden = currentRecommendations.length <= 5;
+      toggle.textContent = recommendationsExpanded ? "Show the strongest five" : "View all destinations";
+      toggle.setAttribute("aria-expanded", recommendationsExpanded ? "true" : "false");
     }
 
     function renderEvidence(items) {
@@ -263,15 +308,22 @@
       element("finder-monthly-summary").textContent = money.format(user.monthlyPortfolioContribution);
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
       renderChart(result.sharedProjection);
-      const recommendations = result.recommendations.slice(0, 12);
-      element("finder-recommendations").innerHTML = recommendations.map(function (item) {
-        return resultRow(item, user);
-      }).join("");
+      currentRecommendations = result.recommendations.slice(0, 12);
+      currentUser = user;
+      recommendationsExpanded = false;
+      element("finder-result-read").textContent = resultSummaryRead({
+        withinReachCount: result.summary.withinReachCount,
+        recommendations: currentRecommendations,
+      });
+      element("finder-closest-match").textContent = currentRecommendations.length
+        ? currentRecommendations[0].name
+        : "—";
+      renderRecommendationList();
       element("finder-excluded-summary").textContent = result.excluded.length
         ? result.excluded.length + " destinations could not be recommended under these assumptions."
         : "Every destination had enough information to evaluate.";
       renderExclusions(result.excluded);
-      renderEvidence(recommendations);
+      renderEvidence(currentRecommendations);
       results.hidden = false;
       results.scrollIntoView({ behavior: "smooth", block: "start" });
       track("retirement_destination_finder_complete", {
@@ -326,6 +378,11 @@
     element("finder-recommendations").addEventListener("click", function (event) {
       if (event.target.closest("[data-finder-detail]")) track("retirement_destination_finder_detail_open");
     });
+    element("finder-show-all").addEventListener("click", function () {
+      recommendationsExpanded = !recommendationsExpanded;
+      renderRecommendationList();
+      track("retirement_destination_finder_results_toggle", { expanded: recommendationsExpanded });
+    });
     syncHousing();
     track("retirement_destination_finder_open");
   }
@@ -333,6 +390,9 @@
   return {
     housingVisibility: housingVisibility,
     safeDetailHref: safeDetailHref,
+    safeDossierHref: safeDossierHref,
+    recommendationsForDisplay: recommendationsForDisplay,
+    resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,
     chartTooltip: chartTooltip,
     mobileChartWidth: mobileChartWidth,

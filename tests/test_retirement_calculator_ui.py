@@ -29,6 +29,77 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_planning_currency_conversion_preserves_the_usd_scenario(self) -> None:
+        rates = {"USD": 1, "SGD": 0.7866117265603891, "EUR": 1.1645}
+
+        self.assertAlmostEqual(
+            786.6117265603891,
+            run_ui(
+                "convertPlanningAmount",
+                {"amount": 1_000, "fromCurrency": "SGD", "toCurrency": "USD", "ratesToUsd": rates},
+            ),
+        )
+        self.assertAlmostEqual(
+            1_000,
+            run_ui(
+                "convertPlanningAmount",
+                {
+                    "amount": 786.6117265603891,
+                    "fromCurrency": "USD",
+                    "toCurrency": "SGD",
+                    "ratesToUsd": rates,
+                },
+            ),
+        )
+
+    def test_planning_summary_formats_results_in_singapore_dollars(self) -> None:
+        self.assertEqual(
+            "Invest SGD\u00a01,271 today and SGD\u00a0254 per month to fund this retirement plan.",
+            run_ui(
+                "planningSummary",
+                {
+                    "result": {
+                        "investmentNeededToday": 1_000,
+                        "monthlyContributionToday": 200,
+                        "homePurchaseNeededToday": 0,
+                    },
+                    "currency": "SGD",
+                    "ratesToUsd": {"USD": 1, "SGD": 0.7866117265603891},
+                },
+            ),
+        )
+
+    def test_converted_currency_input_respects_the_controls_step(self) -> None:
+        self.assertEqual(
+            30_500,
+            run_ui(
+                "convertPlanningControlAmount",
+                {
+                    "amount": 24_000,
+                    "fromCurrency": "USD",
+                    "toCurrency": "SGD",
+                    "step": 100,
+                    "ratesToUsd": {"USD": 1, "SGD": 0.7866117265603891},
+                },
+            ),
+        )
+
+    def test_saved_planning_currency_is_used_only_when_supported(self) -> None:
+        self.assertEqual(
+            "SGD",
+            run_ui(
+                "preferredPlanningCurrency",
+                {"storedCurrency": "SGD", "ratesToUsd": {"USD": 1, "SGD": 0.7866}},
+            ),
+        )
+        self.assertEqual(
+            "USD",
+            run_ui(
+                "preferredPlanningCurrency",
+                {"storedCurrency": "BTC", "ratesToUsd": {"USD": 1, "SGD": 0.7866}},
+            ),
+        )
+
     def test_illustrative_return_example_is_disclosed_and_trackable(self) -> None:
         self.assertEqual(4, run_ui("illustrativeReturnExample", {}))
         source = UI_MODULE.read_text(encoding="utf-8")
