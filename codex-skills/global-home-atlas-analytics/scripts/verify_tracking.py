@@ -21,7 +21,6 @@ EXPECTED_EVENTS = {
     "shortlist_review_click",
     "report_teaser_click",
     "report_library_cta",
-    "country_report_cta",
     "saved_shortlist_intake_prefill",
     "custom_shortlist_submit",
 }

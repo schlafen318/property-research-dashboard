@@ -100,7 +100,7 @@ def valid_guide_fixture() -> dict:
 class ForeignBuyerCountryGuideContractTests(unittest.TestCase):
     destination_ids = ["fukuoka-itoshima", "hakone-izu", "hakuba", "niseko"]
 
-    def test_only_japan_is_migrated_for_the_pilot(self) -> None:
+    def test_japan_remains_the_hand_authored_reference_guide(self) -> None:
         self.assertEqual(["japan-property"], sorted(FOREIGN_BUYER_COUNTRY_GUIDES))
         self.assertIsNotNone(get_foreign_buyer_country_guide("japan-property"))
         self.assertIsNone(get_foreign_buyer_country_guide("spain-property"))
@@ -645,10 +645,10 @@ class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
         cls.japan = render_country("japan-property")
         cls.spain = render_country("spain-property")
 
-    def test_japan_uses_the_acquisition_renderer_only(self) -> None:
+    def test_japan_and_spain_use_the_acquisition_renderer(self) -> None:
         self.assertIn('<body class="foreign-buyer-country-guide">', self.japan)
-        self.assertNotIn('<body class="foreign-buyer-country-guide">', self.spain)
-        self.assertIn("Spain Property Guide for Foreign Buyers", self.spain)
+        self.assertIn('<body class="foreign-buyer-country-guide">', self.spain)
+        self.assertIn("Buying Property in Spain as a Foreigner", self.spain)
 
     def test_japan_sections_follow_the_approved_order(self) -> None:
         section_ids = [
@@ -790,6 +790,78 @@ class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
         self.assertEqual(
             len(FOREIGN_BUYER_COUNTRY_GUIDES["japan-property"]["primary_sources"]),
             references.count('rel="noopener noreferrer"'),
+        )
+
+
+class AllCountryForeignBuyerRolloutTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.rendered = {
+            hub["slug"]: render_country(hub["slug"])
+            for hub in build_unified_app.COUNTRY_HUBS
+        }
+
+    def test_every_country_uses_the_acquisition_first_renderer(self) -> None:
+        self.assertEqual(17, len(self.rendered))
+        for slug, html in self.rendered.items():
+            with self.subTest(slug=slug):
+                self.assertIn('<body class="foreign-buyer-country-guide">', html)
+
+    def test_every_country_has_country_specific_headings_and_metadata(self) -> None:
+        for hub in build_unified_app.COUNTRY_HUBS:
+            html = self.rendered[hub["slug"]]
+            country = hub["country"]
+            with self.subTest(slug=hub["slug"]):
+                self.assertIn(f"Buying Property in {country} as a Foreigner", html)
+                self.assertIn(f"Can foreigners buy property in {country}?", html)
+                self.assertIn(
+                    f'<link rel="canonical" href="https://globalhomeatlas.com/countries/{hub["slug"]}/">',
+                    html,
+                )
+                self.assertIn('<meta property="og:image"', html)
+                self.assertIn('<meta property="og:image:alt"', html)
+
+    def test_greece_fallback_leads_with_property_legality_not_lifestyle_copy(self) -> None:
+        direct_answer = self.rendered["greece-property"].split(
+            '<div class="foreign-buyer-shell foreign-buyer-answers">', 1
+        )[1].split("</article>", 1)[0]
+        self.assertIn("Greek ownership access", direct_answer)
+        self.assertIn("transfer tax", direct_answer)
+        self.assertNotIn("lifestyle case", direct_answer)
+
+    def test_every_country_has_decision_ready_cost_and_destination_evidence(self) -> None:
+        for hub in build_unified_app.COUNTRY_HUBS:
+            html = self.rendered[hub["slug"]]
+            with self.subTest(slug=hub["slug"]):
+                self.assertEqual(1, html.count('class="foreign-buyer-acquisition-example"'))
+                self.assertIn("planning", html.lower())
+                self.assertIn("asking observations", html.lower())
+                for destination_id in hub["destination_ids"]:
+                    self.assertIn(f'/destinations/{destination_id}/', html)
+
+    def test_every_country_links_once_to_both_proprietary_tools(self) -> None:
+        for slug, html in self.rendered.items():
+            with self.subTest(slug=slug):
+                self.assertEqual(1, html.count("/retirement-abroad-calculator/"))
+                self.assertEqual(1, html.count("/retirement-destinations-ranked-by-cost/"))
+
+    def test_every_country_keeps_references_last(self) -> None:
+        for slug, html in self.rendered.items():
+            with self.subTest(slug=slug):
+                source_count = html.count('rel="noopener noreferrer"')
+                self.assertGreater(source_count, 0)
+                if slug != "japan-property":
+                    self.assertLessEqual(source_count, 20)
+                self.assertGreater(html.index('id="sources"'), html.index('id="faq"'))
+
+    def test_structured_country_guides_have_no_legacy_seo_overrides(self) -> None:
+        overrides = build_unified_app.load_content_overrides()
+        country_targets = {
+            f'https://globalhomeatlas.com/countries/{hub["slug"]}/'
+            for hub in build_unified_app.COUNTRY_HUBS
+        }
+        self.assertFalse(
+            [row["target_url"] for row in overrides if row["target_url"] in country_targets]
         )
 
 

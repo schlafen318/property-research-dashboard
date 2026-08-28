@@ -290,10 +290,8 @@ class PerthMargaretRiverRenderingTests(unittest.TestCase):
         destinations = json.loads((ROOT / "data/destinations.json").read_text())
         html = build_country_hub_page(hub, destinations, [])
         self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
-        briefing = html.split('aria-label="Country briefing"', 1)[1].split('</section>', 1)[0]
-        self.assertIn(f'href="/destinations/{DESTINATION_ID}/"', briefing)
-        next_step = html.split('class="buyer-next-step"', 1)[1].split('</section>', 1)[0]
-        self.assertIn(f'href="/destinations/{DESTINATION_ID}/"', next_step)
+        comparison = html.split('<section id="destinations">', 1)[1].split('</section>', 1)[0]
+        self.assertIn(f'href="/destinations/{DESTINATION_ID}/"', comparison)
 
     def test_quality_review_uses_canonical_scorecard_fields(self) -> None:
         review = (ROOT / "docs/research/perth-margaret-river-quality-review.md").read_text()

@@ -130,7 +130,7 @@ class QueenstownRenderingTests(unittest.TestCase):
         self.assertIn(DESTINATION_ID, hub["destination_ids"])
         destinations = json.loads((ROOT / "data/destinations.json").read_text())
         html = build_country_hub_page(hub, destinations, [])
-        self.assertIn("New Zealand Property Guide for Foreign Buyers", html)
+        self.assertIn("Buying Property in New Zealand as a Foreigner", html)
         self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
         for text in (
             "Who can buy a home",

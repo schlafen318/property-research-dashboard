@@ -45,23 +45,20 @@ class PremiumDossierEditorialContractTests(unittest.TestCase):
             with self.subTest(phrase=phrase):
                 self.assertNotIn(phrase, reader_copy)
 
-    def test_every_legacy_country_hub_links_its_first_substantive_destination_mention(self) -> None:
+    def test_every_country_guide_links_its_first_destination_in_the_comparison(self) -> None:
         from src.build_unified_app import COUNTRY_HUBS
-        from src.foreign_buyer_country_guides import get_foreign_buyer_country_guide
 
         for hub in COUNTRY_HUBS:
-            if get_foreign_buyer_country_guide(hub["slug"]):
-                continue
             with self.subTest(country=hub["country"]):
                 artifact = (
                     ROOT / "artifacts" / "countries" / hub["slug"] / "index.html"
                 ).read_text()
-                briefing = artifact.split('aria-label="Country briefing"', 1)[1].split(
+                comparison = artifact.split('<section id="destinations">', 1)[1].split(
                     "</section>", 1
                 )[0]
                 self.assertIn(
                     f'href="/destinations/{hub["destination_ids"][0]}/"',
-                    briefing,
+                    comparison,
                 )
 
 

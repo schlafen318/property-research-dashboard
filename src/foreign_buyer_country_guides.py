@@ -500,6 +500,149 @@ def get_foreign_buyer_country_guide(country_hub_slug: str) -> dict | None:
     return deepcopy(guide) if guide else None
 
 
+def build_foreign_buyer_country_guide(
+    hub: dict,
+    *,
+    country_rules: list[dict],
+    primary_sources: list[dict],
+    hero_image: dict,
+    destination_reads: dict[str, dict],
+    acquisition_example: dict,
+    retirement_guide_slug: str,
+) -> dict:
+    """Build a country-specific guide from reviewed country and market evidence."""
+    country = hub["country"]
+    sources = []
+    seen_urls: set[str] = set()
+    for source in primary_sources:
+        url = source.get("url") if isinstance(source, dict) else None
+        label = source.get("label") if isinstance(source, dict) else None
+        if _is_valid_source_url(url) and isinstance(label, str) and label.strip() and url not in seen_urls:
+            sources.append({"label": label.strip(), "url": url})
+            seen_urls.add(url)
+    if not sources:
+        raise ValueError(f'{hub["slug"]}: no valid sources available for generated guide')
+
+    source_urls = [item["url"] for item in sources]
+    core_sources = source_urls[: min(3, len(source_urls))]
+    rule_sources = core_sources[:2] or core_sources
+    rules = [
+        {
+            "heading": item["heading"],
+            "body": item.get("text") or item.get("body") or "",
+            "source_urls": rule_sources,
+        }
+        for item in country_rules
+        if item.get("heading") and (item.get("text") or item.get("body"))
+    ]
+    if not rules:
+        rules = [{
+            "heading": f"Start with {country}'s buyer-eligibility rules",
+            "body": hub["thesis"],
+            "source_urls": rule_sources,
+        }]
+
+    ownership_rule = next(
+        (item["body"] for item in rules if any(term in item["heading"].lower() for term in ("own", "title", "legal", "buyer", "freehold", "leasehold"))),
+        rules[0]["body"],
+    )
+    rental_rule = next(
+        (item["body"] for item in rules if any(term in item["heading"].lower() for term in ("rental", "letting", "lodging", "tourist", "hospitality"))),
+        "Rental permission depends on the property's lawful use, local rules, building governance and any operator licence.",
+    )
+    residency_rule = next(
+        (item["body"] for item in rules if any(term in item["heading"].lower() for term in ("residence", "residency", "visa"))),
+        f"Buying property in {country} does not by itself establish a right to live there. Confirm immigration status separately.",
+    )
+    reviewed = "2026-08-28"
+
+    ownership_rules = [
+        {
+            "heading": "Keep title and owner records current",
+            "body": f"Confirm the registered owner, title form, address and local registration requirements in {country}; assign ongoing owner administration before closing.",
+            "source_urls": rule_sources,
+        },
+        {
+            "heading": "Budget for the building, management and repairs",
+            "body": "Review building condition, condominium or community governance, management charges, reserves, insurance and planned repair work before committing.",
+            "source_urls": rule_sources,
+        },
+        {
+            "heading": "Verify rental and lodging authority",
+            "body": rental_rule,
+            "source_urls": rule_sources,
+        },
+        {
+            "heading": "Maintain the tax, hazard and insurance file",
+            "body": "Confirm acquisition and annual tax obligations, address-level hazards and insurability; retain the records needed for ownership, rental activity and eventual sale.",
+            "source_urls": rule_sources,
+        },
+    ]
+
+    return {
+        "country": country,
+        "title": f"Buying Property in {country} as a Foreigner | Global Home Atlas",
+        "description": f"How foreigners can buy property in {country}: eligibility, purchase steps, costs, financing, ownership rules and destination asking-price evidence.",
+        "h1": f"Buying Property in {country} as a Foreigner",
+        "summary": f"A practical acquisition guide for foreign buyers in {country}, from buyer eligibility and title checks to costs, ownership obligations and destination choice.",
+        "date_published": reviewed,
+        "date_reviewed": reviewed,
+        "hero_image": hero_image,
+        "direct_answers": {
+            "ownership": {
+                "answer": f"Foreign-buyer access in {country} depends on the buyer, title and property. {ownership_rule}",
+                "source_urls": rule_sources,
+            },
+            "residency": {"answer": residency_rule, "source_urls": rule_sources},
+            "financing": {
+                "answer": f"Financing in {country} is lender- and borrower-specific. Obtain written terms covering eligibility, deposit, income, currency, valuation and property type before making a binding offer.",
+                "source_urls": rule_sources,
+            },
+            "short_rentals": {"answer": rental_rule, "source_urls": rule_sources},
+        },
+        "eligibility_sections": rules,
+        "purchase_steps": [
+            {"heading": "Confirm the buyer, title and intended use", "body": f"Establish who can acquire the proposed title in {country}, who will be registered, and whether the property is for personal use, long-term rent or short stays.", "source_urls": rule_sources},
+            {"heading": "Appoint independent advisers", "body": "Assign legal, tax, title, inspection, translation, finance and settlement responsibilities before paying a non-refundable deposit.", "source_urls": rule_sources},
+            {"heading": "Investigate the exact property", "body": "Verify ownership, boundaries, planning, lawful construction, occupancy, leases, building condition, access, utilities, governance and address-level hazards.", "source_urls": rule_sources},
+            {"heading": "Review the contract before signing", "body": "Confirm price, deposit, conditions, financing, defects, fixtures, possession, tax adjustments, cancellation rights and the documents required to transfer the chosen title.", "source_urls": rule_sources},
+            {"heading": "Settle and register the transfer", "body": "Coordinate verified funds, final inspection, closing documents, taxes and registration; do not treat payment alone as proof that title transferred correctly.", "source_urls": rule_sources},
+            {"heading": "Operate the property after closing", "body": "Put tax, insurance, utilities, management, repairs, building notices, rental compliance and future owner-record updates onto a written calendar.", "source_urls": rule_sources},
+        ],
+        "cost_rows": [
+            {"cost": "Purchase price and contract adjustments", "when": "Deposit and settlement", "buyer_read": "Separate the agreed property price from taxes, fees and prorated items; reconcile them in the final settlement statement.", "source_urls": rule_sources},
+            {"cost": "Acquisition and registration taxes", "when": "Transfer and registration", "buyer_read": f"Obtain a transaction-specific estimate for {country}; rates and reliefs can depend on buyer status, title, asset, use, location and date.", "source_urls": rule_sources},
+            {"cost": "Professional and financing costs", "when": "Diligence through closing", "buyer_read": "Price legal, title, tax, translation, inspection, valuation, mortgage, banking and remittance work separately.", "source_urls": rule_sources},
+            {"cost": "Annual ownership and management", "when": "Every year", "buyer_read": "Budget annual tax, insurance, community or condominium charges, utilities, local management and a realistic repair reserve.", "source_urls": rule_sources},
+            {"cost": "Rental and eventual sale costs", "when": "During operation or exit", "buyer_read": "Model licensing, operator, income-tax, vacancy, brokerage, disposal-tax and transfer costs before relying on yield or resale proceeds.", "source_urls": rule_sources},
+        ],
+        "acquisition_example": acquisition_example,
+        "ownership_rules": ownership_rules,
+        "destination_reads": destination_reads,
+        "engagement_links": [
+            {"label": "Calculate retirement capital", "href": "/retirement-abroad-calculator/"},
+            {"label": "Compare retirement costs", "href": "/retirement-destinations-ranked-by-cost/"},
+        ],
+        "buyer_checklist": [
+            f"Confirm that this buyer can acquire this title in {country}.",
+            "Match the contract buyer to identity, address, bank and registration records.",
+            "Confirm intended use against planning, building and rental rules.",
+            "Resolve title, boundaries, security interests, occupancy and access.",
+            "Inspect the structure, services and address-level hazards.",
+            "Obtain a written total-cash requirement and financing decision.",
+            "Assign tax, insurance, management, repair and resale responsibilities.",
+        ],
+        "faqs": [
+            {"question": f"Can a foreigner buy property in {country}?", "answer": f"It depends on the buyer, title and property. Start with the eligibility rules above, then have the exact asset and transaction verified before signing.", "source_urls": rule_sources},
+            {"question": f"Does buying property in {country} create residency?", "answer": residency_rule, "source_urls": rule_sources},
+            {"question": "What should be checked before making an offer?", "answer": "Confirm buyer eligibility, title, lawful construction and use, building condition, hazards, total costs, financing, tax, rental authority and the likely resale pool.", "source_urls": rule_sources},
+            {"question": "Are the destination prices valuations?", "answer": "No. They are dated asking-price observations for market orientation, not completed-sale evidence, valuations or proof of availability.", "source_urls": acquisition_example["source_urls"]},
+        ],
+        "primary_sources": sources,
+        "retirement_guide_slug": retirement_guide_slug,
+    }
+
+
 def validate_foreign_buyer_country_guide(
     country_hub_slug: str,
     guide: dict,

@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 try:
     from src.country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from src.foreign_buyer_country_guides import (
+        build_foreign_buyer_country_guide,
         get_foreign_buyer_country_guide,
         validate_foreign_buyer_country_guide,
     )
@@ -34,6 +35,7 @@ try:
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from foreign_buyer_country_guides import (
+        build_foreign_buyer_country_guide,
         get_foreign_buyer_country_guide,
         validate_foreign_buyer_country_guide,
     )
@@ -6625,13 +6627,19 @@ def foreign_buyer_destination_comparison_html(
 
 
 def foreign_buyer_engagement_links_html(guide: dict) -> str:
-    links = "".join(
-        f'<a href="{escape(item["href"])}">{escape(item["label"])}</a>'
-        for item in guide["engagement_links"]
-    )
+    links = []
+    for item in guide["engagement_links"]:
+        tracking = (
+            ' data-track="retirement_calculator_open" data-track-label="country hub"'
+            if item["href"] == "/retirement-abroad-calculator/"
+            else ""
+        )
+        links.append(
+            f'<a href="{escape(item["href"])}"{tracking}>{escape(item["label"])}</a>'
+        )
     return (
         '<p class="foreign-buyer-price-note">These are dated asking observations, not valuations or market averages.</p>'
-        f'<nav class="foreign-buyer-reader-tools" aria-label="Continue your research">{links}</nav>'
+        f'<nav class="foreign-buyer-reader-tools" aria-label="Continue your research">{"".join(links)}</nav>'
     )
 
 
@@ -6700,7 +6708,7 @@ def build_foreign_buyer_country_guide_page(
 <main><div class="foreign-buyer-shell foreign-buyer-layout">
   <aside class="foreign-buyer-rail"><p>In this guide</p><nav aria-label="In this guide">{rail_links}</nav><a class="foreign-buyer-atlas-link" href="/dashboard/#destinations">Compare every destination</a></aside>
   <article class="foreign-buyer-article">
-    <section id="ownership-answer"><h2>Can foreigners buy property in Japan?</h2>{eligibility_html}</section>
+    <section id="ownership-answer"><h2>Can foreigners buy property in {escape(guide["country"])}?</h2>{eligibility_html}</section>
     <section id="purchase-process"><h2>How the purchase works</h2><ol class="foreign-buyer-steps">{foreign_buyer_purchase_steps_html(guide)}</ol></section>
     <section id="costs-financing"><h2>Costs and financing</h2>{foreign_buyer_cost_table_html(guide)}{foreign_buyer_acquisition_example_html(guide)}</section>
     <section id="after-purchase"><h2>Rules after purchase</h2>{foreign_buyer_rules_html(guide)}</section>
@@ -6715,6 +6723,137 @@ def build_foreign_buyer_country_guide_page(
 </body></html>"""
 
 
+FOREIGN_BUYER_CURRENCY_PREFIXES = {
+    "AED": "AED ", "AUD": "A$", "CAD": "C$", "CHF": "CHF ", "EUR": "€",
+    "GBP": "£", "IDR": "Rp", "JPY": "¥", "NZD": "NZ$", "THB": "฿",
+    "USD": "$", "VND": "₫",
+}
+
+
+def foreign_buyer_money(amount: float, currency: str) -> str:
+    prefix = FOREIGN_BUYER_CURRENCY_PREFIXES.get(currency, f"{currency} ")
+    rounded = int(round(amount))
+    return f"{prefix}{rounded:,}"
+
+
+def derived_foreign_buyer_country_guide(hub: dict, destinations: list[dict]) -> dict:
+    listings = load_json("listings.json")
+    listing_groups: dict[str, list[dict]] = {}
+    for listing in listings:
+        listing_groups.setdefault(listing["destination_id"], []).append(listing)
+    retirement_records = {
+        item["destination_id"]: item for item in load_retirement_costs()["destinations"]
+    }
+    selected = destinations_for_ids(hub["destination_ids"], destinations)
+    selected_by_id = {destination_slug(item): item for item in selected}
+
+    first_spec = next(
+        (get_premium_dossier(destination_id) for destination_id in hub["destination_ids"] if get_premium_dossier(destination_id)),
+        None,
+    )
+    if first_spec is None:
+        raise ValueError(f'{hub["slug"]}: premium destination evidence is required')
+    hero = first_spec.images[0]
+    hero_image = {"src": hero.src, "alt": hero.alt, "caption": hero.caption}
+
+    sources = list(hub.get("primary_sources", []))[:15]
+    if not sources:
+        for source in first_spec.references:
+            if str(source.get("url", "")).startswith("https://"):
+                sources.append({"label": source["label"], "url": source["url"]})
+            if len(sources) == 12:
+                break
+
+    destination_reads = {}
+    for destination_id in hub["destination_ids"]:
+        observations = listing_groups.get(destination_id, [])
+        destination = selected_by_id.get(destination_id, {})
+        if observations:
+            prices = sorted(float(item["local_price"]) for item in observations)
+            currency = observations[0]["local_currency"]
+            price_context = (
+                f"{foreign_buyer_money(prices[0], currency)}–{foreign_buyer_money(prices[-1], currency)}"
+                f" · {len(observations)} asking observations · captured through {max(item['captured_date'] for item in observations)}"
+            )
+        else:
+            price_context = "No current asking observations; obtain current local evidence before budgeting"
+        pros = destination.get("pros") or []
+        best_for = "; ".join(str(item).rstrip(".") for item in pros[:2]) or destination.get("panel_summary") or "Country-specific lifestyle and ownership fit"
+        verify_first = destination.get("red_flags") or destination.get("ownership_notes") or "Buyer eligibility, title, use, costs and exit demand"
+        destination_reads[destination_id] = {
+            "best_for": best_for,
+            "verify_first": verify_first,
+            "asking_price_context": price_context,
+        }
+
+    example_destination_id = next(
+        (destination_id for destination_id in hub["destination_ids"] if listing_groups.get(destination_id) and retirement_records.get(destination_id)),
+        next((destination_id for destination_id in hub["destination_ids"] if listing_groups.get(destination_id)), hub["destination_ids"][0]),
+    )
+    example_listings = sorted(
+        listing_groups[example_destination_id], key=lambda item: float(item["local_price"])
+    )
+    representative = example_listings[len(example_listings) // 2]
+    currency = representative["local_currency"]
+    price = float(representative["local_price"])
+    retirement_record = retirement_records.get(example_destination_id, {})
+    rate = float(retirement_record.get("property", {}).get("acquisition_cost_rate", 0.08))
+    modeled_cost = price * rate
+    total = price + modeled_cost
+    example_source_urls = [representative["source_url"]]
+    sources.append({
+        "label": f'{representative["source_name"]} — dated asking observation for {representative["destination_name"]}',
+        "url": representative["source_url"],
+    })
+    for source in retirement_record.get("sources", []):
+        url = source.get("url")
+        if str(url).startswith("https://"):
+            sources.append({"label": source.get("name") or "Acquisition planning source", "url": url})
+            example_source_urls.append(url)
+    acquisition_example = {
+        "heading": f'{representative["destination_name"]} acquisition planning example',
+        "intro": f'A cash-planning illustration using the median of {len(example_listings)} dated asking observations for {representative["destination_name"]}.',
+        "rows": [
+            {"label": "Representative asking price", "amount": foreign_buyer_money(price, currency), "note": f'Median observation; captured {representative["captured_date"]}'},
+            {"label": "Acquisition-cost planning rate", "amount": f"{rate * 100:.1f}%", "note": "Planning allowance; obtain a buyer-specific closing estimate"},
+            {"label": "Modeled acquisition costs", "amount": foreign_buyer_money(modeled_cost, currency), "note": "Representative price multiplied by the planning rate"},
+            {"label": "Cash before finance and reserves", "amount": foreign_buyer_money(total, currency), "note": "Asking price plus modeled acquisition costs"},
+        ],
+        "total": f"Planning total: {foreign_buyer_money(total, currency)}",
+        "caveat": "This is a planning illustration, not a valuation, tax opinion or closing quote. It excludes financing, renovation, furnishing, currency movement and ongoing ownership costs.",
+        "source_urls": list(dict.fromkeys(example_source_urls)),
+    }
+
+    country_rules = list(hub.get("country_rules", []))
+    if not country_rules:
+        acquisition_lenses = sorted(
+            first_spec.lenses,
+            key=lambda lens: (
+                0 if {"ownership_clarity", "regulatory_safety"}.intersection(lens.dimension_keys)
+                else 1 if {"rental_profit", "capital_upside"}.intersection(lens.dimension_keys)
+                else 2 if {"value_entry", "exit_liquidity"}.intersection(lens.dimension_keys)
+                else 3
+            ),
+        )[:3]
+        country_rules = [
+            {"heading": lens.heading, "text": lens.paragraphs[0]}
+            for lens in acquisition_lenses
+        ]
+    retirement_slug = next(
+        (slug for slug in hub.get("guide_slugs", []) if "retirement-property-foreign-buyers" in slug),
+        "buying-property-abroad-for-retirement",
+    )
+    return build_foreign_buyer_country_guide(
+        hub,
+        country_rules=country_rules,
+        primary_sources=sources,
+        hero_image=hero_image,
+        destination_reads=destination_reads,
+        acquisition_example=acquisition_example,
+        retirement_guide_slug=retirement_slug,
+    )
+
+
 def build_country_hub_page(
     hub: dict,
     destinations: list[dict],
@@ -6722,17 +6861,30 @@ def build_country_hub_page(
     content_overrides: list[dict] | None = None,
 ) -> str:
     migrated_guide = get_foreign_buyer_country_guide(hub["slug"])
-    if migrated_guide:
-        validate_foreign_buyer_country_guide(
-            hub["slug"], migrated_guide, hub["destination_ids"]
-        )
-        return build_foreign_buyer_country_guide_page(
-            hub,
-            migrated_guide,
-            destinations,
-            pages,
-            content_overrides=content_overrides,
-        )
+    if not migrated_guide:
+        migrated_guide = derived_foreign_buyer_country_guide(hub, destinations)
+    override_base = {
+        "title": migrated_guide["title"],
+        "description": migrated_guide["description"],
+        "generated_intro": migrated_guide["summary"],
+    }
+    overridden = apply_content_override(
+        override_base, country_url(hub), content_overrides or []
+    )
+    migrated_guide["title"] = overridden["title"]
+    migrated_guide["description"] = overridden["description"]
+    migrated_guide["summary"] = overridden["generated_intro"]
+    validate_foreign_buyer_country_guide(
+        hub["slug"], migrated_guide, hub["destination_ids"]
+    )
+    return build_foreign_buyer_country_guide_page(
+        hub,
+        migrated_guide,
+        destinations,
+        pages,
+        content_overrides=content_overrides,
+    )
+    # Retained below temporarily as the legacy renderer for non-country callers.
     canonical = country_url(hub)
     hub = apply_content_override(hub, canonical, content_overrides or [])
     selected = destinations_for_ids(hub["destination_ids"], destinations)

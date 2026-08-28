@@ -201,10 +201,9 @@ class DaNangHoiAnGeneratedPageTests(unittest.TestCase):
     def test_vietnam_hub_is_substantive_and_links_first_briefing(self) -> None:
         page = (ROOT / "artifacts/countries/vietnam-property/index.html").read_text()
         href = '/destinations/da-nang-hoi-an/'
-        self.assertRegex(
-            page,
-            rf"Top destination match[\s\S]{{0,400}}href=\"{re.escape(href)}\"[\s\S]{{0,200}}Da Nang / Hoi An",
-        )
+        comparison = page.split('<section id="destinations">', 1)[1].split('</section>', 1)[0]
+        self.assertIn(f'href="{href}"', comparison)
+        self.assertIn("Da Nang / Hoi An", comparison)
         visible = html_module.unescape(page)
         self.assertRegex(visible, r"30%|50 years")
         self.assertRegex(visible, r"0\.5%|registration fee")

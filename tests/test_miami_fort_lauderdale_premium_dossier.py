@@ -190,10 +190,9 @@ class MiamiFortLauderdaleGeneratedPageTests(unittest.TestCase):
     def test_united_states_hub_links_its_first_miami_briefing_to_the_dossier(self) -> None:
         page = (ROOT / "artifacts/countries/united-states-property/index.html").read_text()
         href = '/destinations/miami-fort-lauderdale/'
-        self.assertRegex(
-            page,
-            rf"Top destination match[\s\S]{{0,400}}href=\"{re.escape(href)}\"[\s\S]{{0,200}}Miami / Fort Lauderdale",
-        )
+        comparison = page.split('<section id="destinations">', 1)[1].split('</section>', 1)[0]
+        self.assertIn(f'href="{href}"', comparison)
+        self.assertIn("Miami / Fort Lauderdale", comparison)
         self.assertIn("Florida condominium", html_module.unescape(page))
 
     def test_quality_review_records_completed_hard_gates(self) -> None:

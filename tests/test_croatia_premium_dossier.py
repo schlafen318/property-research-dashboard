@@ -118,7 +118,7 @@ class CroatiaRenderingTests(unittest.TestCase):
         self.assertIn(DESTINATION_ID, hub["destination_ids"])
         destinations = json.loads((ROOT / "data" / "destinations.json").read_text())
         html = build_country_hub_page(hub, destinations, [])
-        self.assertIn("Croatia Property Guide for Foreign Buyers", html)
+        self.assertIn("Buying Property in Croatia as a Foreigner", html)
         self.assertIn(f'/destinations/{DESTINATION_ID}/', html)
         comparison = build_country_comparison_page(destinations, [])
         self.assertIn('<span>1 destination</span>\n              <h3><a href="/countries/croatia-property/">Croatia</a></h3>', comparison)
