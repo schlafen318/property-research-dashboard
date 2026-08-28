@@ -6075,20 +6075,36 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
     destination_by_id = {item["id"]: item for item in destinations}
     records = retirement_payload["destinations"]
     browser_records = []
-    options = []
     source_links = []
     for record in records:
         item = dict(record)
         destination = destination_by_id.get(record["destination_id"], {})
         item["name"] = destination.get("name", record["destination_id"].replace("-", " ").title())
+        item["country"] = destination.get("country", "Other")
         item["continent"] = CONTINENT_BY_COUNTRY.get(destination.get("country", ""), "")
         browser_records.append(item)
-        options.append(f'<option value="{escape(item["destination_id"])}">{escape(item["name"])}</option>')
         first_source = item["sources"][0]
         source_links.append(
             f'<li><a href="{escape(first_source["url"])}" rel="nofollow noopener">{escape(item["name"])} cost evidence</a> '
             f'({escape(first_source["source_date"])}) · {escape(item["confidence"]["overall"])} confidence</li>'
         )
+    if len(browser_records) < 4:
+        raise ValueError("Retirement calculator quick answer requires at least four destinations")
+    default_destination_id = "fukuoka-itoshima" if any(
+        item["destination_id"] == "fukuoka-itoshima" for item in browser_records
+    ) else browser_records[0]["destination_id"]
+    destination_groups: dict[str, list[dict]] = {}
+    for item in browser_records:
+        destination_groups.setdefault(item["country"], []).append(item)
+    options = []
+    for country in sorted(destination_groups, key=str.casefold):
+        options.append(f'<optgroup label="{escape(country)}">')
+        for item in sorted(destination_groups[country], key=lambda record: record["name"].casefold()):
+            selected = " selected" if item["destination_id"] == default_destination_id else ""
+            options.append(
+                f'<option value="{escape(item["destination_id"])}"{selected}>{escape(item["name"])}</option>'
+            )
+        options.append("</optgroup>")
     ranked_couple = sorted(
         browser_records,
         key=lambda item: retirement_capital_requirement(item, "couple")["required_capital"],
@@ -6097,8 +6113,6 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         browser_records,
         key=lambda item: retirement_capital_requirement(item, "single")["required_capital"],
     )
-    if len(ranked_couple) < 4:
-        raise ValueError("Retirement calculator quick answer requires at least four destinations")
     representative_indexes = [
         0,
         round((len(ranked_couple) - 1) / 3),
@@ -6156,7 +6170,7 @@ __HEAD__
     * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
     .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
     .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; } .calc-modes { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-weight:750; } .calc-modes a { color:#fff; } .calc-modes a[aria-current] { color:#d8c28d; text-decoration:none; border-bottom:2px solid #d8c28d; }
-    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } .planning-currency { grid-column:1 / -1; } .planning-currency select { max-width:280px; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
+    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } .planning-currency { grid-column:1 / -1; } .planning-currency select { max-width:280px; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:400; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
     .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .save-intent { padding-top:2px; } .save-intent .text-button { font-weight:750; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
     .accumulation-figure { position:relative; margin:0; padding:18px 0; border-top:1px solid var(--line); } .accumulation-figure h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .chart-legend { display:flex; gap:18px; color:var(--muted); font-size:12px; margin-bottom:8px; } .chart-key::before { content:""; display:inline-block; width:10px; height:10px; margin-right:6px; background:#315e50; } .chart-key.contribution::before { background:#c29b45; } .accumulation-chart { display:block; width:100%; height:auto; overflow:visible; } .chart-axis { stroke:var(--line); stroke-width:1; } .chart-target { stroke:#9b6a33; stroke-width:1.5; stroke-dasharray:5 4; } .chart-target-label { fill:#7a5227; font-size:11px; font-weight:700; } .chart-axis-label { fill:var(--muted); font-size:10px; } .chart-lump { fill:#315e50; } .chart-contribution { fill:#c29b45; } .chart-year { opacity:0; transform:translateY(8px); animation:ret-year-in .35s ease forwards; animation-delay:var(--year-delay); cursor:pointer; outline:none; } .chart-year.is-active rect,.chart-year:focus-visible rect { stroke:#24312d; stroke-width:2px; } .chart-tooltip { position:absolute; z-index:2; top:60px; right:0; width:min(245px,calc(100% - 20px)); padding:11px 13px; border-radius:6px; background:#24312d; color:#fff; box-shadow:0 8px 24px rgba(36,49,45,.2); font-size:12px; } .chart-tooltip strong { display:block; font-size:14px; margin-bottom:5px; } .chart-tooltip div { display:flex; justify-content:space-between; gap:12px; } .chart-tooltip span { color:#dfe7e3; } .result-comparison { padding:16px 0; border-top:1px solid var(--line); } .result-comparison h3,.result-comparison summary { font-family:Georgia,serif; font-size:21px; } .result-table { min-width:0; font-size:13px; background:transparent; } .result-table th,.result-table td { padding:8px 5px; white-space:normal; } .result-table td { text-align:right; } .result-table .is-selected { background:#f1eee4; } @keyframes ret-year-in { to { opacity:1; transform:translateY(0); } }
     .text-button { width:auto; min-height:0; padding:0; border:0; border-radius:0; background:none; color:#245c4b; text-decoration:underline; cursor:pointer; font-size:13px; }
@@ -6200,9 +6214,9 @@ __UTILITY_CSS__
           <div class="field"><label for="ret-income-invested-rate">Share invested from income (%)</label><input id="ret-income-invested-rate" type="number" min="0" max="100" step="1" value="20"><p class="hint" id="ret-monthly-investment-preview">Monthly contribution: $0</p></div>
         </div></fieldset>
         <fieldset><legend>Income continuing after retirement (annual)</legend><p class="hint">Use after-tax amounts expected to continue in retirement. Do not include dividends from the portfolio being calculated.</p><div class="field-grid">
-          <div class="field"><label for="ret-pension">Pension</label><input id="ret-pension" type="text" inputmode="numeric" data-money min="0" step="100" value="24,000"><label class="check"><input id="ret-pension-indexed" type="checkbox" checked> Inflation-linked</label></div>
-          <div class="field"><label for="ret-other-income">Other non-portfolio income</label><input id="ret-other-income" type="text" inputmode="numeric" data-money min="0" step="100" value="18,000"><label class="check"><input id="ret-other-indexed" type="checkbox"> Inflation-linked</label></div>
-          <div class="field"><label for="ret-rental-income">Net rental income</label><input id="ret-rental-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at zero when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox"> Inflation-linked</label></div>
+          <div class="field"><label for="ret-pension">Pension</label><input id="ret-pension" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><label class="check"><input id="ret-pension-indexed" type="checkbox" checked> Inflation-linked</label></div>
+          <div class="field"><label for="ret-other-income">Other non-portfolio income</label><input id="ret-other-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><label class="check"><input id="ret-other-indexed" type="checkbox" checked> Inflation-linked</label></div>
+          <div class="field"><label for="ret-rental-income">Net rental income</label><input id="ret-rental-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at zero when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox" checked> Inflation-linked</label></div>
         </div></fieldset>
         <fieldset><legend>Portfolio assumption</legend>
           <label for="ret-expected-return">Expected annual portfolio return after fees (%)</label>
