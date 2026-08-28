@@ -3338,7 +3338,7 @@ def build_country_guides_hub_page(destinations: list[dict]) -> str:
     .country-directory__row h2 {{ margin: 0 0 9px; font-family: Georgia, "Times New Roman", serif; font-size: 30px; font-weight: 400; }}
     .country-directory__row p {{ margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }}
     .country-directory__row nav {{ display: grid; align-content: start; gap: 9px; }}
-    .country-directory__row nav a {{ width: fit-content; font-weight: 650; }}
+    .country-directory__row nav a {{ width: fit-content; font-weight: 400; line-height: 1.45; }}
     .countries-explainer {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, .7fr); gap: 40px; padding: 44px 0 72px; border-top: 1px solid var(--line); }}
     .countries-explainer h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 38px; font-weight: 400; }}
     .countries-explainer p {{ margin: 0 0 14px; color: var(--muted); }}

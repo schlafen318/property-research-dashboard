@@ -64,6 +64,11 @@ class CountryGuidesHubTests(unittest.TestCase):
         self.assertIn('aria-live="polite"', html)
         self.assertIn('data-track="country_filter_use"', html)
 
+    def test_directory_links_use_regular_editorial_weight(self) -> None:
+        html = self.render()
+        self.assertIn(".country-directory__row nav a { width: fit-content; font-weight: 400;", html)
+        self.assertNotIn(".country-directory__row nav a { width: fit-content; font-weight: 650;", html)
+
     def test_navigation_and_sitemap_entries_include_the_hub(self) -> None:
         self.assertIn('href="/countries/">Countries</a>', build_unified_app.primary_nav_links_html())
         self.assertIn(
