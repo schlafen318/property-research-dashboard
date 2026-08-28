@@ -29,6 +29,12 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_illustrative_return_example_is_disclosed_and_trackable(self) -> None:
+        self.assertEqual(4, run_ui("illustrativeReturnExample", {}))
+        source = UI_MODULE.read_text(encoding="utf-8")
+        self.assertIn('el("ret-example-return").addEventListener("click"', source)
+        self.assertIn('track("retirement_calculator_example_return")', source)
+
     def test_detail_handoff_accepts_only_allowlisted_categories(self) -> None:
         self.assertEqual(
             {"destination": "valencia", "household": "couple", "housing": "buy_now"},
