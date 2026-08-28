@@ -24,6 +24,7 @@ try:
     from src.site_design_system import (
         foreign_buyer_country_guide_css,
         landing_design_css,
+        retirement_finder_design_css,
         site_footer_html,
         site_header_html,
         utility_design_css,
@@ -45,6 +46,7 @@ except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.p
     from site_design_system import (
         foreign_buyer_country_guide_css,
         landing_design_css,
+        retirement_finder_design_css,
         site_footer_html,
         site_header_html,
         utility_design_css,
@@ -103,7 +105,25 @@ RETIREMENT_CALCULATOR_DESCRIPTION = (
     "inflation, pension and passive income, property costs, and required portfolio capital."
 )
 RETIREMENT_FINDER_SLUG = "retirement-destination-finder"
-RETIREMENT_FINDER_TITLE = "Retirement Destination Finder | Global Home Atlas"
+RETIREMENT_FINDER_TITLE = "Retirement Destination Finder: Where Can I Afford to Retire? | Global Home Atlas"
+RETIREMENT_FINDER_FAQS = [
+    (
+        "How does the finder choose retirement destinations?",
+        "It ranks destinations by whether projected liquid capital covers the modeled target, then uses region, setting and healthcare preferences within each financial tier.",
+    ),
+    (
+        "Does within reach mean I can definitely retire there?",
+        "No. It means the financial projection covers the modeled target under the assumptions entered. Immigration, tax, healthcare, currency and personal circumstances require separate review.",
+    ),
+    (
+        "Should I model renting or buying?",
+        "Start with renting if the destination is not yet proven through long stays. Model buying when you have a separate acquisition budget and can verify ownership, financing and transaction costs.",
+    ),
+    (
+        "Are visa and tax costs included?",
+        "No. The finder compares modeled living, reserve and housing capital. Confirm visa eligibility and obtain country-specific tax advice separately.",
+    ),
+]
 PREMIUM_DESTINATION_PEER_OVERRIDES = {
     "dubai": ["bali", "phuket-koh-samui", "fukuoka-itoshima"],
     "lake-tahoe": ["park-city-deer-valley", "aspen-snowmass", "miami-fort-lauderdale"],
@@ -5955,6 +5975,18 @@ def schema_for_retirement_finder(canonical: str) -> list[dict]:
             "description": RETIREMENT_FINDER_DESCRIPTION,
             "isAccessibleForFree": True,
         },
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": question,
+                    "acceptedAnswer": {"@type": "Answer", "text": answer},
+                }
+                for question, answer in RETIREMENT_FINDER_FAQS
+            ],
+        },
     ]
 
 
@@ -5996,7 +6028,7 @@ def build_retirement_destination_finder_page(
             canonical,
             schema_for_retirement_finder(canonical),
         ).strip(),
-        navigation=primary_nav_html().strip(),
+        navigation=site_header_html(PRIMARY_NAV_LINKS).strip(),
         region_options=region_options,
         universe_count=len(eligible_destinations),
         payload_json=json.dumps(payload, separators=(",", ":")).replace("</", "<\\/"),
@@ -6005,6 +6037,8 @@ def build_retirement_destination_finder_page(
         finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_ui=RETIREMENT_FINDER_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         analytics=analytics_event_script(),
+        design_css=retirement_finder_design_css(),
+        footer=site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
     )
 
 

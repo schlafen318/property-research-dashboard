@@ -22,11 +22,35 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
     def test_route_has_canonical_and_reciprocal_mode_link(self) -> None:
         self.assertIn(
+            "<title>Retirement Destination Finder: Where Can I Afford to Retire? | Global Home Atlas</title>",
+            self.html,
+        )
+        self.assertIn(
             '<link rel="canonical" href="https://globalhomeatlas.com/retirement-destination-finder/">',
             self.html,
         )
         self.assertIn('href="/retirement-abroad-calculator/">Plan for a destination</a>', self.html)
         self.assertIn('aria-current="page">Find destinations I can afford</a>', self.html)
+
+    def test_page_uses_shared_editorial_shell_and_final_design_layer(self) -> None:
+        self.assertIn('<body class="gha-mode-utility retirement-finder-page" data-design-system="gha-v1">', self.html)
+        self.assertIn('<header class="gha-header">', self.html)
+        self.assertIn('class="gha-mobile-menu"', self.html)
+        self.assertIn('<footer class="gha-footer">', self.html)
+        self.assertNotIn('class="page-nav"', self.html)
+        head = self.html.split("</head>", 1)[0]
+        marker = '<style id="gha-retirement-finder-design">'
+        self.assertEqual(head.rfind("<style"), head.index(marker))
+        design_css = head.split(marker, 1)[1].split("</style>", 1)[0]
+        self.assertIn('--gha-display-serif: "Iowan Old Style"', design_css)
+        self.assertRegex(
+            design_css,
+            r"\.retirement-finder-page \.finder-section\s*\{[^}]*border-radius:\s*0;[^}]*\}",
+        )
+        self.assertRegex(
+            design_css,
+            r"\.retirement-finder-page input,[^{]*\{[^}]*border-radius:\s*0;[^}]*font-weight:\s*400;",
+        )
 
     def test_form_uses_top_down_human_reading_order(self) -> None:
         ordered_ids = [
@@ -75,6 +99,23 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("Retirement target", self.html)
         self.assertIn("Surplus or gap", self.html)
         self.assertNotIn("Retirement score", self.html)
+
+    def test_results_lead_with_a_plain_language_decision_and_progressive_list(self) -> None:
+        self.assertIn('id="finder-result-read"', self.html)
+        self.assertIn('id="finder-closest-match"', self.html)
+        self.assertIn('id="finder-show-all"', self.html)
+        self.assertIn("View all destinations", self.html)
+        self.assertIn("View destination dossier", self.html)
+        self.assertIn('data-finder-dossier', self.html)
+
+    def test_page_adds_specific_search_supporting_content_and_faq_schema(self) -> None:
+        self.assertIn('id="how-matching-works"', self.html)
+        self.assertIn('id="within-reach"', self.html)
+        self.assertIn('id="rent-or-buy"', self.html)
+        self.assertIn('id="finder-faq"', self.html)
+        self.assertIn("Projected liquid capital covers the modeled retirement target", self.html)
+        self.assertIn("Buying requires separate property capital", self.html)
+        self.assertIn('"@type":"FAQPage"', self.html)
 
     def test_mobile_navigation_and_results_use_touch_sized_controls(self) -> None:
         self.assertIn(".mobile-menu>nav{position:absolute", self.html)
