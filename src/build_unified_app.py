@@ -117,6 +117,12 @@ RETIREMENT_DESTINATIONS_DESCRIPTION = (
     "Compare Global Home Atlas retirement destinations by required capital, "
     "annual spending, reserves, and optional property costs using one methodology."
 )
+COUNTRY_GUIDES_HUB_TITLE = "Country Property Guides for Foreign Buyers | Global Home Atlas"
+COUNTRY_GUIDES_HUB_H1 = "Country Property Guides for Foreign Buyers"
+COUNTRY_GUIDES_HUB_DESCRIPTION = (
+    "Compare country property guides for foreign buyers, retirement guides, and local destination "
+    "dossiers covering ownership, costs, risks, daily life, and resale."
+)
 RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
 MORTGAGE_PROFILES_PATH = DATA / "mortgage_profiles.json"
 RETIREMENT_ENGINE_PATH = ROOT / "src" / "retirement_calculator.js"
@@ -2056,7 +2062,7 @@ def trust_page_links(current_slug: str | None = None) -> str:
 PRIMARY_NAV_LINKS = [
     (f"/{FIND_YOUR_FIT_SLUG}/", "Find your fit"),
     ("/dashboard/", "Destinations"),
-    ("/guides/#country-selection", "Countries"),
+    ("/countries/", "Countries"),
     ("/guides/", "Guides"),
     ("/methodology/", "Methodology"),
 ]
@@ -3214,6 +3220,204 @@ def build_report_library_cards() -> str:
         """.rstrip()
         for report in premium_report_catalog()
     )
+
+
+def country_retirement_guide_slug(hub: dict) -> str | None:
+    return next(
+        (
+            slug
+            for slug in hub.get("guide_slugs", [])
+            if slug.endswith("retirement-property-foreign-buyers")
+        ),
+        None,
+    )
+
+
+def schema_for_country_guides_hub(canonical: str) -> list[dict]:
+    countries = sorted(COUNTRY_HUBS, key=lambda item: item["country"])
+    return [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "name": COUNTRY_GUIDES_HUB_H1,
+            "url": canonical,
+            "description": COUNTRY_GUIDES_HUB_DESCRIPTION,
+            "dateModified": date.today().isoformat(),
+            "isPartOf": {"@type": "WebSite", "name": SITE_NAME, "url": SITE_URL},
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": SITE_NAME, "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Countries", "item": canonical},
+            ],
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "ItemList",
+            "name": "Country property guides",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": position,
+                    "name": hub["country"],
+                    "item": country_url(hub),
+                }
+                for position, hub in enumerate(countries, 1)
+            ],
+        },
+    ]
+
+
+def build_country_guides_hub_page(destinations: list[dict]) -> str:
+    canonical = page_url("countries")
+    destination_by_id = {item["id"]: item for item in destinations}
+    rows = []
+    for hub in sorted(COUNTRY_HUBS, key=lambda item: item["country"]):
+        retirement_slug = country_retirement_guide_slug(hub)
+        retirement_link = (
+            f'<a href="/{escape(retirement_slug)}/" data-track="country_retirement_guide_click" '
+            f'data-track-label="{escape(hub["country"])}">Retiring in {escape(hub["country"])}</a>'
+            if retirement_slug
+            else ""
+        )
+        destination_links = "".join(
+            f'<a href="/destinations/{escape(destination_slug(destination_by_id[item_id]))}/" '
+            f'data-track="country_destination_click" data-track-label="{escape(destination_by_id[item_id]["name"])}">'
+            f'{escape(destination_by_id[item_id]["name"])}</a>'
+            for item_id in hub.get("destination_ids", [])
+            if item_id in destination_by_id
+        )
+        thesis = str(hub.get("thesis") or hub.get("description") or "").split(". ", 1)[0].rstrip(".") + "."
+        rows.append(
+            f"""
+            <article class="country-directory__row" data-country="{escape(hub['slug'])}">
+              <div class="country-directory__identity">
+                <h2>{escape(hub['country'])}</h2>
+                <p>{escape(thesis)}</p>
+              </div>
+              <nav class="country-directory__guides" aria-label="{escape(hub['country'])} country guides">
+                <a href="/countries/{escape(hub['slug'])}/" data-track="country_acquisition_guide_click" data-track-label="{escape(hub['country'])}">Buying property in {escape(hub['country'])}</a>
+                {retirement_link}
+              </nav>
+              <nav class="country-directory__destinations" aria-label="{escape(hub['country'])} destinations">
+                {destination_links}
+              </nav>
+            </article>
+            """
+        )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(COUNTRY_GUIDES_HUB_TITLE, COUNTRY_GUIDES_HUB_DESCRIPTION, canonical, schema_for_country_guides_hub(canonical))}
+  <style>
+    {shared_content_css()}
+    .countries-hero {{ padding-bottom: 66px; }}
+    .countries-hero .page-hero-grid {{ grid-template-columns: minmax(0, 820px); }}
+    .countries-hero h1 {{ max-width: 780px; }}
+    .countries-main {{ margin-top: 0; }}
+    .countries-breadcrumb {{ margin: 0 0 28px; color: var(--muted); font-size: 13px; }}
+    .countries-breadcrumb a {{ color: inherit; }}
+    .country-tools {{ display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; padding: 32px 0; border-bottom: 1px solid var(--line); }}
+    .country-tools article {{ min-width: 0; }}
+    .country-tools h2 {{ margin: 0 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: 28px; font-weight: 400; }}
+    .country-tools p {{ margin: 0 0 10px; color: var(--muted); }}
+    .country-tools a {{ font-weight: 700; }}
+    .country-directory {{ padding: 54px 0 72px; }}
+    .country-directory__head {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, 360px); gap: 28px; align-items: end; margin-bottom: 24px; }}
+    .country-directory__head h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(36px, 5vw, 56px); font-weight: 400; line-height: 1; }}
+    .country-filter label {{ display: block; margin-bottom: 7px; font-size: 13px; }}
+    .country-filter input {{ width: 100%; min-height: 46px; padding: 10px 12px; border: 1px solid var(--ink); border-radius: 0; background: var(--paper); color: var(--ink); font: inherit; }}
+    .country-filter p {{ min-height: 20px; margin: 6px 0 0; color: var(--muted); font-size: 12px; }}
+    .country-directory__labels, .country-directory__row {{ display: grid; grid-template-columns: minmax(220px, 1.2fr) minmax(220px, .9fr) minmax(220px, 1fr); gap: 30px; }}
+    .country-directory__labels {{ padding: 11px 0; border-top: 2px solid var(--ink); border-bottom: 1px solid var(--line); color: var(--brass); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; }}
+    .country-directory__row {{ padding: 27px 0 29px; border-bottom: 1px solid var(--line); }}
+    .country-directory__row[hidden] {{ display: none; }}
+    .country-directory__row h2 {{ margin: 0 0 9px; font-family: Georgia, "Times New Roman", serif; font-size: 30px; font-weight: 400; }}
+    .country-directory__row p {{ margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }}
+    .country-directory__row nav {{ display: grid; align-content: start; gap: 9px; }}
+    .country-directory__row nav a {{ width: fit-content; font-weight: 400; line-height: 1.45; }}
+    .countries-explainer {{ display: grid; grid-template-columns: minmax(0, 1fr) minmax(240px, .7fr); gap: 40px; padding: 44px 0 72px; border-top: 1px solid var(--line); }}
+    .countries-explainer h2 {{ margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 38px; font-weight: 400; }}
+    .countries-explainer p {{ margin: 0 0 14px; color: var(--muted); }}
+    @media (max-width: 760px) {{
+      .countries-hero {{ padding-bottom: 38px; }}
+      .country-tools, .country-directory__head, .countries-explainer {{ grid-template-columns: 1fr; }}
+      .country-directory__labels {{ display: none; }}
+      .country-directory__row {{ grid-template-columns: 1fr; gap: 20px; }}
+      .country-directory__row nav::before {{ color: var(--brass); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }}
+      .country-directory__guides::before {{ content: "Country guides"; }}
+      .country-directory__destinations::before {{ content: "Destination dossiers"; }}
+    }}
+  </style>
+</head>
+<body>
+  <header class="page-hero countries-hero">
+    <div class="page-shell">
+      {primary_nav_html()}
+      <div class="page-hero-grid">
+        <div>
+          <nav class="countries-breadcrumb" aria-label="Breadcrumb"><a href="/">Global Home Atlas</a> / Countries</nav>
+          <h1>{COUNTRY_GUIDES_HUB_H1}</h1>
+          <p class="page-lede">Choose a country, then follow the guide that matches your decision: buying mechanics, retirement practicality, or local destination research.</p>
+        </div>
+      </div>
+    </div>
+  </header>
+  <main class="countries-main">
+    <div class="page-shell">
+      <section class="country-tools" aria-label="Atlas research tools">
+        <article><h2>Compare destinations</h2><p>Use the Atlas rankings to compare markets on the same ten dimensions.</p><a href="/dashboard/" data-track="country_rankings_click" data-track-label="countries hub">Open destination rankings</a></article>
+        <article><h2>Plan retirement capital</h2><p>Estimate spending, income, property costs, and the portfolio required.</p><a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="country_calculator_click" data-track-label="countries hub">Open retirement calculator</a></article>
+      </section>
+      <section class="country-directory" aria-labelledby="country-directory-title">
+        <div class="country-directory__head">
+          <h2 id="country-directory-title">Browse by country</h2>
+          <div class="country-filter">
+            <label for="country-filter">Filter countries and destinations</label>
+            <input id="country-filter" type="search" aria-controls="country-directory" autocomplete="off" data-track="country_filter_use">
+            <p id="country-filter-status" aria-live="polite"></p>
+          </div>
+        </div>
+        <div class="country-directory__labels" aria-hidden="true"><span>Country</span><span>Country guides</span><span>Destination dossiers</span></div>
+        <div id="country-directory">{''.join(rows)}</div>
+      </section>
+      <section class="countries-explainer">
+        <h2>Choose the right level of research</h2>
+        <div><p><strong>Buying guides</strong> cover ownership, transaction steps, costs, restrictions, and risks. <strong>Retirement guides</strong> add residence, healthcare, long-term living, and retirement suitability. <strong>Destination dossiers</strong> examine individual markets, neighbourhood choices, prices, and Atlas scores.</p><a href="/methodology/">How the Atlas assesses destinations</a> · <a href="/country-comparison/">Compare countries</a></div>
+      </section>
+    </div>
+  </main>
+  <footer class="page-footer"><div class="page-shell"><strong>{SITE_NAME}</strong><p>Independent overseas property research. Verify current legal, tax, immigration, financing, and property details locally.</p></div></footer>
+  <script>
+    (() => {{
+      const input = document.getElementById("country-filter");
+      const rows = Array.from(document.querySelectorAll("[data-country]"));
+      const status = document.getElementById("country-filter-status");
+      let tracked = false;
+      const filterRows = () => {{
+        const query = input.value.trim().toLowerCase();
+        let visible = 0;
+        rows.forEach((row) => {{
+          const match = !query || row.textContent.toLowerCase().includes(query);
+          row.hidden = !match;
+          if (match) visible += 1;
+        }});
+        status.textContent = query ? `${{visible}} countries shown` : "";
+        if (query && !tracked && window.GHA) {{
+          window.GHA.track("country_filter_use", {{ query_length: query.length }});
+          tracked = true;
+        }}
+      }};
+      input.addEventListener("input", filterRows);
+    }})();
+  </script>
+{analytics_event_script()}
+</body>
+</html>
+"""
 
 
 def country_summary_metrics(hub: dict, destinations: list[dict]) -> dict:
@@ -5821,7 +6025,7 @@ __HEAD__
 </head>
 <body>
   <header class="calc-hero"><div class="calc-shell">
-    <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/find-your-fit/">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/guides/#country-selection">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
+    <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/find-your-fit/">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/countries/">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
     <p class="eyebrow">International retirement planning tool</p><h1>Retirement Abroad Calculator</h1>
     <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p><nav class="calc-modes" aria-label="Retirement calculator mode"><a href="/retirement-abroad-calculator/" aria-current="page">Plan for a destination</a><a href="/retirement-destination-finder/">Find destinations I can afford</a></nav>
   </div></header>
@@ -9802,6 +10006,27 @@ def build_brand_mockups_page() -> str:
 """
 
 
+def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
+    return [
+        (SITE_URL, "1.0"),
+        (page_url(FIND_YOUR_FIT_SLUG), "0.94"),
+        (page_url("dashboard"), "0.92"),
+        (page_url(SHORTLIST_REVIEW_SLUG), "0.90"),
+        (page_url(REPORT_LIBRARY_SLUG), "0.88"),
+        (page_url("country-comparison"), "0.88"),
+        (page_url("countries"), "0.90"),
+        (page_url(GUIDE_HUB_SLUG), "0.90"),
+        (page_url(RETIREMENT_CALCULATOR_SLUG), "0.92"),
+        (page_url(RETIREMENT_FINDER_SLUG), "0.92"),
+        (page_url(RETIREMENT_DESTINATIONS_SLUG), "0.90"),
+        *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
+        *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],
+        *[(destination_url(dest), "0.80") for dest in destinations],
+        *[(page_url(page["slug"]), "0.70") for page in TRUST_PAGES],
+        (page_url("brand-mockups"), "0.40"),
+    ]
+
+
 def build() -> Path:
     content_overrides = load_content_overrides()
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
@@ -11251,6 +11476,10 @@ def build() -> Path:
         )
     countries_dir = ARTIFACTS / "countries"
     countries_dir.mkdir(exist_ok=True)
+    (countries_dir / "index.html").write_text(
+        clean_generated_html(build_country_guides_hub_page(destinations)),
+        encoding="utf-8",
+    )
     for hub in COUNTRY_HUBS:
         page_dir = countries_dir / hub["slug"]
         page_dir.mkdir(parents=True, exist_ok=True)
@@ -11288,23 +11517,7 @@ Sitemap: {SITE_URL}sitemap.xml
         encoding="utf-8",
     )
     indexnow_key_file.write_text(f"{INDEXNOW_KEY}\n", encoding="utf-8")
-    sitemap_urls = [
-        (SITE_URL, "1.0"),
-        (page_url(FIND_YOUR_FIT_SLUG), "0.94"),
-        (page_url("dashboard"), "0.92"),
-        (page_url(SHORTLIST_REVIEW_SLUG), "0.90"),
-        (page_url(REPORT_LIBRARY_SLUG), "0.88"),
-        (page_url("country-comparison"), "0.88"),
-        (page_url(GUIDE_HUB_SLUG), "0.90"),
-        (page_url(RETIREMENT_CALCULATOR_SLUG), "0.92"),
-        (page_url(RETIREMENT_FINDER_SLUG), "0.92"),
-        (page_url(RETIREMENT_DESTINATIONS_SLUG), "0.90"),
-        *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
-        *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],
-        *[(destination_url(dest), "0.80") for dest in destinations],
-        *[(page_url(page["slug"]), "0.70") for page in TRUST_PAGES],
-        (page_url("brand-mockups"), "0.40"),
-    ]
+    sitemap_urls = sitemap_url_entries(destinations)
     sitemap_entries = "\n".join(
         f"""  <url>
     <loc>{escape(loc)}</loc>

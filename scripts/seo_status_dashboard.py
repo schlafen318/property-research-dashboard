@@ -267,7 +267,7 @@ def build_html(report: dict, indexnow: dict) -> str:
         <div class="nav-links">
           <a href="/find-your-fit/">Find your fit</a>
           <a href="/dashboard/">Destinations</a>
-          <a href="/guides/#country-selection">Countries</a>
+          <a href="/countries/">Countries</a>
           <a href="/guides/">Guides</a>
           <a href="/methodology/">Methodology</a>
         </div>
