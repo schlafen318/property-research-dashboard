@@ -70,7 +70,7 @@ class CountryGuidesHubTests(unittest.TestCase):
         self.assertNotIn(".country-directory__row nav a { width: fit-content; font-weight: 650;", html)
 
     def test_navigation_and_sitemap_entries_include_the_hub(self) -> None:
-        self.assertIn('href="/countries/">Countries</a>', build_unified_app.primary_nav_links_html())
+        self.assertIn('href="/countries/">Country Guides</a>', build_unified_app.primary_nav_links_html())
         self.assertIn(
             (build_unified_app.page_url("countries"), "0.90"),
             build_unified_app.sitemap_url_entries(self.destinations),

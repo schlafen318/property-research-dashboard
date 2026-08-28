@@ -326,6 +326,28 @@ def utility_design_css() -> str:
     """
 
 
+def top_level_page_design_css() -> str:
+    return utility_design_css() + r"""
+    .gha-top-level .gha-shell, .gha-top-level .page-shell, .gha-top-level .shell, .gha-top-level .calc-shell { width: min(1220px, calc(100% - 48px)); margin-inline: auto; }
+    .gha-top-level .page-hero, .gha-top-level .compact-hero { min-height: 0; padding: 0; border-bottom: 1px solid var(--gha-rule); background: var(--gha-paper); color: var(--gha-ink); }
+    .gha-top-level .page-hero > .page-shell, .gha-top-level .compact-hero__content { padding: 52px 0 48px; }
+    .gha-top-level .page-hero-grid { display: block; }
+    .gha-top-level .page-eyebrow, .gha-top-level .eyebrow { margin: 0 0 18px; color: var(--gha-accent); font-size: 12px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
+    .gha-top-level h1, .gha-top-level h2, .gha-top-level h3 { font-family: var(--gha-display-serif); font-weight: 500; }
+    .gha-top-level .page-hero h1, .gha-top-level .compact-hero h1 { max-width: 900px; margin: 0; font-size: clamp(48px, 6.2vw, 78px); line-height: .98; letter-spacing: -.035em; }
+    .gha-top-level .page-lede, .gha-top-level .compact-hero .lede { max-width: 780px; margin: 26px 0 0; color: #46524d; font-family: var(--gha-display-serif); font-size: clamp(20px, 2vw, 24px); line-height: 1.42; }
+    .gha-top-level .guide-page-hero { background-image: none; }
+    .gha-top-level .guide-page-layout { margin-left: 0; }
+    .gha-top-level .countries-hero { padding-bottom: 0; }
+    @media (max-width: 860px) {
+      .gha-top-level .gha-shell, .gha-top-level .page-shell, .gha-top-level .shell, .gha-top-level .calc-shell { width: min(100% - 32px, 1220px); }
+    }
+    @media (max-width: 620px) {
+      .gha-top-level .page-hero > .page-shell, .gha-top-level .compact-hero__content { padding: 38px 0 36px; }
+    }
+    """
+
+
 def retirement_finder_design_css() -> str:
     return utility_design_css() + r"""
     .retirement-finder-page .gha-shell, .retirement-finder-page .page-shell { width: min(1220px, calc(100% - 48px)); margin-inline: auto; }

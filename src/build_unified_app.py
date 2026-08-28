@@ -27,6 +27,7 @@ try:
         retirement_finder_design_css,
         site_footer_html,
         site_header_html,
+        top_level_page_design_css,
         utility_design_css,
     )
     from src.premium_destination_dossiers import (
@@ -49,6 +50,7 @@ except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.p
         retirement_finder_design_css,
         site_footer_html,
         site_header_html,
+        top_level_page_design_css,
         utility_design_css,
     )
     from premium_destination_dossiers import (
@@ -2087,11 +2089,10 @@ def trust_page_links(current_slug: str | None = None) -> str:
 
 
 PRIMARY_NAV_LINKS = [
-    (f"/{FIND_YOUR_FIT_SLUG}/", "Find your fit"),
-    ("/dashboard/", "Destinations"),
-    ("/countries/", "Countries"),
-    ("/guides/", "Guides"),
-    ("/methodology/", "Methodology"),
+    ("/dashboard/", "Destination Rankings"),
+    (f"/{RETIREMENT_CALCULATOR_SLUG}/", "Retirement Calculator"),
+    ("/countries/", "Country Guides"),
+    ("/guides/", "Buying Guides"),
 ]
 
 
@@ -3447,11 +3448,12 @@ def build_country_guides_hub_page(destinations: list[dict]) -> str:
       .country-directory__destinations::before {{ content: "Destination dossiers"; }}
     }}
   </style>
+  <style id="gha-top-level-design">{top_level_page_design_css()}</style>
 </head>
-<body>
+<body class="gha-mode-utility gha-top-level countries-page">
+  {site_header_html(PRIMARY_NAV_LINKS)}
   <header class="page-hero countries-hero">
     <div class="page-shell">
-      {primary_nav_html()}
       <div class="page-hero-grid">
         <div>
           <nav class="countries-breadcrumb" aria-label="Breadcrumb"><a href="/">Global Home Atlas</a> / Countries</nav>
@@ -3485,7 +3487,7 @@ def build_country_guides_hub_page(destinations: list[dict]) -> str:
       </section>
     </div>
   </main>
-  <footer class="page-footer"><div class="page-shell"><strong>{SITE_NAME}</strong><p>Independent overseas property research. Verify current legal, tax, immigration, financing, and property details locally.</p></div></footer>
+  {site_footer_html(SITE_NAME, CONTACT_EMAIL)}
   <script>
     (() => {{
       const input = document.getElementById("country-filter");
@@ -6145,11 +6147,11 @@ __HEAD__
     @media(max-width:520px) { .field-grid,.result-grid { grid-template-columns:1fr; } .calc-modes { display:grid; gap:10px; } .calc-modes a { width:max-content; max-width:100%; } h1 { overflow-wrap:anywhere; } th,td { padding:10px 8px; font-size:13px; } }
     @media(prefers-reduced-motion:reduce) { .chart-year,.cost-sidecar[open] { animation:none; opacity:1; transform:none; } }
   </style>
-  <style id="gha-utility-design">
+  <style id="gha-top-level-design">
 __UTILITY_CSS__
   </style>
 </head>
-<body class="gha-mode-utility calculator-page" data-design-system="gha-v1">
+<body class="gha-mode-utility gha-top-level calculator-page" data-design-system="gha-v1">
   __SITE_HEADER__
   <header class="calc-hero"><div class="gha-shell calc-shell">
     <p class="eyebrow">Retirement abroad calculator</p><h1>How Much Do You Need to Retire Abroad?</h1>
@@ -6264,7 +6266,7 @@ __ANALYTICS__
 </body></html>"""
     replacements = {
         "__HEAD__": head_html(RETIREMENT_CALCULATOR_TITLE, RETIREMENT_CALCULATOR_DESCRIPTION, canonical, schema_for_retirement_calculator(canonical)),
-        "__UTILITY_CSS__": utility_design_css(),
+        "__UTILITY_CSS__": top_level_page_design_css(),
         "__SITE_HEADER__": site_header_html(PRIMARY_NAV_LINKS).strip(),
         "__SITE_FOOTER__": site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
         "__OPTIONS__": "".join(options),
@@ -6567,11 +6569,12 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
     @media (max-width: 860px) {{ .journey-grid, .guide-story-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} .guide-feature {{ grid-template-columns: 1fr; gap: 24px; }} .guide-feature__image {{ min-height: min(54vw, 390px); }} }}
     @media (max-width: 560px) {{ .guide-page-hero {{ min-height: 350px; }} .guide-section-nav {{ gap: 17px; margin: 0 -2px; padding: 13px 2px; }} .journey-grid, .guide-story-grid {{ grid-template-columns: 1fr; gap: 22px; }} .guide-page-layout {{ padding-top: 26px; }} .guide-page-layout .page-article {{ gap: 38px; }} .journey-card {{ padding-top: 13px; }} .guide-feature {{ padding: 22px 0; }} .guide-feature__image {{ min-height: 250px; }} .guide-feature__copy h2 {{ font-size: 34px; }} }}
   </style>
+  <style id="gha-top-level-design">{top_level_page_design_css()}</style>
 </head>
-<body>
+<body class="gha-mode-utility gha-top-level guides-page">
+  {site_header_html(PRIMARY_NAV_LINKS)}
   <header class="page-hero guide-page-hero">
     <div class="page-shell">
-      {primary_nav_html()}
       <div class="page-hero-grid">
         <div>
           <p class="page-eyebrow">Global Property Buying Guides · updated {updated}</p>
@@ -6621,13 +6624,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
       </div>
     </div>
   </main>
-  <footer class="page-footer">
-    <div class="page-shell">
-      <strong>{SITE_NAME}</strong>
-      <p>Global property destination research for lifestyle-led investors and long-term planners.</p>
-      <nav>{seo_guide_links(pages, limit=8)} {trust_page_links()}</nav>
-    </div>
-  </footer>
+  {site_footer_html(SITE_NAME, CONTACT_EMAIL)}
 {analytics_event_script()}
 </body>
 </html>
@@ -11105,10 +11102,11 @@ def build() -> Path:
       .market-list__tools, .compare-selection-bar { align-items: flex-start; flex-direction: column; }
     }
   </style>
+  <style id="gha-top-level-design">__TOP_LEVEL_DESIGN_CSS__</style>
 </head>
-<body>
+<body class="gha-mode-utility gha-top-level dashboard-page">
+  __PRIMARY_NAV__
   <header class="compact-hero" id="top">
-    __PRIMARY_NAV__
     <div class="shell compact-hero__content">
       <p class="eyebrow">Global Home Atlas</p>
       <h1>Destinations</h1>
@@ -11492,6 +11490,7 @@ def build() -> Path:
     updateSortIndicators();
     recalculateScores();
   </script>
+  __SITE_FOOTER__
   __ANALYTICS_EVENT_SCRIPT__
 </body>
 </html>
@@ -11517,7 +11516,9 @@ def build() -> Path:
         "__FAVICON_LINKS__": favicon_links_html().strip(),
         "__ANALYTICS_HEAD__": analytics_head_tags(),
         "__ANALYTICS_EVENT_SCRIPT__": analytics_event_script(),
-        "__PRIMARY_NAV__": topbar_nav_html().strip(),
+        "__PRIMARY_NAV__": site_header_html(PRIMARY_NAV_LINKS).strip(),
+        "__SITE_FOOTER__": site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
+        "__TOP_LEVEL_DESIGN_CSS__": top_level_page_design_css(),
     }
     for key, value in replacements.items():
         html = html.replace(key, value)

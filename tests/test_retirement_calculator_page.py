@@ -57,7 +57,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Portfolio dividends and interest", self.html)
 
     def test_page_uses_the_shared_global_home_atlas_utility_shell(self) -> None:
-        self.assertIn('<body class="gha-mode-utility calculator-page" data-design-system="gha-v1">', self.html)
+        self.assertIn('<body class="gha-mode-utility gha-top-level calculator-page" data-design-system="gha-v1">', self.html)
         self.assertIn('<header class="gha-header">', self.html)
         self.assertIn('class="gha-mobile-menu"', self.html)
         self.assertIn('/assets/global-home-atlas-logo-compact-light.svg', self.html)
@@ -66,7 +66,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
 
     def test_page_uses_shared_editorial_typography_and_restrained_surfaces(self) -> None:
         head = self.html.split("</head>", 1)[0]
-        utility_marker = '<style id="gha-utility-design">'
+        utility_marker = '<style id="gha-top-level-design">'
         self.assertEqual(head.rfind("<style"), head.index(utility_marker))
         utility_css = head.split(utility_marker, 1)[1].split("</style>", 1)[0]
 
@@ -444,7 +444,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             'Calculate retirement needs</a>'
         )
         self.assertIn(calculator_link, homepage)
-        self.assertEqual(2, homepage.count('href="/retirement-abroad-calculator/"'))
+        self.assertEqual(2, homepage.count('data-track="retirement_calculator_open"'))
 
     def test_sitemap_contains_one_calculator_url(self) -> None:
         sitemap = (ROOT / "artifacts" / "sitemap.xml").read_text(encoding="utf-8")

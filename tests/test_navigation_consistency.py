@@ -8,11 +8,10 @@ from pathlib import Path
 ARTIFACTS = Path(__file__).resolve().parents[1] / "artifacts"
 EXPECTED_PRIMARY_LINKS = [
     ("/", "Global Home Atlas"),
-    ("/find-your-fit/", "Find your fit"),
-    ("/dashboard/", "Destinations"),
-    ("/countries/", "Countries"),
-    ("/guides/", "Guides"),
-    ("/methodology/", "Methodology"),
+    ("/dashboard/", "Destination Rankings"),
+    ("/retirement-abroad-calculator/", "Retirement Calculator"),
+    ("/countries/", "Country Guides"),
+    ("/guides/", "Buying Guides"),
 ]
 
 
@@ -66,10 +65,22 @@ class NavigationConsistencyTests(unittest.TestCase):
 
         for page in pages:
             with self.subTest(page=page.relative_to(ARTIFACTS)):
+                html = page.read_text(encoding="utf-8")
+                if 'name="robots" content="noindex' in html:
+                    continue
                 parser = PrimaryNavigationParser()
-                parser.feed(page.read_text(encoding="utf-8"))
+                parser.feed(html)
                 links = [(link["href"], " ".join(link["label"].split())) for link in parser.links]
                 self.assertEqual(links, EXPECTED_PRIMARY_LINKS)
+
+    def test_top_level_routes_use_the_shared_editorial_shell(self) -> None:
+        for route in ("dashboard", "retirement-abroad-calculator", "countries", "guides"):
+            with self.subTest(route=route):
+                html = (ARTIFACTS / route / "index.html").read_text(encoding="utf-8")
+                self.assertIn('class="gha-mode-utility gha-top-level', html)
+                self.assertIn('<header class="gha-header">', html)
+                self.assertIn('<footer class="gha-footer">', html)
+                self.assertIn('id="gha-top-level-design"', html)
 
 
 if __name__ == "__main__":

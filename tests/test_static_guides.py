@@ -68,9 +68,13 @@ class GuideHubIndexingTests(unittest.TestCase):
     def test_retirement_calculator_callout_precedes_the_full_catalog(self) -> None:
         html = GUIDE_HUB.read_text(encoding="utf-8")
 
-        self.assertEqual(1, html.count('href="/retirement-abroad-calculator/"'))
+        calculator_callout = (
+            'href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" '
+            'data-track-label="guide hub"'
+        )
+        self.assertEqual(1, html.count(calculator_callout))
         self.assertLess(
-            html.index('href="/retirement-abroad-calculator/"'),
+            html.index(calculator_callout),
             html.index('class="guide-catalog"'),
         )
 
