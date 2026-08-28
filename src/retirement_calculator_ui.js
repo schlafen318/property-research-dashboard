@@ -38,6 +38,13 @@
     return Math.round(converted / step) * step;
   }
 
+  function planningControlConversionStep(input) {
+    if (input.controlId === "ret-monthly-spending" && input.monthlySpendingIsAutomatic) {
+      return 100;
+    }
+    return Number(input.controlStep);
+  }
+
   function preferredPlanningCurrency() {
     return "USD";
   }
@@ -75,6 +82,10 @@
 
   function annualSpendingFromMonthly(monthlySpending) {
     return Number(monthlySpending) * 12;
+  }
+
+  function roundToNearestHundred(amount) {
+    return Math.round(Number(amount) / 100) * 100;
   }
 
   function illustrativeReturnExample() {
@@ -386,6 +397,7 @@
       return invalid;
     };
     let benchmarkValue = 0;
+    let monthlySpendingIsAutomatic = true;
     let autoCalculationTimer = null;
     let hasTrackedResult = false;
     let hasTrackedCurrentCostComparison = false;
@@ -417,7 +429,8 @@
       const plan = el("ret-housing-plan").value;
       const expenseLabels = housingExpenseLabels(plan);
       benchmarkValue = annualBenchmark({ profile: profile, plan: plan });
-      el("ret-monthly-spending").value = formatMoneyInputValue(Math.round(fromUsd(benchmarkValue / 12)));
+      monthlySpendingIsAutomatic = true;
+      el("ret-monthly-spending").value = formatMoneyInputValue(roundToNearestHundred(fromUsd(benchmarkValue / 12)));
       el("ret-monthly-spending-label").textContent = expenseLabels.input;
       el("ret-first-expenses-label").textContent = expenseLabels.result;
       el("ret-housing-guidance").textContent = housingGuidance(plan);
@@ -894,7 +907,11 @@
           fromCurrency: previousCurrency,
           toCurrency: nextCurrency,
           ratesToUsd: ratesToUsd,
-          step: control.step,
+          step: planningControlConversionStep({
+            controlId: id,
+            controlStep: control.step,
+            monthlySpendingIsAutomatic: monthlySpendingIsAutomatic,
+          }),
         });
         if (converted !== null) {
           control.value = formatMoneyInputValue(converted);
@@ -929,7 +946,10 @@
     moneyControlIds.forEach(function (id) {
       const control = el(id);
       if (!control) return;
-      control.addEventListener("input", function () { validateMoneyControl(control); });
+      control.addEventListener("input", function () {
+        if (id === "ret-monthly-spending") monthlySpendingIsAutomatic = false;
+        validateMoneyControl(control);
+      });
       control.addEventListener("blur", function () {
         formatMoneyControl(control);
         validateMoneyControl(control);
@@ -972,12 +992,14 @@
   return {
     convertPlanningAmount: convertPlanningAmount,
     convertPlanningControlAmount: convertPlanningControlAmount,
+    planningControlConversionStep: planningControlConversionStep,
     preferredPlanningCurrency: preferredPlanningCurrency,
     parseMoneyInput: parseMoneyInput,
     formatMoneyInputValue: formatMoneyInputValue,
     isInvalidMoneyInput: isInvalidMoneyInput,
     formatPlanningMoney: formatPlanningMoney,
     annualSpendingFromMonthly: annualSpendingFromMonthly,
+    roundToNearestHundred: roundToNearestHundred,
     illustrativeReturnExample: illustrativeReturnExample,
     currentCostComparison: currentCostComparison,
     retirementTargetComparison: retirementTargetComparison,

@@ -179,6 +179,43 @@ class RetirementCalculatorUITests(unittest.TestCase):
     def test_converts_monthly_spending_to_annual_for_the_engine(self) -> None:
         self.assertEqual(64_596, run_ui("annualSpendingFromMonthly", 5_383))
 
+    def test_destination_monthly_spending_rounds_to_the_nearest_hundred(self) -> None:
+        self.assertEqual(9_200, run_ui("roundToNearestHundred", 9_183))
+        self.assertEqual(5_500, run_ui("roundToNearestHundred", 5_517))
+        self.assertEqual(0, run_ui("roundToNearestHundred", 0))
+        source = UI_MODULE.read_text(encoding="utf-8")
+        self.assertIn(
+            "formatMoneyInputValue(roundToNearestHundred(fromUsd(benchmarkValue / 12)))",
+            source,
+        )
+
+    def test_currency_conversion_keeps_only_automatic_destination_costs_rounded(self) -> None:
+        self.assertEqual(
+            100,
+            run_ui(
+                "planningControlConversionStep",
+                {
+                    "controlId": "ret-monthly-spending",
+                    "controlStep": 1,
+                    "monthlySpendingIsAutomatic": True,
+                },
+            ),
+        )
+        self.assertEqual(
+            1,
+            run_ui(
+                "planningControlConversionStep",
+                {
+                    "controlId": "ret-monthly-spending",
+                    "controlStep": 1,
+                    "monthlySpendingIsAutomatic": False,
+                },
+            ),
+        )
+        source = UI_MODULE.read_text(encoding="utf-8")
+        self.assertIn("let monthlySpendingIsAutomatic = true;", source)
+        self.assertIn("monthlySpendingIsAutomatic = false;", source)
+
     def test_current_cost_comparison_reports_a_lower_destination_cost(self) -> None:
         self.assertEqual(
             {
