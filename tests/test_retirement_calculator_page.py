@@ -179,9 +179,15 @@ class RetirementCalculatorPageTests(unittest.TestCase):
     def test_housing_inputs_match_how_retirees_plan(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
         self.assertIn('id="ret-monthly-spending-label" for="ret-monthly-spending">Monthly retirement living expenses including rent</label>', form)
-        self.assertIn('id="ret-monthly-spending" type="number" min="0" step="1"', form)
+        self.assertIn(
+            'id="ret-monthly-spending" type="text" inputmode="numeric" data-money min="0" step="1"',
+            form,
+        )
         self.assertIn('for="ret-property-budget">Home purchase budget today</label>', form)
-        self.assertIn('id="ret-property-budget" type="number" min="0" step="1"', form)
+        self.assertIn(
+            'id="ret-property-budget" type="text" inputmode="numeric" data-money min="0" step="1"',
+            form,
+        )
         self.assertIn('id="ret-acquisition-cost-guidance"', form)
         self.assertIn("explicit exclusion", form)
         self.assertIn('id="ret-housing-guidance"', form)
@@ -223,7 +229,15 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
         self.assertIn("<legend>Income you receive now (monthly)</legend>", form)
         self.assertIn('for="ret-monthly-income">After-tax monthly income</label>', form)
-        self.assertIn('id="ret-monthly-income" type="number" min="0" step="100" value="0"', form)
+        self.assertIn(
+            'id="ret-monthly-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"',
+            form,
+        )
+        for field_id in ("ret-pension", "ret-other-income", "ret-rental-income"):
+            self.assertIn(
+                f'id="{field_id}" type="text" inputmode="numeric" data-money min="0" step="100"',
+                form,
+            )
         self.assertIn('for="ret-income-invested-rate">Share invested from income (%)</label>', form)
         self.assertIn('id="ret-monthly-investment-preview">Monthly contribution: $0</p>', form)
         self.assertIn('id="ret-income-invested-rate" type="number" min="0" max="100" step="1" value="20"', form)
@@ -287,7 +301,11 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         )
         self.assertIn('id="ret-current-location" type="text" autocomplete="address-level2"', section)
         self.assertIn('for="ret-current-monthly-spending">Current monthly spending</label>', section)
-        self.assertIn('id="ret-current-monthly-spending" type="number" min="1" step="1"', section)
+        self.assertIn(
+            'id="ret-current-monthly-spending" type="text" inputmode="numeric" '
+            'data-money min="1" step="1"',
+            section,
+        )
         self.assertIn('id="ret-current-cost-result" hidden aria-live="polite"', section)
         self.assertIn('id="ret-current-cost-summary"', section)
         self.assertIn('id="ret-current-cost-annual"', section)
@@ -301,8 +319,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
     def test_current_cost_comparison_does_not_persist_or_transmit_personal_values(self) -> None:
         source = UI_MODULE.read_text(encoding="utf-8")
         self.assertIn('track("retirement_calculator_current_cost_compare")', source)
-        self.assertIn('localStorage.getItem("gha_planning_currency")', source)
-        self.assertIn('localStorage.setItem("gha_planning_currency", selectedCurrency)', source)
+        self.assertNotIn('localStorage.getItem("gha_planning_currency")', source)
+        self.assertNotIn('localStorage.setItem("gha_planning_currency", selectedCurrency)', source)
         self.assertNotIn("sessionStorage", source)
         self.assertNotIn("fetch(", source)
         self.assertNotIn("XMLHttpRequest", source)
@@ -422,11 +440,9 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertNotIn("initRetirementBenchmarkTable(\"ret-benchmark-household\"", self.html)
         self.assertLess(self.html.index("window.GHA ="), self.html.index("GHARetirementCalculatorUI.initRetirementCalculator"))
 
-    def test_ui_module_persists_only_currency_and_does_not_transmit_financial_inputs(self) -> None:
+    def test_ui_module_does_not_persist_or_transmit_financial_inputs(self) -> None:
         source = UI_MODULE.read_text(encoding="utf-8")
-        self.assertIn('localStorage.getItem("gha_planning_currency")', source)
-        self.assertIn('localStorage.setItem("gha_planning_currency", selectedCurrency)', source)
-        for forbidden in ("sessionStorage", "fetch(", "XMLHttpRequest"):
+        for forbidden in ("localStorage", "sessionStorage", "fetch(", "XMLHttpRequest"):
             self.assertNotIn(forbidden, source)
         for forbidden_key in ('spending:', 'income:', 'portfolio:', 'property_price:', 'total_capital:'):
             self.assertNotIn(forbidden_key, source)
