@@ -197,6 +197,39 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertNotIn("Annual spending today (USD)", form)
         self.assertNotIn("Destination net rental income", form)
 
+    def test_destination_selector_is_grouped_and_sorted_by_country(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        destination_select = form.split('id="ret-destination"', 1)[1].split("</select>", 1)[0]
+        country_labels = re.findall(r'<optgroup label="([^"]+)">', destination_select)
+
+        self.assertGreaterEqual(len(country_labels), 10)
+        self.assertEqual(sorted(country_labels), country_labels)
+        self.assertIn("Japan", country_labels)
+        japan_group = destination_select.split('<optgroup label="Japan">', 1)[1].split(
+            "</optgroup>", 1
+        )[0]
+        japan_destinations = re.findall(r'<option[^>]*>([^<]+)</option>', japan_group)
+        self.assertEqual(sorted(japan_destinations), japan_destinations)
+        self.assertIn(
+            '<option value="fukuoka-itoshima" selected>Fukuoka / Itoshima</option>',
+            japan_group,
+        )
+
+        payload = json.loads(
+            self.html.split('<script id="retirement-destination-data" type="application/json">', 1)[1]
+            .split("</script>", 1)[0]
+        )
+        self.assertTrue(all(record.get("country") for record in payload["destinations"]))
+
+    def test_empty_destination_data_raises_a_clear_build_error(self) -> None:
+        from src.build_unified_app import build_retirement_calculator_page
+
+        with self.assertRaisesRegex(ValueError, "requires at least four destinations"):
+            build_retirement_calculator_page(
+                [],
+                {"as_of": "2026-08-28", "currency": "USD", "destinations": []},
+            )
+
     def test_destination_cost_sidecar_is_an_accessible_dynamic_selector(self) -> None:
         self.assertIn('<dialog class="cost-sidecar" id="ret-cost-sidecar" aria-labelledby="ret-cost-sidecar-title">', self.html)
         self.assertIn('<h2 id="ret-cost-sidecar-title">Compare monthly living expenses</h2>', self.html)
@@ -213,6 +246,20 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertNotIn("Annual pension (USD)", form)
         self.assertNotIn("Other non-portfolio income (USD)", form)
         self.assertNotIn("Other net rental income (annual USD)", form)
+
+    def test_retirement_income_defaults_to_zero(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        self.assertIn('id="ret-pension" type="text" inputmode="numeric" data-money min="0" step="100" value="0"', form)
+        self.assertIn('id="ret-other-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"', form)
+
+    def test_retirement_income_defaults_to_inflation_linked(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        for field_id in ("ret-pension-indexed", "ret-other-indexed", "ret-rental-indexed"):
+            self.assertIn(f'id="{field_id}" type="checkbox" checked', form)
+
+    def test_disclosure_summaries_use_regular_weight(self) -> None:
+        self.assertIn("summary { cursor:pointer; font-weight:400; }", self.html)
+        self.assertNotIn("details.assumptions summary { font-weight:400; }", self.html)
 
     def test_personalized_form_uses_cash_flow_inputs(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
