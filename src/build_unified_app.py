@@ -151,6 +151,22 @@ RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
 MORTGAGE_PROFILES_PATH = DATA / "mortgage_profiles.json"
 RETIREMENT_ENGINE_PATH = ROOT / "src" / "retirement_calculator.js"
 RETIREMENT_UI_PATH = ROOT / "src" / "retirement_calculator_ui.js"
+RETIREMENT_PLANNING_CURRENCIES = {
+    "as_of": "2026-08-27",
+    "display_date": "27 August 2026",
+    "source": "European Central Bank euro foreign exchange reference rates",
+    "rates_to_usd": {
+        "USD": 1.0,
+        "EUR": 1.1645,
+        "GBP": 1.3581758805691626,
+        "CAD": 0.7210079871215406,
+        "AUD": 0.7190046925166709,
+        "CHF": 1.242000853242321,
+        "JPY": 0.006273907655837509,
+        "HKD": 0.12757170088297803,
+        "SGD": 0.7866117265603891,
+    },
+}
 PROPERTY_FINANCE_PATH = ROOT / "src" / "property_finance.js"
 RETIREMENT_FINDER_ENGINE_PATH = ROOT / "src" / "retirement_destination_finder.js"
 RETIREMENT_FINDER_UI_PATH = ROOT / "src" / "retirement_destination_finder_ui.js"
@@ -6120,7 +6136,12 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         for question, answer in RETIREMENT_FAQS
     )
     page_data = json.dumps(
-        {"as_of": retirement_payload["as_of"], "currency": retirement_payload["currency"], "destinations": browser_records},
+        {
+            "as_of": retirement_payload["as_of"],
+            "currency": retirement_payload["currency"],
+            "planning_currencies": RETIREMENT_PLANNING_CURRENCIES,
+            "destinations": browser_records,
+        },
         ensure_ascii=False,
         separators=(",", ":"),
     ).replace("</", "<\\/")
@@ -6135,7 +6156,7 @@ __HEAD__
     * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
     .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
     .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; } .calc-modes { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-weight:750; } .calc-modes a { color:#fff; } .calc-modes a[aria-current] { color:#d8c28d; text-decoration:none; border-bottom:2px solid #d8c28d; }
-    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
+    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } .planning-currency { grid-column:1 / -1; } .planning-currency select { max-width:280px; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
     .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .save-intent { padding-top:2px; } .save-intent .text-button { font-weight:750; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
     .accumulation-figure { position:relative; margin:0; padding:18px 0; border-top:1px solid var(--line); } .accumulation-figure h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .chart-legend { display:flex; gap:18px; color:var(--muted); font-size:12px; margin-bottom:8px; } .chart-key::before { content:""; display:inline-block; width:10px; height:10px; margin-right:6px; background:#315e50; } .chart-key.contribution::before { background:#c29b45; } .accumulation-chart { display:block; width:100%; height:auto; overflow:visible; } .chart-axis { stroke:var(--line); stroke-width:1; } .chart-target { stroke:#9b6a33; stroke-width:1.5; stroke-dasharray:5 4; } .chart-target-label { fill:#7a5227; font-size:11px; font-weight:700; } .chart-axis-label { fill:var(--muted); font-size:10px; } .chart-lump { fill:#315e50; } .chart-contribution { fill:#c29b45; } .chart-year { opacity:0; transform:translateY(8px); animation:ret-year-in .35s ease forwards; animation-delay:var(--year-delay); cursor:pointer; outline:none; } .chart-year.is-active rect,.chart-year:focus-visible rect { stroke:#24312d; stroke-width:2px; } .chart-tooltip { position:absolute; z-index:2; top:60px; right:0; width:min(245px,calc(100% - 20px)); padding:11px 13px; border-radius:6px; background:#24312d; color:#fff; box-shadow:0 8px 24px rgba(36,49,45,.2); font-size:12px; } .chart-tooltip strong { display:block; font-size:14px; margin-bottom:5px; } .chart-tooltip div { display:flex; justify-content:space-between; gap:12px; } .chart-tooltip span { color:#dfe7e3; } .result-comparison { padding:16px 0; border-top:1px solid var(--line); } .result-comparison h3,.result-comparison summary { font-family:Georgia,serif; font-size:21px; } .result-table { min-width:0; font-size:13px; background:transparent; } .result-table th,.result-table td { padding:8px 5px; white-space:normal; } .result-table td { text-align:right; } .result-table .is-selected { background:#f1eee4; } @keyframes ret-year-in { to { opacity:1; transform:translateY(0); } }
     .text-button { width:auto; min-height:0; padding:0; border:0; border-radius:0; background:none; color:#245c4b; text-decoration:underline; cursor:pointer; font-size:13px; }
@@ -6155,13 +6176,14 @@ __UTILITY_CSS__
   __SITE_HEADER__
   <header class="calc-hero"><div class="gha-shell calc-shell">
     <p class="eyebrow">Retirement abroad calculator</p><h1>How Much Do You Need to Retire Abroad?</h1>
-    <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p><nav class="calc-modes" aria-label="Retirement calculator mode"><a href="/retirement-abroad-calculator/" aria-current="page">Plan for a destination</a><a href="/retirement-destination-finder/">Find destinations I can afford</a></nav>
+    <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">Choose your planning currency below. Destination data is normalized in today's USD before conversion.</p><nav class="calc-modes" aria-label="Retirement calculator mode"><a href="/retirement-abroad-calculator/" aria-current="page">Plan for a destination</a><a href="/retirement-destination-finder/">Find destinations I can afford</a></nav>
   </div></header>
   <main><div class="calc-shell">
     __QUICK_ANSWER__
     <section class="calculator-layout" aria-label="Retirement calculator">
       <form class="calc-panel" id="retirement-calculator" novalidate>
         <fieldset><legend>Your retirement</legend><div class="field-grid">
+          <div class="field planning-currency"><label for="ret-currency">Planning currency</label><select id="ret-currency"><option value="USD" selected>USD — US dollar</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — Pound sterling</option><option value="CAD">CAD — Canadian dollar</option><option value="AUD">AUD — Australian dollar</option><option value="CHF">CHF — Swiss franc</option><option value="JPY">JPY — Japanese yen</option><option value="HKD">HKD — Hong Kong dollar</option><option value="SGD">SGD — Singapore dollar</option></select><p class="hint" id="ret-currency-note">Reference rates dated 27 August 2026. This changes the presentation currency, not future currency-risk assumptions.</p></div>
           <div class="field"><label for="ret-current-age">Current age</label><input id="ret-current-age" type="number" min="18" max="99" value="50" required></div>
           <div class="field"><label for="ret-retirement-age">Planned retirement age</label><input id="ret-retirement-age" type="number" min="19" max="100" value="60" required></div>
           <div class="field"><label for="ret-household">Household</label><select id="ret-household"><option value="single">Single retiree</option><option value="couple" selected>Retired couple</option></select></div>
@@ -6180,7 +6202,7 @@ __UTILITY_CSS__
         <fieldset><legend>Income continuing after retirement (annual)</legend><p class="hint">Use after-tax amounts expected to continue in retirement. Do not include dividends from the portfolio being calculated.</p><div class="field-grid">
           <div class="field"><label for="ret-pension">Pension</label><input id="ret-pension" type="number" min="0" step="100" value="24000"><label class="check"><input id="ret-pension-indexed" type="checkbox" checked> Inflation-linked</label></div>
           <div class="field"><label for="ret-other-income">Other non-portfolio income</label><input id="ret-other-income" type="number" min="0" step="100" value="18000"><label class="check"><input id="ret-other-indexed" type="checkbox"> Inflation-linked</label></div>
-          <div class="field"><label for="ret-rental-income">Net rental income</label><input id="ret-rental-income" type="number" min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at $0 when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox"> Inflation-linked</label></div>
+          <div class="field"><label for="ret-rental-income">Net rental income</label><input id="ret-rental-income" type="number" min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at zero when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox"> Inflation-linked</label></div>
         </div></fieldset>
         <fieldset><legend>Portfolio assumption</legend>
           <label for="ret-expected-return">Expected annual portfolio return after fees (%)</label>
@@ -6227,7 +6249,7 @@ __UTILITY_CSS__
       </section>
     <section class="calc-panel current-cost-comparison" id="ret-current-cost-comparison" hidden aria-labelledby="ret-current-cost-heading">
       <h2 id="ret-current-cost-heading">Compare with where you live now</h2>
-      <p class="hint">Use your household's current monthly spending, including housing, in today's USD. This comparison does not change your retirement estimate.</p>
+      <p class="hint">Use your household's current monthly spending, including housing, in your selected planning currency. This comparison does not change your retirement estimate.</p>
       <div class="current-cost-layout">
         <div class="field-grid">
           <div class="field"><label for="ret-current-location">Current location <span class="optional-label">(optional)</span></label><input id="ret-current-location" type="text" autocomplete="address-level2" placeholder="For example, London"></div>

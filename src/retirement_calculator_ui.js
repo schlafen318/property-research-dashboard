@@ -5,11 +5,42 @@
 })(typeof window !== "undefined" ? window : null, function (root) {
   "use strict";
 
-  const money = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
+  function convertPlanningAmount(input) {
+    const rates = input.ratesToUsd || { USD: 1 };
+    const fromRate = Number(rates[input.fromCurrency]);
+    const toRate = Number(rates[input.toCurrency]);
+    const amount = Number(input.amount);
+    if (!Number.isFinite(amount) || !(fromRate > 0) || !(toRate > 0)) return null;
+    return amount * fromRate / toRate;
+  }
+
+  function formatPlanningMoney(input) {
+    const currency = input.currency || "USD";
+    const converted = convertPlanningAmount({
+      amount: input.amountUsd,
+      fromCurrency: "USD",
+      toCurrency: currency,
+      ratesToUsd: input.ratesToUsd || { USD: 1 },
+    });
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+      maximumFractionDigits: 0,
+    }).format(converted === null ? 0 : converted);
+  }
+
+  function convertPlanningControlAmount(input) {
+    const converted = convertPlanningAmount(input);
+    if (converted === null) return null;
+    const step = Number(input.step);
+    if (!(step > 0)) return Math.round(converted);
+    return Math.round(converted / step) * step;
+  }
+
+  function preferredPlanningCurrency(input) {
+    const rates = input.ratesToUsd || { USD: 1 };
+    return input.storedCurrency && rates[input.storedCurrency] ? input.storedCurrency : "USD";
+  }
 
   function annualSpendingFromMonthly(monthlySpending) {
     return Number(monthlySpending) * 12;
@@ -132,13 +163,19 @@
     ];
   }
 
-  function planningSummary(result) {
-    const investment = money.format(Number(result.investmentNeededToday));
-    const contribution = money.format(Number(result.monthlyContributionToday));
+  function planningSummary(input) {
+    const result = input && input.result ? input.result : input;
+    const currency = input && input.currency ? input.currency : "USD";
+    const ratesToUsd = input && input.ratesToUsd ? input.ratesToUsd : { USD: 1 };
+    const format = function (amountUsd) {
+      return formatPlanningMoney({ amountUsd: amountUsd, currency: currency, ratesToUsd: ratesToUsd });
+    };
+    const investment = format(Number(result.investmentNeededToday));
+    const contribution = format(Number(result.monthlyContributionToday));
     const home = Number(result.homePurchaseNeededToday);
     if (home > 0) {
       return "Invest " + investment + " today and " + contribution +
-        " per month for retirement, plus " + money.format(home) + " for the home purchase.";
+        " per month for retirement, plus " + format(home) + " for the home purchase.";
     }
     return "Invest " + investment + " today and " + contribution +
       " per month to fund this retirement plan.";
@@ -147,9 +184,16 @@
   function accumulationTooltipContent(input) {
     const point = input.point;
     const projectedAge = Number(input.currentAge) + Number(point.year);
-    const lumpSum = money.format(Number(point.lumpSumValue));
-    const contributions = money.format(Number(point.contributionValue));
-    const total = money.format(Number(point.totalValue));
+    const format = function (amountUsd) {
+      return formatPlanningMoney({
+        amountUsd: amountUsd,
+        currency: input.currency || "USD",
+        ratesToUsd: input.ratesToUsd || { USD: 1 },
+      });
+    };
+    const lumpSum = format(Number(point.lumpSumValue));
+    const contributions = format(Number(point.contributionValue));
+    const total = format(Number(point.totalValue));
     return {
       heading: "Year " + point.year + " · age " + projectedAge,
       lumpSum: lumpSum,
@@ -253,6 +297,34 @@
     const el = function (id) { return document.getElementById(id); };
     const number = function (id) { return Number(el(id).value); };
     const rate = function (id) { return number(id) / 100; };
+    const currencyConfig = payload.planning_currencies || { as_of: "", rates_to_usd: { USD: 1 } };
+    const ratesToUsd = currencyConfig.rates_to_usd || { USD: 1 };
+    let storedCurrency = "";
+    try {
+      storedCurrency = root.localStorage && root.localStorage.getItem("gha_planning_currency") || "";
+    } catch (error) {}
+    const initialCurrency = preferredPlanningCurrency({ storedCurrency: storedCurrency, ratesToUsd: ratesToUsd });
+    let selectedCurrency = "USD";
+    const displayMoney = function (amountUsd) {
+      return formatPlanningMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
+    };
+    const toUsd = function (amount, currency) {
+      return convertPlanningAmount({
+        amount: amount,
+        fromCurrency: currency || selectedCurrency,
+        toCurrency: "USD",
+        ratesToUsd: ratesToUsd,
+      });
+    };
+    const fromUsd = function (amountUsd, currency) {
+      return convertPlanningAmount({
+        amount: amountUsd,
+        fromCurrency: "USD",
+        toCurrency: currency || selectedCurrency,
+        ratesToUsd: ratesToUsd,
+      });
+    };
+    const moneyNumber = function (id) { return Number(toUsd(number(id)) || 0); };
     let benchmarkValue = 0;
     let autoCalculationTimer = null;
     let hasTrackedResult = false;
@@ -272,6 +344,7 @@
       });
       if (match) control.value = entry[1];
     });
+    el("ret-currency").value = selectedCurrency;
 
     function selectedRecord() {
       return byId[el("ret-destination").value];
@@ -284,7 +357,7 @@
       const plan = el("ret-housing-plan").value;
       const expenseLabels = housingExpenseLabels(plan);
       benchmarkValue = annualBenchmark({ profile: profile, plan: plan });
-      el("ret-monthly-spending").value = String(Math.round(benchmarkValue / 12));
+      el("ret-monthly-spending").value = String(Math.round(fromUsd(benchmarkValue / 12)));
       el("ret-monthly-spending-label").textContent = expenseLabels.input;
       el("ret-first-expenses-label").textContent = expenseLabels.result;
       el("ret-housing-guidance").textContent = housingGuidance(plan);
@@ -298,7 +371,7 @@
           : "No acquisition-cost allowance is included. Add a buyer-specific closing-cost estimate before relying on the total."
       );
       if (resetPropertyBudget) {
-        el("ret-property-budget").value = String(Math.round(Number(record.property.representative_price_usd)));
+        el("ret-property-budget").value = String(Math.round(fromUsd(Number(record.property.representative_price_usd))));
       }
       el("ret-general-inflation").value = String(record.inflation.general * 100);
       el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
@@ -317,7 +390,7 @@
       });
       const maximum = rows.length ? rows[rows.length - 1].monthlyCost : 1;
       const currentId = el("ret-destination").value;
-      context.textContent = el("ret-household").selectedOptions[0].textContent + " · Monthly USD " +
+      context.textContent = el("ret-household").selectedOptions[0].textContent + " · Monthly " + selectedCurrency + " " +
         (plan === "rent" ? "including rent" : "including owner running costs");
       chart.replaceChildren();
       rows.forEach(function (row, index) {
@@ -330,7 +403,7 @@
         button.type = "button";
         button.className = "cost-row";
         button.dataset.destinationId = row.destinationId;
-        button.setAttribute("aria-label", "Select " + row.name + ", " + money.format(row.monthlyCost) +
+        button.setAttribute("aria-label", "Select " + row.name + ", " + displayMoney(row.monthlyCost) +
           " per month, rank " + (index + 1) + " of " + rows.length);
         if (row.destinationId === currentId) {
           button.classList.add("is-current");
@@ -338,7 +411,7 @@
         }
         heading.className = "cost-row-heading";
         name.textContent = (index + 1) + ". " + row.name;
-        amount.textContent = money.format(row.monthlyCost) + "/mo";
+        amount.textContent = displayMoney(row.monthlyCost) + "/mo";
         track.className = "cost-bar-track";
         track.setAttribute("aria-hidden", "true");
         fill.className = "cost-bar-fill";
@@ -385,7 +458,7 @@
       const healthcareRate = rate("ret-healthcare-inflation");
       const propertyRate = rate("ret-property-inflation");
       const monthlySpending = monthlySpendingOverride === undefined
-        ? number("ret-monthly-spending")
+        ? moneyNumber("ret-monthly-spending")
         : Number(monthlySpendingOverride);
       const annualSpending = annualSpendingFromMonthly(monthlySpending);
       const scale = benchmarkValue > 0 ? annualSpending / benchmarkValue : 1;
@@ -415,24 +488,24 @@
         horizonYears: number("ret-horizon"),
         expenseCategories: expenseCategories(record, profile, plan, monthlySpendingOverride),
         incomeStreams: [
-          { amount: number("ret-pension"), indexed: el("ret-pension-indexed").checked, inflationRate: generalRate },
-          { amount: number("ret-other-income"), indexed: el("ret-other-indexed").checked, inflationRate: generalRate },
-          { amount: number("ret-rental-income"), indexed: el("ret-rental-indexed").checked, inflationRate: generalRate },
+          { amount: moneyNumber("ret-pension"), indexed: el("ret-pension-indexed").checked, inflationRate: generalRate },
+          { amount: moneyNumber("ret-other-income"), indexed: el("ret-other-indexed").checked, inflationRate: generalRate },
+          { amount: moneyNumber("ret-rental-income"), indexed: el("ret-rental-indexed").checked, inflationRate: generalRate },
         ],
         housingPlan: plan,
-        propertyPrice: number("ret-property-budget"),
+        propertyPrice: moneyNumber("ret-property-budget"),
         propertyInflation: rate("ret-property-inflation"),
         acquisitionCostRate: Number(record.property.acquisition_cost_rate),
         generalInflation: generalRate,
         emergencyReserveMonths: number("ret-reserve-months"),
         expectedPortfolioReturn: rate("ret-expected-return"),
-        monthlyIncomeBeforeRetirement: number("ret-monthly-income"),
+        monthlyIncomeBeforeRetirement: moneyNumber("ret-monthly-income"),
         incomeInvestedRate: rate("ret-income-invested-rate"),
       };
     }
 
     function setMoney(id, value) {
-      el(id).textContent = money.format(value);
+      el(id).textContent = displayMoney(value);
     }
 
     function horizonBand(years) {
@@ -460,10 +533,10 @@
       const result = el("ret-current-cost-result");
       const destination = selectedRecord();
       const retirementResult = resultOverride || latestResult;
-      const currentMonthly = number("ret-current-monthly-spending");
+      const currentMonthly = moneyNumber("ret-current-monthly-spending");
       const comparison = currentCostComparison({
         currentMonthly: currentMonthly,
-        destinationMonthly: number("ret-monthly-spending"),
+        destinationMonthly: moneyNumber("ret-monthly-spending"),
       });
       section.hidden = false;
       if (!comparison || !destination || !retirementResult) {
@@ -477,8 +550,8 @@
       el("ret-current-cost-destination-label").textContent = destinationLabel;
       el("ret-current-target-label").textContent = currentLabel;
       el("ret-destination-target-label").textContent = destinationLabel;
-      setMoney("ret-current-cost-amount", number("ret-current-monthly-spending"));
-      setMoney("ret-current-cost-destination-amount", number("ret-monthly-spending"));
+      setMoney("ret-current-cost-amount", moneyNumber("ret-current-monthly-spending"));
+      setMoney("ret-current-cost-destination-amount", moneyNumber("ret-monthly-spending"));
       el("ret-current-cost-bar").style.width = comparison.currentBarPercent.toFixed(1) + "%";
       el("ret-current-cost-destination-bar").style.width = comparison.destinationBarPercent.toFixed(1) + "%";
       const currentRetirementResult = engine.calculateRetirement(calculatorInput(undefined, currentMonthly));
@@ -494,18 +567,18 @@
         el("ret-current-cost-annual").textContent = "No modeled annual difference at these spending levels.";
       } else {
         el("ret-current-cost-summary").textContent = destinationLabel + " is " +
-          money.format(comparison.monthlyDifference) + " " +
+          displayMoney(comparison.monthlyDifference) + " " +
           (comparison.direction === "lower" ? "less" : "more") + " per month (" +
           comparison.percentDifference + "% " + comparison.direction + ") than " + currentLabel + ".";
         el("ret-current-cost-annual").textContent = "That is about " +
-          money.format(comparison.annualDifference) + " " +
+          displayMoney(comparison.annualDifference) + " " +
           (comparison.direction === "lower" ? "less" : "more") + " per year.";
       }
       if (targets.direction === "same") {
         el("ret-target-difference").textContent = "The modeled retirement funding targets are about the same.";
       } else {
         el("ret-target-difference").textContent = "The destination target is " +
-          money.format(targets.targetDifference) + " " +
+          displayMoney(targets.targetDifference) + " " +
           (targets.direction === "lower" ? "lower" : "higher") +
           (targets.percentDifference === null ? "." : " (" + targets.percentDifference + "%).");
       }
@@ -520,7 +593,11 @@
       const record = selectedRecord();
       latestResult = result;
       el("ret-detailed-projection").hidden = false;
-      el("ret-plan-summary").textContent = planningSummary(result);
+      el("ret-plan-summary").textContent = planningSummary({
+        result: result,
+        currency: selectedCurrency,
+        ratesToUsd: ratesToUsd,
+      });
       setMoney("ret-total-today", result.totalNeededToday);
       setMoney("ret-invest-today", result.investmentNeededToday);
       setMoney("ret-home-today", result.homePurchaseNeededToday);
@@ -578,7 +655,7 @@
       name.scope = "row";
       name.textContent = label;
       rateCell.textContent = rateLabel;
-      valueCell.textContent = money.format(value);
+      valueCell.textContent = displayMoney(value);
       if (isSelected) row.className = "is-selected";
       row.append(name, rateCell, valueCell);
       container.appendChild(row);
@@ -621,8 +698,8 @@
         const retirement = document.createElement("td");
         name.scope = "row";
         name.textContent = plan.label;
-        today.textContent = money.format(result.totalNeededToday);
-        retirement.textContent = money.format(result.totalCapitalAtRetirement);
+        today.textContent = displayMoney(result.totalNeededToday);
+        retirement.textContent = displayMoney(result.totalCapitalAtRetirement);
         if (plan.value === selectedPlan) row.className = "is-selected";
         row.append(name, today, retirement);
         container.appendChild(row);
@@ -654,7 +731,12 @@
         const yearLabel = index % labelEvery === 0 || index === count - 1
           ? '<text class="chart-axis-label" x="' + (left + index * step) + '" y="278" text-anchor="middle">' + label + '</text>'
           : "";
-        const tooltipContent = accumulationTooltipContent({ currentAge: currentAge, point: point });
+        const tooltipContent = accumulationTooltipContent({
+          currentAge: currentAge,
+          point: point,
+          currency: selectedCurrency,
+          ratesToUsd: ratesToUsd,
+        });
         return '<g class="chart-year" tabindex="0" role="button" data-year-index="' + index + '" aria-label="' + tooltipContent.accessibleLabel + '" style="--year-delay:' + Math.round(index * delayStep) + 'ms">' +
           '<rect class="chart-lump" x="' + x.toFixed(2) + '" y="' + lumpY.toFixed(2) + '" width="' + barWidth.toFixed(2) + '" height="' + point.lumpHeight.toFixed(2) + '"></rect>' +
           '<rect class="chart-contribution" x="' + x.toFixed(2) + '" y="' + contributionY.toFixed(2) + '" width="' + barWidth.toFixed(2) + '" height="' + point.contributionHeight.toFixed(2) + '"></rect>' +
@@ -666,7 +748,7 @@
       targetLine.setAttribute("y1", model.targetY.toFixed(2));
       targetLine.setAttribute("y2", model.targetY.toFixed(2));
       targetLabel.setAttribute("y", Math.max(14, model.targetY - 6).toFixed(2));
-      targetLabel.textContent = "Target " + money.format(targetValue);
+      targetLabel.textContent = "Target " + displayMoney(targetValue);
       barsLayer.innerHTML = '<line class="chart-axis" x1="22" y1="258" x2="618" y2="258"></line>' + bars;
       const yearGroups = Array.from(barsLayer.querySelectorAll(".chart-year"));
       function showTooltip(group) {
@@ -674,6 +756,8 @@
         const content = accumulationTooltipContent({
           currentAge: currentAge,
           point: model.years[Number(group.dataset.yearIndex)],
+          currency: selectedCurrency,
+          ratesToUsd: ratesToUsd,
         });
         el("ret-tooltip-heading").textContent = content.heading;
         el("ret-tooltip-lump").textContent = content.lumpSum;
@@ -694,8 +778,8 @@
         group.addEventListener("click", function () { showTooltip(group); });
       });
       description.textContent = "Annual portfolio progression from now to retirement, split between the lump sum invested today and inflation-adjusted monthly contributions.";
-      caption.textContent = "At retirement: " + money.format(finalPoint.lumpSumValue) +
-        " from today's lump sum and growth, plus " + money.format(finalPoint.contributionValue) +
+      caption.textContent = "At retirement: " + displayMoney(finalPoint.lumpSumValue) +
+        " from today's lump sum and growth, plus " + displayMoney(finalPoint.contributionValue) +
         " from monthly contributions and growth.";
       figure.hidden = false;
     }
@@ -728,7 +812,39 @@
 
     function updateMonthlyInvestmentPreview() {
       el("ret-monthly-investment-preview").textContent =
-        "Monthly contribution: " + money.format(number("ret-monthly-income") * rate("ret-income-invested-rate"));
+        "Monthly contribution: " + displayMoney(moneyNumber("ret-monthly-income") * rate("ret-income-invested-rate"));
+    }
+
+    function changePlanningCurrency(nextCurrency, shouldTrack) {
+      if (!ratesToUsd[nextCurrency] || nextCurrency === selectedCurrency) return;
+      const previousCurrency = selectedCurrency;
+      [
+        "ret-monthly-spending",
+        "ret-property-budget",
+        "ret-monthly-income",
+        "ret-pension",
+        "ret-other-income",
+        "ret-rental-income",
+        "ret-current-monthly-spending",
+      ].forEach(function (id) {
+        const control = el(id);
+        if (!control || control.value === "") return;
+        const converted = convertPlanningControlAmount({
+          amount: Number(control.value),
+          fromCurrency: previousCurrency,
+          toCurrency: nextCurrency,
+          ratesToUsd: ratesToUsd,
+          step: control.step,
+        });
+        if (converted !== null) control.value = String(converted);
+      });
+      selectedCurrency = nextCurrency;
+      try {
+        if (root.localStorage) root.localStorage.setItem("gha_planning_currency", selectedCurrency);
+      } catch (error) {}
+      updateMonthlyInvestmentPreview();
+      if (latestResult) render(latestResult);
+      if (shouldTrack !== false) track("retirement_calculator_currency_change");
     }
 
     function scheduleCalculation() {
@@ -743,6 +859,9 @@
         syncDestinationDefaults(id === "ret-destination");
         if (id === "ret-destination") track("retirement_calculator_destination_change");
       });
+    });
+    el("ret-currency").addEventListener("change", function () {
+      changePlanningCurrency(el("ret-currency").value, true);
     });
     form.addEventListener("submit", calculate);
     form.addEventListener("input", scheduleCalculation);
@@ -760,6 +879,10 @@
       el(id).addEventListener("input", function () { renderCurrentCostComparison(); });
     });
     syncDestinationDefaults(true);
+    if (initialCurrency !== "USD") {
+      el("ret-currency").value = initialCurrency;
+      changePlanningCurrency(initialCurrency, false);
+    }
     updateMonthlyInvestmentPreview();
     initDestinationCostSidecar();
     track("retirement_calculator_open");
@@ -778,6 +901,10 @@
   }
 
   return {
+    convertPlanningAmount: convertPlanningAmount,
+    convertPlanningControlAmount: convertPlanningControlAmount,
+    preferredPlanningCurrency: preferredPlanningCurrency,
+    formatPlanningMoney: formatPlanningMoney,
     annualSpendingFromMonthly: annualSpendingFromMonthly,
     illustrativeReturnExample: illustrativeReturnExample,
     currentCostComparison: currentCostComparison,
