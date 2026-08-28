@@ -10,7 +10,7 @@ EXPECTED_PRIMARY_LINKS = [
     ("/", "Global Home Atlas"),
     ("/find-your-fit/", "Find your fit"),
     ("/dashboard/", "Destinations"),
-    ("/guides/#country-selection", "Countries"),
+    ("/countries/", "Countries"),
     ("/guides/", "Guides"),
     ("/methodology/", "Methodology"),
 ]
