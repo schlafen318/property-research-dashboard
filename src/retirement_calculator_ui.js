@@ -15,6 +15,10 @@
     return Number(monthlySpending) * 12;
   }
 
+  function illustrativeReturnExample() {
+    return 4;
+  }
+
   function currentCostComparison(input) {
     const currentMonthly = Number(input.currentMonthly);
     const destinationMonthly = Number(input.destinationMonthly);
@@ -743,6 +747,11 @@
     form.addEventListener("submit", calculate);
     form.addEventListener("input", scheduleCalculation);
     form.addEventListener("change", scheduleCalculation);
+    el("ret-example-return").addEventListener("click", function () {
+      el("ret-expected-return").value = String(illustrativeReturnExample());
+      scheduleCalculation();
+      track("retirement_calculator_example_return");
+    });
     el("ret-save-intent-button").addEventListener("click", function () {
       el("ret-save-intent-button").hidden = true;
       el("ret-save-intent-status").hidden = false;
@@ -770,6 +779,7 @@
 
   return {
     annualSpendingFromMonthly: annualSpendingFromMonthly,
+    illustrativeReturnExample: illustrativeReturnExample,
     currentCostComparison: currentCostComparison,
     retirementTargetComparison: retirementTargetComparison,
     annualBenchmark: annualBenchmark,

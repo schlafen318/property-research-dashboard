@@ -49,12 +49,50 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             '<link rel="canonical" href="https://globalhomeatlas.com/retirement-abroad-calculator/">',
             self.html,
         )
-        self.assertIn("<h1>Retirement Abroad Calculator</h1>", self.html)
+        self.assertIn("<h1>How Much Do You Need to Retire Abroad?</h1>", self.html)
         self.assertIn('"@type":"WebApplication"', self.compact_html)
         self.assertIn('"@type":"FAQPage"', self.compact_html)
         self.assertIn("Fukuoka / Itoshima", self.html)
         self.assertIn("Málaga / Costa del Sol", self.html)
         self.assertIn("Portfolio dividends and interest", self.html)
+
+    def test_page_leads_with_search_answer_and_compact_destination_benchmark(self) -> None:
+        self.assertIn("<h1>How Much Do You Need to Retire Abroad?</h1>", self.html)
+        self.assertIn('id="ret-quick-answer"', self.html)
+        quick_answer = self.html.split('id="ret-quick-answer"', 1)[1].split("</section>", 1)[0]
+        self.assertIn("couple renting", quick_answer)
+        self.assertIn("single retiree", quick_answer)
+        self.assertEqual(4, quick_answer.count('class="quick-benchmark-row"'))
+        benchmark_destinations = re.findall(
+            r'class="quick-benchmark-row".*?<a[^>]*>(.*?)</a>',
+            quick_answer,
+            re.DOTALL,
+        )
+        self.assertEqual(4, len(set(benchmark_destinations)))
+        self.assertIn("3.5% withdrawal rate", quick_answer)
+        self.assertIn('/retirement-destinations-ranked-by-cost/', quick_answer)
+
+    def test_page_exposes_authorship_review_methodology_sources_and_exclusions(self) -> None:
+        self.assertIn('id="ret-trust"', self.html)
+        trust = self.html.split('id="ret-trust"', 1)[1].split("</section>", 1)[0]
+        self.assertIn("Global Home Atlas Research Team", trust)
+        self.assertIn("Data reviewed", trust)
+        self.assertIn("Tax, visa eligibility, currency shocks", trust)
+        self.assertIn('href="/methodology/"', trust)
+        self.assertIn("Destination cost sources", trust)
+        self.assertIn('rel="nofollow noopener"', trust)
+
+    def test_free_web_application_schema_includes_required_offer(self) -> None:
+        self.assertIn(
+            '"offers":{"@type":"Offer","price":"0","priceCurrency":"USD"}',
+            self.compact_html,
+        )
+
+    def test_return_assumption_offers_a_disclosed_illustrative_example(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        self.assertIn('id="ret-example-return" type="button"', form)
+        self.assertIn("Use an illustrative 4% example", form)
+        self.assertIn("not a forecast or recommendation", form)
 
     def test_form_controls_are_labeled_and_results_are_accessible(self) -> None:
         parser = CalculatorMarkupParser()
