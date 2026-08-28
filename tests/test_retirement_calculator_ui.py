@@ -84,9 +84,23 @@ class RetirementCalculatorUITests(unittest.TestCase):
             ),
         )
 
-    def test_saved_planning_currency_is_used_only_when_supported(self) -> None:
+    def test_invalid_money_amount_is_not_converted_to_zero(self) -> None:
+        self.assertIsNone(
+            run_ui(
+                "convertPlanningControlAmount",
+                {
+                    "amount": None,
+                    "fromCurrency": "USD",
+                    "toCurrency": "EUR",
+                    "step": 100,
+                    "ratesToUsd": {"USD": 1, "EUR": 1.1645},
+                },
+            )
+        )
+
+    def test_saved_planning_currency_never_overrides_the_usd_default(self) -> None:
         self.assertEqual(
-            "SGD",
+            "USD",
             run_ui(
                 "preferredPlanningCurrency",
                 {"storedCurrency": "SGD", "ratesToUsd": {"USD": 1, "SGD": 0.7866}},
@@ -98,6 +112,24 @@ class RetirementCalculatorUITests(unittest.TestCase):
                 "preferredPlanningCurrency",
                 {"storedCurrency": "BTC", "ratesToUsd": {"USD": 1, "SGD": 0.7866}},
             ),
+        )
+
+    def test_money_inputs_parse_and_display_thousands_separators(self) -> None:
+        self.assertEqual(2_000_000, run_ui("parseMoneyInput", "2,000,000"))
+        self.assertEqual(36_319, run_ui("parseMoneyInput", " 36,319 "))
+        self.assertIsNone(run_ui("parseMoneyInput", "36,3x9"))
+        self.assertEqual("2,000,000", run_ui("formatMoneyInputValue", 2_000_000))
+        self.assertEqual("36,319", run_ui("formatMoneyInputValue", "36319"))
+
+    def test_money_input_validation_preserves_minimum_and_step_rules(self) -> None:
+        self.assertFalse(
+            run_ui("isInvalidMoneyInput", {"value": "24,000", "min": 0, "step": 100})
+        )
+        self.assertTrue(
+            run_ui("isInvalidMoneyInput", {"value": "24,050", "min": 0, "step": 100})
+        )
+        self.assertTrue(
+            run_ui("isInvalidMoneyInput", {"value": "24x000", "min": 0, "step": 100})
         )
 
     def test_illustrative_return_example_is_disclosed_and_trackable(self) -> None:

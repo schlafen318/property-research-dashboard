@@ -9,6 +9,7 @@
     const rates = input.ratesToUsd || { USD: 1 };
     const fromRate = Number(rates[input.fromCurrency]);
     const toRate = Number(rates[input.toCurrency]);
+    if (input.amount === null || input.amount === undefined || input.amount === "") return null;
     const amount = Number(input.amount);
     if (!Number.isFinite(amount) || !(fromRate > 0) || !(toRate > 0)) return null;
     return amount * fromRate / toRate;
@@ -37,9 +38,39 @@
     return Math.round(converted / step) * step;
   }
 
-  function preferredPlanningCurrency(input) {
-    const rates = input.ratesToUsd || { USD: 1 };
-    return input.storedCurrency && rates[input.storedCurrency] ? input.storedCurrency : "USD";
+  function preferredPlanningCurrency() {
+    return "USD";
+  }
+
+  function parseMoneyInput(value) {
+    const normalized = String(value === null || value === undefined ? "" : value)
+      .trim()
+      .replace(/,/g, "");
+    if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
+    const amount = Number(normalized);
+    return Number.isFinite(amount) ? amount : null;
+  }
+
+  function formatMoneyInputValue(value) {
+    const amount = typeof value === "number" ? value : parseMoneyInput(value);
+    if (!Number.isFinite(amount)) return "";
+    return new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: 2,
+    }).format(amount);
+  }
+
+  function isInvalidMoneyInput(input) {
+    const amount = parseMoneyInput(input.value);
+    if (amount === null) return true;
+    const minimum = input.min === "" || input.min === null || input.min === undefined
+      ? null
+      : Number(input.min);
+    if (minimum !== null && amount < minimum) return true;
+    const step = Number(input.step);
+    if (!(step > 0)) return false;
+    const base = minimum === null ? 0 : minimum;
+    const steps = (amount - base) / step;
+    return Math.abs(steps - Math.round(steps)) > 1e-9;
   }
 
   function annualSpendingFromMonthly(monthlySpending) {
@@ -299,11 +330,7 @@
     const rate = function (id) { return number(id) / 100; };
     const currencyConfig = payload.planning_currencies || { as_of: "", rates_to_usd: { USD: 1 } };
     const ratesToUsd = currencyConfig.rates_to_usd || { USD: 1 };
-    let storedCurrency = "";
-    try {
-      storedCurrency = root.localStorage && root.localStorage.getItem("gha_planning_currency") || "";
-    } catch (error) {}
-    const initialCurrency = preferredPlanningCurrency({ storedCurrency: storedCurrency, ratesToUsd: ratesToUsd });
+    const initialCurrency = preferredPlanningCurrency();
     let selectedCurrency = "USD";
     const displayMoney = function (amountUsd) {
       return formatPlanningMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
@@ -324,7 +351,40 @@
         ratesToUsd: ratesToUsd,
       });
     };
-    const moneyNumber = function (id) { return Number(toUsd(number(id)) || 0); };
+    const moneyNumber = function (id) {
+      const amount = parseMoneyInput(el(id).value);
+      return Number(toUsd(amount === null ? 0 : amount) || 0);
+    };
+    const moneyControlIds = [
+      "ret-monthly-spending",
+      "ret-property-budget",
+      "ret-monthly-income",
+      "ret-pension",
+      "ret-other-income",
+      "ret-rental-income",
+      "ret-current-monthly-spending",
+    ];
+    const formatMoneyControl = function (control) {
+      if (!control || control.value === "") return;
+      const amount = parseMoneyInput(control.value);
+      if (amount !== null) control.value = formatMoneyInputValue(amount);
+    };
+    const validateMoneyControl = function (control) {
+      if (control.disabled) {
+        control.setCustomValidity("");
+        control.removeAttribute("aria-invalid");
+        return false;
+      }
+      const invalid = isInvalidMoneyInput({
+        value: control.value,
+        min: control.min,
+        step: control.step,
+      });
+      control.setCustomValidity(invalid ? "Enter a valid amount." : "");
+      if (invalid) control.setAttribute("aria-invalid", "true");
+      else control.removeAttribute("aria-invalid");
+      return invalid;
+    };
     let benchmarkValue = 0;
     let autoCalculationTimer = null;
     let hasTrackedResult = false;
@@ -357,7 +417,7 @@
       const plan = el("ret-housing-plan").value;
       const expenseLabels = housingExpenseLabels(plan);
       benchmarkValue = annualBenchmark({ profile: profile, plan: plan });
-      el("ret-monthly-spending").value = String(Math.round(fromUsd(benchmarkValue / 12)));
+      el("ret-monthly-spending").value = formatMoneyInputValue(Math.round(fromUsd(benchmarkValue / 12)));
       el("ret-monthly-spending-label").textContent = expenseLabels.input;
       el("ret-first-expenses-label").textContent = expenseLabels.result;
       el("ret-housing-guidance").textContent = housingGuidance(plan);
@@ -371,7 +431,9 @@
           : "No acquisition-cost allowance is included. Add a buyer-specific closing-cost estimate before relying on the total."
       );
       if (resetPropertyBudget) {
-        el("ret-property-budget").value = String(Math.round(fromUsd(Number(record.property.representative_price_usd))));
+        el("ret-property-budget").value = formatMoneyInputValue(
+          Math.round(fromUsd(Number(record.property.representative_price_usd)))
+        );
       }
       el("ret-general-inflation").value = String(record.inflation.general * 100);
       el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
@@ -786,7 +848,11 @@
 
     function firstInvalidField() {
       const controls = Array.from(form.querySelectorAll("input[type=number]"));
-      return controls.find(isInvalidNumericControl);
+      const invalidNumber = controls.find(isInvalidNumericControl);
+      if (invalidNumber) return invalidNumber;
+      return Array.from(form.querySelectorAll("input[data-money]")).find(function (control) {
+        return validateMoneyControl(control);
+      });
     }
 
     function calculate(event) {
@@ -818,30 +884,24 @@
     function changePlanningCurrency(nextCurrency, shouldTrack) {
       if (!ratesToUsd[nextCurrency] || nextCurrency === selectedCurrency) return;
       const previousCurrency = selectedCurrency;
-      [
-        "ret-monthly-spending",
-        "ret-property-budget",
-        "ret-monthly-income",
-        "ret-pension",
-        "ret-other-income",
-        "ret-rental-income",
-        "ret-current-monthly-spending",
-      ].forEach(function (id) {
+      moneyControlIds.forEach(function (id) {
         const control = el(id);
         if (!control || control.value === "") return;
+        const amount = parseMoneyInput(control.value);
+        if (amount === null) return;
         const converted = convertPlanningControlAmount({
-          amount: Number(control.value),
+          amount: amount,
           fromCurrency: previousCurrency,
           toCurrency: nextCurrency,
           ratesToUsd: ratesToUsd,
           step: control.step,
         });
-        if (converted !== null) control.value = String(converted);
+        if (converted !== null) {
+          control.value = formatMoneyInputValue(converted);
+          validateMoneyControl(control);
+        }
       });
       selectedCurrency = nextCurrency;
-      try {
-        if (root.localStorage) root.localStorage.setItem("gha_planning_currency", selectedCurrency);
-      } catch (error) {}
       updateMonthlyInvestmentPreview();
       if (latestResult) render(latestResult);
       if (shouldTrack !== false) track("retirement_calculator_currency_change");
@@ -866,6 +926,15 @@
     form.addEventListener("submit", calculate);
     form.addEventListener("input", scheduleCalculation);
     form.addEventListener("change", scheduleCalculation);
+    moneyControlIds.forEach(function (id) {
+      const control = el(id);
+      if (!control) return;
+      control.addEventListener("input", function () { validateMoneyControl(control); });
+      control.addEventListener("blur", function () {
+        formatMoneyControl(control);
+        validateMoneyControl(control);
+      });
+    });
     el("ret-example-return").addEventListener("click", function () {
       el("ret-expected-return").value = String(illustrativeReturnExample());
       scheduleCalculation();
@@ -904,6 +973,9 @@
     convertPlanningAmount: convertPlanningAmount,
     convertPlanningControlAmount: convertPlanningControlAmount,
     preferredPlanningCurrency: preferredPlanningCurrency,
+    parseMoneyInput: parseMoneyInput,
+    formatMoneyInputValue: formatMoneyInputValue,
+    isInvalidMoneyInput: isInvalidMoneyInput,
     formatPlanningMoney: formatPlanningMoney,
     annualSpendingFromMonthly: annualSpendingFromMonthly,
     illustrativeReturnExample: illustrativeReturnExample,
