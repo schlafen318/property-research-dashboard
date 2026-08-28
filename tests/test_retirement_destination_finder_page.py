@@ -66,6 +66,20 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("text-decoration: none", design_css)
         self.assertIn("box-shadow: inset 0 -2px 0 var(--gha-accent)", design_css)
 
+    def test_finder_uses_the_landing_page_left_grid_without_overstretching_content(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+        self.assertIn(
+            ".retirement-finder-page .gha-shell, .retirement-finder-page .page-shell",
+            design_css,
+        )
+        self.assertIn("width: min(1220px, calc(100% - 48px))", design_css)
+        self.assertIn(
+            ".retirement-finder-page .finder-form, .retirement-finder-page .finder-results, .retirement-finder-page .finder-editorial",
+            design_css,
+        )
+        self.assertIn("max-width: 960px", design_css)
+
     def test_form_uses_top_down_human_reading_order(self) -> None:
         ordered_ids = [
             'id="finder-current-resources"',
