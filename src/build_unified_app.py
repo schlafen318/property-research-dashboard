@@ -1993,9 +1993,14 @@ def country_next_step_html(hub: dict, selected: list[dict], pages: list[dict]) -
 
 
 def guide_links_for_destination(dest: dict, pages: list[dict], limit: int = 5) -> str:
+    country_hub = country_hub_for_destination(dest)
+    country_retirement_slug = country_retirement_guide_slug(country_hub) if country_hub else None
     matches = []
     for page in pages:
-        if dest["id"] in page.get("destination_ids", []):
+        if (
+            dest["id"] in page.get("destination_ids", [])
+            and page.get("slug") != country_retirement_slug
+        ):
             matches.append(page)
     if not matches:
         matches = pages[:limit]
@@ -3231,6 +3236,74 @@ def country_retirement_guide_slug(hub: dict) -> str | None:
         ),
         None,
     )
+
+
+def country_hub_for_retirement_guide(page: dict) -> dict | None:
+    return next(
+        (
+            hub
+            for hub in COUNTRY_HUBS
+            if country_retirement_guide_slug(hub) == page.get("slug")
+        ),
+        None,
+    )
+
+
+def national_guide_links_for_hub(hub: dict | None) -> str:
+    if not hub:
+        return ""
+    links = [
+        f'<a href="/countries/{escape(hub["slug"])}/">Buying property in {escape(hub["country"])}</a>'
+    ]
+    retirement_slug = country_retirement_guide_slug(hub)
+    if retirement_slug:
+        links.append(
+            f'<a href="/{escape(retirement_slug)}/">Retiring in {escape(hub["country"])}</a>'
+        )
+    return "\n".join(links)
+
+
+def national_guide_sentence_for_hub(hub: dict | None) -> str:
+    if not hub:
+        return "the country guide"
+    links = [
+        f'<a href="/countries/{escape(hub["slug"])}/">buying property in {escape(hub["country"])}</a>'
+    ]
+    retirement_slug = country_retirement_guide_slug(hub)
+    if retirement_slug:
+        links.append(
+            f'<a href="/{escape(retirement_slug)}/">retiring in {escape(hub["country"])}</a>'
+        )
+    return " and ".join(links)
+
+
+def country_research_links_for_retirement_guide(
+    page: dict, destinations: list[dict], *, include_acquisition: bool = True
+) -> str:
+    hub = country_hub_for_retirement_guide(page)
+    if not hub:
+        return ""
+    destination_by_id = {item["id"]: item for item in destinations}
+    destination_links = "\n".join(
+        f'<a href="/destinations/{escape(destination_slug(destination_by_id[item_id]))}/">'
+        f'{escape(destination_by_id[item_id]["name"])}</a>'
+        for item_id in hub.get("destination_ids", [])
+        if item_id in destination_by_id
+    )
+    acquisition_link = (
+        f'<a href="/countries/{escape(hub["slug"])}/">Buying property in {escape(hub["country"])}</a>'
+        if include_acquisition
+        else ""
+    )
+    return f'''
+          <section class="editorial-guide-rail__country-links">
+            <h2>Country research</h2>
+            <nav aria-label="{escape(hub["country"])} country research">
+              {acquisition_link}
+              {destination_links}
+            </nav>
+          </section>
+    '''
 
 
 def schema_for_country_guides_hub(canonical: str) -> list[dict]:
@@ -7427,6 +7500,21 @@ def build_seo_page(
         if is_spain_article or is_portugal_article or is_structured_article
         else "seo-page"
     )
+    retirement_country_hub = country_hub_for_retirement_guide(page)
+    acquisition_href = (
+        f'href="/countries/{retirement_country_hub["slug"]}/"'
+        if retirement_country_hub
+        else ""
+    )
+    editorial_country_research = (
+        country_research_links_for_retirement_guide(
+            page,
+            destinations,
+            include_acquisition=not acquisition_href or acquisition_href not in overview_html,
+        )
+        if is_editorial_article
+        else ""
+    )
     editorial_hero_visual = (
         destination_editorial_figure_html(
             {
@@ -7484,6 +7572,7 @@ def build_seo_page(
             <p>Compare Japan with every destination in the Atlas.</p>
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
           </div>
+          {editorial_country_research}
           <p class="japan-guide-rail__note">Research inputs only. Verify current legal, tax and immigration rules locally.</p>
         </aside>
     '''
@@ -7505,6 +7594,7 @@ def build_seo_page(
             <p>Compare Spain with every destination in the Atlas.</p>
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
           </div>
+          {editorial_country_research}
           <p class="editorial-guide-rail__note">Research inputs only. Verify current legal, tax and immigration rules locally.</p>
         </aside>
     '''
@@ -7526,6 +7616,7 @@ def build_seo_page(
             <p>Compare Portugal with every destination in the Atlas.</p>
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
           </div>
+          {editorial_country_research}
           <p class="editorial-guide-rail__note">Verify current residence, legal and tax rules for your circumstances before acting.</p>
         </aside>
     '''
@@ -7551,6 +7642,7 @@ def build_seo_page(
             <p>Compare {country} with every destination in the Atlas.</p>
             <a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} aside">Open the Atlas</a>
           </div>
+          {editorial_country_research}
           <p class="editorial-guide-rail__note">Verify current residence, legal and tax rules for your circumstances before acting.</p>
         </aside>
         '''
@@ -7796,6 +7888,10 @@ def build_seo_page(
     .seo-page--editorial-retirement .editorial-guide-rail__action {{ margin-top: 28px; padding: 18px 0; border-top: 1px solid rgba(36, 49, 45, .28); border-bottom: 1px solid rgba(36, 49, 45, .28); }}
     .seo-page--editorial-retirement .editorial-guide-rail__action p {{ margin-top: 0; font-family: var(--editorial-serif); font-size: 17px; line-height: 1.35; }}
     .seo-page--editorial-retirement .editorial-guide-rail__note {{ color: #6e756f; font-size: 12px; line-height: 1.55; }}
+    .editorial-guide-rail__country-links {{ margin-top: 28px; padding-top: 18px; border-top: 1px solid rgba(36, 49, 45, .28); }}
+    .editorial-guide-rail__country-links h2 {{ margin: 0 0 8px; color: #a44e2f; font-family: var(--editorial-sans, inherit); font-size: 11px; font-weight: 600; letter-spacing: .11em; text-transform: uppercase; }}
+    .editorial-guide-rail__country-links nav {{ display: grid; }}
+    .editorial-guide-rail__country-links nav a {{ padding: 9px 0; border-top: 1px solid rgba(36, 49, 45, .16); color: #24312d; font-size: 13px; font-weight: 500; text-decoration: none; }}
     .seo-page--editorial-retirement .faq-item summary {{ font-family: var(--editorial-serif); font-size: 18px; font-weight: 600; }}
     .seo-page--editorial-retirement .seo-footer {{ background: #24312d; color: #e9e1d4; }}
     .seo-page--editorial-retirement .seo-footer a {{ color: #d2b988; }}
@@ -9161,6 +9257,9 @@ def build_premium_destination_page(
             'title, legal use, building condition, negotiability, fees or completed transaction value.</p>'
             f'{premium_dossier_market_anchors_html(spec)}'
         )
+    national_guide_sentence = national_guide_sentence_for_hub(
+        country_hub_for_destination(dest)
+    )
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -9200,7 +9299,7 @@ def build_premium_destination_page(
         <section class="premium-section" id="checklist">
           <h2>Buyer checklist—in decision order</h2>
           <ol class="premium-checklist">{checklist}</ol>
-          <p class="premium-handoff">For the national residence, tax and ownership framework, read the <a href="{escape(spec.country_guide_url)}">{escape(spec.country_guide_label)}</a>. To size the plan, use the <a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="destination page">retirement abroad calculator</a>. {comparison_handoff}</p>
+          <p class="premium-handoff">For the national residence, tax and ownership framework, read about {national_guide_sentence}. To size the plan, use the <a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="destination page">retirement abroad calculator</a>. {comparison_handoff}</p>
         </section>
         {premium_dossier_references_html(spec)}
       </article>
@@ -9321,11 +9420,7 @@ def build_destination_page(
     risk_section = destination_risk_checklist_html(dest)
     compare_section = destination_compare_html(dest, peer_destinations)
     country_hub = country_hub_for_destination(dest)
-    country_hub_link = (
-        f'<a href="/countries/{escape(country_hub["slug"])}/">{escape(country_hub["h1"])}</a>'
-        if country_hub
-        else ""
-    )
+    national_guide_links = national_guide_links_for_hub(country_hub)
     retirement_ids = {item["destination_id"] for item in load_retirement_costs()["destinations"]}
     retirement_callout = retirement_calculator_callout("page-section", "destination page") if dest["id"] in retirement_ids else ""
     destination_image = destination_image_assets(dest)
@@ -9405,7 +9500,7 @@ def build_destination_page(
             <h2>Continue your research</h2>
             <div class="continue-research__grid">
               <div><h3>Related destinations</h3><nav>{peer_links}</nav></div>
-              <div><h3>Country guides</h3><nav>{country_hub_link or country_hub_links(limit=4)}</nav></div>
+              <div><h3>Country guides</h3><nav>{national_guide_links or country_hub_links(limit=4)}</nav></div>
               <div><h3>Buying guides</h3><nav><a href="/guides/">All buying guides</a>{destination_guide_links}</nav></div>
               <div><h3>How we research</h3><nav>{trust_page_links()}</nav></div>
             </div>
