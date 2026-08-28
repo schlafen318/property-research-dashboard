@@ -273,9 +273,9 @@ def utility_design_css() -> str:
     .gha-mode-utility h2 { font-size: clamp(34px, 4vw, 48px); line-height: 1.03; letter-spacing: -.025em; }
     .gha-mode-utility .calc-hero .lede { max-width: 760px; margin: 26px 0 0; color: #46524d; font-family: var(--gha-display-serif); font-size: clamp(20px, 2vw, 24px); line-height: 1.42; }
     .gha-mode-utility .calc-hero .hint { color: var(--gha-muted); }
-    .gha-mode-utility .calc-modes { gap: 8px 24px; margin-top: 26px; font-weight: 500; }
-    .gha-mode-utility .calc-modes a { min-height: 44px; display: inline-flex; align-items: center; color: var(--gha-ink); font-size: 14px; font-weight: 500; }
-    .gha-mode-utility .calc-modes a[aria-current] { border-color: var(--gha-accent); color: var(--gha-accent); }
+    .gha-mode-utility .calc-modes, .gha-mode-utility .finder-modes { display: flex; flex-wrap: wrap; gap: 0 24px; margin-top: 26px; border-bottom: 1px solid var(--gha-rule); font-weight: 500; }
+    .gha-mode-utility .calc-modes a, .gha-mode-utility .finder-modes a { min-height: 44px; display: inline-flex; align-items: center; border: 0; color: var(--gha-ink); font-size: 14px; font-weight: 500; text-decoration: none; }
+    .gha-mode-utility .calc-modes a[aria-current], .gha-mode-utility .finder-modes a[aria-current] { color: var(--gha-accent); box-shadow: inset 0 -2px 0 var(--gha-accent); }
 
     .gha-mode-utility main { padding: 0 0 76px; }
     .gha-mode-utility .quick-answer { padding: 56px 0; border-bottom: 1px solid var(--gha-rule); }
@@ -338,9 +338,6 @@ def retirement_finder_design_css() -> str:
     }
     .retirement-finder-page h1 { max-width: 850px; margin: 0; font-size: clamp(48px, 6.2vw, 76px); line-height: .98; letter-spacing: -.035em; }
     .retirement-finder-page .finder-hero .lede { max-width: 760px; margin: 26px 0 0; color: #46524d; font-family: var(--gha-display-serif); font-size: clamp(20px, 2vw, 24px); line-height: 1.42; }
-    .retirement-finder-page .finder-modes { gap: 8px 24px; margin-top: 26px; font-weight: 500; }
-    .retirement-finder-page .finder-modes a { min-height: 44px; display: inline-flex; align-items: center; color: var(--gha-ink); font-size: 14px; font-weight: 500; }
-    .retirement-finder-page .finder-modes a[aria-current] { border-color: var(--gha-accent); color: var(--gha-accent); }
     .retirement-finder-page main { padding: 52px 0 76px; }
     .retirement-finder-page .finder-form { gap: 0; }
     .retirement-finder-page .finder-section { padding: 30px 0 34px; border: 0; border-bottom: 1px solid var(--gha-rule); border-radius: 0; background: transparent; box-shadow: none; }

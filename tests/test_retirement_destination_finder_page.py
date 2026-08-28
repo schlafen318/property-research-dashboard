@@ -52,6 +52,20 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             r"\.retirement-finder-page input,[^{]*\{[^}]*border-radius:\s*0;[^}]*font-weight:\s*400;",
         )
 
+    def test_calculator_mode_links_share_one_aligned_tab_treatment(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+        self.assertIn(
+            ".gha-mode-utility .calc-modes, .gha-mode-utility .finder-modes",
+            design_css,
+        )
+        self.assertIn(
+            ".gha-mode-utility .calc-modes a, .gha-mode-utility .finder-modes a",
+            design_css,
+        )
+        self.assertIn("text-decoration: none", design_css)
+        self.assertIn("box-shadow: inset 0 -2px 0 var(--gha-accent)", design_css)
+
     def test_form_uses_top_down_human_reading_order(self) -> None:
         ordered_ids = [
             'id="finder-current-resources"',
