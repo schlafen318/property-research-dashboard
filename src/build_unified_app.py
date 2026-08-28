@@ -26,6 +26,7 @@ try:
         landing_design_css,
         site_footer_html,
         site_header_html,
+        utility_design_css,
     )
     from src.premium_destination_dossiers import (
         PremiumDossierSpec,
@@ -46,6 +47,7 @@ except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.p
         landing_design_css,
         site_footer_html,
         site_header_html,
+        utility_design_css,
     )
     from premium_destination_dossiers import (
         PremiumDossierSpec,
@@ -6095,7 +6097,7 @@ __HEAD__
   <style>
     :root { color: #24312d; background: #f5f1e9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#24312d; --muted:#66736c; --line:#d8d1c4; --paper:#fffdf7; --green:#315e50; }
     * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
-    .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; } .calc-nav { display:flex; align-items:center; justify-content:space-between; gap:24px; padding:18px 0; border-bottom:1px solid rgba(255,255,255,.18); } .calc-brand { color:#fff; text-decoration:none; font-weight:900; } .calc-nav-links { display:flex; flex-wrap:wrap; gap:16px; } .calc-nav-links a { color:#f5f1e9; text-decoration:none; font-size:14px; }
+    .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
     .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; } .calc-modes { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-weight:750; } .calc-modes a { color:#fff; } .calc-modes a[aria-current] { color:#d8c28d; text-decoration:none; border-bottom:2px solid #d8c28d; }
     main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:800; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
     .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .save-intent { padding-top:2px; } .save-intent .text-button { font-weight:750; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
@@ -6105,14 +6107,17 @@ __HEAD__
     .cost-sidecar { width:min(560px,100%); max-width:none; height:100dvh; max-height:none; margin:0 0 0 auto; padding:0; border:0; background:transparent; overflow:hidden; } .cost-sidecar[open] { animation:cost-sidecar-in .25s ease-out; } .cost-sidecar::backdrop { background:rgba(24,34,30,.42); } .cost-sidecar-panel { height:100%; padding:24px; overflow:auto; background:var(--paper); box-shadow:-12px 0 32px rgba(36,49,45,.18); } .cost-sidecar-header { position:sticky; top:-24px; z-index:1; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin:-24px -24px 14px; padding:24px; border-bottom:1px solid var(--line); background:var(--paper); } .cost-sidecar-header h2 { margin:0; font-size:30px; } .cost-sidecar-close { width:auto; min-height:40px; padding:7px 10px; background:transparent; cursor:pointer; } .cost-sidecar-chart { display:grid; gap:5px; } .cost-row { min-height:0; padding:9px 10px; border:1px solid transparent; border-radius:3px; background:transparent; text-align:left; cursor:pointer; } .cost-row:hover,.cost-row:focus-visible { border-color:var(--line); background:#f5f1e9; } .cost-row.is-current { border-color:var(--green); } .cost-row-heading { display:flex; justify-content:space-between; gap:16px; } .cost-row-heading > span { color:var(--muted); white-space:nowrap; } .cost-bar-track { display:block; height:8px; margin-top:6px; background:#e7e1d6; } .cost-bar-fill { display:block; height:100%; background:#56806f; } @keyframes cost-sidecar-in { from { transform:translateX(100%); } to { transform:translateX(0); } }
     .quick-answer { padding:4px 0 36px; } .quick-answer h2 { max-width:760px; margin:.2rem 0 1rem; } .quick-answer > p { max-width:850px; } .quick-answer .table-wrap { margin-top:20px; } .quick-benchmark { min-width:560px; } .quick-benchmark td:last-child { font-family:Georgia,serif; font-size:18px; }
     .content-section { padding:34px 0; border-top:1px solid var(--line); } .table-wrap { overflow-x:auto; } table { width:100%; min-width:1080px; border-collapse:collapse; background:var(--paper); } caption { padding:12px; text-align:left; color:var(--muted); font-weight:750; } th,td { text-align:left; padding:12px; border-bottom:1px solid var(--line); white-space:nowrap; } th { white-space:normal; } .quick-benchmark { min-width:560px; } .trust-meta { font-family:Georgia,serif; font-size:19px; } .source-list { columns:2; padding-left:20px; } .source-list li { break-inside:avoid; margin:0 0 8px; } .faq details { padding:14px 0; border-bottom:1px solid var(--line); } .related { display:flex; flex-wrap:wrap; gap:16px; } footer { padding:30px 0; background:#243f37; color:#e2e8e4; } footer a { color:#fff; }
-    @media(max-width:780px) { .calculator-layout,.projection-grid,.current-cost-layout { grid-template-columns:1fr; } .result-panel { position:static; } .calc-nav-links { display:none; } .current-cost-result { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } .source-list { columns:1; } }
+    @media(max-width:780px) { .calculator-layout,.projection-grid,.current-cost-layout { grid-template-columns:1fr; } .result-panel { position:static; } .current-cost-result { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } .source-list { columns:1; } }
     @media(max-width:520px) { .field-grid,.result-grid { grid-template-columns:1fr; } .calc-modes { display:grid; gap:10px; } .calc-modes a { width:max-content; max-width:100%; } h1 { overflow-wrap:anywhere; } th,td { padding:10px 8px; font-size:13px; } }
     @media(prefers-reduced-motion:reduce) { .chart-year,.cost-sidecar[open] { animation:none; opacity:1; transform:none; } }
   </style>
+  <style id="gha-utility-design">
+__UTILITY_CSS__
+  </style>
 </head>
-<body>
-  <header class="calc-hero"><div class="calc-shell">
-    <nav class="calc-nav" aria-label="Primary"><a class="calc-brand" href="/">Global Home Atlas</a><div class="calc-nav-links"><a href="/find-your-fit/">Find your fit</a><a href="/dashboard/">Destinations</a><a href="/countries/">Countries</a><a href="/guides/">Guides</a><a href="/methodology/">Methodology</a></div></nav>
+<body class="gha-mode-utility calculator-page" data-design-system="gha-v1">
+  __SITE_HEADER__
+  <header class="calc-hero"><div class="gha-shell calc-shell">
     <p class="eyebrow">Retirement abroad calculator</p><h1>How Much Do You Need to Retire Abroad?</h1>
     <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">All amounts are in today's USD unless marked “at retirement”.</p><nav class="calc-modes" aria-label="Retirement calculator mode"><a href="/retirement-abroad-calculator/" aria-current="page">Plan for a destination</a><a href="/retirement-destination-finder/">Find destinations I can afford</a></nav>
   </div></header>
@@ -6216,7 +6221,7 @@ __HEAD__
     <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Tax, visa eligibility, currency shocks, individualized healthcare and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
-  <footer><div class="calc-shell">Global Home Atlas · Research for overseas property and long-stay decisions · <a href="/contact/">Contact</a></div></footer>
+  __SITE_FOOTER__
   <script id="retirement-destination-data" type="application/json">__DATA__</script>
   <script>__ENGINE__</script>
   <script>__UI__</script>
@@ -6225,6 +6230,9 @@ __ANALYTICS__
 </body></html>"""
     replacements = {
         "__HEAD__": head_html(RETIREMENT_CALCULATOR_TITLE, RETIREMENT_CALCULATOR_DESCRIPTION, canonical, schema_for_retirement_calculator(canonical)),
+        "__UTILITY_CSS__": utility_design_css(),
+        "__SITE_HEADER__": site_header_html(PRIMARY_NAV_LINKS).strip(),
+        "__SITE_FOOTER__": site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
         "__OPTIONS__": "".join(options),
         "__QUICK_ANSWER__": quick_answer,
         "__AS_OF__": escape(retirement_payload["as_of"]),

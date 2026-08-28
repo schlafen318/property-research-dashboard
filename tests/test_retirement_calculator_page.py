@@ -56,6 +56,42 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("Málaga / Costa del Sol", self.html)
         self.assertIn("Portfolio dividends and interest", self.html)
 
+    def test_page_uses_the_shared_global_home_atlas_utility_shell(self) -> None:
+        self.assertIn('<body class="gha-mode-utility calculator-page" data-design-system="gha-v1">', self.html)
+        self.assertIn('<header class="gha-header">', self.html)
+        self.assertIn('class="gha-mobile-menu"', self.html)
+        self.assertIn('/assets/global-home-atlas-logo-compact-light.svg', self.html)
+        self.assertIn('<footer class="gha-footer">', self.html)
+        self.assertNotIn('<nav class="calc-nav"', self.html)
+
+    def test_page_uses_shared_editorial_typography_and_restrained_surfaces(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        utility_marker = '<style id="gha-utility-design">'
+        self.assertEqual(head.rfind("<style"), head.index(utility_marker))
+        utility_css = head.split(utility_marker, 1)[1].split("</style>", 1)[0]
+
+        self.assertIn('--gha-display-serif: "Iowan Old Style"', utility_css)
+        self.assertIn('--gha-reading-sans: "Avenir Next"', utility_css)
+        self.assertRegex(
+            utility_css,
+            r"\.gha-mode-utility \.calc-panel\s*\{[^}]*border-radius:\s*4px;[^}]*\}",
+        )
+        self.assertRegex(
+            utility_css,
+            r"\.gha-mode-utility input,[^{]*\{[^}]*border-radius:\s*0;[^}]*"
+            r"font-family:\s*var\(--gha-reading-sans\);[^}]*font-weight:\s*400;[^}]*\}",
+        )
+        self.assertRegex(
+            utility_css,
+            r"\.gha-mode-utility \.primary\s*\{[^}]*font-weight:\s*500;[^}]*\}",
+        )
+        self.assertRegex(
+            utility_css,
+            r"@media \(max-width:\s*860px\)\s*\{[\s\S]*?"
+            r"\.gha-mode-utility \.gha-primary-links\s*\{\s*display:\s*none;\s*\}[\s\S]*?"
+            r"\.gha-mode-utility \.gha-mobile-menu\s*\{\s*display:\s*block;\s*\}",
+        )
+
     def test_page_leads_with_search_answer_and_compact_destination_benchmark(self) -> None:
         self.assertIn("<h1>How Much Do You Need to Retire Abroad?</h1>", self.html)
         self.assertIn('id="ret-quick-answer"', self.html)
