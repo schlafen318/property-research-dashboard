@@ -38,5 +38,31 @@
     "source_slug": "buy-property-abroad",
     "target_slug": "where-can-foreigners-buy-property",
     "type": "internal-link"
+  },
+  {
+    "anchor": "Queenstown property market and foreign-buyer guide",
+    "description": "Assess current Queenstown pricing, foreign-buyer eligibility, local areas, visitor rules, hazards and resale.",
+    "fingerprint": "gha-seo-priority-queenstown-20260829",
+    "reason": "Support the Queenstown page's current property-market intent from an established second-home guide.",
+    "source_slug": "best-places-to-buy-a-second-home-abroad",
+    "target_path": "/destinations/queenstown/",
+    "theme": "New Zealand market guide",
+    "type": "internal-link"
+  },
+  {
+    "anchor": "foreign buyer guide to Thailand villas",
+    "fingerprint": "gha-seo-priority-thailand-villas-20260829",
+    "reason": "Connect the broad foreign-buyer ownership guide to the detailed Thailand villa cluster.",
+    "source_slug": "where-can-foreigners-buy-property",
+    "target_slug": "thailand-villa-ownership-foreigners",
+    "type": "internal-link"
+  },
+  {
+    "anchor": "overseas property investment markets compared",
+    "fingerprint": "gha-seo-priority-overseas-investment-20260829",
+    "reason": "Connect risk analysis to the structured eight-market investment comparison.",
+    "source_slug": "foreign-property-investment-risks",
+    "target_slug": "overseas-property-investment",
+    "type": "internal-link"
   }
 ]

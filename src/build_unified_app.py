@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import csv
+import io
 import json
 import os
 import re
@@ -98,6 +100,11 @@ REPORT_LIBRARY_TITLE = "Premium Property Research Reports | Global Home Atlas"
 REPORT_LIBRARY_DESCRIPTION = (
     "Browse premium Global Home Atlas research brief formats for retirement markets, "
     "second-home shortlists, overseas property risk, and polished buyer memos."
+)
+PROPERTY_MARKET_DATA_SLUG = "global-property-market-data"
+PROPERTY_MARKET_DATA_DESCRIPTION = (
+    "Download and compare Global Home Atlas data for 37 international property markets, "
+    "including prices, yields, ownership clarity, retirement fit and exit liquidity."
 )
 RETIREMENT_CALCULATOR_SLUG = "retirement-abroad-calculator"
 RETIREMENT_CALCULATOR_TITLE = "Retirement Abroad Calculator: How Much Do You Need? | Global Home Atlas"
@@ -763,8 +770,8 @@ SEO_PAGES = [
     },
     {
         "slug": "overseas-property-investment",
-        "title": "Overseas Property Investment: Markets to Compare | Global Home Atlas",
-        "description": "Compare overseas property investment destinations by net yield, capital upside, regulatory safety, entry price, and liquidity.",
+        "title": "Overseas Property Investment: 8 Markets Compared",
+        "description": "Compare eight overseas property investment markets through buyer access, realistic net income, demand, carrying costs, regulation, entry price and exit liquidity.",
         "h1": "Overseas Property Investment",
         "keyword": "overseas property investment",
         "theme": "investment underwriting",
@@ -985,9 +992,9 @@ SEO_PAGES = [
     },
     {
         "slug": "thailand-villa-ownership-foreigners",
-        "title": "Thailand Villa Ownership for Foreigners | Global Home Atlas",
-        "description": "Understand Thailand villa ownership for foreigners and compare Phuket and Koh Samui against other Asia lifestyle property alternatives.",
-        "h1": "Thailand Villa Ownership for Foreigners",
+        "title": "Foreign Buyer Guide to Thailand Villas: Ownership Rules",
+        "description": "A foreign buyer guide to Thailand villas covering land and building rights, leasehold risk, due diligence, rental assumptions, Phuket, Koh Samui and resale.",
+        "h1": "Thailand Villa Ownership: Foreign Buyer Guide",
         "keyword": "Thailand villa ownership foreigners",
         "theme": "Thailand ownership",
         "intent": "buyers attracted to Thai villas who need to understand structure, rental appeal, and legal friction",
@@ -1854,22 +1861,57 @@ def related_guide_pages(page: dict, pages: list[dict], limit: int = 4, priority_
 
 
 def contextual_related_guides(page: dict, pages: list[dict], auto_links: list[dict] | None = None) -> str:
-    priority_slugs = [
-        str(item.get("target_slug"))
+    approved = [
+        item
         for item in auto_links or []
-        if item.get("source_slug") == page.get("slug") and item.get("target_slug")
+        if item.get("source_slug") == page.get("slug")
     ]
+    by_slug = {candidate["slug"]: candidate for candidate in pages}
     cards = []
-    for candidate in related_guide_pages(page, pages, priority_slugs=priority_slugs):
+    seen_hrefs: set[str] = set()
+
+    def append_card(href: str, anchor: str, theme: str, description: str) -> None:
+        if not href or href in seen_hrefs:
+            return
+        seen_hrefs.add(href)
         cards.append(
             f"""
             <article class="seo-link-card">
-              <span>{escape(candidate["theme"])}</span>
-              <h3><a href="/{escape(candidate["slug"])}/">{escape(candidate["h1"])}</a></h3>
-              <p>{escape(candidate["description"])}</p>
+              <span>{escape(theme)}</span>
+              <h3><a href="{escape(href)}" data-track="internal_page_click" data-track-label="seo authority {escape(page['slug'])}">{escape(anchor)}</a></h3>
+              <p>{escape(description)}</p>
             </article>
             """.rstrip()
         )
+
+    for item in approved:
+        candidate = by_slug.get(str(item.get("target_slug", "")))
+        if candidate:
+            append_card(
+                f'/{candidate["slug"]}/',
+                str(item.get("anchor") or candidate["h1"]),
+                str(item.get("theme") or candidate["theme"]),
+                str(item.get("description") or candidate["description"]),
+            )
+        elif item.get("target_path"):
+            append_card(
+                str(item["target_path"]),
+                str(item.get("anchor", "Related research")),
+                str(item.get("theme", "Related research")),
+                str(item.get("description", "Continue with the related market research.")),
+            )
+        if len(cards) >= 4:
+            break
+
+    for candidate in related_guide_pages(page, pages):
+        append_card(
+            f'/{candidate["slug"]}/',
+            candidate["h1"],
+            candidate["theme"],
+            candidate["description"],
+        )
+        if len(cards) >= 4:
+            break
     return "\n".join(cards)
 
 
@@ -3694,6 +3736,133 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
 """
 
 
+def property_market_data_rows(destinations: list[dict]) -> list[dict[str, str]]:
+    rows = []
+    for dest in destinations:
+        rows.append(
+            {
+                "rank": str(dest.get("rank", "")),
+                "destination": str(dest.get("name", "")),
+                "country": str(dest.get("country", "")),
+                "setting": str(dest.get("category", "")),
+                "decision_score_5": f'{float(dest.get("decision_score", 0) or 0):.2f}',
+                "usd_per_m2": f'{float(dest.get("usd_per_m2", 0) or 0):.0f}',
+                "net_yield_estimate": str(dest.get("net_yield_estimate", "")),
+                "ownership_clarity_5": f'{score(dest, "ownership_clarity"):.1f}',
+                "regulatory_safety_5": f'{score(dest, "str_regulatory_safety"):.1f}',
+                "retirement_fit_5": f'{score(dest, "retirement_suitability"):.1f}',
+                "exit_liquidity_5": f'{score(dest, "exit_liquidity"):.1f}',
+                "foreigner_fit_5": f'{score(dest, "chinese_foreigner_friendliness"):.1f}',
+                "access_status": str(dest.get("access_status", "available")),
+            }
+        )
+    return rows
+
+
+def property_market_data_csv(destinations: list[dict]) -> str:
+    fields = [
+        "rank",
+        "destination",
+        "country",
+        "setting",
+        "decision_score_5",
+        "usd_per_m2",
+        "net_yield_estimate",
+        "ownership_clarity_5",
+        "regulatory_safety_5",
+        "retirement_fit_5",
+        "exit_liquidity_5",
+        "foreigner_fit_5",
+        "access_status",
+    ]
+    output = io.StringIO(newline="")
+    writer = csv.DictWriter(output, fieldnames=fields, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(property_market_data_rows(destinations))
+    return output.getvalue()
+
+
+def build_property_market_data_page(destinations: list[dict]) -> str:
+    canonical = page_url(PROPERTY_MARKET_DATA_SLUG)
+    title = f"Global Property Market Data: {len(destinations)} Markets Compared"
+    csv_url = f"{SITE_URL}data/global-property-market-data.csv"
+    schema = [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            "name": title,
+            "description": PROPERTY_MARKET_DATA_DESCRIPTION,
+            "url": canonical,
+            "dateModified": date.today().isoformat(),
+            "creator": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL},
+            "distribution": {
+                "@type": "DataDownload",
+                "encodingFormat": "text/csv",
+                "contentUrl": csv_url,
+            },
+        },
+    ]
+    table_rows = "".join(
+        f"""
+        <tr>
+          <td>{escape(row["rank"])}</td>
+          <td><a href="/destinations/{escape(destination_slug(dest))}/">{escape(row["destination"])}</a></td>
+          <td>{escape(row["country"])}</td>
+          <td>{escape(row["setting"])}</td>
+          <td>{escape(row["decision_score_5"])}</td>
+          <td>{escape(row["usd_per_m2"])}</td>
+          <td>{escape(row["net_yield_estimate"])}</td>
+          <td>{escape(row["ownership_clarity_5"])}</td>
+          <td>{escape(row["retirement_fit_5"])}</td>
+          <td>{escape(row["exit_liquidity_5"])}</td>
+        </tr>"""
+        for dest, row in zip(destinations, property_market_data_rows(destinations))
+    )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(title, PROPERTY_MARKET_DATA_DESCRIPTION, canonical, schema)}
+  <style>{shared_content_css()}
+    .data-table-wrap {{ overflow-x: auto; margin: 24px 0; }}
+    .data-table {{ width: 100%; border-collapse: collapse; background: var(--paper); font-size: 14px; }}
+    .data-table th, .data-table td {{ padding: 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; white-space: nowrap; }}
+    .data-table th {{ position: sticky; top: 0; background: var(--stone); }}
+  </style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      {primary_nav_html()}
+      <div class="page-hero-grid"><div>
+        <p class="page-eyebrow">Downloadable research data · updated {date.today().isoformat()}</p>
+        <h1>Global property market data</h1>
+        <p class="page-lede">Compare {len(destinations)} international markets using the same decision framework, then download the complete table for analysis or citation.</p>
+        <p><a class="page-button" href="/data/global-property-market-data.csv" download data-track="property_data_download" data-track-label="global property market csv">Download CSV</a></p>
+      </div></div>
+    </div>
+  </header>
+  <main><div class="page-shell"><article class="page-article">
+    <section class="page-section">
+      <h2>Market comparison table</h2>
+      <p>Prices are indicative USD per square metre; yield figures are research estimates rather than guarantees. Scores use a five-point scale. Read the <a href="/methodology/">scoring methodology</a> and <a href="/research-standards/">research standards</a> before reuse.</p>
+      <div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>Rank</th><th>Destination</th><th>Country</th><th>Setting</th><th>Score / 5</th><th>USD / m²</th><th>Net yield estimate</th><th>Ownership / 5</th><th>Retirement / 5</th><th>Exit / 5</th></tr></thead>
+        <tbody>{table_rows}</tbody>
+      </table></div>
+    </section>
+    <section class="page-section">
+      <h2>Reuse and attribution</h2>
+      <p>You may quote or analyse this table with attribution to Global Home Atlas and a link to this page. Verify current legal, tax, immigration and property rules locally before relying on any market comparison.</p>
+    </section>
+  </article></div></main>
+  <footer class="page-footer"><div class="page-shell"><strong>{SITE_NAME}</strong><p>Independent research for overseas property decisions.</p><nav><a href="/dashboard/">Rankings</a> <a href="/methodology/">Methodology</a> <a href="/contact/">Contact</a></nav></div></footer>
+{analytics_event_script()}
+</body>
+</html>
+"""
+
+
 def build_report_library_page(destinations: list[dict], pages: list[dict]) -> str:
     canonical = page_url(REPORT_LIBRARY_SLUG)
     schema = [
@@ -4168,13 +4337,13 @@ def build_landing_page(
         else "Compare overseas property destinations using foreign ownership, retirement fit, realistic costs, rental rules, resale potential, and representative listings."
     )
     search_description = (
-        f"Compare property abroad for retirement and second homes across {destination_count} destinations, with ownership rules, costs, rankings, listings and a calculator."
+        f"Compare property abroad across {destination_count} destinations for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools."
         if destination_count
-        else "Compare property abroad for retirement and second homes using ownership rules, realistic costs, rankings, listings and a calculator."
+        else "Compare property abroad for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools."
     )
     content = apply_content_override(
         {
-            "title": "Compare Property Abroad for Retirement & Second Homes | Global Home Atlas",
+            "title": "Global Home Atlas: Compare Property Abroad",
             "description": search_description,
             "generated_intro": coverage_intro,
         },
@@ -4563,6 +4732,7 @@ def build_landing_page(
           </div>
           <nav class="method-links" aria-label="Research methodology">
             <a href="/methodology/" data-track="methodology_click" data-track-label="landing methodology">Scoring methodology</a>
+            <a href="/{PROPERTY_MARKET_DATA_SLUG}/" data-track="property_data_open" data-track-label="landing methodology">Download market data</a>
             <a href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>
           </nav>
         </div>
@@ -5292,6 +5462,38 @@ def seo_decision_framework_html(page: dict) -> str:
             <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
           </section>
     """
+
+
+def seo_query_intent_html(page: dict) -> str:
+    if page["slug"] == "thailand-villa-ownership-foreigners":
+        return """
+          <section class="seo-section" id="foreign-buyer-guide">
+            <h2>How foreign buyers should assess a Thailand villa</h2>
+            <p>Do not treat a villa advertisement as proof of land ownership, building ownership, a valid lease, or lawful rental use. Start by separating every advertised right: the land, the building, any registered lease or superficies, project-management obligations, common-area rights, and the route by which a later buyer could acquire the same package.</p>
+            <p>The <a href="/countries/thailand-property/" data-track="country_hub_click" data-track-label="Thailand villa foreign buyer guide">Thailand property guide</a> explains the national ownership screen. Then use the <a href="/destinations/phuket-koh-samui/" data-track="destination_click" data-track-label="Thailand villa foreign buyer guide">Phuket and Koh Samui dossier</a> to compare island-level access, management, hazards, seasonality and resale. For alternative ownership markets, continue with <a href="/where-can-foreigners-buy-property/" data-track="guide_click" data-track-label="Thailand villa foreign buyer guide">where foreigners can buy property</a>.</p>
+            <ul>
+              <li><strong>Legal interest:</strong> obtain independent Thai advice on the exact land, building, lease, company and registration documents.</li>
+              <li><strong>Operating case:</strong> assume no rental income until lawful use, licensing, project rules, management and net costs are verified.</li>
+              <li><strong>Exit case:</strong> identify who can acquire the same legal package and what happens when a lease term shortens or project governance weakens.</li>
+            </ul>
+          </section>
+        """
+    if page["slug"] == "overseas-property-investment":
+        return """
+          <section class="seo-section" id="investment-comparison-framework">
+            <h2>Overseas property investment comparison framework</h2>
+            <p>Compare each market with the same five tests before looking at advertised returns. This keeps legal access, operating economics and resale in one decision rather than treating the purchase price as the investment thesis.</p>
+            <ol>
+              <li><strong>Legal access</strong> — confirm the buyer, title, permitted use and transaction route before paying a deposit.</li>
+              <li><strong>Net income</strong> — deduct vacancy, management, tax, insurance, utilities, repairs, furnishing and platform costs from rent.</li>
+              <li><strong>Demand durability</strong> — separate year-round resident demand from seasonal visitor demand and one-country buyer dependence.</li>
+              <li><strong>Total carrying cost</strong> — model acquisition, financing, annual ownership, major works, currency movement and sale costs.</li>
+              <li><strong>Exit liquidity</strong> — identify the next eligible buyer, realistic marketing period and completed-sale evidence before entry.</li>
+            </ol>
+            <p>Use the <a href="/foreign-property-investment-risks/" data-track="guide_click" data-track-label="overseas investment framework">foreign property investment risk framework</a> for the downside review and <a href="/where-can-foreigners-buy-property/" data-track="guide_click" data-track-label="overseas investment framework">the foreign-buyer access guide</a> for the ownership screen.</p>
+          </section>
+        """
+    return ""
 
 
 def seo_references_html(page: dict) -> str:
@@ -7488,6 +7690,7 @@ def build_seo_page(
     comparison_html = seo_comparison_html(page, selected, top, runner_up)
     destination_notes_html = seo_destination_notes_html(page, selected)
     decision_framework_html = seo_decision_framework_html(page)
+    query_intent_html = seo_query_intent_html(page)
     references_html = seo_references_html(page)
     retirement_callout = (
         retirement_calculator_callout("seo-section", "buying guide")
@@ -8074,6 +8277,7 @@ def build_seo_page(
         <article class="seo-article">
           {callout_before_overview}
           {overview_html}
+          {query_intent_html}
           {callout_after_overview}
           {comparison_html}
           {destination_notes_html}
@@ -10211,6 +10415,7 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
         (page_url("dashboard"), "0.92"),
         (page_url(SHORTLIST_REVIEW_SLUG), "0.90"),
         (page_url(REPORT_LIBRARY_SLUG), "0.88"),
+        (page_url(PROPERTY_MARKET_DATA_SLUG), "0.88"),
         (page_url("country-comparison"), "0.88"),
         (page_url("countries"), "0.90"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
@@ -11642,6 +11847,18 @@ def build() -> Path:
     report_library_dir.mkdir(parents=True, exist_ok=True)
     (report_library_dir / "index.html").write_text(
         clean_generated_html(build_report_library_page(destinations, SEO_PAGES)),
+        encoding="utf-8",
+    )
+    property_data_dir = ARTIFACTS / PROPERTY_MARKET_DATA_SLUG
+    property_data_dir.mkdir(parents=True, exist_ok=True)
+    (property_data_dir / "index.html").write_text(
+        clean_generated_html(build_property_market_data_page(destinations)),
+        encoding="utf-8",
+    )
+    data_download_dir = ARTIFACTS / "data"
+    data_download_dir.mkdir(parents=True, exist_ok=True)
+    (data_download_dir / "global-property-market-data.csv").write_text(
+        property_market_data_csv(destinations),
         encoding="utf-8",
     )
     for page in SEO_PAGES:

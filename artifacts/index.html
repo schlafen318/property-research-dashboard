@@ -7,310 +7,273 @@
   <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
   <link rel="apple-touch-icon" href="/assets/apple-touch-icon.svg">
   <link rel="manifest" href="/assets/site.webmanifest">
-  <title>Best Places to Buy Property Abroad | Global Property Markets</title>
-  <meta name="description" content="Compare the best places to buy property abroad, including global property markets for buying property abroad, vacation homes, second homes, retirement, budget, and exit plan.">
+  <title>Global Home Atlas: Compare Property Abroad</title>
+  <meta name="description" content="Compare property abroad across 37 destinations for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools.">
   <link rel="canonical" href="https://globalhomeatlas.com/">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Global Home Atlas">
   <meta property="og:title" content="Global Home Atlas">
-  <meta property="og:description" content="Compare the best places to buy property abroad, including global property markets for buying property abroad, vacation homes, second homes, retirement, budget, and exit plan.">
+  <meta property="og:description" content="Compare property abroad across 37 destinations for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools.">
   <meta property="og:url" content="https://globalhomeatlas.com/">
   <meta name="twitter:card" content="summary_large_image">
 
   <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."}]</script>
   <style>
     :root {
-      color: #24312d;
-      background: #f5f1e9;
-      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      --ink: #24312d;
-      --muted: #68776f;
-      --line: rgba(36, 49, 45, .13);
-      --paper: #fffdf7;
-      --cream: #f5f1e9;
-      --sage: #c7d3c2;
-      --eucalyptus: #5f7f72;
-      --brass: #a98a4b;
-      --deep: #24312d;
-      --shadow: 0 18px 48px rgba(36, 49, 45, .10);
+      --gha-ink: #24312d;
+      --gha-paper: #f4efe4;
+      --gha-surface: #fffdf7;
+      --gha-muted: #646e69;
+      --gha-rule: rgba(36, 49, 45, .24);
+      --gha-accent: #a44e2f;
+      --gha-link: #41665a;
+      --gha-brass: #a98a4b;
+      --gha-display-serif: "Iowan Old Style", Baskerville, "Palatino Linotype", Palatino, Georgia, serif;
+      --gha-reading-sans: "Avenir Next", Avenir, "Helvetica Neue", Helvetica, Arial, sans-serif;
     }
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
-    html, body { overflow-x: hidden; }
-    body { margin: 0; background: var(--cream); color: var(--ink); }
-    a { color: var(--eucalyptus); text-underline-offset: 3px; }
-    p { line-height: 1.58; }
-    .shell { width: min(1160px, calc(100% - 32px)); margin: 0 auto; }
-    .hero {
-      min-height: 78vh;
-      display: grid;
-      align-items: center;
-      padding: 22px 0 76px;
-      background:
-        linear-gradient(90deg, rgba(255, 253, 247, .98) 0 38%, rgba(255, 253, 247, .76) 62%, rgba(199, 211, 194, .30)),
-        linear-gradient(180deg, rgba(245, 241, 233, .04), rgba(245, 241, 233, .50)),
-        url("/assets/atlas-map-coastal-sage.jpg");
-      background-size: cover;
-      background-position: center;
-    }
-    .topbar { position: absolute; inset: 0 0 auto; padding: 18px 0; }
-    .topbar__inner { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
-    .brand { display: flex; align-items: center; gap: 12px; color: var(--ink); font-weight: 900; text-decoration: none; }
-    .brand-logo { width: 174px; max-width: 48vw; height: auto; display: block; }
-    .top-links { display: flex; gap: 18px; flex-wrap: wrap; }
-    .top-links a { color: rgba(36, 49, 45, .76); font-size: 13px; font-weight: 800; text-decoration: none; }
-    .top-links a:hover { color: var(--ink); }
-    .mobile-menu { display: none; position: relative; }
-    .mobile-menu summary { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; padding: 0 13px; border: 1px solid rgba(36, 49, 45, .20); border-radius: 6px; color: var(--ink); font-size: 13px; font-weight: 850; list-style: none; cursor: pointer; }
-    .mobile-menu summary::-webkit-details-marker { display: none; }
-    .mobile-menu nav { position: absolute; right: 0; top: calc(100% + 8px); z-index: 20; width: min(78vw, 280px); display: grid; gap: 2px; padding: 8px; border: 1px solid rgba(36, 49, 45, .16); border-radius: 8px; background: rgba(255, 253, 247, .98); box-shadow: 0 20px 50px rgba(36, 49, 45, .16); }
-    .mobile-menu nav a { padding: 12px; border-radius: 6px; color: var(--ink); text-decoration: none; font-weight: 800; }
-    .hero-grid { display: grid; grid-template-columns: minmax(0, 760px); align-items: center; padding-top: 74px; }
-    .eyebrow { max-width: 100%; margin: 0 0 12px; color: #806738; font-size: 13px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; overflow-wrap: anywhere; }
-    h1 { max-width: 860px; margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(46px, 8vw, 104px); line-height: .9; letter-spacing: 0; }
-    .lede { max-width: 720px; margin: 24px 0 0; color: #45534e; font-size: clamp(17px, 2.2vw, 21px); }
-    .hero-actions { display: grid; justify-items: start; gap: 12px; margin-top: 28px; }
-    .hero-secondary-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; }
-    .primary-action, .secondary-action {
-      min-height: 46px;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      padding: 0 16px;
-      border-radius: 6px;
-      font-weight: 700;
-      text-decoration: none;
-      letter-spacing: 0;
-    }
-    .primary-action { background: var(--eucalyptus); color: #fffdf7; }
-    .secondary-action { border: 1px solid rgba(36, 49, 45, .20); background: rgba(255, 253, 247, .66); color: var(--ink); }
-    .text-action { min-height: 36px; display: inline-flex; align-items: center; color: var(--ink); font-size: 14px; font-weight: 650; text-decoration: none; letter-spacing: 0; }
-    .text-action::after { content: " →"; }
-    .card-link::after, .path-card em::after, .inspired-visual::after { content: " ->"; }
-    .primary-action:hover, .secondary-action:hover { transform: translateY(-1px); box-shadow: 0 10px 24px rgba(36, 49, 45, .13); }
-    .text-action:hover, .card-link:hover { color: #365f6d; }
-    .atlas-visual { min-height: 178px; position: relative; overflow: hidden; border: 1px solid rgba(36, 49, 45, .13); border-radius: 8px; background: linear-gradient(135deg, rgba(255, 253, 247, .48), rgba(199, 211, 194, .12)), url("/assets/atlas-map-coastal-sage.jpg"); background-size: cover; background-position: center; }
-    .atlas-visual span { position: absolute; left: 14px; top: 14px; padding: 9px 10px; border: 1px solid rgba(36, 49, 45, .12); border-radius: 6px; background: rgba(255, 253, 247, .82); color: var(--ink); font-size: 12px; font-weight: 850; }
-    .map-link { position: absolute; width: 14px; height: 14px; border: 2px solid #fffdf7; border-radius: 50%; background: var(--eucalyptus); box-shadow: 0 0 0 5px rgba(95, 127, 114, .22); text-indent: -999px; overflow: hidden; transition: transform .18s ease, background .18s ease; }
-    .map-link:hover, .map-link:focus-visible { transform: scale(1.18); background: #806738; }
-    .map-link--canada { left: 14%; top: 37%; }
-    .map-link--portugal { left: 47%; top: 47%; }
-    .map-link--spain { left: 49%; top: 45%; }
-    .map-link--italy { left: 53%; top: 42%; }
-    .map-link--greece { left: 57%; top: 49%; }
-    .map-link--japan { right: 16%; top: 42%; }
-    .map-link--thailand { right: 23%; top: 60%; }
-    .map-link--nz { right: 9%; bottom: 13%; }
-    main { margin-top: -24px; position: relative; z-index: 2; }
-    .section { margin-bottom: 20px; padding: 20px; border: 1px solid var(--line); border-radius: 8px; background: var(--paper); box-shadow: 0 12px 40px rgba(36, 49, 45, .07); }
-    .section--finder { position: relative; overflow: hidden; padding: 24px; border-color: rgba(95, 127, 114, .30); background: linear-gradient(135deg, #fffdf7, #eef4ef); }
-    .section--finder .section-header, .section--finder .finder-grid { position: relative; z-index: 1; }
-    .finder-map-cue { position: absolute; top: -34px; right: -42px; width: 320px; height: 176px; opacity: .12; background: url("/assets/atlas-map-coastal-sage.jpg") center / cover; mask-image: linear-gradient(120deg, transparent, #000 34%); pointer-events: none; }
-    .section-header { display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 18px; }
-    .section-header h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 42px); line-height: 1; }
-    .section-header p { max-width: 680px; margin: 8px 0 0; color: var(--muted); }
-    .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .explore-grid { display: grid; gap: 12px; }
-    .path-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-    .recommendation-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .country-grid { grid-template-columns: repeat(7, minmax(0, 1fr)); }
-    .trust-grid, .guide-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .explore-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-    .explore-column { min-width: 0; padding: 4px 20px 4px 0; }
-    .explore-column + .explore-column { padding-left: 20px; border-left: 1px solid var(--line); }
-    .explore-column h3 { margin: 0 0 12px; font-size: 18px; }
-    .explore-column ul { display: grid; gap: 9px; margin: 0; padding: 0; list-style: none; }
-    .explore-column a { color: var(--ink); font-weight: 650; text-decoration-color: rgba(95, 127, 114, .5); }
-    .explore-column .explore-all { display: inline-block; margin-top: 14px; color: var(--eucalyptus); font-size: 13px; font-weight: 800; }
-    .explore-more { margin-top: 9px; }
-    .explore-more summary { width: fit-content; min-height: 44px; display: inline-flex; align-items: center; cursor: pointer; color: var(--muted); font-size: 13px; font-weight: 700; }
-    .explore-more ul { margin-top: 9px; }
-    .finder-grid { display: grid; grid-template-columns: minmax(250px, 320px) minmax(0, 1fr); gap: 18px; align-items: start; }
-    .finder-panel, .finder-output { display: grid; align-content: start; gap: 14px; }
-    .finder-panel { padding: 18px 0 0; }
-    .finder-output { padding-top: 18px; }
-    .finder-step, .finder-panel label, .finder-result span, .finder-result dt { color: #806738; font-size: 11px; font-weight: 800; letter-spacing: .07em; line-height: 1.2; text-transform: uppercase; }
-    .finder-step { margin: 0; }
-    .finder-panel label { display: grid; gap: 9px; }
-    .finder-panel select { min-height: 48px; width: 100%; appearance: none; border: 1px solid rgba(95, 127, 114, .24); border-radius: 7px; background: linear-gradient(180deg, #fff, #f8faf6) padding-box, linear-gradient(135deg, transparent calc(100% - 36px), rgba(95, 127, 114, .10) 0) border-box; color: var(--ink); padding: 0 42px 0 14px; font: inherit; font-size: 13px; font-weight: 650; letter-spacing: 0; text-transform: none; }
-    .finder-panel label { position: relative; }
-    .finder-panel label::after { content: ""; position: absolute; right: 15px; bottom: 19px; width: 8px; height: 8px; border-right: 2px solid #365f6d; border-bottom: 2px solid #365f6d; transform: rotate(45deg); pointer-events: none; }
-    .finder-panel .secondary-action { min-height: 44px; width: 100%; justify-content: center; border-color: rgba(95, 127, 114, .24); background: #f8faf6; font-size: 13px; }
-    .finder-note { margin: 2px 0 0; color: var(--muted); font-size: 13px; }
-    .finder-signal { margin: 7px 0 0 !important; color: #3f4d48 !important; font-size: 13px !important; line-height: 1.4; }
-    .finder-signal strong { color: #806738; font-size: 10px; letter-spacing: .07em; text-transform: uppercase; }
-    .finder-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .finder-result { min-width: 0; display: grid; align-content: start; padding: 16px; border: 1px solid rgba(95, 127, 114, .22); border-radius: 8px; background: #fffdf7; box-shadow: 0 10px 26px rgba(36, 49, 45, .06); }
-    .finder-result__thumb { height: 82px; margin: -8px -8px 12px; overflow: hidden; border-radius: 6px; background: #e8ede7; }
-    .finder-result__thumb img { width: 100%; height: 100%; display: block; object-fit: cover; filter: saturate(.72) contrast(.94) brightness(.97) sepia(.06); }
-    .finder-result__thumb--map { opacity: .42; background: linear-gradient(rgba(244, 238, 226, .18), rgba(244, 238, 226, .18)), url("/assets/atlas-map-coastal-sage.jpg") center / cover; }
-    .finder-result h3 { margin: 8px 0 4px; font-family: Georgia, "Times New Roman", serif; font-size: 19px; font-weight: 700; line-height: 1.12; }
-    .finder-result h3 a { color: var(--sage); text-decoration-thickness: 1px; text-underline-offset: 3px; }
-    .finder-result p { margin: 0 0 10px; color: var(--muted); font-size: 14px; }
-    .finder-result dl { display: grid; gap: 11px; margin: 0; }
-    .finder-result dd { margin: 5px 0 0; color: #3f4d48; font-size: 13px; line-height: 1.38; }
-    .finder-result ul { display: grid; gap: 3px; margin: 0; padding-left: 16px; }
-    .finder-result li { padding-left: 1px; }
-    .finder-result li::marker { color: var(--brass); }
-    .card-link { align-self: end; margin-top: 10px; font-size: 13px; font-weight: 800; text-decoration: none; }
-    .inspired-band { display: grid; grid-template-columns: minmax(0, .62fr) minmax(0, 1fr); gap: 16px; align-items: stretch; }
-    .inspired-visual {
-      min-height: 320px;
-      display: grid;
-      align-items: end;
-      padding: 22px;
-      border-radius: 8px;
-      background:
-        linear-gradient(180deg, rgba(36, 49, 45, .08), rgba(36, 49, 45, .58)),
-        url("/assets/coastal-sage-landscape-band.jpg");
-      background-size: cover;
-      background-position: center;
-      color: #fffdf7;
-      text-decoration: none;
-    }
-    .inspired-visual span { color: rgba(255, 253, 247, .78); font-size: 12px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
-    .inspired-visual strong { display: block; max-width: 420px; margin-top: 8px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(28px, 4vw, 46px); line-height: 1; }
-    .inspired-routes { display: grid; gap: 12px; }
-    .inspired-routes article { min-width: 0; padding: 16px; border: 1px solid rgba(95, 127, 114, .20); border-left: 4px solid var(--eucalyptus); border-radius: 8px; background: #f9fbf6; }
-    .inspired-routes span, .inspired-routes dt { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-    .inspired-routes h3 { margin: 7px 0 6px; font-size: 20px; }
-    .inspired-routes p, .inspired-routes dd { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
-    .inspired-routes dl { margin: 12px 0 10px; }
-    .inspired-routes a { font-weight: 900; }
-    .report-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
-    .report-card { min-width: 0; display: grid; gap: 10px; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: linear-gradient(180deg, #fffdf7, #f4eee2); }
-    .report-card span { color: var(--brass); font-size: 11px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-    .report-card h3 { margin: 0; font-size: 20px; line-height: 1.14; }
-    .report-card p { margin: 0; color: #3f4d48; font-size: 14px; line-height: 1.5; }
-    .report-card strong { color: var(--ink); font-size: 13px; line-height: 1.45; }
-    .report-card a { font-weight: 900; }
-    .path-card, .country-tile { color: var(--ink); text-decoration: none; }
-    .path-card, .recommendation-card, .country-tile, .trust-card, .guide-card { min-width: 0; padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: #fffdf7; }
-    .recommendation-card { padding: 0; overflow: hidden; }
-    .recommendation-card__visual { position: relative; height: clamp(168px, 16vw, 198px); display: block; overflow: hidden; background: #e8ede7; }
-    .recommendation-card__visual::after { content: ""; position: absolute; inset: 0; pointer-events: none; background: rgba(244, 238, 226, .08); }
-    .recommendation-card__image { width: 100%; height: 100%; display: block; object-fit: cover; filter: saturate(.72) contrast(.94) brightness(.97) sepia(.06); transition: transform .25s ease; }
-    .recommendation-card__visual:hover .recommendation-card__image { transform: scale(1.015); }
-    .recommendation-card__body { padding: 14px 16px 16px; }
-    .path-card { position: relative; border-top: 4px solid var(--path-accent, var(--brass)); transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
-    .path-card:hover, .recommendation-card:hover, .country-tile:hover, .guide-card:hover { transform: translateY(-2px); border-color: rgba(95, 127, 114, .34); box-shadow: 0 14px 30px rgba(36, 49, 45, .08); }
-    .path-card span, .recommendation-card span, .country-tile span, .guide-card span { color: #806738; font-size: 12px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
-    .path-card span { display: inline-flex; align-items: center; gap: 8px; }
-    .path-card b { width: 26px; height: 26px; display: grid; place-items: center; border-radius: 50%; background: color-mix(in srgb, var(--path-accent, var(--brass)) 18%, white); color: var(--path-accent, var(--brass)); font-size: 11px; }
-    .path-card strong, .country-tile strong, .trust-card strong { display: block; margin: 8px 0; font-size: 18px; line-height: 1.12; }
-    .path-card p, .recommendation-card p, .country-tile p, .trust-card p, .guide-card p { margin: 0; color: var(--muted); font-size: 14px; }
-    .path-card em { display: inline-block; margin-top: 14px; color: var(--path-accent, var(--brass)); font-size: 13px; font-style: normal; font-weight: 900; }
-    .recommendation-card h3, .guide-card h3 { margin: 8px 0 4px; font-size: 18px; line-height: 1.12; }
-    .recommendation-card strong { display: block; margin: 12px 0 8px; font-size: 24px; }
-    .recommendation-card em { display: block; color: #3f4d48; font-size: 13px; font-style: normal; line-height: 1.45; }
-    .recommendation-card dl { display: grid; gap: 8px; margin: 12px 0 0; }
-    .recommendation-card dt { color: var(--brass); font-size: 10px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; }
-    .recommendation-card dd { margin: 3px 0 0; color: var(--muted); font-size: 12px; line-height: 1.38; }
-    .recommendation-card summary { margin-top: 12px; cursor: pointer; color: var(--ink); font-size: 13px; font-weight: 900; }
-    .more-markets { display: flex; flex-wrap: wrap; gap: 7px 14px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); font-size: 13px; }
-    .more-markets span { color: var(--muted); font-weight: 800; }
-    .more-markets a { color: var(--ink); }
-    .method-compact { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
-    .method-compact h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 38px); }
-    .method-compact p { margin: 6px 0 0; color: var(--muted); }
-    .method-compact a { flex: none; font-weight: 800; }
-    .trust-card span { width: 34px; height: 34px; display: grid; place-items: center; margin-bottom: 12px; border-radius: 50%; background: #eef3f0; color: var(--deep); font-weight: 900; }
-    .cta-band { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 18px; align-items: center; padding: 26px; border-radius: 8px; background: var(--deep); color: #fffdf7; }
-    .cta-band h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: clamp(26px, 4vw, 40px); }
-    .cta-band p { max-width: 700px; margin: 8px 0 0; color: rgba(255, 253, 247, .78); }
-    .cta-band .primary-action { background: #fffdf7; color: var(--deep); }
-    .cta-band--light { margin-bottom: 28px; background: #eef4ef; color: var(--ink); border: 1px solid rgba(95, 127, 114, .25); }
-    .cta-band--light p { color: #45534e; }
-    .cta-band--light .primary-action { background: var(--eucalyptus); color: #fffdf7; }
-    a:focus-visible, button:focus-visible, select:focus-visible, summary:focus-visible { outline: 3px solid rgba(169, 138, 75, .55); outline-offset: 3px; }
-    .footer { padding: 26px 0 42px; color: var(--muted); }
-    .footer-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(250px, 340px); gap: 24px; align-items: start; }
-    .footer nav { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
-    .footer-signup { padding: 16px; border: 1px solid var(--line); border-radius: 8px; background: rgba(255, 253, 247, .68); }
-    .footer-signup p { margin: 8px 0 12px; }
-    @media (max-width: 980px) {
-      .hero { min-height: auto; padding-bottom: 58px; }
-      .hero-grid { grid-template-columns: 1fr; }
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .explore-grid, .finder-grid, .finder-results, .inspired-band, .report-grid, .footer-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .explore-column:nth-child(3) { grid-column: 1 / -1; padding-left: 0; border-left: 0; }
-    }
-    @media (max-width: 640px) {
-      .shell { width: min(1160px, calc(100% - 28px)); }
-      .top-links { display: none; }
-      .mobile-menu { display: block; }
-      .brand-logo { width: 158px; max-width: 66vw; }
-      .hero-grid { gap: 18px; padding-top: 80px; }
-      .eyebrow { max-width: 330px; font-size: 11px; letter-spacing: .12em; }
-      h1 { max-width: min(100%, 362px); font-size: clamp(36px, 10vw, 48px); line-height: 1; overflow-wrap: anywhere; }
-      .lede { max-width: min(100%, 362px); margin-top: 18px; font-size: 16px; }
-      .hero-actions { gap: 10px; }
-      .hero-actions > .primary-action, .hero-secondary-actions { width: 100%; }
-      .hero-secondary-actions { display: grid; gap: 2px; }
-      .hero-secondary-actions a { width: 100%; min-height: 38px; }
-      .section { padding: 18px; }
-      .section--finder { padding: 20px; }
-      .finder-map-cue { width: 190px; height: 110px; opacity: .09; }
-      .section-header, .cta-band { display: block; }
-      .section-header h2 { max-width: 300px; font-size: 24px; line-height: 1.05; }
-      .section-header a, .cta-band a { margin-top: 14px; }
-      .path-grid, .recommendation-grid, .country-grid, .trust-grid, .guide-grid, .explore-grid, .finder-grid, .finder-results, .inspired-band, .report-grid, .footer-grid { grid-template-columns: 1fr; }
-      .recommendation-card__visual { height: 158px; }
-      .recommendation-card__image { height: 158px; }
-      .explore-column, .explore-column + .explore-column { grid-column: auto; padding: 0; border-left: 0; }
-      .explore-column + .explore-column { padding-top: 18px; border-top: 1px solid var(--line); }
-      .method-compact { display: block; }
-      .method-compact a { display: inline-block; margin-top: 12px; }
-      .inspired-visual { min-height: 230px; }
-      .atlas-visual { min-height: 140px; }
-    }
-  </style>
-</head>
-<body>
-  <header class="hero" id="top">
+    html { scroll-behavior: smooth; overflow-x: hidden; }
+    .gha-mode-landing { margin: 0; overflow-x: hidden; background: var(--gha-paper); color: var(--gha-ink); font-family: var(--gha-reading-sans); font-weight: 400; }
+    .gha-mode-landing *, .gha-mode-landing *::before, .gha-mode-landing *::after { box-sizing: border-box; }
+    .gha-mode-landing a { color: var(--gha-link); text-underline-offset: .18em; text-decoration-thickness: 1px; }
+    .gha-mode-landing p { line-height: 1.62; }
+    .gha-mode-landing :focus-visible { outline: 2px solid var(--gha-accent); outline-offset: 4px; }
+    .gha-shell, .gha-mode-landing .shell { width: min(1220px, calc(100% - 48px)); margin-inline: auto; }
 
-    <nav class="topbar" aria-label="Primary">
-      <div class="shell topbar__inner">
-        <a class="brand" href="/" aria-label="Global Home Atlas home"><img class="brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
-        <div class="top-links">
-          <a href="/find-your-fit/">Find your fit</a>
-<a href="/dashboard/">Destinations</a>
-<a href="/guides/#country-selection">Countries</a>
-<a href="/guides/">Guides</a>
-<a href="/methodology/">Methodology</a>
-        </div>
-        <details class="mobile-menu">
+    .gha-header { position: absolute; inset: 0 0 auto; z-index: 20; color: var(--gha-ink); }
+    .gha-header__inner { min-height: 86px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 3px solid var(--gha-ink); }
+    .gha-brand { display: flex; align-items: center; text-decoration: none; }
+    .gha-brand img { display: block; width: 150px; height: auto; }
+    .gha-primary-nav { display: block; }
+    .gha-primary-links { display: flex; align-items: center; gap: 28px; }
+    .gha-primary-links a { font-weight: 500; color: var(--gha-ink); font-size: 12px; letter-spacing: .075em; text-decoration: none; text-transform: uppercase; }
+    .gha-primary-links a:hover { color: var(--gha-accent); }
+    .gha-mobile-menu { display: none; position: relative; }
+    .gha-mobile-menu summary { min-height: 44px; display: inline-flex; align-items: center; padding: 0 4px; color: var(--gha-ink); font-size: 14px; font-weight: 500; list-style: none; cursor: pointer; }
+    .gha-mobile-menu summary::-webkit-details-marker { display: none; }
+    .gha-mobile-menu nav { position: absolute; top: calc(100% + 8px); right: 0; width: min(82vw, 300px); display: grid; padding: 8px 16px; border: 1px solid var(--gha-rule); background: var(--gha-surface); box-shadow: 0 18px 44px rgba(36, 49, 45, .14); }
+    .gha-mobile-menu nav a { min-height: 44px; display: flex; align-items: center; border-bottom: 1px solid var(--gha-rule); color: var(--gha-ink); font-size: 14px; font-weight: 500; text-decoration: none; }
+    .gha-mobile-menu nav a:last-child { border-bottom: 0; }
+
+    .gha-mode-landing .hero { min-height: 760px; display: grid; align-items: center; padding: 128px 0 92px; background: linear-gradient(90deg, rgba(244, 239, 228, .99) 0 43%, rgba(244, 239, 228, .78) 64%, rgba(244, 239, 228, .28)), url("/assets/atlas-map-coastal-sage.jpg") center / cover; }
+    .gha-mode-landing .hero-grid { width: min(790px, calc(100% - 48px)); max-width: none; margin: 0 auto 0 max(24px, calc((100% - 1220px) / 2)); display: grid; padding-top: 42px; }
+    .gha-mode-landing h1 { max-width: 780px; font-family: var(--gha-display-serif); font-size: clamp(54px, 5.5vw, 78px); font-weight: 500; line-height: .96; letter-spacing: -.035em; }
+    .gha-mode-landing .lede { max-width: 670px; margin-top: 28px; color: #46524d; font-family: var(--gha-display-serif); font-size: clamp(20px, 2vw, 25px); line-height: 1.42; }
+    .gha-mode-landing .hero-actions { display: flex; flex-wrap: wrap; align-items: center; margin-top: 32px; gap: 8px 22px; }
+    .gha-mode-landing .hero-actions .text-action { flex-basis: 100%; }
+    .gha-mode-landing .hero-secondary-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 24px; }
+    .gha-mode-landing .primary-action { font-weight: 500; }
+    .gha-mode-landing .primary-action { min-height: 46px; display: inline-flex; align-items: center; justify-content: center; padding: 0 18px; border: 1px solid var(--gha-ink); border-radius: 0; background: var(--gha-ink); color: var(--gha-paper); font-size: 12px; font-weight: 500; letter-spacing: .055em; text-decoration: none; text-transform: uppercase; box-shadow: none; }
+    .gha-mode-landing .secondary-action { min-height: 44px; display: inline-flex; align-items: center; padding: 0; border: 0; border-radius: 0; background: transparent; color: var(--gha-ink); font-size: 14px; font-weight: 500; text-decoration: underline; text-underline-offset: .2em; }
+    .gha-mode-landing .text-action { min-height: 44px; display: inline-flex; align-items: center; color: var(--gha-ink); font-size: 14px; font-weight: 500; text-decoration: none; }
+    .gha-mode-landing .text-action::after, .gha-mode-landing .card-link::after { content: " →"; }
+    .gha-mode-landing .primary-action:hover { background: var(--gha-accent); color: var(--gha-paper); }
+    .gha-mode-landing .secondary-action:hover, .gha-mode-landing .text-action:hover { color: var(--gha-accent); }
+    .gha-mode-landing main { position: relative; z-index: 1; margin: 0; }
+    .gha-mode-landing .section { margin: 0; padding: 64px 0; border: 0; border-top: 1px solid var(--gha-rule); border-radius: 0; background: transparent; box-shadow: none; }
+    .gha-mode-landing main > .shell > .section:first-child { border-top: 0; }
+    .gha-mode-landing .section-header { display: flex; justify-content: space-between; gap: 24px; margin-bottom: 28px; align-items: end; }
+    .gha-mode-landing .section-header h2, .gha-mode-landing .method-compact h2 { font-family: var(--gha-display-serif); font-size: clamp(38px, 4.2vw, 54px); font-weight: 500; line-height: 1; letter-spacing: -.025em; }
+    .gha-mode-landing .section-header p, .gha-mode-landing .method-compact p { color: #47534e; font-size: 16px; line-height: 1.65; }
+
+    .gha-mode-landing .atlas-tool-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+    .gha-mode-landing .atlas-tool { min-height: 100%; display: grid; align-content: start; gap: 12px; padding: 20px 0 0; border-top: 3px solid var(--gha-ink); }
+    .gha-mode-landing .atlas-tool h3 { margin: 0; font-family: var(--gha-display-serif); font-size: 27px; font-weight: 500; line-height: 1.08; }
+    .gha-mode-landing .atlas-tool p { margin: 0; color: var(--gha-muted); font-size: 14px; }
+    .gha-mode-landing .atlas-tool__link { min-height: 44px; display: inline-flex; align-items: center; margin-top: 4px; font-weight: 500; }
+    .gha-mode-landing .atlas-tool__link::after { content: " →"; }
+    .gha-mode-landing .atlas-support { margin: 24px 0 0; color: var(--gha-muted); font-size: 14px; }
+    .gha-mode-landing .atlas-support a { font-weight: 500; }
+
+    .gha-mode-landing .intent-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 42px; }
+    .gha-mode-landing .intent-item { padding: 20px 0; border-top: 1px solid var(--gha-rule); }
+    .gha-mode-landing .intent-item h3 { margin: 0; font-family: var(--gha-display-serif); font-size: 25px; font-weight: 500; }
+    .gha-mode-landing .intent-item h3 a { color: var(--gha-ink); }
+    .gha-mode-landing .intent-item p { margin: 8px 0 0; color: var(--gha-muted); font-size: 14px; }
+
+    .gha-mode-landing .section--finder { margin: 72px 0; padding: 40px; border: 1px solid var(--gha-rule); background: rgba(255, 253, 247, .62); }
+    .gha-mode-landing .finder-map-cue { display: none; }
+    .gha-mode-landing .finder-grid { display: grid; grid-template-columns: minmax(250px, 300px) minmax(0, 1fr); gap: 38px; align-items: start; }
+    .gha-mode-landing .finder-panel, .gha-mode-landing .finder-output { display: grid; align-content: start; gap: 14px; }
+    .gha-mode-landing .finder-panel label { display: grid; gap: 9px; }
+    .gha-mode-landing .finder-panel select { width: 100%; min-height: 48px; padding: 0 14px; border: 1px solid var(--gha-rule); border-radius: 0; background: var(--gha-surface); color: var(--gha-ink); font: inherit; font-weight: 400; }
+    .gha-mode-landing .finder-step, .gha-mode-landing .finder-panel label, .gha-mode-landing .finder-result span, .gha-mode-landing .finder-result dt { color: var(--gha-accent); font-weight: 500; }
+    .gha-mode-landing .finder-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+    .gha-mode-landing .finder-result { min-width: 0; display: grid; align-content: start; padding: 0 0 18px; border: 0; border-bottom: 1px solid var(--gha-rule); border-radius: 0; background: transparent; box-shadow: none; }
+    .gha-mode-landing .finder-result__thumb { height: 112px; margin: 0 0 14px; border-radius: 0; }
+    .gha-mode-landing .finder-result__thumb { overflow: hidden; background: #e8ede7; }
+    .gha-mode-landing .finder-result__thumb img { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .gha-mode-landing .finder-result h3 { margin: 8px 0 4px; font-family: var(--gha-display-serif); font-size: 24px; font-weight: 500; line-height: 1.1; }
+    .gha-mode-landing .finder-result h3 a { color: var(--gha-ink); }
+    .gha-mode-landing .finder-result p { margin: 0 0 10px; color: var(--gha-muted); font-size: 14px; }
+    .gha-mode-landing .finder-note { color: var(--gha-muted); font-size: 13px; }
+    .gha-mode-landing .finder-signal strong { color: var(--gha-accent); font-size: 10px; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; }
+    .gha-mode-landing .card-link { font-weight: 500; }
+
+    .gha-mode-landing .research-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 42px; }
+    .gha-mode-landing .research-link { padding: 18px 0; border-top: 1px solid var(--gha-rule); }
+    .gha-mode-landing .research-link h3 { margin: 0; font-family: var(--gha-display-serif); font-size: 24px; font-weight: 500; line-height: 1.15; }
+    .gha-mode-landing .research-link a { min-height: 44px; display: inline-flex; align-items: center; color: var(--gha-ink); }
+    .gha-mode-landing .research-link p { margin: 6px 0 0; color: var(--gha-muted); font-size: 14px; }
+
+    .gha-mode-landing .browse-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 56px; }
+    .gha-mode-landing .browse-column h3 { margin: 0 0 14px; font-family: var(--gha-display-serif); font-size: 27px; font-weight: 500; }
+    .gha-mode-landing .browse-column ul { columns: 2; column-gap: 24px; margin: 0; padding: 0; list-style: none; }
+    .gha-mode-landing .browse-column li { break-inside: avoid; margin: 0; }
+    .gha-mode-landing .browse-column li a { min-height: 44px; display: flex; align-items: center; font-size: 14px; font-weight: 500; }
+    .gha-mode-landing .browse-all { min-height: 44px; display: inline-flex; align-items: center; margin-top: 12px; font-weight: 500; }
+
+    .gha-mode-landing .latest-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; }
+    .gha-mode-landing .latest-item { padding-top: 18px; border-top: 1px solid var(--gha-rule); }
+    .gha-mode-landing .latest-item time { color: var(--gha-accent); font-size: 12px; font-weight: 500; }
+    .gha-mode-landing .latest-item h3 { margin: 10px 0 6px; font-family: var(--gha-display-serif); font-size: 24px; font-weight: 500; line-height: 1.14; }
+    .gha-mode-landing .latest-item h3 a { color: var(--gha-ink); }
+    .gha-mode-landing .latest-item p { margin: 0; color: var(--gha-muted); font-size: 14px; }
+
+    .gha-mode-landing .method-compact { display: flex; align-items: end; justify-content: space-between; gap: 32px; }
+    .gha-mode-landing .coverage-line { color: var(--gha-ink); font-family: var(--gha-display-serif); font-size: 19px; }
+    .gha-mode-landing .method-links { flex: none; display: grid; gap: 10px; }
+    .gha-mode-landing .method-links a { font-weight: 500; }
+    .gha-footer { font-weight: 400; }
+    .gha-footer { padding: 54px 0; background: var(--gha-ink); color: var(--gha-paper); }
+    .gha-footer__grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(260px, 340px); gap: 48px; }
+    .gha-footer strong { font-family: var(--gha-display-serif); font-size: 25px; font-weight: 500; }
+    .gha-footer p { max-width: 54ch; color: rgba(244, 239, 228, .72); font-size: 13px; line-height: 1.6; }
+    .gha-footer nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 24px; }
+    .gha-footer a { color: var(--gha-paper); font-size: 13px; font-weight: 500; }
+    .gha-footer__signup { display: grid; align-content: start; gap: 10px; }
+
+    @media (max-width: 860px) {
+      .gha-shell, .gha-mode-landing .shell { width: min(100% - 32px, 1220px); }
+      .gha-header__inner { min-height: 74px; }
+      .gha-primary-links { display: none; }
+      .gha-mobile-menu { display: block; }
+      .gha-mode-landing .hero { min-height: 680px; padding: 106px 0 72px; background-position: 62% center; }
+      .gha-mode-landing .hero-grid { width: min(790px, calc(100% - 32px)); margin-left: 16px; padding-top: 28px; }
+      .gha-mode-landing .atlas-tool-grid, .gha-mode-landing .latest-grid { grid-template-columns: 1fr; gap: 28px; }
+      .gha-mode-landing .section--finder { margin: 48px 0; padding: 28px; }
+      .gha-mode-landing .finder-grid { grid-template-columns: 1fr; gap: 22px; }
+      .gha-mode-landing .finder-results { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .gha-footer__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 620px) {
+      .gha-mode-landing .hero { min-height: 620px; padding: 96px 0 60px; background: linear-gradient(180deg, rgba(244, 239, 228, .98) 0 58%, rgba(244, 239, 228, .72)), url("/assets/atlas-map-coastal-sage.jpg") 67% center / cover; }
+      .gha-mode-landing h1 { font-size: clamp(52px, 16vw, 72px); }
+      .gha-mode-landing .hero-secondary-actions { display: grid; gap: 2px; }
+      .gha-mode-landing .hero-secondary-actions a { min-height: 44px; }
+      .gha-mode-landing .section { padding: 48px 0; }
+      .gha-mode-landing .section--finder { padding: 22px 18px; }
+      .gha-mode-landing .section-header, .gha-mode-landing .method-compact { display: grid; grid-template-columns: 1fr; align-items: start; }
+      .gha-mode-landing .intent-grid, .gha-mode-landing .research-grid, .gha-mode-landing .browse-grid, .gha-mode-landing .finder-results { grid-template-columns: 1fr; }
+      .gha-mode-landing .finder-result { display: grid; grid-template-columns: 112px 1fr; column-gap: 14px; }
+      .gha-mode-landing .finder-result__thumb { grid-row: 1 / span 6; height: 112px; }
+      .gha-mode-landing .browse-grid { gap: 36px; }
+      .gha-mode-landing .browse-column ul { columns: 1; }
+      .gha-footer__grid, .gha-footer nav { grid-template-columns: 1fr; }
+      .gha-footer__grid { gap: 32px; }
+    }
+    </style>
+</head>
+<body class="gha-mode-landing" data-design-system="gha-v1">
+
+  <header class="gha-header">
+    <nav class="gha-primary-nav" aria-label="Primary">
+      <div class="gha-shell gha-header__inner">
+        <a class="gha-brand" href="/" aria-label="Global Home Atlas home">
+          <img src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas" width="174" height="48">
+        </a>
+        <div class="gha-primary-links"><a href="/dashboard/">Destination Rankings</a>
+<a href="/retirement-abroad-calculator/">Retirement Calculator</a>
+<a href="/countries/">Country Guides</a>
+<a href="/guides/">Buying Guides</a></div>
+        <details class="gha-mobile-menu">
           <summary>Menu</summary>
-          <nav aria-label="Mobile primary">
-            <a href="/find-your-fit/">Find your fit</a>
-<a href="/dashboard/">Destinations</a>
-<a href="/guides/#country-selection">Countries</a>
-<a href="/guides/">Guides</a>
-<a href="/methodology/">Methodology</a>
-          </nav>
+          <nav aria-label="Mobile primary"><a href="/dashboard/">Destination Rankings</a>
+<a href="/retirement-abroad-calculator/">Retirement Calculator</a>
+<a href="/countries/">Country Guides</a>
+<a href="/guides/">Buying Guides</a></nav>
         </details>
       </div>
     </nav>
+  </header>
 
+  <section class="hero" id="top" aria-labelledby="landing-title">
     <div class="shell hero-grid">
       <div>
-        <p class="eyebrow">Independent overseas property research</p>
-        <h1>Global Home Atlas</h1>
-        <p class="lede">Find overseas property markets that fit your lifestyle, ownership constraints, budget, and exit plan.</p>
+        <h1 id="landing-title">Find the right place to buy property abroad</h1>
+        <p class="lede">Compare 37 destinations across 17 countries using foreign ownership, retirement fit, realistic costs, rental rules, resale potential, and 111 representative listings.</p>
 
         <div class="hero-actions">
-          <a class="primary-action" href="/find-your-fit/" data-track="homepage_start_click" data-track-label="hero">Find my best-fit destinations</a>
-          <nav class="hero-secondary-actions" aria-label="Explore Global Home Atlas">
-            <a class="text-action" href="/guides/#country-selection" data-track="country_browse_click" data-track-label="hero">Browse countries</a>
-            <a class="text-action" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="hero">Calculate retirement needs</a>
-            <a class="text-action" href="/retirement-destination-finder/">Find affordable retirement destinations</a>
-            <a class="text-action" href="/methodology/" data-track="methodology_click" data-track-label="hero">View methodology</a>
-          </nav>
+          <a class="primary-action" href="/dashboard/#destinations" data-track="homepage_start_click" data-track-label="hero rankings">Explore the rankings</a>
+          <a class="secondary-action" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="hero calculator">Calculate retirement needs</a>
+          <a class="text-action" href="/retirement-destinations-ranked-by-cost/" data-track="retirement_ranking_open" data-track-label="hero retirement ranking">See retirement destinations ranked by required capital</a>
         </div>
       </div>
     </div>
-  </header>
+  </section>
 
   <main>
     <div class="shell">
+      <section class="section" id="atlas-tools">
+        <div class="section-header">
+          <div>
+            <h2>Atlas tools</h2>
+            <p>Start with the rankings, then use the calculator to test the plan against your own resources.</p>
+          </div>
+        </div>
+        <div class="atlas-tool-grid">
+
+        <article class="atlas-tool">
+          <h3>Global destination rankings</h3>
+          <p>Compare 37 destinations across the same ten weighted decision dimensions.</p>
+          <a class="atlas-tool__link" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="landing atlas tools">Explore rankings across 17 countries</a>
+        </article>
+
+        <article class="atlas-tool">
+          <h3>Retirement capital rankings</h3>
+          <p>See how annual spending and required retirement capital change by destination.</p>
+          <a class="atlas-tool__link" href="/retirement-destinations-ranked-by-cost/" data-track="retirement_ranking_open" data-track-label="landing atlas tools">Compare retirement costs</a>
+        </article>
+
+        <article class="atlas-tool">
+          <h3>Retirement-abroad calculator</h3>
+          <p>Model your own plan, then compare it with 111 representative property listings.</p>
+          <a class="atlas-tool__link" href="/retirement-abroad-calculator/" data-track="retirement_calculator_open" data-track-label="landing atlas tools">Calculate what you need</a>
+        </article>
+        </div>
+        <p class="atlas-support">Prefer to start with a target budget? <a href="/retirement-destination-finder/" data-track="retirement_finder_open" data-track-label="landing atlas tools">Find affordable retirement destinations</a>.</p>
+      </section>
+
+      <section class="section" id="intent-paths">
+        <div class="section-header">
+          <div>
+            <h2>Choose your buying path</h2>
+            <p>Start with the question the property needs to answer.</p>
+          </div>
+        </div>
+        <div class="intent-grid">
+
+        <article class="intent-item">
+          <h3><a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="buyer_path_click" data-track-label="Buy property abroad for retirement">Buy property abroad for retirement</a></h3>
+          <p>Compare healthcare practicality, daily life, ownership rules and resale depth before choosing a long-term base.</p>
+        </article>
+
+        <article class="intent-item">
+          <h3><a href="/best-places-to-buy-a-second-home-abroad/" data-track="buyer_path_click" data-track-label="Buy a second or vacation home abroad">Buy a second or vacation home abroad</a></h3>
+          <p>Compare access, repeat owner use, carrying costs, rental restrictions and future buyer demand.</p>
+        </article>
+
+        <article class="intent-item">
+          <h3><a href="/overseas-property-investment/" data-track="buyer_path_click" data-track-label="Compare overseas property investments">Compare overseas property investments</a></h3>
+          <p>Start with realistic net income, entry value, regulatory safety and exit liquidity.</p>
+        </article>
+
+        <article class="intent-item">
+          <h3><a href="/where-can-foreigners-buy-property/" data-track="buyer_path_click" data-track-label="Find countries where foreigners can buy">Find countries where foreigners can buy</a></h3>
+          <p>Compare legal access, title practicality and the local checks required before making an offer.</p>
+        </article>
+        </div>
+      </section>
+
       <section class="section section--finder" id="market-finder">
         <div class="finder-map-cue" aria-hidden="true"></div>
         <div class="section-header">
@@ -340,142 +303,140 @@
         </div>
       </section>
 
-      <section class="section" id="recommendations">
+      <section class="section" id="priority-research">
         <div class="section-header">
           <div>
-            <h2>Three destinations to start with</h2>
-            <p>Well-rounded options for buyers who are still deciding where to look.</p>
+            <h2>Priority property research</h2>
+            <p>Core guides for the questions international buyers search before choosing a market.</p>
           </div>
-          <a href="/dashboard/" data-track="dashboard_open" data-track-label="recommendations">Compare all destinations</a>
         </div>
-        <div class="recommendation-grid">
+        <div class="research-grid">
 
-            <article class="recommendation-card">
-              <div class="recommendation-card__visual">
-                <picture>
-                  <source type="image/webp" srcset="/assets/market-fukuoka-itoshima-600.webp 600w, /assets/market-fukuoka-itoshima-900.webp 900w" sizes="(max-width: 640px) calc(100vw - 60px), (max-width: 980px) 50vw, 360px">
-                  <img class="recommendation-card__image" src="/assets/market-fukuoka-itoshima.jpg" alt="Fukuoka waterfront and city skyline" width="900" height="600" loading="lazy" decoding="async">
-                </picture>
-              </div>
-              <div class="recommendation-card__body">
-                <span>Best overall</span>
-                <h3><a href="/destinations/fukuoka-itoshima/" data-track="destination_click" data-track-label="landing recommendation Fukuoka / Itoshima">Fukuoka / Itoshima</a></h3>
-                <p>Japan · Water</p>
-                <strong>4.3/5</strong>
-                <em>Easy ownership, strong day-to-day living and access to a major city.</em>
-                <a class="card-link" href="/destinations/fukuoka-itoshima/" data-track="destination_click" data-track-label="landing recommendation cta Fukuoka / Itoshima">See full profile</a>
-              </div>
-            </article>
+        <article class="research-link">
+          <h3><a href="/best-places-to-buy-a-second-home-abroad/" data-track="guide_click" data-track-label="landing priority Best Places to Buy a Second Home Abroad">Best Places to Buy a Second Home Abroad</a></h3>
+          <p>Compare the best places to buy a second home abroad for family use, vacation-home optionality, rental offset, ownership clarity, and resale liquidity.</p>
+        </article>
 
-            <article class="recommendation-card">
-              <div class="recommendation-card__visual">
-                <picture>
-                  <source type="image/webp" srcset="/assets/market-valencia-600.webp 600w, /assets/market-valencia-900.webp 900w" sizes="(max-width: 640px) calc(100vw - 60px), (max-width: 980px) 50vw, 360px">
-                  <img class="recommendation-card__image" src="/assets/market-valencia.jpg" alt="Valencia streetscape opening toward the Mediterranean" width="900" height="600" loading="lazy" decoding="async">
-                </picture>
-              </div>
-              <div class="recommendation-card__body">
-                <span>Best for city and beach</span>
-                <h3><a href="/destinations/valencia/" data-track="destination_click" data-track-label="landing recommendation Valencia">Valencia</a></h3>
-                <p>Spain · Water</p>
-                <strong>4.1/5</strong>
-                <em>A walkable city with beaches, healthcare, an airport and year-round life.</em>
-                <a class="card-link" href="/destinations/valencia/" data-track="destination_click" data-track-label="landing recommendation cta Valencia">See full profile</a>
-              </div>
-            </article>
+        <article class="research-link">
+          <h3><a href="/best-places-to-buy-vacation-home-abroad/" data-track="guide_click" data-track-label="landing priority Best Places to Buy a Vacation Home in the World">Best Places to Buy a Vacation Home in the World</a></h3>
+          <p>Compare the best places to buy a vacation home worldwide by prices, buyer access, lifestyle, rental rules, carrying costs, and resale potential.</p>
+        </article>
 
-            <article class="recommendation-card">
-              <div class="recommendation-card__visual">
-                <picture>
-                  <source type="image/webp" srcset="/assets/market-algarve-cascais-600.webp 600w, /assets/market-algarve-cascais-900.webp 900w" sizes="(max-width: 640px) calc(100vw - 60px), (max-width: 980px) 50vw, 360px">
-                  <img class="recommendation-card__image" src="/assets/market-algarve-cascais.jpg" alt="Portuguese coastal town overlooking the Atlantic" width="900" height="600" loading="lazy" decoding="async">
-                </picture>
-              </div>
-              <div class="recommendation-card__body">
-                <span>Best for retirement</span>
-                <h3><a href="/destinations/algarve-cascais/" data-track="destination_click" data-track-label="landing recommendation Algarve / Cascais">Algarve / Cascais</a></h3>
-                <p>Portugal · Water</p>
-                <strong>4.1/5</strong>
-                <em>Warm weather, established expat communities and plenty of towns to compare.</em>
-                <a class="card-link" href="/destinations/algarve-cascais/" data-track="destination_click" data-track-label="landing recommendation cta Algarve / Cascais">See full profile</a>
-              </div>
-            </article>
+        <article class="research-link">
+          <h3><a href="/best-countries-for-expats-to-buy-property/" data-track="guide_click" data-track-label="landing priority Best Countries for Expats to Buy Property">Best Countries for Expats to Buy Property</a></h3>
+          <p>Compare the best countries for expats to buy property by foreign-buyer practicality, ownership rules, lifestyle quality, value, and resale depth.</p>
+        </article>
+
+        <article class="research-link">
+          <h3><a href="/where-can-foreigners-buy-property/" data-track="guide_click" data-track-label="landing priority Where Can Foreigners Buy Property?">Where Can Foreigners Buy Property?</a></h3>
+          <p>Compare where foreigners can buy property using ownership clarity, transaction practicality, lifestyle quality, value, and resale depth across global destinations.</p>
+        </article>
+
+        <article class="research-link">
+          <h3><a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="guide_click" data-track-label="landing priority Best Places to Buy Property Abroad for Retirement">Best Places to Buy Property Abroad for Retirement</a></h3>
+          <p>Compare the best places to buy property abroad for retirement using ownership clarity, healthcare, lifestyle, value, rental resilience, and exit liquidity.</p>
+        </article>
+
+        <article class="research-link">
+          <h3><a href="/best-countries-to-buy-property-as-a-foreigner/" data-track="guide_click" data-track-label="landing priority Best Countries to Buy Property as a Foreigner">Best Countries to Buy Property as a Foreigner</a></h3>
+          <p>Compare where foreigners can buy property with ownership clarity, title practicality, lifestyle quality, value discipline, and resale depth.</p>
+        </article>
         </div>
-        <nav class="more-markets" aria-label="More featured destinations"><span>More destinations</span><a href="/destinations/crete/" data-track="destination_click" data-track-label="more destinations Crete">Crete</a><a href="/destinations/lake-como/" data-track="destination_click" data-track-label="more destinations Lake Como">Lake Como</a><a href="/destinations/madeira/" data-track="destination_click" data-track-label="more destinations Madeira">Madeira</a><a href="/destinations/phuket-koh-samui/" data-track="destination_click" data-track-label="more destinations Phuket / Koh Samui">Phuket / Koh Samui</a><a href="/destinations/queenstown/" data-track="destination_click" data-track-label="more destinations Queenstown">Queenstown</a><a href="/destinations/whistler/" data-track="destination_click" data-track-label="more destinations Whistler">Whistler</a></nav>
       </section>
 
-      <section class="section" id="explore">
+      <section class="section" id="browse-atlas">
         <div class="section-header">
           <div>
-            <h2>Explore the research</h2>
-            <p>Browse by what you want to buy, where you want to look or what you need to learn.</p>
+            <h2>Browse the Atlas</h2>
+            <p>Country guides and destination dossiers expand automatically as the research universe grows.</p>
           </div>
         </div>
-        <div class="explore-grid">
-          <div class="explore-column">
-        <h3>By buying goal</h3>
-        <ul><li class="explore-primary"><a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="buyer_path_click" data-track-label="explore Retirement or lifestyle">Retirement or lifestyle</a></li><li class="explore-primary"><a href="/best-places-to-buy-a-second-home-abroad/" data-track="buyer_path_click" data-track-label="explore Second home abroad">Second home abroad</a></li><li class="explore-primary"><a href="/overseas-property-investment/" data-track="buyer_path_click" data-track-label="explore Investment-led shortlist">Investment-led shortlist</a></li></ul><details class="explore-more"><summary>More buying goals</summary><ul><li><a href="/where-can-foreigners-buy-property/" data-track="buyer_path_click" data-track-label="explore Clear foreign ownership">Clear foreign ownership</a></li></ul></details>
-        <a class="explore-all" href="/guides/" data-track="guide_click" data-track-label="explore all buying goals">View all</a>
+        <div class="browse-grid">
+          <div class="browse-column">
+        <h3>Country property guides</h3>
+        <ul><li><a href="/countries/australia-property/" data-track="country_hub_click" data-track-label="landing browse Australia">Australia property guide</a></li><li><a href="/countries/austria-property/" data-track="country_hub_click" data-track-label="landing browse Austria">Austria property guide</a></li><li><a href="/countries/canada-property/" data-track="country_hub_click" data-track-label="landing browse Canada">Canada property guide</a></li><li><a href="/countries/croatia-property/" data-track="country_hub_click" data-track-label="landing browse Croatia">Croatia property guide</a></li><li><a href="/countries/france-property/" data-track="country_hub_click" data-track-label="landing browse France">France property guide</a></li><li><a href="/countries/greece-property/" data-track="country_hub_click" data-track-label="landing browse Greece">Greece property guide</a></li><li><a href="/countries/indonesia-property/" data-track="country_hub_click" data-track-label="landing browse Indonesia">Indonesia property guide</a></li><li><a href="/countries/italy-property/" data-track="country_hub_click" data-track-label="landing browse Italy">Italy property guide</a></li><li><a href="/countries/japan-property/" data-track="country_hub_click" data-track-label="landing browse Japan">Japan property guide</a></li><li><a href="/countries/new-zealand-property/" data-track="country_hub_click" data-track-label="landing browse New Zealand">New Zealand property guide</a></li><li><a href="/countries/portugal-property/" data-track="country_hub_click" data-track-label="landing browse Portugal">Portugal property guide</a></li><li><a href="/countries/spain-property/" data-track="country_hub_click" data-track-label="landing browse Spain">Spain property guide</a></li><li><a href="/countries/switzerland-property/" data-track="country_hub_click" data-track-label="landing browse Switzerland">Switzerland property guide</a></li><li><a href="/countries/thailand-property/" data-track="country_hub_click" data-track-label="landing browse Thailand">Thailand property guide</a></li><li><a href="/countries/united-arab-emirates-property/" data-track="country_hub_click" data-track-label="landing browse United Arab Emirates">United Arab Emirates property guide</a></li><li><a href="/countries/united-states-property/" data-track="country_hub_click" data-track-label="landing browse United States">United States property guide</a></li><li><a href="/countries/vietnam-property/" data-track="country_hub_click" data-track-label="landing browse Vietnam">Vietnam property guide</a></li></ul>
+        <a class="browse-all" href="/country-comparison/" data-track="country_compare_click" data-track-label="landing browse all countries">Compare all 17 countries</a>
       </div>
-      <div class="explore-column">
-        <h3>By country</h3>
-        <ul><li class="explore-primary"><a href="/countries/spain-property/" data-track="country_hub_click" data-track-label="explore Spain">Spain</a></li><li class="explore-primary"><a href="/countries/portugal-property/" data-track="country_hub_click" data-track-label="explore Portugal">Portugal</a></li><li class="explore-primary"><a href="/countries/japan-property/" data-track="country_hub_click" data-track-label="explore Japan">Japan</a></li></ul><details class="explore-more"><summary>More countries</summary><ul><li><a href="/countries/united-states-property/" data-track="country_hub_click" data-track-label="explore United States">United States</a></li><li><a href="/countries/canada-property/" data-track="country_hub_click" data-track-label="explore Canada">Canada</a></li><li><a href="/countries/italy-property/" data-track="country_hub_click" data-track-label="explore Italy">Italy</a></li><li><a href="/countries/greece-property/" data-track="country_hub_click" data-track-label="explore Greece">Greece</a></li><li><a href="/countries/thailand-property/" data-track="country_hub_click" data-track-label="explore Thailand">Thailand</a></li><li><a href="/countries/austria-property/" data-track="country_hub_click" data-track-label="explore Austria">Austria</a></li><li><a href="/countries/switzerland-property/" data-track="country_hub_click" data-track-label="explore Switzerland">Switzerland</a></li></ul></details>
-        <a class="explore-all" href="/country-comparison/" data-track="country_compare_click" data-track-label="explore all countries">View all</a>
+      <div class="browse-column">
+        <h3>Destination dossiers</h3>
+        <ul><li><a href="/destinations/fukuoka-itoshima/" data-track="destination_click" data-track-label="landing browse Fukuoka / Itoshima">Fukuoka / Itoshima property dossier</a></li><li><a href="/destinations/dubai/" data-track="destination_click" data-track-label="landing browse Dubai">Dubai property dossier</a></li><li><a href="/destinations/valencia/" data-track="destination_click" data-track-label="landing browse Valencia">Valencia property dossier</a></li><li><a href="/destinations/algarve-cascais/" data-track="destination_click" data-track-label="landing browse Algarve / Cascais">Algarve / Cascais property dossier</a></li><li><a href="/destinations/lake-como/" data-track="destination_click" data-track-label="landing browse Lake Como">Lake Como property dossier</a></li><li><a href="/destinations/miami-fort-lauderdale/" data-track="destination_click" data-track-label="landing browse Miami / Fort Lauderdale">Miami / Fort Lauderdale property dossier</a></li><li><a href="/destinations/crete/" data-track="destination_click" data-track-label="landing browse Crete">Crete property dossier</a></li><li><a href="/destinations/annecy/" data-track="destination_click" data-track-label="landing browse Annecy">Annecy property dossier</a></li></ul>
+        <a class="browse-all" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="landing browse all destinations">Explore all 37 destination rankings</a>
       </div>
-      <div class="explore-column">
-        <h3>Buying guides</h3>
-        <ul><li class="explore-primary"><a href="/retirement-destinations-ranked-by-cost/" data-track="guide_click" data-track-label="landing Retirement Destinations Ranked by How Much You Need">Retirement Destinations Ranked by How Much You Need</a></li><li class="explore-primary"><a href="/best-places-to-buy-property-abroad-for-retirement/" data-track="guide_click" data-track-label="landing Best Places to Buy Property Abroad for Retirement">Best Places to Buy Property Abroad for Retirement</a></li><li class="explore-primary"><a href="/best-places-to-buy-a-second-home-abroad/" data-track="guide_click" data-track-label="landing Best Places to Buy a Second Home Abroad">Best Places to Buy a Second Home Abroad</a></li></ul><details class="explore-more"><summary>More guides</summary><ul><li><a href="/foreign-property-investment-risks/" data-track="guide_click" data-track-label="landing Foreign Property Investment Risks">Foreign Property Investment Risks</a></li><li><a href="/best-places-to-buy-property-in-europe/" data-track="guide_click" data-track-label="landing Best Places to Buy Property in Europe">Best Places to Buy Property in Europe</a></li><li><a href="/best-countries-to-buy-property-as-a-foreigner/" data-track="guide_click" data-track-label="landing Best Countries to Buy Property as a Foreigner">Best Countries to Buy Property as a Foreigner</a></li></ul></details>
-        <a class="explore-all" href="/guides/" data-track="guide_click" data-track-label="explore all guides">View all</a>
-      </div>
+        </div>
+      </section>
+
+      <section class="section" id="latest-research">
+        <div class="section-header">
+          <div>
+            <h2>Latest research</h2>
+            <p>The newest country and buyer guides in the Atlas.</p>
+          </div>
+        </div>
+        <div class="latest-grid">
+
+        <article class="latest-item">
+          <time datetime="2026-08-27">Published 2026-08-27</time>
+          <h3><a href="/united-states-retirement-property-foreign-buyers/" data-track="guide_click" data-track-label="landing latest United States Retirement Property for Foreign Buyers">United States Retirement Property for Foreign Buyers</a></h3>
+          <p>Compare United States retirement property for foreign buyers across residency, healthcare, ownership, tax, insurance, rental rules, climate risk, and four mountain destinations.</p>
+        </article>
+
+        <article class="latest-item">
+          <time datetime="2026-08-27">Published 2026-08-27</time>
+          <h3><a href="/thailand-retirement-property-foreign-buyers/" data-track="guide_click" data-track-label="landing latest Thailand Retirement Property for Foreign Buyers">Thailand Retirement Property for Foreign Buyers</a></h3>
+          <p>Compare Thailand retirement property for foreign buyers across visas, healthcare, condominium and villa ownership, tax, rental rules, climate risk, Phuket, and Koh Samui.</p>
+        </article>
+
+        <article class="latest-item">
+          <time datetime="2026-08-27">Published 2026-08-27</time>
+          <h3><a href="/switzerland-retirement-property-foreign-buyers/" data-track="guide_click" data-track-label="landing latest Switzerland Retirement Property for Foreign Buyers">Switzerland Retirement Property for Foreign Buyers</a></h3>
+          <p>Compare Switzerland retirement property for foreign buyers across residence, Lex Koller, healthcare, tax, second-home rules, climate risk, and three Alpine destinations.</p>
+        </article>
         </div>
       </section>
 
       <section class="section" id="method">
         <div class="method-compact">
           <div>
-            <h2>How we compare destinations</h2>
-            <p>We look at ownership rules, realistic returns, daily life and resale potential.</p>
+            <h2>Research built for real buying decisions</h2>
+            <p class="coverage-line">37 destinations · 17 countries · 111 representative listings · 10 assessment dimensions</p>
+            <p>We compare ownership rules, retirement fit, realistic costs, rental restrictions and resale potential before property-specific local diligence.</p>
           </div>
-          <a href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>
+          <nav class="method-links" aria-label="Research methodology">
+            <a href="/methodology/" data-track="methodology_click" data-track-label="landing methodology">Scoring methodology</a>
+            <a href="/global-property-market-data/" data-track="property_data_open" data-track-label="landing methodology">Download market data</a>
+            <a href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>
+          </nav>
         </div>
-      </section>
-
-      <section class="cta-band" id="conversion">
-        <div>
-          <h2>Want help narrowing your shortlist?</h2>
-          <p>Tell us what you need and we’ll review the destinations on your list.</p>
-        </div>
-        <a class="primary-action" href="/shortlist-review/" data-track="shortlist_review_click" data-track-label="landing cta">Review my shortlist</a>
       </section>
     </div>
   </main>
 
-  <footer class="footer">
-    <div class="shell">
-      <div class="footer-grid">
-        <div>
-          <strong>Global Home Atlas</strong>
-          <p>Independent research for overseas property decisions. Research only; verify legal, tax, immigration, and property advice locally.</p>
-          <nav aria-label="Footer">
-            <a href="/dashboard/">Research dashboard</a>
-            <a href="/country-comparison/">Compare countries</a>
-            <a href="/guides/">Guides</a>
-            <a href="/methodology/">Methodology</a>
-            <a href="/research-standards/">Research standards</a>
-            <a href="/contact/">Contact</a>
-          </nav>
-        </div>
-        <div class="footer-signup">
-          <strong>Get destination updates</strong>
-          <p>Ask to be notified when new destination research or country hubs are added.</p>
-          <a class="secondary-action" href="mailto:hello@globalhomeatlas.com?subject=Global%20Home%20Atlas%20updates" data-track="contact_click" data-track-label="footer updates">Email hello@globalhomeatlas.com</a>
-        </div>
+
+  <footer class="gha-footer">
+    <div class="gha-shell gha-footer__grid">
+      <div>
+        <strong>Global Home Atlas</strong>
+        <p>Independent research for overseas property decisions. Research only; verify legal, tax, immigration, and property advice locally.</p>
+        <nav aria-label="Footer">
+          <a href="/dashboard/">Research dashboard</a>
+          <a href="/country-comparison/">Compare countries</a>
+          <a href="/guides/">Guides</a>
+          <a href="/methodology/">Methodology</a>
+          <a href="/research-standards/">Research standards</a>
+          <a href="/contact/">Contact</a>
+        </nav>
+      </div>
+      <div class="gha-footer__signup">
+        <strong>Get destination updates</strong>
+        <p>Ask to be notified when new destination research or country hubs are added.</p>
+        <a href="mailto:hello@globalhomeatlas.com?subject=Global%20Home%20Atlas%20updates" data-track="contact_click" data-track-label="footer updates">Email hello@globalhomeatlas.com</a>
       </div>
     </div>
   </footer>
+
   <script>
     (function () {
-      const finderData = {"retirement": [{"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.3", "href": "/destinations/fukuoka-itoshima/", "reason": "Strong retirement and long-stay fit", "reasonBullets": ["Strong retirement and long-stay fit"], "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.", "watchBullets": ["Less scarce/trophy than resort markets", "STR upside lower than ski/beach villas"], "image": "/assets/market-fukuoka-itoshima-600.webp", "imageAlt": "Fukuoka waterfront and city skyline"}, {"name": "Swiss Valais / Vaud Alps", "country": "Switzerland", "score": "3.3", "href": "/destinations/swiss-valais-vaud-alps/", "reason": "Strong retirement and long-stay fit", "reasonBullets": ["Strong retirement and long-stay fit"], "watch": "Foreign-buyer restrictions, very high price, low yield, second-home caps, proposed tightening.", "watchBullets": ["Foreign-buyer restrictions", "very high price", "low yield", "second-home caps"], "image": "/assets/market-swiss-valais-vaud-alps-600.webp", "imageAlt": "Editorial landscape of Swiss Valais / Vaud Alps, Switzerland"}, {"name": "Annecy", "country": "France", "score": "3.8", "href": "/destinations/annecy/", "reason": "Strong retirement and long-stay fit", "reasonBullets": ["Strong retirement and long-stay fit"], "watch": "STR regulation, high entry price, local housing pressure, France tax/admin complexity.", "watchBullets": ["STR regulation", "high entry price", "local housing pressure", "France tax/admin complexity"], "image": "/assets/market-annecy-600.webp", "imageAlt": "Editorial landscape of Annecy, France"}], "second-home": [{"name": "Los Angeles / Orange County", "country": "United States", "score": "3.7", "href": "/destinations/los-angeles-orange-county/", "reason": "Strong lifestyle appeal", "reasonBullets": ["Strong lifestyle appeal"], "watch": "Primary-residence-only home-sharing rules in Los Angeles, wildfire and earthquake risk, insurance availability, high entry price, taxes and city-by-city regulation.", "watchBullets": ["Primary-residence-only home-sharing rules in Los Angeles", "wildfire and earthquake risk", "insurance availability", "high entry price"], "image": "/assets/market-los-angeles-orange-county-600.webp", "imageAlt": "Editorial landscape of Los Angeles / Orange County, United States"}, {"name": "Miami / Fort Lauderdale", "country": "United States", "score": "3.9", "href": "/destinations/miami-fort-lauderdale/", "reason": "Strong lifestyle appeal", "reasonBullets": ["Strong lifestyle appeal"], "watch": "Hurricane and flood exposure, insurance cost, condo reserve requirements and assessments, municipal short-term-rental rules, and foreign-owner tax planning.", "watchBullets": ["Hurricane and flood exposure", "insurance cost", "condo reserve requirements and assessments", "municipal short-term-rental rules"], "image": "/assets/market-miami-fort-lauderdale-600.webp", "imageAlt": "Editorial landscape of Miami / Fort Lauderdale, United States"}, {"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.3", "href": "/destinations/fukuoka-itoshima/", "reason": "Strong lifestyle appeal", "reasonBullets": ["Strong lifestyle appeal"], "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.", "watchBullets": ["Less scarce/trophy than resort markets", "STR upside lower than ski/beach villas"], "image": "/assets/market-fukuoka-itoshima-600.webp", "imageAlt": "Fukuoka waterfront and city skyline"}], "investment": [{"name": "Dubai", "country": "United Arab Emirates", "score": "4.2", "href": "/destinations/dubai/", "reason": "Stronger rental fundamentals", "reasonBullets": ["Stronger rental fundamentals"], "watch": "Off-plan delivery and escrow risk, high or rising service charges, developer and building quality, licensed-use assumptions, severe summer heat, intense-rain drainage, and a narrow resale pool.", "watchBullets": ["Off-plan delivery and escrow risk", "high or rising service charges", "developer and building quality", "licensed-use assumptions"], "image": "/assets/market-dubai-600.webp", "imageAlt": "Editorial landscape of Dubai, United Arab Emirates"}, {"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.3", "href": "/destinations/fukuoka-itoshima/", "reason": "Stronger rental fundamentals", "reasonBullets": ["Stronger rental fundamentals"], "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.", "watchBullets": ["Less scarce/trophy than resort markets", "STR upside lower than ski/beach villas"], "image": "/assets/market-fukuoka-itoshima-600.webp", "imageAlt": "Fukuoka waterfront and city skyline"}, {"name": "Valencia", "country": "Spain", "score": "4.1", "href": "/destinations/valencia/", "reason": "Stronger rental fundamentals", "reasonBullets": ["Stronger rental fundamentals"], "watch": "Housing-policy pressure, licence restrictions, rising prices, less trophy-scenery than island/lake markets.", "watchBullets": ["Housing-policy pressure", "licence restrictions", "rising prices", "less trophy-scenery than island/lake markets"], "image": "/assets/market-valencia-600.webp", "imageAlt": "Valencia streetscape opening toward the Mediterranean"}], "ownership": [{"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.3", "href": "/destinations/fukuoka-itoshima/", "reason": "Clearer ownership pathway", "reasonBullets": ["Clearer ownership pathway"], "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.", "watchBullets": ["Less scarce/trophy than resort markets", "STR upside lower than ski/beach villas"], "image": "/assets/market-fukuoka-itoshima-600.webp", "imageAlt": "Fukuoka waterfront and city skyline"}, {"name": "Park City / Deer Valley", "country": "United States", "score": "3.8", "href": "/destinations/park-city-deer-valley/", "reason": "Clearer ownership pathway", "reasonBullets": ["Clearer ownership pathway"], "watch": "High prices, STR zoning/HOA friction, traffic/crowding, and winter-season concentration.", "watchBullets": ["High prices", "STR zoning/HOA friction", "traffic/crowding", "and winter-season concentration"], "image": "/assets/market-park-city-deer-valley-600.webp", "imageAlt": "Editorial landscape of Park City / Deer Valley, United States"}, {"name": "Niseko", "country": "Japan", "score": "3.8", "href": "/destinations/niseko/", "reason": "Clearer ownership pathway", "reasonBullets": ["Clearer ownership pathway"], "watch": "High build costs, operator dependency, snow/climate sensitivity, local pushback if overtourism rises.", "watchBullets": ["High build costs", "operator dependency", "snow/climate sensitivity", "local pushback if overtourism rises"], "image": "/assets/market-niseko-600.webp", "imageAlt": "Editorial landscape of Niseko, Japan"}]};
+      const finderData = {"retirement": [{"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.3", "href": "/destinations/fukuoka-itoshima/", "reason": "Strong retirement and long-stay fit", "reasonBullets": ["Strong retirement and long-stay fit"], "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.", "watchBullets": ["Less scarce/trophy than resort markets", "STR upside lower than ski/beach villas"], "image": "/assets/market-fukuoka-itoshima-600.webp", "imageAlt": "Fukuoka waterfront and city skyline"}, {"name": "Swiss Valais / Vaud Alps", "country": "Switzerland", "score": "3.3", "href": "/destinations/swiss-valais-vaud-alps/", "reason": "Strong retirement and long-stay fit", "reasonBullets": ["Strong retirement and long-stay fit"], "watch": "Permit or quota uncertainty, restricted use, high carrying cost, weak building reserves, mountain access or hazard issues, and a narrow successor-buyer pool.", "watchBullets": ["Permit or quota uncertainty", "restricted use", "high carrying cost", "weak building reserves"], "image": "/assets/market-swiss-valais-vaud-alps-600.webp", "imageAlt": "Editorial landscape of Swiss Valais / Vaud Alps, Switzerland"}, {"name": "Annecy", "country": "France", "score": "3.8", "href": "/destinations/annecy/", "reason": "Strong retirement and long-stay fit", "reasonBullets": ["Strong retirement and long-stay fit"], "watch": "STR regulation, high entry price, local housing pressure, France tax/admin complexity.", "watchBullets": ["STR regulation", "high entry price", "local housing pressure", "France tax/admin complexity"], "image": "/assets/market-annecy-600.webp", "imageAlt": "Editorial landscape of Annecy, France"}], "second-home": [{"name": "Los Angeles / Orange County", "country": "United States", "score": "3.7", "href": "/destinations/los-angeles-orange-county/", "reason": "Strong lifestyle appeal", "reasonBullets": ["Strong lifestyle appeal"], "watch": "Primary-residence-only home-sharing rules in Los Angeles, wildfire and earthquake risk, insurance availability, high entry price, taxes and city-by-city regulation.", "watchBullets": ["Primary-residence-only home-sharing rules in Los Angeles", "wildfire and earthquake risk", "insurance availability", "high entry price"], "image": "/assets/market-los-angeles-orange-county-600.webp", "imageAlt": "Editorial landscape of Los Angeles / Orange County, United States"}, {"name": "Miami / Fort Lauderdale", "country": "United States", "score": "3.9", "href": "/destinations/miami-fort-lauderdale/", "reason": "Strong lifestyle appeal", "reasonBullets": ["Strong lifestyle appeal"], "watch": "Hurricane and flood exposure, insurance cost, condo reserve requirements and assessments, municipal short-term-rental rules, and foreign-owner tax planning.", "watchBullets": ["Hurricane and flood exposure", "insurance cost", "condo reserve requirements and assessments", "municipal short-term-rental rules"], "image": "/assets/market-miami-fort-lauderdale-600.webp", "imageAlt": "Editorial landscape of Miami / Fort Lauderdale, United States"}, {"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.3", "href": "/destinations/fukuoka-itoshima/", "reason": "Strong lifestyle appeal", "reasonBullets": ["Strong lifestyle appeal"], "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.", "watchBullets": ["Less scarce/trophy than resort markets", "STR upside lower than ski/beach villas"], "image": "/assets/market-fukuoka-itoshima-600.webp", "imageAlt": "Fukuoka waterfront and city skyline"}], "investment": [{"name": "Dubai", "country": "United Arab Emirates", "score": "4.2", "href": "/destinations/dubai/", "reason": "Stronger rental fundamentals", "reasonBullets": ["Stronger rental fundamentals"], "watch": "Off-plan delivery and escrow risk, high or rising service charges, developer and building quality, licensed-use assumptions, severe summer heat, intense-rain drainage, and a narrow resale pool.", "watchBullets": ["Off-plan delivery and escrow risk", "high or rising service charges", "developer and building quality", "licensed-use assumptions"], "image": "/assets/market-dubai-600.webp", "imageAlt": "Editorial landscape of Dubai, United Arab Emirates"}, {"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.3", "href": "/destinations/fukuoka-itoshima/", "reason": "Stronger rental fundamentals", "reasonBullets": ["Stronger rental fundamentals"], "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.", "watchBullets": ["Less scarce/trophy than resort markets", "STR upside lower than ski/beach villas"], "image": "/assets/market-fukuoka-itoshima-600.webp", "imageAlt": "Fukuoka waterfront and city skyline"}, {"name": "Valencia", "country": "Spain", "score": "4.1", "href": "/destinations/valencia/", "reason": "Stronger rental fundamentals", "reasonBullets": ["Stronger rental fundamentals"], "watch": "Housing-policy pressure, licence restrictions, rising prices, less trophy-scenery than island/lake markets.", "watchBullets": ["Housing-policy pressure", "licence restrictions", "rising prices", "less trophy-scenery than island/lake markets"], "image": "/assets/market-valencia-600.webp", "imageAlt": "Valencia streetscape opening toward the Mediterranean"}], "ownership": [{"name": "Fukuoka / Itoshima", "country": "Japan", "score": "4.3", "href": "/destinations/fukuoka-itoshima/", "reason": "Clearer ownership pathway", "reasonBullets": ["Clearer ownership pathway"], "watch": "Less scarce/trophy than resort markets; STR upside lower than ski/beach villas.", "watchBullets": ["Less scarce/trophy than resort markets", "STR upside lower than ski/beach villas"], "image": "/assets/market-fukuoka-itoshima-600.webp", "imageAlt": "Fukuoka waterfront and city skyline"}, {"name": "Park City / Deer Valley", "country": "United States", "score": "3.8", "href": "/destinations/park-city-deer-valley/", "reason": "Clearer ownership pathway", "reasonBullets": ["Clearer ownership pathway"], "watch": "High prices, STR zoning/HOA friction, traffic/crowding, and winter-season concentration.", "watchBullets": ["High prices", "STR zoning/HOA friction", "traffic/crowding", "and winter-season concentration"], "image": "/assets/market-park-city-deer-valley-600.webp", "imageAlt": "Editorial landscape of Park City / Deer Valley, United States"}, {"name": "Niseko", "country": "Japan", "score": "3.8", "href": "/destinations/niseko/", "reason": "Clearer ownership pathway", "reasonBullets": ["Clearer ownership pathway"], "watch": "High build costs, operator dependency, snow/climate sensitivity, local pushback if overtourism rises.", "watchBullets": ["High build costs", "operator dependency", "snow/climate sensitivity", "local pushback if overtourism rises"], "image": "/assets/market-niseko-600.webp", "imageAlt": "Editorial landscape of Niseko, Japan"}]};
       const select = document.getElementById("finderGoal");
       const results = document.getElementById("finderResults");
       const detailed = document.getElementById("finderDetailed");
