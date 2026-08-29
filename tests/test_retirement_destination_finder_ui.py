@@ -57,8 +57,8 @@ class FakeElement {
     this.classList = { toggle() {}, remove() {} };
   }
   addEventListener(name, callback) { (this.listeners[name] ||= []).push(callback); }
-  dispatch(name) {
-    const event = { preventDefault() {}, target: this };
+  dispatch(name, target) {
+    const event = { preventDefault() {}, target: target || this };
     (this.listeners[name] || []).forEach((callback) => callback(event));
   }
   setCustomValidity(message) { this.validationMessage = message; }
@@ -104,6 +104,13 @@ const values = {
   "finder-other-income": "0",
 };
 Object.entries(values).forEach(([id, value]) => { el(id).value = value; });
+const projectionGroups = Array.from({ length: input.projectionGroupCount || 0 }, (_, index) => {
+  const group = new FakeElement("projection-" + index);
+  group.dataset.yearIndex = String(index);
+  return group;
+});
+el("finder-projection-bars").querySelectorAll = (selector) =>
+  selector === ".finder-chart-year" ? projectionGroups : [];
 [
   ["finder-liquid-capital", "0", "1000"],
   ["finder-monthly-contribution", "0", "100"],
@@ -136,8 +143,9 @@ const document = {
 let engineInput = null;
 const engineInputs = [];
 let engineCalls = 0;
+const trackedEvents = [];
 const window = {
-  GHA: { track() {} },
+  GHA: { track(name, fields) { trackedEvents.push({ name, fields: fields || {} }); } },
   GHARetirementDestinationFinder: {
     recommendDestinations(request) {
       engineInput = request;
@@ -175,6 +183,23 @@ if (input.editLiquid) {
   el("finder-liquid-capital").dispatch("input");
 }
 if (input.submit) el("retirement-destination-finder-form").dispatch("submit");
+if (input.preferenceChange) {
+  el(input.preferenceChange.id).value = input.preferenceChange.value;
+  el(input.preferenceChange.id).dispatch("change");
+}
+if (input.clickDestination) {
+  const target = {
+    closest(selector) {
+      return selector === "[data-finder-destination]"
+        ? { dataset: input.clickDestination }
+        : null;
+    },
+  };
+  el(input.clickDestination.container).dispatch("click", target);
+}
+if (input.clickProjectionIndex !== undefined) {
+  projectionGroups[input.clickProjectionIndex].dispatch("click");
+}
 
 process.stdout.write(JSON.stringify({
   currency: el("finder-currency").value,
@@ -195,6 +220,7 @@ process.stdout.write(JSON.stringify({
   matchesHidden: el("finder-matches-section").hidden,
   projectionHidden: el("finder-projection-section").hidden,
   emptyStateHidden: el("finder-empty-state").hidden,
+  trackedEvents,
 }));
 '''
     result = subprocess.run(
@@ -687,6 +713,314 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertFalse(scenario["emptyStateHidden"])
         self.assertEqual("", scenario["landscapeRowsHtml"])
         self.assertEqual("", scenario["recommendationsHtml"])
+
+    def test_completion_analytics_describe_outcome_without_financial_inputs(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "engineResult": {
+                    "summary": {"withinReachCount": 1, "closeCount": 0, "stretchCount": 0},
+                    "sharedProjection": {"portfolioAtRetirement": 900000, "annualProjection": []},
+                    "recommendations": [
+                        {
+                            "destinationId": "fukuoka-itoshima",
+                            "name": "Fukuoka / Itoshima",
+                            "country": "Japan",
+                            "tier": "within_reach",
+                            "fundingRatio": 1.2,
+                            "portfolioAtRetirement": 900000,
+                            "retirementTarget": 750000,
+                            "surplusGap": 150000,
+                            "preferenceMatches": ["Long-stay suitability"],
+                            "financingStatus": "Cash purchase",
+                        }
+                    ],
+                    "excluded": [
+                        {"destinationId": "place", "name": "Place", "reasonCode": "missing_cost_data"}
+                    ],
+                },
+                "submit": True,
+            }
+        )
+
+        event = next(item for item in scenario["trackedEvents"] if item["name"] == "retirement_destination_finder_complete")
+        self.assertEqual(
+            {
+                "housing_plan": "rent",
+                "purchase_method": "not_applicable",
+                "currency": "USD",
+                "eligible_count": 1,
+                "within_reach_count": 1,
+                "excluded_count": 1,
+                "strongest_destination_id": "fukuoka-itoshima",
+                "strongest_tier": "within_reach",
+                "region": "any",
+                "setting": "any",
+                "healthcare": "normal",
+            },
+            event["fields"],
+        )
+        self.assertFalse(
+            {"current_age", "retirement_age", "liquid_capital", "monthly_contribution"}
+            & set(event["fields"])
+        )
+
+    def test_no_result_analytics_identify_primary_exclusion_without_financial_inputs(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "engineResult": {
+                    "summary": {"withinReachCount": 0, "closeCount": 0, "stretchCount": 0},
+                    "sharedProjection": None,
+                    "recommendations": [],
+                    "excluded": [
+                        {"destinationId": "a", "name": "A", "reasonCode": "financing_unverified"},
+                        {"destinationId": "b", "name": "B", "reasonCode": "financing_unverified"},
+                        {"destinationId": "c", "name": "C", "reasonCode": "missing_cost_data"},
+                    ],
+                },
+                "submit": True,
+            }
+        )
+
+        event = next(item for item in scenario["trackedEvents"] if item["name"] == "retirement_destination_finder_no_results")
+        self.assertEqual(3, event["fields"]["excluded_count"])
+        self.assertEqual("financing_unverified", event["fields"]["primary_exclusion_reason"])
+        self.assertNotIn("liquid_capital", event["fields"])
+
+    def test_destination_click_analytics_include_surface_and_rank(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "clickDestination": {
+                    "container": "finder-landscape-rows",
+                    "destinationId": "fukuoka-itoshima",
+                    "surface": "cost_landscape",
+                    "costRank": "4",
+                    "matchRank": "1",
+                    "tier": "within_reach",
+                    "action": "dossier",
+                },
+            }
+        )
+
+        event = next(item for item in scenario["trackedEvents"] if item["name"] == "retirement_destination_finder_destination_click")
+        self.assertEqual(
+            {
+                "destination_id": "fukuoka-itoshima",
+                "surface": "cost_landscape",
+                "cost_rank": 4,
+                "match_rank": 1,
+                "tier": "within_reach",
+                "action": "dossier",
+            },
+            event["fields"],
+        )
+
+    def test_detailed_plan_click_preserves_match_attribution_and_legacy_event(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "clickDestination": {
+                    "container": "finder-recommendations",
+                    "destinationId": "fukuoka-itoshima",
+                    "surface": "recommended_match",
+                    "costRank": "0",
+                    "matchRank": "2",
+                    "tier": "close",
+                    "action": "detailed_plan",
+                },
+            }
+        )
+
+        destination_event = next(
+            item for item in scenario["trackedEvents"]
+            if item["name"] == "retirement_destination_finder_destination_click"
+        )
+        detail_event = next(
+            item for item in scenario["trackedEvents"]
+            if item["name"] == "retirement_destination_finder_detail_open"
+        )
+        self.assertEqual(2, destination_event["fields"]["match_rank"])
+        self.assertEqual("detailed_plan", destination_event["fields"]["action"])
+        self.assertEqual(destination_event["fields"], detail_event["fields"])
+
+    def test_preference_change_analytics_identify_control_and_selected_value(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "preferenceChange": {"id": "finder-climate", "value": "Water"},
+            }
+        )
+
+        event = next(item for item in scenario["trackedEvents"] if item["name"] == "retirement_destination_finder_preference_change")
+        self.assertEqual({"preference": "setting", "value": "Water"}, event["fields"])
+
+    def test_match_explanation_names_affordability_rank_and_planning_signals(self) -> None:
+        explanation = run_ui(
+            "finderMatchExplanation",
+            {
+                "item": {
+                    "tier": "within_reach",
+                    "surplusGap": 150000,
+                    "fundingRatio": 1.2,
+                    "preferenceMatches": ["Preferred region", "Long-stay suitability"],
+                },
+                "matchRank": 1,
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertEqual(
+            "Your projected portfolio exceeds the modeled target by $150,000. "
+            "Overall match #1 in the Within reach tier using Preferred region and Long-stay suitability; "
+            "funding coverage breaks remaining ties.",
+            explanation,
+        )
+
+    def test_match_explanation_states_gap_and_tie_break_when_no_signals_match(self) -> None:
+        explanation = run_ui(
+            "finderMatchExplanation",
+            {
+                "item": {
+                    "tier": "close",
+                    "surplusGap": -75000,
+                    "fundingRatio": 0.9,
+                    "preferenceMatches": [],
+                },
+                "matchRank": 2,
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertEqual(
+            "Your projected portfolio covers 90% of the modeled target, leaving a $75,000 gap. "
+            "Overall match #2 in the Close tier; funding coverage breaks ties when no planning signals match.",
+            explanation,
+        )
+
+    def test_match_explanation_avoids_one_hundred_percent_when_a_gap_remains(self) -> None:
+        explanation = run_ui(
+            "finderMatchExplanation",
+            {
+                "item": {
+                    "tier": "close",
+                    "surplusGap": -3000,
+                    "fundingRatio": 0.996,
+                    "preferenceMatches": [],
+                },
+                "matchRank": 1,
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertIn("covers 99.6% of the modeled target", explanation)
+        self.assertNotIn("covers 100%", explanation)
+
+    def test_match_explanation_calls_a_zero_gap_an_exact_match(self) -> None:
+        explanation = run_ui(
+            "finderMatchExplanation",
+            {
+                "item": {
+                    "tier": "within_reach",
+                    "surplusGap": 0,
+                    "fundingRatio": 1,
+                    "preferenceMatches": [],
+                },
+                "matchRank": 1,
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertTrue(explanation.startswith("Your projected portfolio meets the modeled target."))
+        self.assertNotIn("exceeds the modeled target by $0", explanation)
+
+    def test_recommendation_cards_render_one_concise_explanation_instead_of_a_duplicate_match_label(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "engineResult": {
+                    "summary": {"withinReachCount": 1, "closeCount": 0, "stretchCount": 0},
+                    "sharedProjection": {"portfolioAtRetirement": 900000, "annualProjection": []},
+                    "recommendations": [
+                        {
+                            "destinationId": "fukuoka-itoshima",
+                            "name": "Fukuoka / Itoshima",
+                            "country": "Japan",
+                            "tier": "within_reach",
+                            "fundingRatio": 1.2,
+                            "portfolioAtRetirement": 900000,
+                            "retirementTarget": 750000,
+                            "surplusGap": 150000,
+                            "preferenceMatches": ["Long-stay suitability"],
+                            "financingStatus": "Cash purchase",
+                        }
+                    ],
+                    "excluded": [],
+                },
+                "submit": True,
+            }
+        )
+
+        self.assertIn('class="finder-rationale"', scenario["recommendationsHtml"])
+        self.assertIn("Overall match #1 in the Within reach tier", scenario["recommendationsHtml"])
+        self.assertNotIn("Preference match:", scenario["recommendationsHtml"])
+        self.assertIn('data-surface="recommended_match"', scenario["recommendationsHtml"])
+
+    def test_projection_chart_click_tracks_only_position_and_match_categories(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "projectionGroupCount": 2,
+                "clickProjectionIndex": 1,
+                "engineResult": {
+                    "summary": {"withinReachCount": 1, "closeCount": 0, "stretchCount": 0},
+                    "sharedProjection": {
+                        "portfolioAtRetirement": 900000,
+                        "annualProjection": [
+                            {"year": 0, "portfolio": 500000},
+                            {"year": 10, "portfolio": 900000},
+                        ],
+                    },
+                    "recommendations": [
+                        {
+                            "destinationId": "fukuoka-itoshima",
+                            "name": "Fukuoka / Itoshima",
+                            "country": "Japan",
+                            "tier": "within_reach",
+                            "fundingRatio": 1.2,
+                            "portfolioAtRetirement": 900000,
+                            "retirementTarget": 750000,
+                            "surplusGap": 150000,
+                            "preferenceMatches": ["Long-stay suitability"],
+                            "financingStatus": "Cash purchase",
+                        }
+                    ],
+                    "excluded": [],
+                },
+                "submit": True,
+            }
+        )
+
+        event = next(
+            item for item in scenario["trackedEvents"]
+            if item["name"] == "retirement_destination_finder_projection_click"
+        )
+        self.assertEqual(
+            {
+                "chart": "capital_projection",
+                "point_index": 1,
+                "point_count": 2,
+                "strongest_destination_id": "fukuoka-itoshima",
+                "strongest_tier": "within_reach",
+            },
+            event["fields"],
+        )
+        self.assertFalse({"age", "year", "portfolio", "value"} & set(event["fields"]))
 
     def test_currency_changes_do_not_change_recommendation_identity_or_tier(self) -> None:
         recommendations = [

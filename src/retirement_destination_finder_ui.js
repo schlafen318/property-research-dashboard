@@ -145,6 +145,42 @@
     }[value] || "Not classified";
   }
 
+  function finderMatchExplanation(input) {
+    const item = input.item || {};
+    const gap = Number(item.surplusGap) || 0;
+    const currency = input.currency || "USD";
+    const ratesToUsd = input.ratesToUsd || { USD: 1 };
+    let affordability;
+    if (gap === 0) {
+      affordability = "Your projected portfolio meets the modeled target.";
+    } else if (gap > 0) {
+      affordability = "Your projected portfolio exceeds the modeled target by " + resultMoney({
+        amountUsd: gap,
+        currency: currency,
+        ratesToUsd: ratesToUsd,
+      }) + ".";
+    } else {
+      const rawCoverage = Math.max(0, (Number(item.fundingRatio) || 0) * 100);
+      const roundedCoverage = Math.min(99.9, Math.round(rawCoverage * 10) / 10);
+      const coverage = Number.isInteger(roundedCoverage)
+        ? roundedCoverage.toFixed(0)
+        : roundedCoverage.toFixed(1);
+      affordability = "Your projected portfolio covers " + coverage +
+        "% of the modeled target, leaving a " + resultMoney({
+          amountUsd: Math.abs(gap),
+          currency: currency,
+          ratesToUsd: ratesToUsd,
+        }) + " gap.";
+    }
+    const matches = Array.isArray(item.preferenceMatches) ? item.preferenceMatches : [];
+    const ranking = matches.length
+      ? "Overall match #" + Number(input.matchRank) + " in the " + tierLabel(item.tier) + " tier using " +
+        matches.join(" and ") + "; funding coverage breaks remaining ties."
+      : "Overall match #" + Number(input.matchRank) + " in the " + tierLabel(item.tier) +
+        " tier; funding coverage breaks ties when no planning signals match.";
+    return affordability + " " + ranking;
+  }
+
   function finderCapitalLandscape(input) {
     const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
     const strongest = new Map(recommendations.slice(0, 3).map(function (item, index) {
@@ -205,7 +241,7 @@
       (model.ticks || []).map(function (tick) {
         return "<span>" + escapeHtml(resultMoney({ amountUsd: tick, currency: currency, ratesToUsd: ratesToUsd })) + "</span>";
       }).join("") + "</span><span></span>";
-    const rowsHtml = (model.rows || []).map(function (row) {
+    const rowsHtml = (model.rows || []).map(function (row, index) {
       const targetPosition = Math.max(0, Math.min(100, Number(row.position) || 0));
       const label = finderCapitalLandscapeLabel({ row: row, currency: currency, ratesToUsd: ratesToUsd });
       const value = resultMoney({ amountUsd: row.target, currency: currency, ratesToUsd: ratesToUsd });
@@ -214,7 +250,11 @@
         : "";
       return '<div role="listitem"><a class="finder-landscape-row' + (row.matchRank ? " is-match" : "") +
         '" href="' + escapeHtml(safeDossierHref(row.destinationId)) +
-        '" aria-label="' + escapeHtml(label) + '" style="--capital-position:' + capitalPosition.toFixed(2) +
+        '" data-finder-destination data-destination-id="' + escapeHtml(row.destinationId) +
+        '" data-surface="cost_landscape" data-cost-rank="' + (index + 1) +
+        '" data-match-rank="' + (row.matchRank || "") + '" data-tier="' + escapeHtml(row.tier) +
+        '" data-action="dossier"' +
+        ' aria-label="' + escapeHtml(label) + '" style="--capital-position:' + capitalPosition.toFixed(2) +
         "%;--target-position:" + targetPosition.toFixed(2) + '%"><span class="finder-landscape-name">' +
         escapeHtml(row.name) + "<small>" + escapeHtml(row.country) + "</small>" + rank +
         '</span><span class="finder-landscape-track" aria-hidden="true"><i class="finder-landscape-dot"></i></span>' +
@@ -560,13 +600,23 @@
         group.addEventListener("mouseleave", function () { hideTooltip(group); });
         group.addEventListener("focus", function () { showTooltip(group); });
         group.addEventListener("blur", function () { hideTooltip(group); });
-        group.addEventListener("click", function () { showTooltip(group); });
+        group.addEventListener("click", function () {
+          showTooltip(group);
+          const strongest = currentRecommendations[0] || {};
+          track("retirement_destination_finder_projection_click", {
+            chart: "capital_projection",
+            point_index: Number(group.dataset.yearIndex),
+            point_count: count,
+            strongest_destination_id: strongest.destinationId || "none",
+            strongest_tier: strongest.tier || "none",
+          });
+        });
       });
       figure.hidden = false;
       fallback.hidden = true;
     }
 
-    function resultRow(item, user) {
+    function resultRow(item, user, matchRank) {
       const propertyBits = user.housingPlan === "buy_now"
         ? '<div><dt>Property equity</dt><dd>' + displayResultMoney(item.propertyEquity) +
           '</dd></div><div><dt>Mortgage remaining</dt><dd>' + displayResultMoney(item.mortgageBalance) + "</dd></div>"
@@ -584,26 +634,66 @@
         household: user.household,
         housingPlan: user.housingPlan,
       });
+      const trackingAttributes = ' data-finder-destination data-destination-id="' +
+        escapeHtml(item.destinationId) + '" data-surface="recommended_match" data-match-rank="' +
+        matchRank + '" data-tier="' + escapeHtml(item.tier) + '"';
       return '<article class="finder-result"><header><div><p class="finder-tier">' +
         escapeHtml(tierLabel(item.tier)) + '</p><h3><a href="' + escapeHtml(dossierHref) +
-        '" data-finder-dossier>' + escapeHtml(item.name) + "</a>" +
+        '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
         '</p></div></header><dl>' +
         '<div><dt>Projected portfolio</dt><dd>' + displayResultMoney(item.portfolioAtRetirement) + "</dd></div>" +
         '<div><dt>Retirement target</dt><dd>' + displayResultMoney(item.retirementTarget) + "</dd></div>" +
         '<div><dt>Surplus or gap</dt><dd>' + displayResultMoney(item.surplusGap) + "</dd></div>" +
         propertyBits + rental + "</dl>" + financing +
-        (item.preferenceMatches.length ? '<p class="finder-matches"><strong>Preference match:</strong> ' + escapeHtml(item.preferenceMatches.join(" · ")) + "</p>" : "") +
+        '<p class="finder-rationale">' + escapeHtml(finderMatchExplanation({
+          item: item,
+          matchRank: matchRank,
+          currency: selectedCurrency,
+          ratesToUsd: ratesToUsd,
+        })) + "</p>" +
         '<div class="finder-result-actions"><a href="' + escapeHtml(dossierHref) +
-        '" data-finder-dossier>View destination dossier</a><a href="' + escapeHtml(detailHref) +
-        '" data-finder-detail>Build a detailed plan</a></div>' +
+        '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">View destination dossier</a><a href="' + escapeHtml(detailHref) +
+        '" data-finder-detail' + trackingAttributes + ' data-action="detailed_plan">Build a detailed plan</a></div>' +
         "</article>";
     }
 
     function renderRecommendationList() {
-      element("finder-recommendations").innerHTML = currentRecommendations.slice(0, 3).map(function (item) {
-        return resultRow(item, currentUser);
+      element("finder-recommendations").innerHTML = currentRecommendations.slice(0, 3).map(function (item, index) {
+        return resultRow(item, currentUser, index + 1);
       }).join("");
+    }
+
+    function primaryExclusionReason(items) {
+      const counts = {};
+      let primary = "none";
+      let maximum = 0;
+      (items || []).forEach(function (item) {
+        const reason = String(item.reasonCode || "unknown");
+        counts[reason] = (counts[reason] || 0) + 1;
+        if (counts[reason] > maximum) {
+          primary = reason;
+          maximum = counts[reason];
+        }
+      });
+      return primary;
+    }
+
+    function trackDestinationClick(event) {
+      const link = event.target.closest("[data-finder-destination]");
+      if (!link) return;
+      const fields = {
+        destination_id: link.dataset.destinationId || "",
+        surface: link.dataset.surface || "",
+        cost_rank: Number(link.dataset.costRank) || 0,
+        match_rank: Number(link.dataset.matchRank) || 0,
+        tier: link.dataset.tier || "",
+        action: link.dataset.action || "dossier",
+      };
+      track("retirement_destination_finder_destination_click", fields);
+      if (fields.action === "detailed_plan") {
+        track("retirement_destination_finder_detail_open", fields);
+      }
     }
 
     function renderCapitalLandscape(result) {
@@ -712,7 +802,28 @@
       track("retirement_destination_finder_complete", {
         housing_plan: user.housingPlan,
         purchase_method: user.housingPlan === "buy_now" ? user.purchaseMethod : "not_applicable",
+        currency: selectedCurrency,
+        eligible_count: result.recommendations.length,
+        within_reach_count: result.summary.withinReachCount,
+        excluded_count: result.excluded.length,
+        strongest_destination_id: result.recommendations.length ? result.recommendations[0].destinationId : "none",
+        strongest_tier: result.recommendations.length ? result.recommendations[0].tier : "none",
+        region: user.preferences.region,
+        setting: user.preferences.climate,
+        healthcare: user.preferences.healthcare,
       });
+      if (!result.recommendations.length) {
+        track("retirement_destination_finder_no_results", {
+          housing_plan: user.housingPlan,
+          purchase_method: user.housingPlan === "buy_now" ? user.purchaseMethod : "not_applicable",
+          currency: selectedCurrency,
+          excluded_count: result.excluded.length,
+          primary_exclusion_reason: primaryExclusionReason(result.excluded),
+          region: user.preferences.region,
+          setting: user.preferences.climate,
+          healthcare: user.preferences.healthcare,
+        });
+      }
     }
 
     form.addEventListener("submit", function (event) {
@@ -755,8 +866,20 @@
     element("finder-currency").value = selectedCurrency;
     element("finder-currency").addEventListener("change", function () {
       if (changePlanningCurrency(element("finder-currency").value)) {
-        track("retirement_destination_finder_currency_change");
+        track("retirement_destination_finder_currency_change", { currency: selectedCurrency });
       }
+    });
+    [
+      ["finder-region", "region"],
+      ["finder-climate", "setting"],
+      ["finder-healthcare", "healthcare"],
+    ].forEach(function (entry) {
+      element(entry[0]).addEventListener("change", function () {
+        track("retirement_destination_finder_preference_change", {
+          preference: entry[1],
+          value: selected(entry[0]),
+        });
+      });
     });
     moneyControlIds.forEach(function (id) {
       const control = element(id);
@@ -771,9 +894,8 @@
         validateMoneyControl(control);
       });
     });
-    element("finder-recommendations").addEventListener("click", function (event) {
-      if (event.target.closest("[data-finder-detail]")) track("retirement_destination_finder_detail_open");
-    });
+    element("finder-landscape-rows").addEventListener("click", trackDestinationClick);
+    element("finder-recommendations").addEventListener("click", trackDestinationClick);
     syncHousing();
     track("retirement_destination_finder_open");
   }
@@ -791,6 +913,7 @@
     safeDossierHref: safeDossierHref,
     resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,
+    finderMatchExplanation: finderMatchExplanation,
     finderCapitalLandscape: finderCapitalLandscape,
     finderCapitalLandscapeLabel: finderCapitalLandscapeLabel,
     finderCapitalLandscapeMarkup: finderCapitalLandscapeMarkup,
