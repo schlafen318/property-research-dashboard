@@ -219,6 +219,16 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('<input id="finder-pension-indexed" type="checkbox" checked>', self.html)
         self.assertIn('<input id="finder-other-income-indexed" type="checkbox" checked>', self.html)
 
+    def test_finder_result_grid_uses_a_valid_three_column_declaration(self) -> None:
+        self.assertIn(
+            ".finder-result dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px",
+            self.html,
+        )
+        self.assertNotIn(
+            "<style>.finder-result dl{grid-template-columns:repeat(3,minmax(0,1fr));}</style>",
+            self.html,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
