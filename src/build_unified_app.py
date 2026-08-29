@@ -1900,6 +1900,8 @@ def contextual_related_guides(page: dict, pages: list[dict], auto_links: list[di
                 str(item.get("theme", "Related research")),
                 str(item.get("description", "Continue with the related market research.")),
             )
+        if len(cards) >= 4:
+            break
 
     for candidate in related_guide_pages(page, pages):
         append_card(

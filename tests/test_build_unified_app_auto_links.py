@@ -48,6 +48,41 @@ class AutoInternalLinkTests(unittest.TestCase):
             html.index('/foreign-property-investment-risks/'),
         )
 
+    def test_contextual_related_guides_keeps_the_four_card_limit(self) -> None:
+        source = {
+            "slug": "source",
+            "theme": "source",
+            "keyword": "source",
+            "destination_ids": [],
+        }
+        targets = [
+            {
+                "slug": f"target-{index}",
+                "h1": f"Target {index}",
+                "description": f"Target {index} description.",
+                "theme": "target",
+                "keyword": "target",
+                "destination_ids": [],
+            }
+            for index in range(5)
+        ]
+        auto_links = [
+            {
+                "source_slug": "source",
+                "target_slug": target["slug"],
+                "anchor": target["h1"],
+            }
+            for target in targets
+        ]
+
+        html = build_unified_app.contextual_related_guides(
+            source,
+            [source, *targets],
+            auto_links=auto_links,
+        )
+
+        self.assertEqual(4, html.count('<article class="seo-link-card">'))
+
 
 if __name__ == "__main__":
     unittest.main()
