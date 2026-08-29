@@ -213,6 +213,7 @@ process.stdout.write(JSON.stringify({
   users: engineInputs.map((request) => request.user),
   eligibleCount: el("finder-eligible-count").textContent,
   projectedCapital: el("finder-projected-capital").textContent,
+  landscapeProjectedCapital: el("finder-landscape-projected").textContent,
   strongestMatch: el("finder-strongest-match").textContent,
   landscapeRowsHtml: el("finder-landscape-rows").innerHTML,
   recommendationsHtml: el("finder-recommendations").innerHTML,
@@ -523,13 +524,14 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
                     "target": 800_000,
                     "matchRank": 1,
                 },
+                "projectedCapital": 700_000,
                 "currency": "SGD",
                 "ratesToUsd": {"USD": 1, "SGD": 0.8},
             },
         )
 
         self.assertEqual(
-            "Fukuoka / Itoshima, Japan. Retirement target SGD\u00a01,000,000. Close. Strongest modeled match number 1.",
+            "Fukuoka / Itoshima, Japan. Retirement target SGD\u00a01,000,000. SGD\u00a0125,000 over projected capital. Close. Strongest modeled match number 1.",
             label,
         )
 
@@ -538,6 +540,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             "finderCapitalLandscapeMarkup",
             {
                 "model": {
+                    "projectedCapital": 600_000,
                     "projectedPosition": 60,
                     "ticks": [0, 500_000, 1_000_000],
                     "rows": [
@@ -568,12 +571,45 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertEqual(2, markup["rowCount"])
         self.assertIn('href="/destinations/fukuoka-itoshima/"', markup["rowsHtml"])
-        self.assertIn('<div role="listitem"><a class="finder-landscape-row is-match"', markup["rowsHtml"])
-        self.assertIn('class="finder-landscape-row is-match"', markup["rowsHtml"])
-        self.assertIn('class="finder-landscape-row"', markup["rowsHtml"])
-        self.assertIn('--capital-position:60.00%;--target-position:75.00%', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-row is-match is-on-target"', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-row is-over"', markup["rowsHtml"])
+        self.assertIn(
+            '--capital-position:60.00%;--target-position:75.00%;--distance-start:60.00%;--distance-width:15.00%',
+            markup["rowsHtml"],
+        )
+        self.assertIn('class="finder-landscape-capital-dot"', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-distance"', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-dot"', markup["rowsHtml"])
+        self.assertIn('<small class="finder-landscape-gap is-over">$150,000 over</small>', markup["rowsHtml"])
+        self.assertIn('<small class="finder-landscape-gap is-on-target">Matches your projection</small>', markup["rowsHtml"])
         self.assertIn('aria-label="Fukuoka / Itoshima, Japan.', markup["rowsHtml"])
-        self.assertIn("$1,000,000", markup["axisHtml"])
+        self.assertIn('class="finder-landscape-capital-label"', markup["axisHtml"])
+        self.assertIn("Projected capital", markup["axisHtml"])
+
+    def test_render_places_projected_capital_next_to_the_cost_distance_chart(self) -> None:
+        result = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "submit": True,
+                "engineResult": {
+                    "summary": {"withinReachCount": 1, "closeCount": 0, "stretchCount": 0},
+                    "sharedProjection": {"portfolioAtRetirement": 700_000, "series": []},
+                    "recommendations": [
+                        {
+                            "destinationId": "fukuoka-itoshima",
+                            "name": "Fukuoka / Itoshima",
+                            "country": "Japan",
+                            "tier": "within_reach",
+                            "retirementTarget": 600_000,
+                            "portfolioAtRetirement": 700_000,
+                        }
+                    ],
+                    "excluded": [],
+                },
+            }
+        )
+
+        self.assertEqual("$700,000", result["landscapeProjectedCapital"])
 
     def test_projected_capital_uses_shared_projection_or_strongest_purchase_scenario(self) -> None:
         self.assertEqual(
