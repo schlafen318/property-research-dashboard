@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import csv
+import io
 import re
 import unittest
 
@@ -228,6 +230,59 @@ class InternalAuthorityTests(unittest.TestCase):
                 self.assertIn(f'href="{target_href}"', html)
                 self.assertIn(anchor, html)
                 self.assertIn('data-track="internal_page_click"', html)
+
+
+class LinkableDataAssetTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.destinations = rendered_destinations()
+
+    def test_csv_exports_every_ranked_market_with_decision_fields(self) -> None:
+        rows = list(csv.DictReader(io.StringIO(
+            build_unified_app.property_market_data_csv(self.destinations)
+        )))
+
+        self.assertEqual(len(self.destinations), len(rows))
+        self.assertEqual("1", rows[0]["rank"])
+        self.assertEqual(
+            [
+                "rank",
+                "destination",
+                "country",
+                "setting",
+                "decision_score_5",
+                "usd_per_m2",
+                "net_yield_estimate",
+                "ownership_clarity_5",
+                "regulatory_safety_5",
+                "retirement_fit_5",
+                "exit_liquidity_5",
+                "foreigner_fit_5",
+                "access_status",
+            ],
+            list(rows[0]),
+        )
+        for row in rows:
+            self.assertTrue(row["destination"])
+            self.assertTrue(row["country"])
+            self.assertTrue(row["decision_score_5"])
+
+    def test_data_page_is_indexable_downloadable_and_methodology_linked(self) -> None:
+        html = build_unified_app.build_property_market_data_page(self.destinations)
+
+        self.assertEqual("Global Property Market Data: 37 Markets Compared", title_from(html))
+        self.assertIn("<h1>Global property market data</h1>", html)
+        self.assertIn('href="/data/global-property-market-data.csv"', html)
+        self.assertIn('data-track="property_data_download"', html)
+        self.assertIn('href="/methodology/"', html)
+        self.assertIn('"@type":"Dataset"', html)
+        self.assertGreaterEqual(html.count("<tr>"), len(self.destinations) + 1)
+
+    def test_data_page_is_in_the_sitemap(self) -> None:
+        self.assertIn(
+            (build_unified_app.page_url("global-property-market-data"), "0.88"),
+            build_unified_app.sitemap_url_entries(self.destinations),
+        )
 
 
 if __name__ == "__main__":

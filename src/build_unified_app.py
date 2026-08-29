@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import csv
+import io
 import json
 import os
 import re
@@ -98,6 +100,11 @@ REPORT_LIBRARY_TITLE = "Premium Property Research Reports | Global Home Atlas"
 REPORT_LIBRARY_DESCRIPTION = (
     "Browse premium Global Home Atlas research brief formats for retirement markets, "
     "second-home shortlists, overseas property risk, and polished buyer memos."
+)
+PROPERTY_MARKET_DATA_SLUG = "global-property-market-data"
+PROPERTY_MARKET_DATA_DESCRIPTION = (
+    "Download and compare Global Home Atlas data for 37 international property markets, "
+    "including prices, yields, ownership clarity, retirement fit and exit liquidity."
 )
 RETIREMENT_CALCULATOR_SLUG = "retirement-abroad-calculator"
 RETIREMENT_CALCULATOR_TITLE = "Retirement Abroad Calculator: How Much Do You Need? | Global Home Atlas"
@@ -3727,6 +3734,133 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
 """
 
 
+def property_market_data_rows(destinations: list[dict]) -> list[dict[str, str]]:
+    rows = []
+    for dest in destinations:
+        rows.append(
+            {
+                "rank": str(dest.get("rank", "")),
+                "destination": str(dest.get("name", "")),
+                "country": str(dest.get("country", "")),
+                "setting": str(dest.get("category", "")),
+                "decision_score_5": f'{float(dest.get("decision_score", 0) or 0):.2f}',
+                "usd_per_m2": f'{float(dest.get("usd_per_m2", 0) or 0):.0f}',
+                "net_yield_estimate": str(dest.get("net_yield_estimate", "")),
+                "ownership_clarity_5": f'{score(dest, "ownership_clarity"):.1f}',
+                "regulatory_safety_5": f'{score(dest, "str_regulatory_safety"):.1f}',
+                "retirement_fit_5": f'{score(dest, "retirement_suitability"):.1f}',
+                "exit_liquidity_5": f'{score(dest, "exit_liquidity"):.1f}',
+                "foreigner_fit_5": f'{score(dest, "chinese_foreigner_friendliness"):.1f}',
+                "access_status": str(dest.get("access_status", "available")),
+            }
+        )
+    return rows
+
+
+def property_market_data_csv(destinations: list[dict]) -> str:
+    fields = [
+        "rank",
+        "destination",
+        "country",
+        "setting",
+        "decision_score_5",
+        "usd_per_m2",
+        "net_yield_estimate",
+        "ownership_clarity_5",
+        "regulatory_safety_5",
+        "retirement_fit_5",
+        "exit_liquidity_5",
+        "foreigner_fit_5",
+        "access_status",
+    ]
+    output = io.StringIO(newline="")
+    writer = csv.DictWriter(output, fieldnames=fields, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(property_market_data_rows(destinations))
+    return output.getvalue()
+
+
+def build_property_market_data_page(destinations: list[dict]) -> str:
+    canonical = page_url(PROPERTY_MARKET_DATA_SLUG)
+    title = f"Global Property Market Data: {len(destinations)} Markets Compared"
+    csv_url = f"{SITE_URL}data/global-property-market-data.csv"
+    schema = [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            "name": title,
+            "description": PROPERTY_MARKET_DATA_DESCRIPTION,
+            "url": canonical,
+            "dateModified": date.today().isoformat(),
+            "creator": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL},
+            "distribution": {
+                "@type": "DataDownload",
+                "encodingFormat": "text/csv",
+                "contentUrl": csv_url,
+            },
+        },
+    ]
+    table_rows = "".join(
+        f"""
+        <tr>
+          <td>{escape(row["rank"])}</td>
+          <td><a href="/destinations/{escape(destination_slug(dest))}/">{escape(row["destination"])}</a></td>
+          <td>{escape(row["country"])}</td>
+          <td>{escape(row["setting"])}</td>
+          <td>{escape(row["decision_score_5"])}</td>
+          <td>{escape(row["usd_per_m2"])}</td>
+          <td>{escape(row["net_yield_estimate"])}</td>
+          <td>{escape(row["ownership_clarity_5"])}</td>
+          <td>{escape(row["retirement_fit_5"])}</td>
+          <td>{escape(row["exit_liquidity_5"])}</td>
+        </tr>"""
+        for dest, row in zip(destinations, property_market_data_rows(destinations))
+    )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(title, PROPERTY_MARKET_DATA_DESCRIPTION, canonical, schema)}
+  <style>{shared_content_css()}
+    .data-table-wrap {{ overflow-x: auto; margin: 24px 0; }}
+    .data-table {{ width: 100%; border-collapse: collapse; background: var(--paper); font-size: 14px; }}
+    .data-table th, .data-table td {{ padding: 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; white-space: nowrap; }}
+    .data-table th {{ position: sticky; top: 0; background: var(--stone); }}
+  </style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      {primary_nav_html()}
+      <div class="page-hero-grid"><div>
+        <p class="page-eyebrow">Downloadable research data · updated {date.today().isoformat()}</p>
+        <h1>Global property market data</h1>
+        <p class="page-lede">Compare {len(destinations)} international markets using the same decision framework, then download the complete table for analysis or citation.</p>
+        <p><a class="page-button" href="/data/global-property-market-data.csv" download data-track="property_data_download" data-track-label="global property market csv">Download CSV</a></p>
+      </div></div>
+    </div>
+  </header>
+  <main><div class="page-shell"><article class="page-article">
+    <section class="page-section">
+      <h2>Market comparison table</h2>
+      <p>Prices are indicative USD per square metre; yield figures are research estimates rather than guarantees. Scores use a five-point scale. Read the <a href="/methodology/">scoring methodology</a> and <a href="/research-standards/">research standards</a> before reuse.</p>
+      <div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>Rank</th><th>Destination</th><th>Country</th><th>Setting</th><th>Score / 5</th><th>USD / m²</th><th>Net yield estimate</th><th>Ownership / 5</th><th>Retirement / 5</th><th>Exit / 5</th></tr></thead>
+        <tbody>{table_rows}</tbody>
+      </table></div>
+    </section>
+    <section class="page-section">
+      <h2>Reuse and attribution</h2>
+      <p>You may quote or analyse this table with attribution to Global Home Atlas and a link to this page. Verify current legal, tax, immigration and property rules locally before relying on any market comparison.</p>
+    </section>
+  </article></div></main>
+  <footer class="page-footer"><div class="page-shell"><strong>{SITE_NAME}</strong><p>Independent research for overseas property decisions.</p><nav><a href="/dashboard/">Rankings</a> <a href="/methodology/">Methodology</a> <a href="/contact/">Contact</a></nav></div></footer>
+{analytics_event_script()}
+</body>
+</html>
+"""
+
+
 def build_report_library_page(destinations: list[dict], pages: list[dict]) -> str:
     canonical = page_url(REPORT_LIBRARY_SLUG)
     schema = [
@@ -4596,6 +4730,7 @@ def build_landing_page(
           </div>
           <nav class="method-links" aria-label="Research methodology">
             <a href="/methodology/" data-track="methodology_click" data-track-label="landing methodology">Scoring methodology</a>
+            <a href="/{PROPERTY_MARKET_DATA_SLUG}/" data-track="property_data_open" data-track-label="landing methodology">Download market data</a>
             <a href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>
           </nav>
         </div>
@@ -10278,6 +10413,7 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
         (page_url("dashboard"), "0.92"),
         (page_url(SHORTLIST_REVIEW_SLUG), "0.90"),
         (page_url(REPORT_LIBRARY_SLUG), "0.88"),
+        (page_url(PROPERTY_MARKET_DATA_SLUG), "0.88"),
         (page_url("country-comparison"), "0.88"),
         (page_url("countries"), "0.90"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
@@ -11709,6 +11845,18 @@ def build() -> Path:
     report_library_dir.mkdir(parents=True, exist_ok=True)
     (report_library_dir / "index.html").write_text(
         clean_generated_html(build_report_library_page(destinations, SEO_PAGES)),
+        encoding="utf-8",
+    )
+    property_data_dir = ARTIFACTS / PROPERTY_MARKET_DATA_SLUG
+    property_data_dir.mkdir(parents=True, exist_ok=True)
+    (property_data_dir / "index.html").write_text(
+        clean_generated_html(build_property_market_data_page(destinations)),
+        encoding="utf-8",
+    )
+    data_download_dir = ARTIFACTS / "data"
+    data_download_dir.mkdir(parents=True, exist_ok=True)
+    (data_download_dir / "global-property-market-data.csv").write_text(
+        property_market_data_csv(destinations),
         encoding="utf-8",
     )
     for page in SEO_PAGES:
