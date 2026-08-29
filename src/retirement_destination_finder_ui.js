@@ -611,6 +611,14 @@
         sharedProjection: result.sharedProjection,
         recommendations: currentRecommendations,
       });
+      element("finder-eligible-count").textContent = String(currentRecommendations.length);
+      if (!currentRecommendations.length) {
+        element("finder-projected-capital").textContent = "—";
+        element("finder-landscape-axis").innerHTML = "";
+        element("finder-landscape-rows").innerHTML = "";
+        return;
+      }
+      element("finder-projected-capital").textContent = displayResultMoney(projectedCapital);
       const model = finderCapitalLandscape({
         recommendations: currentRecommendations,
         projectedCapital: projectedCapital,
@@ -622,8 +630,6 @@
       });
       element("finder-landscape-axis").innerHTML = markup.axisHtml;
       element("finder-landscape-rows").innerHTML = markup.rowsHtml;
-      element("finder-projected-capital").textContent = displayResultMoney(projectedCapital);
-      element("finder-eligible-count").textContent = String(markup.rowCount);
     }
 
     function renderEvidence(items) {
@@ -669,6 +675,11 @@
       const user = currentUser;
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
       currentRecommendations = result.recommendations.slice();
+      const hasRecommendations = currentRecommendations.length > 0;
+      element("finder-capital-landscape").hidden = !hasRecommendations;
+      element("finder-matches-section").hidden = !hasRecommendations;
+      element("finder-projection-section").hidden = !hasRecommendations;
+      element("finder-empty-state").hidden = hasRecommendations;
       renderCapitalLandscape(result);
       renderChart(finderProjectionView({
         housingPlan: user.housingPlan,

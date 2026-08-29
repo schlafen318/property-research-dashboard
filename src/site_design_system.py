@@ -425,7 +425,7 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-result:first-child { border-top: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-tier { color: var(--gha-accent); font-weight: 500; }
     .retirement-finder-page .finder-result h3 { margin: 3px 0; font-size: clamp(27px, 3vw, 35px); }
-    .retirement-finder-page .finder-result h3 a { color: var(--gha-ink); }
+    .retirement-finder-page .finder-result h3 a { color: var(--gha-ink); white-space: normal; overflow-wrap: anywhere; }
     .retirement-finder-page .finder-result dl { grid-template-columns: 1fr; margin-top: 18px; }
     .retirement-finder-page .finder-result dt { color: var(--gha-muted); }
     .retirement-finder-page .finder-result dd { font-family: var(--gha-display-serif); font-size: 21px; font-weight: 500; }

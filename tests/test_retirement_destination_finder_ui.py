@@ -191,6 +191,10 @@ process.stdout.write(JSON.stringify({
   strongestMatch: el("finder-strongest-match").textContent,
   landscapeRowsHtml: el("finder-landscape-rows").innerHTML,
   recommendationsHtml: el("finder-recommendations").innerHTML,
+  landscapeHidden: el("finder-capital-landscape").hidden,
+  matchesHidden: el("finder-matches-section").hidden,
+  projectionHidden: el("finder-projection-section").hidden,
+  emptyStateHidden: el("finder-empty-state").hidden,
 }));
 '''
     result = subprocess.run(
@@ -656,6 +660,33 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertEqual("Place 0", scenario["strongestMatch"])
         self.assertEqual(13, scenario["landscapeRowsHtml"].count('role="listitem"'))
         self.assertEqual(3, scenario["recommendationsHtml"].count('class="finder-result"'))
+        self.assertFalse(scenario["landscapeHidden"])
+        self.assertTrue(scenario["emptyStateHidden"])
+
+    def test_zero_eligible_result_shows_an_empty_state_instead_of_empty_charts(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "engineResult": {
+                    "summary": {"withinReachCount": 0, "closeCount": 0, "stretchCount": 0},
+                    "sharedProjection": None,
+                    "recommendations": [],
+                    "excluded": [
+                        {"destinationId": "place", "name": "Place", "reasonCode": "property_finance_unavailable"}
+                    ],
+                },
+                "submit": True,
+            }
+        )
+
+        self.assertEqual("0", scenario["eligibleCount"])
+        self.assertEqual("—", scenario["projectedCapital"])
+        self.assertTrue(scenario["landscapeHidden"])
+        self.assertTrue(scenario["matchesHidden"])
+        self.assertTrue(scenario["projectionHidden"])
+        self.assertFalse(scenario["emptyStateHidden"])
+        self.assertEqual("", scenario["landscapeRowsHtml"])
+        self.assertEqual("", scenario["recommendationsHtml"])
 
     def test_currency_changes_do_not_change_recommendation_identity_or_tier(self) -> None:
         recommendations = [

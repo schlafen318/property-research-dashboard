@@ -167,6 +167,19 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
         self.assertIn(".retirement-finder-page .finder-results > * { min-width: 0; }", design_css)
 
+    def test_match_headings_wrap_safely_in_the_three_column_layout(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+        self.assertIn(
+            ".retirement-finder-page .finder-result h3 a { color: var(--gha-ink); white-space: normal; overflow-wrap: anywhere; }",
+            design_css,
+        )
+
+    def test_results_include_a_dedicated_zero_eligible_state(self) -> None:
+        self.assertIn('id="finder-empty-state"', self.html)
+        self.assertIn('id="finder-matches-section"', self.html)
+        self.assertIn('id="finder-projection-section"', self.html)
+
     def test_page_adds_specific_search_supporting_content_and_faq_schema(self) -> None:
         self.assertIn('id="how-matching-works"', self.html)
         self.assertIn('id="within-reach"', self.html)
