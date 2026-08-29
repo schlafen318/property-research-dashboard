@@ -1,7 +1,7 @@
 # FIRE Abroad Design
 
 **Date:** 2026-08-29
-**Status:** Approved in conversation; awaiting written-spec review
+**Status:** Approved for implementation planning
 
 ## Purpose
 
