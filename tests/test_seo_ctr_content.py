@@ -141,9 +141,14 @@ class SeoCtrContentTests(unittest.TestCase):
     def test_vacation_home_page_targets_exact_world_query(self) -> None:
         page = seo_page("best-places-to-buy-vacation-home-abroad")
         query = "best places to buy a vacation home in the world"
+        ctr_title = "Best Locations for Vacation Homes: 10 Global Markets"
+        ctr_description = (
+            "Compare the best places to buy a vacation home worldwide by prices, buyer access, "
+            "lifestyle, rental rules, carrying costs, and resale potential."
+        )
 
-        self.assertIn(query, page["title"].lower())
-        self.assertIn(query, page["description"].lower())
+        self.assertEqual(ctr_title, page["title"])
+        self.assertEqual(ctr_description, page["description"])
         self.assertIn(query, page["h1"].lower())
         self.assertIn(query, page["faqs"][0][0].lower())
 
@@ -152,13 +157,10 @@ class SeoCtrContentTests(unittest.TestCase):
             destinations(),
             build_unified_app.SEO_PAGES,
         ).lower()
-        self.assertIn(f"<title>{query}</title>", html)
-        self.assertIn(
-            f'<meta name="description" content="compare the {query} by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.">',
-            html,
-        )
+        self.assertIn(f"<title>{ctr_title.lower()}</title>", html)
+        self.assertIn(f'<meta name="description" content="{ctr_description.lower()}">', html)
         self.assertIn(f'<h1>{query}</h1>', html)
-        self.assertIn(f'<p class="seo-lede">compare the {query}', html)
+        self.assertIn(f'<p class="seo-lede">{ctr_description.lower()} ', html)
         self.assertIn(f'"name":"what are the {query}?"', html)
 
     def test_expats_and_europe_pages_have_buyer_specific_snippets(self) -> None:
