@@ -179,6 +179,46 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn(expected, homepage)
         self.assertIn(expected, ranking)
 
+    def test_finder_embeds_the_shared_planning_currency_reference_data(self) -> None:
+        payload = json.loads(
+            self.html.split('<script id="retirement-finder-data" type="application/json">', 1)[1]
+            .split("</script>", 1)[0]
+        )
+
+        self.assertEqual("2026-08-27", payload["planning_currencies"]["as_of"])
+        self.assertEqual(
+            ["USD", "EUR", "GBP", "CAD", "AUD", "CHF", "JPY", "HKD", "SGD"],
+            list(payload["planning_currencies"]["rates_to_usd"]),
+        )
+
+    def test_finder_money_controls_follow_the_selected_planning_currency(self) -> None:
+        self.assertIn(
+            '<select id="finder-currency"><option value="USD" selected>USD — US dollar</option>',
+            self.html,
+        )
+        self.assertIn('<option value="SGD">SGD — Singapore dollar</option>', self.html)
+        self.assertIn(
+            "Reference rates dated 27 August 2026. This changes the presentation currency, not future currency-risk assumptions.",
+            self.html,
+        )
+        for field_id in (
+            "finder-liquid-capital",
+            "finder-monthly-contribution",
+            "finder-property-allocation",
+            "finder-pension",
+            "finder-other-income",
+        ):
+            self.assertRegex(
+                self.html,
+                rf'<input id="{field_id}" type="text" inputmode="numeric" data-money min="\d+" step="\d+" value="[\d,]+"',
+            )
+        self.assertNotIn("(USD)", self.html)
+
+    def test_finder_retirement_income_is_monthly_and_inflation_linked_by_default(self) -> None:
+        self.assertIn("Income continuing after retirement (monthly)", self.html)
+        self.assertIn('<input id="finder-pension-indexed" type="checkbox" checked>', self.html)
+        self.assertIn('<input id="finder-other-income-indexed" type="checkbox" checked>', self.html)
+
 
 if __name__ == "__main__":
     unittest.main()
