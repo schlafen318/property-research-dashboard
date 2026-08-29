@@ -673,8 +673,8 @@ SEO_PAGES = [
     },
     {
         "slug": "best-places-to-buy-vacation-home-abroad",
-        "title": "Best Places to Buy a Vacation Home in the World",
-        "description": "Compare the best places to buy a vacation home in the world by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.",
+        "title": "Best Locations for Vacation Homes: 10 Global Markets",
+        "description": "Compare the best places to buy a vacation home worldwide by prices, buyer access, lifestyle, rental rules, carrying costs, and resale potential.",
         "h1": "Best Places to Buy a Vacation Home in the World",
         "keyword": "best country to buy a vacation home",
         "theme": "vacation-home acquisition",
