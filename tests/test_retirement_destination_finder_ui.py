@@ -8,16 +8,17 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 UI = ROOT / "src" / "retirement_destination_finder_ui.js"
+CALCULATOR_UI = ROOT / "src" / "retirement_calculator_ui.js"
 
 
-def run_ui(function_name: str, payload: object) -> object:
+def run_module(ui_path: Path, function_name: str, payload: object) -> object:
     script = (
         "const ui = require(process.argv[1]);"
         "const input = JSON.parse(process.argv[2]);"
         f"process.stdout.write(JSON.stringify(ui.{function_name}(input)));"
     )
     result = subprocess.run(
-        ["node", "-e", script, str(UI), json.dumps(payload)],
+        ["node", "-e", script, str(ui_path), json.dumps(payload)],
         check=True,
         capture_output=True,
         text=True,
@@ -25,7 +26,79 @@ def run_ui(function_name: str, payload: object) -> object:
     return json.loads(result.stdout)
 
 
+def run_ui(function_name: str, payload: object) -> object:
+    return run_module(UI, function_name, payload)
+
+
+def run_calculator_ui(function_name: str, payload: object) -> object:
+    return run_module(CALCULATOR_UI, function_name, payload)
+
+
 class RetirementDestinationFinderUITests(unittest.TestCase):
+    def test_money_helpers_match_the_retirement_calculator(self) -> None:
+        conversion = {
+            "amount": 24000,
+            "fromCurrency": "USD",
+            "toCurrency": "SGD",
+            "ratesToUsd": {"USD": 1, "SGD": 0.7866117265603891},
+        }
+        cases = (
+            ("convertPlanningAmount", conversion),
+            ("convertPlanningControlAmount", {**conversion, "step": 100}),
+            ("parseMoneyInput", "2,000,000"),
+            ("formatMoneyInputValue", 2000000),
+            (
+                "formatPlanningMoney",
+                {
+                    "amountUsd": 1000,
+                    "currency": "SGD",
+                    "ratesToUsd": {"USD": 1, "SGD": 0.7866117265603891},
+                },
+            ),
+        )
+        for function_name, payload in cases:
+            with self.subTest(function_name=function_name):
+                self.assertEqual(
+                    run_calculator_ui(function_name, payload),
+                    run_ui(function_name, payload),
+                )
+
+    def test_money_helpers_reject_invalid_input_and_missing_rates(self) -> None:
+        for value in ("36,3x9", None):
+            with self.subTest(value=value):
+                self.assertIsNone(run_ui("parseMoneyInput", value))
+        self.assertIsNone(
+            run_ui(
+                "convertPlanningAmount",
+                {"amount": 100, "fromCurrency": "USD", "toCurrency": "XYZ", "ratesToUsd": {"USD": 1}},
+            )
+        )
+
+    def test_currency_change_and_money_control_wiring_are_safe(self) -> None:
+        source = UI.read_text()
+        self.assertIn('const moneyControlIds = [', source)
+        self.assertIn('element("finder-currency").addEventListener("change"', source)
+        self.assertIn('if (!control || control.value === "") return;', source)
+        self.assertIn('if (amount === null) return;', source)
+        self.assertIn('convertPlanningControlAmount({', source)
+        self.assertIn('step: control.step,', source)
+        self.assertIn('formatMoneyControl(control);', source)
+        self.assertIn('control.addEventListener("blur"', source)
+        self.assertIn('control.setAttribute("aria-invalid", "true")', source)
+        self.assertIn('control.removeAttribute("aria-invalid")', source)
+
+    def test_money_values_do_not_leave_the_browser(self) -> None:
+        source = UI.read_text()
+        for forbidden in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage", "URLSearchParams"):
+            self.assertNotIn(forbidden, source)
+        for sensitive_id in (
+            "finder-liquid-capital",
+            "finder-monthly-contribution",
+            "finder-property-allocation",
+            "finder-pension",
+            "finder-other-income",
+        ):
+            self.assertNotIn('track("' + sensitive_id, source)
     def test_buy_now_visibility_tracks_financing_and_use(self) -> None:
         visible = run_ui(
             "housingVisibility",

@@ -5,11 +5,67 @@
 })(typeof window !== "undefined" ? window : null, function (root) {
   "use strict";
 
-  const money = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
+  function convertPlanningAmount(input) {
+    const rates = input.ratesToUsd || { USD: 1 };
+    const fromRate = Number(rates[input.fromCurrency]);
+    const toRate = Number(rates[input.toCurrency]);
+    if (input.amount === null || input.amount === undefined || input.amount === "") return null;
+    const amount = Number(input.amount);
+    if (!Number.isFinite(amount) || !(fromRate > 0) || !(toRate > 0)) return null;
+    return amount * fromRate / toRate;
+  }
+
+  function formatPlanningMoney(input) {
+    const currency = input.currency || "USD";
+    const converted = convertPlanningAmount({
+      amount: input.amountUsd,
+      fromCurrency: "USD",
+      toCurrency: currency,
+      ratesToUsd: input.ratesToUsd || { USD: 1 },
+    });
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+      maximumFractionDigits: 0,
+    }).format(converted === null ? 0 : converted);
+  }
+
+  function convertPlanningControlAmount(input) {
+    const converted = convertPlanningAmount(input);
+    if (converted === null) return null;
+    const step = Number(input.step);
+    if (!(step > 0)) return Math.round(converted);
+    return Math.round(converted / step) * step;
+  }
+
+  function parseMoneyInput(value) {
+    const normalized = String(value === null || value === undefined ? "" : value)
+      .trim()
+      .replace(/,/g, "");
+    if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
+    const amount = Number(normalized);
+    return Number.isFinite(amount) ? amount : null;
+  }
+
+  function formatMoneyInputValue(value) {
+    const amount = typeof value === "number" ? value : parseMoneyInput(value);
+    if (!Number.isFinite(amount)) return "";
+    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(amount);
+  }
+
+  function isInvalidMoneyInput(input) {
+    const amount = parseMoneyInput(input.value);
+    if (amount === null) return true;
+    const minimum = input.min === "" || input.min === null || input.min === undefined
+      ? null
+      : Number(input.min);
+    if (minimum !== null && amount < minimum) return true;
+    const step = Number(input.step);
+    if (!(step > 0)) return false;
+    const base = minimum === null ? 0 : minimum;
+    const steps = (amount - base) / step;
+    return Math.abs(steps - Math.round(steps)) > 1e-9;
+  }
 
   function housingVisibility(input) {
     const buyNow = input.housingPlan === "buy_now";
@@ -54,7 +110,11 @@
         closest.name + " is the strongest modeled match under your preferences.";
     }
     return "No destinations are within reach yet. " + closest.name +
-      " is the closest modeled match, with a gap of " + money.format(Math.abs(Number(closest.surplusGap))) + ".";
+      " is the closest modeled match, with a gap of " + formatPlanningMoney({
+        amountUsd: Math.abs(Number(closest.surplusGap)),
+        currency: input.currency || "USD",
+        ratesToUsd: input.ratesToUsd || { USD: 1 },
+      }) + ".";
   }
 
   function tierLabel(value) {
@@ -67,7 +127,11 @@
 
   function chartTooltip(point) {
     const heading = "Year " + Number(point.year);
-    const value = money.format(Number(point.portfolio));
+    const value = formatPlanningMoney({
+      amountUsd: Number(point.portfolio),
+      currency: point.currency || "USD",
+      ratesToUsd: point.ratesToUsd || { USD: 1 },
+    });
     return {
       heading: heading,
       value: value,
@@ -93,6 +157,16 @@
     const form = document.getElementById("retirement-destination-finder-form");
     const results = document.getElementById("finder-results");
     const errorSummary = document.getElementById("finder-errors");
+    const currencyConfig = payload.planning_currencies || { rates_to_usd: { USD: 1 } };
+    const ratesToUsd = currencyConfig.rates_to_usd || { USD: 1 };
+    let selectedCurrency = "USD";
+    const moneyControlIds = [
+      "finder-liquid-capital",
+      "finder-monthly-contribution",
+      "finder-property-allocation",
+      "finder-pension",
+      "finder-other-income",
+    ];
     let currentRecommendations = [];
     let currentUser = null;
     let recommendationsExpanded = false;
@@ -101,6 +175,30 @@
     function numeric(id) { return Number(element(id).value); }
     function checked(id) { return element(id).checked; }
     function selected(id) { return element(id).value; }
+    function displayMoney(amountUsd) {
+      return formatPlanningMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
+    }
+    function moneyNumber(id) {
+      const amount = parseMoneyInput(element(id).value);
+      return Number(convertPlanningAmount({
+        amount: amount === null ? 0 : amount,
+        fromCurrency: selectedCurrency,
+        toCurrency: "USD",
+        ratesToUsd: ratesToUsd,
+      }) || 0);
+    }
+    function formatMoneyControl(control) {
+      if (!control || control.value === "") return;
+      const amount = parseMoneyInput(control.value);
+      if (amount !== null) control.value = formatMoneyInputValue(amount);
+    }
+    function validateMoneyControl(control) {
+      const invalid = isInvalidMoneyInput({ value: control.value, min: control.min, step: control.step });
+      control.setCustomValidity(invalid ? "Enter a valid amount." : "");
+      if (invalid) control.setAttribute("aria-invalid", "true");
+      else control.removeAttribute("aria-invalid");
+      return invalid;
+    }
     function track(name, fields) {
       if (root.GHA && typeof root.GHA.track === "function") root.GHA.track(name, fields || {});
     }
@@ -123,12 +221,12 @@
     function incomeStreams() {
       return [
         {
-          amount: numeric("finder-pension"),
+          amount: moneyNumber("finder-pension") * 12,
           indexed: checked("finder-pension-indexed"),
           inflationRate: 0.026,
         },
         {
-          amount: numeric("finder-other-income"),
+          amount: moneyNumber("finder-other-income") * 12,
           indexed: checked("finder-other-income-indexed"),
           inflationRate: 0.026,
         },
@@ -143,8 +241,8 @@
         horizonYears: numeric("finder-horizon"),
         household: selected("finder-household"),
         housingPlan: housingPlan,
-        totalLiquidCapital: numeric("finder-liquid-capital"),
-        monthlyPortfolioContribution: numeric("finder-monthly-contribution"),
+        totalLiquidCapital: moneyNumber("finder-liquid-capital"),
+        monthlyPortfolioContribution: moneyNumber("finder-monthly-contribution"),
         contributionInflationLinked: checked("finder-contribution-indexed"),
         expectedPortfolioReturn: numeric("finder-return") / 100,
         generalInflation: 0.026,
@@ -155,7 +253,7 @@
           climate: selected("finder-climate"),
           healthcare: selected("finder-healthcare"),
         },
-        maximumPropertyAllocation: numeric("finder-property-allocation"),
+        maximumPropertyAllocation: moneyNumber("finder-property-allocation"),
         purchaseMethod: selected("finder-purchase-method"),
         residency: selected("finder-buyer-residency"),
         incomeSource: selected("finder-income-source"),
@@ -172,6 +270,10 @@
 
     function validate(user) {
       const errors = [];
+      const invalidMoney = moneyControlIds.find(function (id) {
+        return validateMoneyControl(element(id));
+      });
+      if (invalidMoney) errors.push("Enter a valid amount in the highlighted money field.");
       if (!(user.retirementAge > user.currentAge)) errors.push("Retirement age must be later than current age.");
       if (user.totalLiquidCapital < 0) errors.push("Capital today cannot be negative.");
       if (user.monthlyPortfolioContribution < 0) errors.push("Monthly investing cannot be negative.");
@@ -182,6 +284,29 @@
         errors.push("Enter the maximum amount available for a property purchase.");
       }
       return errors;
+    }
+
+    function changePlanningCurrency(nextCurrency) {
+      if (!ratesToUsd[nextCurrency] || nextCurrency === selectedCurrency) return;
+      const previousCurrency = selectedCurrency;
+      moneyControlIds.forEach(function (id) {
+        const control = element(id);
+        if (!control || control.value === "") return;
+        const amount = parseMoneyInput(control.value);
+        if (amount === null) return;
+        const converted = convertPlanningControlAmount({
+          amount: amount,
+          fromCurrency: previousCurrency,
+          toCurrency: nextCurrency,
+          ratesToUsd: ratesToUsd,
+          step: control.step,
+        });
+        if (converted !== null) {
+          control.value = formatMoneyInputValue(converted);
+          validateMoneyControl(control);
+        }
+      });
+      selectedCurrency = nextCurrency;
     }
 
     function renderChart(projection) {
@@ -200,7 +325,12 @@
       }).concat([1]));
       projection.annualProjection.forEach(function (point, index) {
         const button = document.createElement("button");
-        const tooltip = chartTooltip(point);
+        const tooltip = chartTooltip({
+          year: point.year,
+          portfolio: point.portfolio,
+          currency: selectedCurrency,
+          ratesToUsd: ratesToUsd,
+        });
         button.type = "button";
         button.className = "finder-chart-bar";
         button.style.height = Math.max(3, Number(point.portfolio) / maximum * 100) + "%";
@@ -220,11 +350,11 @@
 
     function resultRow(item, user) {
       const propertyBits = user.housingPlan === "buy_now"
-        ? '<div><dt>Property equity</dt><dd>' + money.format(item.propertyEquity) +
-          '</dd></div><div><dt>Mortgage remaining</dt><dd>' + money.format(item.mortgageBalance) + "</dd></div>"
+        ? '<div><dt>Property equity</dt><dd>' + displayMoney(item.propertyEquity) +
+          '</dd></div><div><dt>Mortgage remaining</dt><dd>' + displayMoney(item.mortgageBalance) + "</dd></div>"
         : "";
       const rental = user.housingPlan === "buy_now" && user.useBeforeRetirement === "rental"
-        ? '<div><dt>Annual property cash flow</dt><dd>' + money.format(item.netRentalCashFlow) + "</dd></div>"
+        ? '<div><dt>Annual property cash flow</dt><dd>' + displayMoney(item.netRentalCashFlow) + "</dd></div>"
         : "";
       const financing = user.housingPlan === "buy_now"
         ? '<p class="finder-financing"><strong>' + escapeHtml(item.financingStatus) + "</strong>" +
@@ -241,9 +371,9 @@
         '" data-finder-dossier>' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
         '</p></div></header><dl>' +
-        '<div><dt>Projected portfolio</dt><dd>' + money.format(item.portfolioAtRetirement) + "</dd></div>" +
-        '<div><dt>Retirement target</dt><dd>' + money.format(item.retirementTarget) + "</dd></div>" +
-        '<div><dt>Surplus or gap</dt><dd>' + money.format(item.surplusGap) + "</dd></div>" +
+        '<div><dt>Projected portfolio</dt><dd>' + displayMoney(item.portfolioAtRetirement) + "</dd></div>" +
+        '<div><dt>Retirement target</dt><dd>' + displayMoney(item.retirementTarget) + "</dd></div>" +
+        '<div><dt>Surplus or gap</dt><dd>' + displayMoney(item.surplusGap) + "</dd></div>" +
         propertyBits + rental + "</dl>" + financing +
         (item.preferenceMatches.length ? '<p class="finder-matches"><strong>Preference match:</strong> ' + escapeHtml(item.preferenceMatches.join(" · ")) + "</p>" : "") +
         '<div class="finder-result-actions"><a href="' + escapeHtml(dossierHref) +
@@ -304,8 +434,8 @@
     }
 
     function render(result, user) {
-      element("finder-capital-today").textContent = money.format(user.totalLiquidCapital);
-      element("finder-monthly-summary").textContent = money.format(user.monthlyPortfolioContribution);
+      element("finder-capital-today").textContent = displayMoney(user.totalLiquidCapital);
+      element("finder-monthly-summary").textContent = displayMoney(user.monthlyPortfolioContribution);
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
       renderChart(result.sharedProjection);
       currentRecommendations = result.recommendations.slice(0, 12);
@@ -314,6 +444,8 @@
       element("finder-result-read").textContent = resultSummaryRead({
         withinReachCount: result.summary.withinReachCount,
         recommendations: currentRecommendations,
+        currency: selectedCurrency,
+        ratesToUsd: ratesToUsd,
       });
       element("finder-closest-match").textContent = currentRecommendations.length
         ? currentRecommendations[0].name
@@ -369,6 +501,20 @@
         }
       });
     });
+    element("finder-currency").value = selectedCurrency;
+    element("finder-currency").addEventListener("change", function () {
+      changePlanningCurrency(element("finder-currency").value);
+      track("retirement_destination_finder_currency_change");
+    });
+    moneyControlIds.forEach(function (id) {
+      const control = element(id);
+      formatMoneyControl(control);
+      control.addEventListener("input", function () { validateMoneyControl(control); });
+      control.addEventListener("blur", function () {
+        formatMoneyControl(control);
+        validateMoneyControl(control);
+      });
+    });
     element("finder-projection-bars").addEventListener("mouseover", function (event) {
       if (event.target.matches(".finder-chart-bar")) showTooltip(event.target);
     });
@@ -388,6 +534,11 @@
   }
 
   return {
+    convertPlanningAmount: convertPlanningAmount,
+    convertPlanningControlAmount: convertPlanningControlAmount,
+    parseMoneyInput: parseMoneyInput,
+    formatMoneyInputValue: formatMoneyInputValue,
+    formatPlanningMoney: formatPlanningMoney,
     housingVisibility: housingVisibility,
     safeDetailHref: safeDetailHref,
     safeDossierHref: safeDossierHref,
