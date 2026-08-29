@@ -153,6 +153,16 @@
     return purchaseMethod === "not_sure" ? "Illustrative mortgage · " + label : label;
   }
 
+  function projectionAfterRetirementTreatment(annualProjection, portfolioAtRetirement, mortgageBalanceAtRetirement) {
+    if (!Array.isArray(annualProjection) || !annualProjection.length) return annualProjection;
+    const adjusted = annualProjection.slice();
+    adjusted[adjusted.length - 1] = Object.assign({}, adjusted[adjusted.length - 1], {
+      portfolio: portfolioAtRetirement,
+      mortgageBalance: mortgageBalanceAtRetirement,
+    });
+    return adjusted;
+  }
+
   function profileMatchesBuyer(input) {
     const user = input && input.user || {};
     const profile = input && input.profile || {};
@@ -257,7 +267,11 @@
           return;
         }
         portfolioAtRetirement = propertyResult.portfolioAtRetirement;
-        annualProjection = propertyResult.annualProjection;
+        annualProjection = projectionAfterRetirementTreatment(
+          propertyResult.annualProjection,
+          propertyResult.portfolioAtRetirement,
+          propertyResult.mortgageBalanceAtRetirement
+        );
         propertyEquity = propertyResult.propertyEquityAtRetirement;
         mortgageBalance = propertyResult.mortgageBalanceAtRetirement;
         netRentalCashFlow = propertyResult.netRentalCashFlowAtRetirement;

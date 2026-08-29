@@ -34,6 +34,169 @@ def run_calculator_ui(function_name: str, payload: object) -> object:
     return run_module(CALCULATOR_UI, function_name, payload)
 
 
+def run_ui_dom_scenario(payload: object) -> dict:
+    script = r'''
+const fs = require("fs");
+const vm = require("vm");
+const input = JSON.parse(process.argv[2]);
+
+class FakeElement {
+  constructor(id) {
+    this.id = id;
+    this.value = "";
+    this.checked = false;
+    this.hidden = false;
+    this.disabled = false;
+    this.dataset = {};
+    this.min = "";
+    this.step = "";
+    this.textContent = "";
+    this.innerHTML = "";
+    this.listeners = {};
+    this.attributes = {};
+    this.classList = { toggle() {}, remove() {} };
+  }
+  addEventListener(name, callback) { (this.listeners[name] ||= []).push(callback); }
+  dispatch(name) {
+    const event = { preventDefault() {}, target: this };
+    (this.listeners[name] || []).forEach((callback) => callback(event));
+  }
+  setCustomValidity(message) { this.validationMessage = message; }
+  setAttribute(name, value) { this.attributes[name] = String(value); }
+  removeAttribute(name) { delete this.attributes[name]; }
+  querySelectorAll() { return []; }
+  closest() { return null; }
+  focus() {}
+  scrollIntoView() {}
+}
+
+const elements = new Map();
+function el(id) {
+  if (!elements.has(id)) elements.set(id, new FakeElement(id));
+  return elements.get(id);
+}
+const values = {
+  "finder-currency": "USD",
+  "finder-current-age": "50",
+  "finder-retirement-age": "60",
+  "finder-horizon": "30",
+  "finder-household": "single",
+  "finder-housing-plan": "rent",
+  "finder-liquid-capital": "500,000",
+  "finder-monthly-contribution": "2,000",
+  "finder-return": "4",
+  "finder-region": "any",
+  "finder-climate": "any",
+  "finder-healthcare": "normal",
+  "finder-property-allocation": "300,000",
+  "finder-purchase-method": "cash",
+  "finder-buyer-residency": "non_resident",
+  "finder-income-source": "overseas",
+  "finder-requested-ltv": "60",
+  "finder-mortgage-rate": "5",
+  "finder-mortgage-term": "20",
+  "finder-mortgage-treatment": "payoff",
+  "finder-use-before-retirement": "personal",
+  "finder-rental-yield": "5",
+  "finder-vacancy-rate": "10",
+  "finder-operating-cost-rate": "20",
+  "finder-pension": "0",
+  "finder-other-income": "0",
+};
+Object.entries(values).forEach(([id, value]) => { el(id).value = value; });
+[
+  ["finder-liquid-capital", "0", "1000"],
+  ["finder-monthly-contribution", "0", "100"],
+  ["finder-property-allocation", "0", "1000"],
+  ["finder-pension", "0", "100"],
+  ["finder-other-income", "0", "100"],
+].forEach(([id, min, step]) => { el(id).min = min; el(id).step = step; });
+el("finder-contribution-indexed").checked = true;
+el("finder-pension-indexed").checked = true;
+el("finder-other-income-indexed").checked = true;
+
+const groups = ["buyNow", "mortgage", "rental", "buyAtRetirement"].map((name) => {
+  const group = new FakeElement("group-" + name);
+  group.dataset.finderGroup = name;
+  const controlsByGroup = {
+    buyNow: ["finder-property-allocation", "finder-purchase-method", "finder-use-before-retirement", "finder-mortgage-treatment"],
+    mortgage: ["finder-buyer-residency", "finder-income-source", "finder-requested-ltv", "finder-mortgage-rate", "finder-mortgage-term"],
+    rental: ["finder-rental-yield", "finder-vacancy-rate", "finder-operating-cost-rate"],
+    buyAtRetirement: [],
+  };
+  group.controls = controlsByGroup[name].map(el);
+  group.querySelectorAll = () => group.controls;
+  return group;
+});
+const document = {
+  activeElement: null,
+  getElementById: el,
+  querySelectorAll(selector) { return selector === "[data-finder-group]" ? groups : []; },
+};
+let engineInput = null;
+const engineInputs = [];
+let engineCalls = 0;
+const window = {
+  GHA: { track() {} },
+  GHARetirementDestinationFinder: {
+    recommendDestinations(request) {
+      engineInput = request;
+      engineInputs.push(request);
+      engineCalls += 1;
+      return {
+        summary: { withinReachCount: 0, closeCount: 0, stretchCount: 0 },
+        sharedProjection: null,
+        recommendations: [],
+        excluded: [],
+      };
+    },
+  },
+};
+const context = { window, document, Intl, Number, String, Array, Set, Map, Math, JSON };
+vm.runInNewContext(fs.readFileSync(process.argv[1], "utf8"), context);
+window.GHARetirementDestinationFinderUI.initRetirementDestinationFinder("retirement-destination-finder", {
+  planning_currencies: { rates_to_usd: input.rates },
+  destinations: [],
+  retirementCosts: [],
+  mortgageProfiles: {},
+});
+
+if (input.invalidHiddenProperty) {
+  el("finder-property-allocation").value = "not money";
+  el("finder-property-allocation").dispatch("input");
+}
+if (input.submitBeforeCurrency) el("retirement-destination-finder-form").dispatch("submit");
+if (input.currency) {
+  el("finder-currency").value = input.currency;
+  el("finder-currency").dispatch("change");
+}
+if (input.editLiquid) {
+  el("finder-liquid-capital").value = input.editLiquid;
+  el("finder-liquid-capital").dispatch("input");
+}
+if (input.submit) el("retirement-destination-finder-form").dispatch("submit");
+
+process.stdout.write(JSON.stringify({
+  currency: el("finder-currency").value,
+  liquidDisplay: el("finder-liquid-capital").value,
+  monthlyDisplay: el("finder-monthly-contribution").value,
+  propertyDisplay: el("finder-property-allocation").value,
+  propertyDisabled: el("finder-property-allocation").disabled,
+  propertyError: el("finder-property-allocation").validationMessage || "",
+  engineCalls,
+  user: engineInput && engineInput.user,
+  users: engineInputs.map((request) => request.user),
+}));
+'''
+    result = subprocess.run(
+        ["node", "-e", script, str(UI), json.dumps(payload)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
+
+
 class RetirementDestinationFinderUITests(unittest.TestCase):
     def test_money_helpers_match_the_retirement_calculator(self) -> None:
         conversion = {
@@ -74,9 +237,79 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             )
         )
 
+    def test_currency_switch_uses_canonical_usd_for_untouched_money_inputs(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1, "EUR": 0.91},
+                "submitBeforeCurrency": True,
+                "currency": "EUR",
+                "submit": True,
+            }
+        )
+
+        self.assertEqual("EUR", scenario["currency"])
+        self.assertEqual("549,000", scenario["liquidDisplay"])
+        self.assertEqual("2,200", scenario["monthlyDisplay"])
+        self.assertEqual(500000, scenario["user"]["totalLiquidCapital"])
+        self.assertEqual(2000, scenario["user"]["monthlyPortfolioContribution"])
+
+        from tests.test_retirement_destination_finder import (
+            cost_record,
+            destination,
+            mortgage_profile,
+            run_finder,
+        )
+
+        destinations = [destination("first"), destination("second")]
+        common = {
+            "destinations": destinations,
+            "retirementCosts": [cost_record("first", 150000), cost_record("second", 180000)],
+            "mortgageProfiles": {item["id"]: mortgage_profile() for item in destinations},
+        }
+        usd = run_finder("recommendDestinations", {**common, "user": scenario["users"][0]})
+        eur = run_finder("recommendDestinations", {**common, "user": scenario["users"][1]})
+        self.assertEqual(
+            [(item["destinationId"], item["tier"]) for item in usd["recommendations"]],
+            [(item["destinationId"], item["tier"]) for item in eur["recommendations"]],
+        )
+
+        edited = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1, "EUR": 0.91},
+                "currency": "EUR",
+                "editLiquid": "550,000",
+                "submit": True,
+            }
+        )
+        self.assertEqual(500500, edited["user"]["totalLiquidCapital"])
+
+    def test_hidden_invalid_property_money_does_not_block_rent_submission(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1, "EUR": 0.91},
+                "invalidHiddenProperty": True,
+                "submit": True,
+            }
+        )
+
+        self.assertEqual("not money", scenario["propertyDisplay"])
+        self.assertTrue(scenario["propertyDisabled"])
+        self.assertEqual(1, scenario["engineCalls"])
+        self.assertEqual("rent", scenario["user"]["housingPlan"])
+
+    def test_invalid_next_currency_rates_leave_selection_and_values_unchanged(self) -> None:
+        for invalid_rate in (0, -1, "Infinity", "not-a-rate"):
+            with self.subTest(invalid_rate=invalid_rate):
+                scenario = run_ui_dom_scenario(
+                    {"rates": {"USD": 1, "EUR": invalid_rate}, "currency": "EUR", "submit": False}
+                )
+                self.assertEqual("USD", scenario["currency"])
+                self.assertEqual("500,000", scenario["liquidDisplay"])
+                self.assertEqual("2,000", scenario["monthlyDisplay"])
+
     def test_currency_change_and_money_control_wiring_are_safe(self) -> None:
         source = UI.read_text()
-        self.assertIn('const moneyControlIds = [', source)
+        self.assertIn('const moneyControlIds = MONEY_CONTROL_IDS.slice();', source)
         self.assertIn('element("finder-currency").addEventListener("change"', source)
         self.assertIn('if (!control || control.value === "") return;', source)
         self.assertIn('if (amount === null) return;', source)

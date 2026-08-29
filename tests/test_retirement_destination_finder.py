@@ -278,6 +278,42 @@ class RetirementDestinationFinderTests(unittest.TestCase):
                 item["annualProjection"][-1]["portfolio"],
             )
 
+    def test_buy_now_payoff_projection_ends_after_remaining_mortgage_is_paid(self) -> None:
+        place = destination("payoff-projection")
+        payload = {
+            "user": user_payload(
+                housingPlan="buy_now",
+                currentAge=50,
+                retirementAge=60,
+                horizonYears=30,
+                totalLiquidCapital=700000,
+                maximumPropertyAllocation=400000,
+                monthlyPortfolioContribution=3000,
+                purchaseMethod="mortgage",
+                requestedLtv=0.6,
+                annualMortgageRate=0.04,
+                mortgageTermYears=20,
+                mortgageTreatment="payoff",
+                useBeforeRetirement="rental",
+                grossRentalYield=0.05,
+                vacancyRate=0.1,
+                operatingCostRate=0.2,
+            ),
+            "destinations": [place],
+            "retirementCosts": [cost_record(place["id"], 30000, 400000)],
+            "mortgageProfiles": {place["id"]: mortgage_profile()},
+        }
+
+        result = run_finder("recommendDestinations", payload)
+        item = result["recommendations"][0]
+
+        self.assertGreater(item["annualProjection"][-2]["mortgageBalance"], 0)
+        self.assertEqual(0, item["annualProjection"][-1]["mortgageBalance"])
+        self.assertEqual(
+            item["portfolioAtRetirement"],
+            item["annualProjection"][-1]["portfolio"],
+        )
+
     def test_every_input_destination_is_accounted_for(self) -> None:
         destinations = [destination("a"), destination("b"), destination("c")]
         payload = {

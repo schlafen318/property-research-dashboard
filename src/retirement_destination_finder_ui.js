@@ -5,6 +5,14 @@
 })(typeof window !== "undefined" ? window : null, function (root) {
   "use strict";
 
+  const MONEY_CONTROL_IDS = [
+    "finder-liquid-capital",
+    "finder-monthly-contribution",
+    "finder-property-allocation",
+    "finder-pension",
+    "finder-other-income",
+  ];
+
   function convertPlanningAmount(input) {
     const rates = input.ratesToUsd || { USD: 1 };
     const fromRate = Number(rates[input.fromCurrency]);
@@ -79,6 +87,19 @@
       rental: buyNow && input.useBeforeRetirement === "rental",
       buyAtRetirement: input.housingPlan === "buy_retirement",
     };
+  }
+
+  function activeMoneyControlIds(input) {
+    const active = MONEY_CONTROL_IDS.filter(function (id) {
+      return id !== "finder-property-allocation";
+    });
+    if (input.housingPlan === "buy_now") active.push("finder-property-allocation");
+    return active;
+  }
+
+  function validPlanningRate(currency, ratesToUsd) {
+    const rate = Number((ratesToUsd || {})[currency]);
+    return Number.isFinite(rate) && rate > 0;
   }
 
   function safeDetailHref(input) {
@@ -205,13 +226,8 @@
     const currencyConfig = payload.planning_currencies || { rates_to_usd: { USD: 1 } };
     const ratesToUsd = currencyConfig.rates_to_usd || { USD: 1 };
     let selectedCurrency = "USD";
-    const moneyControlIds = [
-      "finder-liquid-capital",
-      "finder-monthly-contribution",
-      "finder-property-allocation",
-      "finder-pension",
-      "finder-other-income",
-    ];
+    const moneyControlIds = MONEY_CONTROL_IDS.slice();
+    const canonicalMoneyUsd = {};
     let currentRecommendations = [];
     let currentUser = null;
     let currentResult = null;
@@ -225,13 +241,28 @@
       return resultMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
     }
     function moneyNumber(id) {
-      const amount = parseMoneyInput(element(id).value);
+      const control = element(id);
+      const amount = parseMoneyInput(control.value);
+      if (amount !== null && Object.prototype.hasOwnProperty.call(canonicalMoneyUsd, id)) {
+        return canonicalMoneyUsd[id];
+      }
       return Number(convertPlanningAmount({
         amount: amount === null ? 0 : amount,
         fromCurrency: selectedCurrency,
         toCurrency: "USD",
         ratesToUsd: ratesToUsd,
       }) || 0);
+    }
+    function updateCanonicalMoney(control) {
+      const amount = parseMoneyInput(control.value);
+      if (amount === null) return;
+      const amountUsd = convertPlanningAmount({
+        amount: amount,
+        fromCurrency: selectedCurrency,
+        toCurrency: "USD",
+        ratesToUsd: ratesToUsd,
+      });
+      if (amountUsd !== null) canonicalMoneyUsd[control.id] = amountUsd;
     }
     function formatMoneyControl(control) {
       if (!control || control.value === "") return;
@@ -259,6 +290,9 @@
       });
       document.querySelectorAll("[data-finder-group]").forEach(function (group) {
         group.hidden = !visible[group.dataset.finderGroup];
+        group.querySelectorAll("input, select, textarea").forEach(function (control) {
+          control.disabled = group.hidden;
+        });
       });
       element("finder-own-guidance").hidden = selected("finder-housing-plan") !== "own";
       element("finder-submit").disabled = selected("finder-housing-plan") === "own";
@@ -316,7 +350,7 @@
 
     function validate(user) {
       const errors = [];
-      const invalidMoney = moneyControlIds.find(function (id) {
+      const invalidMoney = activeMoneyControlIds({ housingPlan: user.housingPlan }).find(function (id) {
         return validateMoneyControl(element(id));
       });
       if (invalidMoney) errors.push("Enter a valid amount in the highlighted money field.");
@@ -333,16 +367,21 @@
     }
 
     function changePlanningCurrency(nextCurrency) {
-      if (!ratesToUsd[nextCurrency] || nextCurrency === selectedCurrency) return;
+      if (nextCurrency === selectedCurrency) return false;
+      if (!validPlanningRate(selectedCurrency, ratesToUsd) || !validPlanningRate(nextCurrency, ratesToUsd)) {
+        element("finder-currency").value = selectedCurrency;
+        return false;
+      }
       const previousCurrency = selectedCurrency;
       moneyControlIds.forEach(function (id) {
         const control = element(id);
         if (!control || control.value === "") return;
         const amount = parseMoneyInput(control.value);
         if (amount === null) return;
+        const hasCanonical = Object.prototype.hasOwnProperty.call(canonicalMoneyUsd, id);
         const converted = convertPlanningControlAmount({
-          amount: amount,
-          fromCurrency: previousCurrency,
+          amount: hasCanonical ? canonicalMoneyUsd[id] : amount,
+          fromCurrency: hasCanonical ? "USD" : previousCurrency,
           toCurrency: nextCurrency,
           ratesToUsd: ratesToUsd,
           step: control.step,
@@ -354,6 +393,7 @@
       });
       selectedCurrency = nextCurrency;
       renderCurrentResults();
+      return true;
     }
 
     function renderChart(view, user) {
@@ -612,13 +652,18 @@
     });
     element("finder-currency").value = selectedCurrency;
     element("finder-currency").addEventListener("change", function () {
-      changePlanningCurrency(element("finder-currency").value);
-      track("retirement_destination_finder_currency_change");
+      if (changePlanningCurrency(element("finder-currency").value)) {
+        track("retirement_destination_finder_currency_change");
+      }
     });
     moneyControlIds.forEach(function (id) {
       const control = element(id);
+      updateCanonicalMoney(control);
       formatMoneyControl(control);
-      control.addEventListener("input", function () { validateMoneyControl(control); });
+      control.addEventListener("input", function () {
+        updateCanonicalMoney(control);
+        validateMoneyControl(control);
+      });
       control.addEventListener("blur", function () {
         formatMoneyControl(control);
         validateMoneyControl(control);
@@ -644,6 +689,7 @@
     formatPlanningMoney: formatPlanningMoney,
     resultMoney: resultMoney,
     housingVisibility: housingVisibility,
+    activeMoneyControlIds: activeMoneyControlIds,
     safeDetailHref: safeDetailHref,
     safeDossierHref: safeDossierHref,
     recommendationsForDisplay: recommendationsForDisplay,
