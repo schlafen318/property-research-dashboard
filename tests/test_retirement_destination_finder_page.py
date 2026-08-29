@@ -122,6 +122,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-eligible-count"', self.html)
         self.assertIn('id="finder-strongest-match"', self.html)
         self.assertIn('id="finder-capital-landscape"', self.html)
+        self.assertIn('id="finder-landscape-projected"', self.html)
         self.assertIn('aria-labelledby="finder-landscape-heading finder-landscape-caption"', self.html)
         self.assertIn('id="finder-landscape-rows" role="list"', self.html)
         self.assertIn(
@@ -160,6 +161,11 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("grid-template-columns: minmax(190px, 1.15fr) minmax(360px, 3fr) auto", design_css)
         self.assertIn("@media (max-width: 620px)", design_css)
         self.assertIn("grid-template-columns: minmax(0, 1fr) auto", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-projection", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-capital-dot", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-distance", design_css)
+        self.assertNotIn("background: linear-gradient(to right", design_css)
+        self.assertNotIn("border-left: 1px solid var(--gha-rule); border-right: 1px solid var(--gha-rule)", design_css)
         self.assertNotIn(".finder-landscape { border-radius:", design_css)
 
     def test_projection_does_not_force_results_wider_than_the_mobile_viewport(self) -> None:

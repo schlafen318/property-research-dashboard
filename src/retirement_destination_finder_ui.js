@@ -222,13 +222,22 @@
 
   function finderCapitalLandscapeLabel(input) {
     const row = input.row || {};
+    const projectedCapital = Math.max(0, Number(input.projectedCapital) || 0);
+    const difference = (Number(row.target) || 0) - projectedCapital;
     const target = resultMoney({
       amountUsd: Number(row.target) || 0,
       currency: input.currency || "USD",
       ratesToUsd: input.ratesToUsd || { USD: 1 },
     });
+    const differenceText = difference === 0
+      ? "Matches projected capital."
+      : resultMoney({
+        amountUsd: Math.abs(difference),
+        currency: input.currency || "USD",
+        ratesToUsd: input.ratesToUsd || { USD: 1 },
+      }) + (difference < 0 ? " under projected capital." : " over projected capital.");
     return String(row.name || "Destination") + ", " + String(row.country || "") +
-      ". Retirement target " + target + ". " + tierLabel(row.tier) + "." +
+      ". Retirement target " + target + ". " + differenceText + " " + tierLabel(row.tier) + "." +
       (row.matchRank ? " Strongest modeled match number " + row.matchRank + "." : "");
   }
 
@@ -237,28 +246,43 @@
     const currency = input.currency || "USD";
     const ratesToUsd = input.ratesToUsd || { USD: 1 };
     const capitalPosition = Math.max(0, Math.min(100, Number(model.projectedPosition) || 0));
-    const axisHtml = '<span></span><span class="finder-landscape-axis-track">' +
-      (model.ticks || []).map(function (tick) {
-        return "<span>" + escapeHtml(resultMoney({ amountUsd: tick, currency: currency, ratesToUsd: ratesToUsd })) + "</span>";
-      }).join("") + "</span><span></span>";
+    const axisHtml = '<span></span><span class="finder-landscape-axis-track" style="--capital-position:' +
+      capitalPosition.toFixed(2) + '%"><span class="finder-landscape-capital-label">Projected capital</span></span><span></span>';
     const rowsHtml = (model.rows || []).map(function (row, index) {
       const targetPosition = Math.max(0, Math.min(100, Number(row.position) || 0));
-      const label = finderCapitalLandscapeLabel({ row: row, currency: currency, ratesToUsd: ratesToUsd });
+      const difference = (Number(row.target) || 0) - (Number(model.projectedCapital) || 0);
+      const differencePosition = targetPosition - capitalPosition;
+      const distanceStart = Math.min(capitalPosition, targetPosition);
+      const distanceWidth = Math.abs(differencePosition);
+      const state = difference === 0 ? "is-on-target" : difference < 0 ? "is-within" : "is-over";
+      const label = finderCapitalLandscapeLabel({
+        row: row,
+        projectedCapital: model.projectedCapital,
+        currency: currency,
+        ratesToUsd: ratesToUsd,
+      });
       const value = resultMoney({ amountUsd: row.target, currency: currency, ratesToUsd: ratesToUsd });
+      const gap = difference === 0
+        ? "Matches your projection"
+        : resultMoney({ amountUsd: Math.abs(difference), currency: currency, ratesToUsd: ratesToUsd }) +
+          (difference < 0 ? " under" : " over");
       const rank = row.matchRank
         ? '<small class="finder-landscape-rank">Match 0' + row.matchRank + "</small>"
         : "";
-      return '<div role="listitem"><a class="finder-landscape-row' + (row.matchRank ? " is-match" : "") +
+      return '<div role="listitem"><a class="finder-landscape-row' + (row.matchRank ? " is-match" : "") + " " + state +
         '" href="' + escapeHtml(safeDossierHref(row.destinationId)) +
         '" data-finder-destination data-destination-id="' + escapeHtml(row.destinationId) +
         '" data-surface="cost_landscape" data-cost-rank="' + (index + 1) +
         '" data-match-rank="' + (row.matchRank || "") + '" data-tier="' + escapeHtml(row.tier) +
         '" data-action="dossier"' +
         ' aria-label="' + escapeHtml(label) + '" style="--capital-position:' + capitalPosition.toFixed(2) +
-        "%;--target-position:" + targetPosition.toFixed(2) + '%"><span class="finder-landscape-name">' +
+        "%;--target-position:" + targetPosition.toFixed(2) + "%;--distance-start:" + distanceStart.toFixed(2) +
+        "%;--distance-width:" + distanceWidth.toFixed(2) + '%"><span class="finder-landscape-name">' +
         escapeHtml(row.name) + "<small>" + escapeHtml(row.country) + "</small>" + rank +
-        '</span><span class="finder-landscape-track" aria-hidden="true"><i class="finder-landscape-dot"></i></span>' +
-        '<span class="finder-landscape-value">' + escapeHtml(value) + "</span></a></div>";
+        '</span><span class="finder-landscape-track" aria-hidden="true"><i class="finder-landscape-capital-dot"></i>' +
+        '<i class="finder-landscape-distance"></i><i class="finder-landscape-dot"></i></span>' +
+        '<span class="finder-landscape-value"><span>' + escapeHtml(value) + '</span><small class="finder-landscape-gap ' +
+        state + '">' + escapeHtml(gap) + "</small></span></a></div>";
     }).join("");
     return { axisHtml: axisHtml, rowsHtml: rowsHtml, rowCount: (model.rows || []).length };
   }
@@ -704,11 +728,13 @@
       element("finder-eligible-count").textContent = String(currentRecommendations.length);
       if (!currentRecommendations.length) {
         element("finder-projected-capital").textContent = "—";
+        element("finder-landscape-projected").textContent = "—";
         element("finder-landscape-axis").innerHTML = "";
         element("finder-landscape-rows").innerHTML = "";
         return;
       }
       element("finder-projected-capital").textContent = displayResultMoney(projectedCapital);
+      element("finder-landscape-projected").textContent = displayResultMoney(projectedCapital);
       const model = finderCapitalLandscape({
         recommendations: currentRecommendations,
         projectedCapital: projectedCapital,

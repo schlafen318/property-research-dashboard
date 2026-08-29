@@ -389,21 +389,30 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-landscape-key { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 0; color: var(--gha-muted); font-size: 12px; }
     .retirement-finder-page .finder-landscape-key span::before { width: 10px; height: 10px; display: inline-block; margin-right: 7px; border-radius: 50%; content: ""; }
     .retirement-finder-page .finder-key-match::before { border: 2px solid var(--gha-accent); background: var(--gha-paper); }
-    .retirement-finder-page .finder-key-capital::before { width: 2px!important; border-radius: 0!important; background: var(--gha-brass); }
+    .retirement-finder-page .finder-landscape-projection { display: flex; justify-content: space-between; gap: 18px; align-items: baseline; margin: 0 0 18px; padding: 11px 0; border-top: 1px solid var(--gha-brass); border-bottom: 1px solid var(--gha-brass); color: var(--gha-brass); }
+    .retirement-finder-page .finder-landscape-projection strong { font-family: var(--gha-display-serif); font-size: clamp(22px, 2.6vw, 29px); font-weight: 500; }
     .retirement-finder-page .finder-landscape-axis, .retirement-finder-page .finder-landscape-row { display: grid; grid-template-columns: minmax(190px, 1.15fr) minmax(360px, 3fr) auto; column-gap: 18px; }
-    .retirement-finder-page .finder-landscape-axis { padding-bottom: 8px; color: var(--gha-muted); font-size: 10px; }
-    .retirement-finder-page .finder-landscape-axis-track { display: flex; justify-content: space-between; }
+    .retirement-finder-page .finder-landscape-axis { min-height: 26px; color: var(--gha-muted); font-size: 10px; }
+    .retirement-finder-page .finder-landscape-axis-track { position: relative; }
+    .retirement-finder-page .finder-landscape-capital-label { position: absolute; left: var(--capital-position); color: var(--gha-brass); white-space: nowrap; transform: translateX(-50%); }
     .retirement-finder-page .finder-landscape-row { min-height: 42px; align-items: center; color: var(--gha-ink); text-decoration: none; }
     .retirement-finder-page .finder-landscape-name { min-width: 0; font-family: var(--gha-display-serif); font-size: 18px; line-height: 1.1; }
     .retirement-finder-page .finder-landscape-name small { display: block; margin-top: 2px; color: var(--gha-muted); font-family: var(--gha-reading-sans); font-size: 10px; }
-    .retirement-finder-page .finder-landscape-track { position: relative; height: 42px; border-left: 1px solid var(--gha-rule); border-right: 1px solid var(--gha-rule); background: linear-gradient(to right, transparent 24.8%, var(--gha-rule) 25%, transparent 25.2%, transparent 49.8%, var(--gha-rule) 50%, transparent 50.2%, transparent 74.8%, var(--gha-rule) 75%, transparent 75.2%); }
-    .retirement-finder-page .finder-landscape-track::before { position: absolute; inset: 0 auto 0 var(--capital-position); width: 1px; background: var(--gha-brass); content: ""; }
-    .retirement-finder-page .finder-landscape-track::after { position: absolute; top: 50%; left: 0; width: var(--target-position); height: 1px; background: var(--gha-link); content: ""; }
-    .retirement-finder-page .finder-landscape-dot { position: absolute; z-index: 1; top: 50%; left: var(--target-position); width: 8px; height: 8px; border-radius: 50%; background: var(--gha-link); transform: translate(-50%, -50%); }
-    .retirement-finder-page .finder-landscape-row.is-match .finder-landscape-track::after { background: var(--gha-accent); }
+    .retirement-finder-page .finder-landscape-row.is-within { --finder-distance-color: var(--gha-link); }
+    .retirement-finder-page .finder-landscape-row.is-over { --finder-distance-color: var(--gha-accent); }
+    .retirement-finder-page .finder-landscape-row.is-on-target { --finder-distance-color: var(--gha-brass); }
+    .retirement-finder-page .finder-landscape-track { position: relative; height: 42px; }
+    .retirement-finder-page .finder-landscape-distance { position: absolute; top: 50%; left: var(--distance-start); width: var(--distance-width); height: 2px; background: var(--finder-distance-color); transform: translateY(-50%); }
+    .retirement-finder-page .finder-landscape-capital-dot, .retirement-finder-page .finder-landscape-dot { position: absolute; z-index: 1; top: 50%; width: 9px; height: 9px; border-radius: 50%; transform: translate(-50%, -50%); }
+    .retirement-finder-page .finder-landscape-capital-dot { left: var(--capital-position); background: var(--gha-brass); }
+    .retirement-finder-page .finder-landscape-dot { left: var(--target-position); background: var(--finder-distance-color); }
     .retirement-finder-page .finder-landscape-row.is-match .finder-landscape-dot { width: 12px; height: 12px; border: 2px solid var(--gha-accent); background: var(--gha-paper); }
     .retirement-finder-page .finder-landscape-rank { color: var(--gha-accent); font-size: 10px; letter-spacing: .06em; }
-    .retirement-finder-page .finder-landscape-value { min-width: 92px; text-align: right; font-family: var(--gha-display-serif); font-size: 17px; }
+    .retirement-finder-page .finder-landscape-value { min-width: 106px; text-align: right; font-family: var(--gha-display-serif); font-size: 17px; }
+    .retirement-finder-page .finder-landscape-gap { display: block; margin-top: 2px; font-family: var(--gha-reading-sans); font-size: 10px; }
+    .retirement-finder-page .finder-landscape-gap.is-within { color: var(--gha-link); }
+    .retirement-finder-page .finder-landscape-gap.is-over { color: var(--gha-accent); }
+    .retirement-finder-page .finder-landscape-gap.is-on-target { color: var(--gha-brass); }
     .retirement-finder-page .finder-landscape figcaption { margin: 18px 0 0; }
     .retirement-finder-page .finder-matches-section { margin-bottom: 46px; }
     .retirement-finder-page .finder-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 24px; }
