@@ -182,7 +182,8 @@ class SeoCtrContentTests(unittest.TestCase):
     def test_homepage_snippet_includes_global_property_and_vacation_home_intent(self) -> None:
         html = build_unified_app.build_landing_page([], [], [], 0)
 
-        self.assertIn("Compare Property Abroad for Retirement &amp; Second Homes", html)
+        self.assertIn("Global Home Atlas: Compare Property Abroad", html)
+        self.assertIn("for retirement, vacation and second homes", html)
         self.assertIn("Find the right place to buy property abroad", html)
         self.assertIn("foreign ownership", html)
         self.assertIn("representative listings", html)

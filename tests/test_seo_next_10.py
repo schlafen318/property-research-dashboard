@@ -89,7 +89,7 @@ class NearRankingSnippetTests(unittest.TestCase):
             title_from(html),
         )
         self.assertEqual(
-            "Compare property abroad across 37 global destinations with buyer-access rules, costs, rankings, representative listings, retirement tools and research guides.",
+            "Compare property abroad across 37 destinations for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools.",
             description_from(html),
         )
         self.assertIn('<link rel="canonical" href="https://globalhomeatlas.com/">', html)
@@ -115,6 +115,85 @@ class NearRankingSnippetTests(unittest.TestCase):
             '<h1>Best Places to Buy a Vacation Home in the World</h1>',
             vacation_html,
         )
+
+
+class RankingIntentTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.destinations = rendered_destinations()
+        listings = build_unified_app.load_json("listings.json")
+        cls.listings_by_destination: dict[str, list[dict]] = {}
+        for listing in listings:
+            cls.listings_by_destination.setdefault(listing["destination_id"], []).append(listing)
+
+    def seo_page(self, slug: str) -> str:
+        page = next(item for item in build_unified_app.SEO_PAGES if item["slug"] == slug)
+        return build_unified_app.build_seo_page(
+            page,
+            self.destinations,
+            build_unified_app.SEO_PAGES,
+        )
+
+    def test_queenstown_targets_current_property_market_intent(self) -> None:
+        destination = next(item for item in self.destinations if item["id"] == "queenstown")
+        html = build_unified_app.build_destination_page(
+            destination,
+            self.listings_by_destination["queenstown"],
+            self.destinations,
+            build_unified_app.SEO_PAGES,
+        )
+
+        self.assertEqual(
+            "Queenstown Property Market 2026: Foreign Buyer Guide",
+            title_from(html),
+        )
+        self.assertEqual(
+            "Assess the Queenstown property market in 2026 through foreign-buyer eligibility, current prices, local areas, visitor rules, hazards, value and resale.",
+            description_from(html),
+        )
+        self.assertIn(
+            "<h1>Queenstown property market: secure the right to buy before the alpine view</h1>",
+            html,
+        )
+        self.assertIn("Queenstown property market", html)
+        self.assertIn("NZ$5 million-plus", html)
+
+    def test_thailand_villa_page_answers_foreign_buyer_guide_intent(self) -> None:
+        html = self.seo_page("thailand-villa-ownership-foreigners")
+
+        self.assertEqual(
+            "Foreign Buyer Guide to Thailand Villas: Ownership Rules",
+            title_from(html),
+        )
+        self.assertIn(
+            "<h1>Thailand Villa Ownership: Foreign Buyer Guide</h1>",
+            html,
+        )
+        self.assertIn("<h2>How foreign buyers should assess a Thailand villa</h2>", html)
+        self.assertIn('href="/countries/thailand-property/"', html)
+        self.assertIn('href="/destinations/phuket-koh-samui/"', html)
+        self.assertIn('href="/where-can-foreigners-buy-property/"', html)
+        self.assertIn("Do not treat a villa advertisement as proof of land ownership", html)
+
+    def test_overseas_investment_page_has_a_visible_comparison_framework(self) -> None:
+        html = self.seo_page("overseas-property-investment")
+
+        self.assertEqual(
+            "Overseas Property Investment: 8 Markets Compared",
+            title_from(html),
+        )
+        self.assertIn("<h2>Overseas property investment comparison framework</h2>", html)
+        for heading in (
+            "Legal access",
+            "Net income",
+            "Demand durability",
+            "Total carrying cost",
+            "Exit liquidity",
+        ):
+            with self.subTest(heading=heading):
+                self.assertIn(f"<strong>{heading}</strong>", html)
+        self.assertIn('href="/foreign-property-investment-risks/"', html)
+        self.assertIn('href="/where-can-foreigners-buy-property/"', html)
 
 
 if __name__ == "__main__":

@@ -2273,10 +2273,10 @@ CROATIA_ISTRIA_DALMATIA_DOSSIER = PremiumDossierSpec(
 
 QUEENSTOWN_DOSSIER = PremiumDossierSpec(
     destination_id="queenstown",
-    title="Queenstown Retirement Property Dossier",
-    description="Assess Queenstown property through overseas-buyer eligibility, alpine daily life, visitor-accommodation rules, hazards, healthcare, access, value, resale, and current listings.",
-    h1="Queenstown: secure the right to buy before the alpine view",
-    lede="Queenstown can deliver a rare combination of mountain scenery, outdoor life, airport access and an international community. It is also an expensive, supply-constrained market where many overseas people cannot buy ordinary residential land. A credible case begins with legal eligibility, not a listing. The property then has to work through winter roads, steep sites, visitor-accommodation rules, hazard maps, limited local hospital depth and a resale pool that changes sharply between Frankton apartments, Queenstown Hill houses, Arrowtown character homes and Jacks Point new builds.",
+    title="Queenstown Property Market 2026: Foreign Buyer Guide",
+    description="Assess the Queenstown property market in 2026 through foreign-buyer eligibility, current prices, local areas, visitor rules, hazards, value and resale.",
+    h1="Queenstown property market: secure the right to buy before the alpine view",
+    lede="The Queenstown property market can deliver a rare combination of mountain scenery, outdoor life, airport access and an international community. It is also an expensive, supply-constrained market where many overseas people cannot buy ordinary residential land. A credible case begins with legal eligibility, not a listing. The property then has to work through winter roads, steep sites, visitor-accommodation rules, hazard maps, limited local hospital depth and a resale pool that changes sharply between Frankton apartments, Queenstown Hill houses, Arrowtown character homes and Jacks Point new builds.",
     author="Global Home Atlas Research Team",
     date_published="2026-08-22",
     date_reviewed="2026-08-22",

@@ -763,8 +763,8 @@ SEO_PAGES = [
     },
     {
         "slug": "overseas-property-investment",
-        "title": "Overseas Property Investment: Markets to Compare | Global Home Atlas",
-        "description": "Compare overseas property investment destinations by net yield, capital upside, regulatory safety, entry price, and liquidity.",
+        "title": "Overseas Property Investment: 8 Markets Compared",
+        "description": "Compare eight overseas property investment markets through buyer access, realistic net income, demand, carrying costs, regulation, entry price and exit liquidity.",
         "h1": "Overseas Property Investment",
         "keyword": "overseas property investment",
         "theme": "investment underwriting",
@@ -985,9 +985,9 @@ SEO_PAGES = [
     },
     {
         "slug": "thailand-villa-ownership-foreigners",
-        "title": "Thailand Villa Ownership for Foreigners | Global Home Atlas",
-        "description": "Understand Thailand villa ownership for foreigners and compare Phuket and Koh Samui against other Asia lifestyle property alternatives.",
-        "h1": "Thailand Villa Ownership for Foreigners",
+        "title": "Foreign Buyer Guide to Thailand Villas: Ownership Rules",
+        "description": "A foreign buyer guide to Thailand villas covering land and building rights, leasehold risk, due diligence, rental assumptions, Phuket, Koh Samui and resale.",
+        "h1": "Thailand Villa Ownership: Foreign Buyer Guide",
         "keyword": "Thailand villa ownership foreigners",
         "theme": "Thailand ownership",
         "intent": "buyers attracted to Thai villas who need to understand structure, rental appeal, and legal friction",
@@ -4168,9 +4168,9 @@ def build_landing_page(
         else "Compare overseas property destinations using foreign ownership, retirement fit, realistic costs, rental rules, resale potential, and representative listings."
     )
     search_description = (
-        f"Compare property abroad across {destination_count} global destinations with buyer-access rules, costs, rankings, representative listings, retirement tools and research guides."
+        f"Compare property abroad across {destination_count} destinations for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools."
         if destination_count
-        else "Compare property abroad with buyer-access rules, costs, rankings, representative listings, retirement tools and research guides."
+        else "Compare property abroad for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools."
     )
     content = apply_content_override(
         {
@@ -5292,6 +5292,38 @@ def seo_decision_framework_html(page: dict) -> str:
             <p>Affluent buyers often focus on acquisition quality and underweight future liquidity. Exit matters because family plans, residency rules, tax regimes, health needs, and currency preferences can change. Markets with local, regional, and international buyer demand usually deserve a premium over thin markets with one buyer profile.</p>
           </section>
     """
+
+
+def seo_query_intent_html(page: dict) -> str:
+    if page["slug"] == "thailand-villa-ownership-foreigners":
+        return """
+          <section class="seo-section" id="foreign-buyer-guide">
+            <h2>How foreign buyers should assess a Thailand villa</h2>
+            <p>Do not treat a villa advertisement as proof of land ownership, building ownership, a valid lease, or lawful rental use. Start by separating every advertised right: the land, the building, any registered lease or superficies, project-management obligations, common-area rights, and the route by which a later buyer could acquire the same package.</p>
+            <p>The <a href="/countries/thailand-property/" data-track="country_hub_click" data-track-label="Thailand villa foreign buyer guide">Thailand property guide</a> explains the national ownership screen. Then use the <a href="/destinations/phuket-koh-samui/" data-track="destination_click" data-track-label="Thailand villa foreign buyer guide">Phuket and Koh Samui dossier</a> to compare island-level access, management, hazards, seasonality and resale. For alternative ownership markets, continue with <a href="/where-can-foreigners-buy-property/" data-track="guide_click" data-track-label="Thailand villa foreign buyer guide">where foreigners can buy property</a>.</p>
+            <ul>
+              <li><strong>Legal interest:</strong> obtain independent Thai advice on the exact land, building, lease, company and registration documents.</li>
+              <li><strong>Operating case:</strong> assume no rental income until lawful use, licensing, project rules, management and net costs are verified.</li>
+              <li><strong>Exit case:</strong> identify who can acquire the same legal package and what happens when a lease term shortens or project governance weakens.</li>
+            </ul>
+          </section>
+        """
+    if page["slug"] == "overseas-property-investment":
+        return """
+          <section class="seo-section" id="investment-comparison-framework">
+            <h2>Overseas property investment comparison framework</h2>
+            <p>Compare each market with the same five tests before looking at advertised returns. This keeps legal access, operating economics and resale in one decision rather than treating the purchase price as the investment thesis.</p>
+            <ol>
+              <li><strong>Legal access</strong> — confirm the buyer, title, permitted use and transaction route before paying a deposit.</li>
+              <li><strong>Net income</strong> — deduct vacancy, management, tax, insurance, utilities, repairs, furnishing and platform costs from rent.</li>
+              <li><strong>Demand durability</strong> — separate year-round resident demand from seasonal visitor demand and one-country buyer dependence.</li>
+              <li><strong>Total carrying cost</strong> — model acquisition, financing, annual ownership, major works, currency movement and sale costs.</li>
+              <li><strong>Exit liquidity</strong> — identify the next eligible buyer, realistic marketing period and completed-sale evidence before entry.</li>
+            </ol>
+            <p>Use the <a href="/foreign-property-investment-risks/" data-track="guide_click" data-track-label="overseas investment framework">foreign property investment risk framework</a> for the downside review and <a href="/where-can-foreigners-buy-property/" data-track="guide_click" data-track-label="overseas investment framework">the foreign-buyer access guide</a> for the ownership screen.</p>
+          </section>
+        """
+    return ""
 
 
 def seo_references_html(page: dict) -> str:
@@ -7488,6 +7520,7 @@ def build_seo_page(
     comparison_html = seo_comparison_html(page, selected, top, runner_up)
     destination_notes_html = seo_destination_notes_html(page, selected)
     decision_framework_html = seo_decision_framework_html(page)
+    query_intent_html = seo_query_intent_html(page)
     references_html = seo_references_html(page)
     retirement_callout = (
         retirement_calculator_callout("seo-section", "buying guide")
@@ -8074,6 +8107,7 @@ def build_seo_page(
         <article class="seo-article">
           {callout_before_overview}
           {overview_html}
+          {query_intent_html}
           {callout_after_overview}
           {comparison_html}
           {destination_notes_html}
