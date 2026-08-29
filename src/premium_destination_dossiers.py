@@ -1274,8 +1274,8 @@ COSTA_BRAVA_GIRONA_DOSSIER = PremiumDossierSpec(
 
 CRETE_DOSSIER = PremiumDossierSpec(
     destination_id="crete",
-    title="Crete Retirement Property Dossier",
-    description="Assess Crete retirement property through daily life, access, residence, ownership, tax, short-term-rental rules, healthcare, hazards, value, resale, and current listings.",
+    title="Crete Property for Retirement: Areas, Costs & Buyer Guide",
+    description="Compare Crete property for retirement across Chania, Rethymno, Heraklion and eastern Crete, including buyer rules, costs, healthcare, hazards and resale.",
     h1="Crete: choose the working island, not only the sea view",
     lede="Crete is large enough to contain several retirement markets that should not be averaged together. Chania offers a polished historic city and western airport; Apokoronas adds villages, space and a greener landscape with more driving; Rethymno balances a walkable university town with access to both sides of the island; Heraklion has the deepest employment, hospital and administrative base; Agios Nikolaos and Elounda trade on eastern-Crete scenery and premium tourism. This dossier tests which version works in winter, heat and ordinary errands—and whether the title, tax, rental, water and exit plan supports it.",
     author="Global Home Atlas Research Team",
@@ -1704,8 +1704,8 @@ HAKUBA_DOSSIER = PremiumDossierSpec(
 
 ANNECY_DOSSIER = PremiumDossierSpec(
     destination_id="annecy",
-    title="Annecy Retirement Property Dossier",
-    description="Assess Annecy property through year-round daily life, Geneva access, French ownership, tourist-let quotas, DPE, healthcare, hazards, value, resale, and current listings.",
+    title="Annecy Property Guide: Prices, Areas & Buyer Rules",
+    description="Compare Annecy property across the city and Lake Annecy villages, including prices, French buyer rules, Geneva access, tourist letting, hazards and resale.",
     h1="Annecy: buy the year-round address, not only the lake view",
     lede="Annecy combines a working Alpine city, a celebrated lake and access to Geneva, but those advantages are distributed unevenly. Annecy centre and the Vieille Ville put daily services and the station within reach. Annecy-le-Vieux and Albigny connect established residential life with the north end of the lake. Sevrier and Saint-Jorioz on the west shore offer ordinary town services and a flatter lakeside rhythm. Veyrier-du-Lac, Menthon-Saint-Bernard and Talloires on the east shore sell the most dramatic views, often with steeper access, higher prices and a narrower buyer pool. This dossier tests which address still works in rain, winter traffic and ordinary retirement—not only on a clear summer day.",
     author="Global Home Atlas Research Team",
@@ -2130,8 +2130,8 @@ MALLORCA_DOSSIER = PremiumDossierSpec(
 
 CROATIA_ISTRIA_DALMATIA_DOSSIER = PremiumDossierSpec(
     destination_id="croatia-istria-dalmatia",
-    title="Croatia Istria and Dalmatia Retirement Property Dossier",
-    description="Assess retirement property in Istria and Dalmatia through residence, foreign ownership, title, tourist rules, healthcare, access, hazards, value, resale, and current listings.",
+    title="Croatia Property: Istria vs Dalmatia Retirement Guide",
+    description="Compare Croatia retirement property in Istria and Dalmatia across foreign-buyer access, prices, title checks, healthcare, tourist rules, hazards and resale.",
     h1="Croatia: choose the operating base before the Adriatic view",
     lede="Croatia's coast is not one retirement market. Split is a working regional city with hospitals, an airport and year-round services. Trogir and Kaštela keep the mainland close while changing building and traffic constraints. Rovinj, Pula and Poreč create distinct Istrian routines. Hvar and Brač add island character—and ferry dependence. The useful question is not whether the Adriatic is beautiful. It is which address remains practical in January, during an August heat wave and when a title, repair or medical journey needs attention.",
     author="Global Home Atlas Research Team",
@@ -3030,8 +3030,8 @@ BALI_DOSSIER = PremiumDossierSpec(
 
 DOLOMITES_SOUTH_TYROL_DOSSIER = PremiumDossierSpec(
     destination_id="dolomites-south-tyrol",
-    title="Dolomites and South Tyrol Property Dossier | Global Home Atlas",
-    description="Assess Dolomites and South Tyrol property through resident-housing restrictions, ownership, access, healthcare, tourist letting, hazards, value, resale, and current listings.",
+    title="Dolomites & South Tyrol Property: Buyer Guide 2026",
+    description="Compare Dolomites and South Tyrol property markets, buyer restrictions, prices, year-round access, tourist letting, hazards and resale using current evidence.",
     h1="Dolomites / South Tyrol: buy the valley, not the postcard",
     lede=(
         "The Dolomites can deliver one of Europe’s finest year-round mountain lives, but the address determines whether that life is practical. Ortisei and Selva put the Sella landscape close at a premium; Corvara offers a resort-led Alta Badia rhythm; Brunico and Valdaora connect skiing to rail, named provincial hospitals and ordinary services; San Candido gives the eastern Pusteria valley a smaller but complete base. Ownership eligibility, resident-housing restrictions, tourist-use rights, winter access and resale are property-specific. This dossier separates the durable valley system from the postcard premium."
