@@ -6040,6 +6040,7 @@ def build_retirement_destination_finder_page(
     ]
     payload = {
         "asOf": retirement_payload.get("as_of"),
+        "planning_currencies": RETIREMENT_PLANNING_CURRENCIES,
         "destinations": browser_destinations,
         "retirementCosts": retirement_payload["destinations"],
         "mortgageProfiles": mortgage_profiles,

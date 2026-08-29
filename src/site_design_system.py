@@ -380,8 +380,19 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-summary div + div { border: 0; }
     .retirement-finder-page .finder-summary span { color: var(--gha-accent); font-weight: 500; letter-spacing: .035em; text-transform: uppercase; }
     .retirement-finder-page .finder-summary strong { font-size: clamp(23px, 2.6vw, 31px); }
-    .retirement-finder-page .finder-projection-wrap { margin-bottom: 36px; padding-bottom: 32px; }
-    .retirement-finder-page .finder-chart-bar { border-radius: 0; background: var(--gha-link); }
+    .retirement-finder-page .finder-projection-wrap { position: relative; margin-bottom: 36px; padding: 18px 0 32px; border-top: 1px solid var(--gha-rule); }
+    .retirement-finder-page .finder-projection-wrap h3 { margin: 0 0 12px; font-size: 24px; }
+    .retirement-finder-page .finder-projection-scroll { overflow-x: auto; overscroll-behavior-inline: contain; }
+    .retirement-finder-page .finder-projection-chart { display: block; width: 100%; min-width: 640px; height: auto; overflow: visible; }
+    .retirement-finder-page .finder-chart-axis { stroke: var(--gha-rule); stroke-width: 1; }
+    .retirement-finder-page .finder-chart-target { stroke: #9b6a33; stroke-width: 1.5; stroke-dasharray: 5 4; }
+    .retirement-finder-page .finder-chart-target-label { fill: #7a5227; font-size: 11px; font-weight: 500; }
+    .retirement-finder-page .finder-chart-axis-label { fill: var(--gha-muted); font-size: 10px; }
+    .retirement-finder-page .finder-chart-bar { fill: #315e50; }
+    .retirement-finder-page .finder-chart-year { opacity: 0; transform: translateY(8px); animation: finder-year-in .35s ease forwards; animation-delay: var(--year-delay); cursor: pointer; outline: none; }
+    .retirement-finder-page .finder-chart-year.is-active .finder-chart-bar, .retirement-finder-page .finder-chart-year:focus-visible .finder-chart-bar { stroke: var(--gha-ink); stroke-width: 2px; }
+    .retirement-finder-page .finder-chart-tooltip { top: 62px; border: 0; border-radius: 0; background: var(--gha-ink); color: var(--gha-paper); }
+    .retirement-finder-page .finder-chart-tooltip span { color: #dfe7e3; }
     .retirement-finder-page .finder-list { gap: 0; }
     .retirement-finder-page .finder-result { padding: 28px 0; border-top: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-result:first-child { border-top: 3px solid var(--gha-ink); }
@@ -416,6 +427,9 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .field-grid, .retirement-finder-page .finder-summary, .retirement-finder-page .finder-result dl, .retirement-finder-page .finder-comparison { grid-template-columns: 1fr; }
       .retirement-finder-page .finder-summary div { padding-right: 0; }
       .retirement-finder-page .finder-submit { width: 100%; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .retirement-finder-page .finder-chart-year { animation: none; opacity: 1; transform: none; }
     }
     """
 

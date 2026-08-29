@@ -119,8 +119,16 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
     def test_results_are_concise_and_accessible(self) -> None:
         self.assertIn('id="finder-within-count"', self.html)
-        self.assertIn('id="finder-projection" role="img"', self.html)
+        self.assertIn(
+            'id="finder-projection" role="img" aria-labelledby="finder-projection-title finder-projection-desc"',
+            self.html,
+        )
+        self.assertIn('<title id="finder-projection-title">Projected retirement portfolio</title>', self.html)
+        self.assertIn('<desc id="finder-projection-desc">Complete the finder to see annual progression.</desc>', self.html)
+        self.assertIn('id="finder-chart-target" x1="22" x2="618"', self.html)
+        self.assertIn('id="finder-chart-target-label" x="618" text-anchor="end"', self.html)
         self.assertIn('id="finder-chart-tooltip" role="status"', self.html)
+        self.assertIn('id="finder-projection-caption"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
         self.assertIn('id="finder-exclusions"', self.html)
         self.assertIn("Projected portfolio", self.html)
@@ -148,11 +156,23 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
     def test_mobile_navigation_and_results_use_touch_sized_controls(self) -> None:
         self.assertIn(".mobile-menu>nav{position:absolute", self.html)
         self.assertIn(".mobile-menu>nav a{display:flex;min-height:44px", self.html)
-        self.assertIn(".finder-projection{overflow-x:auto", self.html)
-        self.assertIn(".finder-chart-bar{min-width:44px", self.html)
         self.assertIn(".finder-result header a{display:flex;min-height:44px", self.html)
         self.assertIn(".finder-results{min-width:0", self.html)
         self.assertIn(".finder-projection-wrap{min-width:0", self.html)
+
+    def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
+        self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)
+        self.assertIn('<div class="finder-projection-scroll">', self.html)
+        self.assertIn(".finder-projection-scroll{overflow-x:auto", self.html)
+        self.assertIn(".finder-projection-chart{display:block;width:100%;height:auto", self.html)
+        self.assertIn("min-width:640px", self.html)
+        self.assertIn(".finder-chart-bar{fill:#315e50", self.html)
+        self.assertIn(".finder-chart-target{stroke:#9b6a33", self.html)
+        self.assertIn("@media(prefers-reduced-motion:reduce)", self.html)
+        self.assertIn(
+            ".retirement-finder-page .finder-evidence summary { min-height: 44px; display: flex; align-items: center; font-weight: 500; }",
+            self.html,
+        )
 
     def test_embeds_complete_dynamic_universe(self) -> None:
         self.assertIn(f'data-universe-count="{self.retirement_count}"', self.html)
@@ -178,6 +198,56 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn(expected, calculator)
         self.assertIn(expected, homepage)
         self.assertIn(expected, ranking)
+
+    def test_finder_embeds_the_shared_planning_currency_reference_data(self) -> None:
+        payload = json.loads(
+            self.html.split('<script id="retirement-finder-data" type="application/json">', 1)[1]
+            .split("</script>", 1)[0]
+        )
+
+        self.assertEqual("2026-08-27", payload["planning_currencies"]["as_of"])
+        self.assertEqual(
+            ["USD", "EUR", "GBP", "CAD", "AUD", "CHF", "JPY", "HKD", "SGD"],
+            list(payload["planning_currencies"]["rates_to_usd"]),
+        )
+
+    def test_finder_money_controls_follow_the_selected_planning_currency(self) -> None:
+        self.assertIn(
+            '<select id="finder-currency"><option value="USD" selected>USD — US dollar</option>',
+            self.html,
+        )
+        self.assertIn('<option value="SGD">SGD — Singapore dollar</option>', self.html)
+        self.assertIn(
+            "Reference rates dated 27 August 2026. This changes the presentation currency, not future currency-risk assumptions.",
+            self.html,
+        )
+        for field_id in (
+            "finder-liquid-capital",
+            "finder-monthly-contribution",
+            "finder-property-allocation",
+            "finder-pension",
+            "finder-other-income",
+        ):
+            self.assertRegex(
+                self.html,
+                rf'<input id="{field_id}" type="text" inputmode="numeric" data-money min="\d+" step="\d+" value="[\d,]+"',
+            )
+        self.assertNotIn("(USD)", self.html)
+
+    def test_finder_retirement_income_is_monthly_and_inflation_linked_by_default(self) -> None:
+        self.assertIn("Income continuing after retirement (monthly)", self.html)
+        self.assertIn('<input id="finder-pension-indexed" type="checkbox" checked>', self.html)
+        self.assertIn('<input id="finder-other-income-indexed" type="checkbox" checked>', self.html)
+
+    def test_finder_result_grid_uses_a_valid_three_column_declaration(self) -> None:
+        self.assertIn(
+            ".finder-result dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px",
+            self.html,
+        )
+        self.assertNotIn(
+            "<style>.finder-result dl{grid-template-columns:repeat(3,minmax(0,1fr));}</style>",
+            self.html,
+        )
 
 
 if __name__ == "__main__":

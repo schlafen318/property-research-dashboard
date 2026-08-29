@@ -5,11 +5,79 @@
 })(typeof window !== "undefined" ? window : null, function (root) {
   "use strict";
 
-  const money = new Intl.NumberFormat("en-US", {
-    style: "currency",
-    currency: "USD",
-    maximumFractionDigits: 0,
-  });
+  const MONEY_CONTROL_IDS = [
+    "finder-liquid-capital",
+    "finder-monthly-contribution",
+    "finder-property-allocation",
+    "finder-pension",
+    "finder-other-income",
+  ];
+
+  function convertPlanningAmount(input) {
+    const rates = input.ratesToUsd || { USD: 1 };
+    const fromRate = Number(rates[input.fromCurrency]);
+    const toRate = Number(rates[input.toCurrency]);
+    if (input.amount === null || input.amount === undefined || input.amount === "") return null;
+    const amount = Number(input.amount);
+    if (!Number.isFinite(amount) || !(fromRate > 0) || !(toRate > 0)) return null;
+    return amount * fromRate / toRate;
+  }
+
+  function formatPlanningMoney(input) {
+    const currency = input.currency || "USD";
+    const converted = convertPlanningAmount({
+      amount: input.amountUsd,
+      fromCurrency: "USD",
+      toCurrency: currency,
+      ratesToUsd: input.ratesToUsd || { USD: 1 },
+    });
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+      maximumFractionDigits: 0,
+    }).format(converted === null ? 0 : converted);
+  }
+
+  function resultMoney(input) {
+    return formatPlanningMoney(input);
+  }
+
+  function convertPlanningControlAmount(input) {
+    const converted = convertPlanningAmount(input);
+    if (converted === null) return null;
+    const step = Number(input.step);
+    if (!(step > 0)) return Math.round(converted);
+    return Math.round(converted / step) * step;
+  }
+
+  function parseMoneyInput(value) {
+    const normalized = String(value === null || value === undefined ? "" : value)
+      .trim()
+      .replace(/,/g, "");
+    if (!/^\d+(?:\.\d+)?$/.test(normalized)) return null;
+    const amount = Number(normalized);
+    return Number.isFinite(amount) ? amount : null;
+  }
+
+  function formatMoneyInputValue(value) {
+    const amount = typeof value === "number" ? value : parseMoneyInput(value);
+    if (!Number.isFinite(amount)) return "";
+    return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(amount);
+  }
+
+  function isInvalidMoneyInput(input) {
+    const amount = parseMoneyInput(input.value);
+    if (amount === null) return true;
+    const minimum = input.min === "" || input.min === null || input.min === undefined
+      ? null
+      : Number(input.min);
+    if (minimum !== null && amount < minimum) return true;
+    const step = Number(input.step);
+    if (!(step > 0)) return false;
+    const base = minimum === null ? 0 : minimum;
+    const steps = (amount - base) / step;
+    return Math.abs(steps - Math.round(steps)) > 1e-9;
+  }
 
   function housingVisibility(input) {
     const buyNow = input.housingPlan === "buy_now";
@@ -19,6 +87,19 @@
       rental: buyNow && input.useBeforeRetirement === "rental",
       buyAtRetirement: input.housingPlan === "buy_retirement",
     };
+  }
+
+  function activeMoneyControlIds(input) {
+    const active = MONEY_CONTROL_IDS.filter(function (id) {
+      return id !== "finder-property-allocation";
+    });
+    if (input.housingPlan === "buy_now") active.push("finder-property-allocation");
+    return active;
+  }
+
+  function validPlanningRate(currency, ratesToUsd) {
+    const rate = Number((ratesToUsd || {})[currency]);
+    return Number.isFinite(rate) && rate > 0;
   }
 
   function safeDetailHref(input) {
@@ -54,7 +135,11 @@
         closest.name + " is the strongest modeled match under your preferences.";
     }
     return "No destinations are within reach yet. " + closest.name +
-      " is the closest modeled match, with a gap of " + money.format(Math.abs(Number(closest.surplusGap))) + ".";
+      " is the closest modeled match, with a gap of " + resultMoney({
+        amountUsd: Math.abs(Number(closest.surplusGap)),
+        currency: input.currency || "USD",
+        ratesToUsd: input.ratesToUsd || { USD: 1 },
+      }) + ".";
   }
 
   function tierLabel(value) {
@@ -65,19 +150,64 @@
     }[value] || "Not classified";
   }
 
-  function chartTooltip(point) {
-    const heading = "Year " + Number(point.year);
-    const value = money.format(Number(point.portfolio));
+  function finderProjectionModel(input) {
+    const series = Array.isArray(input.series) ? input.series : [];
+    const targetValue = Math.max(0, Number(input.targetValue) || 0);
+    const maximum = Math.max.apply(null, series.map(function (point) {
+      return Math.max(0, Number(point.portfolio) || 0);
+    }).concat([targetValue, 1]));
     return {
-      heading: heading,
-      value: value,
-      accessibleLabel: heading + ", projected portfolio " + value + ".",
+      maximum: maximum,
+      targetY: 258 - targetValue / maximum * 240,
+      years: series.map(function (point) {
+        const portfolio = Math.max(0, Number(point.portfolio) || 0);
+        return {
+          year: Number(point.year),
+          portfolio: portfolio,
+          height: portfolio / maximum * 240,
+        };
+      }),
     };
   }
 
-  function mobileChartWidth(pointCount) {
-    const count = Math.max(1, Math.floor(Number(pointCount) || 0));
-    return count * 44 + (count - 1) * 5;
+  function finderProjectionTooltip(input) {
+    const point = input.point;
+    const year = Number(point.year);
+    const age = Number(input.currentAge) + year;
+    const heading = "Year " + year + " · age " + age;
+    const value = resultMoney({
+      amountUsd: Number(point.portfolio),
+      currency: input.currency || "USD",
+      ratesToUsd: input.ratesToUsd || { USD: 1 },
+    });
+    return {
+      heading: heading,
+      value: value,
+      accessibleLabel: "Year " + year + ", age " + age + ". Projected portfolio " + value + ".",
+    };
+  }
+
+  function finderProjectionAxisLabel(input) {
+    const year = Number(input.year);
+    const age = Number(input.currentAge) + year;
+    return (year === 0 ? "Now" : "+" + year + "y") + " · age " + age;
+  }
+
+  function finderProjectionView(input) {
+    const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
+    const closest = recommendations[0];
+    if (!closest) return null;
+    const shared = input.sharedProjection && Array.isArray(input.sharedProjection.annualProjection)
+      ? input.sharedProjection.annualProjection
+      : [];
+    const destinationSeries = Array.isArray(closest.annualProjection) ? closest.annualProjection : [];
+    const buyNow = input.housingPlan === "buy_now";
+    return {
+      heading: buyNow ? "Projection for " + closest.name : "Projected portfolio by year",
+      series: buyNow ? destinationSeries : shared,
+      targetValue: Number(closest.retirementTarget),
+      destinationName: closest.name,
+    };
   }
 
   function escapeHtml(value) {
@@ -93,14 +223,59 @@
     const form = document.getElementById("retirement-destination-finder-form");
     const results = document.getElementById("finder-results");
     const errorSummary = document.getElementById("finder-errors");
+    const currencyConfig = payload.planning_currencies || { rates_to_usd: { USD: 1 } };
+    const ratesToUsd = currencyConfig.rates_to_usd || { USD: 1 };
+    let selectedCurrency = "USD";
+    const moneyControlIds = MONEY_CONTROL_IDS.slice();
+    const canonicalMoneyUsd = {};
     let currentRecommendations = [];
     let currentUser = null;
+    let currentResult = null;
     let recommendationsExpanded = false;
 
     function element(id) { return document.getElementById(id); }
     function numeric(id) { return Number(element(id).value); }
     function checked(id) { return element(id).checked; }
     function selected(id) { return element(id).value; }
+    function displayResultMoney(amountUsd) {
+      return resultMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
+    }
+    function moneyNumber(id) {
+      const control = element(id);
+      const amount = parseMoneyInput(control.value);
+      if (amount !== null && Object.prototype.hasOwnProperty.call(canonicalMoneyUsd, id)) {
+        return canonicalMoneyUsd[id];
+      }
+      return Number(convertPlanningAmount({
+        amount: amount === null ? 0 : amount,
+        fromCurrency: selectedCurrency,
+        toCurrency: "USD",
+        ratesToUsd: ratesToUsd,
+      }) || 0);
+    }
+    function updateCanonicalMoney(control) {
+      const amount = parseMoneyInput(control.value);
+      if (amount === null) return;
+      const amountUsd = convertPlanningAmount({
+        amount: amount,
+        fromCurrency: selectedCurrency,
+        toCurrency: "USD",
+        ratesToUsd: ratesToUsd,
+      });
+      if (amountUsd !== null) canonicalMoneyUsd[control.id] = amountUsd;
+    }
+    function formatMoneyControl(control) {
+      if (!control || control.value === "") return;
+      const amount = parseMoneyInput(control.value);
+      if (amount !== null) control.value = formatMoneyInputValue(amount);
+    }
+    function validateMoneyControl(control) {
+      const invalid = isInvalidMoneyInput({ value: control.value, min: control.min, step: control.step });
+      control.setCustomValidity(invalid ? "Enter a valid amount." : "");
+      if (invalid) control.setAttribute("aria-invalid", "true");
+      else control.removeAttribute("aria-invalid");
+      return invalid;
+    }
     function track(name, fields) {
       if (root.GHA && typeof root.GHA.track === "function") root.GHA.track(name, fields || {});
     }
@@ -115,6 +290,9 @@
       });
       document.querySelectorAll("[data-finder-group]").forEach(function (group) {
         group.hidden = !visible[group.dataset.finderGroup];
+        group.querySelectorAll("input, select, textarea").forEach(function (control) {
+          control.disabled = group.hidden;
+        });
       });
       element("finder-own-guidance").hidden = selected("finder-housing-plan") !== "own";
       element("finder-submit").disabled = selected("finder-housing-plan") === "own";
@@ -123,12 +301,12 @@
     function incomeStreams() {
       return [
         {
-          amount: numeric("finder-pension"),
+          amount: moneyNumber("finder-pension") * 12,
           indexed: checked("finder-pension-indexed"),
           inflationRate: 0.026,
         },
         {
-          amount: numeric("finder-other-income"),
+          amount: moneyNumber("finder-other-income") * 12,
           indexed: checked("finder-other-income-indexed"),
           inflationRate: 0.026,
         },
@@ -143,8 +321,8 @@
         horizonYears: numeric("finder-horizon"),
         household: selected("finder-household"),
         housingPlan: housingPlan,
-        totalLiquidCapital: numeric("finder-liquid-capital"),
-        monthlyPortfolioContribution: numeric("finder-monthly-contribution"),
+        totalLiquidCapital: moneyNumber("finder-liquid-capital"),
+        monthlyPortfolioContribution: moneyNumber("finder-monthly-contribution"),
         contributionInflationLinked: checked("finder-contribution-indexed"),
         expectedPortfolioReturn: numeric("finder-return") / 100,
         generalInflation: 0.026,
@@ -155,7 +333,7 @@
           climate: selected("finder-climate"),
           healthcare: selected("finder-healthcare"),
         },
-        maximumPropertyAllocation: numeric("finder-property-allocation"),
+        maximumPropertyAllocation: moneyNumber("finder-property-allocation"),
         purchaseMethod: selected("finder-purchase-method"),
         residency: selected("finder-buyer-residency"),
         incomeSource: selected("finder-income-source"),
@@ -172,6 +350,10 @@
 
     function validate(user) {
       const errors = [];
+      const invalidMoney = activeMoneyControlIds({ housingPlan: user.housingPlan }).find(function (id) {
+        return validateMoneyControl(element(id));
+      });
+      if (invalidMoney) errors.push("Enter a valid amount in the highlighted money field.");
       if (!(user.retirementAge > user.currentAge)) errors.push("Retirement age must be later than current age.");
       if (user.totalLiquidCapital < 0) errors.push("Capital today cannot be negative.");
       if (user.monthlyPortfolioContribution < 0) errors.push("Monthly investing cannot be negative.");
@@ -184,47 +366,132 @@
       return errors;
     }
 
-    function renderChart(projection) {
-      const chart = element("finder-projection-bars");
-      chart.innerHTML = "";
-      if (!projection || !projection.annualProjection) {
-        element("finder-projection-wrap").hidden = true;
-        element("finder-buy-now-chart-note").hidden = false;
-        return;
+    function changePlanningCurrency(nextCurrency) {
+      if (nextCurrency === selectedCurrency) return false;
+      if (!validPlanningRate(selectedCurrency, ratesToUsd) || !validPlanningRate(nextCurrency, ratesToUsd)) {
+        element("finder-currency").value = selectedCurrency;
+        return false;
       }
-      element("finder-projection-wrap").hidden = false;
-      element("finder-buy-now-chart-note").hidden = true;
-      chart.style.setProperty("--finder-chart-mobile-width", mobileChartWidth(projection.annualProjection.length) + "px");
-      const maximum = Math.max.apply(null, projection.annualProjection.map(function (point) {
-        return Math.max(0, Number(point.portfolio));
-      }).concat([1]));
-      projection.annualProjection.forEach(function (point, index) {
-        const button = document.createElement("button");
-        const tooltip = chartTooltip(point);
-        button.type = "button";
-        button.className = "finder-chart-bar";
-        button.style.height = Math.max(3, Number(point.portfolio) / maximum * 100) + "%";
-        button.style.animationDelay = index * 35 + "ms";
-        button.setAttribute("aria-label", tooltip.accessibleLabel);
-        button.dataset.heading = tooltip.heading;
-        button.dataset.value = tooltip.value;
-        chart.appendChild(button);
+      const previousCurrency = selectedCurrency;
+      moneyControlIds.forEach(function (id) {
+        const control = element(id);
+        if (!control || control.value === "") return;
+        const amount = parseMoneyInput(control.value);
+        if (amount === null) return;
+        const hasCanonical = Object.prototype.hasOwnProperty.call(canonicalMoneyUsd, id);
+        const converted = convertPlanningControlAmount({
+          amount: hasCanonical ? canonicalMoneyUsd[id] : amount,
+          fromCurrency: hasCanonical ? "USD" : previousCurrency,
+          toCurrency: nextCurrency,
+          ratesToUsd: ratesToUsd,
+          step: control.step,
+        });
+        if (converted !== null) {
+          control.value = formatMoneyInputValue(converted);
+          validateMoneyControl(control);
+        }
       });
+      selectedCurrency = nextCurrency;
+      renderCurrentResults();
+      return true;
     }
 
-    function showTooltip(button) {
-      element("finder-tooltip-heading").textContent = button.dataset.heading;
-      element("finder-tooltip-value").textContent = button.dataset.value;
-      element("finder-chart-tooltip").hidden = false;
+    function renderChart(view, user) {
+      const figure = element("finder-projection-wrap");
+      const barsLayer = element("finder-projection-bars");
+      const fallback = element("finder-buy-now-chart-note");
+      const series = view && Array.isArray(view.series)
+        ? view.series
+        : [];
+      barsLayer.innerHTML = "";
+      element("finder-chart-tooltip").hidden = true;
+      if (!view || !series.length) {
+        figure.hidden = true;
+        fallback.hidden = false;
+        return;
+      }
+      const model = finderProjectionModel({
+        series: series,
+        targetValue: view.targetValue,
+      });
+      const count = model.years.length;
+      const left = 34;
+      const baseline = 258;
+      const plotWidth = 572;
+      const step = count > 1 ? plotWidth / (count - 1) : plotWidth;
+      const barWidth = Math.max(5, Math.min(18, step * 0.62));
+      const labelEvery = Math.max(1, Math.ceil((count - 1) / 6));
+      const delayStep = count > 1 ? Math.min(90, 2400 / (count - 1)) : 0;
+      const bars = model.years.map(function (point, index) {
+        const x = left + index * step - barWidth / 2;
+        const y = baseline - point.height;
+        const label = finderProjectionAxisLabel({ year: point.year, currentAge: user.currentAge });
+        const yearLabel = index % labelEvery === 0 || index === count - 1
+          ? '<text class="finder-chart-axis-label" x="' + (left + index * step).toFixed(2) + '" y="278" text-anchor="middle">' + label + "</text>"
+          : "";
+        const tooltipContent = finderProjectionTooltip({
+          currentAge: user.currentAge,
+          point: point,
+          currency: selectedCurrency,
+          ratesToUsd: ratesToUsd,
+        });
+        return '<g class="finder-chart-year" tabindex="0" role="img" data-year-index="' + index +
+          '" aria-label="' + escapeHtml(tooltipContent.accessibleLabel) + '" style="--year-delay:' +
+          Math.round(index * delayStep) + 'ms"><rect class="finder-chart-bar" x="' + x.toFixed(2) +
+          '" y="' + y.toFixed(2) + '" width="' + barWidth.toFixed(2) + '" height="' +
+          point.height.toFixed(2) + '"></rect>' + yearLabel + "</g>";
+      }).join("");
+      barsLayer.innerHTML = '<line class="finder-chart-axis" x1="22" y1="258" x2="618" y2="258"></line>' + bars;
+      const targetLine = element("finder-chart-target");
+      const targetLabel = element("finder-chart-target-label");
+      targetLine.setAttribute("y1", model.targetY.toFixed(2));
+      targetLine.setAttribute("y2", model.targetY.toFixed(2));
+      targetLabel.setAttribute("y", Math.max(14, model.targetY - 6).toFixed(2));
+      targetLabel.textContent = "Target " + displayResultMoney(view.targetValue);
+      element("finder-projection-heading").textContent = view.heading;
+      element("finder-projection-desc").textContent = "Annual liquid portfolio progression from age " +
+        user.currentAge + " to retirement, compared with the target for " + view.destinationName + ".";
+      const finalPoint = model.years[count - 1];
+      element("finder-projection-caption").textContent = "At retirement: " +
+        displayResultMoney(finalPoint.portfolio) + ". Target for " + view.destinationName + ": " +
+        displayResultMoney(view.targetValue) + ".";
+      const tooltip = element("finder-chart-tooltip");
+      const groups = Array.from(barsLayer.querySelectorAll(".finder-chart-year"));
+      function showTooltip(group) {
+        groups.forEach(function (item) { item.classList.toggle("is-active", item === group); });
+        const content = finderProjectionTooltip({
+          currentAge: user.currentAge,
+          point: model.years[Number(group.dataset.yearIndex)],
+          currency: selectedCurrency,
+          ratesToUsd: ratesToUsd,
+        });
+        element("finder-tooltip-heading").textContent = content.heading;
+        element("finder-tooltip-value").textContent = content.value;
+        tooltip.hidden = false;
+      }
+      function hideTooltip(group) {
+        if (document.activeElement === group) return;
+        group.classList.remove("is-active");
+        tooltip.hidden = true;
+      }
+      groups.forEach(function (group) {
+        group.addEventListener("mouseenter", function () { showTooltip(group); });
+        group.addEventListener("mouseleave", function () { hideTooltip(group); });
+        group.addEventListener("focus", function () { showTooltip(group); });
+        group.addEventListener("blur", function () { hideTooltip(group); });
+        group.addEventListener("click", function () { showTooltip(group); });
+      });
+      figure.hidden = false;
+      fallback.hidden = true;
     }
 
     function resultRow(item, user) {
       const propertyBits = user.housingPlan === "buy_now"
-        ? '<div><dt>Property equity</dt><dd>' + money.format(item.propertyEquity) +
-          '</dd></div><div><dt>Mortgage remaining</dt><dd>' + money.format(item.mortgageBalance) + "</dd></div>"
+        ? '<div><dt>Property equity</dt><dd>' + displayResultMoney(item.propertyEquity) +
+          '</dd></div><div><dt>Mortgage remaining</dt><dd>' + displayResultMoney(item.mortgageBalance) + "</dd></div>"
         : "";
       const rental = user.housingPlan === "buy_now" && user.useBeforeRetirement === "rental"
-        ? '<div><dt>Annual property cash flow</dt><dd>' + money.format(item.netRentalCashFlow) + "</dd></div>"
+        ? '<div><dt>Annual property cash flow</dt><dd>' + displayResultMoney(item.netRentalCashFlow) + "</dd></div>"
         : "";
       const financing = user.housingPlan === "buy_now"
         ? '<p class="finder-financing"><strong>' + escapeHtml(item.financingStatus) + "</strong>" +
@@ -241,9 +508,9 @@
         '" data-finder-dossier>' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
         '</p></div></header><dl>' +
-        '<div><dt>Projected portfolio</dt><dd>' + money.format(item.portfolioAtRetirement) + "</dd></div>" +
-        '<div><dt>Retirement target</dt><dd>' + money.format(item.retirementTarget) + "</dd></div>" +
-        '<div><dt>Surplus or gap</dt><dd>' + money.format(item.surplusGap) + "</dd></div>" +
+        '<div><dt>Projected portfolio</dt><dd>' + displayResultMoney(item.portfolioAtRetirement) + "</dd></div>" +
+        '<div><dt>Retirement target</dt><dd>' + displayResultMoney(item.retirementTarget) + "</dd></div>" +
+        '<div><dt>Surplus or gap</dt><dd>' + displayResultMoney(item.surplusGap) + "</dd></div>" +
         propertyBits + rental + "</dl>" + financing +
         (item.preferenceMatches.length ? '<p class="finder-matches"><strong>Preference match:</strong> ' + escapeHtml(item.preferenceMatches.join(" · ")) + "</p>" : "") +
         '<div class="finder-result-actions"><a href="' + escapeHtml(dossierHref) +
@@ -303,17 +570,24 @@
       element("finder-exclusions").hidden = items.length === 0;
     }
 
-    function render(result, user) {
-      element("finder-capital-today").textContent = money.format(user.totalLiquidCapital);
-      element("finder-monthly-summary").textContent = money.format(user.monthlyPortfolioContribution);
+    function renderCurrentResults() {
+      if (!currentResult || !currentUser) return;
+      const result = currentResult;
+      const user = currentUser;
+      element("finder-capital-today").textContent = displayResultMoney(user.totalLiquidCapital);
+      element("finder-monthly-summary").textContent = displayResultMoney(user.monthlyPortfolioContribution);
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
-      renderChart(result.sharedProjection);
       currentRecommendations = result.recommendations.slice(0, 12);
-      currentUser = user;
-      recommendationsExpanded = false;
+      renderChart(finderProjectionView({
+        housingPlan: user.housingPlan,
+        sharedProjection: result.sharedProjection,
+        recommendations: currentRecommendations,
+      }), user);
       element("finder-result-read").textContent = resultSummaryRead({
         withinReachCount: result.summary.withinReachCount,
         recommendations: currentRecommendations,
+        currency: selectedCurrency,
+        ratesToUsd: ratesToUsd,
       });
       element("finder-closest-match").textContent = currentRecommendations.length
         ? currentRecommendations[0].name
@@ -324,6 +598,13 @@
         : "Every destination had enough information to evaluate.";
       renderExclusions(result.excluded);
       renderEvidence(currentRecommendations);
+    }
+
+    function render(result, user) {
+      currentResult = result;
+      currentUser = user;
+      recommendationsExpanded = false;
+      renderCurrentResults();
       results.hidden = false;
       results.scrollIntoView({ behavior: "smooth", block: "start" });
       track("retirement_destination_finder_complete", {
@@ -369,11 +650,24 @@
         }
       });
     });
-    element("finder-projection-bars").addEventListener("mouseover", function (event) {
-      if (event.target.matches(".finder-chart-bar")) showTooltip(event.target);
+    element("finder-currency").value = selectedCurrency;
+    element("finder-currency").addEventListener("change", function () {
+      if (changePlanningCurrency(element("finder-currency").value)) {
+        track("retirement_destination_finder_currency_change");
+      }
     });
-    element("finder-projection-bars").addEventListener("focusin", function (event) {
-      if (event.target.matches(".finder-chart-bar")) showTooltip(event.target);
+    moneyControlIds.forEach(function (id) {
+      const control = element(id);
+      updateCanonicalMoney(control);
+      formatMoneyControl(control);
+      control.addEventListener("input", function () {
+        updateCanonicalMoney(control);
+        validateMoneyControl(control);
+      });
+      control.addEventListener("blur", function () {
+        formatMoneyControl(control);
+        validateMoneyControl(control);
+      });
     });
     element("finder-recommendations").addEventListener("click", function (event) {
       if (event.target.closest("[data-finder-detail]")) track("retirement_destination_finder_detail_open");
@@ -388,14 +682,23 @@
   }
 
   return {
+    convertPlanningAmount: convertPlanningAmount,
+    convertPlanningControlAmount: convertPlanningControlAmount,
+    parseMoneyInput: parseMoneyInput,
+    formatMoneyInputValue: formatMoneyInputValue,
+    formatPlanningMoney: formatPlanningMoney,
+    resultMoney: resultMoney,
     housingVisibility: housingVisibility,
+    activeMoneyControlIds: activeMoneyControlIds,
     safeDetailHref: safeDetailHref,
     safeDossierHref: safeDossierHref,
     recommendationsForDisplay: recommendationsForDisplay,
     resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,
-    chartTooltip: chartTooltip,
-    mobileChartWidth: mobileChartWidth,
+    finderProjectionModel: finderProjectionModel,
+    finderProjectionTooltip: finderProjectionTooltip,
+    finderProjectionAxisLabel: finderProjectionAxisLabel,
+    finderProjectionView: finderProjectionView,
     initRetirementDestinationFinder: initRetirementDestinationFinder,
   };
 });
