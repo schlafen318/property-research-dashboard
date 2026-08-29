@@ -30,6 +30,10 @@
     }).format(converted === null ? 0 : converted);
   }
 
+  function resultMoney(input) {
+    return formatPlanningMoney(input);
+  }
+
   function convertPlanningControlAmount(input) {
     const converted = convertPlanningAmount(input);
     if (converted === null) return null;
@@ -110,7 +114,7 @@
         closest.name + " is the strongest modeled match under your preferences.";
     }
     return "No destinations are within reach yet. " + closest.name +
-      " is the closest modeled match, with a gap of " + formatPlanningMoney({
+      " is the closest modeled match, with a gap of " + resultMoney({
         amountUsd: Math.abs(Number(closest.surplusGap)),
         currency: input.currency || "USD",
         ratesToUsd: input.ratesToUsd || { USD: 1 },
@@ -127,7 +131,7 @@
 
   function chartTooltip(point) {
     const heading = "Year " + Number(point.year);
-    const value = formatPlanningMoney({
+    const value = resultMoney({
       amountUsd: Number(point.portfolio),
       currency: point.currency || "USD",
       ratesToUsd: point.ratesToUsd || { USD: 1 },
@@ -169,14 +173,15 @@
     ];
     let currentRecommendations = [];
     let currentUser = null;
+    let currentResult = null;
     let recommendationsExpanded = false;
 
     function element(id) { return document.getElementById(id); }
     function numeric(id) { return Number(element(id).value); }
     function checked(id) { return element(id).checked; }
     function selected(id) { return element(id).value; }
-    function displayMoney(amountUsd) {
-      return formatPlanningMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
+    function displayResultMoney(amountUsd) {
+      return resultMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
     }
     function moneyNumber(id) {
       const amount = parseMoneyInput(element(id).value);
@@ -307,6 +312,7 @@
         }
       });
       selectedCurrency = nextCurrency;
+      renderCurrentResults();
     }
 
     function renderChart(projection) {
@@ -350,11 +356,11 @@
 
     function resultRow(item, user) {
       const propertyBits = user.housingPlan === "buy_now"
-        ? '<div><dt>Property equity</dt><dd>' + displayMoney(item.propertyEquity) +
-          '</dd></div><div><dt>Mortgage remaining</dt><dd>' + displayMoney(item.mortgageBalance) + "</dd></div>"
+        ? '<div><dt>Property equity</dt><dd>' + displayResultMoney(item.propertyEquity) +
+          '</dd></div><div><dt>Mortgage remaining</dt><dd>' + displayResultMoney(item.mortgageBalance) + "</dd></div>"
         : "";
       const rental = user.housingPlan === "buy_now" && user.useBeforeRetirement === "rental"
-        ? '<div><dt>Annual property cash flow</dt><dd>' + displayMoney(item.netRentalCashFlow) + "</dd></div>"
+        ? '<div><dt>Annual property cash flow</dt><dd>' + displayResultMoney(item.netRentalCashFlow) + "</dd></div>"
         : "";
       const financing = user.housingPlan === "buy_now"
         ? '<p class="finder-financing"><strong>' + escapeHtml(item.financingStatus) + "</strong>" +
@@ -371,9 +377,9 @@
         '" data-finder-dossier>' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
         '</p></div></header><dl>' +
-        '<div><dt>Projected portfolio</dt><dd>' + displayMoney(item.portfolioAtRetirement) + "</dd></div>" +
-        '<div><dt>Retirement target</dt><dd>' + displayMoney(item.retirementTarget) + "</dd></div>" +
-        '<div><dt>Surplus or gap</dt><dd>' + displayMoney(item.surplusGap) + "</dd></div>" +
+        '<div><dt>Projected portfolio</dt><dd>' + displayResultMoney(item.portfolioAtRetirement) + "</dd></div>" +
+        '<div><dt>Retirement target</dt><dd>' + displayResultMoney(item.retirementTarget) + "</dd></div>" +
+        '<div><dt>Surplus or gap</dt><dd>' + displayResultMoney(item.surplusGap) + "</dd></div>" +
         propertyBits + rental + "</dl>" + financing +
         (item.preferenceMatches.length ? '<p class="finder-matches"><strong>Preference match:</strong> ' + escapeHtml(item.preferenceMatches.join(" · ")) + "</p>" : "") +
         '<div class="finder-result-actions"><a href="' + escapeHtml(dossierHref) +
@@ -433,14 +439,15 @@
       element("finder-exclusions").hidden = items.length === 0;
     }
 
-    function render(result, user) {
-      element("finder-capital-today").textContent = displayMoney(user.totalLiquidCapital);
-      element("finder-monthly-summary").textContent = displayMoney(user.monthlyPortfolioContribution);
+    function renderCurrentResults() {
+      if (!currentResult || !currentUser) return;
+      const result = currentResult;
+      const user = currentUser;
+      element("finder-capital-today").textContent = displayResultMoney(user.totalLiquidCapital);
+      element("finder-monthly-summary").textContent = displayResultMoney(user.monthlyPortfolioContribution);
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
       renderChart(result.sharedProjection);
       currentRecommendations = result.recommendations.slice(0, 12);
-      currentUser = user;
-      recommendationsExpanded = false;
       element("finder-result-read").textContent = resultSummaryRead({
         withinReachCount: result.summary.withinReachCount,
         recommendations: currentRecommendations,
@@ -456,6 +463,13 @@
         : "Every destination had enough information to evaluate.";
       renderExclusions(result.excluded);
       renderEvidence(currentRecommendations);
+    }
+
+    function render(result, user) {
+      currentResult = result;
+      currentUser = user;
+      recommendationsExpanded = false;
+      renderCurrentResults();
       results.hidden = false;
       results.scrollIntoView({ behavior: "smooth", block: "start" });
       track("retirement_destination_finder_complete", {
@@ -539,6 +553,7 @@
     parseMoneyInput: parseMoneyInput,
     formatMoneyInputValue: formatMoneyInputValue,
     formatPlanningMoney: formatPlanningMoney,
+    resultMoney: resultMoney,
     housingVisibility: housingVisibility,
     safeDetailHref: safeDetailHref,
     safeDossierHref: safeDossierHref,

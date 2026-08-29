@@ -156,11 +156,71 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
                 "recommendations": [
                     {"name": "Fukuoka / Itoshima", "surplusGap": -322418},
                 ],
+                "currency": "SGD",
+                "ratesToUsd": {"USD": 1, "SGD": 0.7866117265603891},
             },
         )
         self.assertIn("No destinations are within reach yet", read)
         self.assertIn("Fukuoka / Itoshima is the closest modeled match", read)
-        self.assertIn("$322,418", read)
+        self.assertIn("SGD\u00a0409,882", read)
+
+    def test_result_money_formats_negative_gaps_equity_and_jpy(self) -> None:
+        rates = {"USD": 1, "SGD": 0.7866117265603891, "JPY": 0.0067}
+        self.assertEqual(
+            "-SGD\u00a0409,882",
+            run_ui("resultMoney", {"amountUsd": -322418, "currency": "SGD", "ratesToUsd": rates}),
+        )
+        self.assertEqual(
+            "SGD\u00a0762,765",
+            run_ui("resultMoney", {"amountUsd": 600000, "currency": "SGD", "ratesToUsd": rates}),
+        )
+        self.assertEqual(
+            "\u00a5" + "89,552,239",
+            run_ui("resultMoney", {"amountUsd": 600000, "currency": "JPY", "ratesToUsd": rates}),
+        )
+
+    def test_result_money_wiring_covers_all_result_amounts_and_rerenders(self) -> None:
+        source = UI.read_text()
+        self.assertIn("function resultMoney(input)", source)
+        for result_id in ("finder-capital-today", "finder-monthly-summary"):
+            self.assertIn(f'element("{result_id}").textContent = displayResultMoney(', source)
+        for recommendation_value in (
+            "item.portfolioAtRetirement",
+            "item.retirementTarget",
+            "item.surplusGap",
+            "item.propertyEquity",
+            "item.mortgageBalance",
+            "item.netRentalCashFlow",
+        ):
+            self.assertIn("displayResultMoney(" + recommendation_value + ")", source)
+        self.assertIn("renderCurrentResults();", source)
+
+    def test_currency_changes_do_not_change_recommendation_identity_or_tier(self) -> None:
+        recommendations = [
+            {"destinationId": "fukuoka-itoshima", "tier": "close", "surplusGap": -322418},
+            {"destinationId": "valencia", "tier": "within_reach", "surplusGap": 41250},
+        ]
+        usd = [
+            (item["destinationId"], item["tier"], run_ui("resultMoney", {"amountUsd": item["surplusGap"]}))
+            for item in recommendations
+        ]
+        sgd = [
+            (
+                item["destinationId"],
+                item["tier"],
+                run_ui(
+                    "resultMoney",
+                    {
+                        "amountUsd": item["surplusGap"],
+                        "currency": "SGD",
+                        "ratesToUsd": {"USD": 1, "SGD": 0.7866117265603891},
+                    },
+                ),
+            )
+            for item in recommendations
+        ]
+        self.assertEqual([(item[0], item[1]) for item in usd], [(item[0], item[1]) for item in sgd])
+        self.assertNotEqual([item[2] for item in usd], [item[2] for item in sgd])
 
     def test_tier_labels_are_plain_language(self) -> None:
         self.assertEqual("Within reach", run_ui("tierLabel", "within_reach"))
