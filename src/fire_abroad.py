@@ -36,6 +36,22 @@ VALID_CONFIDENCE = frozenset({"low", "medium", "medium_high", "high"})
 VALID_ACTIVITY_TAGS = frozenset(
     {"walking", "cycling", "hiking", "water", "winter_sports", "fitness_social"}
 )
+CANONICAL_LAUNCH_IDS = frozenset(
+    {
+        "algarve-cascais",
+        "bali",
+        "croatia-istria-dalmatia",
+        "crete",
+        "da-nang-hoi-an",
+        "fukuoka-itoshima",
+        "madeira",
+        "malaga-costa-del-sol",
+        "phuket-koh-samui",
+        "valencia",
+    }
+)
+
+_UNRANKED_STATUSES = frozenset({"needs_verification", "not_eligible"})
 
 _REVIEW_POLICY_KEYS = frozenset(
     {
@@ -105,6 +121,13 @@ def validate_fire_abroad_payload(
             add(owner, path, "must be a number from 0 through 5")
         elif not 0 <= value <= 5:
             add(owner, path, "must be from 0 through 5")
+
+    def score_for_status(value: Any, status: Any, owner: str, path: str) -> None:
+        if isinstance(status, str) and status in _UNRANKED_STATUSES:
+            if value is not None:
+                add(owner, path, f"must be null when status is {status!r}")
+            return
+        score(value, owner, path)
 
     def enum(value: Any, allowed: frozenset[str], owner: str, path: str) -> None:
         if not isinstance(value, str) or value not in allowed:
@@ -191,10 +214,9 @@ def validate_fire_abroad_payload(
         add("payload", "launch_destination_ids", "must be a list")
         launch_ids: list[str] = []
     else:
-        launch_ids = launch_ids_value
-        if len(launch_ids) != len(set(launch_ids)):
-            add("payload", "launch_destination_ids", "must not contain duplicates")
-        for index, destination_id in enumerate(launch_ids):
+        launch_ids = []
+        seen_launch_ids: set[str] = set()
+        for index, destination_id in enumerate(launch_ids_value):
             if not isinstance(destination_id, str) or not destination_id:
                 add(
                     "payload",
@@ -202,6 +224,14 @@ def validate_fire_abroad_payload(
                     "must be a non-empty destination ID",
                 )
                 continue
+            launch_ids.append(destination_id)
+            if destination_id in seen_launch_ids:
+                add(
+                    "payload",
+                    f"launch_destination_ids[{index}]",
+                    f"duplicates destination ID {destination_id!r}",
+                )
+            seen_launch_ids.add(destination_id)
             if destination_id not in destination_ids:
                 add(
                     destination_id,
@@ -214,6 +244,14 @@ def validate_fire_abroad_payload(
                     "launch_destination_ids",
                     "is absent from data/retirement_costs.json",
                 )
+        if seen_launch_ids != CANONICAL_LAUNCH_IDS or len(launch_ids) != len(
+            CANONICAL_LAUNCH_IDS
+        ):
+            add(
+                "payload",
+                "launch_destination_ids",
+                f"must contain exactly {sorted(CANONICAL_LAUNCH_IDS)}",
+            )
 
     countries = mapping(payload.get("countries"), "payload", "countries")
     overrides = mapping(
@@ -283,13 +321,19 @@ def validate_fire_abroad_payload(
             )
         for mode in VALID_STAY_MODES:
             route = mapping(routes.get(mode), country_id, f"stay_routes.{mode}")
+            route_status = route.get("status")
             enum(
-                route.get("status"),
+                route_status,
                 VALID_ELIGIBILITY,
                 country_id,
                 f"stay_routes.{mode}.status",
             )
-            score(route.get("base_score"), country_id, f"stay_routes.{mode}.base_score")
+            score_for_status(
+                route.get("base_score"),
+                route_status,
+                country_id,
+                f"stay_routes.{mode}.base_score",
+            )
             max_days = route.get("max_days")
             if max_days is not None and (
                 isinstance(max_days, bool)
@@ -374,8 +418,35 @@ def validate_fire_abroad_payload(
             )
         for mode in VALID_STAY_MODES:
             mode_tax = mapping(tax_by_mode.get(mode), country_id, f"tax.by_mode.{mode}")
-            score(
+            mode_tax_status = mode_tax.get("status")
+            enum(
+                mode_tax_status,
+                VALID_ELIGIBILITY,
+                country_id,
+                f"tax.by_mode.{mode}.status",
+            )
+            rankable = mode_tax.get("rankable")
+            if not isinstance(rankable, bool):
+                add(
+                    country_id,
+                    f"tax.by_mode.{mode}.rankable",
+                    "must be a boolean",
+                )
+            elif (
+                isinstance(mode_tax_status, str)
+                and mode_tax_status in VALID_ELIGIBILITY
+            ):
+                should_rank = mode_tax_status not in _UNRANKED_STATUSES
+                if rankable is not should_rank:
+                    add(
+                        country_id,
+                        f"tax.by_mode.{mode}.rankable",
+                        "must be "
+                        f"{str(should_rank).lower()} when status is {mode_tax_status!r}",
+                    )
+            score_for_status(
                 mode_tax.get("compatibility_score"),
+                mode_tax_status,
                 country_id,
                 f"tax.by_mode.{mode}.compatibility_score",
             )
@@ -407,13 +478,15 @@ def validate_fire_abroad_payload(
                 country_id,
                 f"healthcare.by_mode.{mode}",
             )
-            score(
+            bridge_eligibility = bridge.get("eligibility")
+            score_for_status(
                 bridge.get("bridge_score"),
+                bridge_eligibility,
                 country_id,
                 f"healthcare.by_mode.{mode}.bridge_score",
             )
             enum(
-                bridge.get("eligibility"),
+                bridge_eligibility,
                 VALID_ELIGIBILITY,
                 country_id,
                 f"healthcare.by_mode.{mode}.eligibility",
@@ -486,7 +559,9 @@ def validate_fire_abroad_payload(
         nonempty_text(country_id, destination_id, "country")
         if isinstance(country_id, str):
             used_countries.add(country_id)
-        if country_id not in countries:
+        if not isinstance(country_id, str):
+            available = set()
+        elif country_id not in countries:
             add(destination_id, "country", f"references missing country {country_id!r}")
             available = set()
         else:
@@ -528,15 +603,17 @@ def validate_fire_abroad_payload(
         if not isinstance(tags, list) or not tags:
             add(destination_id, "activity_tags", "must be a non-empty list")
         else:
-            invalid_tags = set(tags) - VALID_ACTIVITY_TAGS
-            if invalid_tags:
-                add(
-                    destination_id,
-                    "activity_tags",
-                    f"contains unsupported values {sorted(invalid_tags)}",
-                )
-            if len(tags) != len(set(tags)):
-                add(destination_id, "activity_tags", "must not contain duplicates")
+            seen_tags: set[str] = set()
+            for index, tag in enumerate(tags):
+                tag_path = f"activity_tags[{index}]"
+                if not isinstance(tag, str):
+                    add(destination_id, tag_path, "must be a string")
+                elif tag not in VALID_ACTIVITY_TAGS:
+                    add(destination_id, tag_path, f"unsupported value {tag!r}")
+                elif tag in seen_tags:
+                    add(destination_id, tag_path, f"duplicates activity tag {tag!r}")
+                else:
+                    seen_tags.add(tag)
         score(
             destination.get("rent_flexibility_score"),
             destination_id,

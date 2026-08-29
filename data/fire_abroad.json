@@ -91,16 +91,22 @@
         "confidence": "high",
         "by_mode": {
           "seasonal": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 4.0,
             "summary": "A sub-threshold stay is comparatively clear, but a habitual home and Portuguese-source income can still matter.",
             "source_ids": ["portugal-tax-1"]
           },
           "part_year": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.0,
             "summary": "Recurring days and a maintained home make residence analysis and recordkeeping more important.",
             "source_ids": ["portugal-tax-1"]
           },
           "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.5,
             "summary": "Worldwide-income scope is generally relevant and treaty, investment and reporting details require professional review.",
             "source_ids": ["portugal-tax-1"]
@@ -167,13 +173,13 @@
         },
         {
           "id": "portugal-own-income-1",
-          "metric_supported": "Residence visa for immigrants living on own income and remote workers",
-          "url": "https://home-affairs.ec.europa.eu/policies/migration-and-asylum/eu-immigration-portal/international-service-provider-portugal_en",
-          "publisher": "European Commission, Directorate-General for Migration and Home Affairs",
-          "source_date": "2025-04-01",
+          "metric_supported": "Residence visa for retired people and people living on their own income",
+          "url": "https://www2.gov.pt/en/servicos/pedir-um-visto-de-residencia-para-fixacao-de-residencia-de-reformados-religiosos-e-pessoas-que-vivem-de-rendimentos-proprios/-/asset_publisher/01mjqjlm1jP0/content/1842-srv-ces-fds_lead",
+          "publisher": "Government of Portugal",
+          "source_date": "2026-08-29",
           "accessed_date": "2026-08-29",
-          "jurisdiction_level": "Portugal / European Union",
-          "notes": "Official portal summary; consular post and AIMA requirements must be reconfirmed for the applicant."
+          "jurisdiction_level": "Portugal",
+          "notes": "Undated official service page; source_date records the reviewed live-page snapshot. The competent Portuguese consular post controls the application."
         },
         {
           "id": "portugal-tax-1",
@@ -214,6 +220,16 @@
           "accessed_date": "2026-08-29",
           "jurisdiction_level": "Algarve",
           "notes": "Undated official destination guidance; used for infrastructure and activity availability, not marketing superlatives."
+        },
+        {
+          "id": "portugal-cascais-active-1",
+          "metric_supported": "Cascais municipal walking, cycling and outdoor-sport networks",
+          "url": "https://www.cascais.pt/sub-area/oferta-desportiva-em-cascais",
+          "publisher": "Câmara Municipal de Cascais",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Cascais",
+          "notes": "Undated municipal service page; source_date records the reviewed live-page snapshot and supports facilities and route availability only."
         },
         {
           "id": "portugal-madeira-active-1",
@@ -281,16 +297,22 @@
         "confidence": "high",
         "by_mode": {
           "seasonal": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.8,
             "summary": "A clearly sub-threshold stay is easier to document, while Spanish-source income and non-day tests remain relevant.",
             "source_ids": ["spain-tax-1"]
           },
           "part_year": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.8,
             "summary": "Recurring days, sporadic-absence rules and economic-interest tests create material recordkeeping and advice needs.",
             "source_ids": ["spain-tax-1"]
           },
           "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.3,
             "summary": "Worldwide-income, asset-reporting, treaty and regional tax questions make full relocation administratively demanding.",
             "source_ids": ["spain-tax-1"]
@@ -437,7 +459,7 @@
           "minimum_age": null,
           "summary": "The national digital-nomad visa can support up to twelve months for qualifying remote workers with foreign work and documented resources.",
           "work_permission": "remote_permitted",
-          "source_ids": ["greece-digital-nomad-1"],
+          "source_ids": ["greece-digital-nomad-1", "greece-digital-nomad-details-1"],
           "last_reviewed": "2026-08-29",
           "confidence": "medium_high"
         },
@@ -471,16 +493,22 @@
         "confidence": "high",
         "by_mode": {
           "seasonal": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.8,
             "summary": "Tourist-only presence below 183 days can be comparatively clear, while Greek-source income remains relevant.",
             "source_ids": ["greece-tax-1"]
           },
           "part_year": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.8,
             "summary": "The rolling twelve-month count and vital-interest tests make recurring stays advice-sensitive.",
             "source_ids": ["greece-tax-1"]
           },
           "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.5,
             "summary": "Worldwide-income reporting and treaty coordination are expected planning issues for a Greek tax resident.",
             "source_ids": ["greece-tax-1"]
@@ -547,13 +575,23 @@
         },
         {
           "id": "greece-digital-nomad-1",
-          "metric_supported": "Digital-nomad national visa, qualifying foreign work and income condition",
-          "url": "https://home-affairs.ec.europa.eu/policies/migration-and-asylum/eu-immigration-portal/international-service-provider-greece_en",
-          "publisher": "European Commission, Directorate-General for Migration and Home Affairs",
-          "source_date": "2025-04-01",
+          "metric_supported": "Digital-nomad visa for non-European remote professionals working for foreign employers",
+          "url": "https://www.mfa.gr/en/services/working-in-greece-as-a-digital-nomad/",
+          "publisher": "Hellenic Republic Ministry of Foreign Affairs",
+          "source_date": "2026-08-29",
           "accessed_date": "2026-08-29",
-          "jurisdiction_level": "Greece / European Union",
-          "notes": "Official portal summary; current Greek consular requirements control an application."
+          "jurisdiction_level": "Greece",
+          "notes": "Undated live ministry page; source_date records the reviewed snapshot. Current consular requirements control an application."
+        },
+        {
+          "id": "greece-digital-nomad-details-1",
+          "metric_supported": "Digital-nomad national visa duration and documented-resource conditions",
+          "url": "https://www.mfa.gr/uk/images/stories/london/docs/Newsletter/Newsletter_No.28_opt.pdf",
+          "publisher": "Embassy of Greece in the United Kingdom, Ministry of Foreign Affairs",
+          "source_date": "2023-06-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Greece",
+          "notes": "Official consular bulletin supports the twelve-month national-visa description; applicants must reconfirm current amounts and documents with the competent consulate."
         },
         {
           "id": "greece-residence-1",
@@ -633,7 +671,7 @@
         },
         "full_relocation": {
           "status": "needs_verification",
-          "base_score": 2.0,
+          "base_score": null,
           "max_days": null,
           "minimum_age": null,
           "summary": "Digital-nomad stay is temporary and has a reapplication gap; a separate residence category is required for durable full relocation.",
@@ -661,16 +699,22 @@
         "confidence": "medium_high",
         "by_mode": {
           "seasonal": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.8,
             "summary": "A documented short visit is comparatively simple, but Croatian-source income and residence facts remain relevant.",
             "source_ids": ["croatia-tax-1"]
           },
           "part_year": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.4,
             "summary": "The digital-nomad route has specific tax treatment, but residence and income-category facts still require advice.",
             "source_ids": ["croatia-tax-1", "croatia-digital-nomad-1"]
           },
           "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.7,
             "summary": "Worldwide-income scope and treaty coordination become central once Croatian tax residence applies.",
             "source_ids": ["croatia-tax-1"]
@@ -786,14 +830,24 @@
           "notes": "Official statutory translation; bank onboarding remains subject to identity and AML checks."
         },
         {
-          "id": "croatia-active-1",
-          "metric_supported": "Istria and Dalmatia cycling, walking and active-tourism offerings",
-          "url": "https://www.istra.hr/en",
+          "id": "croatia-istria-active-1",
+          "metric_supported": "Istria cycling, walking and active-tourism offerings",
+          "url": "https://www.istra.hr/en/information/brochures/istra-outdoor",
           "publisher": "Istria Tourist Board",
           "source_date": "2026-08-29",
           "accessed_date": "2026-08-29",
           "jurisdiction_level": "Istria",
           "notes": "Official regional page used for documented route and event availability, not promotional rankings."
+        },
+        {
+          "id": "croatia-dalmatia-active-1",
+          "metric_supported": "Central Dalmatia cycling, hiking and active-tourism offerings",
+          "url": "https://www.dalmatia.hr/active-summer-in-dalmatia/",
+          "publisher": "Split-Dalmatia County Tourist Board",
+          "source_date": "2024-11-07",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Dalmatia",
+          "notes": "Official regional tourism-board page supports documented cycling, hiking and coastal activity availability, not promotional rankings."
         }
       ]
     },
@@ -851,16 +905,22 @@
         "confidence": "high",
         "by_mode": {
           "seasonal": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.2,
             "summary": "A short stay can remain nonresident, but Indonesian-source income and intention-to-reside facts still matter.",
             "source_ids": ["indonesia-tax-1"]
           },
           "part_year": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.5,
             "summary": "Rolling twelve-month day counts and intention-to-reside evidence make recurring stays administratively sensitive.",
             "source_ids": ["indonesia-tax-1"]
           },
           "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.2,
             "summary": "Worldwide-income reporting, registration and treaty coordination require professional support.",
             "source_ids": ["indonesia-tax-1"]
@@ -1031,16 +1091,22 @@
         "confidence": "high",
         "by_mode": {
           "seasonal": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.2,
             "summary": "A stay well below 180 days is easier to document, while Thai-source income remains in scope.",
             "source_ids": ["thailand-tax-1"]
           },
           "part_year": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.4,
             "summary": "Approaching or crossing 180 aggregate days materially changes residence and foreign-income remittance analysis.",
             "source_ids": ["thailand-tax-1", "thailand-tax-remittance-1"]
           },
           "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.1,
             "summary": "Resident foreign-income, remittance, treaty and annual filing questions require professional review.",
             "source_ids": ["thailand-tax-1", "thailand-tax-remittance-1"]
@@ -1156,7 +1222,7 @@
           "notes": "Undated live central-bank guidance; source_date is the reviewed snapshot date."
         },
         {
-          "id": "thailand-active-1",
+          "id": "thailand-samui-active-1",
           "metric_supported": "Ko Samui water, fitness and outdoor activity availability",
           "url": "https://www.tourismthailand.org/Destinations/Provinces/Ko-Samui/360",
           "publisher": "Tourism Authority of Thailand",
@@ -1164,6 +1230,16 @@
           "accessed_date": "2026-08-29",
           "jurisdiction_level": "Ko Samui",
           "notes": "Official destination page used for documented activities and island transport caution, not promotional claims."
+        },
+        {
+          "id": "thailand-phuket-active-1",
+          "metric_supported": "Phuket beach, diving, snorkeling, windsurfing and sailing availability",
+          "url": "https://www.tourismthailand.org/Destinations/Provinces/Phuket/350",
+          "publisher": "Tourism Authority of Thailand",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Phuket",
+          "notes": "Undated official destination page; source_date records the reviewed live-page snapshot and supports activity availability only."
         }
       ]
     },
@@ -1182,7 +1258,7 @@
         },
         "part_year": {
           "status": "needs_verification",
-          "base_score": 1.8,
+          "base_score": null,
           "max_days": 90,
           "minimum_age": null,
           "summary": "No general part-year retirement permission is documented; repeated temporary-visitor use must not be treated as a residence route.",
@@ -1193,7 +1269,7 @@
         },
         "full_relocation": {
           "status": "needs_verification",
-          "base_score": 1.5,
+          "base_score": null,
           "max_days": null,
           "minimum_age": null,
           "summary": "Japan requires a qualifying status of residence for long-term stay; no general passive-income or retirement category is documented for this launch profile.",
@@ -1221,16 +1297,22 @@
         "confidence": "high",
         "by_mode": {
           "seasonal": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.8,
             "summary": "A genuine short visit without Japanese domicile is relatively clear, while Japanese-source income remains relevant.",
             "source_ids": ["japan-tax-1"]
           },
           "part_year": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.0,
             "summary": "Domicile facts and repeated presence need review even without a 183-day statutory trigger.",
             "source_ids": ["japan-tax-1"]
           },
           "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.5,
             "summary": "Residence classification, foreign-income remittance, asset reporting and treaty issues add complexity.",
             "source_ids": ["japan-tax-1", "japan-tax-foreign-1"]
@@ -1382,7 +1464,7 @@
         },
         "part_year": {
           "status": "needs_verification",
-          "base_score": 2.0,
+          "base_score": null,
           "max_days": 90,
           "minimum_age": null,
           "summary": "The e-visa is capped at 90 days and cannot be treated as a durable recurring residence route; a separate qualifying sponsored status is required.",
@@ -1393,7 +1475,7 @@
         },
         "full_relocation": {
           "status": "needs_verification",
-          "base_score": 1.2,
+          "base_score": null,
           "max_days": null,
           "minimum_age": null,
           "summary": "No general retirement or passive-income residence route is documented in the official e-visa system; full relocation requires a separately qualifying status.",
@@ -1421,16 +1503,22 @@
         "confidence": "high",
         "by_mode": {
           "seasonal": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 3.2,
             "summary": "A 90-day visit is below the day threshold, but Vietnamese-source income remains relevant.",
             "source_ids": ["vietnam-tax-1"]
           },
           "part_year": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.4,
             "summary": "Recurring days, the rolling twelve-month test and housing facts require careful records.",
             "source_ids": ["vietnam-tax-1"]
           },
           "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
             "compatibility_score": 2.1,
             "summary": "Worldwide-income scope, filings and treaty coordination require professional advice.",
             "source_ids": ["vietnam-tax-1"]
@@ -1462,7 +1550,7 @@
             "confidence": "medium_high"
           },
           "full_relocation": {
-            "bridge_score": 2.5,
+            "bridge_score": null,
             "eligibility": "needs_verification",
             "waiting_period_summary": "Public or social-insurance eligibility depends on a separately qualifying legal and employment status; no retiree pathway is assumed.",
             "age_limit_summary": "Private insurer entry and renewal ages require verification.",
@@ -1555,25 +1643,25 @@
         "everyday_movement": {
           "score": 4.1,
           "summary": "Walkable town centers and documented walking and cycling networks support routine activity, though the combined region varies by base.",
-          "source_ids": ["portugal-algarve-active-1"],
+          "source_ids": ["portugal-algarve-active-1", "portugal-cascais-active-1"],
           "confidence": "medium_high"
         },
         "active_pursuits": {
           "score": 4.5,
           "summary": "Long-distance coastal walking, mountain-bike routes and road cycling are directly documented across the Algarve.",
-          "source_ids": ["portugal-algarve-active-1"],
+          "source_ids": ["portugal-algarve-active-1", "portugal-cascais-active-1"],
           "confidence": "high"
         },
         "year_round_continuity": {
           "score": 4.3,
           "summary": "The route network is not defined as a winter-only product, while heat and fire guidance must be checked before summer outings.",
-          "source_ids": ["portugal-algarve-active-1"],
+          "source_ids": ["portugal-algarve-active-1", "portugal-cascais-active-1"],
           "confidence": "medium_high"
         },
         "activity_ecosystem": {
           "score": 3.8,
           "summary": "Marked regional routes and established walking and cycling products provide multiple entry points for participation.",
-          "source_ids": ["portugal-algarve-active-1"],
+          "source_ids": ["portugal-algarve-active-1", "portugal-cascais-active-1"],
           "confidence": "medium"
         }
       },
@@ -1581,7 +1669,7 @@
       "rent_flexibility_score": 3.7,
       "one_time_relocation_usd": 6000,
       "risk_warnings": ["Summer heat, fire conditions and route closures should be checked before outdoor activity."],
-      "source_ids": ["portugal-algarve-active-1", "portugal-health-1"],
+      "source_ids": ["portugal-algarve-active-1", "portugal-cascais-active-1", "portugal-health-1"],
       "confidence": "medium_high",
       "last_reviewed": "2026-08-29"
     },
@@ -1735,25 +1823,25 @@
         "everyday_movement": {
           "score": 3.3,
           "summary": "Historic centers can be highly walkable, while dispersed coast, hills and island links make the broader region base-dependent.",
-          "source_ids": ["croatia-active-1"],
+          "source_ids": ["croatia-istria-active-1", "croatia-dalmatia-active-1"],
           "confidence": "medium"
         },
         "active_pursuits": {
           "score": 4.6,
           "summary": "The regional tourism evidence documents cycling routes, walking programs and coast-based outdoor access.",
-          "source_ids": ["croatia-active-1"],
+          "source_ids": ["croatia-istria-active-1", "croatia-dalmatia-active-1"],
           "confidence": "high"
         },
         "year_round_continuity": {
           "score": 3.8,
           "summary": "Walking and cycling extend beyond summer, but island schedules and tourism services are more seasonal.",
-          "source_ids": ["croatia-active-1"],
+          "source_ids": ["croatia-istria-active-1", "croatia-dalmatia-active-1"],
           "confidence": "medium"
         },
         "activity_ecosystem": {
           "score": 3.5,
           "summary": "Marked routes and recurring organized events support participation, with greater depth in larger coastal towns.",
-          "source_ids": ["croatia-active-1"],
+          "source_ids": ["croatia-istria-active-1", "croatia-dalmatia-active-1"],
           "confidence": "medium_high"
         }
       },
@@ -1761,7 +1849,7 @@
       "rent_flexibility_score": 3.3,
       "one_time_relocation_usd": 6000,
       "risk_warnings": ["The digital-nomad route is temporary and includes a reapplication gap; island transport and healthcare access vary seasonally."],
-      "source_ids": ["croatia-digital-nomad-1", "croatia-active-1", "croatia-health-1"],
+      "source_ids": ["croatia-digital-nomad-1", "croatia-istria-active-1", "croatia-dalmatia-active-1", "croatia-health-1"],
       "confidence": "medium_high",
       "last_reviewed": "2026-08-29"
     },
@@ -1807,25 +1895,25 @@
         "everyday_movement": {
           "score": 3.1,
           "summary": "Beach districts allow local walking, while island-wide routine movement often relies on road transport.",
-          "source_ids": ["thailand-active-1"],
+          "source_ids": ["thailand-phuket-active-1", "thailand-samui-active-1"],
           "confidence": "medium"
         },
         "active_pursuits": {
           "score": 4.7,
           "summary": "The official destination record documents kayaking, diving, yoga, Muay Thai, golf and extensive beach activity.",
-          "source_ids": ["thailand-active-1"],
+          "source_ids": ["thailand-phuket-active-1", "thailand-samui-active-1"],
           "confidence": "high"
         },
         "year_round_continuity": {
           "score": 3.2,
           "summary": "A broad activity base exists, but monsoon weather, heat and marine conditions interrupt some outdoor routines.",
-          "source_ids": ["thailand-active-1"],
+          "source_ids": ["thailand-phuket-active-1", "thailand-samui-active-1"],
           "confidence": "medium"
         },
         "activity_ecosystem": {
           "score": 4.5,
           "summary": "Instruction and facilities across diving, fitness, combat sport, yoga and golf provide many social entry points.",
-          "source_ids": ["thailand-active-1"],
+          "source_ids": ["thailand-phuket-active-1", "thailand-samui-active-1"],
           "confidence": "high"
         }
       },
@@ -1833,7 +1921,7 @@
       "rent_flexibility_score": 3.9,
       "one_time_relocation_usd": 5500,
       "risk_warnings": ["Island residents should plan for road-safety exposure, up-front medical payment and mainland or international evacuation."],
-      "source_ids": ["thailand-active-1", "thailand-health-1"],
+      "source_ids": ["thailand-phuket-active-1", "thailand-samui-active-1", "thailand-health-1"],
       "confidence": "medium_high",
       "last_reviewed": "2026-08-29"
     },
