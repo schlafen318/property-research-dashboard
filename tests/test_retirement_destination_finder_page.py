@@ -119,6 +119,11 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
     def test_results_are_concise_and_accessible(self) -> None:
         self.assertIn('id="finder-within-count"', self.html)
+        self.assertIn('id="finder-eligible-count"', self.html)
+        self.assertIn('id="finder-strongest-match"', self.html)
+        self.assertIn('id="finder-capital-landscape"', self.html)
+        self.assertIn('aria-labelledby="finder-landscape-heading finder-landscape-caption"', self.html)
+        self.assertIn('id="finder-landscape-rows" role="list"', self.html)
         self.assertIn(
             'id="finder-projection" role="img" aria-labelledby="finder-projection-title finder-projection-desc"',
             self.html,
@@ -131,18 +136,36 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-projection-caption"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
         self.assertIn('id="finder-exclusions"', self.html)
-        self.assertIn("Projected portfolio", self.html)
-        self.assertIn("Retirement target", self.html)
-        self.assertIn("Surplus or gap", self.html)
+        self.assertIn("Retirement capital by destination", self.html)
+        self.assertIn("Estimated capital required", self.html)
+        self.assertIn("How your capital gets there", self.html)
         self.assertNotIn("Retirement score", self.html)
 
-    def test_results_lead_with_a_plain_language_decision_and_progressive_list(self) -> None:
+    def test_results_lead_with_cost_landscape_and_three_modeled_matches(self) -> None:
         self.assertIn('id="finder-result-read"', self.html)
-        self.assertIn('id="finder-closest-match"', self.html)
-        self.assertIn('id="finder-show-all"', self.html)
-        self.assertIn("View all destinations", self.html)
+        self.assertIn('id="finder-recommendations"', self.html)
+        self.assertIn('aria-label="Three strongest modeled matches"', self.html)
+        self.assertNotIn('id="finder-closest-match"', self.html)
+        self.assertNotIn('id="finder-show-all"', self.html)
+        self.assertNotIn("View all destinations", self.html)
         self.assertIn("View destination dossier", self.html)
         self.assertIn('data-finder-dossier', self.html)
+
+    def test_landscape_uses_plain_editorial_rules_and_a_compact_mobile_list(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+        self.assertIn(".retirement-finder-page .finder-landscape", design_css)
+        self.assertIn("border-top: 1px solid var(--gha-rule)", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-row", design_css)
+        self.assertIn("grid-template-columns: minmax(190px, 1.15fr) minmax(360px, 3fr) auto", design_css)
+        self.assertIn("@media (max-width: 620px)", design_css)
+        self.assertIn("grid-template-columns: minmax(0, 1fr) auto", design_css)
+        self.assertNotIn(".finder-landscape { border-radius:", design_css)
+
+    def test_projection_does_not_force_results_wider_than_the_mobile_viewport(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+        self.assertIn(".retirement-finder-page .finder-results > * { min-width: 0; }", design_css)
 
     def test_page_adds_specific_search_supporting_content_and_faq_schema(self) -> None:
         self.assertIn('id="how-matching-works"', self.html)
