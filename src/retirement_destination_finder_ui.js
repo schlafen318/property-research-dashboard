@@ -166,6 +166,29 @@
     };
   }
 
+  function finderProjectionAxisLabel(input) {
+    const year = Number(input.year);
+    const age = Number(input.currentAge) + year;
+    return (year === 0 ? "Now" : "+" + year + "y") + " · age " + age;
+  }
+
+  function finderProjectionView(input) {
+    const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
+    const closest = recommendations[0];
+    if (!closest) return null;
+    const shared = input.sharedProjection && Array.isArray(input.sharedProjection.annualProjection)
+      ? input.sharedProjection.annualProjection
+      : [];
+    const destinationSeries = Array.isArray(closest.annualProjection) ? closest.annualProjection : [];
+    const buyNow = input.housingPlan === "buy_now";
+    return {
+      heading: buyNow ? "Projection for " + closest.name : "Projected portfolio by year",
+      series: buyNow ? destinationSeries : shared,
+      targetValue: Number(closest.retirementTarget),
+      destinationName: closest.name,
+    };
+  }
+
   function escapeHtml(value) {
     return String(value === null || value === undefined ? "" : value).replace(/[&<>"']/g, function (character) {
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[character];
@@ -333,23 +356,23 @@
       renderCurrentResults();
     }
 
-    function renderChart(recommendation, user) {
+    function renderChart(view, user) {
       const figure = element("finder-projection-wrap");
       const barsLayer = element("finder-projection-bars");
       const fallback = element("finder-buy-now-chart-note");
-      const series = recommendation && Array.isArray(recommendation.annualProjection)
-        ? recommendation.annualProjection
+      const series = view && Array.isArray(view.series)
+        ? view.series
         : [];
       barsLayer.innerHTML = "";
       element("finder-chart-tooltip").hidden = true;
-      if (!recommendation || !series.length) {
+      if (!view || !series.length) {
         figure.hidden = true;
         fallback.hidden = false;
         return;
       }
       const model = finderProjectionModel({
         series: series,
-        targetValue: recommendation.retirementTarget,
+        targetValue: view.targetValue,
       });
       const count = model.years.length;
       const left = 34;
@@ -362,7 +385,7 @@
       const bars = model.years.map(function (point, index) {
         const x = left + index * step - barWidth / 2;
         const y = baseline - point.height;
-        const label = index === 0 ? "Now" : "+" + point.year + "y";
+        const label = finderProjectionAxisLabel({ year: point.year, currentAge: user.currentAge });
         const yearLabel = index % labelEvery === 0 || index === count - 1
           ? '<text class="finder-chart-axis-label" x="' + (left + index * step).toFixed(2) + '" y="278" text-anchor="middle">' + label + "</text>"
           : "";
@@ -372,7 +395,7 @@
           currency: selectedCurrency,
           ratesToUsd: ratesToUsd,
         });
-        return '<g class="finder-chart-year" tabindex="0" role="button" data-year-index="' + index +
+        return '<g class="finder-chart-year" tabindex="0" role="img" data-year-index="' + index +
           '" aria-label="' + escapeHtml(tooltipContent.accessibleLabel) + '" style="--year-delay:' +
           Math.round(index * delayStep) + 'ms"><rect class="finder-chart-bar" x="' + x.toFixed(2) +
           '" y="' + y.toFixed(2) + '" width="' + barWidth.toFixed(2) + '" height="' +
@@ -384,16 +407,14 @@
       targetLine.setAttribute("y1", model.targetY.toFixed(2));
       targetLine.setAttribute("y2", model.targetY.toFixed(2));
       targetLabel.setAttribute("y", Math.max(14, model.targetY - 6).toFixed(2));
-      targetLabel.textContent = "Target " + displayResultMoney(recommendation.retirementTarget);
-      element("finder-projection-heading").textContent = user.housingPlan === "buy_now"
-        ? "Projection for " + recommendation.name
-        : "Projected portfolio by year";
+      targetLabel.textContent = "Target " + displayResultMoney(view.targetValue);
+      element("finder-projection-heading").textContent = view.heading;
       element("finder-projection-desc").textContent = "Annual liquid portfolio progression from age " +
-        user.currentAge + " to retirement, compared with the target for " + recommendation.name + ".";
+        user.currentAge + " to retirement, compared with the target for " + view.destinationName + ".";
       const finalPoint = model.years[count - 1];
       element("finder-projection-caption").textContent = "At retirement: " +
-        displayResultMoney(finalPoint.portfolio) + ". Target for " + recommendation.name + ": " +
-        displayResultMoney(recommendation.retirementTarget) + ".";
+        displayResultMoney(finalPoint.portfolio) + ". Target for " + view.destinationName + ": " +
+        displayResultMoney(view.targetValue) + ".";
       const tooltip = element("finder-chart-tooltip");
       const groups = Array.from(barsLayer.querySelectorAll(".finder-chart-year"));
       function showTooltip(group) {
@@ -517,7 +538,11 @@
       element("finder-monthly-summary").textContent = displayResultMoney(user.monthlyPortfolioContribution);
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
       currentRecommendations = result.recommendations.slice(0, 12);
-      renderChart(currentRecommendations[0], user);
+      renderChart(finderProjectionView({
+        housingPlan: user.housingPlan,
+        sharedProjection: result.sharedProjection,
+        recommendations: currentRecommendations,
+      }), user);
       element("finder-result-read").textContent = resultSummaryRead({
         withinReachCount: result.summary.withinReachCount,
         recommendations: currentRecommendations,
@@ -626,6 +651,8 @@
     tierLabel: tierLabel,
     finderProjectionModel: finderProjectionModel,
     finderProjectionTooltip: finderProjectionTooltip,
+    finderProjectionAxisLabel: finderProjectionAxisLabel,
+    finderProjectionView: finderProjectionView,
     initRetirementDestinationFinder: initRetirementDestinationFinder,
   };
 });

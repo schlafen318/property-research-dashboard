@@ -266,6 +266,74 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             tooltip["accessibleLabel"],
         )
 
+    def test_projection_axis_label_shows_elapsed_years_and_age(self) -> None:
+        self.assertEqual(
+            "Now · age 50",
+            run_ui("finderProjectionAxisLabel", {"year": 0, "currentAge": 50}),
+        )
+        self.assertEqual(
+            "+7y · age 57",
+            run_ui("finderProjectionAxisLabel", {"year": 7, "currentAge": 50}),
+        )
+
+    def test_non_buy_now_projection_view_uses_shared_series_and_closest_target(self) -> None:
+        self.assertEqual(
+            {
+                "heading": "Projected portfolio by year",
+                "series": [{"year": 0, "portfolio": 500000}],
+                "targetValue": 700000,
+                "destinationName": "Valencia",
+            },
+            run_ui(
+                "finderProjectionView",
+                {
+                    "housingPlan": "rent",
+                    "sharedProjection": {"annualProjection": [{"year": 0, "portfolio": 500000}]},
+                    "recommendations": [
+                        {
+                            "name": "Valencia",
+                            "retirementTarget": 700000,
+                            "annualProjection": [{"year": 0, "portfolio": 1}],
+                        }
+                    ],
+                },
+            ),
+        )
+
+    def test_buy_now_projection_view_uses_closest_destination_series(self) -> None:
+        self.assertEqual(
+            {
+                "heading": "Projection for Fukuoka / Itoshima",
+                "series": [{"year": 0, "portfolio": 420000}],
+                "targetValue": 650000,
+                "destinationName": "Fukuoka / Itoshima",
+            },
+            run_ui(
+                "finderProjectionView",
+                {
+                    "housingPlan": "buy_now",
+                    "sharedProjection": {"annualProjection": [{"year": 0, "portfolio": 999999}]},
+                    "recommendations": [
+                        {
+                            "name": "Fukuoka / Itoshima",
+                            "retirementTarget": 650000,
+                            "annualProjection": [{"year": 0, "portfolio": 420000}],
+                        },
+                        {
+                            "name": "Valencia",
+                            "retirementTarget": 600000,
+                            "annualProjection": [{"year": 0, "portfolio": 510000}],
+                        },
+                    ],
+                },
+            ),
+        )
+
+    def test_focusable_projection_points_use_non_button_semantics(self) -> None:
+        source = UI.read_text()
+        self.assertIn('class="finder-chart-year" tabindex="0" role="img"', source)
+        self.assertNotIn('class="finder-chart-year" tabindex="0" role="button"', source)
+
     def test_ui_does_not_store_or_transmit_financial_values(self) -> None:
         source = UI.read_text()
         for forbidden in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage"):

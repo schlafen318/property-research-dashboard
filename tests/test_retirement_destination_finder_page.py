@@ -162,7 +162,10 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
     def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
         self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)
+        self.assertIn('<div class="finder-projection-scroll">', self.html)
+        self.assertIn(".finder-projection-scroll{overflow-x:auto", self.html)
         self.assertIn(".finder-projection-chart{display:block;width:100%;height:auto", self.html)
+        self.assertIn("min-width:640px", self.html)
         self.assertIn(".finder-chart-bar{fill:#315e50", self.html)
         self.assertIn(".finder-chart-target{stroke:#9b6a33", self.html)
         self.assertIn("@media(prefers-reduced-motion:reduce)", self.html)

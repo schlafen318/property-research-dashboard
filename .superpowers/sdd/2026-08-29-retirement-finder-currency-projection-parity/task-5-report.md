@@ -25,3 +25,19 @@ Replaced the retirement destination finder's flex-button projection with the cal
 - `tests/test_retirement_destination_finder_ui.py`
 
 Generated artifacts and unrelated changes were not staged.
+
+## Fix round 1
+
+Addressed the projection review findings:
+
+- Sparse visible x-axis labels now pair elapsed years with the corresponding age.
+- A horizontally scrollable chart viewport and 640px SVG minimum width preserve legibility on narrow screens.
+- Added pure `finderProjectionView` coverage proving non-buy-now uses the shared series while buy-now uses the closest sorted recommendation's destination-specific series, target, and heading.
+- Focusable annual points now use non-button image semantics while retaining complete accessible labels and focus-triggered tooltips.
+
+### Fix verification
+
+- RED: the focused finder page/UI suite failed with three missing-helper errors and two expected markup/semantics failures.
+- GREEN focused: `python3 -m unittest tests.test_retirement_destination_finder_page tests.test_retirement_destination_finder_ui` — 39 tests passed.
+- GREEN full: `python3 -m unittest` — 900 tests passed.
+- `git diff --check -- src tests` passed.

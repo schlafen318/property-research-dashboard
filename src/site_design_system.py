@@ -382,7 +382,8 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-summary strong { font-size: clamp(23px, 2.6vw, 31px); }
     .retirement-finder-page .finder-projection-wrap { position: relative; margin-bottom: 36px; padding: 18px 0 32px; border-top: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-projection-wrap h3 { margin: 0 0 12px; font-size: 24px; }
-    .retirement-finder-page .finder-projection-chart { display: block; width: 100%; height: auto; overflow: visible; }
+    .retirement-finder-page .finder-projection-scroll { overflow-x: auto; overscroll-behavior-inline: contain; }
+    .retirement-finder-page .finder-projection-chart { display: block; width: 100%; min-width: 640px; height: auto; overflow: visible; }
     .retirement-finder-page .finder-chart-axis { stroke: var(--gha-rule); stroke-width: 1; }
     .retirement-finder-page .finder-chart-target { stroke: #9b6a33; stroke-width: 1.5; stroke-dasharray: 5 4; }
     .retirement-finder-page .finder-chart-target-label { fill: #7a5227; font-size: 11px; font-weight: 500; }
