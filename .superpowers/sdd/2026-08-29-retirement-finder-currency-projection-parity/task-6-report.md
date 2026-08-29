@@ -1,6 +1,4 @@
-## Task 6 verification report — steps 1–3 and repository scope
-
-Browser QA and independent review are intentionally excluded from this report.
+## Task 6 verification report
 
 ### Focused calculator coverage
 
@@ -37,3 +35,20 @@ Browser QA and independent review are intentionally excluded from this report.
 - Base commit `fec1986` is an ancestor of `HEAD`.
 - Branch-only committed tracked changes are confined to the finder source/UI/page/design-system files, finder tests, and this initiative's specification, plan, and task reports.
 - Existing generated `artifacts/` modifications and untracked generated directories remain unstaged and were not added to any commit.
+
+### Browser QA
+
+Verified the rebuilt static artifact from a temporary local server at desktop and narrow responsive widths:
+
+- USD loaded by default; all five money inputs used comma-formatted values.
+- Switching USD → SGD converted each populated money field once; switching back restored the original USD values.
+- Invalid money text remained intact, set `aria-invalid="true"`, and exposed the native validation message `Enter a valid amount.` rather than coercing to zero.
+- Pension and other dependable income were monthly and inflation-linked by default.
+- Result summaries, recommendation amounts, target labels, captions, and keyboard tooltips used SGD.
+- Destination order and financial tiers were identical after changing currencies.
+- Buy-now rendered `Projection for Hakone / Izu`, matching the closest recommendation and its destination-specific target.
+- Keyboard focus revealed a complete `Year 0 · age 50` tooltip with an SGD value.
+- Narrow layout kept the 640px SVG readable inside a horizontal scroller without page-level horizontal overflow.
+- Browser console contained no warnings or errors.
+
+Independent final review follows this report.
