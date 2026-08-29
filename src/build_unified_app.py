@@ -1854,22 +1854,55 @@ def related_guide_pages(page: dict, pages: list[dict], limit: int = 4, priority_
 
 
 def contextual_related_guides(page: dict, pages: list[dict], auto_links: list[dict] | None = None) -> str:
-    priority_slugs = [
-        str(item.get("target_slug"))
+    approved = [
+        item
         for item in auto_links or []
-        if item.get("source_slug") == page.get("slug") and item.get("target_slug")
+        if item.get("source_slug") == page.get("slug")
     ]
+    by_slug = {candidate["slug"]: candidate for candidate in pages}
     cards = []
-    for candidate in related_guide_pages(page, pages, priority_slugs=priority_slugs):
+    seen_hrefs: set[str] = set()
+
+    def append_card(href: str, anchor: str, theme: str, description: str) -> None:
+        if not href or href in seen_hrefs:
+            return
+        seen_hrefs.add(href)
         cards.append(
             f"""
             <article class="seo-link-card">
-              <span>{escape(candidate["theme"])}</span>
-              <h3><a href="/{escape(candidate["slug"])}/">{escape(candidate["h1"])}</a></h3>
-              <p>{escape(candidate["description"])}</p>
+              <span>{escape(theme)}</span>
+              <h3><a href="{escape(href)}" data-track="internal_page_click" data-track-label="seo authority {escape(page['slug'])}">{escape(anchor)}</a></h3>
+              <p>{escape(description)}</p>
             </article>
             """.rstrip()
         )
+
+    for item in approved:
+        candidate = by_slug.get(str(item.get("target_slug", "")))
+        if candidate:
+            append_card(
+                f'/{candidate["slug"]}/',
+                str(item.get("anchor") or candidate["h1"]),
+                str(item.get("theme") or candidate["theme"]),
+                str(item.get("description") or candidate["description"]),
+            )
+        elif item.get("target_path"):
+            append_card(
+                str(item["target_path"]),
+                str(item.get("anchor", "Related research")),
+                str(item.get("theme", "Related research")),
+                str(item.get("description", "Continue with the related market research.")),
+            )
+
+    for candidate in related_guide_pages(page, pages):
+        append_card(
+            f'/{candidate["slug"]}/',
+            candidate["h1"],
+            candidate["theme"],
+            candidate["description"],
+        )
+        if len(cards) >= 4:
+            break
     return "\n".join(cards)
 
 

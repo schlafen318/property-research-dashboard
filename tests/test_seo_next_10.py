@@ -196,5 +196,39 @@ class RankingIntentTests(unittest.TestCase):
         self.assertIn('href="/where-can-foreigners-buy-property/"', html)
 
 
+class InternalAuthorityTests(unittest.TestCase):
+    def test_priority_pages_receive_descriptive_tracked_internal_links(self) -> None:
+        auto_links = build_unified_app.load_auto_internal_links()
+        cases = [
+            (
+                "best-places-to-buy-a-second-home-abroad",
+                "/destinations/queenstown/",
+                "Queenstown property market and foreign-buyer guide",
+            ),
+            (
+                "where-can-foreigners-buy-property",
+                "/thailand-villa-ownership-foreigners/",
+                "foreign buyer guide to Thailand villas",
+            ),
+            (
+                "foreign-property-investment-risks",
+                "/overseas-property-investment/",
+                "overseas property investment markets compared",
+            ),
+        ]
+
+        for source_slug, target_href, anchor in cases:
+            with self.subTest(source_slug=source_slug):
+                source = next(page for page in build_unified_app.SEO_PAGES if page["slug"] == source_slug)
+                html = build_unified_app.contextual_related_guides(
+                    source,
+                    build_unified_app.SEO_PAGES,
+                    auto_links=auto_links,
+                )
+                self.assertIn(f'href="{target_href}"', html)
+                self.assertIn(anchor, html)
+                self.assertIn('data-track="internal_page_click"', html)
+
+
 if __name__ == "__main__":
     unittest.main()
