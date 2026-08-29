@@ -1,0 +1,40 @@
+{
+  "cases": [
+    {
+      "name": "default",
+      "raw_profile": {},
+      "normalized_profile": {"stay_mode": "part_year", "age": 50, "household": "single", "housing": "rent", "mobility_rights": "prefer_not_to_say", "home_tax_context": "prefer_not_to_say", "annual_days": null, "income_type": "prefer_not_to_say", "activity_priority": "balanced"},
+      "expected": {"ordered_ids": ["alpha"], "statuses": ["eligible"], "scores": [3.23], "annual_budgets": [60000], "warning_substrings": []}
+    },
+    {
+      "name": "seasonal_under_50",
+      "raw_profile": {"stay_mode": "seasonal", "age": 49},
+      "normalized_profile": {"stay_mode": "seasonal", "age": 49, "household": "single", "housing": "rent", "mobility_rights": "prefer_not_to_say", "home_tax_context": "prefer_not_to_say", "annual_days": null, "income_type": "prefer_not_to_say", "activity_priority": "balanced"},
+      "expected": {"ordered_ids": ["alpha"], "statuses": ["eligible"], "scores": [3.23], "annual_budgets": [60000], "warning_substrings": []}
+    },
+    {
+      "name": "exact_minimum_age",
+      "raw_profile": {"age": 50},
+      "normalized_profile": {"stay_mode": "part_year", "age": 50, "household": "single", "housing": "rent", "mobility_rights": "prefer_not_to_say", "home_tax_context": "prefer_not_to_say", "annual_days": null, "income_type": "prefer_not_to_say", "activity_priority": "balanced"},
+      "expected": {"ordered_ids": ["alpha"], "statuses": ["conditional"], "scores": [3.23], "annual_budgets": [60000], "warning_substrings": []}
+    },
+    {
+      "name": "full_relocation_unavailable",
+      "raw_profile": {"stay_mode": "full_relocation"},
+      "normalized_profile": {"stay_mode": "full_relocation", "age": 50, "household": "single", "housing": "rent", "mobility_rights": "prefer_not_to_say", "home_tax_context": "prefer_not_to_say", "annual_days": null, "income_type": "prefer_not_to_say", "activity_priority": "balanced"},
+      "expected": {"ordered_ids": ["alpha"], "statuses": ["not_eligible"], "scores": [null], "annual_budgets": [60000], "warning_substrings": []}
+    },
+    {
+      "name": "consulting_passive_only",
+      "raw_profile": {"income_type": "business_consulting"},
+      "normalized_profile": {"stay_mode": "part_year", "age": 50, "household": "single", "housing": "rent", "mobility_rights": "prefer_not_to_say", "home_tax_context": "prefer_not_to_say", "annual_days": null, "income_type": "business_consulting", "activity_priority": "balanced"},
+      "expected": {"ordered_ids": ["alpha"], "statuses": ["eligible"], "scores": [3.18], "annual_budgets": [60000], "warning_substrings": []}
+    },
+    {
+      "name": "us_person_over_tax_threshold",
+      "raw_profile": {"home_tax_context": "us_person", "annual_days": 183},
+      "normalized_profile": {"stay_mode": "part_year", "age": 50, "household": "single", "housing": "rent", "mobility_rights": "prefer_not_to_say", "home_tax_context": "us_person", "annual_days": 183, "income_type": "prefer_not_to_say", "activity_priority": "balanced"},
+      "expected": {"ordered_ids": ["alpha"], "statuses": ["eligible"], "scores": [3.23], "annual_budgets": [60000], "warning_substrings": ["worldwide filing", "Tax residence likely"]}
+    }
+  ]
+}

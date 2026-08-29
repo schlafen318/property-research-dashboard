@@ -53,6 +53,37 @@ CANONICAL_LAUNCH_IDS = frozenset(
 
 _UNRANKED_STATUSES = frozenset({"needs_verification", "not_eligible"})
 
+PROFILE_DEFAULTS = {
+    "stay_mode": "part_year",
+    "age": 50,
+    "household": "single",
+    "housing": "rent",
+    "mobility_rights": "prefer_not_to_say",
+    "home_tax_context": "prefer_not_to_say",
+    "annual_days": None,
+    "income_type": "prefer_not_to_say",
+    "activity_priority": "balanced",
+}
+PROFILE_ALLOWLISTS = {
+    "stay_mode": VALID_STAY_MODES,
+    "household": frozenset({"single", "couple"}),
+    "housing": frozenset({"rent", "own", "buy_now", "buy_retirement"}),
+    "mobility_rights": frozenset(
+        {"local_free_movement", "general_nonlocal", "prefer_not_to_say"}
+    ),
+    "home_tax_context": frozenset({"us_person", "other", "prefer_not_to_say"}),
+    "income_type": frozenset(
+        {"portfolio", "pension", "property", "business_consulting", "mixed", "prefer_not_to_say"}
+    ),
+    "activity_priority": frozenset(
+        {"balanced", "walking", "cycling", "hiking", "water", "winter_sports", "fitness_social"}
+    ),
+}
+COST_SCORE_ANCHORS = {
+    "single": {"five": 30_000, "zero": 90_000},
+    "couple": {"five": 45_000, "zero": 135_000},
+}
+
 _REVIEW_POLICY_KEYS = frozenset(
     {
         "immigration_days",
@@ -90,6 +121,332 @@ _HEALTHCARE_SUMMARIES = (
 
 def load_fire_abroad(path: Path = FIRE_ABROAD_PATH) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def normalize_fire_profile(raw: dict) -> dict:
+    """Return the fixed, safe FIRE Abroad profile contract for a user input."""
+
+    raw = raw if isinstance(raw, dict) else {}
+    normalized = dict(PROFILE_DEFAULTS)
+    for key, allowed in PROFILE_ALLOWLISTS.items():
+        value = raw.get(key)
+        if isinstance(value, str) and value in allowed:
+            normalized[key] = value
+
+    age = raw.get("age")
+    if isinstance(age, (int, float)) and not isinstance(age, bool):
+        normalized["age"] = max(18, min(100, int(age)))
+
+    annual_days = raw.get("annual_days")
+    if isinstance(annual_days, int) and not isinstance(annual_days, bool) and 1 <= annual_days <= 366:
+        normalized["annual_days"] = annual_days
+    return normalized
+
+
+def eligibility_for_mode(country: dict, profile: dict) -> dict:
+    """Evaluate the selected stay route without guessing nationality-specific rights."""
+
+    mode = profile["stay_mode"]
+    routes = country.get("stay_routes", {}) if isinstance(country, dict) else {}
+    route = routes.get(mode) if isinstance(routes, dict) else None
+    if not isinstance(route, dict):
+        return {
+            "status": "needs_verification",
+            "reason": "No documented route is available for this stay mode.",
+            "work_permission": "unclear",
+            "stay_score": None,
+        }
+
+    status = route.get("status")
+    summary = route.get("summary")
+    summary = summary if isinstance(summary, str) and summary else "Route conditions require confirmation."
+    work_permission = route.get("work_permission")
+    if work_permission not in VALID_WORK_PERMISSIONS:
+        work_permission = "unclear"
+
+    rights = route.get("mobility_rights")
+    if isinstance(rights, dict):
+        selected = rights.get(profile["mobility_rights"])
+        if not isinstance(selected, str) or selected not in VALID_ELIGIBILITY:
+            return {
+                "status": "needs_verification",
+                "reason": "Nationality-dependent mobility rights must be confirmed.",
+                "work_permission": work_permission,
+                "stay_score": None,
+            }
+        status = selected
+
+    minimum_age = route.get("minimum_age")
+    if isinstance(minimum_age, int) and not isinstance(minimum_age, bool) and profile["age"] < minimum_age:
+        return {
+            "status": "not_eligible",
+            "reason": f"This route requires an age of at least {minimum_age}.",
+            "work_permission": work_permission,
+            "stay_score": 0.0,
+        }
+
+    if status not in VALID_ELIGIBILITY:
+        status = "needs_verification"
+    base_score = route.get("base_score")
+    if status in _UNRANKED_STATUSES or not isinstance(base_score, (int, float)) or isinstance(base_score, bool):
+        score = None
+    else:
+        score = float(base_score)
+        if profile["income_type"] == "business_consulting":
+            if work_permission == "passive_only":
+                score -= 0.5
+            elif work_permission == "unclear":
+                score -= 1.0
+        score = round(max(0.0, min(5.0, score)), 2)
+    return {
+        "status": status,
+        "reason": summary,
+        "work_permission": work_permission,
+        "stay_score": score,
+    }
+
+
+def annual_cost_score(annual_total_usd: float, household: str) -> float:
+    anchors = COST_SCORE_ANCHORS[household]
+    ratio = (annual_total_usd - anchors["five"]) / (anchors["zero"] - anchors["five"])
+    return round(max(0.0, min(5.0, 5.0 * (1.0 - ratio))), 2)
+
+
+def build_resilience_budget(
+    cost: dict, profile: dict, destination_override: dict | None = None
+) -> dict:
+    """Build an annual screening budget without mixing recurring and one-time costs."""
+
+    cost = cost if isinstance(cost, dict) else {}
+    profiles = cost.get("profiles", {})
+    household_cost = profiles.get(profile["household"], {}) if isinstance(profiles, dict) else {}
+    raw_categories = household_cost.get("categories_usd", {}) if isinstance(household_cost, dict) else {}
+    categories = {
+        key: value
+        for key, value in raw_categories.items()
+        if isinstance(key, str) and isinstance(value, (int, float)) and not isinstance(value, bool)
+    } if isinstance(raw_categories, dict) else {}
+
+    housing = profile["housing"]
+    if housing in {"rent", "buy_retirement"}:
+        housing_cost = household_cost.get("annual_rent_usd", 0)
+        housing_key = "rent"
+    else:
+        housing_cost = household_cost.get("annual_owner_costs_usd", 0)
+        housing_key = "owner_costs"
+    if isinstance(housing_cost, (int, float)) and not isinstance(housing_cost, bool):
+        categories[housing_key] = housing_cost
+
+    property_record = cost.get("property", {}) if isinstance(cost.get("property"), dict) else {}
+    property_capital = 0
+    if housing in {"buy_now", "buy_retirement"}:
+        price = property_record.get("representative_price_usd", 0)
+        rate = property_record.get("acquisition_cost_rate", 0)
+        if isinstance(price, (int, float)) and not isinstance(price, bool) and isinstance(rate, (int, float)) and not isinstance(rate, bool):
+            property_capital = round(price * (1 + rate), 2)
+
+    recurring_without_contingency = sum(
+        value for key, value in categories.items() if key != "contingency"
+    )
+    # Use half-up rounding so the matching browser implementation has the same result.
+    currency_inflation_buffer = int(recurring_without_contingency * 0.10 + 0.5)
+    annual_total = round(sum(categories.values()) + currency_inflation_buffer, 2)
+    override = destination_override if isinstance(destination_override, dict) else {}
+    relocation = override.get("one_time_relocation_usd", 0)
+    if not isinstance(relocation, (int, float)) or isinstance(relocation, bool):
+        relocation = 0
+    return {
+        "annual_total_usd": annual_total,
+        "categories": categories,
+        "currency_inflation_buffer": currency_inflation_buffer,
+        "property_capital_usd": property_capital,
+        "one_time_relocation_usd": relocation,
+    }
+
+
+def resolve_country_record(destination: dict, payload: dict) -> dict:
+    """Find the country overlay named by a destination's validated override."""
+
+    destination_id = destination.get("id") if isinstance(destination, dict) else None
+    overrides = payload.get("destination_overrides", {}) if isinstance(payload, dict) else {}
+    override = overrides.get(destination_id, {}) if isinstance(overrides, dict) else {}
+    country_id = override.get("country") if isinstance(override, dict) else None
+    countries = payload.get("countries", {}) if isinstance(payload, dict) else {}
+    country = countries.get(country_id, {}) if isinstance(countries, dict) else {}
+    return country if isinstance(country, dict) else {}
+
+
+def _numeric_score(value: Any) -> float | None:
+    if isinstance(value, dict):
+        value = value.get("score")
+    if isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value <= 5:
+        return float(value)
+    return None
+
+
+def active_life_score(record: dict) -> float:
+    """Calculate the published Active Life composite from its four evidence components."""
+
+    active_life = record.get("active_life", record) if isinstance(record, dict) else {}
+    if not isinstance(active_life, dict):
+        return 0.0
+    total = 0.0
+    for component, weight in ACTIVE_LIFE_WEIGHTS.items():
+        score = _numeric_score(active_life.get(component))
+        if score is None:
+            return 0.0
+        total += score * weight
+    return round(total, 2)
+
+
+def _destination_score(destination: dict, dimension: str, fallbacks: tuple[str, ...] = ()) -> float | None:
+    value = _numeric_score(destination.get(dimension))
+    if value is not None:
+        return value
+    for container_key in ("dimensions", "scores"):
+        container = destination.get(container_key)
+        if isinstance(container, dict):
+            value = _numeric_score(container.get(dimension))
+            if value is not None:
+                return value
+    fallback_scores = [_destination_score(destination, key) for key in fallbacks]
+    usable = [score for score in fallback_scores if score is not None]
+    return round(sum(usable) / len(usable), 2) if len(usable) == len(fallbacks) else None
+
+
+def _status_priority(status: str) -> int:
+    return {"eligible": 0, "conditional": 1, "needs_verification": 2, "not_eligible": 3}.get(status, 2)
+
+
+def _worst_status(*statuses: str) -> str:
+    return max(statuses, key=_status_priority)
+
+
+def _retirement_cost_for(destination_id: str, retirement_costs: dict[str, dict]) -> dict | None:
+    if isinstance(retirement_costs, dict):
+        direct = retirement_costs.get(destination_id)
+        if isinstance(direct, dict):
+            return direct
+        rows = retirement_costs.get("destinations")
+        if isinstance(rows, list):
+            return next((row for row in rows if isinstance(row, dict) and row.get("destination_id") == destination_id), None)
+    return None
+
+
+def rank_fire_abroad_destinations(
+    destinations: list[dict],
+    retirement_costs: dict[str, dict],
+    fire_payload: dict,
+    profile: dict,
+) -> list[dict]:
+    """Return stable FIRE Abroad destination view models for the selected profile."""
+
+    profile = normalize_fire_profile(profile)
+    overrides = fire_payload.get("destination_overrides", {}) if isinstance(fire_payload, dict) else {}
+    results: list[dict] = []
+    for destination in destinations:
+        if not isinstance(destination, dict):
+            continue
+        destination_id = destination.get("id")
+        if not isinstance(destination_id, str):
+            continue
+        override = overrides.get(destination_id, {}) if isinstance(overrides, dict) else {}
+        override = override if isinstance(override, dict) else {}
+        country = resolve_country_record(destination, fire_payload)
+        eligibility = eligibility_for_mode(country, profile)
+        mode = profile["stay_mode"]
+        tax = country.get("tax", {}) if isinstance(country.get("tax"), dict) else {}
+        tax_modes = tax.get("by_mode", {}) if isinstance(tax.get("by_mode"), dict) else {}
+        tax_mode = tax_modes.get(mode, {}) if isinstance(tax_modes.get(mode), dict) else {}
+        healthcare = country.get("healthcare", {}) if isinstance(country.get("healthcare"), dict) else {}
+        health_modes = healthcare.get("by_mode", {}) if isinstance(healthcare.get("by_mode"), dict) else {}
+        health_mode = health_modes.get(mode, {}) if isinstance(health_modes.get(mode), dict) else {}
+
+        tax_score = _numeric_score(tax_mode.get("compatibility_score"))
+        health_score = _numeric_score(health_mode.get("bridge_score"))
+        tax_status = tax_mode.get("status") if isinstance(tax_mode.get("status"), str) else "needs_verification"
+        health_status = health_mode.get("eligibility") if isinstance(health_mode.get("eligibility"), str) else "needs_verification"
+        evidence_missing = (
+            tax_mode.get("rankable") is not True
+            or tax_score is None
+            or health_score is None
+            or tax_status in _UNRANKED_STATUSES
+            or health_status in _UNRANKED_STATUSES
+        )
+        status = _worst_status(eligibility["status"], tax_status, health_status)
+        if evidence_missing and status != "not_eligible":
+            status = "needs_verification"
+
+        cost = _retirement_cost_for(destination_id, retirement_costs)
+        budget = build_resilience_budget(cost or {}, profile, override)
+        active = active_life_score(override)
+        global_access = _destination_score(destination, "global_access", ("airport_access", "business_hub_access"))
+        community_fit = _destination_score(destination, "foreigner_fit", ("chinese_foreigner_friendliness",))
+        exit_liquidity = _destination_score(destination, "exit_liquidity")
+        ownership_clarity = _destination_score(destination, "ownership_clarity")
+        rent_flexibility = _numeric_score(override.get("rent_flexibility_score"))
+        property_exit = None
+        if None not in (exit_liquidity, ownership_clarity, rent_flexibility):
+            property_exit = round((exit_liquidity + ownership_clarity + rent_flexibility) / 3, 2)
+        cost_score = annual_cost_score(budget["annual_total_usd"], profile["household"]) if cost else None
+        components = {
+            "active_life": active,
+            "sustainable_annual_cost": cost_score,
+            "healthcare_bridge": health_score,
+            "stay_flexibility": eligibility["stay_score"],
+            "tax_compatibility": tax_score,
+            "global_access": global_access,
+            "community_fit": community_fit,
+            "property_exit_flexibility": property_exit,
+        }
+        components = {key: round(value, 2) if value is not None else None for key, value in components.items()}
+        if any(value is None for value in components.values()) and status != "not_eligible":
+            status = "needs_verification"
+        score = None
+        if status in {"eligible", "conditional"}:
+            score = round(sum(components[key] * FIRE_WEIGHTS[key] for key in FIRE_WEIGHTS), 2)
+
+        warnings = list(override.get("risk_warnings", [])) if isinstance(override.get("risk_warnings"), list) else []
+        if profile["home_tax_context"] == "us_person":
+            warnings.append("US persons generally remain subject to U.S. worldwide filing and reporting obligations.")
+        threshold = tax.get("standard_day_threshold")
+        if isinstance(threshold, int) and profile["annual_days"] is not None and profile["annual_days"] >= threshold:
+            warnings.append("Tax residence likely at the selected day count.")
+        non_day_tests = tax.get("non_day_tests")
+        if isinstance(non_day_tests, str) and non_day_tests:
+            warnings.append(non_day_tests)
+
+        active_life = override.get("active_life", {}) if isinstance(override.get("active_life"), dict) else {}
+        strongest = max(
+            active_life.values(), key=lambda item: _numeric_score(item) or 0, default={}
+        )
+        strongest_reason = strongest.get("summary", "") if isinstance(strongest, dict) else ""
+        status_reason = eligibility["reason"]
+        if status == "needs_verification" and evidence_missing:
+            status_reason = "Tax or healthcare evidence for this stay mode needs verification."
+        results.append({
+            "destination_id": destination_id,
+            "name": destination.get("name", destination_id),
+            "status": status,
+            "status_reason": status_reason,
+            "score": score,
+            "components": components,
+            "resilience_budget": budget,
+            "work_permission": eligibility["work_permission"],
+            "warnings": warnings,
+            "strongest_activity_reason": strongest_reason,
+            "confidence": override.get("confidence", "low"),
+            "last_reviewed": override.get("last_reviewed"),
+        })
+
+    confidence_rank = {"high": 0, "medium_high": 1, "medium": 2, "low": 3}
+    results.sort(key=lambda item: (
+        _status_priority(item["status"]),
+        -(item["score"] if item["score"] is not None else -1),
+        confidence_rank.get(item["confidence"], 4),
+        item["name"],
+    ))
+    return results
 
 
 def validate_fire_abroad_payload(
