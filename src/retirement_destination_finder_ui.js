@@ -129,23 +129,41 @@
     }[value] || "Not classified";
   }
 
-  function chartTooltip(point) {
-    const heading = "Year " + Number(point.year);
+  function finderProjectionModel(input) {
+    const series = Array.isArray(input.series) ? input.series : [];
+    const targetValue = Math.max(0, Number(input.targetValue) || 0);
+    const maximum = Math.max.apply(null, series.map(function (point) {
+      return Math.max(0, Number(point.portfolio) || 0);
+    }).concat([targetValue, 1]));
+    return {
+      maximum: maximum,
+      targetY: 258 - targetValue / maximum * 240,
+      years: series.map(function (point) {
+        const portfolio = Math.max(0, Number(point.portfolio) || 0);
+        return {
+          year: Number(point.year),
+          portfolio: portfolio,
+          height: portfolio / maximum * 240,
+        };
+      }),
+    };
+  }
+
+  function finderProjectionTooltip(input) {
+    const point = input.point;
+    const year = Number(point.year);
+    const age = Number(input.currentAge) + year;
+    const heading = "Year " + year + " · age " + age;
     const value = resultMoney({
       amountUsd: Number(point.portfolio),
-      currency: point.currency || "USD",
-      ratesToUsd: point.ratesToUsd || { USD: 1 },
+      currency: input.currency || "USD",
+      ratesToUsd: input.ratesToUsd || { USD: 1 },
     });
     return {
       heading: heading,
       value: value,
-      accessibleLabel: heading + ", projected portfolio " + value + ".",
+      accessibleLabel: "Year " + year + ", age " + age + ". Projected portfolio " + value + ".",
     };
-  }
-
-  function mobileChartWidth(pointCount) {
-    const count = Math.max(1, Math.floor(Number(pointCount) || 0));
-    return count * 44 + (count - 1) * 5;
   }
 
   function escapeHtml(value) {
@@ -315,43 +333,95 @@
       renderCurrentResults();
     }
 
-    function renderChart(projection) {
-      const chart = element("finder-projection-bars");
-      chart.innerHTML = "";
-      if (!projection || !projection.annualProjection) {
-        element("finder-projection-wrap").hidden = true;
-        element("finder-buy-now-chart-note").hidden = false;
+    function renderChart(recommendation, user) {
+      const figure = element("finder-projection-wrap");
+      const barsLayer = element("finder-projection-bars");
+      const fallback = element("finder-buy-now-chart-note");
+      const series = recommendation && Array.isArray(recommendation.annualProjection)
+        ? recommendation.annualProjection
+        : [];
+      barsLayer.innerHTML = "";
+      element("finder-chart-tooltip").hidden = true;
+      if (!recommendation || !series.length) {
+        figure.hidden = true;
+        fallback.hidden = false;
         return;
       }
-      element("finder-projection-wrap").hidden = false;
-      element("finder-buy-now-chart-note").hidden = true;
-      chart.style.setProperty("--finder-chart-mobile-width", mobileChartWidth(projection.annualProjection.length) + "px");
-      const maximum = Math.max.apply(null, projection.annualProjection.map(function (point) {
-        return Math.max(0, Number(point.portfolio));
-      }).concat([1]));
-      projection.annualProjection.forEach(function (point, index) {
-        const button = document.createElement("button");
-        const tooltip = chartTooltip({
-          year: point.year,
-          portfolio: point.portfolio,
+      const model = finderProjectionModel({
+        series: series,
+        targetValue: recommendation.retirementTarget,
+      });
+      const count = model.years.length;
+      const left = 34;
+      const baseline = 258;
+      const plotWidth = 572;
+      const step = count > 1 ? plotWidth / (count - 1) : plotWidth;
+      const barWidth = Math.max(5, Math.min(18, step * 0.62));
+      const labelEvery = Math.max(1, Math.ceil((count - 1) / 6));
+      const delayStep = count > 1 ? Math.min(90, 2400 / (count - 1)) : 0;
+      const bars = model.years.map(function (point, index) {
+        const x = left + index * step - barWidth / 2;
+        const y = baseline - point.height;
+        const label = index === 0 ? "Now" : "+" + point.year + "y";
+        const yearLabel = index % labelEvery === 0 || index === count - 1
+          ? '<text class="finder-chart-axis-label" x="' + (left + index * step).toFixed(2) + '" y="278" text-anchor="middle">' + label + "</text>"
+          : "";
+        const tooltipContent = finderProjectionTooltip({
+          currentAge: user.currentAge,
+          point: point,
           currency: selectedCurrency,
           ratesToUsd: ratesToUsd,
         });
-        button.type = "button";
-        button.className = "finder-chart-bar";
-        button.style.height = Math.max(3, Number(point.portfolio) / maximum * 100) + "%";
-        button.style.animationDelay = index * 35 + "ms";
-        button.setAttribute("aria-label", tooltip.accessibleLabel);
-        button.dataset.heading = tooltip.heading;
-        button.dataset.value = tooltip.value;
-        chart.appendChild(button);
+        return '<g class="finder-chart-year" tabindex="0" role="button" data-year-index="' + index +
+          '" aria-label="' + escapeHtml(tooltipContent.accessibleLabel) + '" style="--year-delay:' +
+          Math.round(index * delayStep) + 'ms"><rect class="finder-chart-bar" x="' + x.toFixed(2) +
+          '" y="' + y.toFixed(2) + '" width="' + barWidth.toFixed(2) + '" height="' +
+          point.height.toFixed(2) + '"></rect>' + yearLabel + "</g>";
+      }).join("");
+      barsLayer.innerHTML = '<line class="finder-chart-axis" x1="22" y1="258" x2="618" y2="258"></line>' + bars;
+      const targetLine = element("finder-chart-target");
+      const targetLabel = element("finder-chart-target-label");
+      targetLine.setAttribute("y1", model.targetY.toFixed(2));
+      targetLine.setAttribute("y2", model.targetY.toFixed(2));
+      targetLabel.setAttribute("y", Math.max(14, model.targetY - 6).toFixed(2));
+      targetLabel.textContent = "Target " + displayResultMoney(recommendation.retirementTarget);
+      element("finder-projection-heading").textContent = user.housingPlan === "buy_now"
+        ? "Projection for " + recommendation.name
+        : "Projected portfolio by year";
+      element("finder-projection-desc").textContent = "Annual liquid portfolio progression from age " +
+        user.currentAge + " to retirement, compared with the target for " + recommendation.name + ".";
+      const finalPoint = model.years[count - 1];
+      element("finder-projection-caption").textContent = "At retirement: " +
+        displayResultMoney(finalPoint.portfolio) + ". Target for " + recommendation.name + ": " +
+        displayResultMoney(recommendation.retirementTarget) + ".";
+      const tooltip = element("finder-chart-tooltip");
+      const groups = Array.from(barsLayer.querySelectorAll(".finder-chart-year"));
+      function showTooltip(group) {
+        groups.forEach(function (item) { item.classList.toggle("is-active", item === group); });
+        const content = finderProjectionTooltip({
+          currentAge: user.currentAge,
+          point: model.years[Number(group.dataset.yearIndex)],
+          currency: selectedCurrency,
+          ratesToUsd: ratesToUsd,
+        });
+        element("finder-tooltip-heading").textContent = content.heading;
+        element("finder-tooltip-value").textContent = content.value;
+        tooltip.hidden = false;
+      }
+      function hideTooltip(group) {
+        if (document.activeElement === group) return;
+        group.classList.remove("is-active");
+        tooltip.hidden = true;
+      }
+      groups.forEach(function (group) {
+        group.addEventListener("mouseenter", function () { showTooltip(group); });
+        group.addEventListener("mouseleave", function () { hideTooltip(group); });
+        group.addEventListener("focus", function () { showTooltip(group); });
+        group.addEventListener("blur", function () { hideTooltip(group); });
+        group.addEventListener("click", function () { showTooltip(group); });
       });
-    }
-
-    function showTooltip(button) {
-      element("finder-tooltip-heading").textContent = button.dataset.heading;
-      element("finder-tooltip-value").textContent = button.dataset.value;
-      element("finder-chart-tooltip").hidden = false;
+      figure.hidden = false;
+      fallback.hidden = true;
     }
 
     function resultRow(item, user) {
@@ -446,8 +516,8 @@
       element("finder-capital-today").textContent = displayResultMoney(user.totalLiquidCapital);
       element("finder-monthly-summary").textContent = displayResultMoney(user.monthlyPortfolioContribution);
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
-      renderChart(result.sharedProjection);
       currentRecommendations = result.recommendations.slice(0, 12);
+      renderChart(currentRecommendations[0], user);
       element("finder-result-read").textContent = resultSummaryRead({
         withinReachCount: result.summary.withinReachCount,
         recommendations: currentRecommendations,
@@ -529,12 +599,6 @@
         validateMoneyControl(control);
       });
     });
-    element("finder-projection-bars").addEventListener("mouseover", function (event) {
-      if (event.target.matches(".finder-chart-bar")) showTooltip(event.target);
-    });
-    element("finder-projection-bars").addEventListener("focusin", function (event) {
-      if (event.target.matches(".finder-chart-bar")) showTooltip(event.target);
-    });
     element("finder-recommendations").addEventListener("click", function (event) {
       if (event.target.closest("[data-finder-detail]")) track("retirement_destination_finder_detail_open");
     });
@@ -560,8 +624,8 @@
     recommendationsForDisplay: recommendationsForDisplay,
     resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,
-    chartTooltip: chartTooltip,
-    mobileChartWidth: mobileChartWidth,
+    finderProjectionModel: finderProjectionModel,
+    finderProjectionTooltip: finderProjectionTooltip,
     initRetirementDestinationFinder: initRetirementDestinationFinder,
   };
 });

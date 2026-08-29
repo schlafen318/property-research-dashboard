@@ -119,8 +119,16 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
     def test_results_are_concise_and_accessible(self) -> None:
         self.assertIn('id="finder-within-count"', self.html)
-        self.assertIn('id="finder-projection" role="img"', self.html)
+        self.assertIn(
+            'id="finder-projection" role="img" aria-labelledby="finder-projection-title finder-projection-desc"',
+            self.html,
+        )
+        self.assertIn('<title id="finder-projection-title">Projected retirement portfolio</title>', self.html)
+        self.assertIn('<desc id="finder-projection-desc">Complete the finder to see annual progression.</desc>', self.html)
+        self.assertIn('id="finder-chart-target" x1="22" x2="618"', self.html)
+        self.assertIn('id="finder-chart-target-label" x="618" text-anchor="end"', self.html)
         self.assertIn('id="finder-chart-tooltip" role="status"', self.html)
+        self.assertIn('id="finder-projection-caption"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
         self.assertIn('id="finder-exclusions"', self.html)
         self.assertIn("Projected portfolio", self.html)
@@ -148,11 +156,20 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
     def test_mobile_navigation_and_results_use_touch_sized_controls(self) -> None:
         self.assertIn(".mobile-menu>nav{position:absolute", self.html)
         self.assertIn(".mobile-menu>nav a{display:flex;min-height:44px", self.html)
-        self.assertIn(".finder-projection{overflow-x:auto", self.html)
-        self.assertIn(".finder-chart-bar{min-width:44px", self.html)
         self.assertIn(".finder-result header a{display:flex;min-height:44px", self.html)
         self.assertIn(".finder-results{min-width:0", self.html)
         self.assertIn(".finder-projection-wrap{min-width:0", self.html)
+
+    def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
+        self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)
+        self.assertIn(".finder-projection-chart{display:block;width:100%;height:auto", self.html)
+        self.assertIn(".finder-chart-bar{fill:#315e50", self.html)
+        self.assertIn(".finder-chart-target{stroke:#9b6a33", self.html)
+        self.assertIn("@media(prefers-reduced-motion:reduce)", self.html)
+        self.assertIn(
+            ".retirement-finder-page .finder-evidence summary { min-height: 44px; display: flex; align-items: center; font-weight: 500; }",
+            self.html,
+        )
 
     def test_embeds_complete_dynamic_universe(self) -> None:
         self.assertIn(f'data-universe-count="{self.retirement_count}"', self.html)

@@ -227,15 +227,44 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertEqual("Close", run_ui("tierLabel", "close"))
         self.assertEqual("Stretch", run_ui("tierLabel", "stretch"))
 
-    def test_chart_tooltip_exposes_year_and_amount(self) -> None:
-        tooltip = run_ui("chartTooltip", {"year": 7, "portfolio": 432100})
-        self.assertEqual("Year 7", tooltip["heading"])
-        self.assertIn("$432,100", tooltip["value"])
-        self.assertIn("Year 7", tooltip["accessibleLabel"])
+    def test_projection_model_scales_portfolio_and_target_to_the_same_axis(self) -> None:
+        self.assertEqual(
+            {
+                "maximum": 200,
+                "targetY": 18,
+                "years": [
+                    {"year": 0, "portfolio": 100, "height": 120},
+                    {"year": 1, "portfolio": 150, "height": 180},
+                ],
+            },
+            run_ui(
+                "finderProjectionModel",
+                {
+                    "series": [
+                        {"year": 0, "portfolio": 100},
+                        {"year": 1, "portfolio": 150},
+                    ],
+                    "targetValue": 200,
+                },
+            ),
+        )
 
-    def test_mobile_chart_width_preserves_one_touch_target_per_year(self) -> None:
-        self.assertEqual(779, run_ui("mobileChartWidth", 16))
-        self.assertEqual(44, run_ui("mobileChartWidth", 1))
+    def test_projection_tooltip_exposes_age_and_selected_currency_amount(self) -> None:
+        tooltip = run_ui(
+            "finderProjectionTooltip",
+            {
+                "currentAge": 50,
+                "point": {"year": 7, "portfolio": 432100},
+                "currency": "SGD",
+                "ratesToUsd": {"USD": 1, "SGD": 0.7866117265603891},
+            },
+        )
+        self.assertEqual("Year 7 · age 57", tooltip["heading"])
+        self.assertEqual("SGD\u00a0549,318", tooltip["value"])
+        self.assertEqual(
+            "Year 7, age 57. Projected portfolio SGD\u00a0549,318.",
+            tooltip["accessibleLabel"],
+        )
 
     def test_ui_does_not_store_or_transmit_financial_values(self) -> None:
         source = UI.read_text()
