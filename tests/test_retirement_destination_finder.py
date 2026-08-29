@@ -223,6 +223,61 @@ class RetirementDestinationFinderTests(unittest.TestCase):
         self.assertGreater(item["propertyEquity"], item["portfolioAtRetirement"])
         self.assertLess(item["fundingRatio"], 0.85)
 
+    def test_rent_recommendations_use_shared_annual_projection(self) -> None:
+        destinations = [destination("rent-a"), destination("rent-b")]
+        payload = {
+            "user": user_payload(),
+            "destinations": destinations,
+            "retirementCosts": [cost_record(item["id"], 50000) for item in destinations],
+            "mortgageProfiles": {item["id"]: mortgage_profile() for item in destinations},
+        }
+        result = run_finder("recommendDestinations", payload)
+
+        for item in result["recommendations"]:
+            self.assertEqual(result["sharedProjection"]["annualProjection"], item["annualProjection"])
+            self.assertEqual(
+                item["portfolioAtRetirement"],
+                item["annualProjection"][-1]["portfolio"],
+            )
+
+    def test_buy_now_recommendations_use_destination_specific_projections(self) -> None:
+        destinations = [destination("buy-a"), destination("buy-b")]
+        payload = {
+            "user": user_payload(
+                housingPlan="buy_now",
+                totalLiquidCapital=1000000,
+                maximumPropertyAllocation=500000,
+                purchaseMethod="cash",
+                requestedLtv=0,
+                annualMortgageRate=0,
+                mortgageTermYears=20,
+                mortgageTreatment="payoff",
+                useBeforeRetirement="personal",
+                grossRentalYield=0,
+                vacancyRate=0,
+                operatingCostRate=0,
+            ),
+            "destinations": destinations,
+            "retirementCosts": [
+                cost_record("buy-a", 50000, 200000),
+                cost_record("buy-b", 50000, 300000),
+            ],
+            "mortgageProfiles": {item["id"]: mortgage_profile("research_incomplete", None) for item in destinations},
+        }
+        result = run_finder("recommendDestinations", payload)
+        recommendations = {item["destinationId"]: item for item in result["recommendations"]}
+
+        self.assertEqual(2, len(recommendations))
+        self.assertNotEqual(
+            recommendations["buy-a"]["annualProjection"],
+            recommendations["buy-b"]["annualProjection"],
+        )
+        for item in recommendations.values():
+            self.assertEqual(
+                item["portfolioAtRetirement"],
+                item["annualProjection"][-1]["portfolio"],
+            )
+
     def test_every_input_destination_is_accounted_for(self) -> None:
         destinations = [destination("a"), destination("b"), destination("c")]
         payload = {

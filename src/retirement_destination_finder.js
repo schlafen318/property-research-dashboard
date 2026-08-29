@@ -196,6 +196,7 @@
       const targetResult = retirement.calculateRetirementTarget(retirementTargetInput(user, cost));
       let retirementTarget = Number(targetResult.totalCapitalAtRetirement);
       let portfolioAtRetirement = sharedProjection ? sharedProjection.portfolioAtRetirement : 0;
+      let annualProjection = sharedProjection ? sharedProjection.annualProjection : null;
       let propertyEquity = 0;
       let mortgageBalance = 0;
       let netRentalCashFlow = 0;
@@ -256,6 +257,7 @@
           return;
         }
         portfolioAtRetirement = propertyResult.portfolioAtRetirement;
+        annualProjection = propertyResult.annualProjection;
         propertyEquity = propertyResult.propertyEquityAtRetirement;
         mortgageBalance = propertyResult.mortgageBalanceAtRetirement;
         netRentalCashFlow = propertyResult.netRentalCashFlowAtRetirement;
@@ -273,6 +275,7 @@
         tier: tier,
         fundingRatio: fundingRatio,
         portfolioAtRetirement: portfolioAtRetirement,
+        annualProjection: annualProjection,
         retirementTarget: retirementTarget,
         surplusGap: portfolioAtRetirement - retirementTarget,
         propertyEquity: propertyEquity,
