@@ -1237,7 +1237,8 @@ FIT_BUDGET_THRESHOLDS = {
 def rank_destinations_for_fit(destinations: list[dict], preferences: dict) -> list[dict]:
     """Rank every destination for a reader's broad buying preferences."""
     goal = preferences.get("goal", "retirement")
-    setting = preferences.get("setting", "any")
+    raw_setting = preferences.get("setting", "any")
+    settings = [raw_setting] if isinstance(raw_setting, str) else list(raw_setting or ["any"])
     use = preferences.get("use", "balanced")
     tradeoff = preferences.get("tradeoff", "balanced")
     budget_threshold = FIT_BUDGET_THRESHOLDS.get(preferences.get("budget", "flexible"))
@@ -1249,8 +1250,8 @@ def rank_destinations_for_fit(destinations: list[dict], preferences: dict) -> li
             for item in destination.get("decision_dimensions", [])
         }
         goal_score = rank_destinations_for_goal([destination], goal)[0]["goal_score"]
-        setting_score = goal_score if setting == "any" else (
-            5.0 if setting in destination_location_types(destination) else 2.0
+        setting_score = goal_score if "any" in settings else (
+            5.0 if any(setting in destination_location_types(destination) for setting in settings) else 2.0
         )
         price = float(destination.get("usd_per_m2", 0) or 0)
         if budget_threshold is None or not price:
@@ -5843,11 +5844,11 @@ __PRIMARY_NAV__
             <legend>What kind of setting feels right?</legend>
             <p class="question-help">Destinations can belong to more than one setting.</p>
             <div class="choice-list">
-              <label class="choice"><input type="radio" name="setting" value="any" checked><span><strong>No strong preference</strong><small>Let the other answers lead.</small></span></label>
-              <label class="choice"><input type="radio" name="setting" value="city"><span><strong>City</strong><small>Services, transport and year-round daily life.</small></span></label>
-              <label class="choice"><input type="radio" name="setting" value="coast-island"><span><strong>Coast or island</strong><small>Water access, warm-weather use and holiday appeal.</small></span></label>
-              <label class="choice"><input type="radio" name="setting" value="mountain"><span><strong>Mountain</strong><small>Outdoor access, seasons and resort-market dynamics.</small></span></label>
-              <label class="choice"><input type="radio" name="setting" value="lake"><span><strong>Lake</strong><small>Waterside living with a mountain or regional setting.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="any" checked><span><strong>No strong preference</strong><small>Let the other answers lead.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="city"><span><strong>City</strong><small>Services, transport and year-round daily life.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="coast-island"><span><strong>Coast or island</strong><small>Water access, warm-weather use and holiday appeal.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="mountain"><span><strong>Mountain</strong><small>Outdoor access, seasons and resort-market dynamics.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="lake"><span><strong>Lake</strong><small>Waterside living with a mountain or regional setting.</small></span></label>
             </div>
           </fieldset>
           <fieldset data-fit-step="3" hidden>
@@ -5885,9 +5886,11 @@ __PRIMARY_NAV__
   </main>
   <footer class="page-footer"><div class="page-shell"><strong>Global Home Atlas</strong><p>Research guidance only. Verify current legal, tax, immigration, financing, insurance, and property details locally.</p></div></footer>
   <script type="application/json" id="fit-data">__FIT_DATA__</script>
+  <script src="/assets/find-your-fit-ui.js"></script>
   <script>
     (() => {
       const data = JSON.parse(document.getElementById("fit-data").textContent);
+      const fitUI = window.GHAFindYourFitUI;
       const form = document.getElementById("fitForm");
       const questionnaire = document.getElementById("fitQuestionnaire");
       const steps = Array.from(form.querySelectorAll("[data-fit-step]"));
@@ -5895,6 +5898,7 @@ __PRIMARY_NAV__
       const next = document.getElementById("fitNext");
       const submit = document.getElementById("fitSubmit");
       const results = document.getElementById("fitResults");
+      const settingInputs = Array.from(form.querySelectorAll('input[name="setting"]'));
       let activeStep = 0;
       const locationLabels = { city:"city setting", "coast-island":"coast or island setting", mountain:"mountain setting", lake:"lake setting" };
       const dimensionLabels = { lifestyle_magnetism:"lifestyle appeal", global_access:"international access", ownership_clarity:"ownership clarity", regulatory_safety:"regulatory safety", rental_profit:"rental fundamentals", capital_upside:"capital upside", retirement_fit:"long-stay comfort", exit_liquidity:"resale depth", foreigner_fit:"foreigner practicality", value_entry:"value at entry" };
@@ -5912,11 +5916,16 @@ __PRIMARY_NAV__
         document.getElementById("fitProgressText").textContent = `Question ${activeStep + 1} of ${steps.length}`;
         document.getElementById("fitProgressBar").style.width = `${((activeStep + 1) / steps.length) * 100}%`;
       }
-      function values() { return Object.fromEntries(new FormData(form).entries()); }
+      function values() {
+        const formData = new FormData(form);
+        const output = Object.fromEntries(formData.entries());
+        output.setting = formData.getAll("setting");
+        return output;
+      }
       function average(item, keys) { return keys.reduce((sum, key) => sum + Number(item.dimensions[key] || 0), 0) / keys.length; }
       function scoreItem(item, answers) {
         const goalScore = Number(item.goalScores[answers.goal] || item.decisionScore || 0);
-        const settingScore = answers.setting === "any" ? goalScore : (item.locationTypes.includes(answers.setting) ? 5 : 2);
+        const settingScore = fitUI.settingScore(goalScore, item.locationTypes, answers.setting);
         const threshold = data.budgetThresholds[answers.budget];
         let budgetScore = goalScore;
         if (threshold && item.price) {
@@ -5931,7 +5940,8 @@ __PRIMARY_NAV__
       }
       function reasons(item, answers) {
         const output = [`Strong relative fit for ${goalLabels[answers.goal]}.`];
-        if (answers.setting !== "any" && item.locationTypes.includes(answers.setting)) output.push(`Matches your preferred ${locationLabels[answers.setting]}.`);
+        const matchingSettings = fitUI.matchingSettings(item.locationTypes, answers.setting);
+        if (matchingSettings.length) output.push(`Matches your preferred ${matchingSettings.map((setting) => locationLabels[setting]).join(" or ")}.`);
         if (item.budgetScore >= 3.5) output.push("Fits the broad price screen you selected.");
         const strongest = Object.entries(item.dimensions).sort((a,b) => b[1] - a[1])[0];
         if (strongest) output.push(`One of its strongest signals is ${dimensionLabels[strongest[0]] || strongest[0]}.`);
@@ -5959,6 +5969,7 @@ __PRIMARY_NAV__
       }
       next.addEventListener("click", () => showStep(activeStep + 1));
       back.addEventListener("click", () => showStep(activeStep - 1));
+      fitUI.initSettingInputs(settingInputs);
       form.addEventListener("submit", (event) => { event.preventDefault(); renderResults(); });
       document.getElementById("fitEdit").addEventListener("click", () => { results.hidden = true; questionnaire.hidden = false; showStep(0); questionnaire.scrollIntoView({ behavior:"smooth", block:"start" }); });
       const requestedGoal = new URLSearchParams(location.search).get("goal");

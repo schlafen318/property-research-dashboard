@@ -35,6 +35,48 @@ class FindYourFitTests(unittest.TestCase):
         self.assertNotIn("vancouver", {item["id"] for item in ranked[:5]})
         self.assertFalse(next(item for item in ranked if item["id"] == "vancouver")["recommendable"])
 
+    def test_fit_ranking_accepts_any_selected_setting_as_a_match(self) -> None:
+        base_preferences = {
+            "goal": "retirement",
+            "budget": "flexible",
+            "use": "balanced",
+            "tradeoff": "balanced",
+        }
+
+        multi_setting = build_unified_app.rank_destinations_for_fit(
+            self.destinations,
+            {**base_preferences, "setting": ["city", "lake"]},
+        )
+        city_only = build_unified_app.rank_destinations_for_fit(
+            self.destinations,
+            {**base_preferences, "setting": "city"},
+        )
+        lake_only = build_unified_app.rank_destinations_for_fit(
+            self.destinations,
+            {**base_preferences, "setting": "lake"},
+        )
+
+        multi_scores = {item["id"]: item["fit_score"] for item in multi_setting}
+        city_scores = {item["id"]: item["fit_score"] for item in city_only}
+        lake_scores = {item["id"]: item["fit_score"] for item in lake_only}
+        self.assertEqual(city_scores["fukuoka-itoshima"], multi_scores["fukuoka-itoshima"])
+        self.assertEqual(lake_scores["lake-como"], multi_scores["lake-como"])
+
+    def test_setting_question_allows_multiple_choices(self) -> None:
+        html = build_unified_app.build_find_your_fit_page(self.destinations)
+        setting_inputs = re.findall(
+            r'<input type="([^"]+)" name="setting" value="([^"]+)"([^>]*)>',
+            html,
+        )
+
+        self.assertEqual(
+            ["any", "city", "coast-island", "mountain", "lake"],
+            [value for _input_type, value, _attributes in setting_inputs],
+        )
+        self.assertTrue(all(input_type == "checkbox" for input_type, _value, _attributes in setting_inputs))
+        self.assertIn("checked", setting_inputs[0][2])
+        self.assertIn('<script src="/assets/find-your-fit-ui.js"></script>', html)
+
     def test_dedicated_finder_is_a_five_question_data_driven_flow(self) -> None:
         html = build_unified_app.build_find_your_fit_page(self.destinations)
 
