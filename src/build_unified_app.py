@@ -1705,6 +1705,7 @@ def analytics_event_script() -> str:
       document.addEventListener("click", function (event) {{
         const target = event.target.closest("a, button");
         if (!target) return;
+        if (target.hasAttribute("data-finder-destination")) return;
         const explicit = target.getAttribute("data-track");
         const href = target.getAttribute("href") || "";
         if (explicit) {{

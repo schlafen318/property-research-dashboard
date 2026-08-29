@@ -104,6 +104,13 @@ const values = {
   "finder-other-income": "0",
 };
 Object.entries(values).forEach(([id, value]) => { el(id).value = value; });
+const projectionGroups = Array.from({ length: input.projectionGroupCount || 0 }, (_, index) => {
+  const group = new FakeElement("projection-" + index);
+  group.dataset.yearIndex = String(index);
+  return group;
+});
+el("finder-projection-bars").querySelectorAll = (selector) =>
+  selector === ".finder-chart-year" ? projectionGroups : [];
 [
   ["finder-liquid-capital", "0", "1000"],
   ["finder-monthly-contribution", "0", "100"],
@@ -189,6 +196,9 @@ if (input.clickDestination) {
     },
   };
   el(input.clickDestination.container).dispatch("click", target);
+}
+if (input.clickProjectionIndex !== undefined) {
+  projectionGroups[input.clickProjectionIndex].dispatch("click");
 }
 
 process.stdout.write(JSON.stringify({
@@ -864,7 +874,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertEqual(
             "Your projected portfolio exceeds the modeled target by $150,000. "
-            "Ranked #1 within the Within reach tier using Preferred region and Long-stay suitability; "
+            "Overall match #1 in the Within reach tier using Preferred region and Long-stay suitability; "
             "funding coverage breaks remaining ties.",
             explanation,
         )
@@ -887,9 +897,47 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertEqual(
             "Your projected portfolio covers 90% of the modeled target, leaving a $75,000 gap. "
-            "Ranked #2 within the Close tier; funding coverage breaks ties when no planning signals match.",
+            "Overall match #2 in the Close tier; funding coverage breaks ties when no planning signals match.",
             explanation,
         )
+
+    def test_match_explanation_avoids_one_hundred_percent_when_a_gap_remains(self) -> None:
+        explanation = run_ui(
+            "finderMatchExplanation",
+            {
+                "item": {
+                    "tier": "close",
+                    "surplusGap": -3000,
+                    "fundingRatio": 0.996,
+                    "preferenceMatches": [],
+                },
+                "matchRank": 1,
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertIn("covers 99.6% of the modeled target", explanation)
+        self.assertNotIn("covers 100%", explanation)
+
+    def test_match_explanation_calls_a_zero_gap_an_exact_match(self) -> None:
+        explanation = run_ui(
+            "finderMatchExplanation",
+            {
+                "item": {
+                    "tier": "within_reach",
+                    "surplusGap": 0,
+                    "fundingRatio": 1,
+                    "preferenceMatches": [],
+                },
+                "matchRank": 1,
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertTrue(explanation.startswith("Your projected portfolio meets the modeled target."))
+        self.assertNotIn("exceeds the modeled target by $0", explanation)
 
     def test_recommendation_cards_render_one_concise_explanation_instead_of_a_duplicate_match_label(self) -> None:
         scenario = run_ui_dom_scenario(
@@ -919,9 +967,60 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
 
         self.assertIn('class="finder-rationale"', scenario["recommendationsHtml"])
-        self.assertIn("Ranked #1 within the Within reach tier", scenario["recommendationsHtml"])
+        self.assertIn("Overall match #1 in the Within reach tier", scenario["recommendationsHtml"])
         self.assertNotIn("Preference match:", scenario["recommendationsHtml"])
         self.assertIn('data-surface="recommended_match"', scenario["recommendationsHtml"])
+
+    def test_projection_chart_click_tracks_only_position_and_match_categories(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "projectionGroupCount": 2,
+                "clickProjectionIndex": 1,
+                "engineResult": {
+                    "summary": {"withinReachCount": 1, "closeCount": 0, "stretchCount": 0},
+                    "sharedProjection": {
+                        "portfolioAtRetirement": 900000,
+                        "annualProjection": [
+                            {"year": 0, "portfolio": 500000},
+                            {"year": 10, "portfolio": 900000},
+                        ],
+                    },
+                    "recommendations": [
+                        {
+                            "destinationId": "fukuoka-itoshima",
+                            "name": "Fukuoka / Itoshima",
+                            "country": "Japan",
+                            "tier": "within_reach",
+                            "fundingRatio": 1.2,
+                            "portfolioAtRetirement": 900000,
+                            "retirementTarget": 750000,
+                            "surplusGap": 150000,
+                            "preferenceMatches": ["Long-stay suitability"],
+                            "financingStatus": "Cash purchase",
+                        }
+                    ],
+                    "excluded": [],
+                },
+                "submit": True,
+            }
+        )
+
+        event = next(
+            item for item in scenario["trackedEvents"]
+            if item["name"] == "retirement_destination_finder_projection_click"
+        )
+        self.assertEqual(
+            {
+                "chart": "capital_projection",
+                "point_index": 1,
+                "point_count": 2,
+                "strongest_destination_id": "fukuoka-itoshima",
+                "strongest_tier": "within_reach",
+            },
+            event["fields"],
+        )
+        self.assertFalse({"age", "year", "portfolio", "value"} & set(event["fields"]))
 
     def test_currency_changes_do_not_change_recommendation_identity_or_tier(self) -> None:
         recommendations = [

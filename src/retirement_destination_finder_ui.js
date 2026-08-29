@@ -150,23 +150,33 @@
     const gap = Number(item.surplusGap) || 0;
     const currency = input.currency || "USD";
     const ratesToUsd = input.ratesToUsd || { USD: 1 };
-    const affordability = gap >= 0
-      ? "Your projected portfolio exceeds the modeled target by " + resultMoney({
-          amountUsd: gap,
-          currency: currency,
-          ratesToUsd: ratesToUsd,
-        }) + "."
-      : "Your projected portfolio covers " + Math.max(0, Math.round((Number(item.fundingRatio) || 0) * 100)) +
+    let affordability;
+    if (gap === 0) {
+      affordability = "Your projected portfolio meets the modeled target.";
+    } else if (gap > 0) {
+      affordability = "Your projected portfolio exceeds the modeled target by " + resultMoney({
+        amountUsd: gap,
+        currency: currency,
+        ratesToUsd: ratesToUsd,
+      }) + ".";
+    } else {
+      const rawCoverage = Math.max(0, (Number(item.fundingRatio) || 0) * 100);
+      const roundedCoverage = Math.min(99.9, Math.round(rawCoverage * 10) / 10);
+      const coverage = Number.isInteger(roundedCoverage)
+        ? roundedCoverage.toFixed(0)
+        : roundedCoverage.toFixed(1);
+      affordability = "Your projected portfolio covers " + coverage +
         "% of the modeled target, leaving a " + resultMoney({
           amountUsd: Math.abs(gap),
           currency: currency,
           ratesToUsd: ratesToUsd,
         }) + " gap.";
+    }
     const matches = Array.isArray(item.preferenceMatches) ? item.preferenceMatches : [];
     const ranking = matches.length
-      ? "Ranked #" + Number(input.matchRank) + " within the " + tierLabel(item.tier) + " tier using " +
+      ? "Overall match #" + Number(input.matchRank) + " in the " + tierLabel(item.tier) + " tier using " +
         matches.join(" and ") + "; funding coverage breaks remaining ties."
-      : "Ranked #" + Number(input.matchRank) + " within the " + tierLabel(item.tier) +
+      : "Overall match #" + Number(input.matchRank) + " in the " + tierLabel(item.tier) +
         " tier; funding coverage breaks ties when no planning signals match.";
     return affordability + " " + ranking;
   }
@@ -590,7 +600,17 @@
         group.addEventListener("mouseleave", function () { hideTooltip(group); });
         group.addEventListener("focus", function () { showTooltip(group); });
         group.addEventListener("blur", function () { hideTooltip(group); });
-        group.addEventListener("click", function () { showTooltip(group); });
+        group.addEventListener("click", function () {
+          showTooltip(group);
+          const strongest = currentRecommendations[0] || {};
+          track("retirement_destination_finder_projection_click", {
+            chart: "capital_projection",
+            point_index: Number(group.dataset.yearIndex),
+            point_count: count,
+            strongest_destination_id: strongest.destinationId || "none",
+            strongest_tier: strongest.tier || "none",
+          });
+        });
       });
       figure.hidden = false;
       fallback.hidden = true;
