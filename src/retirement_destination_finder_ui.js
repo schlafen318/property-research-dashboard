@@ -121,11 +121,6 @@
     return "/destinations/" + (slug ? encodeURIComponent(slug) + "/" : "");
   }
 
-  function recommendationsForDisplay(input) {
-    const items = Array.isArray(input.items) ? input.items : [];
-    return items.slice(0, input.expanded ? 12 : 5);
-  }
-
   function resultSummaryRead(input) {
     const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
     const closest = recommendations[0];
@@ -135,7 +130,7 @@
         closest.name + " is the strongest modeled match under your preferences.";
     }
     return "No destinations are within reach yet. " + closest.name +
-      " is the closest modeled match, with a gap of " + resultMoney({
+      " is the strongest modeled match, with a gap of " + resultMoney({
         amountUsd: Math.abs(Number(closest.surplusGap)),
         currency: input.currency || "USD",
         ratesToUsd: input.ratesToUsd || { USD: 1 },
@@ -148,6 +143,93 @@
       close: "Close",
       stretch: "Stretch",
     }[value] || "Not classified";
+  }
+
+  function finderCapitalLandscape(input) {
+    const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
+    const strongest = new Map(recommendations.slice(0, 3).map(function (item, index) {
+      return [item.destinationId, index + 1];
+    }));
+    const rows = recommendations.map(function (item) {
+      const target = Math.max(0, Number(item.retirementTarget) || 0);
+      return {
+        destinationId: item.destinationId,
+        name: item.name,
+        country: item.country,
+        tier: item.tier,
+        target: target,
+        matchRank: strongest.get(item.destinationId) || null,
+      };
+    }).sort(function (left, right) {
+      return left.target - right.target || String(left.name).localeCompare(String(right.name));
+    });
+    const projectedCapital = Math.max(0, Number(input.projectedCapital) || 0);
+    const rawMaximum = Math.max.apply(null, rows.map(function (row) { return row.target; })
+      .concat([projectedCapital, 1]));
+    const roughStep = rawMaximum / 4;
+    const magnitude = Math.pow(10, Math.floor(Math.log10(roughStep)));
+    const normalized = roughStep / magnitude;
+    const niceFactor = normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 2.5 ? 2.5 :
+      normalized <= 5 ? 5 : 10;
+    const tickStep = niceFactor * magnitude;
+    const maximum = tickStep * 4;
+    return {
+      maximum: maximum,
+      projectedCapital: projectedCapital,
+      projectedPosition: projectedCapital / maximum * 100,
+      ticks: [0, 1, 2, 3, 4].map(function (index) { return tickStep * index; }),
+      rows: rows.map(function (row) {
+        return Object.assign({}, row, { position: row.target / maximum * 100 });
+      }),
+    };
+  }
+
+  function finderCapitalLandscapeLabel(input) {
+    const row = input.row || {};
+    const target = resultMoney({
+      amountUsd: Number(row.target) || 0,
+      currency: input.currency || "USD",
+      ratesToUsd: input.ratesToUsd || { USD: 1 },
+    });
+    return String(row.name || "Destination") + ", " + String(row.country || "") +
+      ". Retirement target " + target + ". " + tierLabel(row.tier) + "." +
+      (row.matchRank ? " Strongest modeled match number " + row.matchRank + "." : "");
+  }
+
+  function finderCapitalLandscapeMarkup(input) {
+    const model = input.model || { rows: [], ticks: [], projectedPosition: 0 };
+    const currency = input.currency || "USD";
+    const ratesToUsd = input.ratesToUsd || { USD: 1 };
+    const capitalPosition = Math.max(0, Math.min(100, Number(model.projectedPosition) || 0));
+    const axisHtml = '<span></span><span class="finder-landscape-axis-track">' +
+      (model.ticks || []).map(function (tick) {
+        return "<span>" + escapeHtml(resultMoney({ amountUsd: tick, currency: currency, ratesToUsd: ratesToUsd })) + "</span>";
+      }).join("") + "</span><span></span>";
+    const rowsHtml = (model.rows || []).map(function (row) {
+      const targetPosition = Math.max(0, Math.min(100, Number(row.position) || 0));
+      const label = finderCapitalLandscapeLabel({ row: row, currency: currency, ratesToUsd: ratesToUsd });
+      const value = resultMoney({ amountUsd: row.target, currency: currency, ratesToUsd: ratesToUsd });
+      const rank = row.matchRank
+        ? '<small class="finder-landscape-rank">Match 0' + row.matchRank + "</small>"
+        : "";
+      return '<div role="listitem"><a class="finder-landscape-row' + (row.matchRank ? " is-match" : "") +
+        '" href="' + escapeHtml(safeDossierHref(row.destinationId)) +
+        '" aria-label="' + escapeHtml(label) + '" style="--capital-position:' + capitalPosition.toFixed(2) +
+        "%;--target-position:" + targetPosition.toFixed(2) + '%"><span class="finder-landscape-name">' +
+        escapeHtml(row.name) + "<small>" + escapeHtml(row.country) + "</small>" + rank +
+        '</span><span class="finder-landscape-track" aria-hidden="true"><i class="finder-landscape-dot"></i></span>' +
+        '<span class="finder-landscape-value">' + escapeHtml(value) + "</span></a></div>";
+    }).join("");
+    return { axisHtml: axisHtml, rowsHtml: rowsHtml, rowCount: (model.rows || []).length };
+  }
+
+  function finderProjectedCapital(input) {
+    const shared = input.sharedProjection;
+    if (shared && Number.isFinite(Number(shared.portfolioAtRetirement))) {
+      return Math.max(0, Number(shared.portfolioAtRetirement));
+    }
+    const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
+    return recommendations.length ? Math.max(0, Number(recommendations[0].portfolioAtRetirement) || 0) : 0;
   }
 
   function finderProjectionModel(input) {
@@ -231,7 +313,6 @@
     let currentRecommendations = [];
     let currentUser = null;
     let currentResult = null;
-    let recommendationsExpanded = false;
 
     function element(id) { return document.getElementById(id); }
     function numeric(id) { return Number(element(id).value); }
@@ -520,17 +601,35 @@
     }
 
     function renderRecommendationList() {
-      const visible = recommendationsForDisplay({
-        items: currentRecommendations,
-        expanded: recommendationsExpanded,
-      });
-      element("finder-recommendations").innerHTML = visible.map(function (item) {
+      element("finder-recommendations").innerHTML = currentRecommendations.slice(0, 3).map(function (item) {
         return resultRow(item, currentUser);
       }).join("");
-      const toggle = element("finder-show-all");
-      toggle.hidden = currentRecommendations.length <= 5;
-      toggle.textContent = recommendationsExpanded ? "Show the strongest five" : "View all destinations";
-      toggle.setAttribute("aria-expanded", recommendationsExpanded ? "true" : "false");
+    }
+
+    function renderCapitalLandscape(result) {
+      const projectedCapital = finderProjectedCapital({
+        sharedProjection: result.sharedProjection,
+        recommendations: currentRecommendations,
+      });
+      element("finder-eligible-count").textContent = String(currentRecommendations.length);
+      if (!currentRecommendations.length) {
+        element("finder-projected-capital").textContent = "—";
+        element("finder-landscape-axis").innerHTML = "";
+        element("finder-landscape-rows").innerHTML = "";
+        return;
+      }
+      element("finder-projected-capital").textContent = displayResultMoney(projectedCapital);
+      const model = finderCapitalLandscape({
+        recommendations: currentRecommendations,
+        projectedCapital: projectedCapital,
+      });
+      const markup = finderCapitalLandscapeMarkup({
+        model: model,
+        currency: selectedCurrency,
+        ratesToUsd: ratesToUsd,
+      });
+      element("finder-landscape-axis").innerHTML = markup.axisHtml;
+      element("finder-landscape-rows").innerHTML = markup.rowsHtml;
     }
 
     function renderEvidence(items) {
@@ -574,10 +673,14 @@
       if (!currentResult || !currentUser) return;
       const result = currentResult;
       const user = currentUser;
-      element("finder-capital-today").textContent = displayResultMoney(user.totalLiquidCapital);
-      element("finder-monthly-summary").textContent = displayResultMoney(user.monthlyPortfolioContribution);
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
-      currentRecommendations = result.recommendations.slice(0, 12);
+      currentRecommendations = result.recommendations.slice();
+      const hasRecommendations = currentRecommendations.length > 0;
+      element("finder-capital-landscape").hidden = !hasRecommendations;
+      element("finder-matches-section").hidden = !hasRecommendations;
+      element("finder-projection-section").hidden = !hasRecommendations;
+      element("finder-empty-state").hidden = hasRecommendations;
+      renderCapitalLandscape(result);
       renderChart(finderProjectionView({
         housingPlan: user.housingPlan,
         sharedProjection: result.sharedProjection,
@@ -589,7 +692,7 @@
         currency: selectedCurrency,
         ratesToUsd: ratesToUsd,
       });
-      element("finder-closest-match").textContent = currentRecommendations.length
+      element("finder-strongest-match").textContent = currentRecommendations.length
         ? currentRecommendations[0].name
         : "—";
       renderRecommendationList();
@@ -603,7 +706,6 @@
     function render(result, user) {
       currentResult = result;
       currentUser = user;
-      recommendationsExpanded = false;
       renderCurrentResults();
       results.hidden = false;
       results.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -672,11 +774,6 @@
     element("finder-recommendations").addEventListener("click", function (event) {
       if (event.target.closest("[data-finder-detail]")) track("retirement_destination_finder_detail_open");
     });
-    element("finder-show-all").addEventListener("click", function () {
-      recommendationsExpanded = !recommendationsExpanded;
-      renderRecommendationList();
-      track("retirement_destination_finder_results_toggle", { expanded: recommendationsExpanded });
-    });
     syncHousing();
     track("retirement_destination_finder_open");
   }
@@ -692,9 +789,12 @@
     activeMoneyControlIds: activeMoneyControlIds,
     safeDetailHref: safeDetailHref,
     safeDossierHref: safeDossierHref,
-    recommendationsForDisplay: recommendationsForDisplay,
     resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,
+    finderCapitalLandscape: finderCapitalLandscape,
+    finderCapitalLandscapeLabel: finderCapitalLandscapeLabel,
+    finderCapitalLandscapeMarkup: finderCapitalLandscapeMarkup,
+    finderProjectedCapital: finderProjectedCapital,
     finderProjectionModel: finderProjectionModel,
     finderProjectionTooltip: finderProjectionTooltip,
     finderProjectionAxisLabel: finderProjectionAxisLabel,

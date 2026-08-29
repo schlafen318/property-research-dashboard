@@ -143,7 +143,7 @@ const window = {
       engineInput = request;
       engineInputs.push(request);
       engineCalls += 1;
-      return {
+      return input.engineResult || {
         summary: { withinReachCount: 0, closeCount: 0, stretchCount: 0 },
         sharedProjection: null,
         recommendations: [],
@@ -186,6 +186,15 @@ process.stdout.write(JSON.stringify({
   engineCalls,
   user: engineInput && engineInput.user,
   users: engineInputs.map((request) => request.user),
+  eligibleCount: el("finder-eligible-count").textContent,
+  projectedCapital: el("finder-projected-capital").textContent,
+  strongestMatch: el("finder-strongest-match").textContent,
+  landscapeRowsHtml: el("finder-landscape-rows").innerHTML,
+  recommendationsHtml: el("finder-recommendations").innerHTML,
+  landscapeHidden: el("finder-capital-landscape").hidden,
+  matchesHidden: el("finder-matches-section").hidden,
+  projectionHidden: el("finder-projection-section").hidden,
+  emptyStateHidden: el("finder-empty-state").hidden,
 }));
 '''
     result = subprocess.run(
@@ -376,12 +385,193 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
         self.assertEqual("/destinations/", run_ui("safeDossierHref", "../contact"))
 
-    def test_recommendation_list_shows_five_before_expansion(self) -> None:
-        items = list(range(12))
-        self.assertEqual(items[:5], run_ui("recommendationsForDisplay", {"items": items, "expanded": False}))
-        self.assertEqual(items, run_ui("recommendationsForDisplay", {"items": items, "expanded": True}))
+    def test_capital_landscape_cost_ranks_every_eligible_destination_without_mutating_match_order(self) -> None:
+        recommendations = [
+            {
+                "destinationId": "strongest",
+                "name": "Strongest",
+                "country": "A",
+                "tier": "close",
+                "retirementTarget": 1_900_000,
+                "portfolioAtRetirement": 1_500_000,
+            },
+            {
+                "destinationId": "lowest-cost",
+                "name": "Lowest cost",
+                "country": "B",
+                "tier": "within_reach",
+                "retirementTarget": 900_000,
+                "portfolioAtRetirement": 1_500_000,
+            },
+            {
+                "destinationId": "third-match",
+                "name": "Third match",
+                "country": "C",
+                "tier": "stretch",
+                "retirementTarget": 2_200_000,
+                "portfolioAtRetirement": 1_500_000,
+            },
+            {
+                "destinationId": "unhighlighted",
+                "name": "Unhighlighted",
+                "country": "D",
+                "tier": "within_reach",
+                "retirementTarget": 1_100_000,
+                "portfolioAtRetirement": 1_500_000,
+            },
+        ]
 
-    def test_result_summary_explains_the_closest_match_when_none_are_affordable(self) -> None:
+        model = run_ui(
+            "finderCapitalLandscape",
+            {"recommendations": recommendations, "projectedCapital": 1_500_000},
+        )
+
+        self.assertEqual(
+            ["lowest-cost", "unhighlighted", "strongest", "third-match"],
+            [row["destinationId"] for row in model["rows"]],
+        )
+        self.assertEqual(
+            {"strongest": 1, "lowest-cost": 2, "third-match": 3, "unhighlighted": None},
+            {row["destinationId"]: row["matchRank"] for row in model["rows"]},
+        )
+        self.assertEqual(
+            ["strongest", "lowest-cost", "third-match", "unhighlighted"],
+            [item["destinationId"] for item in recommendations],
+        )
+
+    def test_capital_landscape_uses_one_safe_axis_for_targets_and_projected_capital(self) -> None:
+        model = run_ui(
+            "finderCapitalLandscape",
+            {
+                "recommendations": [
+                    {
+                        "destinationId": "zero",
+                        "name": "Zero",
+                        "country": "A",
+                        "tier": "within_reach",
+                        "retirementTarget": 0,
+                    },
+                    {
+                        "destinationId": "target",
+                        "name": "Target",
+                        "country": "B",
+                        "tier": "stretch",
+                        "retirementTarget": 250_000,
+                    },
+                ],
+                "projectedCapital": 400_000,
+            },
+        )
+
+        self.assertEqual(400_000, model["maximum"])
+        self.assertEqual(100, model["projectedPosition"])
+        self.assertEqual([0, 62.5], [row["position"] for row in model["rows"]])
+        self.assertEqual([0, 100_000, 200_000, 300_000, 400_000], model["ticks"])
+
+        large = run_ui(
+            "finderCapitalLandscape",
+            {
+                "recommendations": [
+                    {
+                        "destinationId": "large",
+                        "name": "Large",
+                        "country": "A",
+                        "tier": "stretch",
+                        "retirementTarget": 6_107_245,
+                    }
+                ],
+                "projectedCapital": 1_662_594,
+            },
+        )
+        self.assertEqual(8_000_000, large["maximum"])
+        self.assertEqual([0, 2_000_000, 4_000_000, 6_000_000, 8_000_000], large["ticks"])
+
+    def test_capital_landscape_accessible_label_identifies_match_rank_and_selected_currency(self) -> None:
+        label = run_ui(
+            "finderCapitalLandscapeLabel",
+            {
+                "row": {
+                    "name": "Fukuoka / Itoshima",
+                    "country": "Japan",
+                    "tier": "close",
+                    "target": 800_000,
+                    "matchRank": 1,
+                },
+                "currency": "SGD",
+                "ratesToUsd": {"USD": 1, "SGD": 0.8},
+            },
+        )
+
+        self.assertEqual(
+            "Fukuoka / Itoshima, Japan. Retirement target SGD\u00a01,000,000. Close. Strongest modeled match number 1.",
+            label,
+        )
+
+    def test_capital_landscape_markup_renders_every_row_as_an_accessible_dossier_link(self) -> None:
+        markup = run_ui(
+            "finderCapitalLandscapeMarkup",
+            {
+                "model": {
+                    "projectedPosition": 60,
+                    "ticks": [0, 500_000, 1_000_000],
+                    "rows": [
+                        {
+                            "destinationId": "fukuoka-itoshima",
+                            "name": "Fukuoka / Itoshima",
+                            "country": "Japan",
+                            "tier": "within_reach",
+                            "target": 600_000,
+                            "position": 60,
+                            "matchRank": 1,
+                        },
+                        {
+                            "destinationId": "valencia",
+                            "name": "Valencia",
+                            "country": "Spain",
+                            "tier": "close",
+                            "target": 750_000,
+                            "position": 75,
+                            "matchRank": None,
+                        },
+                    ],
+                },
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertEqual(2, markup["rowCount"])
+        self.assertIn('href="/destinations/fukuoka-itoshima/"', markup["rowsHtml"])
+        self.assertIn('<div role="listitem"><a class="finder-landscape-row is-match"', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-row is-match"', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-row"', markup["rowsHtml"])
+        self.assertIn('--capital-position:60.00%;--target-position:75.00%', markup["rowsHtml"])
+        self.assertIn('aria-label="Fukuoka / Itoshima, Japan.', markup["rowsHtml"])
+        self.assertIn("$1,000,000", markup["axisHtml"])
+
+    def test_projected_capital_uses_shared_projection_or_strongest_purchase_scenario(self) -> None:
+        self.assertEqual(
+            1_750_000,
+            run_ui(
+                "finderProjectedCapital",
+                {
+                    "sharedProjection": {"portfolioAtRetirement": 1_750_000},
+                    "recommendations": [{"portfolioAtRetirement": 900_000}],
+                },
+            ),
+        )
+        self.assertEqual(
+            900_000,
+            run_ui(
+                "finderProjectedCapital",
+                {
+                    "sharedProjection": None,
+                    "recommendations": [{"portfolioAtRetirement": 900_000}],
+                },
+            ),
+        )
+
+    def test_result_summary_explains_the_strongest_match_when_none_are_affordable(self) -> None:
         read = run_ui(
             "resultSummaryRead",
             {
@@ -394,7 +584,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             },
         )
         self.assertIn("No destinations are within reach yet", read)
-        self.assertIn("Fukuoka / Itoshima is the closest modeled match", read)
+        self.assertIn("Fukuoka / Itoshima is the strongest modeled match", read)
         self.assertIn("SGD\u00a0409,882", read)
 
     def test_result_money_formats_negative_gaps_equity_and_jpy(self) -> None:
@@ -415,7 +605,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
     def test_result_money_wiring_covers_all_result_amounts_and_rerenders(self) -> None:
         source = UI.read_text()
         self.assertIn("function resultMoney(input)", source)
-        for result_id in ("finder-capital-today", "finder-monthly-summary"):
+        for result_id in ("finder-projected-capital",):
             self.assertIn(f'element("{result_id}").textContent = displayResultMoney(', source)
         for recommendation_value in (
             "item.portfolioAtRetirement",
@@ -427,6 +617,76 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         ):
             self.assertIn("displayResultMoney(" + recommendation_value + ")", source)
         self.assertIn("renderCurrentResults();", source)
+
+    def test_submit_renders_all_eligible_destinations_but_only_three_strongest_matches(self) -> None:
+        recommendations = [
+            {
+                "destinationId": f"place-{index}",
+                "name": f"Place {index}",
+                "country": "Country",
+                "tier": "within_reach" if index < 4 else "stretch",
+                "fundingRatio": 1,
+                "portfolioAtRetirement": 2_000_000,
+                "annualProjection": [{"year": 0, "portfolio": 500_000}],
+                "retirementTarget": 500_000 + index * 10_000,
+                "surplusGap": 1_500_000 - index * 10_000,
+                "propertyEquity": 0,
+                "mortgageBalance": 0,
+                "netRentalCashFlow": 0,
+                "financingStatus": "Not applicable",
+                "financingReason": "",
+                "preferenceMatches": [],
+            }
+            for index in range(13)
+        ]
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "engineResult": {
+                    "summary": {"withinReachCount": 4, "closeCount": 0, "stretchCount": 9},
+                    "sharedProjection": {
+                        "portfolioAtRetirement": 2_000_000,
+                        "annualProjection": [{"year": 0, "portfolio": 500_000}],
+                    },
+                    "recommendations": recommendations,
+                    "excluded": [],
+                },
+                "submit": True,
+            }
+        )
+
+        self.assertEqual("13", scenario["eligibleCount"])
+        self.assertEqual("$2,000,000", scenario["projectedCapital"])
+        self.assertEqual("Place 0", scenario["strongestMatch"])
+        self.assertEqual(13, scenario["landscapeRowsHtml"].count('role="listitem"'))
+        self.assertEqual(3, scenario["recommendationsHtml"].count('class="finder-result"'))
+        self.assertFalse(scenario["landscapeHidden"])
+        self.assertTrue(scenario["emptyStateHidden"])
+
+    def test_zero_eligible_result_shows_an_empty_state_instead_of_empty_charts(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "engineResult": {
+                    "summary": {"withinReachCount": 0, "closeCount": 0, "stretchCount": 0},
+                    "sharedProjection": None,
+                    "recommendations": [],
+                    "excluded": [
+                        {"destinationId": "place", "name": "Place", "reasonCode": "property_finance_unavailable"}
+                    ],
+                },
+                "submit": True,
+            }
+        )
+
+        self.assertEqual("0", scenario["eligibleCount"])
+        self.assertEqual("—", scenario["projectedCapital"])
+        self.assertTrue(scenario["landscapeHidden"])
+        self.assertTrue(scenario["matchesHidden"])
+        self.assertTrue(scenario["projectionHidden"])
+        self.assertFalse(scenario["emptyStateHidden"])
+        self.assertEqual("", scenario["landscapeRowsHtml"])
+        self.assertEqual("", scenario["recommendationsHtml"])
 
     def test_currency_changes_do_not_change_recommendation_identity_or_tier(self) -> None:
         recommendations = [
