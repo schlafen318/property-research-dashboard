@@ -5,6 +5,8 @@ import subprocess
 import unittest
 from pathlib import Path
 
+from src.fire_abroad import eligibility_for_mode, normalize_fire_profile, rank_fire_abroad_destinations
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ENGINE = ROOT / "src" / "fire_abroad.js"
@@ -178,6 +180,52 @@ class FireAbroadJavaScriptParityTests(unittest.TestCase):
         self.assertEqual("needs_verification", result["status"])
         self.assertIsNone(result["score"])
         self.assertIsNone(result["components"]["global_access"])
+
+    def test_empty_cost_record_stays_unranked_like_the_python_model(self) -> None:
+        payload = self.payload_for({"name": "default", "raw_profile": {}})
+        payload["retirement_costs"] = {"alpha": {}}
+        result = run_js(ENGINE, "rankDestinations", payload)[0]
+        expected = rank_fire_abroad_destinations(
+            payload["destinations"], payload["retirement_costs"],
+            {"countries": payload["countries"], "destination_overrides": payload["destination_overrides"]},
+            payload["profile"],
+        )[0]
+        self.assertEqual("needs_verification", result["status"])
+        self.assertIsNone(result["score"])
+        self.assertIsNone(result["components"]["sustainable_annual_cost"])
+        self.assertEqual(expected["status"], result["status"])
+        self.assertEqual(expected["score"], result["score"])
+
+    def test_eligibility_clamps_out_of_range_numeric_route_scores(self) -> None:
+        for base_score in (0.0, 5.0, 5.5, -1.0):
+            with self.subTest(base_score=base_score):
+                country = {"stay_routes": {"part_year": self.route("eligible", base_score)}}
+                expected = eligibility_for_mode(country, normalize_fire_profile({}))
+                actual = run_js_call(ENGINE, "eligibilityForMode", country, {})
+                self.assertEqual(expected["stay_score"], actual["stay_score"])
+
+    def test_tied_rankings_use_python_code_point_name_order(self) -> None:
+        payload = self.payload_for({"name": "default", "raw_profile": {}})
+        payload["destinations"][0]["name"] = "alpha"
+        beta = self.destination()
+        beta["id"] = "beta"
+        beta["name"] = "Zeta"
+        payload["destinations"].append(beta)
+        payload["retirement_costs"]["beta"] = self.cost()
+        payload["destination_overrides"]["beta"] = self.override()
+        expected = rank_fire_abroad_destinations(
+            payload["destinations"], payload["retirement_costs"],
+            {"countries": payload["countries"], "destination_overrides": payload["destination_overrides"]},
+            payload["profile"],
+        )
+        self.assertEqual(
+            ["beta", "alpha"],
+            [item["destination_id"] for item in run_js(ENGINE, "rankDestinations", payload)],
+        )
+        self.assertEqual(
+            [item["destination_id"] for item in expected],
+            [item["destination_id"] for item in run_js(ENGINE, "rankDestinations", payload)],
+        )
 
 
 class FireAbroadJavaScriptPrivacyTests(unittest.TestCase):

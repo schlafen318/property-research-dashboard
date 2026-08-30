@@ -130,7 +130,7 @@
       };
     }
     if (!VALID_ELIGIBILITY.has(status)) status = "needs_verification";
-    let score = numericScore(route.base_score);
+    let score = isNumber(route.base_score) ? route.base_score : null;
     if (UNRANKED_STATUSES.has(status) || score === null) score = null;
     else {
       if (normalized.income_type === "business_consulting") {
@@ -202,6 +202,21 @@
     return { eligible: 0, conditional: 1, needs_verification: 2, not_eligible: 3 }[status] ?? 2;
   }
 
+  function compareCodePoints(left, right) {
+    const first = String(left);
+    const second = String(right);
+    let firstIndex = 0;
+    let secondIndex = 0;
+    while (firstIndex < first.length && secondIndex < second.length) {
+      const firstPoint = first.codePointAt(firstIndex);
+      const secondPoint = second.codePointAt(secondIndex);
+      if (firstPoint !== secondPoint) return firstPoint < secondPoint ? -1 : 1;
+      firstIndex += firstPoint > 0xFFFF ? 2 : 1;
+      secondIndex += secondPoint > 0xFFFF ? 2 : 1;
+    }
+    return firstIndex === first.length && secondIndex === second.length ? 0 : (firstIndex === first.length ? -1 : 1);
+  }
+
   function worstStatus() {
     return Array.from(arguments).reduce(function (worst, status) {
       return statusPriority(status) > statusPriority(worst) ? status : worst;
@@ -222,6 +237,15 @@
       }) || null;
     }
     return null;
+  }
+
+  function hasUsableCost(cost, profile) {
+    if (!isObject(cost) || !isObject(cost.profiles)) return false;
+    const householdCost = cost.profiles[profile.household];
+    if (!isObject(householdCost) || !isObject(householdCost.categories_usd)) return false;
+    const housingCost = profile.housing === "rent" || profile.housing === "buy_retirement"
+      ? householdCost.annual_rent_usd : householdCost.annual_owner_costs_usd;
+    return isNumber(housingCost);
   }
 
   function rankDestinations(payload, rawProfile) {
@@ -255,6 +279,7 @@
       let status = worstStatus(eligibility.status, taxStatus, healthStatus);
       if (evidenceMissing && status !== "not_eligible") status = "needs_verification";
       const cost = retirementCostFor(destinationId, retirementCosts);
+      const usableCost = hasUsableCost(cost, profile);
       const budget = buildResilienceBudget(cost || {}, profile, override);
       const exitLiquidity = destinationScore(destination, "exit_liquidity");
       const ownershipClarity = destinationScore(destination, "ownership_clarity");
@@ -263,7 +288,7 @@
         ? null : round2((exitLiquidity + ownershipClarity + rentFlexibility) / 3);
       const components = {
         active_life: activeLifeScore(override),
-        sustainable_annual_cost: cost ? annualCostScore(budget.annual_total_usd, profile.household) : null,
+        sustainable_annual_cost: usableCost ? annualCostScore(budget.annual_total_usd, profile.household) : null,
         healthcare_bridge: healthScore,
         stay_flexibility: eligibility.stay_score,
         tax_compatibility: taxScore,
@@ -326,7 +351,7 @@
       if (scoreDifference) return scoreDifference;
       const confidenceDifference = (confidenceRank[left.confidence] ?? 4) - (confidenceRank[right.confidence] ?? 4);
       if (confidenceDifference) return confidenceDifference;
-      return left.name.localeCompare(right.name);
+      return compareCodePoints(left.name, right.name);
     });
     return results;
   }
