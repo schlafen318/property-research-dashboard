@@ -312,6 +312,22 @@ class FireRankingTests(unittest.TestCase):
         self.assertIsNone(result["score"])
         self.assertIsNone(result["components"]["tax_compatibility"])
 
+    def test_malformed_cost_records_remain_unranked_without_zero_cost_substitution(self) -> None:
+        malformed_costs = {
+            "empty_record": {},
+            "empty_profiles": {"profiles": {}},
+            "missing_selected_household": {"profiles": {"couple": {"categories_usd": {}, "annual_rent_usd": 1}}},
+            "missing_required_housing_cost": {"profiles": {"single": {"categories_usd": {"living": 50000}}}},
+        }
+        for name, cost in malformed_costs.items():
+            with self.subTest(cost=name):
+                result = rank_fire_abroad_destinations(
+                    [self.destination("alpha", "Alpha")], {"alpha": cost}, self.payload(), normalize_fire_profile({})
+                )[0]
+                self.assertEqual("needs_verification", result["status"])
+                self.assertIsNone(result["score"])
+                self.assertIsNone(result["components"]["sustainable_annual_cost"])
+
     def test_rank_orders_status_score_confidence_then_name(self) -> None:
         countries = {"Example": self.country(), "Conditional": self.country()}
         countries["Conditional"]["stay_routes"]["part_year"] = self.route("conditional")

@@ -181,20 +181,28 @@ class FireAbroadJavaScriptParityTests(unittest.TestCase):
         self.assertIsNone(result["score"])
         self.assertIsNone(result["components"]["global_access"])
 
-    def test_empty_cost_record_stays_unranked_like_the_python_model(self) -> None:
-        payload = self.payload_for({"name": "default", "raw_profile": {}})
-        payload["retirement_costs"] = {"alpha": {}}
-        result = run_js(ENGINE, "rankDestinations", payload)[0]
-        expected = rank_fire_abroad_destinations(
-            payload["destinations"], payload["retirement_costs"],
-            {"countries": payload["countries"], "destination_overrides": payload["destination_overrides"]},
-            payload["profile"],
-        )[0]
-        self.assertEqual("needs_verification", result["status"])
-        self.assertIsNone(result["score"])
-        self.assertIsNone(result["components"]["sustainable_annual_cost"])
-        self.assertEqual(expected["status"], result["status"])
-        self.assertEqual(expected["score"], result["score"])
+    def test_malformed_cost_records_stay_unranked_like_the_python_model(self) -> None:
+        malformed_costs = {
+            "empty_record": {},
+            "empty_profiles": {"profiles": {}},
+            "missing_selected_household": {"profiles": {"couple": {"categories_usd": {}, "annual_rent_usd": 1}}},
+            "missing_required_housing_cost": {"profiles": {"single": {"categories_usd": {"living": 50000}}}},
+        }
+        for name, cost in malformed_costs.items():
+            with self.subTest(cost=name):
+                payload = self.payload_for({"name": "default", "raw_profile": {}})
+                payload["retirement_costs"] = {"alpha": cost}
+                result = run_js(ENGINE, "rankDestinations", payload)[0]
+                expected = rank_fire_abroad_destinations(
+                    payload["destinations"], payload["retirement_costs"],
+                    {"countries": payload["countries"], "destination_overrides": payload["destination_overrides"]},
+                    payload["profile"],
+                )[0]
+                self.assertEqual("needs_verification", result["status"])
+                self.assertIsNone(result["score"])
+                self.assertIsNone(result["components"]["sustainable_annual_cost"])
+                self.assertEqual(expected["status"], result["status"])
+                self.assertEqual(expected["score"], result["score"])
 
     def test_eligibility_clamps_out_of_range_numeric_route_scores(self) -> None:
         for base_score in (0.0, 5.0, 5.5, -1.0):

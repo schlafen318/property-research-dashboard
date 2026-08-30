@@ -229,10 +229,10 @@ def build_resilience_budget(
 
     housing = profile["housing"]
     if housing in {"rent", "buy_retirement"}:
-        housing_cost = household_cost.get("annual_rent_usd", 0)
+        housing_cost = household_cost.get("annual_rent_usd")
         housing_key = "rent"
     else:
-        housing_cost = household_cost.get("annual_owner_costs_usd", 0)
+        housing_cost = household_cost.get("annual_owner_costs_usd")
         housing_key = "owner_costs"
     if isinstance(housing_cost, (int, float)) and not isinstance(housing_cost, bool):
         categories[housing_key] = housing_cost
@@ -331,6 +331,22 @@ def _retirement_cost_for(destination_id: str, retirement_costs: dict[str, dict])
     return None
 
 
+def _has_usable_cost(cost: object, profile: dict) -> bool:
+    """Require the selected household's recurring evidence before scoring cost."""
+
+    if not isinstance(cost, dict):
+        return False
+    profiles = cost.get("profiles")
+    if not isinstance(profiles, dict):
+        return False
+    household_cost = profiles.get(profile["household"])
+    if not isinstance(household_cost, dict) or not isinstance(household_cost.get("categories_usd"), dict):
+        return False
+    housing_key = "annual_rent_usd" if profile["housing"] in {"rent", "buy_retirement"} else "annual_owner_costs_usd"
+    housing_cost = household_cost.get(housing_key)
+    return isinstance(housing_cost, (int, float)) and not isinstance(housing_cost, bool)
+
+
 def rank_fire_abroad_destinations(
     destinations: list[dict],
     retirement_costs: dict[str, dict],
@@ -386,7 +402,7 @@ def rank_fire_abroad_destinations(
         property_exit = None
         if None not in (exit_liquidity, ownership_clarity, rent_flexibility):
             property_exit = round((exit_liquidity + ownership_clarity + rent_flexibility) / 3, 2)
-        cost_score = annual_cost_score(budget["annual_total_usd"], profile["household"]) if cost else None
+        cost_score = annual_cost_score(budget["annual_total_usd"], profile["household"]) if _has_usable_cost(cost, profile) else None
         components = {
             "active_life": active,
             "sustainable_annual_cost": cost_score,
