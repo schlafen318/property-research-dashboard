@@ -56,7 +56,16 @@ class FakeElement {
     this.innerHTML = "";
     this.listeners = {};
     this.attributes = {};
-    this.classList = { toggle() {}, remove() {} };
+    this.classNames = new Set();
+    this.classList = {
+      toggle: (name, force) => {
+        const shouldAdd = force === undefined ? !this.classNames.has(name) : Boolean(force);
+        if (shouldAdd) this.classNames.add(name); else this.classNames.delete(name);
+        return shouldAdd;
+      },
+      remove: (name) => this.classNames.delete(name),
+      contains: (name) => this.classNames.has(name),
+    };
   }
   addEventListener(name, callback) { (this.listeners[name] ||= []).push(callback); }
   dispatch(name, target) {
@@ -204,6 +213,7 @@ if (input.editLiquid) {
 }
 if (input.region) el("finder-region").value = input.region;
 if (input.submit) el("retirement-destination-finder-form").dispatch("submit");
+if (input.clickLandscapeToggle) el("finder-landscape-toggle").dispatch("click");
 if (input.clickShare) el("finder-share").dispatch("click");
 if (input.preferenceChange) {
   const control = el(input.preferenceChange.id);
@@ -243,6 +253,10 @@ process.stdout.write(JSON.stringify({
   landscapeProjectedCapital: el("finder-landscape-projected").textContent,
   strongestMatch: el("finder-strongest-match").textContent,
   landscapeRowsHtml: el("finder-landscape-rows").innerHTML,
+  landscapeExpanded: el("finder-landscape-rows").classList.contains("is-expanded"),
+  landscapeToggleHidden: el("finder-landscape-toggle").hidden,
+  landscapeToggleText: el("finder-landscape-toggle").textContent,
+  landscapeToggleExpanded: el("finder-landscape-toggle").attributes["aria-expanded"],
   recommendationsHtml: el("finder-recommendations").innerHTML,
   comparisonHtml: el("finder-comparison-body").innerHTML,
   comparisonHidden: el("finder-comparison").hidden,
@@ -779,9 +793,8 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         for result_id in ("finder-projected-capital",):
             self.assertIn(f'element("{result_id}").textContent = displayResultMoney(', source)
         for recommendation_value in (
-            "item.portfolioAtRetirement",
             "item.retirementTarget",
-            "item.surplusGap",
+            "gapAmount",
             "item.propertyEquity",
             "item.mortgageBalance",
             "item.netRentalCashFlow",
@@ -858,6 +871,76 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertFalse(scenario["emptyStateHidden"])
         self.assertEqual("", scenario["landscapeRowsHtml"])
         self.assertEqual("", scenario["recommendationsHtml"])
+
+    def test_large_landscape_is_collapsed_with_an_explicit_expand_control(self) -> None:
+        recommendations = [
+            {
+                "destinationId": f"place-{index}",
+                "name": f"Place {index}",
+                "country": "Example",
+                "tier": "stretch",
+                "fundingRatio": 0.8,
+                "portfolioAtRetirement": 1_000_000,
+                "retirementTarget": 1_100_000 + index * 10_000,
+                "surplusGap": -100_000 - index * 10_000,
+                "preferenceMatches": [],
+                "annualProjection": [],
+            }
+            for index in range(7)
+        ]
+        common = {
+            "rates": {"USD": 1},
+            "engineResult": {
+                "summary": {"withinReachCount": 0, "closeCount": 0, "stretchCount": 7},
+                "sharedProjection": {"portfolioAtRetirement": 1_000_000, "annualProjection": []},
+                "recommendations": recommendations,
+                "excluded": [],
+            },
+            "submit": True,
+        }
+
+        collapsed = run_ui_dom_scenario(common)
+        expanded = run_ui_dom_scenario({**common, "clickLandscapeToggle": True})
+
+        self.assertFalse(collapsed["landscapeToggleHidden"])
+        self.assertEqual("View all 7 destinations", collapsed["landscapeToggleText"])
+        self.assertEqual("false", collapsed["landscapeToggleExpanded"])
+        self.assertFalse(collapsed["landscapeExpanded"])
+        self.assertEqual("Show fewer destinations", expanded["landscapeToggleText"])
+        self.assertEqual("true", expanded["landscapeToggleExpanded"])
+        self.assertTrue(expanded["landscapeExpanded"])
+
+    def test_recommendation_cards_do_not_repeat_projected_capital(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "engineResult": {
+                    "summary": {"withinReachCount": 0, "closeCount": 1, "stretchCount": 0},
+                    "sharedProjection": {"portfolioAtRetirement": 1_000_000, "annualProjection": []},
+                    "recommendations": [
+                        {
+                            "destinationId": "fukuoka-itoshima",
+                            "name": "Fukuoka / Itoshima",
+                            "country": "Japan",
+                            "tier": "close",
+                            "fundingRatio": 0.91,
+                            "portfolioAtRetirement": 1_000_000,
+                            "retirementTarget": 1_100_000,
+                            "surplusGap": -100_000,
+                            "preferenceMatches": [],
+                            "annualProjection": [],
+                        }
+                    ],
+                    "excluded": [],
+                },
+                "submit": True,
+            }
+        )
+
+        self.assertNotIn("Projected capital", scenario["recommendationsHtml"])
+        self.assertIn("Capital gap", scenario["recommendationsHtml"])
+        self.assertIn("$100,000", scenario["recommendationsHtml"])
+        self.assertNotIn("-$100,000", scenario["recommendationsHtml"])
 
     def test_completion_analytics_describe_outcome_without_financial_inputs(self) -> None:
         scenario = run_ui_dom_scenario(
