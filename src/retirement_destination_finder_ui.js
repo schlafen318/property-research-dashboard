@@ -465,6 +465,7 @@
     let sharedView = false;
     let comparisonOpened = false;
     let wizardStepIndex = 0;
+    let wizardView = "editing";
     const wizardSectionIds = [
       "finder-current-resources",
       "finder-housing",
@@ -599,6 +600,16 @@
           moneyNumber("finder-property-allocation") <= 0) {
         errors.push("Enter the maximum amount available for a property purchase.");
       }
+      const activeSection = element(wizardSectionIds[stepIndex]);
+      const invalidControl = Array.from(activeSection.querySelectorAll("input, select, textarea")).find(function (control) {
+        return !control.disabled && typeof control.checkValidity === "function" && !control.checkValidity();
+      });
+      if (invalidControl) {
+        invalidControl.setAttribute("aria-invalid", "true");
+        if (typeof invalidControl.reportValidity === "function") invalidControl.reportValidity();
+        if (typeof invalidControl.focus === "function") invalidControl.focus();
+        errors.push("Correct the highlighted field before continuing.");
+      }
       return errors;
     }
 
@@ -641,6 +652,7 @@
     }
 
     function returnToWizard() {
+      wizardView = "editing";
       form.hidden = false;
       results.hidden = true;
       element("finder-adjust-plan").hidden = true;
@@ -650,10 +662,18 @@
 
     function syncWizardMode() {
       const active = Boolean(wizardMedia.matches);
-      if (!active) form.hidden = false;
-      if (active && currentResult) {
+      if (!active) {
+        form.hidden = false;
+        if (currentResult) results.hidden = wizardView === "editing";
+        element("finder-adjust-plan").hidden = true;
+      } else if (currentResult && wizardView !== "editing") {
         form.hidden = true;
-        element("finder-adjust-plan").hidden = sharedView;
+        results.hidden = false;
+        element("finder-adjust-plan").hidden = wizardView === "shared";
+      } else {
+        form.hidden = false;
+        if (currentResult) results.hidden = true;
+        element("finder-adjust-plan").hidden = true;
       }
       updateWizardStep();
     }
@@ -1202,6 +1222,7 @@
 
     function render(result, user) {
       sharedView = false;
+      wizardView = "results";
       comparisonOpened = false;
       comparisonIds = [];
       currentResult = result;
@@ -1255,6 +1276,7 @@
           element("finder-currency").value = selectedCurrency;
         }
         sharedView = true;
+        wizardView = "shared";
         comparisonIds = scenario.comparisonIds.slice();
         currentUser = {
           household: scenario.household,

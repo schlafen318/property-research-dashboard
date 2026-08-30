@@ -51,7 +51,10 @@ class FakeElement {
     this.disabled = false;
     this.dataset = {};
     this.min = "";
+    this.max = "";
     this.step = "";
+    this.type = "";
+    this.required = false;
     this.textContent = "";
     this.innerHTML = "";
     this.listeners = {};
@@ -73,6 +76,23 @@ class FakeElement {
     (this.listeners[name] || []).forEach((callback) => callback(event));
   }
   setCustomValidity(message) { this.validationMessage = message; }
+  checkValidity() {
+    if (this.disabled) return true;
+    if (this.validationMessage) return false;
+    if (this.required && this.value === "") return false;
+    if (this.type !== "number" || this.value === "") return true;
+    const value = Number(this.value);
+    if (!Number.isFinite(value)) return false;
+    if (this.min !== "" && value < Number(this.min)) return false;
+    if (this.max !== "" && value > Number(this.max)) return false;
+    if (this.step !== "" && this.step !== "any") {
+      const base = this.min === "" ? 0 : Number(this.min);
+      const quotient = (value - base) / Number(this.step);
+      if (Math.abs(quotient - Math.round(quotient)) > 1e-8) return false;
+    }
+    return true;
+  }
+  reportValidity() { this.reportedInvalid = true; return this.checkValidity(); }
   setAttribute(name, value) { this.attributes[name] = String(value); }
   removeAttribute(name) { delete this.attributes[name]; }
   querySelectorAll() { return []; }
@@ -128,6 +148,16 @@ const wizardSections = [
   el("finder-retirement-income"),
   el("finder-preferences"),
 ];
+const controlsBySection = [
+  ["finder-currency", "finder-current-age", "finder-retirement-age", "finder-horizon", "finder-household", "finder-liquid-capital", "finder-monthly-contribution", "finder-return"],
+  ["finder-housing-plan", "finder-property-allocation", "finder-purchase-method", "finder-buyer-residency", "finder-income-source", "finder-requested-ltv", "finder-mortgage-rate", "finder-mortgage-term", "finder-mortgage-treatment", "finder-use-before-retirement", "finder-rental-yield", "finder-vacancy-rate", "finder-operating-cost-rate"],
+  ["finder-pension", "finder-other-income"],
+  ["finder-region", "finder-healthcare"],
+];
+wizardSections.forEach((section, index) => {
+  section.controls = controlsBySection[index].map(el);
+  section.querySelectorAll = () => section.controls;
+});
 el("finder-results").hidden = true;
 el("finder-wizard-progress").hidden = true;
 el("finder-wizard-actions").hidden = true;
@@ -145,6 +175,24 @@ el("finder-projection-bars").querySelectorAll = (selector) =>
   ["finder-pension", "0", "100"],
   ["finder-other-income", "0", "100"],
 ].forEach(([id, min, step]) => { el(id).min = min; el(id).step = step; });
+[
+  ["finder-current-age", "18", "90", "1"],
+  ["finder-retirement-age", "19", "100", "1"],
+  ["finder-horizon", "1", "60", "1"],
+  ["finder-return", "-5", "15", "0.1"],
+  ["finder-requested-ltv", "0", "100", "1"],
+  ["finder-mortgage-rate", "0", "25", "0.1"],
+  ["finder-mortgage-term", "1", "40", "1"],
+  ["finder-rental-yield", "0", "30", "0.1"],
+  ["finder-vacancy-rate", "0", "100", "1"],
+  ["finder-operating-cost-rate", "0", "100", "1"],
+].forEach(([id, min, max, step]) => {
+  const control = el(id);
+  control.type = "number";
+  control.min = min;
+  control.max = max;
+  control.step = step;
+});
 el("finder-contribution-indexed").checked = true;
 el("finder-pension-indexed").checked = true;
 el("finder-other-income-indexed").checked = true;
@@ -183,12 +231,7 @@ const fakeWindow = {
     search: input.search || "",
   },
   navigator: input.clipboard ? { clipboard: { writeText(value) { input.copied = value; return Promise.resolve(); } } } : {},
-  matchMedia() {
-    return {
-      matches: Boolean(input.mobile),
-      addEventListener() {},
-    };
-  },
+  matchMedia() { return mediaQuery; },
   GHA: { track(name, fields) { trackedEvents.push({ name, fields: fields || {} }); } },
   GHARetirementFinderScenario: scenarioApi,
   GHARetirementDestinationFinder: {
@@ -204,6 +247,11 @@ const fakeWindow = {
       };
     },
   },
+};
+const mediaListeners = [];
+const mediaQuery = {
+  matches: Boolean(input.mobile),
+  addEventListener(name, callback) { if (name === "change") mediaListeners.push(callback); },
 };
 const context = { window: fakeWindow, document, Intl, Number, String, Array, Set, Map, Math, JSON };
 vm.runInNewContext(fs.readFileSync(process.argv[1], "utf8"), context);
@@ -233,10 +281,26 @@ if (input.invalidAges) {
   el("finder-current-age").value = "65";
   el("finder-retirement-age").value = "60";
 }
+if (input.invalidReturnStep) el("finder-return").value = "5.05";
 for (const action of input.wizardActions || []) {
   if (action === "next") el("finder-wizard-next").dispatch("click");
   if (action === "back") el("finder-wizard-back").dispatch("click");
   if (action === "adjust") el("finder-adjust-plan").dispatch("click");
+  if (action === "buy-mortgage") {
+    el("finder-housing-plan").value = "buy_now";
+    el("finder-housing-plan").dispatch("change");
+    el("finder-purchase-method").value = "mortgage";
+    el("finder-purchase-method").dispatch("change");
+  }
+  if (action === "invalid-ltv") el("finder-requested-ltv").value = "101";
+  if (action === "desktop") {
+    mediaQuery.matches = false;
+    mediaListeners.forEach((callback) => callback({ matches: false }));
+  }
+  if (action === "mobile") {
+    mediaQuery.matches = true;
+    mediaListeners.forEach((callback) => callback({ matches: true }));
+  }
 }
 if (input.submit) el("retirement-destination-finder-form").dispatch("submit");
 if (input.clickLandscapeToggle) el("finder-landscape-toggle").dispatch("click");
@@ -363,6 +427,33 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertEqual([False, True, True, True], scenario["wizardSectionHidden"])
         self.assertFalse(scenario["wizardErrorHidden"])
 
+    def test_mobile_wizard_reports_native_step_mismatch_before_hiding_the_field(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "invalidReturnStep": True,
+                "wizardActions": ["next"],
+            }
+        )
+
+        self.assertEqual([False, True, True, True], scenario["wizardSectionHidden"])
+        self.assertFalse(scenario["wizardErrorHidden"])
+        self.assertEqual(0, scenario["engineCalls"])
+
+    def test_mobile_wizard_reports_invalid_conditional_mortgage_field_on_step_two(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "wizardActions": ["next", "buy-mortgage", "invalid-ltv", "next"],
+            }
+        )
+
+        self.assertEqual([True, False, True, True], scenario["wizardSectionHidden"])
+        self.assertFalse(scenario["wizardErrorHidden"])
+        self.assertEqual(0, scenario["engineCalls"])
+
     def test_mobile_wizard_enter_advances_instead_of_bypassing_remaining_steps(self) -> None:
         scenario = run_ui_dom_scenario(
             {
@@ -402,6 +493,21 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertTrue(adjusted["resultsHidden"])
         self.assertEqual([True, True, True, False], adjusted["wizardSectionHidden"])
         self.assertEqual("View my matches", adjusted["wizardNextText"])
+
+    def test_mobile_wizard_keeps_adjusted_form_visible_across_responsive_changes(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "wizardActions": [
+                    "next", "next", "next", "next", "adjust", "desktop", "mobile"
+                ],
+            }
+        )
+
+        self.assertFalse(scenario["formHidden"])
+        self.assertTrue(scenario["resultsHidden"])
+        self.assertEqual([True, True, True, False], scenario["wizardSectionHidden"])
 
     def test_desktop_keeps_the_full_form_and_hides_wizard_navigation(self) -> None:
         scenario = run_ui_dom_scenario({"rates": {"USD": 1}, "mobile": False})
