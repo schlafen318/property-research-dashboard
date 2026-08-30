@@ -92,6 +92,20 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         positions = [self.html.index(value) for value in ordered_ids]
         self.assertEqual(sorted(positions), positions)
 
+    def test_form_defaults_to_age_45_and_retirement_at_60(self) -> None:
+        form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
+            "</form>", 1
+        )[0]
+
+        self.assertIn(
+            'id="finder-current-age" type="number" min="18" max="90" value="45"',
+            form,
+        )
+        self.assertIn(
+            'id="finder-retirement-age" type="number" min="19" max="100" value="60"',
+            form,
+        )
+
     def test_housing_and_conditional_fields_exist(self) -> None:
         for option in (
             '<option value="rent">Rent</option>',
