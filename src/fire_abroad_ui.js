@@ -160,6 +160,20 @@
       return documentRoot.getElementById(id);
     }
 
+    function setValidationState(controlId, message) {
+      const control = element(controlId);
+      const error = element(controlId + "-error");
+      const invalid = Boolean(message);
+      if (control && typeof control.setAttribute === "function" && invalid) {
+        control.setAttribute("aria-invalid", "true");
+      } else if (control && typeof control.removeAttribute === "function") {
+        control.removeAttribute("aria-invalid");
+      }
+      if (!error) return;
+      error.textContent = message || "";
+      error.hidden = !invalid;
+    }
+
     function readProfile() {
       const raw = {};
       const controls = {
@@ -176,8 +190,29 @@
       Object.keys(controls).forEach(function (key) {
         const control = element(controls[key]);
         if (!control) return;
-        raw[key] = key === "age" || key === "annual_days" ? Number(control.value) : control.value;
+        raw[key] = control.value;
       });
+      const errors = {
+        "fire-stay-mode": STAY_MODES.has(raw.stay_mode) ? "" : "Choose an intended stay.",
+        "fire-age": "",
+        "fire-household": HOUSEHOLDS.has(raw.household) ? "" : "Choose a household.",
+        "fire-housing": HOUSING.has(raw.housing) ? "" : "Choose a housing plan.",
+        "fire-annual-days": "",
+      };
+      const age = Number(raw.age);
+      if (!Number.isInteger(age) || age < 18 || age > 100) {
+        errors["fire-age"] = "Enter an age from 18 to 100.";
+      }
+      const annualDays = typeof raw.annual_days === "string" ? raw.annual_days.trim() : "";
+      if (annualDays && (!Number.isInteger(Number(annualDays)) || Number(annualDays) < 1 || Number(annualDays) > 366)) {
+        errors["fire-annual-days"] = "Enter days from 1 to 366, or leave this field blank.";
+      }
+      Object.keys(errors).forEach(function (controlId) {
+        setValidationState(controlId, errors[controlId]);
+      });
+      if (Object.keys(errors).some(function (controlId) { return errors[controlId]; })) return null;
+      raw.age = age;
+      raw.annual_days = annualDays ? Number(annualDays) : null;
       return engine.normalizeProfile(raw);
     }
 
@@ -245,15 +280,21 @@
         resultsNode.appendChild(article);
       });
       if (summaryNode) {
-        const ranked = rows.filter(function (row) { return typeof row.score === "number"; }).length;
-        const unranked = rows.length - ranked;
-        summaryNode.textContent = ranked + " ranked destinations" + (unranked ? "; " + unranked + " need verification." : ".");
+        const statuses = { eligible: 0, conditional: 0, needs_verification: 0, not_eligible: 0 };
+        rows.forEach(function (row) {
+          if (Object.prototype.hasOwnProperty.call(statuses, row.status)) statuses[row.status] += 1;
+          else statuses.needs_verification += 1;
+        });
+        summaryNode.textContent = rows.length + " destinations evaluated; " + statuses.eligible +
+          " eligible, " + statuses.conditional + " conditional, " + statuses.needs_verification +
+          " need verification" + (statuses.not_eligible ? ", " + statuses.not_eligible + " not currently eligible." : ".");
       }
     }
 
     function update(event) {
       if (event) event.preventDefault();
       const profile = readProfile();
+      if (!profile) return;
       render(profile);
       const stayMode = element("fire-stay-mode");
       const activity = element("fire-activity-priority");

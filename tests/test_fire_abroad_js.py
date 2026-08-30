@@ -47,10 +47,12 @@ def run_js_call(module: Path, function_name: str, *arguments: object) -> object:
 def run_js_program(source: str) -> object:
     result = subprocess.run(
         ["node", "-e", source, str(UI)],
-        check=True,
+        check=False,
         capture_output=True,
         text=True,
     )
+    if result.returncode:
+        raise RuntimeError(result.stderr)
     return json.loads(result.stdout)
 
 
@@ -509,7 +511,10 @@ process.stdout.write(JSON.stringify({
         )
         self.assertEqual(1, state["afterChange"]["rankCalls"])
         self.assertEqual(1, state["afterChange"]["replaceCalls"])
-        self.assertEqual("1 ranked destinations.", state["afterChange"]["summary"])
+        self.assertEqual(
+            "1 destinations evaluated; 0 eligible, 1 conditional, 0 need verification.",
+            state["afterChange"]["summary"],
+        )
         self.assertEqual(
             ["page_view", "stay_mode_change"], state["afterChange"]["tracked"]
         )
@@ -537,6 +542,101 @@ process.stdout.write(JSON.stringify({
             ],
             state["afterChange"]["hrefs"],
         )
+
+    def test_validation_keeps_last_results_and_announces_status_counts_without_moving_focus(self) -> None:
+        state = run_js_program(
+            r"""
+const ui = require(process.argv[1]);
+const listeners = {};
+let rankCalls = 0;
+let focusCalls = 0;
+function node(tagName) {
+  return {
+    tagName: String(tagName).toUpperCase(), textContent: "", children: [], attributes: {}, hidden: true,
+    appendChild(child) { this.children.push(child); },
+    setAttribute(name, value) { this.attributes[name] = String(value); },
+    removeAttribute(name) { delete this.attributes[name]; },
+    addEventListener() {},
+    focus() { focusCalls += 1; },
+  };
+}
+const form = { dataset: {}, addEventListener(type, listener) { listeners[type] = listener; } };
+const results = node("div");
+results.hidden = false;
+results.replaceCalls = 0;
+results.replaceChildren = function () { this.replaceCalls += 1; this.children = []; };
+const summary = { textContent: "SERVER DEFAULT" };
+const controls = {
+  "fire-stay-mode": { value: "part_year", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-age": { value: "50", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-household": { value: "single", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-housing": { value: "rent", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-mobility-rights": { value: "prefer_not_to_say", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-home-tax-context": { value: "prefer_not_to_say", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-annual-days": { value: "", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-income-type": { value: "prefer_not_to_say", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-activity-priority": { value: "balanced", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+};
+const errors = {
+  "fire-stay-mode-error": node("p"), "fire-age-error": node("p"),
+  "fire-household-error": node("p"), "fire-housing-error": node("p"),
+  "fire-annual-days-error": node("p"),
+};
+const nodes = Object.assign({}, controls, errors, {
+  "fire-abroad-data": { textContent: JSON.stringify({ destinations: [] }) },
+  "fire-abroad-form": form, "fire-results": results, "fire-results-summary": summary,
+});
+const rows = [
+  { destination_id: "alpha", name: "Alpha", status: "eligible", score: 4, components: {}, resilience_budget: {}, work_permission: "remote_permitted", warnings: [], confidence: "high" },
+  { destination_id: "bravo", name: "Bravo", status: "conditional", score: 3, components: {}, resilience_budget: {}, work_permission: "passive_only", warnings: [], confidence: "high" },
+  { destination_id: "charlie", name: "Charlie", status: "needs_verification", score: null, components: {}, resilience_budget: {}, work_permission: "unclear", warnings: [], confidence: "low" },
+];
+const host = {
+  document: {
+    getElementById(id) { return nodes[id] || null; },
+    createElement(tagName) { const created = node(tagName); created.hidden = false; return created; },
+    createTextNode(value) { const created = node("#text"); created.hidden = false; created.textContent = value; return created; },
+  },
+  GHAFireAbroad: {
+    normalizeProfile(raw) { return Object.assign({ activity_priority: "balanced" }, raw); },
+    rankDestinations() { rankCalls += 1; return rows; },
+  },
+};
+function submit() { listeners.submit({ type: "submit", preventDefault() {} }); }
+ui.initFireAbroad(host);
+submit();
+const valid = { summary: summary.textContent, replaceCalls: results.replaceCalls, rankCalls };
+controls["fire-age"].value = "17";
+submit();
+const badAge = { summary: summary.textContent, replaceCalls: results.replaceCalls, rankCalls, error: { hidden: errors["fire-age-error"].hidden, textContent: errors["fire-age-error"].textContent }, focusCalls };
+controls["fire-age"].value = "50";
+controls["fire-annual-days"].value = "367";
+submit();
+const badDays = { replaceCalls: results.replaceCalls, rankCalls, error: { hidden: errors["fire-annual-days-error"].hidden, textContent: errors["fire-annual-days-error"].textContent }, focusCalls };
+controls["fire-annual-days"].value = "";
+controls["fire-household"].value = "";
+submit();
+const missingHousehold = { replaceCalls: results.replaceCalls, rankCalls, error: { hidden: errors["fire-household-error"].hidden, textContent: errors["fire-household-error"].textContent }, focusCalls };
+process.stdout.write(JSON.stringify({ valid, badAge, badDays, missingHousehold }));
+"""
+        )
+        self.assertEqual(
+            "3 destinations evaluated; 1 eligible, 1 conditional, 1 need verification.",
+            state["valid"]["summary"],
+        )
+        self.assertEqual(1, state["valid"]["rankCalls"])
+        self.assertEqual(1, state["valid"]["replaceCalls"])
+        for failure, message in (
+            ("badAge", "Enter an age from 18 to 100."),
+            ("badDays", "Enter days from 1 to 366, or leave this field blank."),
+            ("missingHousehold", "Choose a household."),
+        ):
+            with self.subTest(failure=failure):
+                self.assertEqual(1, state[failure]["rankCalls"])
+                self.assertEqual(1, state[failure]["replaceCalls"])
+                self.assertFalse(state[failure]["error"]["hidden"])
+                self.assertEqual(message, state[failure]["error"]["textContent"])
+                self.assertEqual(0, state[failure]["focusCalls"])
 
     def test_one_delegated_handler_tracks_static_and_dynamic_result_links_once(self) -> None:
         state = run_js_program(

@@ -7,6 +7,7 @@ from pathlib import Path
 import re
 import unittest
 from urllib.parse import parse_qs, urlsplit
+from html.parser import HTMLParser
 
 from src.build_unified_app import (
     FIRE_ABROAD_DESCRIPTION,
@@ -21,6 +22,28 @@ from src.build_unified_app import (
     load_retirement_costs,
 )
 from src.fire_abroad import CANONICAL_LAUNCH_IDS, load_fire_abroad
+
+
+class FireAbroadMarkupParser(HTMLParser):
+    """Collect the page accessibility contract from rendered markup."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.label_targets: set[str] = set()
+        self.control_ids: set[str] = set()
+        self.live_region_ids: set[str] = set()
+        self.noscript_sections = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        values = dict(attrs)
+        if tag == "label" and values.get("for"):
+            self.label_targets.add(str(values["for"]))
+        if tag in {"input", "select"} and values.get("id"):
+            self.control_ids.add(str(values["id"]))
+        if values.get("aria-live") == "polite" and values.get("id"):
+            self.live_region_ids.add(str(values["id"]))
+        if tag == "noscript":
+            self.noscript_sections += 1
 
 
 class FireAbroadPageTests(unittest.TestCase):
@@ -152,12 +175,12 @@ class FireAbroadPageTests(unittest.TestCase):
     def test_profile_controls_use_native_labeled_defaults_and_allowlisted_options(self) -> None:
         expected_fragments = (
             '<label for="fire-stay-mode">Intended stay</label>',
-            '<select id="fire-stay-mode">',
+            '<select id="fire-stay-mode" aria-describedby="fire-stay-mode-error">',
             '<option value="part_year" selected>Part-year base</option>',
             '<label for="fire-age">Current age</label>',
-            '<input id="fire-age" type="number" min="18" max="100" value="50">',
+            '<input id="fire-age" type="number" min="18" max="100" value="50" aria-describedby="fire-age-error">',
             '<label for="fire-household">Household</label>',
-            '<select id="fire-household"><option value="single" selected>Single</option><option value="couple">Couple</option></select>',
+            '<select id="fire-household" aria-describedby="fire-household-error"><option value="single" selected>Single</option><option value="couple">Couple</option></select>',
             '<label for="fire-housing">Housing</label>',
             '<option value="own">Already own</option>',
             '<option value="buy_now">Buy now</option>',
@@ -173,6 +196,32 @@ class FireAbroadPageTests(unittest.TestCase):
             with self.subTest(fragment=fragment):
                 self.assertIn(fragment, self.html)
         self.assertNotIn('role="button"', self.html)
+
+    def test_profile_controls_and_failure_states_are_accessible_at_small_widths(self) -> None:
+        parser = FireAbroadMarkupParser()
+        parser.feed(self.html)
+        expected_controls = {
+            "fire-stay-mode", "fire-age", "fire-household", "fire-housing",
+            "fire-mobility-rights", "fire-home-tax-context", "fire-annual-days",
+            "fire-income-type", "fire-activity-priority",
+        }
+        self.assertTrue(expected_controls.issubset(parser.control_ids))
+        self.assertTrue(expected_controls.issubset(parser.label_targets))
+        self.assertIn("fire-results-summary", parser.live_region_ids)
+        self.assertGreaterEqual(parser.noscript_sections, 1)
+        self.assertIn('<form id="fire-abroad-form" class="fire-profile" novalidate>', self.html)
+
+        for control_id in ("fire-age", "fire-annual-days", "fire-stay-mode", "fire-household", "fire-housing"):
+            with self.subTest(control_id=control_id):
+                self.assertIn(f'id="{control_id}-error"', self.html)
+                self.assertIn(f'aria-describedby="{control_id}-error"', self.html)
+
+        page_css = self.html.split('<style id="fire-abroad-page-style">', 1)[1].split("</style>", 1)[0]
+        self.assertRegex(page_css, r"@media \(max-width:\s*(?:[0-7]\d\d|760)px\)")
+        self.assertIn("content: attr(data-label)", page_css)
+        self.assertIn(".fire-abroad-page .fire-results-table tbody th { width: 100%; }", page_css)
+        self.assertRegex(page_css, r"\.fire-field input, \.(?:fire-abroad-page )?\.fire-field select \{[^}]*min-height:\s*(?:44|4[5-9]|[5-9]\d)px")
+        self.assertRegex(page_css, r"\.fire-abroad-page \.fire-results-table a \{[^}]*min-height:\s*44px")
 
     def test_embedded_payload_is_minimal_complete_and_script_safe(self) -> None:
         script_text = re.search(

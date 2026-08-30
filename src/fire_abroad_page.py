@@ -143,6 +143,8 @@ def build_fire_abroad_html(
     .fire-abroad-page .fire-field {{ min-width: 0; }}
     .fire-abroad-page .fire-field label {{ display: block; min-height: 38px; margin-bottom: 6px; font-size: 13px; }}
     .fire-abroad-page .fire-field input, .fire-abroad-page .fire-field select {{ width: 100%; min-height: 46px; padding: 9px 10px; border: 1px solid var(--gha-rule); }}
+    .fire-abroad-page .fire-field input[aria-invalid="true"], .fire-abroad-page .fire-field select[aria-invalid="true"] {{ border-color: var(--gha-accent); }}
+    .fire-abroad-page .fire-field-error {{ margin: 6px 0 0; color: var(--gha-accent); font-size: 12px; line-height: 1.4; }}
     .fire-abroad-page .fire-profile button {{ min-height: 46px; margin-top: 22px; padding: 0 18px; border: 1px solid var(--gha-ink); background: var(--gha-ink); color: var(--gha-paper); cursor: pointer; }}
     .fire-abroad-page .fire-profile button:hover {{ background: var(--gha-accent); }}
     .fire-abroad-page #fire-results-summary {{ margin: 0 0 20px; color: var(--gha-muted); }}
@@ -152,6 +154,7 @@ def build_fire_abroad_html(
     .fire-abroad-page .fire-results-table thead th {{ color: var(--gha-muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }}
     .fire-abroad-page .fire-results-table tbody th {{ width: 18%; font-size: 15px; }}
     .fire-abroad-page .fire-results-table span, .fire-abroad-page .fire-results-table small, .fire-abroad-page .fire-results-table a {{ display: block; margin-top: 7px; }}
+    .fire-abroad-page .fire-results-table a {{ min-height: 44px; display: flex; align-items: center; }}
     .fire-abroad-page .fire-results-table small {{ color: var(--gha-muted); font-size: 12px; }}
     .fire-abroad-page #fire-results > article {{ padding: 24px 0; border-top: 1px solid var(--gha-rule); }}
     .fire-abroad-page #fire-results > article h2 {{ margin: 0 0 10px; font-size: 28px; }}
@@ -170,7 +173,9 @@ def build_fire_abroad_html(
       .fire-abroad-page .fire-results-table thead {{ position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; }}
       .fire-abroad-page .fire-results-table tr {{ padding: 22px 0; border-top: 2px solid var(--gha-ink); }}
       .fire-abroad-page .fire-results-table th, .fire-abroad-page .fire-results-table td {{ padding: 7px 0; border: 0; }}
+      .fire-abroad-page .fire-results-table tbody th {{ width: 100%; }}
       .fire-abroad-page .fire-results-table td::before {{ content: attr(data-label); display: block; margin-bottom: 3px; color: var(--gha-muted); font-size: 11px; letter-spacing: .06em; text-transform: uppercase; }}
+      .fire-abroad-page .fire-table-wrap {{ overflow-x: visible; }}
     }}
     @media (max-width: 560px) {{ .fire-abroad-page .fire-fields {{ grid-template-columns: 1fr; }} .fire-abroad-page .fire-field label {{ min-height: 0; }} .fire-abroad-page .fire-profile button {{ width: 100%; }} }}
   </style>
@@ -186,17 +191,17 @@ def build_fire_abroad_html(
   <p class="page-lede">Residence is mode-dependent. Property ownership is optional, and a high score never guarantees legal stay, tax, healthcare, or work eligibility.</p>
 </div></header>
 <main><div class="gha-shell fire-content">
-  <form id="fire-abroad-form" class="fire-profile">
+  <form id="fire-abroad-form" class="fire-profile" novalidate>
     <h2>Set your planning profile</h2>
     <p>The defaults compare one person renting a part-year base at age 50. Optional context stays in this browser and is not added to calculator links.</p>
     <div class="fire-fields">
-      <div class="fire-field"><label for="fire-stay-mode">Intended stay</label><select id="fire-stay-mode"><option value="seasonal">Seasonal</option><option value="part_year" selected>Part-year base</option><option value="full_relocation">Full relocation</option></select></div>
-      <div class="fire-field"><label for="fire-age">Current age</label><input id="fire-age" type="number" min="18" max="100" value="50"></div>
-      <div class="fire-field"><label for="fire-household">Household</label><select id="fire-household"><option value="single" selected>Single</option><option value="couple">Couple</option></select></div>
-      <div class="fire-field"><label for="fire-housing">Housing</label><select id="fire-housing"><option value="rent" selected>Rent</option><option value="own">Already own</option><option value="buy_now">Buy now</option><option value="buy_retirement">Buy at retirement</option></select></div>
+      <div class="fire-field"><label for="fire-stay-mode">Intended stay</label><select id="fire-stay-mode" aria-describedby="fire-stay-mode-error"><option value="seasonal">Seasonal</option><option value="part_year" selected>Part-year base</option><option value="full_relocation">Full relocation</option></select><p class="fire-field-error" id="fire-stay-mode-error" role="alert" hidden></p></div>
+      <div class="fire-field"><label for="fire-age">Current age</label><input id="fire-age" type="number" min="18" max="100" value="50" aria-describedby="fire-age-error"><p class="fire-field-error" id="fire-age-error" role="alert" hidden></p></div>
+      <div class="fire-field"><label for="fire-household">Household</label><select id="fire-household" aria-describedby="fire-household-error"><option value="single" selected>Single</option><option value="couple">Couple</option></select><p class="fire-field-error" id="fire-household-error" role="alert" hidden></p></div>
+      <div class="fire-field"><label for="fire-housing">Housing</label><select id="fire-housing" aria-describedby="fire-housing-error"><option value="rent" selected>Rent</option><option value="own">Already own</option><option value="buy_now">Buy now</option><option value="buy_retirement">Buy at retirement</option></select><p class="fire-field-error" id="fire-housing-error" role="alert" hidden></p></div>
       <div class="fire-field"><label for="fire-mobility-rights">Mobility rights context (optional)</label><select id="fire-mobility-rights"><option value="prefer_not_to_say" selected>Prefer not to say</option><option value="local_free_movement">Local or free-movement rights</option><option value="general_nonlocal">General nonlocal passport</option></select></div>
       <div class="fire-field"><label for="fire-home-tax-context">Home tax context (optional)</label><select id="fire-home-tax-context"><option value="prefer_not_to_say" selected>Prefer not to say</option><option value="us_person">U.S. person</option><option value="other">Other</option></select></div>
-      <div class="fire-field"><label for="fire-annual-days">Approximate days per year (optional)</label><input id="fire-annual-days" type="number" min="1" max="366" placeholder="Not set"></div>
+      <div class="fire-field"><label for="fire-annual-days">Approximate days per year (optional)</label><input id="fire-annual-days" type="number" min="1" max="366" placeholder="Not set" aria-describedby="fire-annual-days-error"><p class="fire-field-error" id="fire-annual-days-error" role="alert" hidden></p></div>
       <div class="fire-field"><label for="fire-income-type">Income type (optional)</label><select id="fire-income-type"><option value="prefer_not_to_say" selected>Prefer not to say</option><option value="portfolio">Portfolio</option><option value="pension">Pension</option><option value="property">Property</option><option value="business_consulting">Business or consulting</option><option value="mixed">Mixed</option></select></div>
       <div class="fire-field"><label for="fire-activity-priority">Activity priority (optional)</label><select id="fire-activity-priority"><option value="balanced" selected>Balanced Active Life</option><option value="walking">Walking</option><option value="cycling">Cycling</option><option value="hiking">Hiking</option><option value="water">Water activities</option><option value="winter_sports">Winter sports</option><option value="fitness_social">Fitness and social activity</option></select></div>
     </div>
