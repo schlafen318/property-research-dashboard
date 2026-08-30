@@ -62,6 +62,80 @@
     return matchingRanked.concat(unranked);
   }
 
+  function statusLabel(status) {
+    return {
+      eligible: "Eligible",
+      conditional: "Conditional",
+      needs_verification: "Needs verification",
+      not_eligible: "Not currently eligible",
+    }[status] || "Needs verification";
+  }
+
+  function workPermissionLabel(permission) {
+    return {
+      passive_only: "Passive income only",
+      remote_permitted: "Remote work permitted",
+      local_permitted: "Local work permitted",
+      unclear: "Work permission needs professional review",
+    }[permission] || "Work permission needs professional review";
+  }
+
+  function scoreLabel(value) {
+    return typeof value === "number" && Number.isFinite(value)
+      ? value.toFixed(2) + " out of 5"
+      : "Needs verification";
+  }
+
+  function usd(value) {
+    return typeof value === "number" && Number.isFinite(value)
+      ? "$" + Math.round(value).toLocaleString("en-US")
+      : "Not available";
+  }
+
+  function confidenceLabel(value) {
+    const label = typeof value === "string" && value ? value.replaceAll("_", " ") : "low";
+    return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+  }
+
+  function resultDetails(row, profile) {
+    const item = object(row);
+    const components = object(item.components);
+    const budget = object(item.resilience_budget);
+    const eligibilityLabel = statusLabel(item.status);
+    const reason = typeof item.status_reason === "string" && item.status_reason ? " " + item.status_reason : "";
+    const strongestActivity = typeof item.strongest_activity_reason === "string" && item.strongest_activity_reason
+      ? " " + item.strongest_activity_reason : "";
+    const destinationId = safeDestinationId(item.destination_id);
+    const warnings = Array.isArray(item.warnings) ? item.warnings.filter(function (warning) {
+      return typeof warning === "string" && warning;
+    }).map(function (warning) {
+      return "Planning warning: " + warning;
+    }) : [];
+    return {
+      name: typeof item.name === "string" && item.name ? item.name : destinationId,
+      eligibilityLabel: eligibilityLabel,
+      eligibility: "Eligibility: " + eligibilityLabel + "." + reason,
+      score: typeof item.score === "number" && Number.isFinite(item.score)
+        ? "FIRE Abroad score: " + item.score.toFixed(2) + " out of 5."
+        : "Ranking: Unranked until evidence is verified.",
+      resilienceBudget: "Resilience budget: " + usd(budget.annual_total_usd) + " per year. " +
+        "Currency and inflation buffer: " + usd(budget.currency_inflation_buffer) + ". " +
+        "One-time relocation estimate: " + usd(budget.one_time_relocation_usd) + ".",
+      activeLife: "Active Life: " + scoreLabel(components.active_life) + "." + strongestActivity,
+      healthcare: "Healthcare Bridge: " + scoreLabel(components.healthcare_bridge) + ".",
+      stayAndWork: "Stay Flexibility: " + scoreLabel(components.stay_flexibility) +
+        ". Work permission: " + workPermissionLabel(item.work_permission) + ".",
+      tax: "Tax Compatibility: " + scoreLabel(components.tax_compatibility) + ".",
+      warnings: warnings,
+      evidence: "Evidence: " + confidenceLabel(item.confidence) + " confidence; reviewed " +
+        (typeof item.last_reviewed === "string" && item.last_reviewed ? item.last_reviewed : "not recorded") + ".",
+      calculatorLabel: "Build your plan",
+      calculatorHref: safeCalculatorHref({ destinationId: destinationId, profile: profile }),
+      guideLabel: "Read destination guide",
+      guideHref: destinationId ? "/destinations/" + encodeURIComponent(destinationId) + "/" : "/destinations/",
+    };
+  }
+
   function initFireAbroad(appRoot) {
     const host = appRoot || root;
     const documentRoot = host && host.document;
@@ -123,25 +197,31 @@
       const rows = resultRowsForDisplay(engine.rankDestinations(payload, profile), profile.activity_priority);
       resultsNode.replaceChildren();
       rows.forEach(function (row) {
+        const details = resultDetails(row, profile);
         const article = documentRoot.createElement("article");
-        appendText(article, "h2", row.name);
-        appendText(article, "p", "Eligibility: " + String(row.status || "needs_verification") + ". " + String(row.status_reason || ""));
-        appendText(article, "p", row.score === null ? "Ranking: Unranked until evidence is verified." : "FIRE Abroad score: " + row.score.toFixed(2) + " out of 5.");
-        if (row.strongest_activity_reason) appendText(article, "p", row.strongest_activity_reason);
-        (Array.isArray(row.warnings) ? row.warnings : []).forEach(function (warning) {
-          appendText(article, "p", "Warning: " + String(warning));
+        article.setAttribute("data-fire-result", safeDestinationId(row.destination_id));
+        appendText(article, "h2", details.name);
+        appendText(article, "p", details.eligibility);
+        appendText(article, "p", details.score);
+        appendText(article, "p", details.resilienceBudget);
+        appendText(article, "p", details.activeLife);
+        appendText(article, "p", details.healthcare);
+        appendText(article, "p", details.stayAndWork);
+        appendText(article, "p", details.tax);
+        details.warnings.forEach(function (warning) {
+          appendText(article, "p", warning);
         });
+        appendText(article, "p", details.evidence);
         const calculator = documentRoot.createElement("a");
-        calculator.href = safeCalculatorHref({ destinationId: row.destination_id, profile: profile });
-        calculator.textContent = "Explore retirement budget";
+        calculator.href = details.calculatorHref;
+        calculator.textContent = details.calculatorLabel;
         calculator.addEventListener("click", function () {
           track("calculator_handoff", { destinationId: row.destination_id });
         });
         article.appendChild(calculator);
         const guide = documentRoot.createElement("a");
-        const destinationId = safeDestinationId(row.destination_id);
-        guide.href = destinationId ? "/destinations/" + encodeURIComponent(destinationId) + "/" : "/destinations/";
-        guide.textContent = "Read destination guide";
+        guide.href = details.guideHref;
+        guide.textContent = details.guideLabel;
         guide.addEventListener("click", function () {
           track("destination_guide_click", { destinationId: row.destination_id });
         });
@@ -170,9 +250,8 @@
 
     form.addEventListener("submit", update);
     form.addEventListener("change", update);
-    render(readProfile());
     track("page_view", {});
   }
 
-  return { safeCalculatorHref, safeAnalyticsPayload, resultRowsForDisplay, initFireAbroad };
+  return { safeCalculatorHref, safeAnalyticsPayload, resultRowsForDisplay, resultDetails, initFireAbroad };
 });

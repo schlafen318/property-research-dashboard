@@ -46,7 +46,14 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn("Algarve / Cascais", self.html)
         self.assertIn("FIRE Abroad score: 3.70 out of 5", self.html)
         self.assertIn("Needs verification", self.html)
-        self.assertEqual(10, self.html.count("data-fire-result"))
+        self.assertIn("Healthcare Bridge:", self.html)
+        self.assertIn("Stay Flexibility:", self.html)
+        self.assertIn("Tax Compatibility:", self.html)
+        self.assertIn("Passive income only", self.html)
+        self.assertIn("Medium High confidence", self.html)
+        self.assertIn("Evidence reviewed 2026-08-29", self.html)
+        self.assertEqual(10, self.html.count(">Build your plan</a>"))
+        self.assertEqual(10, self.html.count('<tr data-fire-result="'))
         self.assertLess(self.html.index("Algarve / Cascais"), self.html.index("Da Nang / Hoi An"))
 
     def test_metadata_and_schema_describe_a_page_without_ratings(self) -> None:

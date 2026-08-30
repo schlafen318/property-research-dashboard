@@ -44,6 +44,16 @@ def run_js_call(module: Path, function_name: str, *arguments: object) -> object:
     return json.loads(result.stdout)
 
 
+def run_js_program(source: str) -> object:
+    result = subprocess.run(
+        ["node", "-e", source, str(UI)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
+
+
 class FireAbroadJavaScriptParityTests(unittest.TestCase):
     """These fail if browser scoring diverges from the reviewed Python contract."""
 
@@ -281,6 +291,252 @@ class FireAbroadJavaScriptPrivacyTests(unittest.TestCase):
             {"destination_id": "other", "score": 3.0, "status": "eligible", "activity_tags": ["walking"]},
         ], "cycling")
         self.assertEqual(["ranked", "conditional"], [row["destination_id"] for row in rows])
+
+    def test_result_details_expose_complete_human_readable_decision_information(self) -> None:
+        details = run_js_call(
+            UI,
+            "resultDetails",
+            {
+                "destination_id": "valencia",
+                "name": "Valencia",
+                "status": "conditional",
+                "status_reason": "A residence route depends on the applicant profile.",
+                "score": 3.23,
+                "components": {
+                    "active_life": 4.1,
+                    "healthcare_bridge": 3.8,
+                    "stay_flexibility": 3.4,
+                    "tax_compatibility": 2.9,
+                },
+                "resilience_budget": {
+                    "annual_total_usd": 60000,
+                    "currency_inflation_buffer": 4800,
+                    "one_time_relocation_usd": 7000,
+                },
+                "work_permission": "passive_only",
+                "warnings": ["Tax residence requires a separate review."],
+                "strongest_activity_reason": "Daily walking and cycling are practical.",
+                "confidence": "medium_high",
+                "last_reviewed": "2026-08-29",
+            },
+            {"household": "couple", "housing": "buy_now"},
+        )
+        self.assertEqual("Conditional", details["eligibilityLabel"])
+        self.assertEqual(
+            "Eligibility: Conditional. A residence route depends on the applicant profile.",
+            details["eligibility"],
+        )
+        self.assertEqual("FIRE Abroad score: 3.23 out of 5.", details["score"])
+        self.assertEqual(
+            "Resilience budget: $60,000 per year. Currency and inflation buffer: $4,800. One-time relocation estimate: $7,000.",
+            details["resilienceBudget"],
+        )
+        self.assertEqual(
+            "Active Life: 4.10 out of 5. Daily walking and cycling are practical.",
+            details["activeLife"],
+        )
+        self.assertEqual("Healthcare Bridge: 3.80 out of 5.", details["healthcare"])
+        self.assertEqual(
+            "Stay Flexibility: 3.40 out of 5. Work permission: Passive income only.",
+            details["stayAndWork"],
+        )
+        self.assertEqual("Tax Compatibility: 2.90 out of 5.", details["tax"])
+        self.assertEqual(
+            ["Planning warning: Tax residence requires a separate review."],
+            details["warnings"],
+        )
+        self.assertEqual(
+            "Evidence: Medium high confidence; reviewed 2026-08-29.",
+            details["evidence"],
+        )
+        self.assertEqual("Build your plan", details["calculatorLabel"])
+        self.assertEqual(
+            "/retirement-abroad-calculator/?destination=valencia&household=couple&housing=buy_now",
+            details["calculatorHref"],
+        )
+        self.assertEqual("Read destination guide", details["guideLabel"])
+        self.assertEqual("/destinations/valencia/", details["guideHref"])
+
+    def test_result_details_keep_unranked_states_visible_without_raw_enum_values(self) -> None:
+        details = run_js_call(
+            UI,
+            "resultDetails",
+            {
+                "destination_id": "fukuoka-itoshima",
+                "name": "Fukuoka / Itoshima",
+                "status": "needs_verification",
+                "status_reason": "Nationality-dependent rights must be confirmed.",
+                "score": None,
+                "components": {},
+                "resilience_budget": {"annual_total_usd": 47600},
+                "work_permission": "unclear",
+                "warnings": [],
+                "confidence": "low",
+                "last_reviewed": "2026-08-29",
+            },
+            {"household": "single", "housing": "rent"},
+        )
+        self.assertEqual("Needs verification", details["eligibilityLabel"])
+        self.assertNotIn("needs_verification", json.dumps(details))
+        self.assertEqual(
+            "Ranking: Unranked until evidence is verified.", details["score"]
+        )
+        self.assertIn("Needs verification", details["healthcare"])
+        self.assertIn("Work permission needs professional review", details["stayAndWork"])
+
+    def test_initialization_binds_controls_without_replacing_server_results(self) -> None:
+        state = run_js_program(
+            r"""
+const ui = require(process.argv[1]);
+const listeners = {};
+let rankCalls = 0;
+let replaceCalls = 0;
+let allowCreate = false;
+const tracked = [];
+function node(tagName) {
+  return {
+    tagName,
+    textContent: "",
+    children: [],
+    attributes: {},
+    appendChild(child) { this.children.push(child); },
+    setAttribute(name, value) { this.attributes[name] = value; },
+    addEventListener() {},
+  };
+}
+function allText(current) {
+  return [current.textContent].concat(current.children.flatMap(allText)).filter(Boolean).join(" ");
+}
+function allHrefs(current) {
+  return [current.href].concat(current.children.flatMap(allHrefs)).filter(Boolean);
+}
+const form = {
+  dataset: {},
+  addEventListener(type, listener) { listeners[type] = listener; },
+};
+const results = node("div");
+results.replaceChildren = function () { replaceCalls += 1; this.children = []; };
+const summary = { textContent: "SERVER DEFAULT" };
+const controls = {
+  "fire-stay-mode": { value: "part_year" },
+  "fire-age": { value: "50" },
+  "fire-household": { value: "single" },
+  "fire-housing": { value: "rent" },
+  "fire-mobility-rights": { value: "prefer_not_to_say" },
+  "fire-home-tax-context": { value: "prefer_not_to_say" },
+  "fire-annual-days": { value: "" },
+  "fire-income-type": { value: "prefer_not_to_say" },
+  "fire-activity-priority": { value: "balanced" },
+};
+const nodes = Object.assign({}, controls, {
+  "fire-abroad-data": { textContent: JSON.stringify({ destinations: [] }) },
+  "fire-abroad-form": form,
+  "fire-results": results,
+  "fire-results-summary": summary,
+});
+const host = {
+  document: {
+    getElementById(id) { return nodes[id] || null; },
+    createElement(tagName) {
+      if (!allowCreate) throw new Error("initialization must not create result nodes");
+      return node(tagName);
+    },
+    createTextNode(value) {
+      if (!allowCreate) throw new Error("initialization must not create text nodes");
+      const text = node("#text");
+      text.textContent = value;
+      return text;
+    },
+  },
+  GHAFireAbroad: {
+    normalizeProfile() {
+      return { stay_mode: "part_year", household: "single", housing: "rent", activity_priority: "balanced" };
+    },
+    rankDestinations() {
+      rankCalls += 1;
+      return [{
+        destination_id: "valencia",
+        name: "Valencia",
+        status: "conditional",
+        status_reason: "Profile review is required.",
+        score: 3.23,
+        components: { active_life: 4.1, healthcare_bridge: 3.8, stay_flexibility: 3.4, tax_compatibility: 2.9 },
+        resilience_budget: { annual_total_usd: 60000, currency_inflation_buffer: 4800, one_time_relocation_usd: 7000 },
+        work_permission: "passive_only",
+        warnings: ["Tax residence requires a separate review."],
+        strongest_activity_reason: "Daily walking is practical.",
+        confidence: "medium_high",
+        last_reviewed: "2026-08-29",
+      }];
+    },
+  },
+  GHA: { track(name) { tracked.push(name); } },
+};
+ui.initFireAbroad(host);
+const afterInit = {
+  rankCalls,
+  replaceCalls,
+  summary: summary.textContent,
+  bound: form.dataset.fireAbroadBound,
+  listeners: Object.keys(listeners).sort(),
+  tracked: tracked.slice(),
+};
+allowCreate = true;
+listeners.change({ type: "change", target: controls["fire-stay-mode"], preventDefault() {} });
+process.stdout.write(JSON.stringify({
+  afterInit,
+  afterChange: {
+    rankCalls,
+    replaceCalls,
+    summary: summary.textContent,
+    tracked,
+    text: allText(results),
+    hrefs: allHrefs(results),
+  },
+}));
+"""
+        )
+        self.assertEqual(
+            {
+                "rankCalls": 0,
+                "replaceCalls": 0,
+                "summary": "SERVER DEFAULT",
+                "bound": "true",
+                "listeners": ["change", "submit"],
+                "tracked": ["page_view"],
+            },
+            state["afterInit"],
+        )
+        self.assertEqual(1, state["afterChange"]["rankCalls"])
+        self.assertEqual(1, state["afterChange"]["replaceCalls"])
+        self.assertEqual("1 ranked destinations.", state["afterChange"]["summary"])
+        self.assertEqual(
+            ["page_view", "stay_mode_change"], state["afterChange"]["tracked"]
+        )
+        rendered_text = state["afterChange"]["text"]
+        for expected in (
+            "Eligibility: Conditional",
+            "FIRE Abroad score: 3.23 out of 5",
+            "Resilience budget: $60,000 per year",
+            "Active Life: 4.10 out of 5",
+            "Healthcare Bridge: 3.80 out of 5",
+            "Stay Flexibility: 3.40 out of 5",
+            "Work permission: Passive income only",
+            "Tax Compatibility: 2.90 out of 5",
+            "Planning warning: Tax residence requires a separate review",
+            "Evidence: Medium high confidence; reviewed 2026-08-29",
+            "Build your plan",
+            "Read destination guide",
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, rendered_text)
+        self.assertEqual(
+            [
+                "/retirement-abroad-calculator/?destination=valencia&household=single&housing=rent",
+                "/destinations/valencia/",
+            ],
+            state["afterChange"]["hrefs"],
+        )
 
     def test_ui_source_has_no_network_storage_or_sensitive_analytics_fields(self) -> None:
         source = UI.read_text(encoding="utf-8")
