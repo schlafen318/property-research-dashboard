@@ -351,10 +351,6 @@
         ratesToUsd: ratesToUsd,
       });
       const value = resultMoney({ amountUsd: row.target, currency: currency, ratesToUsd: ratesToUsd });
-      const gap = difference === 0
-        ? "Matches your projection"
-        : resultMoney({ amountUsd: Math.abs(difference), currency: currency, ratesToUsd: ratesToUsd }) +
-          (difference < 0 ? " under" : " over");
       const rank = row.matchRank
         ? '<small class="finder-landscape-rank">Match 0' + row.matchRank + "</small>"
         : "";
@@ -370,8 +366,7 @@
         escapeHtml(row.name) + "<small>" + escapeHtml(row.country) + "</small>" + rank +
         '</span><span class="finder-landscape-track" aria-hidden="true"><i class="finder-landscape-capital-dot"></i>' +
         '<i class="finder-landscape-distance"></i><i class="finder-landscape-dot"></i></span>' +
-        '<span class="finder-landscape-value"><span>' + escapeHtml(value) + '</span><small class="finder-landscape-gap ' +
-        state + '">' + escapeHtml(gap) + "</small></span></a></div>";
+        '<span class="finder-landscape-value"><span>' + escapeHtml(value) + "</span></span></a></div>";
     }).join("");
     return { axisHtml: axisHtml, rowsHtml: rowsHtml, rowCount: (model.rows || []).length };
   }

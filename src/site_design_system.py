@@ -411,10 +411,6 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-landscape-row.is-on-target.is-match .finder-landscape-capital-dot { width: 12px; height: 12px; border: 2px solid var(--gha-accent); background: var(--gha-brass); }
     .retirement-finder-page .finder-landscape-rank { color: var(--gha-accent); font-size: 10px; letter-spacing: .06em; }
     .retirement-finder-page .finder-landscape-value { min-width: 106px; text-align: right; font-family: var(--gha-display-serif); font-size: 17px; }
-    .retirement-finder-page .finder-landscape-gap { display: block; margin-top: 2px; font-family: var(--gha-reading-sans); font-size: 10px; }
-    .retirement-finder-page .finder-landscape-gap.is-within { color: var(--gha-link); }
-    .retirement-finder-page .finder-landscape-gap.is-over { color: var(--gha-accent); }
-    .retirement-finder-page .finder-landscape-gap.is-on-target { color: var(--gha-brass); }
     .retirement-finder-page .finder-landscape figcaption { margin: 18px 0 0; }
     .retirement-finder-page .finder-matches-section { margin-bottom: 46px; }
     .retirement-finder-page .finder-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 24px; }

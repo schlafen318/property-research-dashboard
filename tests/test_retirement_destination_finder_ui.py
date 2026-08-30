@@ -598,8 +598,15 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertIn('class="finder-landscape-capital-dot"', markup["rowsHtml"])
         self.assertIn('class="finder-landscape-distance"', markup["rowsHtml"])
         self.assertIn('class="finder-landscape-dot"', markup["rowsHtml"])
-        self.assertIn('<small class="finder-landscape-gap is-over">$150,000 over</small>', markup["rowsHtml"])
-        self.assertIn('<small class="finder-landscape-gap is-on-target">Matches your projection</small>', markup["rowsHtml"])
+        self.assertIn(
+            '<span class="finder-landscape-value"><span>$600,000</span></span>',
+            markup["rowsHtml"],
+        )
+        self.assertIn(
+            '<span class="finder-landscape-value"><span>$750,000</span></span>',
+            markup["rowsHtml"],
+        )
+        self.assertNotIn("finder-landscape-gap", markup["rowsHtml"])
         self.assertIn('aria-label="Fukuoka / Itoshima, Japan.', markup["rowsHtml"])
         self.assertIn('class="finder-landscape-capital-label"', markup["axisHtml"])
         self.assertIn("Projected capital", markup["axisHtml"])
