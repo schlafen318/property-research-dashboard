@@ -173,7 +173,7 @@
     return residencies.includes(residency) && incomeSources.includes(incomeSource);
   }
 
-  function recommendDestinations(input) {
+  function recommendDestinations(input, projectionOverride) {
     if (!input || !Array.isArray(input.destinations) || !Array.isArray(input.retirementCosts)) {
       throw new Error("Destinations and retirement costs are required");
     }
@@ -181,15 +181,15 @@
     const costs = new Map(input.retirementCosts.map(function (item) {
       return [item.destination_id, item];
     }));
-    const sharedProjection = user.housingPlan === "buy_now" ? null : projectPortfolio({
-      currentAge: user.currentAge,
-      retirementAge: user.retirementAge,
-      startingPortfolio: user.totalLiquidCapital,
-      monthlyContribution: user.monthlyPortfolioContribution,
-      contributionInflationLinked: user.contributionInflationLinked,
-      generalInflation: user.generalInflation,
-      expectedPortfolioReturn: user.expectedPortfolioReturn,
-    });
+    const sharedProjection = projectionOverride || (user.housingPlan === "buy_now" ? null : projectPortfolio({
+        currentAge: user.currentAge,
+        retirementAge: user.retirementAge,
+        startingPortfolio: user.totalLiquidCapital,
+        monthlyContribution: user.monthlyPortfolioContribution,
+        contributionInflationLinked: user.contributionInflationLinked,
+        generalInflation: user.generalInflation,
+        expectedPortfolioReturn: user.expectedPortfolioReturn,
+      }));
     const recommendations = [];
     const excluded = [];
 
@@ -324,11 +324,30 @@
     };
   }
 
+  function recommendProjectedCapital(input) {
+    const user = input && input.user || {};
+    if (user.housingPlan === "buy_now") {
+      throw new Error("Projected-capital scenarios do not support buy now");
+    }
+    const capital = nonNegative(input && input.projectedCapitalUsd, "Projected capital");
+    const sharedProjection = {
+      annualProjection: [{
+        year: Math.max(0, Number(user.retirementAge) - Number(user.currentAge)),
+        portfolio: capital,
+        contributions: 0,
+      }],
+      portfolioAtRetirement: capital,
+      exhaustedMonth: null,
+    };
+    return recommendDestinations(input, sharedProjection);
+  }
+
   return {
     projectPortfolio: projectPortfolio,
     retirementTargetInput: retirementTargetInput,
     fundingTier: fundingTier,
     profileMatchesBuyer: profileMatchesBuyer,
     recommendDestinations: recommendDestinations,
+    recommendProjectedCapital: recommendProjectedCapital,
   };
 });
