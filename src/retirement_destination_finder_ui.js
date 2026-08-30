@@ -124,13 +124,13 @@
   function resultSummaryRead(input) {
     const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
     const closest = recommendations[0];
-    if (!closest) return "No destinations could be evaluated under these assumptions.";
+    if (!closest) return "No destinations match this plan yet.";
     if (Number(input.withinReachCount) > 0) {
-      return Number(input.withinReachCount) + " destinations are within reach. " +
-        closest.name + " is the strongest match for your priorities.";
+      return "Your plan puts " + Number(input.withinReachCount) + " destinations within reach. " +
+        closest.name + " is your strongest overall match.";
     }
     return "No destinations are within reach yet. " + closest.name +
-      " is the strongest match, with a gap of " + resultMoney({
+      " comes closest, with a gap of " + resultMoney({
         amountUsd: Math.abs(Number(closest.surplusGap)),
         currency: input.currency || "USD",
         ratesToUsd: input.ratesToUsd || { USD: 1 },
@@ -573,7 +573,7 @@
         errorSummary.hidden = true;
         return;
       }
-      errorSummary.innerHTML = "<strong>Check these fields:</strong><ul>" + errors.map(function (error) {
+      errorSummary.innerHTML = "<strong>Check the highlighted details:</strong><ul>" + errors.map(function (error) {
         return "<li>" + escapeHtml(error) + "</li>";
       }).join("") + "</ul>";
       errorSummary.hidden = false;
@@ -592,7 +592,7 @@
             ? ["finder-pension", "finder-other-income"]
             : [];
       if (invalidMoneyIds.some(function (id) { return validateMoneyControl(element(id)); })) {
-        errors.push("Enter a valid amount in the highlighted money field.");
+        errors.push("Enter a valid amount in the highlighted field.");
       }
       if (stepId === "finder-profile") {
         const currentAge = numeric("finder-current-age");
@@ -601,10 +601,10 @@
         if (!Number.isFinite(currentAge) || currentAge < 18 || currentAge > 90) {
           errors.push("Enter a current age between 18 and 90.");
         } else if (!Number.isFinite(retirementAge) || retirementAge <= currentAge || retirementAge > 100) {
-          errors.push("Retirement age must be later than current age.");
+          errors.push("Retirement age must be later than your current age.");
         }
         if (!Number.isFinite(horizonYears) || horizonYears < 1 || horizonYears > 60) {
-          errors.push("Enter between 1 and 60 years in retirement.");
+          errors.push("Enter between 1 and 60 years for retirement.");
         }
       }
       if (stepId === "finder-current-resources") {
@@ -615,7 +615,7 @@
       }
       if (stepId === "finder-housing" && selected("finder-housing-plan") === "buy_now" &&
           moneyNumber("finder-property-allocation") <= 0) {
-        errors.push("Enter the maximum amount available for a property purchase.");
+        errors.push("Enter your property purchase budget.");
       }
       const activeSection = element(stepId);
       let invalidControl = null;
@@ -631,7 +631,7 @@
         invalidControl.setAttribute("aria-invalid", "true");
         if (typeof invalidControl.reportValidity === "function") invalidControl.reportValidity();
         if (typeof invalidControl.focus === "function") invalidControl.focus();
-        errors.push("Correct the highlighted field before continuing.");
+        errors.push("Correct the highlighted field to continue.");
       }
       return errors;
     }
@@ -639,10 +639,10 @@
     function updateReview() {
       const household = selected("finder-household") === "couple" ? "Couple" : "Single";
       const housingLabels = {
-        rent: "Rent",
-        buy_now: "Buy now",
-        buy_retirement: "Buy at retirement",
-        own: "Already own",
+        rent: "Rent a home",
+        buy_now: "Buy a home now",
+        buy_retirement: "Buy a home at retirement",
+        own: "Already own my retirement home",
       };
       const settings = selectedSettings().map(settingLabel);
       const region = selected("finder-region") === "any"
@@ -707,7 +707,7 @@
         : "No continuing income";
       element("finder-review-preferences").textContent =
         region + " · " + (settings.length ? sentenceList(settings) : "Any setting") +
-        " · Healthcare: " + (selected("finder-healthcare") === "high" ? "leading priority" : "important");
+        " · Healthcare: " + (selected("finder-healthcare") === "high" ? "top priority" : "important");
     }
 
     function updateWizardStep(options) {
@@ -734,7 +734,7 @@
       progressbar.style.setProperty("--finder-progress", String((stepNumber / sections.length) * 100) + "%");
       element("finder-wizard-back").hidden = wizardStepIndex === 0;
       element("finder-wizard-next").textContent = wizardStepIndex === sections.length - 1
-        ? "View my matches"
+        ? "Show my matches"
         : "Continue";
       element("finder-wizard-next").disabled = activeId === "finder-housing" &&
         selected("finder-housing-plan") === "own";
@@ -903,15 +903,15 @@
       const invalidMoney = activeMoneyControlIds({ housingPlan: user.housingPlan }).find(function (id) {
         return validateMoneyControl(element(id));
       });
-      if (invalidMoney) errors.push("Enter a valid amount in the highlighted money field.");
-      if (!(user.retirementAge > user.currentAge)) errors.push("Retirement age must be later than current age.");
+      if (invalidMoney) errors.push("Enter a valid amount in the highlighted field.");
+      if (!(user.retirementAge > user.currentAge)) errors.push("Retirement age must be later than your current age.");
       if (user.totalLiquidCapital < 0) errors.push("Capital today cannot be negative.");
       if (user.monthlyPortfolioContribution < 0) errors.push("Monthly investing cannot be negative.");
       if (user.expectedPortfolioReturn < -0.05 || user.expectedPortfolioReturn > 0.15) {
         errors.push("Expected return must be between -5% and 15%.");
       }
       if (user.housingPlan === "buy_now" && user.maximumPropertyAllocation <= 0) {
-        errors.push("Enter the maximum amount available for a property purchase.");
+        errors.push("Enter your property purchase budget.");
       }
       return errors;
     }
@@ -1300,9 +1300,9 @@
         : "Showing all destinations";
       element("finder-empty-state").textContent = !hasRecommendations &&
         Number(result.summary.evaluatedCount) === 0 && activeFilters.length
-        ? "No destinations match " + sentenceList(activeFilters) +
+        ? "No destinations fit " + sentenceList(activeFilters) +
           ". Try removing a setting or choosing another region."
-        : "No destinations could be evaluated under these assumptions. Review the exclusions below or change the housing and financing assumptions.";
+        : "No destinations fit these choices. Try another region or adjust your housing and financing details.";
       renderCapitalLandscape(result);
       if (!sharedView) {
         renderChart(finderProjectionView({
@@ -1317,6 +1317,7 @@
         currency: selectedCurrency,
         ratesToUsd: ratesToUsd,
       });
+      element("finder-result-read").hidden = !hasRecommendations;
       element("finder-strongest-match").textContent = currentRecommendations.length
         ? currentRecommendations[0].name
         : "—";
@@ -1324,8 +1325,8 @@
       renderComparison();
       element("finder-share-section").hidden = !hasRecommendations || sharedView;
       element("finder-excluded-summary").textContent = result.excluded.length
-        ? result.excluded.length + " destinations could not be recommended under these assumptions."
-        : "Every destination had enough information to evaluate.";
+        ? result.excluded.length + " destinations are not included in these results."
+        : "All destinations that fit your choices are included.";
       renderExclusions(result.excluded);
       renderEvidence(currentRecommendations);
     }
@@ -1455,7 +1456,7 @@
         });
         render(result, user);
       } catch (error) {
-        errorSummary.textContent = error.message || "The calculation could not be completed.";
+        errorSummary.textContent = error.message || "We could not complete this calculation. Review your details and try again.";
         errorSummary.hidden = false;
         errorSummary.focus();
       }

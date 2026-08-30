@@ -529,7 +529,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertFalse(adjusted["formHidden"])
         self.assertTrue(adjusted["resultsHidden"])
         self.assertEqual([True, True, True, True, True, True, True, False], adjusted["wizardSectionHidden"])
-        self.assertEqual("View my matches", adjusted["wizardNextText"])
+        self.assertEqual("Show my matches", adjusted["wizardNextText"])
         self.assertTrue(adjusted["wizardEditing"])
 
     def test_mobile_review_summarizes_the_plan_before_calculation(self) -> None:
@@ -547,7 +547,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             "USD 500,000 today · USD 2,000/month, inflation-linked · 4% return",
             scenario["reviewCapital"],
         )
-        self.assertEqual("Rent", scenario["reviewHousing"])
+        self.assertEqual("Rent a home", scenario["reviewHousing"])
         self.assertEqual("No continuing income", scenario["reviewIncome"])
         self.assertEqual("Any region · Any setting · Healthcare: important", scenario["reviewPreferences"])
 
@@ -568,7 +568,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
 
         self.assertEqual(
-            "Buy now · USD 300,000 · Mortgage: 60% LTV, 5%, 20 years · "
+            "Buy a home now · USD 300,000 · Mortgage: 60% LTV, 5%, 20 years · "
             "Non-resident · Pay off at retirement · Personal use before retirement",
             scenario["reviewHousing"],
         )
@@ -578,7 +578,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             scenario["reviewIncome"],
         )
         self.assertEqual(
-            "Asia · Coast or island · Healthcare: leading priority",
+            "Asia · Coast or island · Healthcare: top priority",
             scenario["reviewPreferences"],
         )
 
@@ -783,7 +783,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
 
         self.assertEqual(
-            "No destinations match Asia and Lake. Try removing a setting or choosing another region.",
+            "No destinations fit Asia and Lake. Try removing a setting or choosing another region.",
             scenario["emptyStateText"],
         )
 
@@ -1107,8 +1107,40 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             },
         )
         self.assertIn("No destinations are within reach yet", read)
-        self.assertIn("Fukuoka / Itoshima is the strongest match", read)
+        self.assertIn("Fukuoka / Itoshima comes closest", read)
         self.assertIn("SGD\u00a0409,882", read)
+
+    def test_result_summary_leads_with_the_outcome_when_destinations_are_affordable(self) -> None:
+        read = run_ui(
+            "resultSummaryRead",
+            {
+                "withinReachCount": 6,
+                "recommendations": [
+                    {"name": "Fukuoka / Itoshima", "surplusGap": 150000},
+                ],
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertEqual(
+            "Your plan puts 6 destinations within reach. "
+            "Fukuoka / Itoshima is your strongest overall match.",
+            read,
+        )
+
+    def test_no_matching_destination_uses_outcome_led_copy(self) -> None:
+        read = run_ui(
+            "resultSummaryRead",
+            {
+                "withinReachCount": 0,
+                "recommendations": [],
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+
+        self.assertEqual("No destinations match this plan yet.", read)
 
     def test_result_money_formats_negative_gaps_equity_and_jpy(self) -> None:
         rates = {"USD": 1, "SGD": 0.7866117265603891, "JPY": 0.0067}

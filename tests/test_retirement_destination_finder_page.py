@@ -99,8 +99,8 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         landscape = self.html.split('id="finder-capital-landscape"', 1)[1].split("</figure>", 1)[0]
 
         self.assertIn("Region and setting filter destinations", preferences)
-        self.assertIn("Healthcare helps order the matches", preferences)
-        self.assertIn("Only destinations matching your region and setting are shown", landscape)
+        self.assertIn("healthcare ranks your best matches", preferences)
+        self.assertIn("Destinations match your selected region and setting", landscape)
 
     def test_setting_filter_allows_multiple_clear_checkbox_selections(self) -> None:
         preferences = self.html.split('id="finder-preferences"', 1)[1].split("</fieldset>", 1)[0]
@@ -149,10 +149,10 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
     def test_housing_and_conditional_fields_exist(self) -> None:
         for option in (
-            '<option value="rent">Rent</option>',
-            '<option value="buy_now">Buy now</option>',
-            '<option value="buy_retirement">Buy at retirement</option>',
-            '<option value="own">Already own</option>',
+            '<option value="rent">Rent a home</option>',
+            '<option value="buy_now">Buy a home now</option>',
+            '<option value="buy_retirement">Buy a home at retirement</option>',
+            '<option value="own">Already own my retirement home</option>',
         ):
             self.assertIn(option, self.html)
         for field_id in (
@@ -170,7 +170,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             "finder-mortgage-treatment",
         ):
             self.assertIn(f'id="{field_id}"', self.html)
-        self.assertIn('<option value="not_sure">Not sure</option>', self.html)
+        self.assertIn('<option value="not_sure">Not decided</option>', self.html)
 
     def test_results_are_concise_and_accessible(self) -> None:
         self.assertIn('id="finder-within-count"', self.html)
@@ -192,9 +192,11 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-projection-caption"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
         self.assertIn('id="finder-exclusions"', self.html)
-        self.assertIn("Retirement capital by destination", self.html)
-        self.assertIn("Estimated capital required", self.html)
-        self.assertIn("How your capital gets there", self.html)
+        self.assertIn("Where your plan could take you", self.html)
+        self.assertIn("Destinations shown", self.html)
+        self.assertIn("Capital required by destination", self.html)
+        self.assertIn("All filtered destinations · lowest capital first", self.html)
+        self.assertIn("How your capital could grow", self.html)
         self.assertNotIn("Retirement score", self.html)
 
     def test_results_include_compact_comparison_and_privacy_safe_sharing(self) -> None:
@@ -207,7 +209,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             'id="finder-shared-error" role="alert"',
         ):
             self.assertIn(marker, self.html)
-        self.assertIn("Compare your three strongest matches", self.html)
+        self.assertIn("Compare your strongest matches", self.html)
         self.assertIn(
             "This link includes your projected capital and planning choices. It does not include your age, current savings, income or pension details.",
             self.html,
@@ -225,7 +227,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
     def test_results_lead_with_three_modeled_matches_and_offer_the_cost_landscape(self) -> None:
         self.assertIn('id="finder-result-read"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
-        self.assertIn('aria-label="Three strongest matches"', self.html)
+        self.assertIn('aria-label="Your three strongest matches"', self.html)
         self.assertNotIn('id="finder-closest-match"', self.html)
         self.assertNotIn('id="finder-show-all"', self.html)
         self.assertIn('id="finder-landscape-toggle"', self.html)
@@ -309,7 +311,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         )
         self.assertIn('id="finder-wizard-back" type="button"', self.html)
         self.assertIn('id="finder-wizard-next" type="button">Continue</button>', self.html)
-        self.assertIn('id="finder-adjust-plan" type="button" hidden>Adjust plan</button>', self.html)
+        self.assertIn('id="finder-adjust-plan" type="button" hidden>Adjust my plan</button>', self.html)
         self.assertIn('aria-valuemax="6"', self.html)
 
         design_css = self.html.split('<style id="gha-retirement-finder-design">', 1)[1].split(
@@ -510,7 +512,9 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertNotIn("(USD)", self.html)
 
     def test_finder_retirement_income_is_monthly_and_inflation_linked_by_default(self) -> None:
-        self.assertIn("Income continuing after retirement (monthly)", self.html)
+        self.assertIn("Income in retirement", self.html)
+        self.assertIn("Monthly pension", self.html)
+        self.assertIn("Other reliable monthly income", self.html)
         self.assertIn('<input id="finder-pension-indexed" type="checkbox" checked>', self.html)
         self.assertIn('<input id="finder-other-income-indexed" type="checkbox" checked>', self.html)
 
