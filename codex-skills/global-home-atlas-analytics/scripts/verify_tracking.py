@@ -121,7 +121,7 @@ def main() -> int:
             except json.JSONDecodeError:
                 failures.append((url, "invalid json-ld"))
 
-        if "window.GHA" in html and "gha_event_queue" in html:
+        if "window.GHA" in html and "function track(eventName, params)" in html:
             tracking_pages += 1
         else:
             failures.append((url, "missing tracking layer"))

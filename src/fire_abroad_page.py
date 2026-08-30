@@ -244,7 +244,7 @@ def build_fire_abroad_html(
 <script id="fire-abroad-data" type="application/json">{payload_json}</script>
 <script>{engine_js}</script>
 <script>{ui_js}</script>
-<script>(function(){{function init(){{GHAFireAbroadUI.initFireAbroad(window);}}if(document.readyState==="loading"){{document.addEventListener("DOMContentLoaded",init,{{once:true}});}}else{{init();}}}})();</script>
 {analytics}
+<script>(function(){{function init(){{GHAFireAbroadUI.initFireAbroad(window);}}if(document.readyState==="loading"){{document.addEventListener("DOMContentLoaded",init,{{once:true}});}}else{{init();}}}})();</script>
 </body>
 </html>"""

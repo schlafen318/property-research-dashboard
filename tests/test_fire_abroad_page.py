@@ -93,6 +93,9 @@ class FireAbroadPageTests(unittest.TestCase):
 
     def test_generated_analytics_allowlists_only_non_sensitive_categories(self) -> None:
         self.assertIn("function safeAnalyticsPayload", self.artifact_html)
+        for forbidden in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage"):
+            with self.subTest(forbidden=forbidden):
+                self.assertNotIn(forbidden, self.artifact_html)
         analytics_source = self.artifact_html.split(
             "const EVENT_NAMES", 1
         )[1].split("function resultRowsForDisplay", 1)[0]

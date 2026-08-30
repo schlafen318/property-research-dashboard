@@ -2013,6 +2013,27 @@ def guide_decision_path_html(page: dict, destinations: list[dict], pages: list[d
     """
 
 
+def fire_abroad_analytics_event_script() -> str:
+    """Expose non-persistent analytics for the privacy-sensitive FIRE tool."""
+
+    return f"""
+  <script>
+    (function () {{
+      const measurementReady = Boolean("{escape(GA4_MEASUREMENT_ID)}");
+      function track(eventName, params) {{
+        const payload = Object.assign({{
+          page_path: location.pathname,
+          page_title: document.title
+        }}, params || {{}});
+        if (measurementReady && typeof window.gtag === "function") {{
+          window.gtag("event", eventName, payload);
+        }}
+      }}
+      window.GHA = Object.assign(window.GHA || {{}}, {{ track }});
+    }})();
+  </script>"""
+
+
 def vacation_home_quick_answer_html(page: dict, destinations: list[dict]) -> str:
     if page.get("slug") != "best-places-to-buy-vacation-home-abroad":
         return ""
@@ -6152,7 +6173,7 @@ def build_fire_abroad_page(
             "</script>", "<\\/script>"
         ),
         design_css=top_level_page_design_css(),
-        analytics=analytics_event_script(),
+        analytics=fire_abroad_analytics_event_script(),
         footer=site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
     )
 
@@ -7196,6 +7217,8 @@ def foreign_buyer_engagement_links_html(guide: dict) -> str:
         )
     return (
         '<p class="foreign-buyer-price-note">These are dated asking observations, not valuations or market averages.</p>'
+        '<aside class="foreign-buyer-next-step"><h3>Buyer Next Step</h3>'
+        f'<p>Turn {escape(guide["country"])} research into a shortlist by comparing the destinations above, then test the exact buyer, title, use and budget with local advisers.</p></aside>'
         f'<nav class="foreign-buyer-reader-tools" aria-label="Continue your research">{"".join(links)}</nav>'
     )
 

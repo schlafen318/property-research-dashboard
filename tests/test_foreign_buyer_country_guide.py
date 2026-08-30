@@ -650,6 +650,10 @@ class ForeignBuyerCountryGuideRenderingTests(unittest.TestCase):
         self.assertIn('<body class="foreign-buyer-country-guide">', self.spain)
         self.assertIn("Buying Property in Spain as a Foreigner", self.spain)
 
+    def test_spain_keeps_the_buyer_next_step_handoff(self) -> None:
+        self.assertIn("Buyer Next Step", self.spain)
+        self.assertIn("Turn Spain research into a shortlist", self.spain)
+
     def test_japan_sections_follow_the_approved_order(self) -> None:
         section_ids = [
             "ownership-answer",
