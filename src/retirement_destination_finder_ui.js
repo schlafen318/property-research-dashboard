@@ -474,7 +474,6 @@
       "finder-before-retirement",
       "finder-retirement-income",
       "finder-preferences",
-      "finder-review",
     ];
     const wizardMedia = typeof root.matchMedia === "function"
       ? root.matchMedia("(max-width: 760px) and (orientation: portrait)")
@@ -490,7 +489,7 @@
         if (selected("finder-purchase-method") === "mortgage") sectionIds.push("finder-financing");
         sectionIds.push("finder-before-retirement");
       }
-      sectionIds.push("finder-retirement-income", "finder-preferences", "finder-review");
+      sectionIds.push("finder-retirement-income", "finder-preferences");
       return sectionIds;
     }
     function selectedSettings() {
@@ -734,12 +733,11 @@
       progressbar.style.setProperty("--finder-progress", String((stepNumber / sections.length) * 100) + "%");
       element("finder-wizard-back").hidden = wizardStepIndex === 0;
       element("finder-wizard-next").textContent = wizardStepIndex === sections.length - 1
-        ? "Show my matches"
+        ? "See my destinations"
         : "Continue";
       element("finder-wizard-next").disabled = activeId === "finder-housing" &&
         selected("finder-housing-plan") === "own";
       document.body.classList.toggle("finder-wizard-editing", wizardView === "editing");
-      if (wizardStepIndex === sections.length - 1) updateReview();
       if (options && options.focus) {
         sections[wizardStepIndex].focus({ preventScroll: true });
         sections[wizardStepIndex].scrollTop = 0;
@@ -1446,6 +1444,7 @@
         showFormErrors(errors);
         return;
       }
+      updateReview();
       errorSummary.hidden = true;
       try {
         const result = root.GHARetirementDestinationFinder.recommendDestinations({

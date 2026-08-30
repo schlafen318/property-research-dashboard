@@ -369,7 +369,8 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-step.finder-step-mobile, .retirement-finder-page .finder-mobile-only { display: none; }
     .retirement-finder-page .finder-profile { padding-bottom: 16px; border-bottom: 0; }
     .retirement-finder-page .finder-section-split { padding-top: 0; }
-    .retirement-finder-page .finder-review { display: none; }
+    .retirement-finder-page .finder-plan-summary { margin-top: 18px; padding: 8px 0; border-top: 1px solid var(--gha-rule); border-bottom: 1px solid var(--gha-rule); }
+    .retirement-finder-page .finder-plan-summary > summary { min-height: 44px; display: flex; align-items: center; font-weight: 400; cursor: pointer; }
     .retirement-finder-page .finder-review-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 24px 0; border-top: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-review-summary div { padding: 16px 0; border-bottom: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-review-summary dt { color: var(--gha-muted); font-size: 12px; }
@@ -510,8 +511,6 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page.finder-wizard-editing .finder-step-desktop, .retirement-finder-page.finder-wizard-editing .finder-desktop-only { display: none; }
       .retirement-finder-page.finder-wizard-editing .finder-step-mobile { display: block; }
       .retirement-finder-page.finder-wizard-editing .finder-mobile-only { display: block; }
-      .retirement-finder-page.finder-wizard-editing .finder-review { display: block; }
-      .retirement-finder-page.finder-wizard-editing .finder-review-summary { grid-template-columns: 1fr; margin-top: 20px; }
       .retirement-finder-page .finder-form { padding-bottom: 84px; }
       .retirement-finder-page .finder-wizard-progress { display: block; margin: 0 0 18px; }
       .retirement-finder-page .finder-wizard-progress p { margin: 0 0 8px; color: var(--gha-accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
@@ -555,12 +554,6 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page.finder-wizard-editing #finder-preferences .field:nth-child(3) { grid-column: 2; grid-row: 1; }
       .retirement-finder-page.finder-wizard-editing #finder-preferences .finder-setting-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
       .retirement-finder-page.finder-wizard-editing #finder-preferences .finder-setting-options .check { min-height: 38px; }
-      .retirement-finder-page.finder-wizard-editing #finder-review .section-help { display: none; }
-      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; margin: 10px 0 8px; }
-      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary div { padding: 8px 0; }
-      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary dt { font-size: 10px; }
-      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary dd { margin-top: 2px; font-family: var(--gha-reading-sans); font-size: 14px; line-height: 1.35; }
-      .retirement-finder-page.finder-wizard-editing #finder-review .privacy-note { display: none; }
       .retirement-finder-page .finder-summary div { padding-right: 0; }
       .retirement-finder-page .finder-submit { width: 100%; }
       .retirement-finder-page .finder-share-section { grid-template-columns: 1fr; }
@@ -569,7 +562,6 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page.finder-wizard-editing .finder-wizard-progress { padding: 8px 16px 6px; }
       .retirement-finder-page.finder-wizard-editing .finder-section { padding-top: 12px; }
       .retirement-finder-page.finder-wizard-editing #finder-profile #finder-currency-note { display: none; }
-      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary div { padding: 5px 0; }
     }
     @media (prefers-reduced-motion: reduce) {
       .retirement-finder-page .finder-chart-year { animation: none; opacity: 1; transform: none; }
