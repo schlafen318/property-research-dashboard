@@ -57,11 +57,11 @@ def _default_result_rows(default_results: list[dict]) -> str:
         rows.append(
             f"""
           <tr data-fire-result="{destination_id}">
-            <th scope="row" data-label="Destination"><a href="/destinations/{destination_id}/">{name}</a><span>{escape(status)}</span><small>{status_reason}</small></th>
+            <th scope="row" data-label="Destination"><a href="/destinations/{destination_id}/" data-fire-track="destination_guide_click" data-fire-destination-id="{destination_id}">{name}</a><span>{escape(status)}</span><small>{status_reason}</small></th>
             <td data-label="FIRE Abroad score"><strong>{escape(score_text)}</strong><span>Active Life: {_score(components.get("active_life"))}</span><small>{escape(str(strongest_activity))}</small></td>
             <td data-label="Resilience budget"><strong>{_money(budget.get("annual_total_usd"))} per year</strong><span>Currency and inflation buffer: {_money(budget.get("currency_inflation_buffer"))}</span><small>One-time relocation estimate: {_money(budget.get("one_time_relocation_usd"))}</small></td>
             <td data-label="Planning checks"><span>Healthcare Bridge: {_score(components.get("healthcare_bridge"))}</span><span>Stay Flexibility: {_score(components.get("stay_flexibility"))}</span><span>{escape(_work_permission_label(result.get("work_permission")))}</span><span>Tax Compatibility: {_score(components.get("tax_compatibility"))}</span><small>{escape(str(warning))}</small></td>
-            <td data-label="Evidence and next steps"><span>{escape(str(result.get("confidence", "low")).replace("_", " ").title())} confidence</span><span>Evidence reviewed {escape(str(result.get("last_reviewed") or "not recorded"))}</span><a href="/retirement-abroad-calculator/?destination={destination_id}&amp;household=single&amp;housing=rent">Build your plan</a><a href="/destinations/{destination_id}/">Read destination guide</a></td>
+            <td data-label="Evidence and next steps"><span>{escape(str(result.get("confidence", "low")).replace("_", " ").title())} confidence</span><span>Evidence reviewed {escape(str(result.get("last_reviewed") or "not recorded"))}</span><a href="/retirement-abroad-calculator/?destination={destination_id}&amp;household=single&amp;housing=rent" data-fire-track="calculator_handoff" data-fire-destination-id="{destination_id}">Build your plan</a><a href="/destinations/{destination_id}/" data-fire-track="destination_guide_click" data-fire-destination-id="{destination_id}">Read destination guide</a></td>
           </tr>""".rstrip()
         )
     return "\n".join(rows)

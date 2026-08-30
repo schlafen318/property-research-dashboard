@@ -538,6 +538,176 @@ process.stdout.write(JSON.stringify({
             state["afterChange"]["hrefs"],
         )
 
+    def test_one_delegated_handler_tracks_static_and_dynamic_result_links_once(self) -> None:
+        state = run_js_program(
+            r"""
+const ui = require(process.argv[1]);
+const formListeners = {};
+const resultListeners = {};
+const tracked = [];
+let anchorListenerCount = 0;
+function node(tagName) {
+  return {
+    tagName: String(tagName).toUpperCase(),
+    textContent: "",
+    href: "",
+    children: [],
+    attributes: {},
+    appendChild(child) { this.children.push(child); },
+    setAttribute(name, value) { this.attributes[name] = String(value); },
+    getAttribute(name) {
+      if (name === "href") return this.href || this.attributes[name] || null;
+      return this.attributes[name] || null;
+    },
+    closest(selector) {
+      if (selector === "a[data-fire-track][data-fire-destination-id]" &&
+          this.tagName === "A" && this.attributes["data-fire-track"] &&
+          this.attributes["data-fire-destination-id"]) return this;
+      if (selector === "a, button" && (this.tagName === "A" || this.tagName === "BUTTON")) return this;
+      return null;
+    },
+    addEventListener() { if (this.tagName === "A") anchorListenerCount += 1; },
+  };
+}
+const form = {
+  dataset: {},
+  addEventListener(type, listener) { formListeners[type] = listener; },
+};
+const results = node("div");
+results.addEventListener = function (type, listener) { resultListeners[type] = listener; };
+results.replaceChildren = function () { this.children = []; };
+const summary = { textContent: "SERVER DEFAULT" };
+const controls = {
+  "fire-stay-mode": { value: "part_year" },
+  "fire-age": { value: "50" },
+  "fire-household": { value: "single" },
+  "fire-housing": { value: "rent" },
+  "fire-mobility-rights": { value: "prefer_not_to_say" },
+  "fire-home-tax-context": { value: "prefer_not_to_say" },
+  "fire-annual-days": { value: "" },
+  "fire-income-type": { value: "prefer_not_to_say" },
+  "fire-activity-priority": { value: "balanced" },
+};
+const nodes = Object.assign({}, controls, {
+  "fire-abroad-data": { textContent: JSON.stringify({ destinations: [] }) },
+  "fire-abroad-form": form,
+  "fire-results": results,
+  "fire-results-summary": summary,
+});
+const host = {
+  document: {
+    getElementById(id) { return nodes[id] || null; },
+    createElement(tagName) { return node(tagName); },
+    createTextNode(value) { const text = node("#text"); text.textContent = value; return text; },
+  },
+  GHAFireAbroad: {
+    normalizeProfile() {
+      return { stay_mode: "part_year", household: "single", housing: "rent", activity_priority: "balanced" };
+    },
+    rankDestinations() {
+      return [{
+        destination_id: "valencia", name: "Valencia", status: "eligible", status_reason: "",
+        score: 4, components: {}, resilience_budget: {}, work_permission: "passive_only",
+        warnings: [], confidence: "high", last_reviewed: "2026-08-29",
+      }];
+    },
+  },
+  GHA: { track(name, params) { tracked.push({ name, params }); } },
+};
+function sharedFallback(event) {
+  const target = event.target.closest("a, button");
+  const href = target ? target.getAttribute("href") || "" : "";
+  if (href.startsWith("/destinations/")) tracked.push({ name: "destination_click", params: { href } });
+  else if (href.startsWith("/")) tracked.push({ name: "internal_page_click", params: { href } });
+}
+function dispatch(link) {
+  let stopped = false;
+  const event = { target: link, stopPropagation() { stopped = true; } };
+  if (typeof resultListeners.click === "function") resultListeners.click(event);
+  if (!stopped) sharedFallback(event);
+}
+function trackedLink(eventName, destinationId, href) {
+  const link = node("a");
+  link.href = href;
+  link.setAttribute("data-fire-track", eventName);
+  link.setAttribute("data-fire-destination-id", destinationId);
+  return link;
+}
+ui.initFireAbroad(host);
+tracked.length = 0;
+dispatch(trackedLink("calculator_handoff", "valencia", "/retirement-abroad-calculator/?destination=valencia&household=single&housing=rent"));
+dispatch(trackedLink("destination_guide_click", "valencia", "/destinations/valencia/"));
+const staticEvents = tracked.slice();
+formListeners.change({ type: "change", target: controls["fire-age"], preventDefault() {} });
+const dynamicLinks = results.children[0].children.filter((child) => child.tagName === "A");
+tracked.length = 0;
+dynamicLinks.forEach(dispatch);
+const dynamicEvents = tracked.slice();
+tracked.length = 0;
+const unrelated = node("a");
+unrelated.href = "/methodology/";
+dispatch(unrelated);
+process.stdout.write(JSON.stringify({
+  delegated: typeof resultListeners.click === "function",
+  staticEvents,
+  dynamicEvents,
+  unrelatedEvents: tracked,
+  dynamicAttributes: dynamicLinks.map((link) => link.attributes),
+  anchorListenerCount,
+}));
+"""
+        )
+        expected = [
+            {
+                "name": "calculator_handoff",
+                "params": {
+                    "eventName": "calculator_handoff",
+                    "destinationId": "valencia",
+                },
+            },
+            {
+                "name": "destination_guide_click",
+                "params": {
+                    "eventName": "destination_guide_click",
+                    "destinationId": "valencia",
+                },
+            },
+        ]
+        self.assertTrue(state["delegated"])
+        self.assertEqual(expected, state["staticEvents"])
+        self.assertEqual(expected, state["dynamicEvents"])
+        self.assertEqual(
+            [
+                {
+                    "name": "internal_page_click",
+                    "params": {"href": "/methodology/"},
+                }
+            ],
+            state["unrelatedEvents"],
+        )
+        self.assertEqual(
+            [
+                {
+                    "data-fire-track": "calculator_handoff",
+                    "data-fire-destination-id": "valencia",
+                },
+                {
+                    "data-fire-track": "destination_guide_click",
+                    "data-fire-destination-id": "valencia",
+                },
+            ],
+            state["dynamicAttributes"],
+        )
+        self.assertEqual(0, state["anchorListenerCount"])
+        self.assertNotIn(
+            "destination_click",
+            [item["name"] for item in state["staticEvents"] + state["dynamicEvents"]],
+        )
+        self.assertNotIn(
+            "internal_page_click",
+            [item["name"] for item in state["staticEvents"] + state["dynamicEvents"]],
+        )
+
     def test_ui_source_has_no_network_storage_or_sensitive_analytics_fields(self) -> None:
         source = UI.read_text(encoding="utf-8")
         for forbidden in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage", "innerHTML"):

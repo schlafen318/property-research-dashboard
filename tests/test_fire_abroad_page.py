@@ -255,6 +255,26 @@ class FireAbroadPageTests(unittest.TestCase):
                 self.assertEqual(["single"], query["household"])
                 self.assertEqual(["rent"], query["housing"])
 
+    def test_server_result_links_declare_sanitized_semantic_tracking(self) -> None:
+        self.assertEqual(
+            10,
+            self.html.count(
+                'data-fire-track="calculator_handoff" data-fire-destination-id="'
+            ),
+        )
+        self.assertEqual(
+            20,
+            self.html.count(
+                'data-fire-track="destination_guide_click" data-fire-destination-id="'
+            ),
+        )
+        for destination_id in CANONICAL_LAUNCH_IDS:
+            with self.subTest(destination_id=destination_id):
+                self.assertEqual(
+                    3,
+                    self.html.count(f'data-fire-destination-id="{destination_id}"'),
+                )
+
     def test_methodology_evidence_and_no_javascript_fallback_are_visible(self) -> None:
         self.assertIn("25% Active Life", self.html)
         self.assertIn("20% sustainable annual cost", self.html)

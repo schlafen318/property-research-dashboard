@@ -193,6 +193,23 @@
       if (event && host.GHA && typeof host.GHA.track === "function") host.GHA.track(event.eventName, event);
     }
 
+    function handleResultClick(event) {
+      const origin = event && event.target;
+      const target = origin && typeof origin.closest === "function"
+        ? origin.closest("a[data-fire-track][data-fire-destination-id]")
+        : null;
+      if (!target) return;
+      const intent = safeAnalyticsPayload(
+        target.getAttribute("data-fire-track"),
+        { destinationId: target.getAttribute("data-fire-destination-id") }
+      );
+      if (!intent || !intent.destinationId) return;
+      if (typeof event.stopPropagation === "function") event.stopPropagation();
+      if (host.GHA && typeof host.GHA.track === "function") {
+        host.GHA.track(intent.eventName, intent);
+      }
+    }
+
     function render(profile) {
       const rows = resultRowsForDisplay(engine.rankDestinations(payload, profile), profile.activity_priority);
       resultsNode.replaceChildren();
@@ -215,16 +232,14 @@
         const calculator = documentRoot.createElement("a");
         calculator.href = details.calculatorHref;
         calculator.textContent = details.calculatorLabel;
-        calculator.addEventListener("click", function () {
-          track("calculator_handoff", { destinationId: row.destination_id });
-        });
+        calculator.setAttribute("data-fire-track", "calculator_handoff");
+        calculator.setAttribute("data-fire-destination-id", safeDestinationId(row.destination_id));
         article.appendChild(calculator);
         const guide = documentRoot.createElement("a");
         guide.href = details.guideHref;
         guide.textContent = details.guideLabel;
-        guide.addEventListener("click", function () {
-          track("destination_guide_click", { destinationId: row.destination_id });
-        });
+        guide.setAttribute("data-fire-track", "destination_guide_click");
+        guide.setAttribute("data-fire-destination-id", safeDestinationId(row.destination_id));
         article.appendChild(documentRoot.createTextNode(" "));
         article.appendChild(guide);
         resultsNode.appendChild(article);
@@ -250,6 +265,7 @@
 
     form.addEventListener("submit", update);
     form.addEventListener("change", update);
+    resultsNode.addEventListener("click", handleResultClick);
     track("page_view", {});
   }
 
