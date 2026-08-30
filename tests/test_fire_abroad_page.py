@@ -3,14 +3,17 @@ from __future__ import annotations
 import copy
 import html as html_module
 import json
+from pathlib import Path
 import re
 import unittest
 from urllib.parse import parse_qs, urlsplit
 
 from src.build_unified_app import (
     FIRE_ABROAD_DESCRIPTION,
+    FIRE_ABROAD_SLUG,
     FIRE_ABROAD_TITLE,
     PRIMARY_NAV_LINKS,
+    build,
     build_fire_abroad_page,
     consolidate_destination,
     load_fire_abroad_for_build,
@@ -23,6 +26,7 @@ from src.fire_abroad import CANONICAL_LAUNCH_IDS, load_fire_abroad
 class FireAbroadPageTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        build()
         cls.destinations = [
             consolidate_destination(item) for item in load_json("destinations.json")
         ]
@@ -33,6 +37,75 @@ class FireAbroadPageTests(unittest.TestCase):
             cls.retirement_costs,
             cls.fire_payload,
         )
+        cls.artifacts = Path(__file__).resolve().parents[1] / "artifacts"
+        artifact_path = cls.artifacts / FIRE_ABROAD_SLUG / "index.html"
+        cls.artifact_html = (
+            artifact_path.read_text(encoding="utf-8") if artifact_path.exists() else ""
+        )
+
+    def test_complete_builder_emits_one_fire_route_and_one_sitemap_url(self) -> None:
+        self.assertIn("<h1>FIRE Abroad</h1>", self.artifact_html)
+        sitemap = (self.artifacts / "sitemap.xml").read_text(encoding="utf-8")
+        self.assertEqual(
+            1,
+            sitemap.count("<loc>https://globalhomeatlas.com/fire-abroad/</loc>"),
+        )
+
+    def test_approved_planning_surfaces_each_link_once_to_fire_abroad(self) -> None:
+        surfaces = {
+            "guides": "guides hub",
+            "retirement-abroad-calculator": "retirement calculator",
+            "retirement-destination-finder": "retirement destination finder",
+            "best-places-to-buy-property-abroad-for-retirement": "retirement destinations guide",
+            "buying-property-abroad-for-retirement": "retirement property guide",
+        }
+        for slug, surface_label in surfaces.items():
+            page_html = (self.artifacts / slug / "index.html").read_text(
+                encoding="utf-8"
+            )
+            with self.subTest(slug=slug):
+                self.assertEqual(1, page_html.count('href="/fire-abroad/"'))
+                self.assertIn('data-track="fire_abroad_open"', page_html)
+                self.assertIn(f'data-track-label="{surface_label}"', page_html)
+
+    def test_generated_analytics_allowlists_only_non_sensitive_categories(self) -> None:
+        self.assertIn("function safeAnalyticsPayload", self.artifact_html)
+        analytics_source = self.artifact_html.split(
+            "const EVENT_NAMES", 1
+        )[1].split("function resultRowsForDisplay", 1)[0]
+        for event_name in (
+            "page_view",
+            "stay_mode_change",
+            "activity_filter_use",
+            "destination_guide_click",
+            "calculator_handoff",
+        ):
+            with self.subTest(event_name=event_name):
+                self.assertIn(event_name, analytics_source)
+        for sensitive_key in (
+            "age",
+            "home_tax_context",
+            "homeTaxContext",
+            "annual_days",
+            "annualDays",
+            "income_type",
+            "incomeType",
+            "mobility_rights",
+            "mobilityRights",
+            "annual_total_usd",
+            "components",
+            "score",
+            "active_life",
+            "healthcare_bridge",
+            "stay_flexibility",
+            "tax_compatibility",
+            "global_access",
+            "sustainable_annual_cost",
+        ):
+            with self.subTest(sensitive_key=sensitive_key):
+                self.assertNotRegex(
+                    analytics_source, rf"\b{re.escape(sensitive_key)}\b"
+                )
 
     def test_default_page_answers_the_query_without_javascript(self) -> None:
         self.assertIn("<h1>FIRE Abroad</h1>", self.html)

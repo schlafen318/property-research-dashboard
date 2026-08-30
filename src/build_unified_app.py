@@ -15,6 +15,7 @@ from urllib.parse import urlparse
 try:
     from src.country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from src.fire_abroad import (
+        CANONICAL_LAUNCH_IDS,
         load_fire_abroad,
         normalize_fire_profile,
         rank_fire_abroad_destinations,
@@ -45,6 +46,7 @@ try:
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from fire_abroad import (
+        CANONICAL_LAUNCH_IDS,
         load_fire_abroad,
         normalize_fire_profile,
         rank_fire_abroad_destinations,
@@ -2170,6 +2172,15 @@ PRIMARY_NAV_LINKS = [
     ("/countries/", "Country Guides"),
     ("/guides/", "Buying Guides"),
 ]
+
+
+def fire_abroad_context_link(destination_ids: set[str], fire_ids: set[str]) -> str:
+    if not destination_ids.intersection(fire_ids):
+        return ""
+    return (
+        f'<p class="context-link"><a href="/{FIRE_ABROAD_SLUG}/" '
+        'data-track="fire_abroad_open">Compare this market for FIRE Abroad</a></p>'
+    )
 
 
 def primary_nav_links_html() -> str:
@@ -6205,7 +6216,7 @@ def build_retirement_destination_finder_page(
         for region in sorted({item["continent"] for item in browser_destinations if item["continent"]})
     )
     canonical = page_url(RETIREMENT_FINDER_SLUG)
-    return build_retirement_destination_finder_html(
+    html = build_retirement_destination_finder_html(
         head=head_html(
             RETIREMENT_FINDER_TITLE,
             RETIREMENT_FINDER_DESCRIPTION,
@@ -6223,6 +6234,13 @@ def build_retirement_destination_finder_page(
         analytics=analytics_event_script(),
         design_css=retirement_finder_design_css(),
         footer=site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
+    )
+    return html.replace(
+        '<div class="finder-editorial">',
+        f'<p class="context-link"><a href="/{FIRE_ABROAD_SLUG}/" '
+        'data-track="fire_abroad_open" data-track-label="retirement destination finder">'
+        'Compare active FIRE Abroad destinations</a></p><div class="finder-editorial">',
+        1,
     )
 
 
@@ -6456,7 +6474,7 @@ __UTILITY_CSS__
       <div class="cost-sidecar-panel"><header class="cost-sidecar-header"><div><h2 id="ret-cost-sidecar-title">Compare monthly living expenses</h2><p class="hint" id="ret-cost-sidecar-context"></p></div><button class="cost-sidecar-close" id="ret-cost-sidecar-close" type="button" aria-label="Close destination comparison">Close</button></header><div class="cost-sidecar-chart" id="ret-cost-sidecar-chart"></div></div>
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
-    <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Tax, visa eligibility, currency shocks, individualized healthcare and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
+    <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Tax, visa eligibility, currency shocks, individualized healthcare and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a>__FIRE_ABROAD_LINK__</p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
   __SITE_FOOTER__
@@ -6476,6 +6494,10 @@ __ANALYTICS__
         "__AS_OF__": escape(retirement_payload["as_of"]),
         "__SOURCES__": "".join(source_links),
         "__FAQ__": faq_html,
+        "__FIRE_ABROAD_LINK__": (
+            f'<a href="/{FIRE_ABROAD_SLUG}/" data-track="fire_abroad_open" '
+            'data-track-label="retirement calculator">Compare active FIRE Abroad destinations</a>'
+        ),
         "__DATA__": page_data,
         "__ENGINE__": engine_js,
         "__UI__": ui_js,
@@ -6804,6 +6826,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
             </div>
           </section>
           {retirement_calculator_callout("guide-research-note", "guide hub")}
+          <p class="context-link"><a href="/{FIRE_ABROAD_SLUG}/" data-track="fire_abroad_open" data-track-label="guides hub">Compare active FIRE Abroad destinations</a></p>
           <section class="guide-feature" id="featured-research">
             <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
             <div class="guide-feature__copy">
@@ -7242,6 +7265,7 @@ def build_foreign_buyer_country_guide_page(
 <main><div class="foreign-buyer-shell foreign-buyer-layout">
   <aside class="foreign-buyer-rail"><p>In this guide</p><nav aria-label="In this guide">{rail_links}</nav><a class="foreign-buyer-atlas-link" href="/dashboard/#destinations">Compare every destination</a></aside>
   <article class="foreign-buyer-article">
+    {fire_abroad_context_link(set(hub["destination_ids"]), set(CANONICAL_LAUNCH_IDS))}
     <section id="ownership-answer"><h2>Can foreigners buy property in {escape(guide["country"])}?</h2>{eligibility_html}</section>
     <section id="purchase-process"><h2>How the purchase works</h2><ol class="foreign-buyer-steps">{foreign_buyer_purchase_steps_html(guide)}</ol></section>
     <section id="costs-financing"><h2>Costs and financing</h2>{foreign_buyer_cost_table_html(guide)}{foreign_buyer_acquisition_example_html(guide)}</section>
@@ -7618,6 +7642,17 @@ def build_seo_page(
     intro = page.get("generated_intro") or description
     generated_link = generated_internal_link_html(page)
     updated = date.today().isoformat()
+    fire_abroad_surface = {
+        "best-places-to-buy-property-abroad-for-retirement": "retirement destinations guide",
+        "buying-property-abroad-for-retirement": "retirement property guide",
+    }.get(page["slug"])
+    fire_abroad_guide_link = (
+        f'<p class="context-link"><a href="/{FIRE_ABROAD_SLUG}/" '
+        f'data-track="fire_abroad_open" data-track-label="{fire_abroad_surface}">'
+        "Compare active FIRE Abroad destinations</a></p>"
+        if fire_abroad_surface
+        else ""
+    )
     is_japan_article = is_japan_retirement_guide(page)
     is_spain_article = is_spain_retirement_guide(page)
     is_portugal_article = is_portugal_retirement_guide(page)
@@ -8227,6 +8262,7 @@ def build_seo_page(
       <div class="seo-content">
         <article class="seo-article">
           {callout_before_overview}
+          {fire_abroad_guide_link}
           {overview_html}
           {callout_after_overview}
           {comparison_html}
@@ -9558,6 +9594,7 @@ def build_premium_destination_page(
           <ol class="premium-checklist">{checklist}</ol>
           <p class="premium-handoff">For the national residence, tax and ownership framework, read about {national_guide_sentence}. To size the plan, use the <a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="destination page">retirement abroad calculator</a>. {comparison_handoff}</p>
         </section>
+        {fire_abroad_context_link({dest["id"]}, set(CANONICAL_LAUNCH_IDS))}
         {premium_dossier_references_html(spec)}
       </article>
       <aside class="premium-rail" aria-label="In this dossier">
@@ -9718,6 +9755,7 @@ def build_destination_page(
       <div class="page-layout destination-layout">
         <article class="page-article">
           {retirement_callout}
+          {fire_abroad_context_link({dest["id"]}, set(CANONICAL_LAUNCH_IDS))}
           <details class="page-section" id="overview" data-mobile-open="true" open>
             <summary><h2>Shortlist Verdict</h2></summary>
             <p>{escape(dest.get("profit_driver") or dest.get("panel_verdict") or "")}</p>
@@ -10370,6 +10408,7 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         (page_url(RETIREMENT_CALCULATOR_SLUG), "0.92"),
         (page_url(RETIREMENT_FINDER_SLUG), "0.92"),
+        (page_url(FIRE_ABROAD_SLUG), "0.92"),
         (page_url(RETIREMENT_DESTINATIONS_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
         *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],
@@ -10384,6 +10423,7 @@ def build() -> Path:
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = rank_destinations(destinations)
     retirement_costs = load_retirement_costs()
+    fire_payload = load_fire_abroad_for_build(destinations, retirement_costs)
     mortgage_profiles = load_mortgage_profiles()
     guide_pages = [RETIREMENT_DESTINATIONS_PAGE, *SEO_PAGES]
     listings = load_json("listings.json")
@@ -11771,6 +11811,14 @@ def build() -> Path:
     (retirement_finder_dir / "index.html").write_text(
         clean_generated_html(
             build_retirement_destination_finder_page(destinations, retirement_costs, mortgage_profiles)
+        ),
+        encoding="utf-8",
+    )
+    fire_abroad_dir = ARTIFACTS / FIRE_ABROAD_SLUG
+    fire_abroad_dir.mkdir(parents=True, exist_ok=True)
+    (fire_abroad_dir / "index.html").write_text(
+        clean_generated_html(
+            build_fire_abroad_page(destinations, retirement_costs, fire_payload)
         ),
         encoding="utf-8",
     )

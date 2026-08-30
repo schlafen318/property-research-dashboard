@@ -21,6 +21,48 @@ class CountryContentLinkGraphTests(unittest.TestCase):
     def setUpClass(cls) -> None:
         cls.destinations, cls.listings = rendered_inputs()
         cls.destinations_by_id = {item["id"]: item for item in cls.destinations}
+        cls.fire_ids = set(
+            build_unified_app.load_fire_abroad_for_build(
+                cls.destinations, build_unified_app.load_retirement_costs()
+            )["launch_destination_ids"]
+        )
+
+    def test_fire_abroad_links_are_limited_to_launch_destinations_and_countries(self) -> None:
+        for destination in self.destinations:
+            html = build_unified_app.build_destination_page(
+                destination,
+                self.listings,
+                self.destinations,
+                build_unified_app.SEO_PAGES,
+            )
+            with self.subTest(destination=destination["id"]):
+                self.assertEqual(
+                    destination["id"] in self.fire_ids,
+                    'href="/fire-abroad/"' in html,
+                )
+
+        for hub in build_unified_app.COUNTRY_HUBS:
+            html = build_unified_app.build_country_hub_page(
+                hub,
+                self.destinations,
+                build_unified_app.SEO_PAGES,
+            )
+            with self.subTest(country=hub["country"]):
+                self.assertEqual(
+                    bool(set(hub["destination_ids"]).intersection(self.fire_ids)),
+                    'href="/fire-abroad/"' in html,
+                )
+
+    def test_primary_navigation_membership_remains_unchanged(self) -> None:
+        self.assertEqual(
+            [
+                ("/dashboard/", "Destination Rankings"),
+                ("/retirement-abroad-calculator/", "Retirement Calculator"),
+                ("/countries/", "Country Guides"),
+                ("/guides/", "Buying Guides"),
+            ],
+            build_unified_app.PRIMARY_NAV_LINKS,
+        )
 
     def test_retirement_guides_link_to_acquisition_guide_and_all_country_dossiers(self) -> None:
         for hub in build_unified_app.COUNTRY_HUBS:
