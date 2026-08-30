@@ -59,6 +59,10 @@ class FakeElement {
     this.innerHTML = "";
     this.listeners = {};
     this.attributes = {};
+    this.style = {
+      values: {},
+      setProperty: (name, value) => { this.style.values[name] = String(value); },
+    };
     this.classNames = new Set();
     this.classList = {
       toggle: (name, force) => {
@@ -147,6 +151,8 @@ const wizardSections = [
   el("finder-profile"),
   el("finder-current-resources"),
   el("finder-housing"),
+  el("finder-financing"),
+  el("finder-before-retirement"),
   el("finder-retirement-income"),
   el("finder-preferences"),
   el("finder-review"),
@@ -154,7 +160,9 @@ const wizardSections = [
 const controlsBySection = [
   ["finder-currency", "finder-current-age", "finder-retirement-age", "finder-horizon", "finder-household"],
   ["finder-liquid-capital", "finder-monthly-contribution", "finder-return"],
-  ["finder-housing-plan", "finder-property-allocation", "finder-purchase-method", "finder-buyer-residency", "finder-income-source", "finder-requested-ltv", "finder-mortgage-rate", "finder-mortgage-term", "finder-mortgage-treatment", "finder-use-before-retirement", "finder-rental-yield", "finder-vacancy-rate", "finder-operating-cost-rate"],
+  ["finder-housing-plan", "finder-property-allocation", "finder-purchase-method"],
+  ["finder-buyer-residency", "finder-income-source", "finder-requested-ltv", "finder-mortgage-rate", "finder-mortgage-term", "finder-mortgage-treatment"],
+  ["finder-use-before-retirement", "finder-rental-yield", "finder-vacancy-rate", "finder-operating-cost-rate"],
   ["finder-pension", "finder-other-income"],
   ["finder-region", "finder-healthcare"],
   [],
@@ -373,6 +381,7 @@ process.stdout.write(JSON.stringify({
   wizardActionsHidden: el("finder-wizard-actions").hidden,
   wizardStepText: el("finder-wizard-step").textContent,
   wizardStepNow: el("finder-wizard-progressbar").attributes["aria-valuenow"],
+  wizardStepMax: el("finder-wizard-progressbar").attributes["aria-valuemax"],
   wizardBackHidden: el("finder-wizard-back").hidden,
   wizardNextText: el("finder-wizard-next").textContent,
   wizardSectionHidden: wizardSections.map((section) => section.hidden),
@@ -409,7 +418,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertFalse(scenario["wizardProgressHidden"])
         self.assertFalse(scenario["wizardActionsHidden"])
-        self.assertEqual([True, False, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([True, False, True, True, True, True, True, True], scenario["wizardSectionHidden"])
         self.assertEqual("Step 2 of 6", scenario["wizardStepText"])
         self.assertEqual("2", scenario["wizardStepNow"])
         self.assertFalse(scenario["wizardBackHidden"])
@@ -425,7 +434,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual([False, True, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([False, True, True, True, True, True, True, True], scenario["wizardSectionHidden"])
         self.assertEqual("Step 1 of 6", scenario["wizardStepText"])
         self.assertTrue(scenario["wizardBackHidden"])
 
@@ -439,7 +448,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual([False, True, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([False, True, True, True, True, True, True, True], scenario["wizardSectionHidden"])
         self.assertFalse(scenario["wizardErrorHidden"])
 
     def test_mobile_wizard_reports_native_step_mismatch_before_hiding_the_field(self) -> None:
@@ -452,7 +461,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual([True, False, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([True, False, True, True, True, True, True, True], scenario["wizardSectionHidden"])
         self.assertFalse(scenario["wizardErrorHidden"])
         self.assertEqual(0, scenario["engineCalls"])
 
@@ -474,11 +483,11 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             {
                 "rates": {"USD": 1},
                 "mobile": True,
-                "wizardActions": ["next", "next", "buy-mortgage", "invalid-ltv", "next"],
+                "wizardActions": ["next", "next", "buy-mortgage", "next", "invalid-ltv", "next"],
             }
         )
 
-        self.assertEqual([True, True, False, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([True, True, True, False, True, True, True, True], scenario["wizardSectionHidden"])
         self.assertFalse(scenario["wizardErrorHidden"])
         self.assertEqual(0, scenario["engineCalls"])
 
@@ -493,7 +502,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertEqual(0, scenario["engineCalls"])
         self.assertEqual("Step 2 of 6", scenario["wizardStepText"])
-        self.assertEqual([True, False, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([True, False, True, True, True, True, True, True], scenario["wizardSectionHidden"])
 
     def test_mobile_wizard_submits_on_final_step_and_adjust_plan_restores_it(self) -> None:
         complete = run_ui_dom_scenario(
@@ -519,7 +528,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertFalse(adjusted["formHidden"])
         self.assertTrue(adjusted["resultsHidden"])
-        self.assertEqual([True, True, True, True, True, False], adjusted["wizardSectionHidden"])
+        self.assertEqual([True, True, True, True, True, True, True, False], adjusted["wizardSectionHidden"])
         self.assertEqual("View my matches", adjusted["wizardNextText"])
         self.assertTrue(adjusted["wizardEditing"])
 
@@ -554,13 +563,13 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
                     "finder-healthcare": "high",
                 },
                 "settings": ["CoastOrIsland"],
-                "wizardActions": ["next", "next", "buy-mortgage", "next", "next", "next"],
+                "wizardActions": ["next", "next", "buy-mortgage", "next", "next", "next", "next", "next"],
             }
         )
 
         self.assertEqual(
-            "Buy now · USD 300,000 budget · Mortgage, 60% LTV at 5% for 20 years · "
-            "Non-resident, Overseas income · Pay off at retirement · Personal use before retirement",
+            "Buy now · USD 300,000 · Mortgage: 60% LTV, 5%, 20 years · "
+            "Non-resident · Pay off at retirement · Personal use before retirement",
             scenario["reviewHousing"],
         )
         self.assertEqual(
@@ -586,15 +595,31 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertFalse(scenario["formHidden"])
         self.assertTrue(scenario["resultsHidden"])
-        self.assertEqual([True, True, True, True, True, False], scenario["wizardSectionHidden"])
+        self.assertEqual([True, True, True, True, True, True, True, False], scenario["wizardSectionHidden"])
 
     def test_desktop_keeps_the_full_form_and_hides_wizard_navigation(self) -> None:
         scenario = run_ui_dom_scenario({"rates": {"USD": 1}, "mobile": False})
 
-        self.assertEqual([False, False, False, False, False, False], scenario["wizardSectionHidden"])
+        self.assertEqual([False, False, False, True, True, False, False, False], scenario["wizardSectionHidden"])
         self.assertTrue(scenario["wizardProgressHidden"])
         self.assertTrue(scenario["wizardActionsHidden"])
         self.assertFalse(scenario["wizardEditing"])
+
+    def test_buy_now_mortgage_adds_short_financing_and_use_steps(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "wizardActions": ["next", "next", "buy-mortgage", "next"],
+            }
+        )
+
+        self.assertEqual("Step 4 of 8", scenario["wizardStepText"])
+        self.assertEqual("8", scenario["wizardStepMax"])
+        self.assertEqual(
+            [True, True, True, False, True, True, True, True],
+            scenario["wizardSectionHidden"],
+        )
 
     def test_money_helpers_match_the_retirement_calculator(self) -> None:
         conversion = {

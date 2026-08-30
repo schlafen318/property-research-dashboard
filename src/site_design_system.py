@@ -380,6 +380,7 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .field label { font-weight: 500; }
     .retirement-finder-page .finder-setting-options { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 7px; }
     .retirement-finder-page .finder-setting-options .check { min-height: 44px; margin: 0; }
+    .retirement-finder-page .finder-section-conditional > [data-finder-group] { margin-top: 0; padding-top: 0; border-top: 0; }
     .retirement-finder-page input, .retirement-finder-page select { border: 1px solid var(--gha-rule); border-radius: 0; background: var(--gha-surface); font-family: var(--gha-reading-sans); font-weight: 400; }
     .retirement-finder-page .finder-submit { width: fit-content; min-height: 48px; padding: 0 18px; border: 1px solid var(--gha-ink); border-radius: 0; background: var(--gha-ink); color: var(--gha-paper); font-family: var(--gha-reading-sans); font-size: 12px; font-weight: 500; letter-spacing: .055em; text-transform: uppercase; }
     .retirement-finder-page .finder-submit:hover { background: var(--gha-accent); }
@@ -515,12 +516,7 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .finder-wizard-progress { display: block; margin: 0 0 18px; }
       .retirement-finder-page .finder-wizard-progress p { margin: 0 0 8px; color: var(--gha-accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
       .retirement-finder-page .finder-wizard-progressbar { position: relative; height: 2px; overflow: hidden; background: var(--gha-rule); }
-      .retirement-finder-page .finder-wizard-progressbar::after { position: absolute; inset: 0 auto 0 0; width: 16.6667%; background: var(--gha-accent); content: ""; transition: width .2s ease; }
-      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="2"]::after { width: 33.3333%; }
-      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="3"]::after { width: 50%; }
-      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="4"]::after { width: 66.6667%; }
-      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="5"]::after { width: 83.3333%; }
-      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="6"]::after { width: 100%; }
+      .retirement-finder-page .finder-wizard-progressbar::after { position: absolute; inset: 0 auto 0 0; width: var(--finder-progress, 16.6667%); background: var(--gha-accent); content: ""; transition: width .2s ease; }
       .retirement-finder-page .finder-section[tabindex="-1"]:focus { outline: 0; }
       .retirement-finder-page .finder-section .finder-step { display: none; }
       .retirement-finder-page .finder-wizard-actions { display: grid; position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--gha-rule); background: rgba(245, 241, 232, .97); }
@@ -528,7 +524,7 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .finder-wizard-back { border: 1px solid var(--gha-rule); background: transparent; color: var(--gha-ink); }
       .retirement-finder-page .finder-wizard-next { border: 1px solid var(--gha-ink); background: var(--gha-ink); color: var(--gha-paper); }
       .retirement-finder-page .finder-wizard-next:disabled { opacity: .45; }
-      .retirement-finder-page .finder-form > .finder-submit { display: none; }
+      .retirement-finder-page.finder-wizard-editing .finder-form > .finder-submit { display: none; }
       .retirement-finder-page .finder-adjust-plan { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; color: var(--gha-link); font: 400 14px var(--gha-reading-sans); text-decoration: underline; text-underline-offset: .18em; }
       .retirement-finder-page .finder-comparison-scroll { display: none; }
       .retirement-finder-page .finder-comparison-mobile { display: block; }
@@ -548,9 +544,31 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .finder-modes { margin-top: 18px; }
       .retirement-finder-page main { padding-top: 38px; }
       .retirement-finder-page .field-grid, .retirement-finder-page .finder-summary, .retirement-finder-page .finder-result dl, .retirement-finder-page .finder-comparison { grid-template-columns: 1fr; }
+      .retirement-finder-page.finder-wizard-editing #finder-profile .field-grid, .retirement-finder-page.finder-wizard-editing #finder-current-resources .field-grid, .retirement-finder-page.finder-wizard-editing #finder-retirement-income .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .retirement-finder-page.finder-wizard-editing #finder-financing .field-grid, .retirement-finder-page.finder-wizard-editing #finder-before-retirement [data-finder-group="rental"] .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .retirement-finder-page.finder-wizard-editing #finder-profile .planning-currency, .retirement-finder-page.finder-wizard-editing #finder-current-resources .field:last-child { grid-column: 1 / -1; }
+      .retirement-finder-page.finder-wizard-editing #finder-before-retirement [data-finder-group="buyNow"] .field, .retirement-finder-page.finder-wizard-editing #finder-before-retirement [data-finder-group="rental"] .field:last-child { grid-column: 1 / -1; }
+      .retirement-finder-page.finder-wizard-editing .finder-section { padding-bottom: calc(76px + env(safe-area-inset-bottom)); }
+      .retirement-finder-page.finder-wizard-editing #finder-preferences .field-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .retirement-finder-page.finder-wizard-editing #finder-preferences .field:nth-child(1) { grid-column: 1; grid-row: 1; }
+      .retirement-finder-page.finder-wizard-editing #finder-preferences .field:nth-child(2) { grid-column: 1 / -1; grid-row: 2; }
+      .retirement-finder-page.finder-wizard-editing #finder-preferences .field:nth-child(3) { grid-column: 2; grid-row: 1; }
+      .retirement-finder-page.finder-wizard-editing #finder-preferences .finder-setting-options { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; }
+      .retirement-finder-page.finder-wizard-editing #finder-preferences .finder-setting-options .check { min-height: 38px; }
+      .retirement-finder-page.finder-wizard-editing #finder-review .section-help { display: none; }
+      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 12px; margin: 10px 0 8px; }
+      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary div { padding: 8px 0; }
+      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary dt { font-size: 10px; }
+      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary dd { margin-top: 2px; font-family: var(--gha-reading-sans); font-size: 14px; line-height: 1.35; }
+      .retirement-finder-page.finder-wizard-editing #finder-review .privacy-note { display: none; }
       .retirement-finder-page .finder-summary div { padding-right: 0; }
       .retirement-finder-page .finder-submit { width: 100%; }
       .retirement-finder-page .finder-share-section { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 620px) and (max-height: 600px) {
+      .retirement-finder-page.finder-wizard-editing .finder-wizard-progress { padding: 8px 16px 6px; }
+      .retirement-finder-page.finder-wizard-editing .finder-section { padding-top: 12px; }
+      .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary div { padding: 5px 0; }
     }
     @media (prefers-reduced-motion: reduce) {
       .retirement-finder-page .finder-chart-year { animation: none; opacity: 1; transform: none; }
