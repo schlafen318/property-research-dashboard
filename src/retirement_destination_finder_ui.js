@@ -42,6 +42,32 @@
     return formatPlanningMoney(input);
   }
 
+  function compactResultMoney(input) {
+    const currency = input.currency || "USD";
+    const converted = convertPlanningAmount({
+      amount: input.amountUsd,
+      fromCurrency: "USD",
+      toCurrency: currency,
+      ratesToUsd: input.ratesToUsd || { USD: 1 },
+    });
+    const amount = Math.max(0, converted === null ? 0 : converted);
+    const divisor = amount >= 1_000_000 ? 1_000_000 : amount >= 1_000 ? 1_000 : 1;
+    const suffix = divisor === 1_000_000 ? "m" : divisor === 1_000 ? "k" : "";
+    const value = new Intl.NumberFormat("en-US", {
+      maximumFractionDigits: divisor === 1_000_000 ? 2 : 0,
+    }).format(amount / divisor);
+    const symbol = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+      maximumFractionDigits: 0,
+    }).formatToParts(0).filter(function (part) {
+      return part.type === "currency";
+    }).map(function (part) {
+      return part.value;
+    }).join("");
+    return symbol + (symbol.length > 1 ? "\u00a0" : "") + value + suffix;
+  }
+
   function convertPlanningControlAmount(input) {
     const converted = convertPlanningAmount(input);
     if (converted === null) return null;
@@ -335,14 +361,16 @@
     const currency = input.currency || "USD";
     const ratesToUsd = input.ratesToUsd || { USD: 1 };
     const capitalPosition = Math.max(0, Math.min(100, Number(model.projectedPosition) || 0));
-    const axisHtml = '<span></span><span class="finder-landscape-axis-track" style="--capital-position:' +
-      capitalPosition.toFixed(2) + '%"><span class="finder-landscape-capital-label">Projected capital</span></span><span></span>';
+    const zero = compactResultMoney({ amountUsd: 0, currency: currency, ratesToUsd: ratesToUsd });
+    const axisHtml = "<span></span><span></span><span>Capital needed</span>";
+    const rankLabels = {
+      1: "Strongest match",
+      2: "Second match",
+      3: "Third match",
+    };
     const rowsHtml = (model.rows || []).map(function (row, index) {
       const targetPosition = Math.max(0, Math.min(100, Number(row.position) || 0));
       const difference = (Number(row.target) || 0) - (Number(model.projectedCapital) || 0);
-      const differencePosition = targetPosition - capitalPosition;
-      const distanceStart = Math.min(capitalPosition, targetPosition);
-      const distanceWidth = Math.abs(differencePosition);
       const state = difference === 0 ? "is-on-target" : difference < 0 ? "is-within" : "is-over";
       const label = finderCapitalLandscapeLabel({
         row: row,
@@ -350,9 +378,16 @@
         currency: currency,
         ratesToUsd: ratesToUsd,
       });
-      const value = resultMoney({ amountUsd: row.target, currency: currency, ratesToUsd: ratesToUsd });
+      const required = compactResultMoney({ amountUsd: row.target, currency: currency, ratesToUsd: ratesToUsd }) + " needed";
+      const buffer = difference === 0
+        ? "Matches your plan"
+        : compactResultMoney({
+          amountUsd: Math.abs(difference),
+          currency: currency,
+          ratesToUsd: ratesToUsd,
+        }) + (difference < 0 ? " remaining" : " above your plan");
       const rank = row.matchRank
-        ? '<small class="finder-landscape-rank">Match 0' + row.matchRank + "</small>"
+        ? '<small class="finder-landscape-rank">' + rankLabels[row.matchRank] + "</small>"
         : "";
       return '<div class="finder-landscape-item" role="listitem"><a class="finder-landscape-row' + (row.matchRank ? " is-match" : "") + " " + state +
         '" href="' + escapeHtml(safeDossierHref(row.destinationId)) +
@@ -361,12 +396,13 @@
         '" data-match-rank="' + (row.matchRank || "") + '" data-tier="' + escapeHtml(row.tier) +
         '" data-action="dossier"' +
         ' aria-label="' + escapeHtml(label) + '" style="--capital-position:' + capitalPosition.toFixed(2) +
-        "%;--target-position:" + targetPosition.toFixed(2) + "%;--distance-start:" + distanceStart.toFixed(2) +
-        "%;--distance-width:" + distanceWidth.toFixed(2) + '%"><span class="finder-landscape-name">' +
+        "%;--target-position:" + targetPosition.toFixed(2) + '%"><span class="finder-landscape-name">' +
         escapeHtml(row.name) + "<small>" + escapeHtml(row.country) + "</small>" + rank +
-        '</span><span class="finder-landscape-track" aria-hidden="true"><i class="finder-landscape-capital-dot"></i>' +
-        '<i class="finder-landscape-distance"></i><i class="finder-landscape-dot"></i></span>' +
-        '<span class="finder-landscape-value"><span>' + escapeHtml(value) + "</span></span></a></div>";
+        '</span><span class="finder-landscape-track" aria-hidden="true"><i class="finder-landscape-fill"></i>' +
+        '<i class="finder-landscape-cost-dot"></i><i class="finder-landscape-plan-marker"></i>' +
+        '<span class="finder-landscape-scale-zero">' + escapeHtml(zero) + '</span><span class="finder-landscape-scale-plan">Your plan</span></span>' +
+        '<span class="finder-landscape-value"><span class="finder-landscape-required">' + escapeHtml(required) +
+        '</span><small class="finder-landscape-buffer">' + escapeHtml(buffer) + "</small></span></a></div>";
     }).join("");
     return { axisHtml: axisHtml, rowsHtml: rowsHtml, rowCount: (model.rows || []).length };
   }
@@ -1584,6 +1620,7 @@
     formatMoneyInputValue: formatMoneyInputValue,
     formatPlanningMoney: formatPlanningMoney,
     resultMoney: resultMoney,
+    compactResultMoney: compactResultMoney,
     housingVisibility: housingVisibility,
     activeMoneyControlIds: activeMoneyControlIds,
     safeDetailHref: safeDetailHref,

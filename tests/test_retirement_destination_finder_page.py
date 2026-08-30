@@ -193,7 +193,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-exclusions"', self.html)
         self.assertIn("Where your plan could take you", self.html)
         self.assertIn("Destinations shown", self.html)
-        self.assertIn("Capital required by destination", self.html)
+        self.assertIn("Capital needed by destination", self.html)
         self.assertIn("All filtered destinations · lowest capital first", self.html)
         self.assertIn("How your capital could grow", self.html)
         self.assertNotIn("Retirement score", self.html)
@@ -234,6 +234,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('data-finder-dossier', self.html)
 
     def test_landscape_uses_plain_editorial_rules_and_a_compact_mobile_list(self) -> None:
+        self.assertIn('id="finder-landscape-heading">Capital needed by destination</h3>', self.html)
         head = self.html.split("</head>", 1)[0]
         design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
         self.assertIn(".retirement-finder-page .finder-landscape", design_css)
@@ -243,10 +244,13 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("@media (max-width: 620px)", design_css)
         self.assertIn("grid-template-columns: minmax(0, 1fr) auto", design_css)
         self.assertIn(".retirement-finder-page .finder-landscape-projection", design_css)
-        self.assertIn(".retirement-finder-page .finder-landscape-capital-dot", design_css)
-        self.assertIn(".retirement-finder-page .finder-landscape-distance", design_css)
-        self.assertIn(".retirement-finder-page .finder-landscape-row.is-on-target .finder-landscape-dot { display: none; }", design_css)
-        self.assertIn(".retirement-finder-page .finder-landscape-row.is-on-target.is-match .finder-landscape-capital-dot", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-fill", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-cost-dot", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-plan-marker", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-required", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-buffer", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-row.is-within .finder-landscape-fill", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-row.is-over .finder-landscape-fill", design_css)
         self.assertIn("@media (max-width: 760px)", design_css)
         self.assertIn(
             ".finder-landscape-rows:not(.is-expanded) > .finder-landscape-item:nth-child(n + 6)",
