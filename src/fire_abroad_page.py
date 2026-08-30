@@ -135,7 +135,7 @@ def build_fire_abroad_html(
   <style id="fire-abroad-page-style">
     .fire-abroad-page .fire-content {{ max-width: 1120px; padding: 52px 0 76px; }}
     .fire-abroad-page .fire-breadcrumb {{ margin: 0 0 18px; color: var(--gha-muted); font-size: 13px; }}
-    .fire-abroad-page .fire-breadcrumb a {{ color: inherit; }}
+    .fire-abroad-page .fire-breadcrumb a {{ min-height: 44px; display: inline-flex; align-items: center; color: inherit; vertical-align: middle; }}
     .fire-abroad-page .fire-profile {{ margin: 0 0 58px; padding: 28px 0 32px; border-top: 3px solid var(--gha-ink); border-bottom: 1px solid var(--gha-rule); }}
     .fire-abroad-page .fire-profile h2, .fire-abroad-page .fire-results-section h2, .fire-abroad-page .fire-methodology h2, .fire-abroad-page .fire-sources h2 {{ margin: 0 0 12px; }}
     .fire-abroad-page .fire-profile > p, .fire-abroad-page .fire-methodology > p, .fire-abroad-page .fire-sources > p {{ max-width: 780px; color: var(--gha-muted); }}
@@ -165,7 +165,9 @@ def build_fire_abroad_html(
     .fire-abroad-page .fire-weights th, .fire-abroad-page .fire-weights td {{ padding: 11px 8px 11px 0; border-top: 1px solid var(--gha-rule); text-align: left; }}
     .fire-abroad-page .fire-evidence {{ margin-top: 24px; border-top: 1px solid var(--gha-rule); }}
     .fire-abroad-page .fire-evidence summary {{ min-height: 48px; display: flex; align-items: center; font-weight: 500; cursor: pointer; }}
+    .fire-abroad-page .fire-evidence a {{ min-height: 44px; display: inline-flex; align-items: center; vertical-align: middle; }}
     .fire-abroad-page .fire-evidence li {{ max-width: 920px; margin: 10px 0; overflow-wrap: anywhere; }}
+    .fire-abroad-page .gha-footer a {{ min-height: 44px; display: flex; align-items: center; }}
     .fire-abroad-page noscript p {{ padding: 14px 0; border-top: 1px solid var(--gha-rule); border-bottom: 1px solid var(--gha-rule); }}
     @media (max-width: 900px) {{ .fire-abroad-page .fire-fields {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }} }}
     @media (max-width: 760px) {{

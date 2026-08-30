@@ -223,6 +223,21 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertRegex(page_css, r"\.fire-field input, \.(?:fire-abroad-page )?\.fire-field select \{[^}]*min-height:\s*(?:44|4[5-9]|[5-9]\d)px")
         self.assertRegex(page_css, r"\.fire-abroad-page \.fire-results-table a \{[^}]*min-height:\s*44px")
 
+    def test_page_scoped_link_targets_cover_navigation_sources_actions_and_footer(self) -> None:
+        page_css = self.html.split('<style id="fire-abroad-page-style">', 1)[1].split("</style>", 1)[0]
+        for selector in (
+            r"\.fire-abroad-page \.fire-breadcrumb a",
+            r"\.fire-abroad-page \.fire-evidence a",
+            r"\.fire-abroad-page \.fire-results-table a",
+            r"\.fire-abroad-page #fire-results > article a",
+            r"\.fire-abroad-page \.gha-footer a",
+        ):
+            with self.subTest(selector=selector):
+                self.assertRegex(
+                    page_css,
+                    selector + r"\s*\{[^}]*min-height:\s*44px",
+                )
+
     def test_embedded_payload_is_minimal_complete_and_script_safe(self) -> None:
         script_text = re.search(
             r'<script id="fire-abroad-data" type="application/json">(.*?)</script>',
