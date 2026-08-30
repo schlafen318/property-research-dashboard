@@ -428,6 +428,12 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-comparison-table tbody th { width: 190px; color: var(--gha-muted); }
     .retirement-finder-page .finder-comparison-table select { min-width: 0; margin-top: 8px; font-size: 13px; }
     .retirement-finder-page .finder-comparison-links { display: grid; gap: 5px; }
+    .retirement-finder-page .finder-comparison-mobile { display: none; }
+    .retirement-finder-page .finder-comparison-mobile article { padding: 20px 0; border-top: 1px solid var(--gha-rule); }
+    .retirement-finder-page .finder-comparison-mobile h4 { margin: 0 0 10px; font-family: var(--gha-display-serif); font-size: 25px; font-weight: 500; }
+    .retirement-finder-page .finder-comparison-mobile dl { display: grid; gap: 12px; margin: 18px 0 0; }
+    .retirement-finder-page .finder-comparison-mobile dt { color: var(--gha-muted); font-size: 12px; }
+    .retirement-finder-page .finder-comparison-mobile dd { margin: 2px 0 0; }
     .retirement-finder-page .finder-comparison-status { min-height: 1.5em; color: var(--gha-muted); font-size: 13px; }
     .retirement-finder-page .finder-share-section { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 18px; align-items: center; margin: 0 0 46px; padding: 24px 0; border-top: 1px solid var(--gha-rule); border-bottom: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-share-section button { min-height: 44px; padding: 0 16px; border: 1px solid var(--gha-ink); border-radius: 0; background: var(--gha-ink); color: var(--gha-paper); font: 500 12px var(--gha-reading-sans); letter-spacing: .05em; text-transform: uppercase; }
@@ -479,6 +485,8 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .finder-list { grid-template-columns: 1fr; }
     }
     @media (max-width: 760px) {
+      .retirement-finder-page .finder-comparison-scroll { display: none; }
+      .retirement-finder-page .finder-comparison-mobile { display: block; }
       .retirement-finder-page .finder-landscape-head { display: block; }
       .retirement-finder-page .finder-landscape-key { margin-top: 12px; }
       .retirement-finder-page .finder-landscape-axis { display: none; }

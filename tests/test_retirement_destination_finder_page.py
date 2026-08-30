@@ -160,6 +160,13 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("retirement_finder_scenario.js", self.builder)
         self.assertNotIn("algorithm", self.html.lower())
 
+    def test_shared_query_is_removed_before_analytics_loads(self) -> None:
+        scrub = 'window.__ghaFinderScenario'
+        analytics = 'googletagmanager.com/gtag/js'
+        self.assertIn(scrub, self.html)
+        self.assertLess(self.html.index(scrub), self.html.index(analytics) if analytics in self.html else self.html.index('type="application/ld+json"'))
+        self.assertIn('id="finder-data-reviewed"', self.html)
+
     def test_results_lead_with_cost_landscape_and_three_modeled_matches(self) -> None:
         self.assertIn('id="finder-result-read"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
@@ -222,6 +229,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn(".finder-result header a{display:flex;min-height:44px", self.html)
         self.assertIn(".finder-results{min-width:0", self.html)
         self.assertIn(".finder-projection-wrap{min-width:0", self.html)
+        self.assertIn(".finder-comparison-mobile", self.html)
 
     def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
         self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)

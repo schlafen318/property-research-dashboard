@@ -1727,6 +1727,14 @@ def analytics_event_script() -> str:
         const explicit = target.getAttribute("data-track");
         const href = target.getAttribute("href") || "";
         if (explicit) {{
+          if (explicit.indexOf("retirement_capital_scenario_") === 0) {{
+            track(explicit, {{
+              scenario_slug: document.body && document.body.dataset ? document.body.dataset.scenarioSlug || "" : "",
+              destination_id: target.getAttribute("data-destination-id") || "",
+              link_type: target.getAttribute("data-link-type") || ""
+            }});
+            return;
+          }}
           track(explicit, {{
             label: target.getAttribute("data-track-label") || target.textContent.trim(),
             href: href
@@ -1784,6 +1792,7 @@ def head_html(
     schema: list[dict],
     social_image: str | None = None,
     social_image_alt: str | None = None,
+    before_analytics: str = "",
 ) -> str:
     social_image_tags = []
     if social_image:
@@ -1816,6 +1825,7 @@ def head_html(
   <meta property="og:url" content="{escape(canonical)}">
 {social_image_meta.rstrip()}
   <meta name="twitter:card" content="summary_large_image">
+{before_analytics}
 {analytics_head_tags()}
   <script type="application/ld+json">{json_ld(schema)}</script>
 """
@@ -6286,6 +6296,7 @@ def build_retirement_destination_finder_page(
             RETIREMENT_FINDER_DESCRIPTION,
             canonical,
             schema_for_retirement_finder(canonical),
+            before_analytics="""<script>(function(){try{var url=new URL(window.location.href);var value=url.searchParams.get("scenario");if(!value)return;window.__ghaFinderScenario=value;url.searchParams.delete("scenario");history.replaceState(null,"",url.pathname+url.search+url.hash);}catch(error){}})();</script>""",
         ).strip(),
         navigation=site_header_html(PRIMARY_NAV_LINKS).strip(),
         region_options=region_options,
@@ -6368,8 +6379,8 @@ def build_retirement_capital_scenario_pages(
             "household": "couple",
             "housingPlan": "rent",
             "generalInflation": 0.0,
-            "expectedPortfolioReturn": 0.04,
-            "emergencyReserveMonths": 6,
+            "expectedPortfolioReturn": 0.05,
+            "emergencyReserveMonths": 12,
             "incomeStreams": [],
             "preferences": {"region": "any", "climate": "any", "healthcare": "normal"},
         },

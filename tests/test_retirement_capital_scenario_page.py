@@ -86,6 +86,14 @@ class RetirementCapitalScenarioPageTests(unittest.TestCase):
             for slug in SCENARIOS:
                 self.assertIn(f'href="/{slug}/"', html)
 
+    def test_scenario_pages_disclose_standard_assumptions_and_separate_tiers(self) -> None:
+        html = (ROOT / "artifacts" / "retire-abroad-with-2-million" / "index.html").read_text()
+        self.assertIn("5% annual portfolio return", html)
+        self.assertIn("12 months of expenses", html)
+        self.assertIn("Closest alternatives", html)
+        within_section = html.split("Destinations Within reach", 1)[1].split("Closest alternatives", 1)[0]
+        self.assertNotIn("· Close", within_section)
+
     def test_build_time_generator_matches_the_shared_engine(self) -> None:
         destinations = [destination("low"), destination("high")]
         base_input = {

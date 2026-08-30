@@ -56,13 +56,14 @@
     return new Set(destinationIds.map(String));
   }
 
-  function validateScenario(input, destinationIds) {
+  function validateScenario(input, destinationIds, options) {
     if (!input || typeof input !== "object" || Array.isArray(input)) {
       throw new Error("Results link is invalid");
     }
     if (Number(input.v) !== 1) throw new Error("Unsupported results-link version");
 
     const knownDestinations = normalizedDestinationIds(destinationIds);
+    const allowMissingDestinations = Boolean(options && options.allowMissingDestinations);
     const currency = shortString(input.currency, "Currency", false).toUpperCase();
     if (!/^[A-Z]{3}$/.test(currency)) throw new Error("Currency is invalid");
     const household = enumValue(input.household, HOUSEHOLDS, "Household");
@@ -81,11 +82,16 @@
       throw new Error("Results list is invalid");
     }
     const seen = new Set();
+    const sourceSeen = new Set();
     const results = input.results.map(function (item) {
       if (!item || typeof item !== "object" || Array.isArray(item)) throw new Error("Destination result is invalid");
       const destinationId = shortString(item.destinationId, "Destination ID", false);
-      if (!knownDestinations.has(destinationId)) throw new Error("Unknown destination: " + destinationId);
-      if (seen.has(destinationId)) throw new Error("Destination IDs must be unique");
+      if (sourceSeen.has(destinationId)) throw new Error("Destination IDs must be unique");
+      sourceSeen.add(destinationId);
+      if (!knownDestinations.has(destinationId)) {
+        if (allowMissingDestinations) return null;
+        throw new Error("Unknown destination: " + destinationId);
+      }
       seen.add(destinationId);
       const preferenceMatches = Array.isArray(item.preferenceMatches) ? item.preferenceMatches : [];
       if (preferenceMatches.length > 4) throw new Error("Preference matches are invalid");
@@ -99,24 +105,40 @@
           return shortString(match, "Preference match", false);
         }),
       };
-    });
+    }).filter(Boolean);
 
     if (!Array.isArray(input.comparisonIds)) throw new Error("Comparison destinations are required");
     const expectedComparisonCount = Math.min(3, results.length);
-    if (input.comparisonIds.length !== expectedComparisonCount) {
+    if (!allowMissingDestinations && input.comparisonIds.length !== expectedComparisonCount) {
       throw new Error("Comparison destinations are invalid");
     }
     const comparisonSeen = new Set();
-    const comparisonIds = input.comparisonIds.map(function (value) {
+    let comparisonIds = input.comparisonIds.map(function (value) {
       const destinationId = shortString(value, "Comparison destination", false);
-      if (!seen.has(destinationId)) throw new Error("Unknown comparison destination: " + destinationId);
+      if (!seen.has(destinationId)) {
+        if (allowMissingDestinations) return null;
+        throw new Error("Unknown comparison destination: " + destinationId);
+      }
       if (comparisonSeen.has(destinationId)) throw new Error("Comparison destination IDs must be unique");
       comparisonSeen.add(destinationId);
       return destinationId;
-    });
+    }).filter(Boolean);
+    if (allowMissingDestinations) {
+      results.forEach(function (item) {
+        if (comparisonIds.length < expectedComparisonCount && !comparisonSeen.has(item.destinationId)) {
+          comparisonSeen.add(item.destinationId);
+          comparisonIds.push(item.destinationId);
+        }
+      });
+    }
 
     const dataReviewed = shortString(input.dataReviewed, "Data review date", false);
     if (!/^\d{4}-\d{2}-\d{2}$/.test(dataReviewed)) throw new Error("Data review date is invalid");
+    const dateParts = dataReviewed.split("-").map(Number);
+    const reviewedDate = new Date(Date.UTC(dateParts[0], dateParts[1] - 1, dateParts[2]));
+    if (reviewedDate.getUTCFullYear() !== dateParts[0] || reviewedDate.getUTCMonth() !== dateParts[1] - 1 || reviewedDate.getUTCDate() !== dateParts[2]) {
+      throw new Error("Data review date is invalid");
+    }
 
     return {
       v: 1,
@@ -194,7 +216,7 @@
     } catch (error) {
       throw new Error("Results link is invalid");
     }
-    return validateScenario(parsed, destinationIds);
+    return validateScenario(parsed, destinationIds, { allowMissingDestinations: true });
   }
 
   return {

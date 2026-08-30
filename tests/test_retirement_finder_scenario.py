@@ -167,6 +167,24 @@ class RetirementFinderScenarioTests(unittest.TestCase):
             ),
         )
 
+    def test_decode_omits_destinations_removed_since_link_creation(self) -> None:
+        scenario = run_scenario("buildScenario", scenario_input())
+        encoded = run_scenario("encodeScenario", scenario)
+        decoded = run_scenario(
+            "decodeScenario",
+            {"value": encoded, "destinationIds": ["fukuoka", "valencia"]},
+        )
+        self.assertEqual(["fukuoka", "valencia"], [item["destinationId"] for item in decoded["results"]])
+        self.assertEqual(["fukuoka", "valencia"], decoded["comparisonIds"])
+
+    def test_validation_rejects_impossible_review_date(self) -> None:
+        scenario = run_scenario("buildScenario", scenario_input())
+        scenario["dataReviewed"] = "2026-99-99"
+        self.assertIn(
+            "Data review date is invalid",
+            run_scenario_failure("validateScenario", {"__args": [scenario, destination_ids()]}),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -234,7 +234,7 @@
       return '<th scope="col">' + escapeHtml(item.name) + '<select data-comparison-position="' + index +
         '" aria-label="Replace ' + escapeHtml(item.name) + '">' + options(index, item.destinationId) + "</select></th>";
     }).join("");
-    const rows = [
+    const rowDefinitions = [
       ["Required capital", function (item) { return escapeHtml(money(item.retirementTarget)); }],
       ["Gap versus projected capital", function (item) { return escapeHtml(money(item.surplusGap)); }],
       ["Financial tier", function (item) { return escapeHtml(tierLabel(item.tier)); }],
@@ -252,13 +252,22 @@
             housingPlan: input.housingPlan,
           })) + '">Detailed plan</a></span>';
       }],
-    ].map(function (row) {
+    ];
+    const rows = rowDefinitions.map(function (row) {
       return '<tr><th scope="row">' + row[0] + "</th>" + selected.map(function (item) {
         return cell(item, row[1]);
       }).join("") + "</tr>";
     }).join("");
+    const mobile = selected.map(function (item, index) {
+      const metrics = rowDefinitions.map(function (row) {
+        return "<div><dt>" + row[0] + "</dt><dd>" + row[1](item) + "</dd></div>";
+      }).join("");
+      return '<article><h4>' + escapeHtml(item.name) + '</h4><select data-comparison-position="' + index +
+        '" aria-label="Replace ' + escapeHtml(item.name) + '">' + options(index, item.destinationId) +
+        "</select><dl>" + metrics + "</dl></article>";
+    }).join("");
     return '<div class="finder-comparison-scroll"><table class="finder-comparison-table"><caption>Compare recommended retirement destinations</caption><thead><tr><th></th>' +
-      headings + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
+      headings + "</tr></thead><tbody>" + rows + '</tbody></table></div><div class="finder-comparison-mobile">' + mobile + "</div>";
   }
 
   function finderCapitalLandscape(input) {
@@ -459,6 +468,7 @@
     let currentResult = null;
     let comparisonIds = [];
     let sharedView = false;
+    let comparisonOpened = false;
 
     function element(id) { return document.getElementById(id); }
     function numeric(id) { return Number(element(id).value); }
@@ -508,6 +518,7 @@
     }
 
     function finderScenarioValue(search) {
+      if (root.__ghaFinderScenario) return String(root.__ghaFinderScenario);
       const match = String(search || "").match(/(?:^|[?&])scenario=([^&]+)/);
       if (!match) return "";
       try { return decodeURIComponent(match[1]); } catch (error) { return ""; }
@@ -763,14 +774,14 @@
     }
 
     function resultRow(item, user, matchRank) {
-      const propertyBits = user.housingPlan === "buy_now"
+      const propertyBits = user.housingPlan === "buy_now" && !user.sharedSnapshot
         ? '<div><dt>Property equity</dt><dd>' + displayResultMoney(item.propertyEquity) +
           '</dd></div><div><dt>Mortgage remaining</dt><dd>' + displayResultMoney(item.mortgageBalance) + "</dd></div>"
         : "";
-      const rental = user.housingPlan === "buy_now" && user.useBeforeRetirement === "rental"
+      const rental = user.housingPlan === "buy_now" && user.useBeforeRetirement === "rental" && !user.sharedSnapshot
         ? '<div><dt>Annual property cash flow</dt><dd>' + displayResultMoney(item.netRentalCashFlow) + "</dd></div>"
         : "";
-      const financing = user.housingPlan === "buy_now"
+      const financing = user.housingPlan === "buy_now" && !user.sharedSnapshot
         ? '<p class="finder-financing"><strong>' + escapeHtml(item.financingStatus) + "</strong>" +
           (item.financingReason ? " — " + escapeHtml(item.financingReason) : "") + "</p>"
         : "";
@@ -780,6 +791,11 @@
         household: user.household,
         housingPlan: user.housingPlan,
       });
+      const countryGuide = item.countryGuideHref
+        ? '<a href="' + escapeHtml(item.countryGuideHref) + '" data-finder-destination data-destination-id="' +
+          escapeHtml(item.destinationId) + '" data-surface="recommended_match" data-match-rank="' + matchRank +
+          '" data-tier="' + escapeHtml(item.tier) + '" data-action="country_guide">Country guide</a>'
+        : "";
       const trackingAttributes = ' data-finder-destination data-destination-id="' +
         escapeHtml(item.destinationId) + '" data-surface="recommended_match" data-match-rank="' +
         matchRank + '" data-tier="' + escapeHtml(item.tier) + '"';
@@ -801,7 +817,7 @@
         })) + "</p>" +
         '<div class="finder-result-actions"><a href="' + escapeHtml(dossierHref) +
         '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">Destination guide</a><a href="' + escapeHtml(detailHref) +
-        '" data-finder-detail' + trackingAttributes + ' data-action="detailed_plan">Build a detailed plan</a></div>' +
+        '" data-finder-detail' + trackingAttributes + ' data-action="detailed_plan">Build a detailed plan</a>' + countryGuide + "</div>" +
         "</article>";
     }
 
@@ -870,6 +886,10 @@
         ratesToUsd: ratesToUsd,
       });
       section.hidden = false;
+      if (!comparisonOpened) {
+        track("retirement_destination_finder_compare_open", { housing_plan: currentUser.housingPlan });
+        comparisonOpened = true;
+      }
     }
 
     function shareFallback(url, message) {
@@ -1024,6 +1044,7 @@
 
     function render(result, user) {
       sharedView = false;
+      comparisonOpened = false;
       comparisonIds = [];
       currentResult = result;
       currentUser = user;
@@ -1075,6 +1096,7 @@
           household: scenario.household,
           horizonYears: scenario.horizonYears,
           housingPlan: scenario.housingPlan,
+          sharedSnapshot: true,
           preferences: scenario.preferences,
         };
         currentResult = {
@@ -1093,6 +1115,13 @@
           excluded: [],
         };
         renderCurrentResults();
+        element("finder-data-reviewed").textContent = "Data reviewed " + scenario.dataReviewed;
+        element("finder-data-reviewed").hidden = false;
+        if (scenario.results.length < 3) {
+          element("finder-comparison-status").textContent =
+            "Some destinations in this shared result are no longer available. Showing " +
+            scenario.results.length + " remaining.";
+        }
         results.hidden = false;
         track("retirement_destination_finder_shared_open", { housing_plan: scenario.housingPlan });
         return true;

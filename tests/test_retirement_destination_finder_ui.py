@@ -978,6 +978,8 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertIn('<select data-comparison-position="0"', markup)
         self.assertIn("Destination guide", markup)
         self.assertIn("Country guide", markup)
+        self.assertIn('class="finder-comparison-mobile"', markup)
+        self.assertIn('<h4>Fukuoka / Itoshima</h4>', markup)
         self.assertNotIn("score", markup.lower())
 
     def test_share_fallback_exposes_a_privacy_safe_results_link(self) -> None:
@@ -1033,6 +1035,16 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         state = run_ui_dom_scenario({"rates": {"USD": 1}, "search": "?scenario=not-valid-json"})
         self.assertFalse(state["sharedErrorHidden"])
         self.assertEqual(0, state["engineCalls"])
+
+    def test_shared_buy_now_snapshot_does_not_invent_zero_property_values(self) -> None:
+        source = UI.read_text()
+        self.assertIn("user.sharedSnapshot", source)
+        self.assertIn("finder-data-reviewed", source)
+
+    def test_recommendation_card_includes_country_guide_when_available(self) -> None:
+        source = UI.read_text()
+        self.assertIn("item.countryGuideHref", source)
+        self.assertIn('data-action="country_guide"', source)
 
     def test_match_explanation_names_affordability_rank_and_planning_signals(self) -> None:
         explanation = run_ui(
