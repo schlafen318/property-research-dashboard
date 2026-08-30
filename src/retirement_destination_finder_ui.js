@@ -464,6 +464,17 @@
     let comparisonIds = [];
     let sharedView = false;
     let comparisonOpened = false;
+    let wizardStepIndex = 0;
+    let wizardView = "editing";
+    const wizardSectionIds = [
+      "finder-current-resources",
+      "finder-housing",
+      "finder-retirement-income",
+      "finder-preferences",
+    ];
+    const wizardMedia = typeof root.matchMedia === "function"
+      ? root.matchMedia("(max-width: 760px)")
+      : { matches: false };
 
     function element(id) { return document.getElementById(id); }
     function numeric(id) { return Number(element(id).value); }
@@ -544,6 +555,135 @@
       if (root.GHA && typeof root.GHA.track === "function") root.GHA.track(name, fields || {});
     }
 
+    function showFormErrors(errors) {
+      if (!errors.length) {
+        errorSummary.hidden = true;
+        return;
+      }
+      errorSummary.innerHTML = "<strong>Check these fields:</strong><ul>" + errors.map(function (error) {
+        return "<li>" + escapeHtml(error) + "</li>";
+      }).join("") + "</ul>";
+      errorSummary.hidden = false;
+      errorSummary.focus();
+    }
+
+    function wizardStepErrors(stepIndex) {
+      const errors = [];
+      const invalidMoneyIds = stepIndex === 0
+        ? ["finder-liquid-capital", "finder-monthly-contribution"]
+        : stepIndex === 1 && selected("finder-housing-plan") === "buy_now"
+          ? ["finder-property-allocation"]
+          : stepIndex === 2
+            ? ["finder-pension", "finder-other-income"]
+            : [];
+      if (invalidMoneyIds.some(function (id) { return validateMoneyControl(element(id)); })) {
+        errors.push("Enter a valid amount in the highlighted money field.");
+      }
+      if (stepIndex === 0) {
+        const currentAge = numeric("finder-current-age");
+        const retirementAge = numeric("finder-retirement-age");
+        const horizonYears = numeric("finder-horizon");
+        const expectedReturn = numeric("finder-return");
+        if (!Number.isFinite(currentAge) || currentAge < 18 || currentAge > 90) {
+          errors.push("Enter a current age between 18 and 90.");
+        } else if (!Number.isFinite(retirementAge) || retirementAge <= currentAge || retirementAge > 100) {
+          errors.push("Retirement age must be later than current age.");
+        }
+        if (!Number.isFinite(horizonYears) || horizonYears < 1 || horizonYears > 60) {
+          errors.push("Enter between 1 and 60 years in retirement.");
+        }
+        if (!Number.isFinite(expectedReturn) || expectedReturn < -5 || expectedReturn > 15) {
+          errors.push("Expected return must be between -5% and 15%.");
+        }
+      }
+      if (stepIndex === 1 && selected("finder-housing-plan") === "buy_now" &&
+          moneyNumber("finder-property-allocation") <= 0) {
+        errors.push("Enter the maximum amount available for a property purchase.");
+      }
+      const activeSection = element(wizardSectionIds[stepIndex]);
+      let invalidControl = null;
+      Array.from(activeSection.querySelectorAll("input, select, textarea")).forEach(function (control) {
+        if (control.disabled || typeof control.checkValidity !== "function") return;
+        if (control.checkValidity()) {
+          control.removeAttribute("aria-invalid");
+        } else if (!invalidControl) {
+          invalidControl = control;
+        }
+      });
+      if (invalidControl) {
+        invalidControl.setAttribute("aria-invalid", "true");
+        if (typeof invalidControl.reportValidity === "function") invalidControl.reportValidity();
+        if (typeof invalidControl.focus === "function") invalidControl.focus();
+        errors.push("Correct the highlighted field before continuing.");
+      }
+      return errors;
+    }
+
+    function updateWizardStep(options) {
+      const active = Boolean(wizardMedia.matches);
+      const progress = element("finder-wizard-progress");
+      const actions = element("finder-wizard-actions");
+      const sections = wizardSectionIds.map(element);
+      progress.hidden = !active;
+      actions.hidden = !active;
+      sections.forEach(function (section, index) {
+        section.hidden = active && index !== wizardStepIndex;
+      });
+      if (!active) return;
+      const stepNumber = wizardStepIndex + 1;
+      element("finder-wizard-step").textContent = "Step " + stepNumber + " of " + sections.length;
+      element("finder-wizard-progressbar").setAttribute("aria-valuenow", String(stepNumber));
+      element("finder-wizard-back").hidden = wizardStepIndex === 0;
+      element("finder-wizard-next").textContent = wizardStepIndex === sections.length - 1
+        ? "View my matches"
+        : "Continue";
+      element("finder-wizard-next").disabled = wizardStepIndex === 1 &&
+        selected("finder-housing-plan") === "own";
+      if (options && options.focus) {
+        sections[wizardStepIndex].focus();
+        sections[wizardStepIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+      }
+    }
+
+    function advanceWizard() {
+      const errors = wizardStepErrors(wizardStepIndex);
+      showFormErrors(errors);
+      if (errors.length) return;
+      if (wizardStepIndex === wizardSectionIds.length - 1) {
+        form.requestSubmit();
+        return;
+      }
+      wizardStepIndex += 1;
+      updateWizardStep({ focus: true });
+    }
+
+    function returnToWizard() {
+      wizardView = "editing";
+      form.hidden = false;
+      results.hidden = true;
+      element("finder-adjust-plan").hidden = true;
+      wizardStepIndex = wizardSectionIds.length - 1;
+      updateWizardStep({ focus: true });
+    }
+
+    function syncWizardMode() {
+      const active = Boolean(wizardMedia.matches);
+      if (!active) {
+        form.hidden = false;
+        if (currentResult) results.hidden = wizardView === "editing";
+        element("finder-adjust-plan").hidden = true;
+      } else if (currentResult && wizardView !== "editing") {
+        form.hidden = true;
+        results.hidden = false;
+        element("finder-adjust-plan").hidden = wizardView === "shared";
+      } else {
+        form.hidden = false;
+        if (currentResult) results.hidden = true;
+        element("finder-adjust-plan").hidden = true;
+      }
+      updateWizardStep();
+    }
+
     function finderScenarioValue(search) {
       if (root.__ghaFinderScenario) return String(root.__ghaFinderScenario);
       const match = String(search || "").match(/(?:^|[?&])scenario=([^&]+)/);
@@ -601,6 +741,7 @@
       });
       element("finder-own-guidance").hidden = selected("finder-housing-plan") !== "own";
       element("finder-submit").disabled = selected("finder-housing-plan") === "own";
+      updateWizardStep();
     }
 
     function incomeStreams() {
@@ -1087,11 +1228,18 @@
 
     function render(result, user) {
       sharedView = false;
+      wizardView = "results";
       comparisonOpened = false;
       comparisonIds = [];
       currentResult = result;
       currentUser = user;
       renderCurrentResults();
+      if (wizardMedia.matches) {
+        form.hidden = true;
+        element("finder-adjust-plan").hidden = false;
+      } else {
+        element("finder-adjust-plan").hidden = true;
+      }
       results.hidden = false;
       results.scrollIntoView({ behavior: "smooth", block: "start" });
       track("retirement_destination_finder_complete", {
@@ -1134,6 +1282,7 @@
           element("finder-currency").value = selectedCurrency;
         }
         sharedView = true;
+        wizardView = "shared";
         comparisonIds = scenario.comparisonIds.slice();
         currentUser = {
           household: scenario.household,
@@ -1166,6 +1315,10 @@
             scenario.results.length + " remaining.";
         }
         results.hidden = false;
+        if (wizardMedia.matches) {
+          form.hidden = true;
+          element("finder-adjust-plan").hidden = true;
+        }
         track("retirement_destination_finder_shared_open", { housing_plan: scenario.housingPlan });
         return true;
       } catch (error) {
@@ -1176,14 +1329,14 @@
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
+      if (wizardMedia.matches && wizardStepIndex < wizardSectionIds.length - 1) {
+        advanceWizard();
+        return;
+      }
       const user = collectUser();
       const errors = validate(user);
       if (errors.length) {
-        errorSummary.innerHTML = "<strong>Check these fields:</strong><ul>" + errors.map(function (error) {
-          return "<li>" + escapeHtml(error) + "</li>";
-        }).join("") + "</ul>";
-        errorSummary.hidden = false;
-        errorSummary.focus();
+        showFormErrors(errors);
         return;
       }
       errorSummary.hidden = true;
@@ -1284,7 +1437,19 @@
       });
     });
     element("finder-share").addEventListener("click", shareCurrentResults);
+    element("finder-wizard-next").addEventListener("click", advanceWizard);
+    element("finder-wizard-back").addEventListener("click", function () {
+      if (wizardStepIndex === 0) return;
+      wizardStepIndex -= 1;
+      showFormErrors([]);
+      updateWizardStep({ focus: true });
+    });
+    element("finder-adjust-plan").addEventListener("click", returnToWizard);
+    if (typeof wizardMedia.addEventListener === "function") {
+      wizardMedia.addEventListener("change", syncWizardMode);
+    }
     syncHousing();
+    syncWizardMode();
     track("retirement_destination_finder_open");
     openSharedScenario();
   }
