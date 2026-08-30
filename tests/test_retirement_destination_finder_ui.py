@@ -155,7 +155,6 @@ const wizardSections = [
   el("finder-before-retirement"),
   el("finder-retirement-income"),
   el("finder-preferences"),
-  el("finder-review"),
 ];
 const controlsBySection = [
   ["finder-currency", "finder-current-age", "finder-retirement-age", "finder-horizon", "finder-household"],
@@ -165,7 +164,6 @@ const controlsBySection = [
   ["finder-use-before-retirement", "finder-rental-yield", "finder-vacancy-rate", "finder-operating-cost-rate"],
   ["finder-pension", "finder-other-income"],
   ["finder-region", "finder-healthcare"],
-  [],
 ];
 wizardSections.forEach((section, index) => {
   section.controls = controlsBySection[index].map(el);
@@ -253,6 +251,7 @@ const fakeWindow = {
       engineInput = request;
       engineInputs.push(request);
       engineCalls += 1;
+      if (engineCalls === input.failEngineCall) throw new Error("Calculation failed");
       return input.engineResult || {
         summary: { withinReachCount: 0, closeCount: 0, stretchCount: 0 },
         sharedProjection: null,
@@ -370,6 +369,7 @@ process.stdout.write(JSON.stringify({
   shareUrlHidden: el("finder-share-url").hidden,
   sharedErrorHidden: el("finder-shared-error").hidden,
   resultsHidden: el("finder-results").hidden,
+  planSummaryHidden: el("finder-plan-summary").hidden,
   landscapeHidden: el("finder-capital-landscape").hidden,
   matchesHidden: el("finder-matches-section").hidden,
   projectionHidden: el("finder-projection-section").hidden,
@@ -418,8 +418,8 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertFalse(scenario["wizardProgressHidden"])
         self.assertFalse(scenario["wizardActionsHidden"])
-        self.assertEqual([True, False, True, True, True, True, True, True], scenario["wizardSectionHidden"])
-        self.assertEqual("Step 2 of 6", scenario["wizardStepText"])
+        self.assertEqual([True, False, True, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual("Step 2 of 5", scenario["wizardStepText"])
         self.assertEqual("2", scenario["wizardStepNow"])
         self.assertFalse(scenario["wizardBackHidden"])
         self.assertEqual("Continue", scenario["wizardNextText"])
@@ -434,8 +434,8 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual([False, True, True, True, True, True, True, True], scenario["wizardSectionHidden"])
-        self.assertEqual("Step 1 of 6", scenario["wizardStepText"])
+        self.assertEqual([False, True, True, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual("Step 1 of 5", scenario["wizardStepText"])
         self.assertTrue(scenario["wizardBackHidden"])
 
     def test_mobile_wizard_blocks_invalid_step_before_advancing(self) -> None:
@@ -448,7 +448,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual([False, True, True, True, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([False, True, True, True, True, True, True], scenario["wizardSectionHidden"])
         self.assertFalse(scenario["wizardErrorHidden"])
 
     def test_mobile_wizard_reports_native_step_mismatch_before_hiding_the_field(self) -> None:
@@ -461,7 +461,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual([True, False, True, True, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([True, False, True, True, True, True, True], scenario["wizardSectionHidden"])
         self.assertFalse(scenario["wizardErrorHidden"])
         self.assertEqual(0, scenario["engineCalls"])
 
@@ -475,7 +475,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual("Step 3 of 6", scenario["wizardStepText"])
+        self.assertEqual("Step 3 of 5", scenario["wizardStepText"])
         self.assertEqual("", scenario["returnAriaInvalid"])
 
     def test_mobile_wizard_reports_invalid_conditional_mortgage_field_on_step_two(self) -> None:
@@ -487,7 +487,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual([True, True, True, False, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual([True, True, True, False, True, True, True], scenario["wizardSectionHidden"])
         self.assertFalse(scenario["wizardErrorHidden"])
         self.assertEqual(0, scenario["engineCalls"])
 
@@ -501,15 +501,15 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
 
         self.assertEqual(0, scenario["engineCalls"])
-        self.assertEqual("Step 2 of 6", scenario["wizardStepText"])
-        self.assertEqual([True, False, True, True, True, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual("Step 2 of 5", scenario["wizardStepText"])
+        self.assertEqual([True, False, True, True, True, True, True], scenario["wizardSectionHidden"])
 
     def test_mobile_wizard_submits_on_final_step_and_adjust_plan_restores_it(self) -> None:
         complete = run_ui_dom_scenario(
             {
                 "rates": {"USD": 1},
                 "mobile": True,
-                "wizardActions": ["next", "next", "next", "next", "next", "next"],
+                "wizardActions": ["next", "next", "next", "next", "next"],
             }
         )
 
@@ -522,17 +522,17 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             {
                 "rates": {"USD": 1},
                 "mobile": True,
-                "wizardActions": ["next", "next", "next", "next", "next", "next", "adjust"],
+                "wizardActions": ["next", "next", "next", "next", "next", "adjust"],
             }
         )
 
         self.assertFalse(adjusted["formHidden"])
         self.assertTrue(adjusted["resultsHidden"])
-        self.assertEqual([True, True, True, True, True, True, True, False], adjusted["wizardSectionHidden"])
-        self.assertEqual("Show my matches", adjusted["wizardNextText"])
+        self.assertEqual([True, True, True, True, True, True, False], adjusted["wizardSectionHidden"])
+        self.assertEqual("See my destinations", adjusted["wizardNextText"])
         self.assertTrue(adjusted["wizardEditing"])
 
-    def test_mobile_review_summarizes_the_plan_before_calculation(self) -> None:
+    def test_results_summarize_the_plan_after_calculation(self) -> None:
         scenario = run_ui_dom_scenario(
             {
                 "rates": {"USD": 1},
@@ -541,7 +541,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual("Step 6 of 6", scenario["wizardStepText"])
+        self.assertFalse(scenario["resultsHidden"])
         self.assertEqual("Age 50 now · retire at 60 · Single · 30 years", scenario["reviewRetirement"])
         self.assertEqual(
             "USD 500,000 today · USD 2,000/month, inflation-linked · 4% return",
@@ -551,7 +551,38 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertEqual("No continuing income", scenario["reviewIncome"])
         self.assertEqual("Any region · Any setting · Healthcare: important", scenario["reviewPreferences"])
 
-    def test_mobile_review_includes_conditional_housing_and_income_assumptions(self) -> None:
+    def test_results_summary_tracks_the_selected_display_currency(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1, "EUR": 1.1},
+                "submitBeforeCurrency": True,
+                "currency": "EUR",
+            }
+        )
+
+        self.assertEqual(
+            "EUR 455,000 today · EUR 1,800/month, inflation-linked · 4% return",
+            scenario["reviewCapital"],
+        )
+
+    def test_failed_recalculation_preserves_the_last_successful_plan_summary(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "submitBeforeCurrency": True,
+                "editLiquid": "900,000",
+                "failEngineCall": 2,
+                "submit": True,
+            }
+        )
+
+        self.assertEqual(2, scenario["engineCalls"])
+        self.assertEqual(
+            "USD 500,000 today · USD 2,000/month, inflation-linked · 4% return",
+            scenario["reviewCapital"],
+        )
+
+    def test_results_summary_includes_conditional_housing_and_income_assumptions(self) -> None:
         scenario = run_ui_dom_scenario(
             {
                 "rates": {"USD": 1},
@@ -588,19 +619,19 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
                 "rates": {"USD": 1},
                 "mobile": True,
                 "wizardActions": [
-                    "next", "next", "next", "next", "next", "next", "adjust", "desktop", "mobile"
+                    "next", "next", "next", "next", "next", "adjust", "desktop", "mobile"
                 ],
             }
         )
 
         self.assertFalse(scenario["formHidden"])
         self.assertTrue(scenario["resultsHidden"])
-        self.assertEqual([True, True, True, True, True, True, True, False], scenario["wizardSectionHidden"])
+        self.assertEqual([True, True, True, True, True, True, False], scenario["wizardSectionHidden"])
 
     def test_desktop_keeps_the_full_form_and_hides_wizard_navigation(self) -> None:
         scenario = run_ui_dom_scenario({"rates": {"USD": 1}, "mobile": False})
 
-        self.assertEqual([False, False, False, True, True, False, False, False], scenario["wizardSectionHidden"])
+        self.assertEqual([False, False, False, True, True, False, False], scenario["wizardSectionHidden"])
         self.assertTrue(scenario["wizardProgressHidden"])
         self.assertTrue(scenario["wizardActionsHidden"])
         self.assertFalse(scenario["wizardEditing"])
@@ -614,10 +645,10 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             }
         )
 
-        self.assertEqual("Step 4 of 8", scenario["wizardStepText"])
-        self.assertEqual("8", scenario["wizardStepMax"])
+        self.assertEqual("Step 4 of 7", scenario["wizardStepText"])
+        self.assertEqual("7", scenario["wizardStepMax"])
         self.assertEqual(
-            [True, True, True, False, True, True, True, True],
+            [True, True, True, False, True, True, True],
             scenario["wizardSectionHidden"],
         )
 
@@ -1625,6 +1656,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertEqual("Showing: Water setting (legacy)", state["activeFilters"])
         self.assertIn("Lake Como", state["recommendationsHtml"])
+        self.assertTrue(state["planSummaryHidden"])
 
     def test_shared_buy_now_snapshot_does_not_invent_zero_property_values(self) -> None:
         source = UI.read_text()

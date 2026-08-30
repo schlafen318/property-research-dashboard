@@ -474,7 +474,6 @@
       "finder-before-retirement",
       "finder-retirement-income",
       "finder-preferences",
-      "finder-review",
     ];
     const wizardMedia = typeof root.matchMedia === "function"
       ? root.matchMedia("(max-width: 760px) and (orientation: portrait)")
@@ -490,7 +489,7 @@
         if (selected("finder-purchase-method") === "mortgage") sectionIds.push("finder-financing");
         sectionIds.push("finder-before-retirement");
       }
-      sectionIds.push("finder-retirement-income", "finder-preferences", "finder-review");
+      sectionIds.push("finder-retirement-income", "finder-preferences");
       return sectionIds;
     }
     function selectedSettings() {
@@ -636,30 +635,45 @@
       return errors;
     }
 
-    function updateReview() {
-      const household = selected("finder-household") === "couple" ? "Couple" : "Single";
+    function reviewMoney(amountUsd, controlId) {
+      const converted = convertPlanningControlAmount({
+        amount: amountUsd,
+        fromCurrency: "USD",
+        toCurrency: selectedCurrency,
+        ratesToUsd: ratesToUsd,
+        step: element(controlId).step,
+      });
+      return selectedCurrency + " " + formatMoneyInputValue(converted);
+    }
+
+    function reviewPercent(value) {
+      return String(Math.round(Number(value || 0) * 1000) / 10);
+    }
+
+    function updateReview(user) {
+      const household = user.household === "couple" ? "Couple" : "Single";
       const housingLabels = {
         rent: "Rent a home",
         buy_now: "Buy a home now",
         buy_retirement: "Buy a home at retirement",
         own: "Already own my retirement home",
       };
-      const settings = selectedSettings().map(settingLabel);
-      const region = selected("finder-region") === "any"
+      const settings = (user.preferences.settings || []).map(settingLabel);
+      const region = user.preferences.region === "any"
         ? "Any region"
-        : titleCaseFilter(selected("finder-region"));
-      const contributionIndexing = element("finder-contribution-indexed").checked
+        : titleCaseFilter(user.preferences.region);
+      const contributionIndexing = user.contributionInflationLinked
         ? ", inflation-linked"
         : "";
-      const housing = selected("finder-housing-plan");
+      const housing = user.housingPlan;
       const housingParts = [housingLabels[housing] || "—"];
       if (housing === "buy_now") {
-        housingParts.push(selectedCurrency + " " + element("finder-property-allocation").value);
-        const purchaseMethod = selected("finder-purchase-method");
+        housingParts.push(reviewMoney(user.maximumPropertyAllocation, "finder-property-allocation"));
+        const purchaseMethod = user.purchaseMethod;
         if (purchaseMethod === "mortgage") {
           housingParts.push(
-            "Mortgage: " + selected("finder-requested-ltv") + "% LTV, " +
-            selected("finder-mortgage-rate") + "%, " + selected("finder-mortgage-term") + " years"
+            "Mortgage: " + reviewPercent(user.requestedLtv) + "% LTV, " +
+            reviewPercent(user.annualMortgageRate) + "%, " + user.mortgageTermYears + " years"
           );
           const residencyLabels = {
             non_resident: "Non-resident",
@@ -667,47 +681,48 @@
             eu_national: "EU national",
             non_resident_with_purchase_permit: "Non-resident with purchase permission",
           };
-          housingParts.push(residencyLabels[selected("finder-buyer-residency")] || "Buyer status not set");
-          housingParts.push(selected("finder-mortgage-treatment") === "continue"
+          housingParts.push(residencyLabels[user.residency] || "Buyer status not set");
+          housingParts.push(user.mortgageTreatment === "continue"
             ? "Continue repayments in retirement"
             : "Pay off at retirement");
         } else {
           housingParts.push(purchaseMethod === "cash" ? "Cash purchase" : "Financing not decided");
         }
-        if (selected("finder-use-before-retirement") === "rental") {
+        if (user.useBeforeRetirement === "rental") {
           housingParts.push("Rent before retirement");
         } else {
           housingParts.push("Personal use before retirement");
         }
       }
       const incomeParts = [];
-      if (moneyNumber("finder-pension") > 0) {
+      const pension = user.incomeStreams[0] || {};
+      const otherIncome = user.incomeStreams[1] || {};
+      if (Number(pension.amount) > 0) {
         incomeParts.push(
-          selectedCurrency + " " + element("finder-pension").value + "/month pension" +
-          (element("finder-pension-indexed").checked ? ", inflation-linked" : "")
+          reviewMoney(Number(pension.amount) / 12, "finder-pension") + "/month pension" +
+          (pension.indexed ? ", inflation-linked" : "")
         );
       }
-      if (moneyNumber("finder-other-income") > 0) {
+      if (Number(otherIncome.amount) > 0) {
         incomeParts.push(
-          selectedCurrency + " " + element("finder-other-income").value + "/month other income" +
-          (element("finder-other-income-indexed").checked ? ", inflation-linked" : "")
+          reviewMoney(Number(otherIncome.amount) / 12, "finder-other-income") + "/month other income" +
+          (otherIncome.indexed ? ", inflation-linked" : "")
         );
       }
       element("finder-review-retirement").textContent =
-        "Age " + selected("finder-current-age") + " now · retire at " +
-        selected("finder-retirement-age") + " · " + household + " · " +
-        selected("finder-horizon") + " years";
+        "Age " + user.currentAge + " now · retire at " + user.retirementAge + " · " +
+        household + " · " + user.horizonYears + " years";
       element("finder-review-capital").textContent =
-        selectedCurrency + " " + element("finder-liquid-capital").value + " today · " +
-        selectedCurrency + " " + element("finder-monthly-contribution").value + "/month" +
-        contributionIndexing + " · " + selected("finder-return") + "% return";
+        reviewMoney(user.totalLiquidCapital, "finder-liquid-capital") + " today · " +
+        reviewMoney(user.monthlyPortfolioContribution, "finder-monthly-contribution") + "/month" +
+        contributionIndexing + " · " + reviewPercent(user.expectedPortfolioReturn) + "% return";
       element("finder-review-housing").textContent = housingParts.join(" · ");
       element("finder-review-income").textContent = incomeParts.length
         ? incomeParts.join(" · ")
         : "No continuing income";
       element("finder-review-preferences").textContent =
         region + " · " + (settings.length ? sentenceList(settings) : "Any setting") +
-        " · Healthcare: " + (selected("finder-healthcare") === "high" ? "top priority" : "important");
+        " · Healthcare: " + (user.preferences.healthcare === "high" ? "top priority" : "important");
     }
 
     function updateWizardStep(options) {
@@ -734,12 +749,11 @@
       progressbar.style.setProperty("--finder-progress", String((stepNumber / sections.length) * 100) + "%");
       element("finder-wizard-back").hidden = wizardStepIndex === 0;
       element("finder-wizard-next").textContent = wizardStepIndex === sections.length - 1
-        ? "Show my matches"
+        ? "See my destinations"
         : "Continue";
       element("finder-wizard-next").disabled = activeId === "finder-housing" &&
         selected("finder-housing-plan") === "own";
       document.body.classList.toggle("finder-wizard-editing", wizardView === "editing");
-      if (wizardStepIndex === sections.length - 1) updateReview();
       if (options && options.focus) {
         sections[wizardStepIndex].focus({ preventScroll: true });
         sections[wizardStepIndex].scrollTop = 0;
@@ -1283,6 +1297,8 @@
       if (!currentResult || !currentUser) return;
       const result = currentResult;
       const user = currentUser;
+      element("finder-plan-summary").hidden = sharedView;
+      if (!sharedView) updateReview(user);
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
       currentRecommendations = decorateRecommendations(
         result.recommendations,

@@ -87,7 +87,6 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             'id="finder-housing"',
             'id="finder-retirement-income"',
             'id="finder-preferences"',
-            'id="finder-review"',
             'id="finder-submit"',
             'id="finder-results"',
         ]
@@ -312,7 +311,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-wizard-back" type="button"', self.html)
         self.assertIn('id="finder-wizard-next" type="button">Continue</button>', self.html)
         self.assertIn('id="finder-adjust-plan" type="button" hidden>Adjust my plan</button>', self.html)
-        self.assertIn('aria-valuemax="6"', self.html)
+        self.assertIn('aria-valuemax="5"', self.html)
 
         design_css = self.html.split('<style id="gha-retirement-finder-design">', 1)[1].split(
             "</style>", 1
@@ -384,14 +383,6 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             design_css,
         )
         self.assertIn(
-            ".finder-wizard-editing #finder-review .finder-review-summary",
-            design_css,
-        )
-        self.assertIn(
-            ".finder-wizard-editing #finder-review .section-help { display: none; }",
-            design_css,
-        )
-        self.assertIn(
             ".finder-section-conditional > [data-finder-group] { margin-top: 0; padding-top: 0; border-top: 0; }",
             design_css,
         )
@@ -407,7 +398,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         )[0]
         self.assertIn("Rates dated 27 August 2026. Currency changes display values only.", form)
 
-    def test_mobile_wizard_has_six_short_steps_and_a_review_screen(self) -> None:
+    def test_mobile_wizard_has_five_input_steps_and_results_plan_summary(self) -> None:
         form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
             "</form>", 1
         )[0]
@@ -420,12 +411,15 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             "finder-before-retirement",
             "finder-retirement-income",
             "finder-preferences",
-            "finder-review",
         ):
             self.assertIn(f'id="{section_id}"', form)
-        self.assertIn('id="finder-review-retirement"', form)
-        self.assertIn('id="finder-review-capital"', form)
-        self.assertIn('id="finder-review-income"', form)
+        self.assertNotIn('id="finder-review"', form)
+        results = self.html.split('id="finder-results"', 1)[1].split("</section>", 1)[0]
+        self.assertIn('id="finder-plan-summary"', results)
+        self.assertIn('id="finder-review-retirement"', results)
+        self.assertIn('id="finder-review-capital"', results)
+        self.assertIn('id="finder-review-income"', results)
+        self.assertIn('id="finder-review-preferences"', results)
         self.assertIn(
             'matchMedia("(max-width: 760px) and (orientation: portrait)")',
             self.html,
