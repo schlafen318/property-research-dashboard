@@ -9955,6 +9955,15 @@ def build_premium_destination_page(
     national_guide_sentence = national_guide_sentence_for_hub(
         country_hub_for_destination(dest)
     )
+    search_intent_section = ""
+    if dest.get("id") == "crete":
+        search_intent_section = """
+        <section class="premium-section" id="retirement-property">
+          <h2>Crete property for retirement: where to focus first</h2>
+          <p>Compare Chania, Rethymno, Heraklion and eastern Crete before comparing individual homes. Start with year-round access, healthcare, buyer rules, total costs, climate exposure and resale depth; buying a home and securing the right to live in Greece are separate decisions.</p>
+          <p class="premium-handoff">Continue with the <a href="/greece-retirement-property-foreign-buyers/">Greece retirement property guide</a>, compare <a href="/greece-vs-portugal-retirement-property/">Greece and Portugal for retirement property</a>, or review the wider <a href="/best-places-to-buy-property-abroad-for-retirement/">retirement property shortlist</a>.</p>
+        </section>
+        """
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -9979,6 +9988,7 @@ def build_premium_destination_page(
   <main>
     <div class="premium-shell premium-content">
       <article class="premium-article">
+        {search_intent_section}
         <section class="premium-section" id="verdict"><h2>The verdict</h2>{verdict}</section>
         {premium_dossier_lenses_html(spec)}
         <section class="premium-section" id="scores">
