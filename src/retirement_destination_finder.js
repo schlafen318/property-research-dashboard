@@ -106,10 +106,26 @@
     return Number(raw && typeof raw === "object" ? raw.score : raw || 0);
   }
 
+  function normalizedPreference(value) {
+    return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+  }
+
+  function destinationMatchesFilters(destination, preferences) {
+    const region = normalizedPreference(preferences.region);
+    const setting = normalizedPreference(preferences.climate);
+    const regionMatches = !region || region === "any" ||
+      [destination.continent, destination.country].some(function (value) {
+        return normalizedPreference(value) === region;
+      });
+    const settingMatches = !setting || setting === "any" ||
+      normalizedPreference(destination.category).includes(setting);
+    return regionMatches && settingMatches;
+  }
+
   function preferenceMatches(destination, preferences) {
     const matches = [];
     if (preferences.region && preferences.region !== "any" &&
-        [destination.continent, destination.country].includes(preferences.region)) {
+        destinationMatchesFilters(destination, { region: preferences.region, climate: "any" })) {
       matches.push("Preferred region");
     }
     if (preferences.climate && preferences.climate !== "any" &&
@@ -193,8 +209,11 @@
       }));
     const recommendations = [];
     const excluded = [];
+    let evaluatedCount = 0;
 
     input.destinations.forEach(function (destination) {
+      if (!destinationMatchesFilters(destination, user.preferences || {})) return;
+      evaluatedCount += 1;
       const cost = costs.get(destination.id);
       if (!cost) {
         excluded.push({ destinationId: destination.id, name: destination.name, reasonCode: "missing_cost_data" });
@@ -323,7 +342,7 @@
     });
     return {
       summary: {
-        evaluatedCount: input.destinations.length,
+        evaluatedCount: evaluatedCount,
         withinReachCount: recommendations.filter(function (item) { return item.tier === "within_reach"; }).length,
         closeCount: recommendations.filter(function (item) { return item.tier === "close"; }).length,
         stretchCount: recommendations.filter(function (item) { return item.tier === "stretch"; }).length,

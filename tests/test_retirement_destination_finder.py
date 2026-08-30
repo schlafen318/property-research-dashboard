@@ -170,6 +170,51 @@ class RetirementDestinationFinderTests(unittest.TestCase):
         self.assertEqual("affordable", result["recommendations"][0]["destinationId"])
         self.assertEqual("within_reach", result["recommendations"][0]["tier"])
 
+    def test_region_preference_filters_destinations_case_insensitively(self) -> None:
+        asia = destination("asia-place")
+        asia["continent"] = "Asia"
+        europe = destination("europe-place")
+        payload = {
+            "user": user_payload(
+                preferences={"region": "asia", "climate": "any", "healthcare": "normal"}
+            ),
+            "destinations": [asia, europe],
+            "retirementCosts": [cost_record(asia["id"], 90_000), cost_record(europe["id"], 80_000)],
+            "mortgageProfiles": {
+                asia["id"]: mortgage_profile(),
+                europe["id"]: mortgage_profile(),
+            },
+        }
+
+        result = run_finder("recommendDestinations", payload)
+
+        self.assertEqual(["asia-place"], [item["destinationId"] for item in result["recommendations"]])
+        self.assertEqual(1, result["summary"]["evaluatedCount"])
+        self.assertEqual([], result["excluded"])
+
+    def test_setting_preference_filters_destinations(self) -> None:
+        coast = destination("coast-place")
+        mountain = destination("mountain-place")
+        mountain["category"] = "Mountain"
+        payload = {
+            "user": user_payload(
+                preferences={"region": "any", "climate": "Mountain", "healthcare": "normal"}
+            ),
+            "destinations": [coast, mountain],
+            "retirementCosts": [cost_record(coast["id"], 80_000), cost_record(mountain["id"], 90_000)],
+            "mortgageProfiles": {
+                coast["id"]: mortgage_profile(),
+                mountain["id"]: mortgage_profile(),
+            },
+        }
+
+        result = run_finder("recommendDestinations", payload)
+
+        self.assertEqual(
+            ["mountain-place"],
+            [item["destinationId"] for item in result["recommendations"]],
+        )
+
     def test_incomplete_mortgage_research_cannot_be_recommended(self) -> None:
         place = destination("unknown-financing")
         payload = {
