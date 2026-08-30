@@ -78,6 +78,19 @@ class NearRankingSnippetTests(unittest.TestCase):
                     html,
                 )
 
+    def test_crete_answers_retirement_property_intent_above_the_dossier(self) -> None:
+        html = self.render_destination("crete")
+
+        self.assertIn("<h1>Crete property for retirement</h1>", html)
+        self.assertIn(
+            "<h2>Crete property for retirement: where to focus first</h2>",
+            html,
+        )
+        self.assertIn("Chania, Rethymno, Heraklion and eastern Crete", html)
+        self.assertIn('href="/greece-retirement-property-foreign-buyers/"', html)
+        self.assertIn('href="/greece-vs-portugal-retirement-property/"', html)
+        self.assertIn('href="/best-places-to-buy-property-abroad-for-retirement/"', html)
+
     def test_homepage_snippet_leads_with_the_brand_and_property_abroad_intent(self) -> None:
         html = build_unified_app.build_landing_page(
             self.destinations,
@@ -211,6 +224,11 @@ class InternalAuthorityTests(unittest.TestCase):
                 "where-can-foreigners-buy-property",
                 "/thailand-villa-ownership-foreigners/",
                 "foreign buyer guide to Thailand villas",
+            ),
+            (
+                "greece-retirement-property-foreign-buyers",
+                "/destinations/crete/",
+                "Crete property for retirement: areas, costs and buyer guide",
             ),
             (
                 "foreign-property-investment-risks",

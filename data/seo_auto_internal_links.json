@@ -64,5 +64,15 @@
     "source_slug": "foreign-property-investment-risks",
     "target_slug": "overseas-property-investment",
     "type": "internal-link"
+  },
+  {
+    "anchor": "Crete property for retirement: areas, costs and buyer guide",
+    "description": "Compare Crete retirement property across Chania, Rethymno, Heraklion and eastern Crete, with buyer rules, costs, healthcare, hazards and resale.",
+    "fingerprint": "gha-seo-priority-crete-retirement-20260830",
+    "reason": "Support Crete's near-ranking retirement-property intent from the dedicated Greece retirement guide.",
+    "source_slug": "greece-retirement-property-foreign-buyers",
+    "target_path": "/destinations/crete/",
+    "theme": "Greece retirement destination",
+    "type": "internal-link"
   }
 ]
