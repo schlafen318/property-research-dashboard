@@ -364,6 +364,27 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             self.assertIn(f'id="{section_id}"', form)
         self.assertIn('id="finder-review-retirement"', form)
         self.assertIn('id="finder-review-capital"', form)
+        self.assertIn('id="finder-review-income"', form)
+
+    def test_desktop_keeps_the_original_four_step_labels_and_combined_opening_section(self) -> None:
+        form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
+            "</form>", 1
+        )[0]
+        design_css = self.html.split('<style id="gha-retirement-finder-design">', 1)[1].split(
+            "</style>", 1
+        )[0]
+        mobile_css = design_css.split("@media (max-width: 760px)", 1)[1].split(
+            "@media (max-width: 620px)", 1
+        )[0]
+
+        self.assertIn('class="finder-step finder-step-desktop">Step 1 of 4', form)
+        self.assertIn('class="finder-desktop-only">What you have today', form)
+        self.assertIn('class="finder-section finder-section-split"', form)
+        self.assertIn(".finder-step.finder-step-mobile, .retirement-finder-page .finder-mobile-only { display: none; }", design_css)
+        self.assertIn(".finder-profile", design_css)
+        self.assertIn(".finder-section-split", design_css)
+        self.assertIn(".finder-step-desktop", mobile_css)
+        self.assertIn(".finder-step-mobile", mobile_css)
 
     def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
         self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)

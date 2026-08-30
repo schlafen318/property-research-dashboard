@@ -635,14 +635,80 @@
       const region = selected("finder-region") === "any"
         ? "Any region"
         : titleCaseFilter(selected("finder-region"));
+      const contributionIndexing = element("finder-contribution-indexed").checked
+        ? ", inflation-linked"
+        : "";
+      const housing = selected("finder-housing-plan");
+      const housingParts = [housingLabels[housing] || "—"];
+      if (housing === "buy_now") {
+        housingParts.push(selectedCurrency + " " + element("finder-property-allocation").value + " budget");
+        const purchaseMethod = selected("finder-purchase-method");
+        if (purchaseMethod === "mortgage") {
+          housingParts.push(
+            "Mortgage, " + selected("finder-requested-ltv") + "% LTV at " +
+            selected("finder-mortgage-rate") + "% for " + selected("finder-mortgage-term") + " years"
+          );
+          const residencyLabels = {
+            non_resident: "Non-resident",
+            resident: "Resident",
+            eu_national: "EU national",
+            non_resident_with_purchase_permit: "Non-resident with purchase permission",
+          };
+          const incomeLabels = {
+            overseas: "Overseas income",
+            documented_overseas_income: "Documented overseas income",
+            eu_income: "EU income",
+            japan_income: "Japan income",
+            swiss_income: "Swiss income",
+          };
+          housingParts.push(
+            (residencyLabels[selected("finder-buyer-residency")] || "Buyer status not set") +
+            ", " + (incomeLabels[selected("finder-income-source")] || "Income source not set")
+          );
+          housingParts.push(selected("finder-mortgage-treatment") === "continue"
+            ? "Continue repayments in retirement"
+            : "Pay off at retirement");
+        } else {
+          housingParts.push(purchaseMethod === "cash" ? "Cash purchase" : "Financing not decided");
+        }
+        if (selected("finder-use-before-retirement") === "rental") {
+          housingParts.push(
+            "Rent before retirement: " + selected("finder-rental-yield") + "% yield, " +
+            selected("finder-vacancy-rate") + "% vacancy, " +
+            selected("finder-operating-cost-rate") + "% operating costs"
+          );
+        } else {
+          housingParts.push("Personal use before retirement");
+        }
+      }
+      const incomeParts = [];
+      if (moneyNumber("finder-pension") > 0) {
+        incomeParts.push(
+          selectedCurrency + " " + element("finder-pension").value + "/month pension" +
+          (element("finder-pension-indexed").checked ? ", inflation-linked" : "")
+        );
+      }
+      if (moneyNumber("finder-other-income") > 0) {
+        incomeParts.push(
+          selectedCurrency + " " + element("finder-other-income").value + "/month other income" +
+          (element("finder-other-income-indexed").checked ? ", inflation-linked" : "")
+        );
+      }
       element("finder-review-retirement").textContent =
-        "Age " + selected("finder-retirement-age") + " · " + household + " · " + selected("finder-horizon") + " years";
+        "Age " + selected("finder-current-age") + " now · retire at " +
+        selected("finder-retirement-age") + " · " + household + " · " +
+        selected("finder-horizon") + " years";
       element("finder-review-capital").textContent =
         selectedCurrency + " " + element("finder-liquid-capital").value + " today · " +
-        selectedCurrency + " " + element("finder-monthly-contribution").value + "/month";
-      element("finder-review-housing").textContent = housingLabels[selected("finder-housing-plan")] || "—";
+        selectedCurrency + " " + element("finder-monthly-contribution").value + "/month" +
+        contributionIndexing + " · " + selected("finder-return") + "% return";
+      element("finder-review-housing").textContent = housingParts.join(" · ");
+      element("finder-review-income").textContent = incomeParts.length
+        ? incomeParts.join(" · ")
+        : "No continuing income";
       element("finder-review-preferences").textContent =
-        region + " · " + (settings.length ? sentenceList(settings) : "Any setting");
+        region + " · " + (settings.length ? sentenceList(settings) : "Any setting") +
+        " · Healthcare: " + (selected("finder-healthcare") === "high" ? "leading priority" : "important");
     }
 
     function updateWizardStep(options) {

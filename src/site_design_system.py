@@ -366,6 +366,9 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-wizard-progress, .retirement-finder-page .finder-wizard-actions, .retirement-finder-page .finder-adjust-plan { display: none; }
     .retirement-finder-page .finder-section { padding: 30px 0 34px; border: 0; border-bottom: 1px solid var(--gha-rule); border-radius: 0; background: transparent; box-shadow: none; }
     .retirement-finder-page .finder-section:first-child { padding-top: 0; }
+    .retirement-finder-page .finder-step.finder-step-mobile, .retirement-finder-page .finder-mobile-only { display: none; }
+    .retirement-finder-page .finder-profile { padding-bottom: 16px; border-bottom: 0; }
+    .retirement-finder-page .finder-section-split { padding-top: 0; }
     .retirement-finder-page .finder-review { display: none; }
     .retirement-finder-page .finder-review-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 24px 0; border-top: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-review-summary div { padding: 16px 0; border-bottom: 1px solid var(--gha-rule); }
@@ -503,6 +506,9 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page.finder-wizard-editing .finder-wizard-progress { flex: none; margin: 0; padding: 14px 16px 10px; }
       .retirement-finder-page.finder-wizard-editing .finder-errors { flex: none; margin: 0 16px 8px; padding: 10px 12px; font-size: 13px; }
       .retirement-finder-page.finder-wizard-editing .finder-section { display: block; min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: 18px 16px calc(92px + env(safe-area-inset-bottom)); border: 0; }
+      .retirement-finder-page.finder-wizard-editing .finder-step-desktop, .retirement-finder-page.finder-wizard-editing .finder-desktop-only { display: none; }
+      .retirement-finder-page.finder-wizard-editing .finder-step-mobile { display: block; }
+      .retirement-finder-page.finder-wizard-editing .finder-mobile-only { display: block; }
       .retirement-finder-page.finder-wizard-editing .finder-review { display: block; }
       .retirement-finder-page.finder-wizard-editing .finder-review-summary { grid-template-columns: 1fr; margin-top: 20px; }
       .retirement-finder-page .finder-form { padding-bottom: 84px; }

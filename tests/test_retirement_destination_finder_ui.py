@@ -136,6 +136,7 @@ const values = {
   "finder-other-income": "0",
 };
 Object.entries(values).forEach(([id, value]) => { el(id).value = value; });
+Object.entries(input.values || {}).forEach(([id, value]) => { el(id).value = String(value); });
 const settingControls = ["City", "CoastOrIsland", "Mountain", "Lake"].map((value) => {
   const control = el("finder-setting-" + value.toLowerCase());
   control.value = value;
@@ -380,6 +381,9 @@ process.stdout.write(JSON.stringify({
   wizardEditing: document.body.classList.contains("finder-wizard-editing"),
   reviewRetirement: el("finder-review-retirement").textContent,
   reviewCapital: el("finder-review-capital").textContent,
+  reviewHousing: el("finder-review-housing").textContent,
+  reviewIncome: el("finder-review-income").textContent,
+  reviewPreferences: el("finder-review-preferences").textContent,
   adjustPlanHidden: el("finder-adjust-plan").hidden,
   trackedEvents,
 }));
@@ -529,8 +533,45 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
 
         self.assertEqual("Step 6 of 6", scenario["wizardStepText"])
-        self.assertEqual("Age 60 · Single · 30 years", scenario["reviewRetirement"])
-        self.assertEqual("USD 500,000 today · USD 2,000/month", scenario["reviewCapital"])
+        self.assertEqual("Age 50 now · retire at 60 · Single · 30 years", scenario["reviewRetirement"])
+        self.assertEqual(
+            "USD 500,000 today · USD 2,000/month, inflation-linked · 4% return",
+            scenario["reviewCapital"],
+        )
+        self.assertEqual("Rent", scenario["reviewHousing"])
+        self.assertEqual("No continuing income", scenario["reviewIncome"])
+        self.assertEqual("Any region · Any setting · Healthcare: important", scenario["reviewPreferences"])
+
+    def test_mobile_review_includes_conditional_housing_and_income_assumptions(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "values": {
+                    "finder-pension": "2,400",
+                    "finder-other-income": "1,800",
+                    "finder-region": "asia",
+                    "finder-healthcare": "high",
+                },
+                "settings": ["CoastOrIsland"],
+                "wizardActions": ["next", "next", "buy-mortgage", "next", "next", "next"],
+            }
+        )
+
+        self.assertEqual(
+            "Buy now · USD 300,000 budget · Mortgage, 60% LTV at 5% for 20 years · "
+            "Non-resident, Overseas income · Pay off at retirement · Personal use before retirement",
+            scenario["reviewHousing"],
+        )
+        self.assertEqual(
+            "USD 2,400/month pension, inflation-linked · "
+            "USD 1,800/month other income, inflation-linked",
+            scenario["reviewIncome"],
+        )
+        self.assertEqual(
+            "Asia · Coast or island · Healthcare: leading priority",
+            scenario["reviewPreferences"],
+        )
 
     def test_mobile_wizard_keeps_adjusted_form_visible_across_responsive_changes(self) -> None:
         scenario = run_ui_dom_scenario(
