@@ -568,6 +568,7 @@ def retirement_finder_design_css() -> str:
     @media (max-width: 620px) and (max-height: 600px) {
       .retirement-finder-page.finder-wizard-editing .finder-wizard-progress { padding: 8px 16px 6px; }
       .retirement-finder-page.finder-wizard-editing .finder-section { padding-top: 12px; }
+      .retirement-finder-page.finder-wizard-editing #finder-profile #finder-currency-note { display: none; }
       .retirement-finder-page.finder-wizard-editing #finder-review .finder-review-summary div { padding: 5px 0; }
     }
     @media (prefers-reduced-motion: reduce) {

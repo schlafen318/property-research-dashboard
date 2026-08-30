@@ -382,6 +382,10 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             design_css,
         )
         self.assertIn("@media (max-width: 620px) and (max-height: 600px)", design_css)
+        self.assertIn(
+            ".finder-wizard-editing #finder-profile #finder-currency-note { display: none; }",
+            design_css,
+        )
         self.assertIn("font-size: 14px", design_css)
 
         form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
