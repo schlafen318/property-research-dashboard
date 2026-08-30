@@ -41,7 +41,7 @@
       "stay_routes": {
         "seasonal": {
           "status": "conditional",
-          "base_score": 4.0,
+          "base_score": 4,
           "max_days": 90,
           "minimum_age": null,
           "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; confirm whether a visa is required.",
@@ -53,22 +53,43 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "portugal-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 90,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; confirm whether a visa is required.",
+              "source_ids": [
+                "portugal-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 90,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; confirm whether a visa is required.",
+              "source_ids": [
+                "portugal-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -86,22 +107,43 @@
           "confidence": "medium_high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "portugal-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "A residence visa for people living on their own income may support a recurring base when the applicant proves qualifying income and meets consular requirements.",
+              "source_ids": [
+                "portugal-own-income-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. A residence visa for people living on their own income may support a recurring base when the applicant proves qualifying income and meets consular requirements.",
+              "source_ids": [
+                "portugal-own-income-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -119,22 +161,43 @@
           "confidence": "medium_high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "portugal-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The own-income residence pathway is profile-dependent and requires a visa followed by residence administration; property purchase alone is not treated as permission to reside.",
+              "source_ids": [
+                "portugal-own-income-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The own-income residence pathway is profile-dependent and requires a visa followed by residence administration; property purchase alone is not treated as permission to reside.",
+              "source_ids": [
+                "portugal-own-income-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             }
           }
         }
@@ -161,7 +224,7 @@
           "seasonal": {
             "status": "conditional",
             "rankable": true,
-            "compatibility_score": 4.0,
+            "compatibility_score": 4,
             "summary": "A sub-threshold stay is comparatively clear, but a habitual home and Portuguese-source income can still matter.",
             "source_ids": [
               "portugal-tax-1"
@@ -170,7 +233,7 @@
           "part_year": {
             "status": "conditional",
             "rankable": true,
-            "compatibility_score": 3.0,
+            "compatibility_score": 3,
             "summary": "Recurring days and a maintained home make residence analysis and recordkeeping more important.",
             "source_ids": [
               "portugal-tax-1"
@@ -203,7 +266,7 @@
             "confidence": "medium_high"
           },
           "part_year": {
-            "bridge_score": 4.0,
+            "bridge_score": 4,
             "eligibility": "conditional",
             "waiting_period_summary": "Legally resident foreigners can obtain an SNS user number, while public payment coverage also requires linked identity, tax, address and residence information.",
             "age_limit_summary": "No general age limit is stated for legal-resident SNS registration; insurance underwriting remains separate.",
@@ -342,6 +405,16 @@
           "accessed_date": "2026-08-29",
           "jurisdiction_level": "national",
           "notes": "Undated official living risk page; source_date records the reviewed snapshot and supports risk screening rather than local incident probability."
+        },
+        {
+          "id": "portugal-eu-mobility-1",
+          "metric_supported": "EU-citizen residence and work rights in another EU country, including registration conditions after three months",
+          "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/index_en.htm",
+          "publisher": "European Union, Your Europe",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
         }
       ]
     },
@@ -349,7 +422,7 @@
       "stay_routes": {
         "seasonal": {
           "status": "conditional",
-          "base_score": 4.0,
+          "base_score": 4,
           "max_days": 90,
           "minimum_age": null,
           "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; visitor activity does not itself authorize work.",
@@ -361,22 +434,43 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "spain-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 90,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; visitor activity does not itself authorize work.",
+              "source_ids": [
+                "spain-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 90,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; visitor activity does not itself authorize work.",
+              "source_ids": [
+                "spain-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -394,22 +488,43 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "spain-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.6,
               "max_days": 365,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "The non-working residence visa supports residence for applicants with sufficient guaranteed means but prohibits gainful and remote professional activity.",
+              "source_ids": [
+                "spain-nonworking-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.6,
               "max_days": 365,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The non-working residence visa supports residence for applicants with sufficient guaranteed means but prohibits gainful and remote professional activity.",
+              "source_ids": [
+                "spain-nonworking-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -427,22 +542,43 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "spain-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.6,
               "max_days": null,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "The non-working route is renewable when its financial, insurance and residence conditions continue; applicants needing remote work should evaluate the separate telework route.",
+              "source_ids": [
+                "spain-nonworking-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.6,
               "max_days": null,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The non-working route is renewable when its financial, insurance and residence conditions continue; applicants needing remote work should evaluate the separate telework route.",
+              "source_ids": [
+                "spain-nonworking-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         }
@@ -511,7 +647,7 @@
             "confidence": "medium_high"
           },
           "part_year": {
-            "bridge_score": 4.0,
+            "bridge_score": 4,
             "eligibility": "conditional",
             "waiting_period_summary": "Economically inactive residents may need qualifying home coverage, private insurance or the paid special agreement where eligible.",
             "age_limit_summary": "The special-agreement route is eligibility-based; private underwriting must be checked separately.",
@@ -620,6 +756,16 @@
           "accessed_date": "2026-08-29",
           "jurisdiction_level": "Malaga",
           "notes": "Official active-tourism guide used for documented trail and cycling-route availability."
+        },
+        {
+          "id": "spain-eu-mobility-1",
+          "metric_supported": "EU-citizen residence and work rights in another EU country, including registration conditions after three months",
+          "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/index_en.htm",
+          "publisher": "European Union, Your Europe",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
         }
       ]
     },
@@ -627,7 +773,7 @@
       "stay_routes": {
         "seasonal": {
           "status": "conditional",
-          "base_score": 4.0,
+          "base_score": 4,
           "max_days": 90,
           "minimum_age": null,
           "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
@@ -639,22 +785,43 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "greece-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 90,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+              "source_ids": [
+                "greece-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 90,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+              "source_ids": [
+                "greece-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -673,22 +840,45 @@
           "confidence": "medium_high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "greece-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.6,
               "max_days": 365,
-              "work_permission": "remote_permitted"
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "The national digital-nomad visa can support up to twelve months for qualifying remote workers with foreign work and documented resources.",
+              "source_ids": [
+                "greece-digital-nomad-1",
+                "greece-digital-nomad-details-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.6,
               "max_days": 365,
-              "work_permission": "remote_permitted"
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The national digital-nomad visa can support up to twelve months for qualifying remote workers with foreign work and documented resources.",
+              "source_ids": [
+                "greece-digital-nomad-1",
+                "greece-digital-nomad-details-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -706,22 +896,43 @@
           "confidence": "medium",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "greece-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.3,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Longer residence depends on the applicant fitting a current residence category and meeting income, insurance and renewal conditions; no universal retirement permission is assumed.",
+              "source_ids": [
+                "greece-residence-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.3,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Longer residence depends on the applicant fitting a current residence category and meeting income, insurance and renewal conditions; no universal retirement permission is assumed.",
+              "source_ids": [
+                "greece-residence-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
             }
           }
         }
@@ -909,6 +1120,16 @@
           "accessed_date": "2026-08-29",
           "jurisdiction_level": "Crete",
           "notes": "Official regional destination page used for documented physical settings and activity availability, not promotional superlatives."
+        },
+        {
+          "id": "greece-eu-mobility-1",
+          "metric_supported": "EU-citizen residence and work rights in another EU country, including registration conditions after three months",
+          "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/index_en.htm",
+          "publisher": "European Union, Your Europe",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
         }
       ]
     },
@@ -916,7 +1137,7 @@
       "stay_routes": {
         "seasonal": {
           "status": "conditional",
-          "base_score": 4.0,
+          "base_score": 4,
           "max_days": 90,
           "minimum_age": null,
           "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
@@ -928,28 +1149,49 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "croatia-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 90,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+              "source_ids": [
+                "croatia-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 90,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+              "source_ids": [
+                "croatia-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
         "part_year": {
           "status": "conditional",
-          "base_score": 4.0,
+          "base_score": 4,
           "max_days": 548,
           "minimum_age": null,
           "summary": "The digital-nomad temporary stay can be granted for up to eighteen months to qualifying third-country remote workers for foreign businesses.",
@@ -961,22 +1203,43 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "croatia-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 548,
-              "work_permission": "remote_permitted"
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "The digital-nomad temporary stay can be granted for up to eighteen months to qualifying third-country remote workers for foreign businesses.",
+              "source_ids": [
+                "croatia-digital-nomad-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
-              "base_score": 4.0,
+              "base_score": 4,
               "max_days": 548,
-              "work_permission": "remote_permitted"
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The digital-nomad temporary stay can be granted for up to eighteen months to qualifying third-country remote workers for foreign businesses.",
+              "source_ids": [
+                "croatia-digital-nomad-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -995,22 +1258,45 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "conditional",
+              "base_score": 4.8,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "croatia-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Digital-nomad stay is temporary and has a reapplication gap; a separate residence category is required for durable full relocation.",
+              "source_ids": [
+                "croatia-digital-nomad-1",
+                "croatia-residence-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Digital-nomad stay is temporary and has a reapplication gap; a separate residence category is required for durable full relocation.",
+              "source_ids": [
+                "croatia-digital-nomad-1",
+                "croatia-residence-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         }
@@ -1199,6 +1485,16 @@
           "accessed_date": "2026-08-29",
           "jurisdiction_level": "Dalmatia",
           "notes": "Official regional tourism-board page supports documented cycling, hiking and coastal activity availability, not promotional rankings."
+        },
+        {
+          "id": "croatia-eu-mobility-1",
+          "metric_supported": "EU-citizen residence and work rights in another EU country, including registration conditions after three months",
+          "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/index_en.htm",
+          "publisher": "European Union, Your Europe",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
         }
       ]
     },
@@ -1218,22 +1514,41 @@
           "confidence": "medium",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.5,
               "max_days": 60,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Visitor stay length, extension and permitted activities depend on the selected visa index and passport; confirm the current immigration catalogue before travel.",
+              "source_ids": [
+                "indonesia-immigration-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.5,
               "max_days": 60,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Visitor stay length, extension and permitted activities depend on the selected visa index and passport; confirm the current immigration catalogue before travel.",
+              "source_ids": [
+                "indonesia-immigration-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -1251,28 +1566,47 @@
           "confidence": "medium",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.4,
               "max_days": 365,
-              "work_permission": "remote_permitted"
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "The E33G remote-worker residence route is profile-dependent and should be checked for income, employer and permitted-activity requirements.",
+              "source_ids": [
+                "indonesia-immigration-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.4,
               "max_days": 365,
-              "work_permission": "remote_permitted"
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The E33G remote-worker residence route is profile-dependent and should be checked for income, employer and permitted-activity requirements.",
+              "source_ids": [
+                "indonesia-immigration-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
         "full_relocation": {
           "status": "conditional",
-          "base_score": 3.0,
+          "base_score": 3,
           "max_days": 1825,
           "minimum_age": 55,
           "summary": "The E33E five-year retiree residence route is expressly limited to applicants aged 55 or older and subject to its financial and immigration conditions.",
@@ -1284,22 +1618,41 @@
           "confidence": "medium_high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
-              "base_score": 3.0,
+              "base_score": 3,
               "max_days": 1825,
-              "work_permission": "unclear"
+              "minimum_age": 55,
+              "work_permission": "unclear",
+              "summary": "The E33E five-year retiree residence route is expressly limited to applicants aged 55 or older and subject to its financial and immigration conditions.",
+              "source_ids": [
+                "indonesia-retiree-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
-              "base_score": 3.0,
+              "base_score": 3,
               "max_days": 1825,
-              "work_permission": "unclear"
+              "minimum_age": 55,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The E33E five-year retiree residence route is expressly limited to applicants aged 55 or older and subject to its financial and immigration conditions.",
+              "source_ids": [
+                "indonesia-retiree-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             }
           }
         }
@@ -1486,22 +1839,41 @@
           "confidence": "medium",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.5,
               "max_days": 60,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Visa exemption or tourist-visa duration is passport-specific; check the official e-visa eligibility tool for the intended stay.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.5,
               "max_days": 60,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Visa exemption or tourist-visa duration is passport-specific; check the official e-visa eligibility tool for the intended stay.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -1519,22 +1891,41 @@
           "confidence": "medium_high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": 180,
-              "work_permission": "remote_permitted"
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "The Destination Thailand Visa includes workcation and other defined activities, with eligibility and each period of stay requiring official confirmation.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": 180,
-              "work_permission": "remote_permitted"
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The Destination Thailand Visa includes workcation and other defined activities, with eligibility and each period of stay requiring official confirmation.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -1552,22 +1943,41 @@
           "confidence": "medium_high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.2,
               "max_days": 365,
-              "work_permission": "passive_only"
+              "minimum_age": 50,
+              "work_permission": "passive_only",
+              "summary": "Retirement visa categories begin at age 50 and require category-specific financial, insurance and renewal compliance; they do not authorize local work.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.2,
               "max_days": 365,
-              "work_permission": "passive_only"
+              "minimum_age": 50,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Retirement visa categories begin at age 50 and require category-specific financial, insurance and renewal compliance; they do not authorize local work.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
             }
           }
         }
@@ -1779,22 +2189,41 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": 90,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Many listed passports receive visa-exempt short stays, commonly 90 days, while other travelers need a short-stay visa and nationality-specific conditions apply.",
+              "source_ids": [
+                "japan-short-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": 90,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Many listed passports receive visa-exempt short stays, commonly 90 days, while other travelers need a short-stay visa and nationality-specific conditions apply.",
+              "source_ids": [
+                "japan-short-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -1813,22 +2242,43 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": 90,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "No general part-year retirement permission is documented; repeated temporary-visitor use must not be treated as a residence route.",
+              "source_ids": [
+                "japan-short-stay-1",
+                "japan-long-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": 90,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. No general part-year retirement permission is documented; repeated temporary-visitor use must not be treated as a residence route.",
+              "source_ids": [
+                "japan-short-stay-1",
+                "japan-long-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -1846,22 +2296,41 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Japan requires a qualifying status of residence for long-term stay; no general passive-income or retirement category is documented for this launch profile.",
+              "source_ids": [
+                "japan-long-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Japan requires a qualifying status of residence for long-term stay; no general passive-income or retirement category is documented for this launch profile.",
+              "source_ids": [
+                "japan-long-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         }
@@ -1898,7 +2367,7 @@
           "part_year": {
             "status": "conditional",
             "rankable": true,
-            "compatibility_score": 3.0,
+            "compatibility_score": 3,
             "summary": "Domicile facts and repeated presence need review even without a 183-day statutory trigger.",
             "source_ids": [
               "japan-tax-1"
@@ -2073,22 +2542,41 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": 90,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Vietnam's official e-visa can be valid for up to 90 days, single or multiple entry, for eligible passport holders.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "conditional",
               "base_score": 3.8,
               "max_days": 90,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Vietnam's official e-visa can be valid for up to 90 days, single or multiple entry, for eligible passport holders.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -2106,22 +2594,41 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": 90,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "The e-visa is capped at 90 days and cannot be treated as a durable recurring residence route; a separate qualifying sponsored status is required.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": 90,
-              "work_permission": "passive_only"
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The e-visa is capped at 90 days and cannot be treated as a durable recurring residence route; a separate qualifying sponsored status is required.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         },
@@ -2139,22 +2646,41 @@
           "confidence": "high",
           "mobility_rights": {
             "local_free_movement": {
-              "status": "eligible",
-              "base_score": 5.0,
+              "status": "needs_verification",
+              "base_score": null,
               "max_days": null,
-              "work_permission": "local_permitted"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
             },
             "general_nonlocal": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "No general retirement or passive-income residence route is documented in the official e-visa system; full relocation requires a separately qualifying status.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             },
             "prefer_not_to_say": {
               "status": "needs_verification",
               "base_score": null,
               "max_days": null,
-              "work_permission": "unclear"
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. No general retirement or passive-income residence route is documented in the official e-visa system; full relocation requires a separately qualifying status.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
             }
           }
         }
@@ -2349,7 +2875,7 @@
           "confidence": "high"
         },
         "year_round_continuity": {
-          "score": 4.0,
+          "score": 4,
           "summary": "Official Faro climate normals show hot, dry summer seasonality; regular activity remains practical with heat and fire-danger adaptation, while Cascais conditions vary.",
           "source_ids": [
             "portugal-algarve-active-1",
@@ -2518,7 +3044,7 @@
           "confidence": "high"
         },
         "year_round_continuity": {
-          "score": 4.0,
+          "score": 4,
           "summary": "Permanent coastal and park infrastructure supports continuity, with summer heat requiring time-of-day adaptation.",
           "source_ids": [
             "spain-malaga-active-1"
@@ -2673,7 +3199,7 @@
       "country": "Indonesia",
       "active_life": {
         "everyday_movement": {
-          "score": 3.0,
+          "score": 3,
           "summary": "Sanur provides a documented beachfront cycle path, while everyday movement across the wider island is uneven and road-condition dependent.",
           "source_ids": [
             "indonesia-bali-active-1"
@@ -2843,7 +3369,7 @@
       "country": "Vietnam",
       "active_life": {
         "everyday_movement": {
-          "score": 4.0,
+          "score": 4,
           "summary": "Da Nang documented 61 public bicycle stations across five districts, and coastal areas support routine walking.",
           "source_ids": [
             "vietnam-active-1",
@@ -2885,7 +3411,7 @@
         "water",
         "fitness_social"
       ],
-      "rent_flexibility_score": 4.0,
+      "rent_flexibility_score": 4,
       "one_time_relocation_usd": 5000,
       "risk_warnings": [
         "The e-visa is not a residence route, and long-term plans need private medical coverage plus evacuation capacity for specialist care."

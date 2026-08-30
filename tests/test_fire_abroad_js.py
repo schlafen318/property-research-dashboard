@@ -100,7 +100,12 @@ class FireAbroadJavaScriptParityTests(unittest.TestCase):
                     ),
                     "base_score": score,
                     "max_days": None,
+                    "minimum_age": None,
                     "work_permission": "remote_permitted",
+                    "summary": "Variant-specific route evidence.",
+                    "source_ids": ["route-source"],
+                    "confidence": "high",
+                    "last_reviewed": "2026-08-25",
                 }
                 for mobility in ("local_free_movement", "general_nonlocal", "prefer_not_to_say")
             },
@@ -324,10 +329,14 @@ class FireAbroadJavaScriptParityTests(unittest.TestCase):
         route["mobility_rights"]["general_nonlocal"]["max_days"] = 90
         route["mobility_rights"]["prefer_not_to_say"]["max_days"] = 90
         route["mobility_rights"]["local_free_movement"].update({
-            "status": "eligible",
-            "base_score": 5.0,
+            "status": "needs_verification",
+            "base_score": None,
             "max_days": None,
-            "work_permission": "local_permitted",
+            "minimum_age": None,
+            "work_permission": "unclear",
+            "summary": "Country-specific local rights need verification.",
+            "source_ids": [],
+            "confidence": "low",
         })
         for mobility, days in (
             ("general_nonlocal", 90),

@@ -208,16 +208,9 @@ def eligibility_for_mode(country: dict, profile: dict) -> dict:
             "max_days": None,
             "confidence": "low",
             "last_reviewed": None,
+            "source_ids": [],
+            "day_warning": None,
         }
-
-    status = route.get("status")
-    base_score = route.get("base_score")
-    max_days = route.get("max_days")
-    summary = route.get("summary")
-    summary = summary if isinstance(summary, str) and summary else "Route conditions require confirmation."
-    work_permission = route.get("work_permission")
-    if work_permission not in VALID_WORK_PERMISSIONS:
-        work_permission = "unclear"
 
     rights = route.get("mobility_rights")
     selected = rights.get(profile["mobility_rights"]) if isinstance(rights, dict) else None
@@ -230,10 +223,25 @@ def eligibility_for_mode(country: dict, profile: dict) -> dict:
             "max_days": None,
             "confidence": route.get("confidence", "low"),
             "last_reviewed": route.get("last_reviewed"),
+            "source_ids": [],
+            "day_warning": None,
         }
     status = selected.get("status")
     base_score = selected.get("base_score")
     max_days = selected.get("max_days")
+    summary = selected.get("summary")
+    summary = (
+        summary
+        if isinstance(summary, str) and summary
+        else "Mobility-rights-specific route conditions require confirmation."
+    )
+    source_ids = selected.get("source_ids")
+    source_ids = (
+        list(source_ids)
+        if isinstance(source_ids, list)
+        and all(isinstance(item, str) and item for item in source_ids)
+        else []
+    )
     selected_work_permission = selected.get("work_permission")
     work_permission = (
         selected_work_permission
@@ -241,10 +249,9 @@ def eligibility_for_mode(country: dict, profile: dict) -> dict:
         else "unclear"
     )
 
-    minimum_age = route.get("minimum_age")
+    minimum_age = selected.get("minimum_age")
     if (
-        profile["mobility_rights"] != "local_free_movement"
-        and isinstance(minimum_age, int)
+        isinstance(minimum_age, int)
         and not isinstance(minimum_age, bool)
         and profile["age"] < minimum_age
     ):
@@ -254,27 +261,24 @@ def eligibility_for_mode(country: dict, profile: dict) -> dict:
             "work_permission": work_permission,
             "stay_score": 0.0,
             "max_days": max_days,
-            "confidence": route.get("confidence", "low"),
-            "last_reviewed": route.get("last_reviewed"),
+            "confidence": selected.get("confidence", "low"),
+            "last_reviewed": selected.get("last_reviewed"),
+            "source_ids": source_ids,
+            "day_warning": None,
         }
 
     annual_days = profile.get("annual_days")
+    day_warning = None
     if (
         isinstance(annual_days, int)
         and isinstance(max_days, int)
         and annual_days > max_days
     ):
-        if profile["mobility_rights"] == "general_nonlocal":
-            status = "not_eligible"
-            summary = (
-                f"The selected {annual_days} days exceed this route's {max_days}-day cap."
-            )
-        else:
-            status = "needs_verification"
-            summary = (
-                f"The selected {annual_days} days exceed the documented {max_days}-day cap; "
-                "mobility rights need verification."
-            )
+        day_warning = (
+            f"The approximate {annual_days}-day annual total exceeds this route's documented "
+            f"{max_days}-day stay limit. The annual total alone cannot determine compliance "
+            "with a per-stay or rolling-window rule; confirm the intended travel pattern."
+        )
 
     if status not in VALID_ELIGIBILITY:
         status = "needs_verification"
@@ -299,8 +303,10 @@ def eligibility_for_mode(country: dict, profile: dict) -> dict:
         "work_permission": work_permission,
         "stay_score": score,
         "max_days": max_days,
-        "confidence": route.get("confidence", "low"),
-        "last_reviewed": route.get("last_reviewed"),
+        "confidence": selected.get("confidence", "low"),
+        "last_reviewed": selected.get("last_reviewed"),
+        "source_ids": source_ids,
+        "day_warning": day_warning,
     }
 
 
@@ -610,6 +616,7 @@ def _selected_evidence(
             "summary": eligibility.get("reason") or "Route conditions require confirmation.",
             "max_days": eligibility.get("max_days"),
             "work_permission": _work_permission_label(eligibility.get("work_permission")),
+            "source_ids": list(eligibility.get("source_ids", [])),
         },
         "tax_facts": {
             "summary": tax_mode.get("summary")
@@ -748,6 +755,8 @@ def rank_fire_abroad_destinations(
             score = _round_half_up(raw_score)
 
         warnings = list(override.get("risk_warnings", [])) if isinstance(override.get("risk_warnings"), list) else []
+        if isinstance(eligibility.get("day_warning"), str):
+            warnings.append(eligibility["day_warning"])
         if profile["home_tax_context"] == "us_person":
             warnings.append("US persons generally remain subject to U.S. worldwide filing and reporting obligations.")
         threshold = tax.get("standard_day_threshold")
@@ -869,9 +878,9 @@ def validate_fire_abroad_payload(
             add(owner, path, f"is stale; review interval is {interval} days")
 
     def source_refs(
-        value: Any, owner: str, path: str, available: set[str]
+        value: Any, owner: str, path: str, available: set[str], *, allow_empty: bool = False
     ) -> None:
-        if not isinstance(value, list) or not value:
+        if not isinstance(value, list) or (not value and not allow_empty):
             add(owner, path, "must contain at least one source ID")
             return
         seen: set[str] = set()
@@ -1111,7 +1120,9 @@ def validate_fire_abroad_payload(
                     f"stay_routes.{mode}.mobility_rights.{mobility_profile}",
                 )
                 expected_fields = {
-                    "status", "base_score", "max_days", "work_permission"
+                    "status", "base_score", "max_days", "minimum_age",
+                    "work_permission", "summary", "source_ids",
+                    "confidence", "last_reviewed",
                 }
                 if set(selected) != expected_fields:
                     add(
@@ -1143,11 +1154,46 @@ def validate_fire_abroad_payload(
                         f"stay_routes.{mode}.mobility_rights.{mobility_profile}.max_days",
                         "must be a positive integer or null",
                     )
+                selected_minimum_age = selected.get("minimum_age")
+                if selected_minimum_age is not None and (
+                    isinstance(selected_minimum_age, bool)
+                    or not isinstance(selected_minimum_age, int)
+                    or selected_minimum_age < 0
+                ):
+                    add(
+                        country_id,
+                        f"stay_routes.{mode}.mobility_rights.{mobility_profile}.minimum_age",
+                        "must be a non-negative integer or null",
+                    )
                 enum(
                     selected.get("work_permission"),
                     VALID_WORK_PERMISSIONS,
                     country_id,
                     f"stay_routes.{mode}.mobility_rights.{mobility_profile}.work_permission",
+                )
+                nonempty_text(
+                    selected.get("summary"),
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights.{mobility_profile}.summary",
+                )
+                source_refs(
+                    selected.get("source_ids"),
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights.{mobility_profile}.source_ids",
+                    available,
+                    allow_empty=selected_status in _UNRANKED_STATUSES,
+                )
+                enum(
+                    selected.get("confidence"),
+                    VALID_CONFIDENCE,
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights.{mobility_profile}.confidence",
+                )
+                freshness(
+                    selected.get("last_reviewed"),
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights.{mobility_profile}.last_reviewed",
+                    review_policy.get("immigration_days"),
                 )
             source_refs(
                 route.get("source_ids"),

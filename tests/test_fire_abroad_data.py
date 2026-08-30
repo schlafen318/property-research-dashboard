@@ -81,10 +81,33 @@ class FireAbroadDataTests(unittest.TestCase):
                     self.assertEqual(expected_profiles, set(route["mobility_rights"]))
                     for profile, mapping in route["mobility_rights"].items():
                         self.assertEqual(
-                            {"status", "base_score", "max_days", "work_permission"},
+                            {
+                                "status", "base_score", "max_days", "minimum_age",
+                                "work_permission", "summary", "source_ids",
+                                "confidence", "last_reviewed",
+                            },
                             set(mapping),
                             f"{country_id} stay_routes.{mode}.mobility_rights.{profile}",
                         )
+
+    def test_local_mobility_claims_are_evidence_backed_or_unranked(self) -> None:
+        payload = load_fire_abroad()
+        eu_countries = {"Portugal", "Spain", "Greece", "Croatia"}
+        for country_id, country in payload["countries"].items():
+            available_sources = {source["id"] for source in country["sources"]}
+            for mode, route in country["stay_routes"].items():
+                with self.subTest(country=country_id, mode=mode):
+                    local = route["mobility_rights"]["local_free_movement"]
+                    if country_id in eu_countries:
+                        self.assertEqual("conditional", local["status"])
+                        self.assertTrue(local["source_ids"])
+                        self.assertTrue(set(local["source_ids"]) <= available_sources)
+                        self.assertIn("EU citizens", local["summary"])
+                    else:
+                        self.assertEqual("needs_verification", local["status"])
+                        self.assertIsNone(local["base_score"])
+                        self.assertEqual([], local["source_ids"])
+                        self.assertIn("exact citizenship or treaty right", local["summary"])
 
     def test_algarve_continuity_and_fire_warning_use_direct_official_evidence(self) -> None:
         payload = load_fire_abroad()

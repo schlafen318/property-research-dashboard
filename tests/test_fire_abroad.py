@@ -27,6 +27,28 @@ class FireProfileTests(unittest.TestCase):
     def country_fixture(self, full_relocation_status: str = "eligible") -> dict:
         def route(status: str, *, minimum_age: int | None = None, max_days: int | None = None) -> dict:
             score = 4.0 if status not in {"needs_verification", "not_eligible"} else None
+            def mobility_variant(
+                variant_status: str,
+                variant_score: float | None,
+                *,
+                variant_max_days: int | None,
+                work_permission: str,
+                summary: str,
+                source_ids: list[str],
+                variant_minimum_age: int | None = None,
+                confidence: str = "high",
+            ) -> dict:
+                return {
+                    "status": variant_status,
+                    "base_score": variant_score,
+                    "max_days": variant_max_days,
+                    "minimum_age": variant_minimum_age,
+                    "work_permission": work_permission,
+                    "summary": summary,
+                    "source_ids": source_ids,
+                    "confidence": confidence,
+                    "last_reviewed": "2026-08-25",
+                }
             return {
                 "status": status,
                 "base_score": score,
@@ -34,25 +56,31 @@ class FireProfileTests(unittest.TestCase):
                 "minimum_age": minimum_age,
                 "summary": "A documented route is available.",
                 "work_permission": "remote_permitted",
+                "source_ids": ["route-source"],
+                "confidence": "high",
+                "last_reviewed": "2026-08-25",
                 "mobility_rights": {
-                    "local_free_movement": {
-                        "status": "eligible",
-                        "base_score": 5.0,
-                        "max_days": None,
-                        "work_permission": "local_permitted",
-                    },
-                    "general_nonlocal": {
-                        "status": status,
-                        "base_score": score,
-                        "max_days": max_days,
-                        "work_permission": "remote_permitted",
-                    },
-                    "prefer_not_to_say": {
-                        "status": "needs_verification" if status in {"needs_verification", "not_eligible"} else status,
-                        "base_score": score,
-                        "max_days": max_days,
-                        "work_permission": "remote_permitted",
-                    },
+                    "local_free_movement": mobility_variant(
+                        "needs_verification", None, variant_max_days=None,
+                        work_permission="unclear",
+                        summary="The broad local-rights selection needs country-specific verification.",
+                        source_ids=[], confidence="low",
+                    ),
+                    "general_nonlocal": mobility_variant(
+                        status, score, variant_max_days=max_days,
+                        variant_minimum_age=minimum_age,
+                        work_permission="remote_permitted",
+                        summary="The documented general-nonlocal route applies.",
+                        source_ids=["route-source"],
+                    ),
+                    "prefer_not_to_say": mobility_variant(
+                        "needs_verification" if status in {"needs_verification", "not_eligible"} else status,
+                        score, variant_max_days=max_days,
+                        variant_minimum_age=minimum_age,
+                        work_permission="remote_permitted",
+                        summary="An illustrative general-nonlocal baseline is shown.",
+                        source_ids=["route-source"],
+                    ),
                 },
             }
 
@@ -61,7 +89,8 @@ class FireProfileTests(unittest.TestCase):
                 "seasonal": route("conditional", max_days=90),
                 "part_year": route("conditional", minimum_age=50),
                 "full_relocation": route(full_relocation_status),
-            }
+            },
+            "sources": [{"id": "route-source", "url": "https://example.gov/route"}],
         }
 
     def test_profile_defaults_are_the_static_page_defaults(self) -> None:
@@ -109,12 +138,17 @@ class FireProfileTests(unittest.TestCase):
         country = self.country_fixture()
         country["stay_routes"]["seasonal"]["mobility_rights"] = {
             "local_free_movement": {
-                "status": "eligible", "base_score": 5.0, "max_days": None,
-                "work_permission": "local_permitted",
+                "status": "needs_verification", "base_score": None, "max_days": None,
+                "minimum_age": None, "work_permission": "unclear",
+                "summary": "Country-specific rights need verification.", "source_ids": [],
+                "confidence": "low", "last_reviewed": "2026-08-25",
             },
             "general_nonlocal": {
                 "status": "conditional", "base_score": 4.0, "max_days": 90,
-                "work_permission": "remote_permitted",
+                "minimum_age": None, "work_permission": "remote_permitted",
+                "summary": "The documented general-nonlocal route applies.",
+                "source_ids": ["route-source"], "confidence": "high",
+                "last_reviewed": "2026-08-25",
             },
         }
         result = eligibility_for_mode(country, normalize_fire_profile({"stay_mode": "seasonal"}))
@@ -138,7 +172,7 @@ class FireProfileTests(unittest.TestCase):
         self.assertEqual("conditional", seasonal["status"])
         self.assertEqual("not_eligible", relocation["status"])
 
-    def test_route_day_cap_is_inclusive_and_fails_closed_by_mobility_profile(self) -> None:
+    def test_annual_days_only_warn_about_route_period_limits(self) -> None:
         country = self.country_fixture()
         at_cap = eligibility_for_mode(
             country,
@@ -166,14 +200,15 @@ class FireProfileTests(unittest.TestCase):
         )
 
         self.assertEqual(("conditional", 90), (at_cap["status"], at_cap["max_days"]))
-        self.assertEqual(("not_eligible", None), (over_cap["status"], over_cap["stay_score"]))
-        self.assertIn("91", over_cap["reason"])
-        self.assertEqual("needs_verification", unknown_over_cap["status"])
-        self.assertEqual(("eligible", "local_permitted", None), (
+        self.assertIsNone(at_cap["day_warning"])
+        self.assertEqual(("conditional", 4.0), (over_cap["status"], over_cap["stay_score"]))
+        self.assertIn("annual total alone cannot determine compliance", over_cap["day_warning"].lower())
+        self.assertEqual("conditional", unknown_over_cap["status"])
+        self.assertEqual(("needs_verification", "unclear", None), (
             local_over_cap["status"], local_over_cap["work_permission"], local_over_cap["max_days"],
         ))
 
-    def test_actual_eu_and_nonlocal_profiles_select_different_portugal_routes(self) -> None:
+    def test_actual_eu_and_nonlocal_profiles_use_variant_specific_portugal_evidence(self) -> None:
         country = load_fire_abroad()["countries"]["Portugal"]
         local = eligibility_for_mode(country, normalize_fire_profile({
             "stay_mode": "seasonal", "mobility_rights": "local_free_movement", "annual_days": 120,
@@ -182,9 +217,25 @@ class FireProfileTests(unittest.TestCase):
             "stay_mode": "seasonal", "mobility_rights": "general_nonlocal", "annual_days": 120,
         }))
 
-        self.assertEqual("eligible", local["status"])
+        self.assertEqual("conditional", local["status"])
         self.assertEqual("local_permitted", local["work_permission"])
-        self.assertEqual("not_eligible", nonlocal_profile["status"])
+        self.assertIn("EU citizens", local["reason"])
+        self.assertIn("portugal-eu-mobility-1", local["source_ids"])
+        self.assertEqual("conditional", nonlocal_profile["status"])
+        self.assertIn("annual total alone cannot determine compliance", nonlocal_profile["day_warning"].lower())
+        self.assertNotEqual(local["reason"], nonlocal_profile["reason"])
+
+    def test_ambiguous_local_rights_fail_closed_without_nonlocal_visa_claims(self) -> None:
+        country = load_fire_abroad()["countries"]["Thailand"]
+        result = eligibility_for_mode(country, normalize_fire_profile({
+            "stay_mode": "full_relocation", "mobility_rights": "local_free_movement", "age": 18,
+        }))
+
+        self.assertEqual("needs_verification", result["status"])
+        self.assertIsNone(result["stay_score"])
+        self.assertEqual([], result["source_ids"])
+        self.assertIn("exact citizenship or treaty right", result["reason"])
+        self.assertNotIn("age 50", result["reason"])
 
 
 class ResilienceBudgetTests(unittest.TestCase):
@@ -293,7 +344,12 @@ class FireRankingTests(unittest.TestCase):
                     ),
                     "base_score": score,
                     "max_days": None,
+                    "minimum_age": None,
                     "work_permission": "remote_permitted",
+                    "summary": "The documented route fits the selected stay.",
+                    "source_ids": ["route-source"],
+                    "confidence": "high",
+                    "last_reviewed": "2026-08-25",
                 }
                 for mobility in ("local_free_movement", "general_nonlocal", "prefer_not_to_say")
             },

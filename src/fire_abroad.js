@@ -137,10 +137,10 @@
         max_days: null,
         confidence: "low",
         last_reviewed: null,
+        source_ids: [],
+        day_warning: null,
       };
     }
-    let status = route.status;
-    let summary = typeof route.summary === "string" && route.summary ? route.summary : "Route conditions require confirmation.";
     const selected = isObject(route.mobility_rights) && isObject(route.mobility_rights[normalized.mobility_rights])
       ? route.mobility_rights[normalized.mobility_rights] : null;
     if (!selected) {
@@ -152,31 +152,37 @@
         max_days: null,
         confidence: typeof route.confidence === "string" ? route.confidence : "low",
         last_reviewed: typeof route.last_reviewed === "string" ? route.last_reviewed : null,
+        source_ids: [],
+        day_warning: null,
       };
     }
-    status = selected.status;
+    let status = selected.status;
     let score = isNumber(selected.base_score) ? selected.base_score : null;
     const maxDays = Number.isInteger(selected.max_days) ? selected.max_days : null;
+    const summary = typeof selected.summary === "string" && selected.summary
+      ? selected.summary : "Mobility-rights-specific route conditions require confirmation.";
+    const sourceIds = Array.isArray(selected.source_ids) && selected.source_ids.every(function (item) {
+      return typeof item === "string" && item;
+    }) ? selected.source_ids.slice() : [];
     const workPermission = VALID_WORK_PERMISSIONS.has(selected.work_permission) ? selected.work_permission : "unclear";
-    if (normalized.mobility_rights !== "local_free_movement" && Number.isInteger(route.minimum_age) && normalized.age < route.minimum_age) {
+    if (Number.isInteger(selected.minimum_age) && normalized.age < selected.minimum_age) {
       return {
         status: "not_eligible",
-        reason: "This route requires an age of at least " + route.minimum_age + ".",
+        reason: "This route requires an age of at least " + selected.minimum_age + ".",
         work_permission: workPermission,
         stay_score: 0,
         max_days: maxDays,
-        confidence: typeof route.confidence === "string" ? route.confidence : "low",
-        last_reviewed: typeof route.last_reviewed === "string" ? route.last_reviewed : null,
+        confidence: typeof selected.confidence === "string" ? selected.confidence : "low",
+        last_reviewed: typeof selected.last_reviewed === "string" ? selected.last_reviewed : null,
+        source_ids: sourceIds,
+        day_warning: null,
       };
     }
+    let dayWarning = null;
     if (Number.isInteger(normalized.annual_days) && maxDays !== null && normalized.annual_days > maxDays) {
-      if (normalized.mobility_rights === "general_nonlocal") {
-        status = "not_eligible";
-        summary = "The selected " + normalized.annual_days + " days exceed this route's " + maxDays + "-day cap.";
-      } else {
-        status = "needs_verification";
-        summary = "The selected " + normalized.annual_days + " days exceed the documented " + maxDays + "-day cap; mobility rights need verification.";
-      }
+      dayWarning = "The approximate " + normalized.annual_days + "-day annual total exceeds this route's documented " +
+        maxDays + "-day stay limit. The annual total alone cannot determine compliance with a per-stay or rolling-window rule; " +
+        "confirm the intended travel pattern.";
     }
     if (!VALID_ELIGIBILITY.has(status)) status = "needs_verification";
     if (UNRANKED_STATUSES.has(status) || score === null) score = null;
@@ -193,8 +199,10 @@
       work_permission: workPermission,
       stay_score: score,
       max_days: maxDays,
-      confidence: typeof route.confidence === "string" ? route.confidence : "low",
-      last_reviewed: typeof route.last_reviewed === "string" ? route.last_reviewed : null,
+      confidence: typeof selected.confidence === "string" ? selected.confidence : "low",
+      last_reviewed: typeof selected.last_reviewed === "string" ? selected.last_reviewed : null,
+      source_ids: sourceIds,
+      day_warning: dayWarning,
     };
   }
 
@@ -401,6 +409,7 @@
         summary: eligibility.reason || "Route conditions require confirmation.",
         max_days: eligibility.max_days,
         work_permission: workPermissionLabel(eligibility.work_permission),
+        source_ids: Array.isArray(eligibility.source_ids) ? eligibility.source_ids.slice() : [],
       },
       tax_facts: {
         summary: taxMode.summary || "Selected-mode tax residence needs a separate review.",
@@ -488,6 +497,7 @@
         }, 0));
       }
       const warnings = Array.isArray(override.risk_warnings) ? override.risk_warnings.slice() : [];
+      if (typeof eligibility.day_warning === "string") warnings.push(eligibility.day_warning);
       if (profile.home_tax_context === "us_person") {
         warnings.push("US persons generally remain subject to U.S. worldwide filing and reporting obligations.");
       }
