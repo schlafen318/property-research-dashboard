@@ -11,7 +11,7 @@
   const STAY_MODES = new Set(["seasonal", "part_year", "full_relocation"]);
   const ACTIVITY_PRIORITIES = new Set(["balanced", "walking", "cycling", "hiking", "water", "winter_sports", "fitness_social"]);
   const EVENT_NAMES = new Set([
-    "page_view", "stay_mode_change", "activity_filter_use", "destination_guide_click", "calculator_handoff",
+    "stay_mode_change", "activity_filter_use", "destination_guide_click", "calculator_handoff",
   ]);
 
   function object(value) {
@@ -88,13 +88,37 @@
 
   function usd(value) {
     return typeof value === "number" && Number.isFinite(value)
-      ? "$" + Math.round(value).toLocaleString("en-US")
+      ? "USD " + Math.round(value).toLocaleString("en-US")
       : "Not available";
   }
 
   function confidenceLabel(value) {
-    const label = typeof value === "string" && value ? value.replaceAll("_", " ") : "low";
+    const label = typeof value === "string" && value ? value.replaceAll("_", " ").replaceAll("-", " ") : "low";
     return label.charAt(0).toUpperCase() + label.slice(1).toLowerCase();
+  }
+
+  function taxIncomeLabel(profile) {
+    return {
+      portfolio: "Portfolio income",
+      pension: "Pension income",
+      property: "Property income",
+      business_consulting: "Business or consulting income",
+      mixed: "Mixed income",
+    }[object(profile).income_type] || "Income category";
+  }
+
+  function resultSummary(results) {
+    const rows = Array.isArray(results) ? results : [];
+    const statuses = { eligible: 0, conditional: 0, needs_verification: 0, not_eligible: 0 };
+    rows.forEach(function (row) {
+      if (row && Object.prototype.hasOwnProperty.call(statuses, row.status)) statuses[row.status] += 1;
+      else statuses.needs_verification += 1;
+    });
+    const destinationNoun = rows.length === 1 ? "destination" : "destinations";
+    const verificationPhrase = statuses.needs_verification === 1 ? "1 needs verification" : statuses.needs_verification + " need verification";
+    return rows.length + " " + destinationNoun + " evaluated; " + statuses.eligible +
+      " eligible, " + statuses.conditional + " conditional, " + verificationPhrase +
+      (statuses.not_eligible ? ", " + statuses.not_eligible + " not currently eligible." : ".");
   }
 
   function resultDetails(row, profile) {
@@ -106,11 +130,23 @@
     const strongestActivity = typeof item.strongest_activity_reason === "string" && item.strongest_activity_reason
       ? " " + item.strongest_activity_reason : "";
     const destinationId = safeDestinationId(item.destination_id);
+    const stayFacts = object(item.stay_facts);
+    const taxFacts = object(item.tax_facts);
+    const healthFacts = object(item.healthcare_facts);
+    const financialFacts = object(item.financial_infrastructure_facts);
     const warnings = Array.isArray(item.warnings) ? item.warnings.filter(function (warning) {
       return typeof warning === "string" && warning;
     }).map(function (warning) {
       return "Planning warning: " + warning;
     }) : [];
+    let resilienceBudget = "Resilience budget: " + usd(budget.annual_total_usd) + " per year. " +
+      "Currency and inflation buffer: " + usd(budget.currency_inflation_buffer) + ". " +
+      "One-time relocation estimate: " + usd(budget.one_time_relocation_usd) + ".";
+    if ((object(profile).housing === "buy_now" || object(profile).housing === "buy_retirement") &&
+        typeof budget.property_capital_usd === "number" && Number.isFinite(budget.property_capital_usd)) {
+      resilienceBudget += " Property capital: " + usd(budget.property_capital_usd) + ".";
+    }
+    const stayCap = Number.isInteger(stayFacts.max_days) ? " Documented cap: " + stayFacts.max_days + " days." : "";
     return {
       name: typeof item.name === "string" && item.name ? item.name : destinationId,
       eligibilityLabel: eligibilityLabel,
@@ -118,14 +154,29 @@
       score: typeof item.score === "number" && Number.isFinite(item.score)
         ? "FIRE Abroad score: " + item.score.toFixed(2) + " out of 5."
         : "Ranking: Unranked until evidence is verified.",
-      resilienceBudget: "Resilience budget: " + usd(budget.annual_total_usd) + " per year. " +
-        "Currency and inflation buffer: " + usd(budget.currency_inflation_buffer) + ". " +
-        "One-time relocation estimate: " + usd(budget.one_time_relocation_usd) + ".",
+      resilienceBudget: resilienceBudget,
       activeLife: "Active Life: " + scoreLabel(components.active_life) + "." + strongestActivity,
       healthcare: "Healthcare Bridge: " + scoreLabel(components.healthcare_bridge) + ".",
       stayAndWork: "Stay Flexibility: " + scoreLabel(components.stay_flexibility) +
         ". Work permission: " + workPermissionLabel(item.work_permission) + ".",
       tax: "Tax Compatibility: " + scoreLabel(components.tax_compatibility) + ".",
+      evidenceSummary: "Selected-mode evidence",
+      evidenceDetails: [
+        "Stay: " + (stayFacts.summary || item.status_reason || "Route conditions require confirmation.") + stayCap +
+          " Work permission: " + (stayFacts.work_permission || workPermissionLabel(item.work_permission)) + ".",
+        "Tax: " + (taxFacts.summary || "Selected-mode tax residence needs a separate review.") +
+          " Resident scope: " + (taxFacts.scope_if_resident || "Resident scope needs jurisdiction-specific review.") +
+          " " + taxIncomeLabel(profile) + ": " + (taxFacts.income_category || "Income-category treatment needs review.") +
+          " Treaty/reporting: " + (taxFacts.treaty_reporting || "Treaty relief and reporting need professional review."),
+        "Healthcare: " + (healthFacts.eligibility || "Needs verification") +
+          ". Waiting/access: " + (healthFacts.waiting_period || "Waiting-period and access rules need verification.") +
+          " Age limits: " + (healthFacts.age_limits || "Age limits need verification.") +
+          " Pre-existing conditions: " + (healthFacts.pre_existing_conditions || "Written coverage terms need verification.") +
+          " Evacuation: " + (healthFacts.evacuation || "Evacuation and repatriation cover need verification."),
+        "Financial infrastructure: " + (financialFacts.banking || "Bank-account access needs verification.") +
+          " Transfers: " + (financialFacts.transfers || "International transfer access needs verification.") +
+          " Brokerage: " + (financialFacts.brokerage || "Brokerage access needs verification after a tax-home change."),
+      ],
       warnings: warnings,
       evidence: "Evidence: " + confidenceLabel(item.confidence) + " confidence; reviewed " +
         (typeof item.last_reviewed === "string" && item.last_reviewed ? item.last_reviewed : "not recorded") + ".",
@@ -260,6 +311,12 @@
         appendText(article, "p", details.healthcare);
         appendText(article, "p", details.stayAndWork);
         appendText(article, "p", details.tax);
+        const evidenceDetails = documentRoot.createElement("details");
+        appendText(evidenceDetails, "summary", details.evidenceSummary);
+        details.evidenceDetails.forEach(function (fact) {
+          appendText(evidenceDetails, "p", fact);
+        });
+        article.appendChild(evidenceDetails);
         details.warnings.forEach(function (warning) {
           appendText(article, "p", warning);
         });
@@ -280,14 +337,7 @@
         resultsNode.appendChild(article);
       });
       if (summaryNode) {
-        const statuses = { eligible: 0, conditional: 0, needs_verification: 0, not_eligible: 0 };
-        rows.forEach(function (row) {
-          if (Object.prototype.hasOwnProperty.call(statuses, row.status)) statuses[row.status] += 1;
-          else statuses.needs_verification += 1;
-        });
-        summaryNode.textContent = rows.length + " destinations evaluated; " + statuses.eligible +
-          " eligible, " + statuses.conditional + " conditional, " + statuses.needs_verification +
-          " need verification" + (statuses.not_eligible ? ", " + statuses.not_eligible + " not currently eligible." : ".");
+        summaryNode.textContent = resultSummary(rows);
       }
     }
 
@@ -307,8 +357,7 @@
     form.addEventListener("submit", update);
     form.addEventListener("change", update);
     resultsNode.addEventListener("click", handleResultClick);
-    track("page_view", {});
   }
 
-  return { safeCalculatorHref, safeAnalyticsPayload, resultRowsForDisplay, resultDetails, initFireAbroad };
+  return { safeCalculatorHref, safeAnalyticsPayload, resultRowsForDisplay, resultSummary, resultDetails, initFireAbroad };
 });

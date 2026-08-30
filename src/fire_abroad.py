@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import json
 from datetime import date
+from decimal import Decimal, ROUND_HALF_UP
+import math
 from pathlib import Path
 from typing import Any
 
@@ -83,6 +85,19 @@ COST_SCORE_ANCHORS = {
     "single": {"five": 30_000, "zero": 90_000},
     "couple": {"five": 45_000, "zero": 135_000},
 }
+REQUIRED_RETIREMENT_CATEGORIES = frozenset(
+    {
+        "food_household",
+        "utilities_communications",
+        "private_healthcare",
+        "transport",
+        "dining_leisure",
+        "travel",
+        "visa_admin",
+        "contingency",
+    }
+)
+_CONFIDENCE_PRIORITY = {"low": 0, "medium": 1, "medium_high": 2, "high": 3}
 
 _REVIEW_POLICY_KEYS = frozenset(
     {
@@ -143,6 +158,41 @@ def normalize_fire_profile(raw: dict) -> dict:
     return normalized
 
 
+def _round_half_up(value: float) -> float:
+    """Round a finite score or amount to two decimals in both runtimes."""
+
+    return float(
+        Decimal(str(value)).quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
+    )
+
+
+def _finite_nonnegative(value: object) -> bool:
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+        and value >= 0
+    )
+
+
+def _work_permission_label(value: object) -> str:
+    return {
+        "passive_only": "Passive income only",
+        "remote_permitted": "Remote work permitted",
+        "local_permitted": "Local work permitted",
+        "unclear": "Work permission needs professional review",
+    }.get(str(value), "Work permission needs professional review")
+
+
+def _eligibility_label(value: object) -> str:
+    return {
+        "eligible": "Eligible",
+        "conditional": "Conditional",
+        "needs_verification": "Needs verification",
+        "not_eligible": "Not currently eligible",
+    }.get(str(value), "Needs verification")
+
+
 def eligibility_for_mode(country: dict, profile: dict) -> dict:
     """Evaluate the selected stay route without guessing nationality-specific rights."""
 
@@ -155,9 +205,14 @@ def eligibility_for_mode(country: dict, profile: dict) -> dict:
             "reason": "No documented route is available for this stay mode.",
             "work_permission": "unclear",
             "stay_score": None,
+            "max_days": None,
+            "confidence": "low",
+            "last_reviewed": None,
         }
 
     status = route.get("status")
+    base_score = route.get("base_score")
+    max_days = route.get("max_days")
     summary = route.get("summary")
     summary = summary if isinstance(summary, str) and summary else "Route conditions require confirmation."
     work_permission = route.get("work_permission")
@@ -165,30 +220,70 @@ def eligibility_for_mode(country: dict, profile: dict) -> dict:
         work_permission = "unclear"
 
     rights = route.get("mobility_rights")
-    if isinstance(rights, dict):
-        selected = rights.get(profile["mobility_rights"])
-        if not isinstance(selected, str) or selected not in VALID_ELIGIBILITY:
-            return {
-                "status": "needs_verification",
-                "reason": "Nationality-dependent mobility rights must be confirmed.",
-                "work_permission": work_permission,
-                "stay_score": None,
-            }
-        status = selected
+    selected = rights.get(profile["mobility_rights"]) if isinstance(rights, dict) else None
+    if not isinstance(selected, dict):
+        return {
+            "status": "needs_verification",
+            "reason": "Nationality-dependent mobility rights must be confirmed.",
+            "work_permission": "unclear",
+            "stay_score": None,
+            "max_days": None,
+            "confidence": route.get("confidence", "low"),
+            "last_reviewed": route.get("last_reviewed"),
+        }
+    status = selected.get("status")
+    base_score = selected.get("base_score")
+    max_days = selected.get("max_days")
+    selected_work_permission = selected.get("work_permission")
+    work_permission = (
+        selected_work_permission
+        if selected_work_permission in VALID_WORK_PERMISSIONS
+        else "unclear"
+    )
 
     minimum_age = route.get("minimum_age")
-    if isinstance(minimum_age, int) and not isinstance(minimum_age, bool) and profile["age"] < minimum_age:
+    if (
+        profile["mobility_rights"] != "local_free_movement"
+        and isinstance(minimum_age, int)
+        and not isinstance(minimum_age, bool)
+        and profile["age"] < minimum_age
+    ):
         return {
             "status": "not_eligible",
             "reason": f"This route requires an age of at least {minimum_age}.",
             "work_permission": work_permission,
             "stay_score": 0.0,
+            "max_days": max_days,
+            "confidence": route.get("confidence", "low"),
+            "last_reviewed": route.get("last_reviewed"),
         }
+
+    annual_days = profile.get("annual_days")
+    if (
+        isinstance(annual_days, int)
+        and isinstance(max_days, int)
+        and annual_days > max_days
+    ):
+        if profile["mobility_rights"] == "general_nonlocal":
+            status = "not_eligible"
+            summary = (
+                f"The selected {annual_days} days exceed this route's {max_days}-day cap."
+            )
+        else:
+            status = "needs_verification"
+            summary = (
+                f"The selected {annual_days} days exceed the documented {max_days}-day cap; "
+                "mobility rights need verification."
+            )
 
     if status not in VALID_ELIGIBILITY:
         status = "needs_verification"
-    base_score = route.get("base_score")
-    if status in _UNRANKED_STATUSES or not isinstance(base_score, (int, float)) or isinstance(base_score, bool):
+    if (
+        status in _UNRANKED_STATUSES
+        or not isinstance(base_score, (int, float))
+        or isinstance(base_score, bool)
+        or not math.isfinite(float(base_score))
+    ):
         score = None
     else:
         score = float(base_score)
@@ -197,19 +292,25 @@ def eligibility_for_mode(country: dict, profile: dict) -> dict:
                 score -= 0.5
             elif work_permission == "unclear":
                 score -= 1.0
-        score = round(max(0.0, min(5.0, score)), 2)
+        score = _round_half_up(max(0.0, min(5.0, score)))
     return {
         "status": status,
         "reason": summary,
         "work_permission": work_permission,
         "stay_score": score,
+        "max_days": max_days,
+        "confidence": route.get("confidence", "low"),
+        "last_reviewed": route.get("last_reviewed"),
     }
 
 
 def annual_cost_score(annual_total_usd: float, household: str) -> float:
     anchors = COST_SCORE_ANCHORS[household]
-    ratio = (annual_total_usd - anchors["five"]) / (anchors["zero"] - anchors["five"])
-    return round(max(0.0, min(5.0, 5.0 * (1.0 - ratio))), 2)
+    total = Decimal(str(annual_total_usd))
+    five = Decimal(str(anchors["five"]))
+    zero = Decimal(str(anchors["zero"]))
+    score = Decimal("5") * (Decimal("1") - ((total - five) / (zero - five)))
+    return _round_half_up(max(Decimal("0"), min(Decimal("5"), score)))
 
 
 def build_resilience_budget(
@@ -218,14 +319,15 @@ def build_resilience_budget(
     """Build an annual screening budget without mixing recurring and one-time costs."""
 
     cost = cost if isinstance(cost, dict) else {}
+    usable = _has_usable_cost(cost, profile)
     profiles = cost.get("profiles", {})
     household_cost = profiles.get(profile["household"], {}) if isinstance(profiles, dict) else {}
     raw_categories = household_cost.get("categories_usd", {}) if isinstance(household_cost, dict) else {}
     categories = {
         key: value
         for key, value in raw_categories.items()
-        if isinstance(key, str) and isinstance(value, (int, float)) and not isinstance(value, bool)
-    } if isinstance(raw_categories, dict) else {}
+        if key in REQUIRED_RETIREMENT_CATEGORIES and _finite_nonnegative(value)
+    } if usable and isinstance(raw_categories, dict) else {}
 
     housing = profile["housing"]
     if housing in {"rent", "buy_retirement"}:
@@ -234,26 +336,45 @@ def build_resilience_budget(
     else:
         housing_cost = household_cost.get("annual_owner_costs_usd")
         housing_key = "owner_costs"
-    if isinstance(housing_cost, (int, float)) and not isinstance(housing_cost, bool):
+    if usable and _finite_nonnegative(housing_cost):
         categories[housing_key] = housing_cost
 
     property_record = cost.get("property", {}) if isinstance(cost.get("property"), dict) else {}
-    property_capital = 0
+    property_capital: float | int | None = 0
     if housing in {"buy_now", "buy_retirement"}:
-        price = property_record.get("representative_price_usd", 0)
-        rate = property_record.get("acquisition_cost_rate", 0)
-        if isinstance(price, (int, float)) and not isinstance(price, bool) and isinstance(rate, (int, float)) and not isinstance(rate, bool):
-            property_capital = round(price * (1 + rate), 2)
+        price = property_record.get("representative_price_usd")
+        rate = property_record.get("acquisition_cost_rate")
+        property_capital = (
+            _round_half_up(
+                Decimal(str(price)) * (Decimal("1") + Decimal(str(rate)))
+            )
+            if usable
+            and _finite_nonnegative(price)
+            and price > 0
+            and _finite_nonnegative(rate)
+            else None
+        )
 
-    recurring_without_contingency = sum(
-        value for key, value in categories.items() if key != "contingency"
-    )
-    # Use half-up rounding so the matching browser implementation has the same result.
-    currency_inflation_buffer = int(recurring_without_contingency * 0.10 + 0.5)
-    annual_total = round(sum(categories.values()) + currency_inflation_buffer, 2)
+    if usable:
+        recurring_without_contingency = sum(
+            (Decimal(str(value)) for key, value in categories.items() if key != "contingency"),
+            Decimal("0"),
+        )
+        currency_inflation_buffer = int(
+            (recurring_without_contingency * Decimal("0.10")).quantize(
+                Decimal("1"), rounding=ROUND_HALF_UP
+            )
+        )
+        annual_total = _round_half_up(
+            sum((Decimal(str(value)) for value in categories.values()), Decimal("0"))
+            + Decimal(currency_inflation_buffer)
+        )
+    else:
+        currency_inflation_buffer = None
+        annual_total = None
     override = destination_override if isinstance(destination_override, dict) else {}
     relocation = override.get("one_time_relocation_usd", 0)
-    if not isinstance(relocation, (int, float)) or isinstance(relocation, bool):
+    if not _finite_nonnegative(relocation):
         relocation = 0
     return {
         "annual_total_usd": annual_total,
@@ -279,24 +400,29 @@ def resolve_country_record(destination: dict, payload: dict) -> dict:
 def _numeric_score(value: Any) -> float | None:
     if isinstance(value, dict):
         value = value.get("score")
-    if isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value <= 5:
+    if (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(float(value))
+        and 0 <= value <= 5
+    ):
         return float(value)
     return None
 
 
-def active_life_score(record: dict) -> float:
+def active_life_score(record: dict) -> float | None:
     """Calculate the published Active Life composite from its four evidence components."""
 
     active_life = record.get("active_life", record) if isinstance(record, dict) else {}
     if not isinstance(active_life, dict):
-        return 0.0
-    total = 0.0
+        return None
+    total = Decimal("0")
     for component, weight in ACTIVE_LIFE_WEIGHTS.items():
         score = _numeric_score(active_life.get(component))
         if score is None:
-            return 0.0
-        total += score * weight
-    return round(total, 2)
+            return None
+        total += Decimal(str(score)) * Decimal(str(weight))
+    return _round_half_up(total)
 
 
 def _destination_score(destination: dict, dimension: str) -> float | None:
@@ -340,11 +466,188 @@ def _has_usable_cost(cost: object, profile: dict) -> bool:
     if not isinstance(profiles, dict):
         return False
     household_cost = profiles.get(profile["household"])
-    if not isinstance(household_cost, dict) or not isinstance(household_cost.get("categories_usd"), dict):
+    if not isinstance(household_cost, dict):
+        return False
+    categories = household_cost.get("categories_usd")
+    if not isinstance(categories, dict):
+        return False
+    if not REQUIRED_RETIREMENT_CATEGORIES.issubset(categories):
+        return False
+    if any(
+        not _finite_nonnegative(categories.get(category))
+        for category in REQUIRED_RETIREMENT_CATEGORIES
+    ):
         return False
     housing_key = "annual_rent_usd" if profile["housing"] in {"rent", "buy_retirement"} else "annual_owner_costs_usd"
     housing_cost = household_cost.get(housing_key)
-    return isinstance(housing_cost, (int, float)) and not isinstance(housing_cost, bool)
+    if not _finite_nonnegative(housing_cost):
+        return False
+    if profile["housing"] in {"buy_now", "buy_retirement"}:
+        property_record = cost.get("property")
+        if not isinstance(property_record, dict):
+            return False
+        price = property_record.get("representative_price_usd")
+        rate = property_record.get("acquisition_cost_rate")
+        if not _finite_nonnegative(price) or price <= 0 or not _finite_nonnegative(rate):
+            return False
+    return True
+
+
+def _normalize_confidence(value: object) -> str | None:
+    if not isinstance(value, str):
+        return None
+    normalized = value.strip().lower().replace("-", "_").replace(" ", "_")
+    return normalized if normalized in VALID_CONFIDENCE else None
+
+
+def _conservative_confidence(values: list[object]) -> str:
+    normalized = [_normalize_confidence(value) for value in values]
+    if not normalized or any(value is None for value in normalized):
+        return "low"
+    return min(normalized, key=lambda value: _CONFIDENCE_PRIORITY[value])
+
+
+def _earliest_review_date(values: list[object]) -> str | None:
+    if not values:
+        return None
+    parsed: list[date] = []
+    for value in values:
+        if not isinstance(value, str):
+            return None
+        try:
+            parsed.append(date.fromisoformat(value))
+        except ValueError:
+            return None
+    return min(parsed).isoformat() if parsed else None
+
+
+def _tax_income_category(flags: dict, income_type: str) -> str:
+    if not isinstance(flags, dict):
+        return "Income-category treatment needs jurisdiction-specific review."
+    keys = {
+        "portfolio": ("dividends", "capital_gains"),
+        "pension": ("pensions",),
+        "property": ("property_income",),
+        "mixed": ("pensions", "dividends", "capital_gains", "property_income"),
+    }.get(income_type)
+    if keys is None:
+        if income_type == "business_consulting":
+            return (
+                "Business or consulting income, work location, and permanent-establishment "
+                "questions need professional review."
+            )
+        return "Income-category treatment depends on the selected income mix."
+    selected = [flags.get(key) for key in keys]
+    return " ".join(value for value in selected if isinstance(value, str) and value) or (
+        "Income-category treatment needs jurisdiction-specific review."
+    )
+
+
+def _selected_evidence(
+    *,
+    eligibility: dict,
+    tax: dict,
+    tax_mode: dict,
+    health_mode: dict,
+    financial: dict,
+    override: dict,
+    cost: dict | None,
+    profile: dict,
+) -> dict:
+    flags = tax.get("category_flags", {}) if isinstance(tax, dict) else {}
+    cost_confidence = cost.get("confidence", {}) if isinstance(cost, dict) else {}
+    cost_confidence = (
+        cost_confidence.get("overall")
+        if isinstance(cost_confidence, dict)
+        else cost_confidence
+    )
+    active_life = (
+        override.get("active_life", {})
+        if isinstance(override.get("active_life"), dict)
+        else {}
+    )
+    confidences: list[object] = [
+        override.get("confidence"),
+        eligibility.get("confidence"),
+        tax.get("confidence"),
+        health_mode.get("confidence"),
+        financial.get("confidence"),
+        cost_confidence,
+        *[
+            active_life.get(component, {}).get("confidence")
+            if isinstance(active_life.get(component), dict)
+            else None
+            for component in ACTIVE_LIFE_WEIGHTS
+        ],
+    ]
+    cost_dates: list[object] = []
+    if isinstance(cost, dict) and isinstance(cost.get("sources"), list):
+        cost_dates = [
+            source.get("accessed_on")
+            for source in cost["sources"]
+            if isinstance(source, dict)
+        ]
+    if not cost_dates:
+        cost_dates = [None]
+    review_dates = [
+        override.get("last_reviewed"),
+        eligibility.get("last_reviewed"),
+        tax.get("last_reviewed"),
+        health_mode.get("last_reviewed"),
+        financial.get("last_reviewed"),
+        *cost_dates,
+    ]
+    banking_parts = [
+        financial.get("bank_account_opening"),
+        financial.get("tax_id_dependency"),
+    ]
+    transfer_parts = [
+        financial.get("international_transfer_friction"),
+        financial.get("international_payments"),
+    ]
+    return {
+        "stay_facts": {
+            "summary": eligibility.get("reason") or "Route conditions require confirmation.",
+            "max_days": eligibility.get("max_days"),
+            "work_permission": _work_permission_label(eligibility.get("work_permission")),
+        },
+        "tax_facts": {
+            "summary": tax_mode.get("summary")
+            or "Selected-mode tax residence needs a separate review.",
+            "scope_if_resident": tax.get("scope_if_resident")
+            or "Resident scope needs jurisdiction-specific review.",
+            "income_category": _tax_income_category(flags, profile["income_type"]),
+            "treaty_reporting": tax.get("treaty_reporting_note")
+            or "Treaty relief and reporting need professional review.",
+        },
+        "healthcare_facts": {
+            "eligibility": _eligibility_label(health_mode.get("eligibility")),
+            "waiting_period": health_mode.get("waiting_period_summary")
+            or "Waiting-period and access rules need verification.",
+            "age_limits": health_mode.get("age_limit_summary")
+            or "Age limits need verification.",
+            "pre_existing_conditions": health_mode.get(
+                "pre_existing_condition_summary"
+            )
+            or "Pre-existing-condition terms need verification.",
+            "evacuation": health_mode.get("evacuation_summary")
+            or "Evacuation and repatriation cover need verification.",
+        },
+        "financial_infrastructure_facts": {
+            "banking": " ".join(
+                part for part in banking_parts if isinstance(part, str) and part
+            )
+            or "Bank-account access needs verification.",
+            "transfers": " ".join(
+                part for part in transfer_parts if isinstance(part, str) and part
+            )
+            or "International transfer access needs verification.",
+            "brokerage": financial.get("brokerage_access")
+            or "Brokerage access needs verification after a tax-home change.",
+        },
+        "confidence": _conservative_confidence(confidences),
+        "last_reviewed": _earliest_review_date(review_dates),
+    }
 
 
 def rank_fire_abroad_destinations(
@@ -375,6 +678,11 @@ def rank_fire_abroad_destinations(
         healthcare = country.get("healthcare", {}) if isinstance(country.get("healthcare"), dict) else {}
         health_modes = healthcare.get("by_mode", {}) if isinstance(healthcare.get("by_mode"), dict) else {}
         health_mode = health_modes.get(mode, {}) if isinstance(health_modes.get(mode), dict) else {}
+        financial = (
+            country.get("financial_infrastructure", {})
+            if isinstance(country.get("financial_infrastructure"), dict)
+            else {}
+        )
 
         tax_score = _numeric_score(tax_mode.get("compatibility_score"))
         health_score = _numeric_score(health_mode.get("bridge_score"))
@@ -401,8 +709,20 @@ def rank_fire_abroad_destinations(
         rent_flexibility = _numeric_score(override.get("rent_flexibility_score"))
         property_exit = None
         if None not in (exit_liquidity, ownership_clarity, rent_flexibility):
-            property_exit = round((exit_liquidity + ownership_clarity + rent_flexibility) / 3, 2)
-        cost_score = annual_cost_score(budget["annual_total_usd"], profile["household"]) if _has_usable_cost(cost, profile) else None
+            property_exit = _round_half_up(
+                (
+                    Decimal(str(exit_liquidity))
+                    + Decimal(str(ownership_clarity))
+                    + Decimal(str(rent_flexibility))
+                )
+                / Decimal("3")
+            )
+        cost_score = (
+            annual_cost_score(budget["annual_total_usd"], profile["household"])
+            if _has_usable_cost(cost, profile)
+            and budget["annual_total_usd"] is not None
+            else None
+        )
         components = {
             "active_life": active,
             "sustainable_annual_cost": cost_score,
@@ -413,12 +733,19 @@ def rank_fire_abroad_destinations(
             "community_fit": community_fit,
             "property_exit_flexibility": property_exit,
         }
-        components = {key: round(value, 2) if value is not None else None for key, value in components.items()}
+        components = {
+            key: _round_half_up(value) if value is not None else None
+            for key, value in components.items()
+        }
         if any(value is None for value in components.values()) and status != "not_eligible":
             status = "needs_verification"
         score = None
         if status in {"eligible", "conditional"}:
-            score = round(sum(components[key] * FIRE_WEIGHTS[key] for key in FIRE_WEIGHTS), 2)
+            raw_score = sum(
+                Decimal(str(components[key])) * Decimal(str(FIRE_WEIGHTS[key]))
+                for key in FIRE_WEIGHTS
+            )
+            score = _round_half_up(raw_score)
 
         warnings = list(override.get("risk_warnings", [])) if isinstance(override.get("risk_warnings"), list) else []
         if profile["home_tax_context"] == "us_person":
@@ -438,6 +765,16 @@ def rank_fire_abroad_destinations(
         status_reason = eligibility["reason"]
         if status == "needs_verification" and evidence_missing:
             status_reason = "Tax or healthcare evidence for this stay mode needs verification."
+        evidence = _selected_evidence(
+            eligibility=eligibility,
+            tax=tax,
+            tax_mode=tax_mode,
+            health_mode=health_mode,
+            financial=financial,
+            override=override,
+            cost=cost,
+            profile=profile,
+        )
         results.append({
             "destination_id": destination_id,
             "name": destination.get("name", destination_id),
@@ -449,8 +786,10 @@ def rank_fire_abroad_destinations(
             "work_permission": eligibility["work_permission"],
             "warnings": warnings,
             "strongest_activity_reason": strongest_reason,
-            "confidence": override.get("confidence", "low"),
-            "last_reviewed": override.get("last_reviewed"),
+            "activity_tags": list(override.get("activity_tags", []))
+            if isinstance(override.get("activity_tags"), list)
+            else [],
+            **evidence,
         })
 
     confidence_rank = {"high": 0, "medium_high": 1, "medium": 2, "low": 3}
@@ -490,7 +829,7 @@ def validate_fire_abroad_payload(
     def score(value: Any, owner: str, path: str) -> None:
         if isinstance(value, bool) or not isinstance(value, (int, float)):
             add(owner, path, "must be a number from 0 through 5")
-        elif not 0 <= value <= 5:
+        elif not math.isfinite(float(value)) or not 0 <= value <= 5:
             add(owner, path, "must be from 0 through 5")
 
     def score_for_status(value: Any, status: Any, owner: str, path: str) -> None:
@@ -540,6 +879,7 @@ def validate_fire_abroad_payload(
             item_path = f"{path}[{index}]"
             if not isinstance(source_id, str) or not source_id:
                 add(owner, item_path, "must be a non-empty source ID")
+                continue
             elif source_id in seen:
                 add(owner, item_path, f"duplicates source ID {source_id!r}")
             elif source_id not in available:
@@ -671,15 +1011,31 @@ def validate_fire_abroad_payload(
             url = source.get("url")
             if not isinstance(url, str) or not url.startswith("https://"):
                 add(country_id, f"{source_path}.url", "must use HTTPS")
-            iso_date(source.get("source_date"), country_id, f"{source_path}.source_date")
+            source_date = iso_date(
+                source.get("source_date"),
+                country_id,
+                f"{source_path}.source_date",
+            )
             accessed = iso_date(
                 source.get("accessed_date"), country_id, f"{source_path}.accessed_date"
             )
+            if source_date and source_date > as_of:
+                add(
+                    country_id,
+                    f"{source_path}.source_date",
+                    f"cannot be after {as_of.isoformat()}",
+                )
             if accessed and accessed > as_of:
                 add(
                     country_id,
                     f"{source_path}.accessed_date",
                     f"cannot be after {as_of.isoformat()}",
+                )
+            if source_date and accessed and source_date > accessed:
+                add(
+                    country_id,
+                    f"{source_path}.source_date",
+                    f"cannot be after {source_path}.accessed_date",
                 )
         country_source_ids[country_id] = available
 
@@ -736,6 +1092,63 @@ def validate_fire_abroad_payload(
                 country_id,
                 f"stay_routes.{mode}.work_permission",
             )
+            mobility = mapping(
+                route.get("mobility_rights"),
+                country_id,
+                f"stay_routes.{mode}.mobility_rights",
+            )
+            expected_mobility = PROFILE_ALLOWLISTS["mobility_rights"]
+            if set(mobility) != expected_mobility:
+                add(
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights",
+                    f"must contain exactly {sorted(expected_mobility)}",
+                )
+            for mobility_profile in expected_mobility:
+                selected = mapping(
+                    mobility.get(mobility_profile),
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights.{mobility_profile}",
+                )
+                expected_fields = {
+                    "status", "base_score", "max_days", "work_permission"
+                }
+                if set(selected) != expected_fields:
+                    add(
+                        country_id,
+                        f"stay_routes.{mode}.mobility_rights.{mobility_profile}",
+                        f"must contain exactly {sorted(expected_fields)}",
+                    )
+                selected_status = selected.get("status")
+                enum(
+                    selected_status,
+                    VALID_ELIGIBILITY,
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights.{mobility_profile}.status",
+                )
+                score_for_status(
+                    selected.get("base_score"),
+                    selected_status,
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights.{mobility_profile}.base_score",
+                )
+                selected_max_days = selected.get("max_days")
+                if selected_max_days is not None and (
+                    isinstance(selected_max_days, bool)
+                    or not isinstance(selected_max_days, int)
+                    or selected_max_days <= 0
+                ):
+                    add(
+                        country_id,
+                        f"stay_routes.{mode}.mobility_rights.{mobility_profile}.max_days",
+                        "must be a positive integer or null",
+                    )
+                enum(
+                    selected.get("work_permission"),
+                    VALID_WORK_PERMISSIONS,
+                    country_id,
+                    f"stay_routes.{mode}.mobility_rights.{mobility_profile}.work_permission",
+                )
             source_refs(
                 route.get("source_ids"),
                 country_id,
@@ -991,7 +1404,11 @@ def validate_fire_abroad_payload(
             "rent_flexibility_score",
         )
         relocation = destination.get("one_time_relocation_usd")
-        if isinstance(relocation, bool) or not isinstance(relocation, (int, float)):
+        if (
+            isinstance(relocation, bool)
+            or not isinstance(relocation, (int, float))
+            or not math.isfinite(float(relocation))
+        ):
             add(destination_id, "one_time_relocation_usd", "must be a non-negative number")
         elif relocation < 0:
             add(destination_id, "one_time_relocation_usd", "must be non-negative")

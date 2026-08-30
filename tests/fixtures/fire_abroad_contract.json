@@ -1,4 +1,9 @@
 {
+  "rounding_ties": {
+    "annual_cost_score": {"annual_total_usd": 65940, "expected": 2.01},
+    "active_life_score": {"component_score": 4.005, "expected": 4.01},
+    "overall_score": {"raw_score": 4.005, "expected": 4.01}
+  },
   "cases": [
     {
       "name": "default",
@@ -22,7 +27,7 @@
       "name": "full_relocation_unavailable",
       "raw_profile": {"stay_mode": "full_relocation"},
       "normalized_profile": {"stay_mode": "full_relocation", "age": 50, "household": "single", "housing": "rent", "mobility_rights": "prefer_not_to_say", "home_tax_context": "prefer_not_to_say", "annual_days": null, "income_type": "prefer_not_to_say", "activity_priority": "balanced"},
-      "expected": {"ordered_ids": ["alpha"], "statuses": ["not_eligible"], "scores": [null], "annual_budgets": [60000], "warning_substrings": []}
+      "expected": {"ordered_ids": ["alpha"], "statuses": ["needs_verification"], "scores": [null], "annual_budgets": [60000], "warning_substrings": []}
     },
     {
       "name": "consulting_passive_only",

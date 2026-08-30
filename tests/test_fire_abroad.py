@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+import copy
 import unittest
 import json
+import math
 from pathlib import Path
 
 from src.fire_abroad import (
@@ -10,6 +12,7 @@ from src.fire_abroad import (
     eligibility_for_mode,
     normalize_fire_profile,
     active_life_score,
+    load_fire_abroad,
     rank_fire_abroad_destinations,
     resolve_country_record,
 )
@@ -22,18 +25,40 @@ class FireProfileTests(unittest.TestCase):
     """The change that should break these tests is incorrect profile/route handling."""
 
     def country_fixture(self, full_relocation_status: str = "eligible") -> dict:
-        def route(status: str, *, minimum_age: int | None = None) -> dict:
+        def route(status: str, *, minimum_age: int | None = None, max_days: int | None = None) -> dict:
+            score = 4.0 if status not in {"needs_verification", "not_eligible"} else None
             return {
                 "status": status,
-                "base_score": 4.0 if status != "needs_verification" else None,
+                "base_score": score,
+                "max_days": max_days,
                 "minimum_age": minimum_age,
                 "summary": "A documented route is available.",
                 "work_permission": "remote_permitted",
+                "mobility_rights": {
+                    "local_free_movement": {
+                        "status": "eligible",
+                        "base_score": 5.0,
+                        "max_days": None,
+                        "work_permission": "local_permitted",
+                    },
+                    "general_nonlocal": {
+                        "status": status,
+                        "base_score": score,
+                        "max_days": max_days,
+                        "work_permission": "remote_permitted",
+                    },
+                    "prefer_not_to_say": {
+                        "status": "needs_verification" if status in {"needs_verification", "not_eligible"} else status,
+                        "base_score": score,
+                        "max_days": max_days,
+                        "work_permission": "remote_permitted",
+                    },
+                },
             }
 
         return {
             "stay_routes": {
-                "seasonal": route("eligible"),
+                "seasonal": route("conditional", max_days=90),
                 "part_year": route("conditional", minimum_age=50),
                 "full_relocation": route(full_relocation_status),
             }
@@ -68,7 +93,7 @@ class FireProfileTests(unittest.TestCase):
     def test_every_stay_mode_uses_its_matching_route(self) -> None:
         country = self.country_fixture()
         self.assertEqual(
-            "eligible",
+            "conditional",
             eligibility_for_mode(country, normalize_fire_profile({"stay_mode": "seasonal"}))["status"],
         )
         self.assertEqual(
@@ -83,8 +108,14 @@ class FireProfileTests(unittest.TestCase):
     def test_missing_mobility_rights_are_never_promoted_to_eligibility(self) -> None:
         country = self.country_fixture()
         country["stay_routes"]["seasonal"]["mobility_rights"] = {
-            "local_free_movement": "eligible",
-            "general_nonlocal": "conditional",
+            "local_free_movement": {
+                "status": "eligible", "base_score": 5.0, "max_days": None,
+                "work_permission": "local_permitted",
+            },
+            "general_nonlocal": {
+                "status": "conditional", "base_score": 4.0, "max_days": 90,
+                "work_permission": "remote_permitted",
+            },
         }
         result = eligibility_for_mode(country, normalize_fire_profile({"stay_mode": "seasonal"}))
         self.assertEqual("needs_verification", result["status"])
@@ -98,10 +129,62 @@ class FireProfileTests(unittest.TestCase):
 
     def test_no_long_term_route_blocks_full_relocation_only(self) -> None:
         country = self.country_fixture(full_relocation_status="not_eligible")
-        seasonal = eligibility_for_mode(country, normalize_fire_profile({"stay_mode": "seasonal"}))
-        relocation = eligibility_for_mode(country, normalize_fire_profile({"stay_mode": "full_relocation"}))
-        self.assertEqual("eligible", seasonal["status"])
+        seasonal = eligibility_for_mode(country, normalize_fire_profile({
+            "stay_mode": "seasonal", "mobility_rights": "general_nonlocal",
+        }))
+        relocation = eligibility_for_mode(country, normalize_fire_profile({
+            "stay_mode": "full_relocation", "mobility_rights": "general_nonlocal",
+        }))
+        self.assertEqual("conditional", seasonal["status"])
         self.assertEqual("not_eligible", relocation["status"])
+
+    def test_route_day_cap_is_inclusive_and_fails_closed_by_mobility_profile(self) -> None:
+        country = self.country_fixture()
+        at_cap = eligibility_for_mode(
+            country,
+            normalize_fire_profile({
+                "stay_mode": "seasonal", "mobility_rights": "general_nonlocal", "annual_days": 90,
+            }),
+        )
+        over_cap = eligibility_for_mode(
+            country,
+            normalize_fire_profile({
+                "stay_mode": "seasonal", "mobility_rights": "general_nonlocal", "annual_days": 91,
+            }),
+        )
+        unknown_over_cap = eligibility_for_mode(
+            country,
+            normalize_fire_profile({
+                "stay_mode": "seasonal", "mobility_rights": "prefer_not_to_say", "annual_days": 91,
+            }),
+        )
+        local_over_cap = eligibility_for_mode(
+            country,
+            normalize_fire_profile({
+                "stay_mode": "seasonal", "mobility_rights": "local_free_movement", "annual_days": 365,
+            }),
+        )
+
+        self.assertEqual(("conditional", 90), (at_cap["status"], at_cap["max_days"]))
+        self.assertEqual(("not_eligible", None), (over_cap["status"], over_cap["stay_score"]))
+        self.assertIn("91", over_cap["reason"])
+        self.assertEqual("needs_verification", unknown_over_cap["status"])
+        self.assertEqual(("eligible", "local_permitted", None), (
+            local_over_cap["status"], local_over_cap["work_permission"], local_over_cap["max_days"],
+        ))
+
+    def test_actual_eu_and_nonlocal_profiles_select_different_portugal_routes(self) -> None:
+        country = load_fire_abroad()["countries"]["Portugal"]
+        local = eligibility_for_mode(country, normalize_fire_profile({
+            "stay_mode": "seasonal", "mobility_rights": "local_free_movement", "annual_days": 120,
+        }))
+        nonlocal_profile = eligibility_for_mode(country, normalize_fire_profile({
+            "stay_mode": "seasonal", "mobility_rights": "general_nonlocal", "annual_days": 120,
+        }))
+
+        self.assertEqual("eligible", local["status"])
+        self.assertEqual("local_permitted", local["work_permission"])
+        self.assertEqual("not_eligible", nonlocal_profile["status"])
 
 
 class ResilienceBudgetTests(unittest.TestCase):
@@ -113,7 +196,10 @@ class ResilienceBudgetTests(unittest.TestCase):
                 "single": {
                     "categories_usd": {
                         "food_household": 10000,
+                        "utilities_communications": 0,
                         "private_healthcare": 1000,
+                        "transport": 0,
+                        "dining_leisure": 0,
                         "travel": 600,
                         "visa_admin": 200,
                         "contingency": 1400,
@@ -169,6 +255,24 @@ class ResilienceBudgetTests(unittest.TestCase):
         self.assertEqual(0.0, annual_cost_score(90000, "single"))
         self.assertEqual(5.0, annual_cost_score(45000, "couple"))
 
+    def test_two_decimal_ties_use_half_up_rounding(self) -> None:
+        ties = json.loads((ROOT / "tests/fixtures/fire_abroad_contract.json").read_text())[
+            "rounding_ties"
+        ]
+        self.assertEqual(
+            ties["annual_cost_score"]["expected"],
+            annual_cost_score(ties["annual_cost_score"]["annual_total_usd"], "single"),
+        )
+        self.assertEqual(
+            ties["active_life_score"]["expected"],
+            active_life_score({
+                key: {"score": ties["active_life_score"]["component_score"]}
+                for key in (
+                    "everyday_movement", "active_pursuits", "year_round_continuity", "activity_ecosystem",
+                )
+            }),
+        )
+
 
 class FireRankingTests(unittest.TestCase):
     """The changes that should break these tests are wrong score composition or ordering."""
@@ -179,6 +283,20 @@ class FireRankingTests(unittest.TestCase):
             "base_score": score,
             "summary": "The documented route fits the selected stay.",
             "work_permission": "remote_permitted",
+            "max_days": None,
+            "confidence": "high",
+            "last_reviewed": "2026-08-25",
+            "mobility_rights": {
+                mobility: {
+                    "status": status if mobility != "prefer_not_to_say" else (
+                        "needs_verification" if status in {"needs_verification", "not_eligible"} else status
+                    ),
+                    "base_score": score,
+                    "max_days": None,
+                    "work_permission": "remote_permitted",
+                }
+                for mobility in ("local_free_movement", "general_nonlocal", "prefer_not_to_say")
+            },
         }
 
     def country(self, *, tax_score: float | None = 2.0, health_score: float | None = 3.0) -> dict:
@@ -187,11 +305,24 @@ class FireRankingTests(unittest.TestCase):
             "tax": {
                 "standard_day_threshold": 183,
                 "non_day_tests": "A permanent home can trigger a separate residence test.",
+                "scope_if_resident": "Residents generally enter worldwide-income scope.",
+                "category_flags": {
+                    "pensions": "Pension treatment needs treaty review.",
+                    "dividends": "Dividend treatment needs treaty review.",
+                    "capital_gains": "Capital-gains treatment depends on asset and source.",
+                    "property_income": "Local property income can remain taxable while nonresident.",
+                    "wealth": "Wealth-related rules need review.",
+                    "inheritance": "Inheritance rules need review.",
+                },
+                "treaty_reporting_note": "Treaty relief and reporting depend on the other jurisdiction.",
+                "confidence": "medium_high",
+                "last_reviewed": "2026-08-24",
                 "by_mode": {
                     mode: {
                         "status": "eligible" if tax_score is not None else "needs_verification",
                         "rankable": tax_score is not None,
                         "compatibility_score": tax_score,
+                        "summary": "Selected-mode tax residence needs a separate review.",
                     }
                     for mode in ("seasonal", "part_year", "full_relocation")
                 },
@@ -201,9 +332,24 @@ class FireRankingTests(unittest.TestCase):
                     mode: {
                         "eligibility": "eligible" if health_score is not None else "needs_verification",
                         "bridge_score": health_score,
+                        "waiting_period_summary": "Private cover is needed during any wait.",
+                        "age_limit_summary": "Policy entry ages vary.",
+                        "pre_existing_condition_summary": "Written coverage terms are required.",
+                        "evacuation_summary": "Confirm evacuation cover.",
+                        "confidence": "medium",
+                        "last_reviewed": "2026-08-23",
                     }
                     for mode in ("seasonal", "part_year", "full_relocation")
                 }
+            },
+            "financial_infrastructure": {
+                "bank_account_opening": "Banks require identity and address evidence.",
+                "tax_id_dependency": "A tax identifier may be required.",
+                "international_transfer_friction": "Transfers can require supporting documents.",
+                "international_payments": "International cards are generally available.",
+                "brokerage_access": "Broker access must be reconfirmed after a tax-home change.",
+                "confidence": "high",
+                "last_reviewed": "2026-08-22",
             },
         }
 
@@ -226,11 +372,12 @@ class FireRankingTests(unittest.TestCase):
         return {
             "country": country,
             "active_life": {
-                "everyday_movement": {"score": 4.0, "summary": "Daily cycling and year-round park access."},
-                "active_pursuits": {"score": 4.0, "summary": "Trails support regular outdoor pursuits."},
-                "year_round_continuity": {"score": 4.0, "summary": "The climate supports activity through the year."},
-                "activity_ecosystem": {"score": 4.0, "summary": "Local clubs create a social activity base."},
+                "everyday_movement": {"score": 4.0, "summary": "Daily cycling and year-round park access.", "confidence": "high"},
+                "active_pursuits": {"score": 4.0, "summary": "Trails support regular outdoor pursuits.", "confidence": "medium_high"},
+                "year_round_continuity": {"score": 4.0, "summary": "The climate supports activity through the year.", "confidence": "medium"},
+                "activity_ecosystem": {"score": 4.0, "summary": "Local clubs create a social activity base.", "confidence": "high"},
             },
+            "activity_tags": ["walking", "cycling"],
             "rent_flexibility_score": 3.0,
             "one_time_relocation_usd": 5000,
             "risk_warnings": ["Heat plans matter in midsummer."],
@@ -243,12 +390,23 @@ class FireRankingTests(unittest.TestCase):
             "destination_id": destination_id,
             "profiles": {
                 "single": {
-                    "categories_usd": {"living": 50000, "contingency": 0},
+                    "categories_usd": {
+                        "food_household": 50000,
+                        "utilities_communications": 0,
+                        "private_healthcare": 0,
+                        "transport": 0,
+                        "dining_leisure": 0,
+                        "travel": 0,
+                        "visa_admin": 0,
+                        "contingency": 0,
+                    },
                     "annual_rent_usd": 4545,
                     "annual_owner_costs_usd": 1000,
                 }
             },
             "property": {"representative_price_usd": 100000, "acquisition_cost_rate": 0.1},
+            "confidence": {"overall": "medium_high"},
+            "sources": [{"accessed_on": "2026-08-21"}],
         }
 
     def payload(self, countries: dict | None = None, overrides: dict | None = None) -> dict:
@@ -271,6 +429,20 @@ class FireRankingTests(unittest.TestCase):
         }
         self.assertEqual(3.75, active_life_score(record))
 
+    def test_missing_active_life_returns_none_and_unranks_the_destination(self) -> None:
+        override = self.override()
+        override["active_life"].pop("year_round_continuity")
+        self.assertIsNone(active_life_score(override))
+        result = rank_fire_abroad_destinations(
+            [self.destination("alpha", "Alpha")],
+            {"alpha": self.cost("alpha")},
+            self.payload(overrides={"alpha": override}),
+            normalize_fire_profile({}),
+        )[0]
+        self.assertEqual("needs_verification", result["status"])
+        self.assertIsNone(result["score"])
+        self.assertIsNone(result["components"]["active_life"])
+
     def test_ranking_composes_each_documented_dimension_and_weight(self) -> None:
         result = rank_fire_abroad_destinations(
             [self.destination("alpha", "Alpha")],
@@ -289,6 +461,30 @@ class FireRankingTests(unittest.TestCase):
         self.assertEqual(3.23, result["score"])
         self.assertEqual(60000, result["resilience_budget"]["annual_total_usd"])
         self.assertEqual("Daily cycling and year-round park access.", result["strongest_activity_reason"])
+        self.assertEqual(["walking", "cycling"], result["activity_tags"])
+
+    def test_selected_evidence_facts_and_conservative_review_metadata_are_attached(self) -> None:
+        profile = normalize_fire_profile({"income_type": "portfolio"})
+        result = rank_fire_abroad_destinations(
+            [self.destination("alpha", "Alpha")],
+            {"alpha": self.cost("alpha")}, self.payload(), profile,
+        )[0]
+
+        self.assertEqual("The documented route fits the selected stay.", result["stay_facts"]["summary"])
+        self.assertEqual("Remote work permitted", result["stay_facts"]["work_permission"])
+        self.assertEqual("Residents generally enter worldwide-income scope.", result["tax_facts"]["scope_if_resident"])
+        self.assertIn("Dividend treatment", result["tax_facts"]["income_category"])
+        self.assertIn("Capital-gains treatment", result["tax_facts"]["income_category"])
+        self.assertIn("Treaty relief", result["tax_facts"]["treaty_reporting"])
+        self.assertEqual("Private cover is needed during any wait.", result["healthcare_facts"]["waiting_period"])
+        self.assertEqual("Policy entry ages vary.", result["healthcare_facts"]["age_limits"])
+        self.assertEqual("Written coverage terms are required.", result["healthcare_facts"]["pre_existing_conditions"])
+        self.assertEqual("Confirm evacuation cover.", result["healthcare_facts"]["evacuation"])
+        self.assertIn("identity and address", result["financial_infrastructure_facts"]["banking"])
+        self.assertIn("supporting documents", result["financial_infrastructure_facts"]["transfers"])
+        self.assertIn("Broker access", result["financial_infrastructure_facts"]["brokerage"])
+        self.assertEqual("medium", result["confidence"])
+        self.assertEqual("2026-08-21", result["last_reviewed"])
 
     def test_missing_consolidated_dimension_is_unranked_without_a_legacy_fallback(self) -> None:
         destination = self.destination("alpha", "Alpha")
@@ -313,26 +509,74 @@ class FireRankingTests(unittest.TestCase):
         self.assertIsNone(result["components"]["tax_compatibility"])
 
     def test_malformed_cost_records_remain_unranked_without_zero_cost_substitution(self) -> None:
+        complete = self.cost("alpha")
         malformed_costs = {
             "empty_record": {},
             "empty_profiles": {"profiles": {}},
             "missing_selected_household": {"profiles": {"couple": {"categories_usd": {}, "annual_rent_usd": 1}}},
             "missing_required_housing_cost": {"profiles": {"single": {"categories_usd": {"living": 50000}}}},
+            "missing_required_category": copy.deepcopy(complete),
+            "empty_categories": copy.deepcopy(complete),
+            "negative_category": copy.deepcopy(complete),
+            "nan_category": copy.deepcopy(complete),
+            "infinite_housing": copy.deepcopy(complete),
+            "missing_buy_property": copy.deepcopy(complete),
+            "negative_buy_property_rate": copy.deepcopy(complete),
         }
+        malformed_costs["missing_required_category"]["profiles"]["single"]["categories_usd"].pop("travel")
+        malformed_costs["empty_categories"]["profiles"]["single"]["categories_usd"] = {}
+        malformed_costs["negative_category"]["profiles"]["single"]["categories_usd"]["travel"] = -1
+        malformed_costs["nan_category"]["profiles"]["single"]["categories_usd"]["travel"] = math.nan
+        malformed_costs["infinite_housing"]["profiles"]["single"]["annual_rent_usd"] = math.inf
+        malformed_costs["missing_buy_property"].pop("property")
+        malformed_costs["negative_buy_property_rate"]["property"]["acquisition_cost_rate"] = -0.1
         for name, cost in malformed_costs.items():
             with self.subTest(cost=name):
+                profile = normalize_fire_profile({
+                    "housing": "buy_now" if name in {"missing_buy_property", "negative_buy_property_rate"} else "rent",
+                })
                 result = rank_fire_abroad_destinations(
-                    [self.destination("alpha", "Alpha")], {"alpha": cost}, self.payload(), normalize_fire_profile({})
+                    [self.destination("alpha", "Alpha")], {"alpha": cost}, self.payload(), profile
                 )[0]
                 self.assertEqual("needs_verification", result["status"])
                 self.assertIsNone(result["score"])
                 self.assertIsNone(result["components"]["sustainable_annual_cost"])
+                self.assertIsNone(result["resilience_budget"]["annual_total_usd"])
+
+    def test_overall_score_uses_half_up_on_a_point_zero_zero_five_tie(self) -> None:
+        country = self.country(tax_score=4.0, health_score=4.0)
+        country["stay_routes"]["part_year"] = self.route("eligible", 4.0)
+        destination = self.destination("alpha", "Alpha")
+        destination["decision_dimensions"] = [
+            {"key": "global_access", "score": 4.0},
+            {"key": "foreigner_fit", "score": 4.0},
+        ]
+        destination["scores"]["exit_liquidity"]["score"] = 4.1
+        destination["scores"]["ownership_clarity"]["score"] = 4.1
+        override = self.override()
+        override["rent_flexibility_score"] = 4.1
+        cost = self.cost("alpha")
+        categories = cost["profiles"]["single"]["categories_usd"]
+        for key in categories:
+            categories[key] = 0
+        categories["food_household"] = 28000
+        categories["contingency"] = 200
+        cost["profiles"]["single"]["annual_rent_usd"] = 10000
+
+        result = rank_fire_abroad_destinations(
+            [destination], {"alpha": cost},
+            self.payload({"Example": country}, {"alpha": override}), normalize_fire_profile({}),
+        )[0]
+
+        self.assertEqual(42000, result["resilience_budget"]["annual_total_usd"])
+        self.assertEqual(4.1, result["components"]["property_exit_flexibility"])
+        self.assertEqual(4.01, result["score"])
 
     def test_rank_orders_status_score_confidence_then_name(self) -> None:
         countries = {"Example": self.country(), "Conditional": self.country()}
         countries["Conditional"]["stay_routes"]["part_year"] = self.route("conditional")
         overrides = {
-            "alpha": self.override("Example", "medium"),
+            "alpha": self.override("Example", "low"),
             "beta": self.override("Example", "high"),
             "able": self.override("Example", "high"),
             "conditional": self.override("Conditional", "high"),
@@ -369,6 +613,8 @@ class FireRankingTests(unittest.TestCase):
                 country["stay_routes"]["full_relocation"] = self.route("not_eligible")
             elif case["name"] == "consulting_passive_only":
                 country["stay_routes"]["part_year"]["work_permission"] = "passive_only"
+                for mapping in country["stay_routes"]["part_year"]["mobility_rights"].values():
+                    mapping["work_permission"] = "passive_only"
             result = rank_fire_abroad_destinations(
                 [self.destination("alpha", "Alpha")], {"alpha": self.cost("alpha")},
                 self.payload({"Example": country}, {"alpha": self.override()}), case["normalized_profile"],

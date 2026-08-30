@@ -7,7 +7,7 @@ from html import escape
 def _money(value: object) -> str:
     if not isinstance(value, (int, float)) or isinstance(value, bool):
         return "Not available"
-    return f"${value:,.0f}"
+    return f"USD {value:,.0f}"
 
 
 def _score(value: object) -> str:
@@ -54,14 +54,66 @@ def _default_result_rows(default_results: list[dict]) -> str:
         warnings = result.get("warnings", [])
         warning = next((item for item in warnings if isinstance(item, str) and item), "Verify current legal, tax, healthcare, and cost evidence before acting.")
         strongest_activity = result.get("strongest_activity_reason") or "Review the Active Life evidence for everyday movement and year-round continuity."
+        stay_facts = result.get("stay_facts", {})
+        stay_facts = stay_facts if isinstance(stay_facts, dict) else {}
+        tax_facts = result.get("tax_facts", {})
+        tax_facts = tax_facts if isinstance(tax_facts, dict) else {}
+        healthcare_facts = result.get("healthcare_facts", {})
+        healthcare_facts = healthcare_facts if isinstance(healthcare_facts, dict) else {}
+        financial_facts = result.get("financial_infrastructure_facts", {})
+        financial_facts = financial_facts if isinstance(financial_facts, dict) else {}
+        cap = stay_facts.get("max_days")
+        cap_text = f" Documented cap: {cap} days." if isinstance(cap, int) else ""
+        evidence_facts = (
+            "Stay: {stay}.{cap} Work permission: {work}.",
+            "Tax: {tax} Resident scope: {scope} Income category: {income} Treaty/reporting: {treaty}",
+            "Healthcare: {eligibility}. Waiting/access: {waiting} Age limits: {age} Pre-existing conditions: {preexisting} Evacuation: {evacuation}",
+            "Financial infrastructure: {banking} Transfers: {transfers} Brokerage: {brokerage}",
+        )
+        evidence_facts = (
+            evidence_facts[0].format(
+                stay=str(stay_facts.get("summary") or status_reason or "Route conditions require confirmation.").rstrip("."),
+                cap=cap_text,
+                work=str(stay_facts.get("work_permission") or _work_permission_label(result.get("work_permission"))),
+            ),
+            evidence_facts[1].format(
+                tax=str(tax_facts.get("summary") or "Selected-mode tax residence needs a separate review."),
+                scope=str(tax_facts.get("scope_if_resident") or "Resident scope needs jurisdiction-specific review."),
+                income=str(tax_facts.get("income_category") or "Income-category treatment needs review."),
+                treaty=str(tax_facts.get("treaty_reporting") or "Treaty relief and reporting need professional review."),
+            ),
+            evidence_facts[2].format(
+                eligibility=str(healthcare_facts.get("eligibility") or "Needs verification"),
+                waiting=str(healthcare_facts.get("waiting_period") or "Waiting-period and access rules need verification."),
+                age=str(healthcare_facts.get("age_limits") or "Age limits need verification."),
+                preexisting=str(healthcare_facts.get("pre_existing_conditions") or "Written coverage terms need verification."),
+                evacuation=str(healthcare_facts.get("evacuation") or "Evacuation and repatriation cover need verification."),
+            ),
+            evidence_facts[3].format(
+                banking=str(financial_facts.get("banking") or "Bank-account access needs verification."),
+                transfers=str(financial_facts.get("transfers") or "International transfer access needs verification."),
+                brokerage=str(financial_facts.get("brokerage") or "Brokerage access needs verification after a tax-home change."),
+            ),
+        )
+        evidence_details = "".join(
+            f"<p>{escape(fact)}</p>" for fact in evidence_facts
+        )
+        property_capital = budget.get("property_capital_usd")
+        property_text = (
+            f"<small>Property capital: {_money(property_capital)}</small>"
+            if isinstance(property_capital, (int, float))
+            and not isinstance(property_capital, bool)
+            and property_capital > 0
+            else ""
+        )
         rows.append(
             f"""
           <tr data-fire-result="{destination_id}">
             <th scope="row" data-label="Destination"><a href="/destinations/{destination_id}/" data-fire-track="destination_guide_click" data-fire-destination-id="{destination_id}">{name}</a><span>{escape(status)}</span><small>{status_reason}</small></th>
             <td data-label="FIRE Abroad score"><strong>{escape(score_text)}</strong><span>Active Life: {_score(components.get("active_life"))}</span><small>{escape(str(strongest_activity))}</small></td>
-            <td data-label="Resilience budget"><strong>{_money(budget.get("annual_total_usd"))} per year</strong><span>Currency and inflation buffer: {_money(budget.get("currency_inflation_buffer"))}</span><small>One-time relocation estimate: {_money(budget.get("one_time_relocation_usd"))}</small></td>
+            <td data-label="Resilience budget"><strong>{_money(budget.get("annual_total_usd"))} per year</strong><span>Currency and inflation buffer: {_money(budget.get("currency_inflation_buffer"))}</span><small>One-time relocation estimate: {_money(budget.get("one_time_relocation_usd"))}</small>{property_text}</td>
             <td data-label="Planning checks"><span>Healthcare Bridge: {_score(components.get("healthcare_bridge"))}</span><span>Stay Flexibility: {_score(components.get("stay_flexibility"))}</span><span>{escape(_work_permission_label(result.get("work_permission")))}</span><span>Tax Compatibility: {_score(components.get("tax_compatibility"))}</span><small>{escape(str(warning))}</small></td>
-            <td data-label="Evidence and next steps"><span>{escape(str(result.get("confidence", "low")).replace("_", " ").title())} confidence</span><span>Evidence reviewed {escape(str(result.get("last_reviewed") or "not recorded"))}</span><a href="/retirement-abroad-calculator/?destination={destination_id}&amp;household=single&amp;housing=rent" data-fire-track="calculator_handoff" data-fire-destination-id="{destination_id}">Build your plan</a><a href="/destinations/{destination_id}/" data-fire-track="destination_guide_click" data-fire-destination-id="{destination_id}">Read destination guide</a></td>
+            <td data-label="Evidence and next steps"><span>{escape(str(result.get("confidence", "low")).replace("_", " ").replace("-", " ").title())} confidence</span><span>Evidence reviewed {escape(str(result.get("last_reviewed") or "not recorded"))}</span><details class="fire-result-evidence"><summary>Selected-mode evidence</summary>{evidence_details}</details><a href="/retirement-abroad-calculator/?destination={destination_id}&amp;household=single&amp;housing=rent" data-fire-track="calculator_handoff" data-fire-destination-id="{destination_id}">Build your plan</a><a href="/destinations/{destination_id}/" data-fire-track="destination_guide_click" data-fire-destination-id="{destination_id}">Read destination guide</a></td>
           </tr>""".rstrip()
         )
     return "\n".join(rows)
@@ -117,9 +169,11 @@ def build_fire_abroad_html(
         1 for result in default_results if isinstance(result.get("score"), (int, float))
     )
     unranked_count = len(default_results) - ranked_count
-    summary = f"{ranked_count} ranked destinations"
+    ranked_noun = "destination" if ranked_count == 1 else "destinations"
+    summary = f"{ranked_count} ranked {ranked_noun}"
     if unranked_count:
-        summary += f"; {unranked_count} need verification."
+        verification_verb = "needs" if unranked_count == 1 else "need"
+        summary += f"; {unranked_count} {verification_verb} verification."
     else:
         summary += "."
     result_rows = _default_result_rows(default_results)
@@ -156,6 +210,9 @@ def build_fire_abroad_html(
     .fire-abroad-page .fire-results-table span, .fire-abroad-page .fire-results-table small, .fire-abroad-page .fire-results-table a {{ display: block; margin-top: 7px; }}
     .fire-abroad-page .fire-results-table a {{ min-height: 44px; display: flex; align-items: center; }}
     .fire-abroad-page .fire-results-table small {{ color: var(--gha-muted); font-size: 12px; }}
+    .fire-abroad-page .fire-result-evidence {{ margin-top: 8px; }}
+    .fire-abroad-page .fire-result-evidence summary {{ min-height: 44px; display: flex; align-items: center; cursor: pointer; }}
+    .fire-abroad-page .fire-result-evidence p {{ margin: 7px 0; color: var(--gha-muted); font-size: 12px; }}
     .fire-abroad-page #fire-results > article {{ padding: 24px 0; border-top: 1px solid var(--gha-rule); }}
     .fire-abroad-page #fire-results > article h2 {{ margin: 0 0 10px; font-size: 28px; }}
     .fire-abroad-page #fire-results > article p {{ max-width: 780px; margin: 7px 0; }}
@@ -213,7 +270,7 @@ def build_fire_abroad_html(
     <h2 id="fire-results-heading">Default FIRE Abroad ranking</h2>
     <p id="fire-results-summary" aria-live="polite">{escape(summary)}</p>
     <noscript><p>JavaScript is optional. The default part-year ranking remains available below; use the linked destination research and calculator to continue planning.</p></noscript>
-    <div id="fire-results" aria-live="polite"><div class="fire-table-wrap"><table class="fire-results-table"><caption>Age 50, single household, renting a part-year base</caption><thead><tr><th>Destination and eligibility</th><th>Score and Active Life</th><th>Resilience budget</th><th>Planning checks</th><th>Evidence and next steps</th></tr></thead><tbody>
+    <div id="fire-results"><div class="fire-table-wrap"><table class="fire-results-table"><caption>Age 50, single household, renting a part-year base</caption><thead><tr><th>Destination and eligibility</th><th>Score and Active Life</th><th>Resilience budget</th><th>Planning checks</th><th>Evidence and next steps</th></tr></thead><tbody>
 {result_rows}
     </tbody></table></div></div>
   </section>

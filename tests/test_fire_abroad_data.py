@@ -70,6 +70,37 @@ class FireAbroadDataTests(unittest.TestCase):
         )
         self.assertEqual([], self.validate(payload))
 
+    def test_every_route_defines_all_mobility_profiles_with_route_specific_caps(self) -> None:
+        payload = load_fire_abroad()
+        expected_profiles = {
+            "local_free_movement", "general_nonlocal", "prefer_not_to_say",
+        }
+        for country_id, country in payload["countries"].items():
+            for mode, route in country["stay_routes"].items():
+                with self.subTest(country=country_id, mode=mode):
+                    self.assertEqual(expected_profiles, set(route["mobility_rights"]))
+                    for profile, mapping in route["mobility_rights"].items():
+                        self.assertEqual(
+                            {"status", "base_score", "max_days", "work_permission"},
+                            set(mapping),
+                            f"{country_id} stay_routes.{mode}.mobility_rights.{profile}",
+                        )
+
+    def test_algarve_continuity_and_fire_warning_use_direct_official_evidence(self) -> None:
+        payload = load_fire_abroad()
+        portugal = payload["countries"]["Portugal"]
+        sources = {source["id"]: source for source in portugal["sources"]}
+        algarve = payload["destination_overrides"]["algarve-cascais"]
+        continuity_sources = set(
+            algarve["active_life"]["year_round_continuity"]["source_ids"]
+        )
+
+        self.assertIn("portugal-algarve-climate-1", continuity_sources)
+        self.assertIn("portugal-algarve-fire-1", set(algarve["source_ids"]))
+        self.assertEqual("www.ipma.pt", sources["portugal-algarve-climate-1"]["url"].split("/")[2])
+        self.assertEqual("prociv.gov.pt", sources["portugal-algarve-fire-1"]["url"].split("/")[2])
+        self.assertIn("fire", sources["portugal-algarve-fire-1"]["metric_supported"].lower())
+
     def test_launch_critical_verification_gaps_are_unranked(self) -> None:
         payload = load_fire_abroad()
         stay_gaps = (
@@ -267,6 +298,47 @@ class FireAbroadDataTests(unittest.TestCase):
             self.assertTrue(
                 any(owner in error and field in error for error in errors), errors
             )
+
+    def test_non_string_source_reference_accumulates_an_error_without_crashing(self) -> None:
+        payload = copy.deepcopy(load_fire_abroad())
+        payload["destination_overrides"]["bali"]["source_ids"].append(
+            {"not": "hashable"}
+        )
+
+        try:
+            errors = self.validate(payload)
+        except Exception as exc:  # pragma: no cover - the assertion names the regression
+            self.fail(f"validator raised instead of accumulating an error: {exc!r}")
+
+        self.assertTrue(
+            any("bali" in error and "source_ids[" in error for error in errors),
+            errors,
+        )
+
+    def test_source_dates_cannot_be_future_or_after_access(self) -> None:
+        payload = copy.deepcopy(load_fire_abroad())
+        future_source = payload["countries"]["Portugal"]["sources"][0]
+        future_source["source_date"] = "2026-08-30"
+        future_access = payload["countries"]["Spain"]["sources"][0]
+        future_access["accessed_date"] = "2026-08-30"
+        reversed_dates = payload["countries"]["Greece"]["sources"][0]
+        reversed_dates["source_date"] = "2026-08-29"
+        reversed_dates["accessed_date"] = "2026-08-28"
+
+        errors = self.validate(payload)
+
+        self.assertTrue(any(
+            "Portugal" in error and "source_date" in error and "cannot be after" in error
+            for error in errors
+        ), errors)
+        self.assertTrue(any(
+            "Spain" in error and "accessed_date" in error and "cannot be after" in error
+            for error in errors
+        ), errors)
+        self.assertTrue(any(
+            "Greece" in error and "source_date" in error and "accessed_date" in error
+            for error in errors
+        ), errors)
 
 
 if __name__ == "__main__":

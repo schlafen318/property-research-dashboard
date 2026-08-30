@@ -9,6 +9,7 @@ import unittest
 from urllib.parse import parse_qs, urlsplit
 from html.parser import HTMLParser
 
+import src.build_unified_app as build_module
 from src.build_unified_app import (
     FIRE_ABROAD_DESCRIPTION,
     FIRE_ABROAD_SLUG,
@@ -22,6 +23,7 @@ from src.build_unified_app import (
     load_retirement_costs,
 )
 from src.fire_abroad import CANONICAL_LAUNCH_IDS, load_fire_abroad
+from src.fire_abroad_page import _default_result_rows, build_fire_abroad_html
 
 
 class FireAbroadMarkupParser(HTMLParser):
@@ -100,7 +102,6 @@ class FireAbroadPageTests(unittest.TestCase):
             "const EVENT_NAMES", 1
         )[1].split("function resultRowsForDisplay", 1)[0]
         for event_name in (
-            "page_view",
             "stay_mode_change",
             "activity_filter_use",
             "destination_guide_click",
@@ -137,20 +138,27 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn("<h1>FIRE Abroad</h1>", self.html)
         self.assertIn("financial independence", self.html.lower())
         self.assertIn('data-default-stay-mode="part_year"', self.html)
-        self.assertIn('id="fire-results" aria-live="polite"', self.html)
+        self.assertNotIn('id="fire-results" aria-live=', self.html)
         self.assertIn('id="fire-results-summary" aria-live="polite"', self.html)
         self.assertIn("Immigration status and tax residence are separate", self.html)
         self.assertIn("Active Life", self.html)
         self.assertIn("Resilience budget", self.html)
         self.assertIn("Algarve / Cascais", self.html)
-        self.assertIn("FIRE Abroad score: 3.70 out of 5", self.html)
+        self.assertIn("FIRE Abroad score: 3.69 out of 5", self.html)
         self.assertIn("Needs verification", self.html)
         self.assertIn("Healthcare Bridge:", self.html)
         self.assertIn("Stay Flexibility:", self.html)
         self.assertIn("Tax Compatibility:", self.html)
         self.assertIn("Passive income only", self.html)
-        self.assertIn("Medium High confidence", self.html)
-        self.assertIn("Evidence reviewed 2026-08-29", self.html)
+        self.assertIn("Selected-mode evidence", self.html)
+        self.assertIn(
+            self.fire_payload["countries"]["Portugal"]["tax"]["scope_if_resident"],
+            self.html,
+        )
+        self.assertIn("Pre-existing conditions", self.html)
+        self.assertIn("Brokerage", self.html)
+        self.assertIn("USD ", self.html)
+        self.assertNotIn("$", self.html.split('<script id="fire-abroad-data"', 1)[0])
         self.assertEqual(10, self.html.count(">Build your plan</a>"))
         self.assertEqual(10, self.html.count('<tr data-fire-result="'))
         self.assertLess(self.html.index("Algarve / Cascais"), self.html.index("Da Nang / Hoi An"))
@@ -210,7 +218,7 @@ class FireAbroadPageTests(unittest.TestCase):
         }
         self.assertTrue(expected_controls.issubset(parser.control_ids))
         self.assertTrue(expected_controls.issubset(parser.label_targets))
-        self.assertIn("fire-results-summary", parser.live_region_ids)
+        self.assertEqual({"fire-results-summary"}, parser.live_region_ids)
         self.assertGreaterEqual(parser.noscript_sections, 1)
         self.assertIn('<form id="fire-abroad-form" class="fire-profile" novalidate>', self.html)
 
@@ -341,6 +349,59 @@ class FireAbroadPageTests(unittest.TestCase):
                     3,
                     self.html.count(f'data-fire-destination-id="{destination_id}"'),
                 )
+
+    def test_configured_ga_uses_only_the_global_automatic_page_view(self) -> None:
+        previous = build_module.GA4_MEASUREMENT_ID
+        try:
+            build_module.GA4_MEASUREMENT_ID = "G-FIRETEST"
+            rendered = build_fire_abroad_page(
+                self.destinations, self.retirement_costs, self.fire_payload
+            )
+        finally:
+            build_module.GA4_MEASUREMENT_ID = previous
+
+        self.assertEqual(1, rendered.count('"send_page_view": true'))
+        self.assertEqual(1, rendered.count('gtag("config", "G-FIRETEST"'))
+        self.assertNotIn('track("page_view"', rendered)
+
+    def test_static_rows_show_property_capital_only_when_present_and_label_usd(self) -> None:
+        result = {
+            "destination_id": "valencia",
+            "name": "Valencia",
+            "status": "eligible",
+            "score": 4.0,
+            "components": {},
+            "resilience_budget": {
+                "annual_total_usd": 50_000,
+                "currency_inflation_buffer": 4_000,
+                "one_time_relocation_usd": 6_000,
+                "property_capital_usd": 250_000,
+            },
+        }
+        with_capital = _default_result_rows([result])
+        self.assertIn("Property capital: USD 250,000", with_capital)
+        self.assertNotIn("$", with_capital)
+        result["resilience_budget"]["property_capital_usd"] = None
+        self.assertNotIn("Property capital", _default_result_rows([result]))
+
+    def test_static_summary_pluralizes_single_ranked_and_verification_counts(self) -> None:
+        base = {
+            "head": "", "navigation": "", "engine_js": "", "ui_js": "",
+            "design_css": "", "analytics": "", "footer": "",
+            "payload_json": json.dumps(
+                {"fire_payload": {}, "retirement_costs": {}}
+            ),
+        }
+        ranked = build_fire_abroad_html(
+            **base,
+            default_results=[{"destination_id": "one", "score": 4.0}],
+        )
+        unranked = build_fire_abroad_html(
+            **base,
+            default_results=[{"destination_id": "one", "score": None}],
+        )
+        self.assertIn(">1 ranked destination.<", ranked)
+        self.assertIn(">0 ranked destinations; 1 needs verification.<", unranked)
 
     def test_methodology_evidence_and_no_javascript_fallback_are_visible(self) -> None:
         self.assertIn("25% Active Life", self.html)
