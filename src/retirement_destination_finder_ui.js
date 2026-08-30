@@ -601,8 +601,14 @@
         errors.push("Enter the maximum amount available for a property purchase.");
       }
       const activeSection = element(wizardSectionIds[stepIndex]);
-      const invalidControl = Array.from(activeSection.querySelectorAll("input, select, textarea")).find(function (control) {
-        return !control.disabled && typeof control.checkValidity === "function" && !control.checkValidity();
+      let invalidControl = null;
+      Array.from(activeSection.querySelectorAll("input, select, textarea")).forEach(function (control) {
+        if (control.disabled || typeof control.checkValidity !== "function") return;
+        if (control.checkValidity()) {
+          control.removeAttribute("aria-invalid");
+        } else if (!invalidControl) {
+          invalidControl = control;
+        }
       });
       if (invalidControl) {
         invalidControl.setAttribute("aria-invalid", "true");

@@ -293,6 +293,7 @@ for (const action of input.wizardActions || []) {
     el("finder-purchase-method").dispatch("change");
   }
   if (action === "invalid-ltv") el("finder-requested-ltv").value = "101";
+  if (action === "correct-return") el("finder-return").value = "5";
   if (action === "desktop") {
     mediaQuery.matches = false;
     mediaListeners.forEach((callback) => callback({ matches: false }));
@@ -370,6 +371,7 @@ process.stdout.write(JSON.stringify({
   wizardNextText: el("finder-wizard-next").textContent,
   wizardSectionHidden: wizardSections.map((section) => section.hidden),
   wizardErrorHidden: el("finder-errors").hidden,
+  returnAriaInvalid: el("finder-return").attributes["aria-invalid"] || "",
   adjustPlanHidden: el("finder-adjust-plan").hidden,
   trackedEvents,
 }));
@@ -440,6 +442,19 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertEqual([False, True, True, True], scenario["wizardSectionHidden"])
         self.assertFalse(scenario["wizardErrorHidden"])
         self.assertEqual(0, scenario["engineCalls"])
+
+    def test_mobile_wizard_clears_native_invalid_state_after_correction(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "invalidReturnStep": True,
+                "wizardActions": ["next", "correct-return", "next"],
+            }
+        )
+
+        self.assertEqual("Step 2 of 4", scenario["wizardStepText"])
+        self.assertEqual("", scenario["returnAriaInvalid"])
 
     def test_mobile_wizard_reports_invalid_conditional_mortgage_field_on_step_two(self) -> None:
         scenario = run_ui_dom_scenario(
