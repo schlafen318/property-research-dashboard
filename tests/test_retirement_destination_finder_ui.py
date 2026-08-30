@@ -251,6 +251,7 @@ const fakeWindow = {
       engineInput = request;
       engineInputs.push(request);
       engineCalls += 1;
+      if (engineCalls === input.failEngineCall) throw new Error("Calculation failed");
       return input.engineResult || {
         summary: { withinReachCount: 0, closeCount: 0, stretchCount: 0 },
         sharedProjection: null,
@@ -368,6 +369,7 @@ process.stdout.write(JSON.stringify({
   shareUrlHidden: el("finder-share-url").hidden,
   sharedErrorHidden: el("finder-shared-error").hidden,
   resultsHidden: el("finder-results").hidden,
+  planSummaryHidden: el("finder-plan-summary").hidden,
   landscapeHidden: el("finder-capital-landscape").hidden,
   matchesHidden: el("finder-matches-section").hidden,
   projectionHidden: el("finder-projection-section").hidden,
@@ -548,6 +550,37 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertEqual("Rent a home", scenario["reviewHousing"])
         self.assertEqual("No continuing income", scenario["reviewIncome"])
         self.assertEqual("Any region · Any setting · Healthcare: important", scenario["reviewPreferences"])
+
+    def test_results_summary_tracks_the_selected_display_currency(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1, "EUR": 1.1},
+                "submitBeforeCurrency": True,
+                "currency": "EUR",
+            }
+        )
+
+        self.assertEqual(
+            "EUR 455,000 today · EUR 1,800/month, inflation-linked · 4% return",
+            scenario["reviewCapital"],
+        )
+
+    def test_failed_recalculation_preserves_the_last_successful_plan_summary(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "submitBeforeCurrency": True,
+                "editLiquid": "900,000",
+                "failEngineCall": 2,
+                "submit": True,
+            }
+        )
+
+        self.assertEqual(2, scenario["engineCalls"])
+        self.assertEqual(
+            "USD 500,000 today · USD 2,000/month, inflation-linked · 4% return",
+            scenario["reviewCapital"],
+        )
 
     def test_results_summary_includes_conditional_housing_and_income_assumptions(self) -> None:
         scenario = run_ui_dom_scenario(
@@ -1623,6 +1656,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
 
         self.assertEqual("Showing: Water setting (legacy)", state["activeFilters"])
         self.assertIn("Lake Como", state["recommendationsHtml"])
+        self.assertTrue(state["planSummaryHidden"])
 
     def test_shared_buy_now_snapshot_does_not_invent_zero_property_values(self) -> None:
         source = UI.read_text()
