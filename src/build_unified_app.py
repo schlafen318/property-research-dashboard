@@ -14,6 +14,13 @@ from urllib.parse import urlparse
 
 try:
     from src.country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
+    from src.fire_abroad import (
+        load_fire_abroad,
+        normalize_fire_profile,
+        rank_fire_abroad_destinations,
+        validate_fire_abroad_payload,
+    )
+    from src.fire_abroad_page import build_fire_abroad_html
     from src.foreign_buyer_country_guides import (
         build_foreign_buyer_country_guide,
         get_foreign_buyer_country_guide,
@@ -37,6 +44,13 @@ try:
     )
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
+    from fire_abroad import (
+        load_fire_abroad,
+        normalize_fire_profile,
+        rank_fire_abroad_destinations,
+        validate_fire_abroad_payload,
+    )
+    from fire_abroad_page import build_fire_abroad_html
     from foreign_buyer_country_guides import (
         build_foreign_buyer_country_guide,
         get_foreign_buyer_country_guide,
@@ -134,6 +148,12 @@ RETIREMENT_FINDER_DESCRIPTION = (
     "Project your retirement savings and monthly investing, then compare destinations "
     "you may be able to afford when renting or buying abroad."
 )
+FIRE_ABROAD_SLUG = "fire-abroad"
+FIRE_ABROAD_TITLE = "FIRE Abroad: Best Places for an Active Life Overseas | Global Home Atlas"
+FIRE_ABROAD_DESCRIPTION = (
+    "Compare FIRE Abroad destinations for active living, sustainable costs, healthcare, "
+    "legal stay options, tax complexity, global access, and long-term flexibility."
+)
 RETIREMENT_DESTINATIONS_SLUG = "retirement-destinations-ranked-by-cost"
 RETIREMENT_DESTINATIONS_TITLE = "Retirement Destinations Ranked by Cost (2026) | Global Home Atlas"
 RETIREMENT_DESTINATIONS_H1 = "Retirement Destinations Ranked by How Much You Need"
@@ -148,9 +168,12 @@ COUNTRY_GUIDES_HUB_DESCRIPTION = (
     "dossiers covering ownership, costs, risks, daily life, and resale."
 )
 RETIREMENT_COSTS_PATH = DATA / "retirement_costs.json"
+FIRE_ABROAD_PATH = DATA / "fire_abroad.json"
 MORTGAGE_PROFILES_PATH = DATA / "mortgage_profiles.json"
 RETIREMENT_ENGINE_PATH = ROOT / "src" / "retirement_calculator.js"
 RETIREMENT_UI_PATH = ROOT / "src" / "retirement_calculator_ui.js"
+FIRE_ABROAD_ENGINE_PATH = ROOT / "src" / "fire_abroad.js"
+FIRE_ABROAD_UI_PATH = ROOT / "src" / "fire_abroad_ui.js"
 RETIREMENT_PLANNING_CURRENCIES = {
     "as_of": "2026-08-27",
     "display_date": "27 August 2026",
@@ -1341,6 +1364,43 @@ def load_retirement_costs(path: Path = RETIREMENT_COSTS_PATH) -> dict:
     if len(ids) != len(records) or len(ids) != len(set(ids)) or any(not item for item in ids):
         raise ValueError("Retirement destination IDs must be present and unique")
     return payload
+
+
+def _validated_fire_abroad_for_build(
+    payload: dict,
+    destinations: list[dict],
+    retirement_costs: dict,
+) -> dict:
+    destination_ids = {
+        item.get("id") for item in destinations if isinstance(item, dict) and item.get("id")
+    }
+    retirement_records = retirement_costs.get("destinations", []) if isinstance(retirement_costs, dict) else []
+    retirement_ids = {
+        item.get("destination_id")
+        for item in retirement_records
+        if isinstance(item, dict) and item.get("destination_id")
+    }
+    errors = validate_fire_abroad_payload(
+        payload,
+        destination_ids=destination_ids,
+        retirement_ids=retirement_ids,
+        as_of=date.today(),
+    )
+    if errors:
+        raise ValueError("Invalid FIRE Abroad data:\n- " + "\n- ".join(errors))
+    return payload
+
+
+def load_fire_abroad_for_build(
+    destinations: list[dict],
+    retirement_costs: dict,
+    path: Path = FIRE_ABROAD_PATH,
+) -> dict:
+    """Load and validate the complete FIRE overlay against current shared IDs."""
+
+    return _validated_fire_abroad_for_build(
+        load_fire_abroad(path), destinations, retirement_costs
+    )
 
 
 def load_mortgage_profiles(path: Path = MORTGAGE_PROFILES_PATH) -> dict:
@@ -5977,6 +6037,112 @@ __ANALYTICS__
         .replace("__DESTINATION_COUNT__", str(len(destinations)))
         .replace("__FIT_DATA__", payload)
         .replace("__ANALYTICS__", analytics_event_script())
+    )
+
+
+def schema_for_fire_abroad(canonical: str) -> list[dict]:
+    return [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            "@id": canonical,
+            "name": "FIRE Abroad",
+            "url": canonical,
+            "description": FIRE_ABROAD_DESCRIPTION,
+            "dateModified": date.today().isoformat(),
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {
+                    "@type": "ListItem",
+                    "position": 1,
+                    "name": "Home",
+                    "item": SITE_URL,
+                },
+                {
+                    "@type": "ListItem",
+                    "position": 2,
+                    "name": "FIRE Abroad",
+                    "item": canonical,
+                },
+            ],
+        },
+    ]
+
+
+def build_fire_abroad_page(
+    destinations: list[dict],
+    retirement_costs: dict,
+    fire_payload: dict,
+) -> str:
+    """Build the validated default FIRE Abroad ranking and browser payload."""
+
+    fire_payload = _validated_fire_abroad_for_build(
+        fire_payload, destinations, retirement_costs
+    )
+    launch_ids = fire_payload["launch_destination_ids"]
+    launch_id_set = set(launch_ids)
+    destinations_by_id = {
+        item["id"]: item
+        for item in destinations
+        if isinstance(item, dict) and item.get("id") in launch_id_set
+    }
+    launch_destinations = [destinations_by_id[destination_id] for destination_id in launch_ids]
+    launch_cost_records = [
+        item
+        for item in retirement_costs["destinations"]
+        if item["destination_id"] in launch_id_set
+    ]
+    launch_retirement_costs = {
+        key: retirement_costs[key]
+        for key in ("as_of", "currency", "methodology_note")
+        if key in retirement_costs
+    }
+    launch_retirement_costs["destinations"] = launch_cost_records
+    default_profile = normalize_fire_profile({})
+    default_results = rank_fire_abroad_destinations(
+        launch_destinations,
+        launch_retirement_costs,
+        fire_payload,
+        default_profile,
+    )
+    embedded_payload = {
+        "destinations": launch_destinations,
+        "retirement_costs": launch_retirement_costs,
+        "fire_payload": fire_payload,
+        "profile": default_profile,
+    }
+    payload_json = json.dumps(
+        embedded_payload, ensure_ascii=False, separators=(",", ":")
+    )
+    payload_json = (
+        payload_json.replace("&", "\\u0026")
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+    )
+    canonical = page_url(FIRE_ABROAD_SLUG)
+    return build_fire_abroad_html(
+        head=head_html(
+            FIRE_ABROAD_TITLE,
+            FIRE_ABROAD_DESCRIPTION,
+            canonical,
+            schema_for_fire_abroad(canonical),
+        ).strip(),
+        navigation=site_header_html(PRIMARY_NAV_LINKS).strip(),
+        default_results=default_results,
+        payload_json=payload_json,
+        engine_js=FIRE_ABROAD_ENGINE_PATH.read_text(encoding="utf-8").replace(
+            "</script>", "<\\/script>"
+        ),
+        ui_js=FIRE_ABROAD_UI_PATH.read_text(encoding="utf-8").replace(
+            "</script>", "<\\/script>"
+        ),
+        design_css=top_level_page_design_css(),
+        analytics=analytics_event_script(),
+        footer=site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
     )
 
 
