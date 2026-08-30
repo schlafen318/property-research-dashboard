@@ -369,6 +369,8 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page legend, .retirement-finder-page .finder-results h2 { margin: 0 0 8px; font-size: clamp(29px, 3vw, 38px); line-height: 1.05; }
     .retirement-finder-page .section-help, .retirement-finder-page .hint { color: var(--gha-muted); }
     .retirement-finder-page .field label { font-weight: 500; }
+    .retirement-finder-page .finder-setting-options { display: flex; flex-wrap: wrap; gap: 4px 20px; margin-top: 7px; }
+    .retirement-finder-page .finder-setting-options .check { min-height: 32px; margin: 0; }
     .retirement-finder-page input, .retirement-finder-page select { border: 1px solid var(--gha-rule); border-radius: 0; background: var(--gha-surface); font-family: var(--gha-reading-sans); font-weight: 400; }
     .retirement-finder-page .finder-submit { width: fit-content; min-height: 48px; padding: 0 18px; border: 1px solid var(--gha-ink); border-radius: 0; background: var(--gha-ink); color: var(--gha-paper); font-family: var(--gha-reading-sans); font-size: 12px; font-weight: 500; letter-spacing: .055em; text-transform: uppercase; }
     .retirement-finder-page .finder-submit:hover { background: var(--gha-accent); }
@@ -411,10 +413,6 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-landscape-row.is-on-target.is-match .finder-landscape-capital-dot { width: 12px; height: 12px; border: 2px solid var(--gha-accent); background: var(--gha-brass); }
     .retirement-finder-page .finder-landscape-rank { color: var(--gha-accent); font-size: 10px; letter-spacing: .06em; }
     .retirement-finder-page .finder-landscape-value { min-width: 106px; text-align: right; font-family: var(--gha-display-serif); font-size: 17px; }
-    .retirement-finder-page .finder-landscape-gap { display: block; margin-top: 2px; font-family: var(--gha-reading-sans); font-size: 10px; }
-    .retirement-finder-page .finder-landscape-gap.is-within { color: var(--gha-link); }
-    .retirement-finder-page .finder-landscape-gap.is-over { color: var(--gha-accent); }
-    .retirement-finder-page .finder-landscape-gap.is-on-target { color: var(--gha-brass); }
     .retirement-finder-page .finder-landscape figcaption { margin: 18px 0 0; }
     .retirement-finder-page .finder-matches-section { margin-bottom: 46px; }
     .retirement-finder-page .finder-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 24px; }

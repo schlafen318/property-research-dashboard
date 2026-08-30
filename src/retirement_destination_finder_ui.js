@@ -351,10 +351,6 @@
         ratesToUsd: ratesToUsd,
       });
       const value = resultMoney({ amountUsd: row.target, currency: currency, ratesToUsd: ratesToUsd });
-      const gap = difference === 0
-        ? "Matches your projection"
-        : resultMoney({ amountUsd: Math.abs(difference), currency: currency, ratesToUsd: ratesToUsd }) +
-          (difference < 0 ? " under" : " over");
       const rank = row.matchRank
         ? '<small class="finder-landscape-rank">Match 0' + row.matchRank + "</small>"
         : "";
@@ -370,8 +366,7 @@
         escapeHtml(row.name) + "<small>" + escapeHtml(row.country) + "</small>" + rank +
         '</span><span class="finder-landscape-track" aria-hidden="true"><i class="finder-landscape-capital-dot"></i>' +
         '<i class="finder-landscape-distance"></i><i class="finder-landscape-dot"></i></span>' +
-        '<span class="finder-landscape-value"><span>' + escapeHtml(value) + '</span><small class="finder-landscape-gap ' +
-        state + '">' + escapeHtml(gap) + "</small></span></a></div>";
+        '<span class="finder-landscape-value"><span>' + escapeHtml(value) + "</span></span></a></div>";
     }).join("");
     return { axisHtml: axisHtml, rowsHtml: rowsHtml, rowCount: (model.rows || []).length };
   }
@@ -474,6 +469,13 @@
     function numeric(id) { return Number(element(id).value); }
     function checked(id) { return element(id).checked; }
     function selected(id) { return element(id).value; }
+    function selectedSettings() {
+      return Array.from(document.querySelectorAll('[name="finder-setting"]')).filter(function (control) {
+        return control.checked;
+      }).map(function (control) {
+        return control.value;
+      });
+    }
     function displayResultMoney(amountUsd) {
       return resultMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
     }
@@ -608,7 +610,7 @@
         incomeStreams: incomeStreams(),
         preferences: {
           region: selected("finder-region"),
-          climate: selected("finder-climate"),
+          settings: selectedSettings(),
           healthcare: selected("finder-healthcare"),
         },
         maximumPropertyAllocation: moneyNumber("finder-property-allocation"),
@@ -1061,7 +1063,7 @@
         strongest_destination_id: result.recommendations.length ? result.recommendations[0].destinationId : "none",
         strongest_tier: result.recommendations.length ? result.recommendations[0].tier : "none",
         region: user.preferences.region,
-        setting: user.preferences.climate,
+        setting: user.preferences.settings.join("|") || "any",
         healthcare: user.preferences.healthcare,
       });
       if (!result.recommendations.length) {
@@ -1072,7 +1074,7 @@
           excluded_count: result.excluded.length,
           primary_exclusion_reason: primaryExclusionReason(result.excluded),
           region: user.preferences.region,
-          setting: user.preferences.climate,
+          setting: user.preferences.settings.join("|") || "any",
           healthcare: user.preferences.healthcare,
         });
       }
@@ -1176,13 +1178,21 @@
     });
     [
       ["finder-region", "region"],
-      ["finder-climate", "setting"],
       ["finder-healthcare", "healthcare"],
     ].forEach(function (entry) {
       element(entry[0]).addEventListener("change", function () {
         track("retirement_destination_finder_preference_change", {
           preference: entry[1],
           value: selected(entry[0]),
+        });
+      });
+    });
+    document.querySelectorAll('[name="finder-setting"]').forEach(function (control) {
+      control.addEventListener("change", function () {
+        track("retirement_destination_finder_preference_change", {
+          preference: "setting",
+          value: control.value,
+          selected: control.checked,
         });
       });
     });

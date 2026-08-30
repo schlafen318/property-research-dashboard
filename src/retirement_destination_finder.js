@@ -106,14 +106,41 @@
     return Number(raw && typeof raw === "object" ? raw.score : raw || 0);
   }
 
+  function normalizedPreference(value) {
+    return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+  }
+
+  function normalizedSettings(preferences) {
+    const source = Array.isArray(preferences.settings)
+      ? preferences.settings
+      : [preferences.climate];
+    return source.map(normalizedPreference).filter(function (value, index, values) {
+      return value && value !== "any" && values.indexOf(value) === index;
+    });
+  }
+
+  function destinationMatchesFilters(destination, preferences) {
+    const region = normalizedPreference(preferences.region);
+    const settings = normalizedSettings(preferences);
+    const regionMatches = !region || region === "any" ||
+      [destination.continent, destination.country].some(function (value) {
+        return normalizedPreference(value) === region;
+      });
+    const destinationSetting = normalizedPreference(destination.category);
+    const settingMatches = !settings.length || settings.some(function (setting) {
+      return destinationSetting.includes(setting);
+    });
+    return regionMatches && settingMatches;
+  }
+
   function preferenceMatches(destination, preferences) {
     const matches = [];
     if (preferences.region && preferences.region !== "any" &&
-        [destination.continent, destination.country].includes(preferences.region)) {
+        destinationMatchesFilters(destination, { region: preferences.region, climate: "any" })) {
       matches.push("Preferred region");
     }
-    if (preferences.climate && preferences.climate !== "any" &&
-        String(destination.category || "").toLowerCase().includes(String(preferences.climate).toLowerCase())) {
+    if (normalizedSettings(preferences).length &&
+        destinationMatchesFilters(destination, { region: "any", settings: preferences.settings, climate: preferences.climate })) {
       matches.push("Preferred setting");
     }
     if (preferences.healthcare === "high" && scoreValue(destination, "healthcare") >= 4) {
@@ -193,8 +220,11 @@
       }));
     const recommendations = [];
     const excluded = [];
+    let evaluatedCount = 0;
 
     input.destinations.forEach(function (destination) {
+      if (!destinationMatchesFilters(destination, user.preferences || {})) return;
+      evaluatedCount += 1;
       const cost = costs.get(destination.id);
       if (!cost) {
         excluded.push({ destinationId: destination.id, name: destination.name, reasonCode: "missing_cost_data" });
@@ -323,7 +353,7 @@
     });
     return {
       summary: {
-        evaluatedCount: input.destinations.length,
+        evaluatedCount: evaluatedCount,
         withinReachCount: recommendations.filter(function (item) { return item.tier === "within_reach"; }).length,
         closeCount: recommendations.filter(function (item) { return item.tier === "close"; }).length,
         stretchCount: recommendations.filter(function (item) { return item.tier === "stretch"; }).length,

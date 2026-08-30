@@ -92,6 +92,24 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         positions = [self.html.index(value) for value in ordered_ids]
         self.assertEqual(sorted(positions), positions)
 
+    def test_preference_copy_distinguishes_filters_from_ranking(self) -> None:
+        preferences = self.html.split('id="finder-preferences"', 1)[1].split("</fieldset>", 1)[0]
+        landscape = self.html.split('id="finder-capital-landscape"', 1)[1].split("</figure>", 1)[0]
+
+        self.assertIn("Region and setting filter destinations", preferences)
+        self.assertIn("Healthcare helps order the matches", preferences)
+        self.assertIn("Only destinations matching your region and setting are shown", landscape)
+
+    def test_setting_filter_allows_multiple_clear_checkbox_selections(self) -> None:
+        preferences = self.html.split('id="finder-preferences"', 1)[1].split("</fieldset>", 1)[0]
+
+        self.assertIn('role="group" aria-labelledby="finder-setting-label"', preferences)
+        self.assertEqual(4, preferences.count('name="finder-setting"'))
+        for value in ("City", "Water", "Mountain", "Lake"):
+            self.assertIn(f'name="finder-setting" value="{value}"', preferences)
+        self.assertIn("Choose any that apply. Leave all unchecked for no preference.", preferences)
+        self.assertNotIn('id="finder-climate"', preferences)
+
     def test_form_defaults_to_age_45_and_retirement_at_60(self) -> None:
         form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
             "</form>", 1

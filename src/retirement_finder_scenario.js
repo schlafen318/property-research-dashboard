@@ -56,6 +56,18 @@
     return new Set(destinationIds.map(String));
   }
 
+  function normalizedSettings(preferences) {
+    const source = Array.isArray(preferences.settings)
+      ? preferences.settings
+      : [preferences.climate || "any"];
+    if (source.length > 4) throw new Error("Setting preferences are invalid");
+    return source.map(function (value) {
+      return shortString(value, "Setting", false);
+    }).filter(function (value, index, values) {
+      return value.toLowerCase() !== "any" && values.indexOf(value) === index;
+    });
+  }
+
   function validateScenario(input, destinationIds, options) {
     if (!input || typeof input !== "object" || Array.isArray(input)) {
       throw new Error("Results link is invalid");
@@ -74,7 +86,7 @@
     const preferences = input.preferences || {};
     const normalizedPreferences = {
       region: shortString(preferences.region || "any", "Region", false),
-      climate: shortString(preferences.climate || "any", "Setting", false),
+      settings: normalizedSettings(preferences),
       healthcare: enumValue(preferences.healthcare || "normal", HEALTHCARE, "Healthcare preference"),
     };
 
