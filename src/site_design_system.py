@@ -498,7 +498,7 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page.finder-wizard-editing { height: 100vh; height: 100svh; overflow: hidden; }
       .retirement-finder-page.finder-wizard-editing .gha-header__inner { min-height: 56px; padding: 0 16px; border-bottom-width: 1px; }
       .retirement-finder-page.finder-wizard-editing .gha-brand img { width: 112px; }
-      .retirement-finder-page.finder-wizard-editing .gha-primary-links, .retirement-finder-page.finder-wizard-editing .gha-mobile-menu { display: none; }
+      .retirement-finder-page.finder-wizard-editing .gha-primary-links { display: none; }
       .retirement-finder-page.finder-wizard-editing .finder-hero, .retirement-finder-page.finder-wizard-editing .context-link, .retirement-finder-page.finder-wizard-editing .finder-editorial, .retirement-finder-page.finder-wizard-editing .gha-footer { display: none; }
       .retirement-finder-page.finder-wizard-editing main { height: calc(100svh - 56px); padding: 0; overflow: hidden; }
       .retirement-finder-page.finder-wizard-editing #retirement-destination-finder > .page-shell { width: 100%; height: 100%; }

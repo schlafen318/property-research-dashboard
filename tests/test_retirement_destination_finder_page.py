@@ -350,6 +350,20 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             r"\.finder-wizard-editing \.finder-section\s*\{[^}]*overflow-y:\s*auto;",
         )
 
+    def test_mobile_wizard_keeps_compact_site_navigation_available(self) -> None:
+        design_css = self.html.split('<style id="gha-retirement-finder-design">', 1)[1].split(
+            "</style>", 1
+        )[0]
+        mobile_css = design_css.split("@media (max-width: 760px)", 1)[1].split(
+            "@media (max-width: 620px)", 1
+        )[0]
+
+        self.assertIn('href="/retirement-abroad-calculator/">Retirement Calculator</a>', self.html)
+        self.assertNotRegex(
+            mobile_css,
+            r"\.finder-wizard-editing \.gha-mobile-menu\s*\{[^}]*display:\s*none;",
+        )
+
     def test_short_mobile_viewports_pair_compact_fields_to_avoid_step_scrolling(self) -> None:
         design_css = self.html.split('<style id="gha-retirement-finder-design">', 1)[1].split(
             "</style>", 1
