@@ -127,10 +127,10 @@
     if (!closest) return "No destinations could be evaluated under these assumptions.";
     if (Number(input.withinReachCount) > 0) {
       return Number(input.withinReachCount) + " destinations are within reach. " +
-        closest.name + " is the strongest modeled match under your preferences.";
+        closest.name + " is the strongest match for your priorities.";
     }
     return "No destinations are within reach yet. " + closest.name +
-      " is the strongest modeled match, with a gap of " + resultMoney({
+      " is the strongest match, with a gap of " + resultMoney({
         amountUsd: Math.abs(Number(closest.surplusGap)),
         currency: input.currency || "USD",
         ratesToUsd: input.ratesToUsd || { USD: 1 },
@@ -150,35 +150,115 @@
     const gap = Number(item.surplusGap) || 0;
     const currency = input.currency || "USD";
     const ratesToUsd = input.ratesToUsd || { USD: 1 };
-    let affordability;
+    let affordability = tierLabel(item.tier) + ".";
     if (gap === 0) {
-      affordability = "Your projected portfolio meets the modeled target.";
+      affordability = "Within reach at the required capital.";
     } else if (gap > 0) {
-      affordability = "Your projected portfolio exceeds the modeled target by " + resultMoney({
+      affordability = "Within reach with " + resultMoney({
         amountUsd: gap,
         currency: currency,
         ratesToUsd: ratesToUsd,
-      }) + ".";
+      }) + " remaining.";
     } else {
-      const rawCoverage = Math.max(0, (Number(item.fundingRatio) || 0) * 100);
-      const roundedCoverage = Math.min(99.9, Math.round(rawCoverage * 10) / 10);
-      const coverage = Number.isInteger(roundedCoverage)
-        ? roundedCoverage.toFixed(0)
-        : roundedCoverage.toFixed(1);
-      affordability = "Your projected portfolio covers " + coverage +
-        "% of the modeled target, leaving a " + resultMoney({
+      affordability = tierLabel(item.tier) + ", with a " + resultMoney({
           amountUsd: Math.abs(gap),
           currency: currency,
           ratesToUsd: ratesToUsd,
         }) + " gap.";
     }
     const matches = Array.isArray(item.preferenceMatches) ? item.preferenceMatches : [];
-    const ranking = matches.length
-      ? "Overall match #" + Number(input.matchRank) + " in the " + tierLabel(item.tier) + " tier using " +
-        matches.join(" and ") + "; funding coverage breaks remaining ties."
-      : "Overall match #" + Number(input.matchRank) + " in the " + tierLabel(item.tier) +
-        " tier; funding coverage breaks ties when no planning signals match.";
-    return affordability + " " + ranking;
+    const labels = {
+      "Preferred region": "preferred region",
+      "Preferred setting": "preferred setting",
+      "Stronger healthcare signal": "healthcare priorities",
+      "Long-stay suitability": "long-stay priorities",
+    };
+    const preference = matches.length
+      ? " Matches your " + matches.map(function (match) { return labels[match] || String(match).toLowerCase(); }).join(" and ") + "."
+      : "";
+    const housing = {
+      rent: "Renting keeps more capital available.",
+      own: "Existing ownership keeps acquisition costs outside this estimate.",
+      buy_retirement: "The required capital includes the retirement home purchase.",
+      buy_now: "The estimate reflects the selected purchase and financing plan.",
+    }[input.housingPlan || "rent"];
+    return affordability + preference + " " + housing;
+  }
+
+  function comparisonSelection(input) {
+    const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
+    const byId = new Map(recommendations.map(function (item) { return [item.destinationId, item]; }));
+    const selected = [];
+    (Array.isArray(input.selectedIds) ? input.selectedIds : []).forEach(function (id) {
+      if (byId.has(id) && !selected.includes(id) && selected.length < 3) selected.push(id);
+    });
+    recommendations.forEach(function (item) {
+      if (!selected.includes(item.destinationId) && selected.length < Math.min(3, recommendations.length)) {
+        selected.push(item.destinationId);
+      }
+    });
+    return selected.map(function (id) { return byId.get(id); });
+  }
+
+  function replaceComparisonDestination(input) {
+    const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
+    const allowed = new Set(recommendations.map(function (item) { return item.destinationId; }));
+    const ids = comparisonSelection(input).map(function (item) { return item.destinationId; });
+    const position = Number(input.position);
+    const nextId = String(input.destinationId || "");
+    if (!Number.isInteger(position) || position < 0 || position >= ids.length || !allowed.has(nextId)) return ids;
+    if (ids.includes(nextId) && ids[position] !== nextId) return ids;
+    ids[position] = nextId;
+    return ids;
+  }
+
+  function comparisonMarkup(input) {
+    const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
+    const selected = comparisonSelection(input);
+    const currency = input.currency || "USD";
+    const ratesToUsd = input.ratesToUsd || { USD: 1 };
+    function money(value) {
+      return resultMoney({ amountUsd: Number(value) || 0, currency: currency, ratesToUsd: ratesToUsd });
+    }
+    function options(position, selectedId) {
+      const occupied = new Set(selected.map(function (item) { return item.destinationId; }));
+      return recommendations.map(function (item) {
+        const disabled = occupied.has(item.destinationId) && item.destinationId !== selectedId;
+        return '<option value="' + escapeHtml(item.destinationId) + '"' +
+          (item.destinationId === selectedId ? " selected" : "") + (disabled ? " disabled" : "") + ">" +
+          escapeHtml(item.name) + "</option>";
+      }).join("");
+    }
+    function cell(item, value) { return "<td>" + value(item) + "</td>"; }
+    const headings = selected.map(function (item, index) {
+      return '<th scope="col">' + escapeHtml(item.name) + '<select data-comparison-position="' + index +
+        '" aria-label="Replace ' + escapeHtml(item.name) + '">' + options(index, item.destinationId) + "</select></th>";
+    }).join("");
+    const rows = [
+      ["Required capital", function (item) { return escapeHtml(money(item.retirementTarget)); }],
+      ["Gap versus projected capital", function (item) { return escapeHtml(money(item.surplusGap)); }],
+      ["Financial tier", function (item) { return escapeHtml(tierLabel(item.tier)); }],
+      ["Monthly retirement cost", function (item) { return escapeHtml(money(item.monthlyRetirementCost)); }],
+      ["Housing assumption", function () { return escapeHtml({ rent: "Rent", own: "Already own", buy_now: "Buy now", buy_retirement: "Buy at retirement" }[input.housingPlan] || "Rent"); }],
+      ["Preference alignment", function (item) { return escapeHtml((item.preferenceMatches || []).join(" · ") || "No additional preference match"); }],
+      ["Guides", function (item) {
+        const country = item.countryGuideHref
+          ? '<a href="' + escapeHtml(item.countryGuideHref) + '">Country guide</a>'
+          : "";
+        return '<span class="finder-comparison-links"><a href="' + escapeHtml(safeDossierHref(item.destinationId)) +
+          '">Destination guide</a>' + country + '<a href="' + escapeHtml(safeDetailHref({
+            destinationId: item.destinationId,
+            household: input.household,
+            housingPlan: input.housingPlan,
+          })) + '">Detailed plan</a></span>';
+      }],
+    ].map(function (row) {
+      return '<tr><th scope="row">' + row[0] + "</th>" + selected.map(function (item) {
+        return cell(item, row[1]);
+      }).join("") + "</tr>";
+    }).join("");
+    return '<div class="finder-comparison-scroll"><table class="finder-comparison-table"><caption>Compare recommended retirement destinations</caption><thead><tr><th></th>' +
+      headings + "</tr></thead><tbody>" + rows + "</tbody></table></div>";
   }
 
   function finderCapitalLandscape(input) {
@@ -237,8 +317,8 @@
         ratesToUsd: input.ratesToUsd || { USD: 1 },
       }) + (difference < 0 ? " under projected capital." : " over projected capital.");
     return String(row.name || "Destination") + ", " + String(row.country || "") +
-      ". Retirement target " + target + ". " + differenceText + " " + tierLabel(row.tier) + "." +
-      (row.matchRank ? " Strongest modeled match number " + row.matchRank + "." : "");
+      ". Required capital " + target + ". " + differenceText + " " + tierLabel(row.tier) + "." +
+      (row.matchRank ? " Recommended match number " + row.matchRank + "." : "");
   }
 
   function finderCapitalLandscapeMarkup(input) {
@@ -377,6 +457,8 @@
     let currentRecommendations = [];
     let currentUser = null;
     let currentResult = null;
+    let comparisonIds = [];
+    let sharedView = false;
 
     function element(id) { return document.getElementById(id); }
     function numeric(id) { return Number(element(id).value); }
@@ -423,6 +505,46 @@
     }
     function track(name, fields) {
       if (root.GHA && typeof root.GHA.track === "function") root.GHA.track(name, fields || {});
+    }
+
+    function finderScenarioValue(search) {
+      const match = String(search || "").match(/(?:^|[?&])scenario=([^&]+)/);
+      if (!match) return "";
+      try { return decodeURIComponent(match[1]); } catch (error) { return ""; }
+    }
+
+    function destinationDetails(destinationId, user) {
+      const destination = (payload.destinations || []).find(function (item) { return item.id === destinationId; });
+      const cost = (payload.retirementCosts || []).find(function (item) { return item.destination_id === destinationId; });
+      const profile = cost && cost.profiles && cost.profiles[user.household];
+      const housing = profile && user.housingPlan === "rent" ? profile.annual_rent_usd : profile && profile.annual_owner_costs_usd;
+      const annual = profile
+        ? Object.keys(profile.categories_usd || {}).reduce(function (total, key) {
+          return total + Number(profile.categories_usd[key] || 0);
+        }, 0) + Number(housing || 0)
+        : 0;
+      return {
+        name: destination && destination.name,
+        country: destination && destination.country,
+        countryGuideHref: destination && destination.countryGuideHref,
+        monthlyRetirementCost: annual / 12,
+      };
+    }
+
+    function decorateRecommendations(recommendations, user, projectedCapital) {
+      return (recommendations || []).map(function (item) {
+        const details = destinationDetails(item.destinationId, user);
+        return Object.assign({}, details, item, {
+          portfolioAtRetirement: Number(item.portfolioAtRetirement != null
+            ? item.portfolioAtRetirement
+            : projectedCapital),
+          retirementTarget: Number(item.retirementTarget != null
+            ? item.retirementTarget
+            : item.retirementTargetUsd),
+          surplusGap: Number(item.surplusGap != null ? item.surplusGap : item.surplusGapUsd),
+          annualProjection: Array.isArray(item.annualProjection) ? item.annualProjection : [],
+        });
+      });
     }
 
     function syncHousing() {
@@ -666,18 +788,19 @@
         '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
         '</p></div></header><dl>' +
-        '<div><dt>Projected portfolio</dt><dd>' + displayResultMoney(item.portfolioAtRetirement) + "</dd></div>" +
-        '<div><dt>Retirement target</dt><dd>' + displayResultMoney(item.retirementTarget) + "</dd></div>" +
-        '<div><dt>Surplus or gap</dt><dd>' + displayResultMoney(item.surplusGap) + "</dd></div>" +
+        '<div><dt>Projected capital</dt><dd>' + displayResultMoney(item.portfolioAtRetirement) + "</dd></div>" +
+        '<div><dt>Required capital</dt><dd>' + displayResultMoney(item.retirementTarget) + "</dd></div>" +
+        '<div><dt>Remaining or gap</dt><dd>' + displayResultMoney(item.surplusGap) + "</dd></div>" +
         propertyBits + rental + "</dl>" + financing +
         '<p class="finder-rationale">' + escapeHtml(finderMatchExplanation({
           item: item,
           matchRank: matchRank,
+          housingPlan: user.housingPlan,
           currency: selectedCurrency,
           ratesToUsd: ratesToUsd,
         })) + "</p>" +
         '<div class="finder-result-actions"><a href="' + escapeHtml(dossierHref) +
-        '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">View destination dossier</a><a href="' + escapeHtml(detailHref) +
+        '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">Destination guide</a><a href="' + escapeHtml(detailHref) +
         '" data-finder-detail' + trackingAttributes + ' data-action="detailed_plan">Build a detailed plan</a></div>' +
         "</article>";
     }
@@ -717,6 +840,78 @@
       track("retirement_destination_finder_destination_click", fields);
       if (fields.action === "detailed_plan") {
         track("retirement_destination_finder_detail_open", fields);
+      }
+      if (fields.surface === "recommended_match") {
+        track("retirement_destination_finder_match_guide_click", {
+          destination_id: fields.destination_id,
+          link_type: fields.action,
+        });
+      }
+    }
+
+    function renderComparison() {
+      const section = element("finder-comparison");
+      if (!currentRecommendations.length) {
+        section.hidden = true;
+        element("finder-comparison-body").innerHTML = "";
+        return;
+      }
+      const selected = comparisonSelection({
+        recommendations: currentRecommendations,
+        selectedIds: comparisonIds,
+      });
+      comparisonIds = selected.map(function (item) { return item.destinationId; });
+      element("finder-comparison-body").innerHTML = comparisonMarkup({
+        recommendations: currentRecommendations,
+        selectedIds: comparisonIds,
+        housingPlan: currentUser.housingPlan,
+        household: currentUser.household,
+        currency: selectedCurrency,
+        ratesToUsd: ratesToUsd,
+      });
+      section.hidden = false;
+    }
+
+    function shareFallback(url, message) {
+      const output = element("finder-share-url");
+      output.value = url;
+      output.hidden = false;
+      element("finder-share-status").textContent = message;
+      if (typeof output.select === "function") output.select();
+    }
+
+    function shareCurrentResults() {
+      if (!currentResult || !currentUser || !root.GHARetirementFinderScenario) return;
+      try {
+        const scenario = root.GHARetirementFinderScenario.buildScenario({
+          currency: selectedCurrency,
+          projectedCapitalUsd: finderProjectedCapital({
+            sharedProjection: currentResult.sharedProjection,
+            recommendations: currentRecommendations,
+          }),
+          user: currentUser,
+          result: { recommendations: currentRecommendations },
+          dataReviewed: payload.asOf,
+        });
+        scenario.comparisonIds = comparisonIds.slice();
+        const encoded = root.GHARetirementFinderScenario.encodeScenario(scenario);
+        const location = root.location || {};
+        const base = (location.origin || "https://globalhomeatlas.com") +
+          (location.pathname || "/retirement-destination-finder/");
+        const url = base + "?scenario=" + encoded;
+        track("retirement_destination_finder_share", { housing_plan: currentUser.housingPlan });
+        if (root.navigator && root.navigator.clipboard && typeof root.navigator.clipboard.writeText === "function") {
+          root.navigator.clipboard.writeText(url).then(function () {
+            element("finder-share-status").textContent = "Results link copied.";
+            element("finder-share-url").hidden = true;
+          }).catch(function () {
+            shareFallback(url, "Copy this results link.");
+          });
+        } else {
+          shareFallback(url, "Copy this results link.");
+        }
+      } catch (error) {
+        element("finder-share-status").textContent = "A results link could not be created.";
       }
     }
 
@@ -790,18 +985,24 @@
       const result = currentResult;
       const user = currentUser;
       element("finder-within-count").textContent = String(result.summary.withinReachCount);
-      currentRecommendations = result.recommendations.slice();
+      currentRecommendations = decorateRecommendations(
+        result.recommendations,
+        user,
+        finderProjectedCapital({ sharedProjection: result.sharedProjection, recommendations: result.recommendations })
+      );
       const hasRecommendations = currentRecommendations.length > 0;
       element("finder-capital-landscape").hidden = !hasRecommendations;
       element("finder-matches-section").hidden = !hasRecommendations;
-      element("finder-projection-section").hidden = !hasRecommendations;
+      element("finder-projection-section").hidden = !hasRecommendations || sharedView;
       element("finder-empty-state").hidden = hasRecommendations;
       renderCapitalLandscape(result);
-      renderChart(finderProjectionView({
-        housingPlan: user.housingPlan,
-        sharedProjection: result.sharedProjection,
-        recommendations: currentRecommendations,
-      }), user);
+      if (!sharedView) {
+        renderChart(finderProjectionView({
+          housingPlan: user.housingPlan,
+          sharedProjection: result.sharedProjection,
+          recommendations: currentRecommendations,
+        }), user);
+      }
       element("finder-result-read").textContent = resultSummaryRead({
         withinReachCount: result.summary.withinReachCount,
         recommendations: currentRecommendations,
@@ -812,6 +1013,8 @@
         ? currentRecommendations[0].name
         : "—";
       renderRecommendationList();
+      renderComparison();
+      element("finder-share-section").hidden = !hasRecommendations || sharedView;
       element("finder-excluded-summary").textContent = result.excluded.length
         ? result.excluded.length + " destinations could not be recommended under these assumptions."
         : "Every destination had enough information to evaluate.";
@@ -820,6 +1023,8 @@
     }
 
     function render(result, user) {
+      sharedView = false;
+      comparisonIds = [];
       currentResult = result;
       currentUser = user;
       renderCurrentResults();
@@ -849,6 +1054,51 @@
           setting: user.preferences.climate,
           healthcare: user.preferences.healthcare,
         });
+      }
+    }
+
+    function openSharedScenario() {
+      const encoded = finderScenarioValue(root.location && root.location.search);
+      if (!encoded) return false;
+      try {
+        const scenario = root.GHARetirementFinderScenario.decodeScenario(
+          encoded,
+          (payload.destinations || []).map(function (item) { return item.id; })
+        );
+        if (validPlanningRate(scenario.currency, ratesToUsd)) {
+          selectedCurrency = scenario.currency;
+          element("finder-currency").value = selectedCurrency;
+        }
+        sharedView = true;
+        comparisonIds = scenario.comparisonIds.slice();
+        currentUser = {
+          household: scenario.household,
+          horizonYears: scenario.horizonYears,
+          housingPlan: scenario.housingPlan,
+          preferences: scenario.preferences,
+        };
+        currentResult = {
+          summary: {
+            evaluatedCount: scenario.results.length,
+            withinReachCount: scenario.results.filter(function (item) { return item.tier === "within_reach"; }).length,
+            closeCount: scenario.results.filter(function (item) { return item.tier === "close"; }).length,
+            stretchCount: scenario.results.filter(function (item) { return item.tier === "stretch"; }).length,
+          },
+          sharedProjection: {
+            portfolioAtRetirement: scenario.projectedCapitalUsd,
+            annualProjection: [],
+            exhaustedMonth: null,
+          },
+          recommendations: scenario.results,
+          excluded: [],
+        };
+        renderCurrentResults();
+        results.hidden = false;
+        track("retirement_destination_finder_shared_open", { housing_plan: scenario.housingPlan });
+        return true;
+      } catch (error) {
+        element("finder-shared-error").hidden = false;
+        return false;
       }
     }
 
@@ -922,8 +1172,31 @@
     });
     element("finder-landscape-rows").addEventListener("click", trackDestinationClick);
     element("finder-recommendations").addEventListener("click", trackDestinationClick);
+    element("finder-comparison-body").addEventListener("change", function (event) {
+      const control = event.target && event.target.dataset && event.target.dataset.comparisonPosition !== undefined
+        ? event.target
+        : null;
+      if (!control) return;
+      const position = Number(control.dataset.comparisonPosition);
+      const nextIds = replaceComparisonDestination({
+        recommendations: currentRecommendations,
+        selectedIds: comparisonIds,
+        position: position,
+        destinationId: control.value,
+      });
+      if (nextIds.join("|") === comparisonIds.join("|")) return;
+      comparisonIds = nextIds;
+      renderComparison();
+      element("finder-comparison-status").textContent = "Comparison updated.";
+      track("retirement_destination_finder_compare_replace", {
+        destination_id: control.value,
+        comparison_position: position + 1,
+      });
+    });
+    element("finder-share").addEventListener("click", shareCurrentResults);
     syncHousing();
     track("retirement_destination_finder_open");
+    openSharedScenario();
   }
 
   return {
@@ -940,6 +1213,9 @@
     resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,
     finderMatchExplanation: finderMatchExplanation,
+    comparisonSelection: comparisonSelection,
+    replaceComparisonDestination: replaceComparisonDestination,
+    comparisonMarkup: comparisonMarkup,
     finderCapitalLandscape: finderCapitalLandscape,
     finderCapitalLandscapeLabel: finderCapitalLandscapeLabel,
     finderCapitalLandscapeMarkup: finderCapitalLandscapeMarkup,

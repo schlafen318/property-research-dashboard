@@ -203,6 +203,7 @@
         excluded.push({ destinationId: destination.id, name: destination.name, reasonCode: "buyer_access_restricted" });
         return;
       }
+      const retirementProfile = cost.profiles[user.household];
       const targetResult = retirement.calculateRetirementTarget(retirementTargetInput(user, cost));
       let retirementTarget = Number(targetResult.totalCapitalAtRetirement);
       let portfolioAtRetirement = sharedProjection ? sharedProjection.portfolioAtRetirement : 0;
@@ -291,6 +292,14 @@
         portfolioAtRetirement: portfolioAtRetirement,
         annualProjection: annualProjection,
         retirementTarget: retirementTarget,
+        monthlyRetirementCost: (
+          Object.keys(retirementProfile.categories_usd).reduce(function (total, key) {
+            return total + Number(retirementProfile.categories_usd[key] || 0);
+          }, 0) + Number(user.housingPlan === "rent"
+            ? retirementProfile.annual_rent_usd
+            : retirementProfile.annual_owner_costs_usd)
+        ) / 12,
+        countryGuideHref: destination.countryGuideHref || "",
         surplusGap: portfolioAtRetirement - retirementTarget,
         propertyEquity: propertyEquity,
         mortgageBalance: mortgageBalance,

@@ -142,14 +142,32 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("How your capital gets there", self.html)
         self.assertNotIn("Retirement score", self.html)
 
+    def test_results_include_compact_comparison_and_privacy_safe_sharing(self) -> None:
+        for marker in (
+            'id="finder-comparison"',
+            'id="finder-comparison-body"',
+            'id="finder-comparison-status" aria-live="polite"',
+            'id="finder-share"',
+            'id="finder-share-status" aria-live="polite"',
+            'id="finder-shared-error" role="alert"',
+        ):
+            self.assertIn(marker, self.html)
+        self.assertIn("Compare your three strongest matches", self.html)
+        self.assertIn(
+            "This link includes your projected capital and planning choices. It does not include your age, current savings, income or pension details.",
+            self.html,
+        )
+        self.assertIn("retirement_finder_scenario.js", self.builder)
+        self.assertNotIn("algorithm", self.html.lower())
+
     def test_results_lead_with_cost_landscape_and_three_modeled_matches(self) -> None:
         self.assertIn('id="finder-result-read"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
-        self.assertIn('aria-label="Three strongest modeled matches"', self.html)
+        self.assertIn('aria-label="Three strongest matches"', self.html)
         self.assertNotIn('id="finder-closest-match"', self.html)
         self.assertNotIn('id="finder-show-all"', self.html)
         self.assertNotIn("View all destinations", self.html)
-        self.assertIn("View destination dossier", self.html)
+        self.assertIn("Destination guide", self.html)
         self.assertIn('data-finder-dossier', self.html)
 
     def test_landscape_uses_plain_editorial_rules_and_a_compact_mobile_list(self) -> None:
@@ -194,7 +212,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="within-reach"', self.html)
         self.assertIn('id="rent-or-buy"', self.html)
         self.assertIn('id="finder-faq"', self.html)
-        self.assertIn("Projected liquid capital covers the modeled retirement target", self.html)
+        self.assertIn("Projected liquid capital covers the required retirement capital", self.html)
         self.assertIn("Buying requires separate property capital", self.html)
         self.assertIn('"@type":"FAQPage"', self.html)
 

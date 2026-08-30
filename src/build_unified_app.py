@@ -176,6 +176,7 @@ RETIREMENT_PLANNING_CURRENCIES = {
 }
 PROPERTY_FINANCE_PATH = ROOT / "src" / "property_finance.js"
 RETIREMENT_FINDER_ENGINE_PATH = ROOT / "src" / "retirement_destination_finder.js"
+RETIREMENT_FINDER_SCENARIO_PATH = ROOT / "src" / "retirement_finder_scenario.js"
 RETIREMENT_FINDER_UI_PATH = ROOT / "src" / "retirement_destination_finder_ui.js"
 RETIREMENT_RANKING_TABLE_PATH = ROOT / "src" / "retirement_ranking_table.js"
 CONTINENT_BY_COUNTRY = {
@@ -6238,6 +6239,14 @@ def build_retirement_destination_finder_page(
             **item,
             "continent": CONTINENT_BY_COUNTRY.get(item.get("country", ""), ""),
             "recommendable": is_destination_recommendable(item),
+            "countryGuideHref": next(
+                (
+                    f"/{country_path(hub)}/"
+                    for hub in COUNTRY_HUBS
+                    if hub["country"] == item.get("country")
+                ),
+                "",
+            ),
         }
         for item in eligible_destinations
     ]
@@ -6268,6 +6277,7 @@ def build_retirement_destination_finder_page(
         retirement_engine=RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         property_engine=PROPERTY_FINANCE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        scenario_engine=RETIREMENT_FINDER_SCENARIO_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_ui=RETIREMENT_FINDER_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         analytics=analytics_event_script(),
         design_css=retirement_finder_design_css(),
