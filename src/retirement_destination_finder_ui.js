@@ -483,7 +483,8 @@
     }
     function settingLabel(value) {
       const normalized = String(value || "").toLowerCase();
-      if (normalized === "coastorisland" || normalized === "water") return "Coast or island";
+      if (normalized === "coastorisland") return "Coast or island";
+      if (normalized === "water") return "Water setting (legacy)";
       return titleCaseFilter(value);
     }
     function activeDestinationFilters(preferences) {

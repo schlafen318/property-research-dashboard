@@ -1130,6 +1130,49 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertFalse(state["sharedErrorHidden"])
         self.assertEqual(0, state["engineCalls"])
 
+    def test_legacy_water_shared_link_keeps_an_honest_filter_label(self) -> None:
+        from tests.test_retirement_finder_scenario import encode_unchecked
+
+        encoded = encode_unchecked(
+            {
+                "v": 1,
+                "currency": "USD",
+                "projectedCapitalUsd": 1_000_000,
+                "household": "couple",
+                "horizonYears": 30,
+                "housingPlan": "rent",
+                "preferences": {
+                    "region": "any",
+                    "settings": ["Water"],
+                    "healthcare": "normal",
+                },
+                "results": [
+                    {
+                        "destinationId": "lake-como",
+                        "retirementTargetUsd": 1_100_000,
+                        "surplusGapUsd": -100_000,
+                        "fundingRatio": 0.91,
+                        "tier": "close",
+                        "preferenceMatches": ["Preferred setting"],
+                    }
+                ],
+                "comparisonIds": ["lake-como"],
+                "dataReviewed": "2026-08-27",
+            }
+        )
+        state = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "search": "?scenario=" + encoded,
+                "destinations": [
+                    {"id": "lake-como", "name": "Lake Como", "country": "Italy"}
+                ],
+            }
+        )
+
+        self.assertEqual("Showing: Water setting (legacy)", state["activeFilters"])
+        self.assertIn("Lake Como", state["recommendationsHtml"])
+
     def test_shared_buy_now_snapshot_does_not_invent_zero_property_values(self) -> None:
         source = UI.read_text()
         self.assertIn("user.sharedSnapshot", source)
