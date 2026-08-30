@@ -354,7 +354,7 @@
       const rank = row.matchRank
         ? '<small class="finder-landscape-rank">Match 0' + row.matchRank + "</small>"
         : "";
-      return '<div role="listitem"><a class="finder-landscape-row' + (row.matchRank ? " is-match" : "") + " " + state +
+      return '<div class="finder-landscape-item" role="listitem"><a class="finder-landscape-row' + (row.matchRank ? " is-match" : "") + " " + state +
         '" href="' + escapeHtml(safeDossierHref(row.destinationId)) +
         '" data-finder-destination data-destination-id="' + escapeHtml(row.destinationId) +
         '" data-surface="cost_landscape" data-cost-rank="' + (index + 1) +
@@ -475,6 +475,31 @@
       }).map(function (control) {
         return control.value;
       });
+    }
+    function titleCaseFilter(value) {
+      return String(value || "").replace(/-/g, " ").replace(/\b\w/g, function (letter) {
+        return letter.toUpperCase();
+      });
+    }
+    function settingLabel(value) {
+      const normalized = String(value || "").toLowerCase();
+      if (normalized === "coastorisland") return "Coast or island";
+      if (normalized === "water") return "Water setting (legacy)";
+      return titleCaseFilter(value);
+    }
+    function activeDestinationFilters(preferences) {
+      const filters = [];
+      const region = preferences && preferences.region;
+      if (region && String(region).toLowerCase() !== "any") filters.push(titleCaseFilter(region));
+      (preferences && Array.isArray(preferences.settings) ? preferences.settings : []).forEach(function (setting) {
+        filters.push(settingLabel(setting));
+      });
+      return filters;
+    }
+    function sentenceList(values) {
+      if (values.length < 2) return values.join("");
+      if (values.length === 2) return values.join(" and ");
+      return values.slice(0, -1).join(", ") + ", and " + values[values.length - 1];
     }
     function displayResultMoney(amountUsd) {
       return resultMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
@@ -801,14 +826,16 @@
       const trackingAttributes = ' data-finder-destination data-destination-id="' +
         escapeHtml(item.destinationId) + '" data-surface="recommended_match" data-match-rank="' +
         matchRank + '" data-tier="' + escapeHtml(item.tier) + '"';
+      const hasRemainingCapital = Number(item.surplusGap) >= 0;
+      const gapLabel = hasRemainingCapital ? "Capital remaining" : "Capital gap";
+      const gapAmount = Math.abs(Number(item.surplusGap) || 0);
       return '<article class="finder-result"><header><div><p class="finder-tier">' +
         escapeHtml(tierLabel(item.tier)) + '</p><h3><a href="' + escapeHtml(dossierHref) +
         '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
         '</p></div></header><dl>' +
-        '<div><dt>Projected capital</dt><dd>' + displayResultMoney(item.portfolioAtRetirement) + "</dd></div>" +
         '<div><dt>Required capital</dt><dd>' + displayResultMoney(item.retirementTarget) + "</dd></div>" +
-        '<div><dt>Remaining or gap</dt><dd>' + displayResultMoney(item.surplusGap) + "</dd></div>" +
+        '<div><dt>' + gapLabel + '</dt><dd>' + displayResultMoney(gapAmount) + "</dd></div>" +
         propertyBits + rental + "</dl>" + financing +
         '<p class="finder-rationale">' + escapeHtml(finderMatchExplanation({
           item: item,
@@ -948,6 +975,7 @@
         element("finder-landscape-projected").textContent = "—";
         element("finder-landscape-axis").innerHTML = "";
         element("finder-landscape-rows").innerHTML = "";
+        element("finder-landscape-toggle").hidden = true;
         return;
       }
       element("finder-projected-capital").textContent = displayResultMoney(projectedCapital);
@@ -963,6 +991,10 @@
       });
       element("finder-landscape-axis").innerHTML = markup.axisHtml;
       element("finder-landscape-rows").innerHTML = markup.rowsHtml;
+      element("finder-landscape-rows").classList.remove("is-expanded");
+      element("finder-landscape-toggle").hidden = markup.rowCount <= 5;
+      element("finder-landscape-toggle").textContent = "View all " + markup.rowCount + " destinations";
+      element("finder-landscape-toggle").setAttribute("aria-expanded", "false");
     }
 
     function renderEvidence(items) {
@@ -1017,6 +1049,15 @@
       element("finder-matches-section").hidden = !hasRecommendations;
       element("finder-projection-section").hidden = !hasRecommendations || sharedView;
       element("finder-empty-state").hidden = hasRecommendations;
+      const activeFilters = activeDestinationFilters(user.preferences || {});
+      element("finder-active-filters").textContent = activeFilters.length
+        ? "Showing: " + activeFilters.join(" · ")
+        : "Showing all destinations";
+      element("finder-empty-state").textContent = !hasRecommendations &&
+        Number(result.summary.evaluatedCount) === 0 && activeFilters.length
+        ? "No destinations match " + sentenceList(activeFilters) +
+          ". Try removing a setting or choosing another region."
+        : "No destinations could be evaluated under these assumptions. Review the exclusions below or change the housing and financing assumptions.";
       renderCapitalLandscape(result);
       if (!sharedView) {
         renderChart(finderProjectionView({
@@ -1210,6 +1251,16 @@
       });
     });
     element("finder-landscape-rows").addEventListener("click", trackDestinationClick);
+    element("finder-landscape-toggle").addEventListener("click", function () {
+      const rows = element("finder-landscape-rows");
+      const toggle = element("finder-landscape-toggle");
+      const expanded = !rows.classList.contains("is-expanded");
+      rows.classList.toggle("is-expanded", expanded);
+      toggle.setAttribute("aria-expanded", String(expanded));
+      toggle.textContent = expanded
+        ? "Show fewer destinations"
+        : "View all " + currentRecommendations.length + " destinations";
+    });
     element("finder-recommendations").addEventListener("click", trackDestinationClick);
     element("finder-comparison-body").addEventListener("change", function (event) {
       const control = event.target && event.target.dataset && event.target.dataset.comparisonPosition !== undefined

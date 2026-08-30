@@ -105,10 +105,31 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
         self.assertIn('role="group" aria-labelledby="finder-setting-label"', preferences)
         self.assertEqual(4, preferences.count('name="finder-setting"'))
-        for value in ("City", "Water", "Mountain", "Lake"):
+        for value in ("City", "CoastOrIsland", "Mountain", "Lake"):
             self.assertIn(f'name="finder-setting" value="{value}"', preferences)
-        self.assertIn("Choose any that apply. Leave all unchecked for no preference.", preferences)
+        self.assertIn(
+            "Choose one or more. Destinations matching any selected setting are shown.",
+            preferences,
+        )
         self.assertNotIn('id="finder-climate"', preferences)
+
+    def test_results_show_recommendations_before_the_full_cost_landscape(self) -> None:
+        results = self.html.split('id="finder-results"', 1)[1].split(
+            'class="finder-editorial"', 1
+        )[0]
+
+        self.assertLess(
+            results.index('id="finder-matches-section"'),
+            results.index('id="finder-capital-landscape"'),
+        )
+        self.assertIn('id="finder-landscape-toggle"', results)
+
+    def test_results_reserve_plain_text_for_active_filters(self) -> None:
+        results = self.html.split('id="finder-results"', 1)[1].split(
+            'class="finder-editorial"', 1
+        )[0]
+
+        self.assertIn('id="finder-active-filters"', results)
 
     def test_form_defaults_to_age_45_and_retirement_at_60(self) -> None:
         form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
@@ -199,13 +220,13 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertLess(self.html.index(scrub), self.html.index(analytics) if analytics in self.html else self.html.index('type="application/ld+json"'))
         self.assertIn('id="finder-data-reviewed"', self.html)
 
-    def test_results_lead_with_cost_landscape_and_three_modeled_matches(self) -> None:
+    def test_results_lead_with_three_modeled_matches_and_offer_the_cost_landscape(self) -> None:
         self.assertIn('id="finder-result-read"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
         self.assertIn('aria-label="Three strongest matches"', self.html)
         self.assertNotIn('id="finder-closest-match"', self.html)
         self.assertNotIn('id="finder-show-all"', self.html)
-        self.assertNotIn("View all destinations", self.html)
+        self.assertIn('id="finder-landscape-toggle"', self.html)
         self.assertIn("Destination guide", self.html)
         self.assertIn('data-finder-dossier', self.html)
 
@@ -224,6 +245,11 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn(".retirement-finder-page .finder-landscape-row.is-on-target .finder-landscape-dot { display: none; }", design_css)
         self.assertIn(".retirement-finder-page .finder-landscape-row.is-on-target.is-match .finder-landscape-capital-dot", design_css)
         self.assertIn("@media (max-width: 760px)", design_css)
+        self.assertIn(
+            ".finder-landscape-rows:not(.is-expanded) > .finder-landscape-item:nth-child(n + 6)",
+            design_css,
+        )
+        self.assertIn(".finder-landscape-toggle", design_css)
         self.assertNotIn("background: linear-gradient(to right", design_css)
         self.assertNotIn("border-left: 1px solid var(--gha-rule); border-right: 1px solid var(--gha-rule)", design_css)
         self.assertNotIn(".finder-landscape { border-radius:", design_css)
@@ -262,6 +288,17 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn(".finder-results{min-width:0", self.html)
         self.assertIn(".finder-projection-wrap{min-width:0", self.html)
         self.assertIn(".finder-comparison-mobile", self.html)
+        self.assertIn(
+            ".retirement-finder-page .finder-setting-options .check { min-height: 44px;",
+            self.html,
+        )
+
+    def test_mobile_hero_is_compact_enough_to_reach_the_form_quickly(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+
+        self.assertIn("padding: 24px 0 26px", design_css)
+        self.assertIn("font-size: clamp(38px, 11vw, 52px)", design_css)
 
     def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
         self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)
