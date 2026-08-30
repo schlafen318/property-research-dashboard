@@ -106,7 +106,7 @@ const values = {
   "finder-other-income": "0",
 };
 Object.entries(values).forEach(([id, value]) => { el(id).value = value; });
-const settingControls = ["City", "Water", "Mountain", "Lake"].map((value) => {
+const settingControls = ["City", "CoastOrIsland", "Mountain", "Lake"].map((value) => {
   const control = el("finder-setting-" + value.toLowerCase());
   control.value = value;
   control.checked = (input.settings || []).includes(value);
@@ -202,6 +202,7 @@ if (input.editLiquid) {
   el("finder-liquid-capital").value = input.editLiquid;
   el("finder-liquid-capital").dispatch("input");
 }
+if (input.region) el("finder-region").value = input.region;
 if (input.submit) el("retirement-destination-finder-form").dispatch("submit");
 if (input.clickShare) el("finder-share").dispatch("click");
 if (input.preferenceChange) {
@@ -253,6 +254,8 @@ process.stdout.write(JSON.stringify({
   matchesHidden: el("finder-matches-section").hidden,
   projectionHidden: el("finder-projection-section").hidden,
   emptyStateHidden: el("finder-empty-state").hidden,
+  emptyStateText: el("finder-empty-state").textContent,
+  activeFilters: el("finder-active-filters").textContent,
   trackedEvents,
 }));
 '''
@@ -369,16 +372,68 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         scenario = run_ui_dom_scenario(
             {
                 "rates": {"USD": 1},
-                "settings": ["Water", "Mountain"],
+                "settings": ["CoastOrIsland", "Mountain"],
                 "submit": True,
             }
         )
 
         self.assertEqual(
-            ["Water", "Mountain"],
+            ["CoastOrIsland", "Mountain"],
             scenario["user"]["preferences"]["settings"],
         )
         self.assertNotIn("climate", scenario["user"]["preferences"])
+
+    def test_results_name_the_active_region_and_settings(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "region": "asia",
+                "settings": ["CoastOrIsland", "Mountain"],
+                "submit": True,
+                "engineResult": {
+                    "summary": {
+                        "evaluatedCount": 0,
+                        "withinReachCount": 0,
+                        "closeCount": 0,
+                        "stretchCount": 0,
+                    },
+                    "sharedProjection": None,
+                    "recommendations": [],
+                    "excluded": [],
+                },
+            }
+        )
+
+        self.assertEqual(
+            "Showing: Asia · Coast or island · Mountain",
+            scenario["activeFilters"],
+        )
+
+    def test_no_match_state_suggests_relaxing_destination_filters(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "region": "asia",
+                "settings": ["Lake"],
+                "submit": True,
+                "engineResult": {
+                    "summary": {
+                        "evaluatedCount": 0,
+                        "withinReachCount": 0,
+                        "closeCount": 0,
+                        "stretchCount": 0,
+                    },
+                    "sharedProjection": None,
+                    "recommendations": [],
+                    "excluded": [],
+                },
+            }
+        )
+
+        self.assertEqual(
+            "No destinations match Asia and Lake. Try removing a setting or choosing another region.",
+            scenario["emptyStateText"],
+        )
 
     def test_invalid_next_currency_rates_leave_selection_and_values_unchanged(self) -> None:
         for invalid_rate in (0, -1, "Infinity", "not-a-rate"):
@@ -939,13 +994,13 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         scenario = run_ui_dom_scenario(
             {
                 "rates": {"USD": 1},
-                "preferenceChange": {"id": "finder-setting-water", "checked": True},
+                "preferenceChange": {"id": "finder-setting-coastorisland", "checked": True},
             }
         )
 
         event = next(item for item in scenario["trackedEvents"] if item["name"] == "retirement_destination_finder_preference_change")
         self.assertEqual(
-            {"preference": "setting", "value": "Water", "selected": True},
+            {"preference": "setting", "value": "CoastOrIsland", "selected": True},
             event["fields"],
         )
 

@@ -476,6 +476,30 @@
         return control.value;
       });
     }
+    function titleCaseFilter(value) {
+      return String(value || "").replace(/-/g, " ").replace(/\b\w/g, function (letter) {
+        return letter.toUpperCase();
+      });
+    }
+    function settingLabel(value) {
+      const normalized = String(value || "").toLowerCase();
+      if (normalized === "coastorisland" || normalized === "water") return "Coast or island";
+      return titleCaseFilter(value);
+    }
+    function activeDestinationFilters(preferences) {
+      const filters = [];
+      const region = preferences && preferences.region;
+      if (region && String(region).toLowerCase() !== "any") filters.push(titleCaseFilter(region));
+      (preferences && Array.isArray(preferences.settings) ? preferences.settings : []).forEach(function (setting) {
+        filters.push(settingLabel(setting));
+      });
+      return filters;
+    }
+    function sentenceList(values) {
+      if (values.length < 2) return values.join("");
+      if (values.length === 2) return values.join(" and ");
+      return values.slice(0, -1).join(", ") + ", and " + values[values.length - 1];
+    }
     function displayResultMoney(amountUsd) {
       return resultMoney({ amountUsd: amountUsd, currency: selectedCurrency, ratesToUsd: ratesToUsd });
     }
@@ -1017,6 +1041,15 @@
       element("finder-matches-section").hidden = !hasRecommendations;
       element("finder-projection-section").hidden = !hasRecommendations || sharedView;
       element("finder-empty-state").hidden = hasRecommendations;
+      const activeFilters = activeDestinationFilters(user.preferences || {});
+      element("finder-active-filters").textContent = activeFilters.length
+        ? "Showing: " + activeFilters.join(" · ")
+        : "Showing all destinations";
+      element("finder-empty-state").textContent = !hasRecommendations &&
+        Number(result.summary.evaluatedCount) === 0 && activeFilters.length
+        ? "No destinations match " + sentenceList(activeFilters) +
+          ". Try removing a setting or choosing another region."
+        : "No destinations could be evaluated under these assumptions. Review the exclusions below or change the housing and financing assumptions.";
       renderCapitalLandscape(result);
       if (!sharedView) {
         renderChart(finderProjectionView({

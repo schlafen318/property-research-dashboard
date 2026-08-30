@@ -378,6 +378,7 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-results { margin-top: 64px; padding: 42px 0 0; border: 0; border-top: 3px solid var(--gha-ink); border-radius: 0; background: transparent; }
     .retirement-finder-page .finder-results > * { min-width: 0; }
     .retirement-finder-page .finder-results-intro { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr); gap: 48px; align-items: end; }
+    .retirement-finder-page .finder-active-filters { margin: 10px 0 0; color: var(--gha-muted); font-size: 14px; }
     .retirement-finder-page .finder-result-read { margin: 0; font-family: var(--gha-display-serif); font-size: 21px; line-height: 1.45; }
     .retirement-finder-page .finder-summary { grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 28px 0 36px; border: 0; border-top: 1px solid var(--gha-rule); border-bottom: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-summary div { padding: 16px 16px 18px 0; }

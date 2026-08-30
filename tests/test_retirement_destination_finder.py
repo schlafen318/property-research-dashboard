@@ -97,6 +97,21 @@ def user_payload(**overrides: object) -> dict:
 
 
 class RetirementDestinationFinderTests(unittest.TestCase):
+    def test_destination_setting_taxonomy_is_explicit_and_complete(self) -> None:
+        destinations = json.loads((ROOT / "data" / "destinations.json").read_text())
+        allowed = {"City", "Coast", "Island", "Mountain", "Lake"}
+        covered = set()
+
+        for item in destinations:
+            with self.subTest(destination=item["id"]):
+                self.assertIsInstance(item.get("settings"), list)
+                self.assertTrue(item["settings"])
+                self.assertEqual(len(item["settings"]), len(set(item["settings"])))
+                self.assertTrue(set(item["settings"]).issubset(allowed))
+                covered.update(item["settings"])
+
+        self.assertEqual(allowed, covered)
+
     def test_conditional_mortgage_requires_matching_residency_and_income_profile(self) -> None:
         profile = mortgage_profile("conditional", 0.6)
         profile["eligible_residency"] = ["resident"]
@@ -218,17 +233,17 @@ class RetirementDestinationFinderTests(unittest.TestCase):
 
     def test_multiple_setting_preferences_match_any_selected_setting(self) -> None:
         coast = destination("coast-place")
-        coast["category"] = "Water"
+        coast["settings"] = ["Coast"]
         mountain = destination("mountain-place")
-        mountain["category"] = "Mountain"
+        mountain["settings"] = ["Mountain"]
         city = destination("city-place")
-        city["category"] = "City"
+        city["settings"] = ["City"]
         destinations = [coast, mountain, city]
         payload = {
             "user": user_payload(
                 preferences={
                     "region": "any",
-                    "settings": ["Water", "Mountain"],
+                    "settings": ["CoastOrIsland", "Mountain"],
                     "healthcare": "normal",
                 }
             ),
@@ -242,6 +257,30 @@ class RetirementDestinationFinderTests(unittest.TestCase):
         self.assertEqual(
             {"coast-place", "mountain-place"},
             {item["destinationId"] for item in result["recommendations"]},
+        )
+
+    def test_lake_filter_uses_explicit_tags_not_legacy_category_text(self) -> None:
+        lake = destination("lake-place")
+        lake["category"] = "Mountain + Water"
+        lake["settings"] = ["Mountain", "Lake"]
+        coast = destination("coast-place")
+        coast["category"] = "Mountain + Water"
+        coast["settings"] = ["Mountain", "Coast"]
+        destinations = [lake, coast]
+        payload = {
+            "user": user_payload(
+                preferences={"region": "any", "settings": ["Lake"], "healthcare": "normal"}
+            ),
+            "destinations": destinations,
+            "retirementCosts": [cost_record(item["id"], 90_000) for item in destinations],
+            "mortgageProfiles": {item["id"]: mortgage_profile() for item in destinations},
+        }
+
+        result = run_finder("recommendDestinations", payload)
+
+        self.assertEqual(
+            ["lake-place"],
+            [item["destinationId"] for item in result["recommendations"]],
         )
 
     def test_incomplete_mortgage_research_cannot_be_recommended(self) -> None:

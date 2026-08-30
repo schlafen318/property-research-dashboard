@@ -114,9 +114,34 @@
     const source = Array.isArray(preferences.settings)
       ? preferences.settings
       : [preferences.climate];
-    return source.map(normalizedPreference).filter(function (value, index, values) {
+    const normalized = source.map(normalizedPreference).filter(function (value, index, values) {
       return value && value !== "any" && values.indexOf(value) === index;
     });
+    return normalized.reduce(function (settings, value) {
+      const expanded = value === "water" || value === "coastorisland"
+        ? ["coast", "island"]
+        : [value];
+      expanded.forEach(function (setting) {
+        if (settings.indexOf(setting) === -1) settings.push(setting);
+      });
+      return settings;
+    }, []);
+  }
+
+  function destinationSettings(destination) {
+    if (Array.isArray(destination.settings) && destination.settings.length) {
+      return destination.settings.map(normalizedPreference).filter(Boolean);
+    }
+    const category = normalizedPreference(destination.category);
+    return {
+      city: ["city"],
+      coast: ["coast"],
+      island: ["island"],
+      lake: ["lake"],
+      mountain: ["mountain"],
+      water: ["coast", "island"],
+      mountainwater: ["mountain", "coast", "island", "lake"],
+    }[category] || [];
   }
 
   function destinationMatchesFilters(destination, preferences) {
@@ -126,9 +151,9 @@
       [destination.continent, destination.country].some(function (value) {
         return normalizedPreference(value) === region;
       });
-    const destinationSetting = normalizedPreference(destination.category);
+    const availableSettings = destinationSettings(destination);
     const settingMatches = !settings.length || settings.some(function (setting) {
-      return destinationSetting.includes(setting);
+      return availableSettings.indexOf(setting) !== -1;
     });
     return regionMatches && settingMatches;
   }
