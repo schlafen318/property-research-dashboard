@@ -71,6 +71,13 @@ def level_cash_flow_payload() -> dict:
 
 
 class RetirementCalculatorEngineTests(unittest.TestCase):
+    def test_retirement_can_begin_now_for_static_scenario_pages(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update({"currentAge": 60, "retirementAge": 60, "retirementBeginsNow": True})
+        result = calculate(payload)
+        self.assertEqual(0, result["yearsToRetirement"])
+        self.assertEqual(12000, result["firstYearExpenses"])
+
     def test_projects_expenses_and_indexed_income(self) -> None:
         result = calculate(base_payload())
         factor = 1.026**10

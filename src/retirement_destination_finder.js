@@ -85,6 +85,7 @@
     return {
       currentAge: user.currentAge,
       retirementAge: user.retirementAge,
+      retirementBeginsNow: user.retirementBeginsNow === true,
       horizonYears: user.horizonYears,
       expenseCategories: categories,
       incomeStreams: user.incomeStreams || [],
@@ -105,14 +106,66 @@
     return Number(raw && typeof raw === "object" ? raw.score : raw || 0);
   }
 
+  function normalizedPreference(value) {
+    return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+  }
+
+  function normalizedSettings(preferences) {
+    const source = Array.isArray(preferences.settings)
+      ? preferences.settings
+      : [preferences.climate];
+    const normalized = source.map(normalizedPreference).filter(function (value, index, values) {
+      return value && value !== "any" && values.indexOf(value) === index;
+    });
+    return normalized.reduce(function (settings, value) {
+      const expanded = value === "water" || value === "coastorisland"
+        ? ["coast", "island"]
+        : [value];
+      expanded.forEach(function (setting) {
+        if (settings.indexOf(setting) === -1) settings.push(setting);
+      });
+      return settings;
+    }, []);
+  }
+
+  function destinationSettings(destination) {
+    if (Array.isArray(destination.settings) && destination.settings.length) {
+      return destination.settings.map(normalizedPreference).filter(Boolean);
+    }
+    const category = normalizedPreference(destination.category);
+    return {
+      city: ["city"],
+      coast: ["coast"],
+      island: ["island"],
+      lake: ["lake"],
+      mountain: ["mountain"],
+      water: ["coast", "island"],
+      mountainwater: ["mountain", "coast", "island", "lake"],
+    }[category] || [];
+  }
+
+  function destinationMatchesFilters(destination, preferences) {
+    const region = normalizedPreference(preferences.region);
+    const settings = normalizedSettings(preferences);
+    const regionMatches = !region || region === "any" ||
+      [destination.continent, destination.country].some(function (value) {
+        return normalizedPreference(value) === region;
+      });
+    const availableSettings = destinationSettings(destination);
+    const settingMatches = !settings.length || settings.some(function (setting) {
+      return availableSettings.indexOf(setting) !== -1;
+    });
+    return regionMatches && settingMatches;
+  }
+
   function preferenceMatches(destination, preferences) {
     const matches = [];
     if (preferences.region && preferences.region !== "any" &&
-        [destination.continent, destination.country].includes(preferences.region)) {
+        destinationMatchesFilters(destination, { region: preferences.region, climate: "any" })) {
       matches.push("Preferred region");
     }
-    if (preferences.climate && preferences.climate !== "any" &&
-        String(destination.category || "").toLowerCase().includes(String(preferences.climate).toLowerCase())) {
+    if (normalizedSettings(preferences).length &&
+        destinationMatchesFilters(destination, { region: "any", settings: preferences.settings, climate: preferences.climate })) {
       matches.push("Preferred setting");
     }
     if (preferences.healthcare === "high" && scoreValue(destination, "healthcare") >= 4) {
@@ -153,6 +206,16 @@
     return purchaseMethod === "not_sure" ? "Illustrative mortgage · " + label : label;
   }
 
+  function projectionAfterRetirementTreatment(annualProjection, portfolioAtRetirement, mortgageBalanceAtRetirement) {
+    if (!Array.isArray(annualProjection) || !annualProjection.length) return annualProjection;
+    const adjusted = annualProjection.slice();
+    adjusted[adjusted.length - 1] = Object.assign({}, adjusted[adjusted.length - 1], {
+      portfolio: portfolioAtRetirement,
+      mortgageBalance: mortgageBalanceAtRetirement,
+    });
+    return adjusted;
+  }
+
   function profileMatchesBuyer(input) {
     const user = input && input.user || {};
     const profile = input && input.profile || {};
@@ -163,7 +226,7 @@
     return residencies.includes(residency) && incomeSources.includes(incomeSource);
   }
 
-  function recommendDestinations(input) {
+  function recommendDestinations(input, projectionOverride) {
     if (!input || !Array.isArray(input.destinations) || !Array.isArray(input.retirementCosts)) {
       throw new Error("Destinations and retirement costs are required");
     }
@@ -171,19 +234,22 @@
     const costs = new Map(input.retirementCosts.map(function (item) {
       return [item.destination_id, item];
     }));
-    const sharedProjection = user.housingPlan === "buy_now" ? null : projectPortfolio({
-      currentAge: user.currentAge,
-      retirementAge: user.retirementAge,
-      startingPortfolio: user.totalLiquidCapital,
-      monthlyContribution: user.monthlyPortfolioContribution,
-      contributionInflationLinked: user.contributionInflationLinked,
-      generalInflation: user.generalInflation,
-      expectedPortfolioReturn: user.expectedPortfolioReturn,
-    });
+    const sharedProjection = projectionOverride || (user.housingPlan === "buy_now" ? null : projectPortfolio({
+        currentAge: user.currentAge,
+        retirementAge: user.retirementAge,
+        startingPortfolio: user.totalLiquidCapital,
+        monthlyContribution: user.monthlyPortfolioContribution,
+        contributionInflationLinked: user.contributionInflationLinked,
+        generalInflation: user.generalInflation,
+        expectedPortfolioReturn: user.expectedPortfolioReturn,
+      }));
     const recommendations = [];
     const excluded = [];
+    let evaluatedCount = 0;
 
     input.destinations.forEach(function (destination) {
+      if (!destinationMatchesFilters(destination, user.preferences || {})) return;
+      evaluatedCount += 1;
       const cost = costs.get(destination.id);
       if (!cost) {
         excluded.push({ destinationId: destination.id, name: destination.name, reasonCode: "missing_cost_data" });
@@ -193,9 +259,11 @@
         excluded.push({ destinationId: destination.id, name: destination.name, reasonCode: "buyer_access_restricted" });
         return;
       }
+      const retirementProfile = cost.profiles[user.household];
       const targetResult = retirement.calculateRetirementTarget(retirementTargetInput(user, cost));
       let retirementTarget = Number(targetResult.totalCapitalAtRetirement);
       let portfolioAtRetirement = sharedProjection ? sharedProjection.portfolioAtRetirement : 0;
+      let annualProjection = sharedProjection ? sharedProjection.annualProjection : null;
       let propertyEquity = 0;
       let mortgageBalance = 0;
       let netRentalCashFlow = 0;
@@ -256,6 +324,11 @@
           return;
         }
         portfolioAtRetirement = propertyResult.portfolioAtRetirement;
+        annualProjection = projectionAfterRetirementTreatment(
+          propertyResult.annualProjection,
+          propertyResult.portfolioAtRetirement,
+          propertyResult.mortgageBalanceAtRetirement
+        );
         propertyEquity = propertyResult.propertyEquityAtRetirement;
         mortgageBalance = propertyResult.mortgageBalanceAtRetirement;
         netRentalCashFlow = propertyResult.netRentalCashFlowAtRetirement;
@@ -273,7 +346,16 @@
         tier: tier,
         fundingRatio: fundingRatio,
         portfolioAtRetirement: portfolioAtRetirement,
+        annualProjection: annualProjection,
         retirementTarget: retirementTarget,
+        monthlyRetirementCost: (
+          Object.keys(retirementProfile.categories_usd).reduce(function (total, key) {
+            return total + Number(retirementProfile.categories_usd[key] || 0);
+          }, 0) + Number(user.housingPlan === "rent"
+            ? retirementProfile.annual_rent_usd
+            : retirementProfile.annual_owner_costs_usd)
+        ) / 12,
+        countryGuideHref: destination.countryGuideHref || "",
         surplusGap: portfolioAtRetirement - retirementTarget,
         propertyEquity: propertyEquity,
         mortgageBalance: mortgageBalance,
@@ -296,7 +378,7 @@
     });
     return {
       summary: {
-        evaluatedCount: input.destinations.length,
+        evaluatedCount: evaluatedCount,
         withinReachCount: recommendations.filter(function (item) { return item.tier === "within_reach"; }).length,
         closeCount: recommendations.filter(function (item) { return item.tier === "close"; }).length,
         stretchCount: recommendations.filter(function (item) { return item.tier === "stretch"; }).length,
@@ -307,11 +389,30 @@
     };
   }
 
+  function recommendProjectedCapital(input) {
+    const user = input && input.user || {};
+    if (user.housingPlan === "buy_now") {
+      throw new Error("Projected-capital scenarios do not support buy now");
+    }
+    const capital = nonNegative(input && input.projectedCapitalUsd, "Projected capital");
+    const sharedProjection = {
+      annualProjection: [{
+        year: Math.max(0, Number(user.retirementAge) - Number(user.currentAge)),
+        portfolio: capital,
+        contributions: 0,
+      }],
+      portfolioAtRetirement: capital,
+      exhaustedMonth: null,
+    };
+    return recommendDestinations(input, sharedProjection);
+  }
+
   return {
     projectPortfolio: projectPortfolio,
     retirementTargetInput: retirementTargetInput,
     fundingTier: fundingTier,
     profileMatchesBuyer: profileMatchesBuyer,
     recommendDestinations: recommendDestinations,
+    recommendProjectedCapital: recommendProjectedCapital,
   };
 });

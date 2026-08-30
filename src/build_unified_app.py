@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+import csv
+import io
 import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import unicodedata
 from copy import deepcopy
@@ -29,6 +32,10 @@ try:
     )
     from src.seo_content_overrides import apply_content_override, load_content_overrides
     from src.retirement_destination_finder_page import build_retirement_destination_finder_html
+    from src.retirement_capital_scenario_page import (
+        SCENARIO_LABELS,
+        build_retirement_capital_scenario_html,
+    )
     from src.site_design_system import (
         foreign_buyer_country_guide_css,
         landing_design_css,
@@ -60,6 +67,10 @@ except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.p
     )
     from seo_content_overrides import apply_content_override, load_content_overrides
     from retirement_destination_finder_page import build_retirement_destination_finder_html
+    from retirement_capital_scenario_page import (
+        SCENARIO_LABELS,
+        build_retirement_capital_scenario_html,
+    )
     from site_design_system import (
         foreign_buyer_country_guide_css,
         landing_design_css,
@@ -115,6 +126,11 @@ REPORT_LIBRARY_DESCRIPTION = (
     "Browse premium Global Home Atlas research brief formats for retirement markets, "
     "second-home shortlists, overseas property risk, and polished buyer memos."
 )
+PROPERTY_MARKET_DATA_SLUG = "global-property-market-data"
+PROPERTY_MARKET_DATA_DESCRIPTION = (
+    "Download and compare Global Home Atlas data for 37 international property markets, "
+    "including prices, yields, ownership clarity, retirement fit and exit liquidity."
+)
 RETIREMENT_CALCULATOR_SLUG = "retirement-abroad-calculator"
 RETIREMENT_CALCULATOR_TITLE = "Retirement Abroad Calculator: How Much Do You Need? | Global Home Atlas"
 RETIREMENT_CALCULATOR_H1 = "How Much Do You Need to Retire Abroad?"
@@ -123,6 +139,13 @@ RETIREMENT_CALCULATOR_DESCRIPTION = (
     "inflation, pension and passive income, property costs, and required portfolio capital."
 )
 RETIREMENT_FINDER_SLUG = "retirement-destination-finder"
+RETIREMENT_CAPITAL_SCENARIOS = (
+    ("retire-abroad-with-500k", 500_000),
+    ("retire-abroad-with-750k", 750_000),
+    ("retire-abroad-with-1-million", 1_000_000),
+    ("retire-abroad-with-1-5-million", 1_500_000),
+    ("retire-abroad-with-2-million", 2_000_000),
+)
 RETIREMENT_FINDER_TITLE = "Retirement Destination Finder: Where Can I Afford to Retire? | Global Home Atlas"
 RETIREMENT_FINDER_FAQS = [
     (
@@ -194,7 +217,9 @@ RETIREMENT_PLANNING_CURRENCIES = {
 }
 PROPERTY_FINANCE_PATH = ROOT / "src" / "property_finance.js"
 RETIREMENT_FINDER_ENGINE_PATH = ROOT / "src" / "retirement_destination_finder.js"
+RETIREMENT_FINDER_SCENARIO_PATH = ROOT / "src" / "retirement_finder_scenario.js"
 RETIREMENT_FINDER_UI_PATH = ROOT / "src" / "retirement_destination_finder_ui.js"
+RETIREMENT_CAPITAL_GENERATOR_PATH = ROOT / "scripts" / "generate_retirement_capital_scenarios.js"
 RETIREMENT_RANKING_TABLE_PATH = ROOT / "src" / "retirement_ranking_table.js"
 CONTINENT_BY_COUNTRY = {
     "Austria": "europe",
@@ -698,8 +723,8 @@ SEO_PAGES = [
     },
     {
         "slug": "best-places-to-buy-vacation-home-abroad",
-        "title": "Best Places to Buy a Vacation Home in the World",
-        "description": "Compare the best places to buy a vacation home in the world by lifestyle use, ownership clarity, rental-rule risk, value discipline, and resale depth.",
+        "title": "Best Locations for Vacation Homes: 10 Global Markets",
+        "description": "Compare the best places to buy a vacation home worldwide by prices, buyer access, lifestyle, rental rules, carrying costs, and resale potential.",
         "h1": "Best Places to Buy a Vacation Home in the World",
         "keyword": "best country to buy a vacation home",
         "theme": "vacation-home acquisition",
@@ -788,8 +813,8 @@ SEO_PAGES = [
     },
     {
         "slug": "overseas-property-investment",
-        "title": "Overseas Property Investment: Markets to Compare | Global Home Atlas",
-        "description": "Compare overseas property investment destinations by net yield, capital upside, regulatory safety, entry price, and liquidity.",
+        "title": "Overseas Property Investment: 8 Markets Compared",
+        "description": "Compare eight overseas property investment markets through buyer access, realistic net income, demand, carrying costs, regulation, entry price and exit liquidity.",
         "h1": "Overseas Property Investment",
         "keyword": "overseas property investment",
         "theme": "investment underwriting",
@@ -1010,9 +1035,9 @@ SEO_PAGES = [
     },
     {
         "slug": "thailand-villa-ownership-foreigners",
-        "title": "Thailand Villa Ownership for Foreigners | Global Home Atlas",
-        "description": "Understand Thailand villa ownership for foreigners and compare Phuket and Koh Samui against other Asia lifestyle property alternatives.",
-        "h1": "Thailand Villa Ownership for Foreigners",
+        "title": "Foreign Buyer Guide to Thailand Villas: Ownership Rules",
+        "description": "A foreign buyer guide to Thailand villas covering land and building rights, leasehold risk, due diligence, rental assumptions, Phuket, Koh Samui and resale.",
+        "h1": "Thailand Villa Ownership: Foreign Buyer Guide",
         "keyword": "Thailand villa ownership foreigners",
         "theme": "Thailand ownership",
         "intent": "buyers attracted to Thai villas who need to understand structure, rental appeal, and legal friction",
@@ -1262,7 +1287,8 @@ FIT_BUDGET_THRESHOLDS = {
 def rank_destinations_for_fit(destinations: list[dict], preferences: dict) -> list[dict]:
     """Rank every destination for a reader's broad buying preferences."""
     goal = preferences.get("goal", "retirement")
-    setting = preferences.get("setting", "any")
+    raw_setting = preferences.get("setting", "any")
+    settings = [raw_setting] if isinstance(raw_setting, str) else list(raw_setting or ["any"])
     use = preferences.get("use", "balanced")
     tradeoff = preferences.get("tradeoff", "balanced")
     budget_threshold = FIT_BUDGET_THRESHOLDS.get(preferences.get("budget", "flexible"))
@@ -1274,8 +1300,8 @@ def rank_destinations_for_fit(destinations: list[dict], preferences: dict) -> li
             for item in destination.get("decision_dimensions", [])
         }
         goal_score = rank_destinations_for_goal([destination], goal)[0]["goal_score"]
-        setting_score = goal_score if setting == "any" else (
-            5.0 if setting in destination_location_types(destination) else 2.0
+        setting_score = goal_score if "any" in settings else (
+            5.0 if any(setting in destination_location_types(destination) for setting in settings) else 2.0
         )
         price = float(destination.get("usd_per_m2", 0) or 0)
         if budget_threshold is None or not price:
@@ -1759,9 +1785,18 @@ def analytics_event_script() -> str:
       document.addEventListener("click", function (event) {{
         const target = event.target.closest("a, button");
         if (!target) return;
+        if (target.hasAttribute("data-finder-destination")) return;
         const explicit = target.getAttribute("data-track");
         const href = target.getAttribute("href") || "";
         if (explicit) {{
+          if (explicit.indexOf("retirement_capital_scenario_") === 0) {{
+            track(explicit, {{
+              scenario_slug: document.body && document.body.dataset ? document.body.dataset.scenarioSlug || "" : "",
+              destination_id: target.getAttribute("data-destination-id") || "",
+              link_type: target.getAttribute("data-link-type") || ""
+            }});
+            return;
+          }}
           track(explicit, {{
             label: target.getAttribute("data-track-label") || target.textContent.trim(),
             href: href
@@ -1819,6 +1854,7 @@ def head_html(
     schema: list[dict],
     social_image: str | None = None,
     social_image_alt: str | None = None,
+    before_analytics: str = "",
 ) -> str:
     social_image_tags = []
     if social_image:
@@ -1851,6 +1887,7 @@ def head_html(
   <meta property="og:url" content="{escape(canonical)}">
 {social_image_meta.rstrip()}
   <meta name="twitter:card" content="summary_large_image">
+{before_analytics}
 {analytics_head_tags()}
   <script type="application/ld+json">{json_ld(schema)}</script>
 """
@@ -1915,22 +1952,57 @@ def related_guide_pages(page: dict, pages: list[dict], limit: int = 4, priority_
 
 
 def contextual_related_guides(page: dict, pages: list[dict], auto_links: list[dict] | None = None) -> str:
-    priority_slugs = [
-        str(item.get("target_slug"))
+    approved = [
+        item
         for item in auto_links or []
-        if item.get("source_slug") == page.get("slug") and item.get("target_slug")
+        if item.get("source_slug") == page.get("slug")
     ]
+    by_slug = {candidate["slug"]: candidate for candidate in pages}
     cards = []
-    for candidate in related_guide_pages(page, pages, priority_slugs=priority_slugs):
+    seen_hrefs: set[str] = set()
+
+    def append_card(href: str, anchor: str, theme: str, description: str) -> None:
+        if not href or href in seen_hrefs:
+            return
+        seen_hrefs.add(href)
         cards.append(
             f"""
             <article class="seo-link-card">
-              <span>{escape(candidate["theme"])}</span>
-              <h3><a href="/{escape(candidate["slug"])}/">{escape(candidate["h1"])}</a></h3>
-              <p>{escape(candidate["description"])}</p>
+              <span>{escape(theme)}</span>
+              <h3><a href="{escape(href)}" data-track="internal_page_click" data-track-label="seo authority {escape(page['slug'])}">{escape(anchor)}</a></h3>
+              <p>{escape(description)}</p>
             </article>
             """.rstrip()
         )
+
+    for item in approved:
+        candidate = by_slug.get(str(item.get("target_slug", "")))
+        if candidate:
+            append_card(
+                f'/{candidate["slug"]}/',
+                str(item.get("anchor") or candidate["h1"]),
+                str(item.get("theme") or candidate["theme"]),
+                str(item.get("description") or candidate["description"]),
+            )
+        elif item.get("target_path"):
+            append_card(
+                str(item["target_path"]),
+                str(item.get("anchor", "Related research")),
+                str(item.get("theme", "Related research")),
+                str(item.get("description", "Continue with the related market research.")),
+            )
+        if len(cards) >= 4:
+            break
+
+    for candidate in related_guide_pages(page, pages):
+        append_card(
+            f'/{candidate["slug"]}/',
+            candidate["h1"],
+            candidate["theme"],
+            candidate["description"],
+        )
+        if len(cards) >= 4:
+            break
     return "\n".join(cards)
 
 
@@ -3785,6 +3857,133 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
 """
 
 
+def property_market_data_rows(destinations: list[dict]) -> list[dict[str, str]]:
+    rows = []
+    for dest in destinations:
+        rows.append(
+            {
+                "rank": str(dest.get("rank", "")),
+                "destination": str(dest.get("name", "")),
+                "country": str(dest.get("country", "")),
+                "setting": str(dest.get("category", "")),
+                "decision_score_5": f'{float(dest.get("decision_score", 0) or 0):.2f}',
+                "usd_per_m2": f'{float(dest.get("usd_per_m2", 0) or 0):.0f}',
+                "net_yield_estimate": str(dest.get("net_yield_estimate", "")),
+                "ownership_clarity_5": f'{score(dest, "ownership_clarity"):.1f}',
+                "regulatory_safety_5": f'{score(dest, "str_regulatory_safety"):.1f}',
+                "retirement_fit_5": f'{score(dest, "retirement_suitability"):.1f}',
+                "exit_liquidity_5": f'{score(dest, "exit_liquidity"):.1f}',
+                "foreigner_fit_5": f'{score(dest, "chinese_foreigner_friendliness"):.1f}',
+                "access_status": str(dest.get("access_status", "available")),
+            }
+        )
+    return rows
+
+
+def property_market_data_csv(destinations: list[dict]) -> str:
+    fields = [
+        "rank",
+        "destination",
+        "country",
+        "setting",
+        "decision_score_5",
+        "usd_per_m2",
+        "net_yield_estimate",
+        "ownership_clarity_5",
+        "regulatory_safety_5",
+        "retirement_fit_5",
+        "exit_liquidity_5",
+        "foreigner_fit_5",
+        "access_status",
+    ]
+    output = io.StringIO(newline="")
+    writer = csv.DictWriter(output, fieldnames=fields, lineterminator="\n")
+    writer.writeheader()
+    writer.writerows(property_market_data_rows(destinations))
+    return output.getvalue()
+
+
+def build_property_market_data_page(destinations: list[dict]) -> str:
+    canonical = page_url(PROPERTY_MARKET_DATA_SLUG)
+    title = f"Global Property Market Data: {len(destinations)} Markets Compared"
+    csv_url = f"{SITE_URL}data/global-property-market-data.csv"
+    schema = [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "Dataset",
+            "name": title,
+            "description": PROPERTY_MARKET_DATA_DESCRIPTION,
+            "url": canonical,
+            "dateModified": date.today().isoformat(),
+            "creator": {"@type": "Organization", "name": SITE_NAME, "url": SITE_URL},
+            "distribution": {
+                "@type": "DataDownload",
+                "encodingFormat": "text/csv",
+                "contentUrl": csv_url,
+            },
+        },
+    ]
+    table_rows = "".join(
+        f"""
+        <tr>
+          <td>{escape(row["rank"])}</td>
+          <td><a href="/destinations/{escape(destination_slug(dest))}/">{escape(row["destination"])}</a></td>
+          <td>{escape(row["country"])}</td>
+          <td>{escape(row["setting"])}</td>
+          <td>{escape(row["decision_score_5"])}</td>
+          <td>{escape(row["usd_per_m2"])}</td>
+          <td>{escape(row["net_yield_estimate"])}</td>
+          <td>{escape(row["ownership_clarity_5"])}</td>
+          <td>{escape(row["retirement_fit_5"])}</td>
+          <td>{escape(row["exit_liquidity_5"])}</td>
+        </tr>"""
+        for dest, row in zip(destinations, property_market_data_rows(destinations))
+    )
+    return f"""<!doctype html>
+<html lang="en">
+<head>
+{head_html(title, PROPERTY_MARKET_DATA_DESCRIPTION, canonical, schema)}
+  <style>{shared_content_css()}
+    .data-table-wrap {{ overflow-x: auto; margin: 24px 0; }}
+    .data-table {{ width: 100%; border-collapse: collapse; background: var(--paper); font-size: 14px; }}
+    .data-table th, .data-table td {{ padding: 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; white-space: nowrap; }}
+    .data-table th {{ position: sticky; top: 0; background: var(--stone); }}
+  </style>
+</head>
+<body>
+  <header class="page-hero">
+    <div class="page-shell">
+      {primary_nav_html()}
+      <div class="page-hero-grid"><div>
+        <p class="page-eyebrow">Downloadable research data · updated {date.today().isoformat()}</p>
+        <h1>Global property market data</h1>
+        <p class="page-lede">Compare {len(destinations)} international markets using the same decision framework, then download the complete table for analysis or citation.</p>
+        <p><a class="page-button" href="/data/global-property-market-data.csv" download data-track="property_data_download" data-track-label="global property market csv">Download CSV</a></p>
+      </div></div>
+    </div>
+  </header>
+  <main><div class="page-shell"><article class="page-article">
+    <section class="page-section">
+      <h2>Market comparison table</h2>
+      <p>Prices are indicative USD per square metre; yield figures are research estimates rather than guarantees. Scores use a five-point scale. Read the <a href="/methodology/">scoring methodology</a> and <a href="/research-standards/">research standards</a> before reuse.</p>
+      <div class="data-table-wrap"><table class="data-table">
+        <thead><tr><th>Rank</th><th>Destination</th><th>Country</th><th>Setting</th><th>Score / 5</th><th>USD / m²</th><th>Net yield estimate</th><th>Ownership / 5</th><th>Retirement / 5</th><th>Exit / 5</th></tr></thead>
+        <tbody>{table_rows}</tbody>
+      </table></div>
+    </section>
+    <section class="page-section">
+      <h2>Reuse and attribution</h2>
+      <p>You may quote or analyse this table with attribution to Global Home Atlas and a link to this page. Verify current legal, tax, immigration and property rules locally before relying on any market comparison.</p>
+    </section>
+  </article></div></main>
+  <footer class="page-footer"><div class="page-shell"><strong>{SITE_NAME}</strong><p>Independent research for overseas property decisions.</p><nav><a href="/dashboard/">Rankings</a> <a href="/methodology/">Methodology</a> <a href="/contact/">Contact</a></nav></div></footer>
+{analytics_event_script()}
+</body>
+</html>
+"""
+
+
 def build_report_library_page(destinations: list[dict], pages: list[dict]) -> str:
     canonical = page_url(REPORT_LIBRARY_SLUG)
     schema = [
@@ -4259,13 +4458,13 @@ def build_landing_page(
         else "Compare overseas property destinations using foreign ownership, retirement fit, realistic costs, rental rules, resale potential, and representative listings."
     )
     search_description = (
-        f"Compare property abroad for retirement and second homes across {destination_count} destinations, with ownership rules, costs, rankings, listings and a calculator."
+        f"Compare property abroad across {destination_count} destinations for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools."
         if destination_count
-        else "Compare property abroad for retirement and second homes using ownership rules, realistic costs, rankings, listings and a calculator."
+        else "Compare property abroad for retirement, vacation and second homes, with buyer-access rules, costs, rankings, listings and tools."
     )
     content = apply_content_override(
         {
-            "title": "Compare Property Abroad for Retirement & Second Homes | Global Home Atlas",
+            "title": "Global Home Atlas: Compare Property Abroad",
             "description": search_description,
             "generated_intro": coverage_intro,
         },
@@ -4654,6 +4853,7 @@ def build_landing_page(
           </div>
           <nav class="method-links" aria-label="Research methodology">
             <a href="/methodology/" data-track="methodology_click" data-track-label="landing methodology">Scoring methodology</a>
+            <a href="/{PROPERTY_MARKET_DATA_SLUG}/" data-track="property_data_open" data-track-label="landing methodology">Download market data</a>
             <a href="/research-standards/" data-track="trust_click" data-track-label="landing standards">Research standards</a>
           </nav>
         </div>
@@ -5385,6 +5585,38 @@ def seo_decision_framework_html(page: dict) -> str:
     """
 
 
+def seo_query_intent_html(page: dict) -> str:
+    if page["slug"] == "thailand-villa-ownership-foreigners":
+        return """
+          <section class="seo-section" id="foreign-buyer-guide">
+            <h2>How foreign buyers should assess a Thailand villa</h2>
+            <p>Do not treat a villa advertisement as proof of land ownership, building ownership, a valid lease, or lawful rental use. Start by separating every advertised right: the land, the building, any registered lease or superficies, project-management obligations, common-area rights, and the route by which a later buyer could acquire the same package.</p>
+            <p>The <a href="/countries/thailand-property/" data-track="country_hub_click" data-track-label="Thailand villa foreign buyer guide">Thailand property guide</a> explains the national ownership screen. Then use the <a href="/destinations/phuket-koh-samui/" data-track="destination_click" data-track-label="Thailand villa foreign buyer guide">Phuket and Koh Samui dossier</a> to compare island-level access, management, hazards, seasonality and resale. For alternative ownership markets, continue with <a href="/where-can-foreigners-buy-property/" data-track="guide_click" data-track-label="Thailand villa foreign buyer guide">where foreigners can buy property</a>.</p>
+            <ul>
+              <li><strong>Legal interest:</strong> obtain independent Thai advice on the exact land, building, lease, company and registration documents.</li>
+              <li><strong>Operating case:</strong> assume no rental income until lawful use, licensing, project rules, management and net costs are verified.</li>
+              <li><strong>Exit case:</strong> identify who can acquire the same legal package and what happens when a lease term shortens or project governance weakens.</li>
+            </ul>
+          </section>
+        """
+    if page["slug"] == "overseas-property-investment":
+        return """
+          <section class="seo-section" id="investment-comparison-framework">
+            <h2>Overseas property investment comparison framework</h2>
+            <p>Compare each market with the same five tests before looking at advertised returns. This keeps legal access, operating economics and resale in one decision rather than treating the purchase price as the investment thesis.</p>
+            <ol>
+              <li><strong>Legal access</strong> — confirm the buyer, title, permitted use and transaction route before paying a deposit.</li>
+              <li><strong>Net income</strong> — deduct vacancy, management, tax, insurance, utilities, repairs, furnishing and platform costs from rent.</li>
+              <li><strong>Demand durability</strong> — separate year-round resident demand from seasonal visitor demand and one-country buyer dependence.</li>
+              <li><strong>Total carrying cost</strong> — model acquisition, financing, annual ownership, major works, currency movement and sale costs.</li>
+              <li><strong>Exit liquidity</strong> — identify the next eligible buyer, realistic marketing period and completed-sale evidence before entry.</li>
+            </ol>
+            <p>Use the <a href="/foreign-property-investment-risks/" data-track="guide_click" data-track-label="overseas investment framework">foreign property investment risk framework</a> for the downside review and <a href="/where-can-foreigners-buy-property/" data-track="guide_click" data-track-label="overseas investment framework">the foreign-buyer access guide</a> for the ownership screen.</p>
+          </section>
+        """
+    return ""
+
+
 def seo_references_html(page: dict) -> str:
     if is_japan_retirement_guide(page):
         return japan_retirement_references_html()
@@ -5935,11 +6167,11 @@ __PRIMARY_NAV__
             <legend>What kind of setting feels right?</legend>
             <p class="question-help">Destinations can belong to more than one setting.</p>
             <div class="choice-list">
-              <label class="choice"><input type="radio" name="setting" value="any" checked><span><strong>No strong preference</strong><small>Let the other answers lead.</small></span></label>
-              <label class="choice"><input type="radio" name="setting" value="city"><span><strong>City</strong><small>Services, transport and year-round daily life.</small></span></label>
-              <label class="choice"><input type="radio" name="setting" value="coast-island"><span><strong>Coast or island</strong><small>Water access, warm-weather use and holiday appeal.</small></span></label>
-              <label class="choice"><input type="radio" name="setting" value="mountain"><span><strong>Mountain</strong><small>Outdoor access, seasons and resort-market dynamics.</small></span></label>
-              <label class="choice"><input type="radio" name="setting" value="lake"><span><strong>Lake</strong><small>Waterside living with a mountain or regional setting.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="any" checked><span><strong>No strong preference</strong><small>Let the other answers lead.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="city"><span><strong>City</strong><small>Services, transport and year-round daily life.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="coast-island"><span><strong>Coast or island</strong><small>Water access, warm-weather use and holiday appeal.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="mountain"><span><strong>Mountain</strong><small>Outdoor access, seasons and resort-market dynamics.</small></span></label>
+              <label class="choice"><input type="checkbox" name="setting" value="lake"><span><strong>Lake</strong><small>Waterside living with a mountain or regional setting.</small></span></label>
             </div>
           </fieldset>
           <fieldset data-fit-step="3" hidden>
@@ -5977,9 +6209,11 @@ __PRIMARY_NAV__
   </main>
   <footer class="page-footer"><div class="page-shell"><strong>Global Home Atlas</strong><p>Research guidance only. Verify current legal, tax, immigration, financing, insurance, and property details locally.</p></div></footer>
   <script type="application/json" id="fit-data">__FIT_DATA__</script>
+  <script src="/assets/find-your-fit-ui.js"></script>
   <script>
     (() => {
       const data = JSON.parse(document.getElementById("fit-data").textContent);
+      const fitUI = window.GHAFindYourFitUI;
       const form = document.getElementById("fitForm");
       const questionnaire = document.getElementById("fitQuestionnaire");
       const steps = Array.from(form.querySelectorAll("[data-fit-step]"));
@@ -5987,6 +6221,7 @@ __PRIMARY_NAV__
       const next = document.getElementById("fitNext");
       const submit = document.getElementById("fitSubmit");
       const results = document.getElementById("fitResults");
+      const settingInputs = Array.from(form.querySelectorAll('input[name="setting"]'));
       let activeStep = 0;
       const locationLabels = { city:"city setting", "coast-island":"coast or island setting", mountain:"mountain setting", lake:"lake setting" };
       const dimensionLabels = { lifestyle_magnetism:"lifestyle appeal", global_access:"international access", ownership_clarity:"ownership clarity", regulatory_safety:"regulatory safety", rental_profit:"rental fundamentals", capital_upside:"capital upside", retirement_fit:"long-stay comfort", exit_liquidity:"resale depth", foreigner_fit:"foreigner practicality", value_entry:"value at entry" };
@@ -6004,11 +6239,16 @@ __PRIMARY_NAV__
         document.getElementById("fitProgressText").textContent = `Question ${activeStep + 1} of ${steps.length}`;
         document.getElementById("fitProgressBar").style.width = `${((activeStep + 1) / steps.length) * 100}%`;
       }
-      function values() { return Object.fromEntries(new FormData(form).entries()); }
+      function values() {
+        const formData = new FormData(form);
+        const output = Object.fromEntries(formData.entries());
+        output.setting = formData.getAll("setting");
+        return output;
+      }
       function average(item, keys) { return keys.reduce((sum, key) => sum + Number(item.dimensions[key] || 0), 0) / keys.length; }
       function scoreItem(item, answers) {
         const goalScore = Number(item.goalScores[answers.goal] || item.decisionScore || 0);
-        const settingScore = answers.setting === "any" ? goalScore : (item.locationTypes.includes(answers.setting) ? 5 : 2);
+        const settingScore = fitUI.settingScore(goalScore, item.locationTypes, answers.setting);
         const threshold = data.budgetThresholds[answers.budget];
         let budgetScore = goalScore;
         if (threshold && item.price) {
@@ -6023,7 +6263,8 @@ __PRIMARY_NAV__
       }
       function reasons(item, answers) {
         const output = [`Strong relative fit for ${goalLabels[answers.goal]}.`];
-        if (answers.setting !== "any" && item.locationTypes.includes(answers.setting)) output.push(`Matches your preferred ${locationLabels[answers.setting]}.`);
+        const matchingSettings = fitUI.matchingSettings(item.locationTypes, answers.setting);
+        if (matchingSettings.length) output.push(`Matches your preferred ${matchingSettings.map((setting) => locationLabels[setting]).join(" or ")}.`);
         if (item.budgetScore >= 3.5) output.push("Fits the broad price screen you selected.");
         const strongest = Object.entries(item.dimensions).sort((a,b) => b[1] - a[1])[0];
         if (strongest) output.push(`One of its strongest signals is ${dimensionLabels[strongest[0]] || strongest[0]}.`);
@@ -6051,6 +6292,7 @@ __PRIMARY_NAV__
       }
       next.addEventListener("click", () => showStep(activeStep + 1));
       back.addEventListener("click", () => showStep(activeStep - 1));
+      fitUI.initSettingInputs(settingInputs);
       form.addEventListener("submit", (event) => { event.preventDefault(); renderResults(); });
       document.getElementById("fitEdit").addEventListener("click", () => { results.hidden = true; questionnaire.hidden = false; showStep(0); questionnaire.scrollIntoView({ behavior:"smooth", block:"start" }); });
       const requestedGoal = new URLSearchParams(location.search).get("goal");
@@ -6222,11 +6464,20 @@ def build_retirement_destination_finder_page(
             **item,
             "continent": CONTINENT_BY_COUNTRY.get(item.get("country", ""), ""),
             "recommendable": is_destination_recommendable(item),
+            "countryGuideHref": next(
+                (
+                    f"/{country_path(hub)}/"
+                    for hub in COUNTRY_HUBS
+                    if hub["country"] == item.get("country")
+                ),
+                "",
+            ),
         }
         for item in eligible_destinations
     ]
     payload = {
         "asOf": retirement_payload.get("as_of"),
+        "planning_currencies": RETIREMENT_PLANNING_CURRENCIES,
         "destinations": browser_destinations,
         "retirementCosts": retirement_payload["destinations"],
         "mortgageProfiles": mortgage_profiles,
@@ -6243,6 +6494,7 @@ def build_retirement_destination_finder_page(
             RETIREMENT_FINDER_DESCRIPTION,
             canonical,
             schema_for_retirement_finder(canonical),
+            before_analytics="""<script>(function(){try{var url=new URL(window.location.href);var value=url.searchParams.get("scenario");if(!value)return;window.__ghaFinderScenario=value;url.searchParams.delete("scenario");history.replaceState(null,"",url.pathname+url.search+url.hash);}catch(error){}})();</script>""",
         ).strip(),
         navigation=site_header_html(PRIMARY_NAV_LINKS).strip(),
         region_options=region_options,
@@ -6251,6 +6503,7 @@ def build_retirement_destination_finder_page(
         retirement_engine=RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         property_engine=PROPERTY_FINANCE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        scenario_engine=RETIREMENT_FINDER_SCENARIO_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_ui=RETIREMENT_FINDER_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         analytics=analytics_event_script(),
         design_css=retirement_finder_design_css(),
@@ -6263,6 +6516,128 @@ def build_retirement_destination_finder_page(
         'Compare active FIRE Abroad destinations</a></p><div class="finder-editorial">',
         1,
     )
+
+
+def retirement_capital_scenario_schema(slug: str, label: str) -> list[dict]:
+    canonical = page_url(slug)
+    return [
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": f"Retire abroad with {label}", "item": canonical},
+            ],
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": f"Is {label} enough to retire abroad?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "It is within reach where the capital covers required retirement capital under the stated assumptions. Personal results vary.",
+                    },
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does this include buying a home?",
+                    "acceptedAnswer": {"@type": "Answer", "text": "No. This comparison assumes renting."},
+                },
+                {
+                    "@type": "Question",
+                    "name": "Are tax and visa costs included?",
+                    "acceptedAnswer": {"@type": "Answer", "text": "No. Immigration and tax requirements must be checked separately."},
+                },
+            ],
+        },
+    ]
+
+
+def build_retirement_capital_scenario_pages(
+    destinations: list[dict],
+    retirement_payload: dict,
+    mortgage_payload: dict,
+) -> None:
+    retirement_ids = {item["destination_id"] for item in retirement_payload["destinations"]}
+    eligible = [item for item in destinations if item["id"] in retirement_ids]
+    browser_destinations = [
+        {
+            **item,
+            "continent": CONTINENT_BY_COUNTRY.get(item.get("country", ""), ""),
+            "recommendable": is_destination_recommendable(item),
+            "countryGuideHref": next(
+                (f"/{country_path(hub)}/" for hub in COUNTRY_HUBS if hub["country"] == item.get("country")),
+                "",
+            ),
+        }
+        for item in eligible
+    ]
+    base_input = {
+        "user": {
+            "currentAge": 65,
+            "retirementAge": 65,
+            "retirementBeginsNow": True,
+            "horizonYears": 30,
+            "household": "couple",
+            "housingPlan": "rent",
+            "generalInflation": 0.0,
+            "expectedPortfolioReturn": 0.05,
+            "emergencyReserveMonths": 12,
+            "incomeStreams": [],
+            "preferences": {"region": "any", "settings": [], "healthcare": "normal"},
+        },
+        "destinations": browser_destinations,
+        "retirementCosts": retirement_payload["destinations"],
+        "mortgageProfiles": {
+            item["id"]: resolve_mortgage_profile(item, mortgage_payload)
+            for item in browser_destinations
+        },
+    }
+    completed = subprocess.run(
+        ["node", str(RETIREMENT_CAPITAL_GENERATOR_PATH)],
+        input=json.dumps(
+            {
+                "capitalValues": [capital for _, capital in RETIREMENT_CAPITAL_SCENARIOS],
+                "baseInput": base_input,
+            },
+            separators=(",", ":"),
+        ),
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    results = json.loads(completed.stdout)
+    destinations_by_id = {item["id"]: item for item in browser_destinations}
+    scenario_links = [(slug, f"Retire abroad with {SCENARIO_LABELS[capital]}") for slug, capital in RETIREMENT_CAPITAL_SCENARIOS]
+    for slug, capital in RETIREMENT_CAPITAL_SCENARIOS:
+        label = SCENARIO_LABELS[capital]
+        title = f"Where Can You Retire Abroad With {label}? | Global Home Atlas"
+        description = (
+            f"Compare retirement destinations for {label} in capital, including required capital, "
+            "surplus or shortfall, and destination guides."
+        )
+        page_dir = ARTIFACTS / slug
+        page_dir.mkdir(parents=True, exist_ok=True)
+        page_dir.joinpath("index.html").write_text(
+            clean_generated_html(
+                build_retirement_capital_scenario_html(
+                    slug=slug,
+                    capital_usd=capital,
+                    result=results[str(capital)],
+                    destinations_by_id=destinations_by_id,
+                    head=head_html(title, description, page_url(slug), retirement_capital_scenario_schema(slug, label)).strip(),
+                    navigation=site_header_html(PRIMARY_NAV_LINKS).strip(),
+                    footer=site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
+                    analytics=analytics_event_script(),
+                    design_css=utility_design_css(),
+                    scenario_links=scenario_links,
+                )
+            ),
+            encoding="utf-8",
+        )
 
 
 def retirement_calculator_callout(css_class: str, source_label: str) -> str:
@@ -6403,7 +6778,7 @@ __UTILITY_CSS__
       <form class="calc-panel" id="retirement-calculator" novalidate>
         <fieldset><legend>Your retirement</legend><div class="field-grid">
           <div class="field planning-currency"><label for="ret-currency">Planning currency</label><select id="ret-currency"><option value="USD" selected>USD — US dollar</option><option value="EUR">EUR — Euro</option><option value="GBP">GBP — Pound sterling</option><option value="CAD">CAD — Canadian dollar</option><option value="AUD">AUD — Australian dollar</option><option value="CHF">CHF — Swiss franc</option><option value="JPY">JPY — Japanese yen</option><option value="HKD">HKD — Hong Kong dollar</option><option value="SGD">SGD — Singapore dollar</option></select><p class="hint" id="ret-currency-note">Reference rates dated 27 August 2026. This changes the presentation currency, not future currency-risk assumptions.</p></div>
-          <div class="field"><label for="ret-current-age">Current age</label><input id="ret-current-age" type="number" min="18" max="99" value="50" required></div>
+          <div class="field"><label for="ret-current-age">Current age</label><input id="ret-current-age" type="number" min="18" max="99" value="45" required></div>
           <div class="field"><label for="ret-retirement-age">Planned retirement age</label><input id="ret-retirement-age" type="number" min="19" max="100" value="60" required></div>
           <div class="field"><label for="ret-household">Household</label><select id="ret-household"><option value="single">Single retiree</option><option value="couple" selected>Retired couple</option></select></div>
           <div class="field"><label for="ret-horizon">Retirement horizon (years)</label><input id="ret-horizon" type="number" min="1" max="60" value="30"></div>
@@ -6496,6 +6871,7 @@ __UTILITY_CSS__
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
     <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Tax, visa eligibility, currency shocks, individualized healthcare and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a>__FIRE_ABROAD_LINK__</p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
+    <section class="content-section"><h2>Retirement plans by capital</h2><p class="related"><a href="/retire-abroad-with-500k/">$500,000</a><a href="/retire-abroad-with-750k/">$750,000</a><a href="/retire-abroad-with-1-million/">$1 million</a><a href="/retire-abroad-with-1-5-million/">$1.5 million</a><a href="/retire-abroad-with-2-million/">$2 million</a></p></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
   __SITE_FOOTER__
@@ -6848,6 +7224,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
           </section>
           {retirement_calculator_callout("guide-research-note", "guide hub")}
           <p class="context-link"><a href="/{FIRE_ABROAD_SLUG}/" data-track="fire_abroad_open" data-track-label="guides hub">Compare active FIRE Abroad destinations</a></p>
+          <section class="guide-research-note"><p>Explore retirement destinations with <a href="/retire-abroad-with-500k/">$500,000</a>, <a href="/retire-abroad-with-750k/">$750,000</a>, <a href="/retire-abroad-with-1-million/">$1 million</a>, <a href="/retire-abroad-with-1-5-million/">$1.5 million</a>, or <a href="/retire-abroad-with-2-million/">$2 million</a>.</p></section>
           <section class="guide-feature" id="featured-research">
             <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
             <div class="guide-feature__copy">
@@ -7700,6 +8077,7 @@ def build_seo_page(
     comparison_html = seo_comparison_html(page, selected, top, runner_up)
     destination_notes_html = seo_destination_notes_html(page, selected)
     decision_framework_html = seo_decision_framework_html(page)
+    query_intent_html = seo_query_intent_html(page)
     references_html = seo_references_html(page)
     retirement_callout = (
         retirement_calculator_callout("seo-section", "buying guide")
@@ -8287,6 +8665,7 @@ def build_seo_page(
           {callout_before_overview}
           {fire_abroad_guide_link}
           {overview_html}
+          {query_intent_html}
           {callout_after_overview}
           {comparison_html}
           {destination_notes_html}
@@ -10426,12 +10805,14 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
         (page_url("dashboard"), "0.92"),
         (page_url(SHORTLIST_REVIEW_SLUG), "0.90"),
         (page_url(REPORT_LIBRARY_SLUG), "0.88"),
+        (page_url(PROPERTY_MARKET_DATA_SLUG), "0.88"),
         (page_url("country-comparison"), "0.88"),
         (page_url("countries"), "0.90"),
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         (page_url(RETIREMENT_CALCULATOR_SLUG), "0.92"),
         (page_url(RETIREMENT_FINDER_SLUG), "0.92"),
         (page_url(FIRE_ABROAD_SLUG), "0.92"),
+        *[(page_url(slug), "0.88") for slug, _ in RETIREMENT_CAPITAL_SCENARIOS],
         (page_url(RETIREMENT_DESTINATIONS_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
         *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],
@@ -11845,6 +12226,7 @@ def build() -> Path:
         ),
         encoding="utf-8",
     )
+    build_retirement_capital_scenario_pages(destinations, retirement_costs, mortgage_profiles)
     retirement_article_dir = ARTIFACTS / RETIREMENT_DESTINATIONS_SLUG
     retirement_article_dir.mkdir(parents=True, exist_ok=True)
     (retirement_article_dir / "index.html").write_text(
@@ -11867,6 +12249,18 @@ def build() -> Path:
     report_library_dir.mkdir(parents=True, exist_ok=True)
     (report_library_dir / "index.html").write_text(
         clean_generated_html(build_report_library_page(destinations, SEO_PAGES)),
+        encoding="utf-8",
+    )
+    property_data_dir = ARTIFACTS / PROPERTY_MARKET_DATA_SLUG
+    property_data_dir.mkdir(parents=True, exist_ok=True)
+    (property_data_dir / "index.html").write_text(
+        clean_generated_html(build_property_market_data_page(destinations)),
+        encoding="utf-8",
+    )
+    data_download_dir = ARTIFACTS / "data"
+    data_download_dir.mkdir(parents=True, exist_ok=True)
+    (data_download_dir / "global-property-market-data.csv").write_text(
+        property_market_data_csv(destinations),
         encoding="utf-8",
     )
     for page in SEO_PAGES:

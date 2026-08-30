@@ -92,6 +92,59 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         positions = [self.html.index(value) for value in ordered_ids]
         self.assertEqual(sorted(positions), positions)
 
+    def test_preference_copy_distinguishes_filters_from_ranking(self) -> None:
+        preferences = self.html.split('id="finder-preferences"', 1)[1].split("</fieldset>", 1)[0]
+        landscape = self.html.split('id="finder-capital-landscape"', 1)[1].split("</figure>", 1)[0]
+
+        self.assertIn("Region and setting filter destinations", preferences)
+        self.assertIn("Healthcare helps order the matches", preferences)
+        self.assertIn("Only destinations matching your region and setting are shown", landscape)
+
+    def test_setting_filter_allows_multiple_clear_checkbox_selections(self) -> None:
+        preferences = self.html.split('id="finder-preferences"', 1)[1].split("</fieldset>", 1)[0]
+
+        self.assertIn('role="group" aria-labelledby="finder-setting-label"', preferences)
+        self.assertEqual(4, preferences.count('name="finder-setting"'))
+        for value in ("City", "CoastOrIsland", "Mountain", "Lake"):
+            self.assertIn(f'name="finder-setting" value="{value}"', preferences)
+        self.assertIn(
+            "Choose one or more. Destinations matching any selected setting are shown.",
+            preferences,
+        )
+        self.assertNotIn('id="finder-climate"', preferences)
+
+    def test_results_show_recommendations_before_the_full_cost_landscape(self) -> None:
+        results = self.html.split('id="finder-results"', 1)[1].split(
+            'class="finder-editorial"', 1
+        )[0]
+
+        self.assertLess(
+            results.index('id="finder-matches-section"'),
+            results.index('id="finder-capital-landscape"'),
+        )
+        self.assertIn('id="finder-landscape-toggle"', results)
+
+    def test_results_reserve_plain_text_for_active_filters(self) -> None:
+        results = self.html.split('id="finder-results"', 1)[1].split(
+            'class="finder-editorial"', 1
+        )[0]
+
+        self.assertIn('id="finder-active-filters"', results)
+
+    def test_form_defaults_to_age_45_and_retirement_at_60(self) -> None:
+        form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
+            "</form>", 1
+        )[0]
+
+        self.assertIn(
+            'id="finder-current-age" type="number" min="18" max="90" value="45"',
+            form,
+        )
+        self.assertIn(
+            'id="finder-retirement-age" type="number" min="19" max="100" value="60"',
+            form,
+        )
+
     def test_housing_and_conditional_fields_exist(self) -> None:
         for option in (
             '<option value="rent">Rent</option>',
@@ -119,40 +172,147 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
     def test_results_are_concise_and_accessible(self) -> None:
         self.assertIn('id="finder-within-count"', self.html)
-        self.assertIn('id="finder-projection" role="img"', self.html)
+        self.assertIn('id="finder-eligible-count"', self.html)
+        self.assertIn('id="finder-strongest-match"', self.html)
+        self.assertIn('id="finder-capital-landscape"', self.html)
+        self.assertIn('id="finder-landscape-projected"', self.html)
+        self.assertIn('aria-labelledby="finder-landscape-heading finder-landscape-caption"', self.html)
+        self.assertIn('id="finder-landscape-rows" role="list"', self.html)
+        self.assertIn(
+            'id="finder-projection" role="img" aria-labelledby="finder-projection-title finder-projection-desc"',
+            self.html,
+        )
+        self.assertIn('<title id="finder-projection-title">Projected retirement portfolio</title>', self.html)
+        self.assertIn('<desc id="finder-projection-desc">Complete the finder to see annual progression.</desc>', self.html)
+        self.assertIn('id="finder-chart-target" x1="22" x2="618"', self.html)
+        self.assertIn('id="finder-chart-target-label" x="618" text-anchor="end"', self.html)
         self.assertIn('id="finder-chart-tooltip" role="status"', self.html)
+        self.assertIn('id="finder-projection-caption"', self.html)
         self.assertIn('id="finder-recommendations"', self.html)
         self.assertIn('id="finder-exclusions"', self.html)
-        self.assertIn("Projected portfolio", self.html)
-        self.assertIn("Retirement target", self.html)
-        self.assertIn("Surplus or gap", self.html)
+        self.assertIn("Retirement capital by destination", self.html)
+        self.assertIn("Estimated capital required", self.html)
+        self.assertIn("How your capital gets there", self.html)
         self.assertNotIn("Retirement score", self.html)
 
-    def test_results_lead_with_a_plain_language_decision_and_progressive_list(self) -> None:
+    def test_results_include_compact_comparison_and_privacy_safe_sharing(self) -> None:
+        for marker in (
+            'id="finder-comparison"',
+            'id="finder-comparison-body"',
+            'id="finder-comparison-status" aria-live="polite"',
+            'id="finder-share"',
+            'id="finder-share-status" aria-live="polite"',
+            'id="finder-shared-error" role="alert"',
+        ):
+            self.assertIn(marker, self.html)
+        self.assertIn("Compare your three strongest matches", self.html)
+        self.assertIn(
+            "This link includes your projected capital and planning choices. It does not include your age, current savings, income or pension details.",
+            self.html,
+        )
+        self.assertIn("retirement_finder_scenario.js", self.builder)
+        self.assertNotIn("algorithm", self.html.lower())
+
+    def test_shared_query_is_removed_before_analytics_loads(self) -> None:
+        scrub = 'window.__ghaFinderScenario'
+        analytics = 'googletagmanager.com/gtag/js'
+        self.assertIn(scrub, self.html)
+        self.assertLess(self.html.index(scrub), self.html.index(analytics) if analytics in self.html else self.html.index('type="application/ld+json"'))
+        self.assertIn('id="finder-data-reviewed"', self.html)
+
+    def test_results_lead_with_three_modeled_matches_and_offer_the_cost_landscape(self) -> None:
         self.assertIn('id="finder-result-read"', self.html)
-        self.assertIn('id="finder-closest-match"', self.html)
-        self.assertIn('id="finder-show-all"', self.html)
-        self.assertIn("View all destinations", self.html)
-        self.assertIn("View destination dossier", self.html)
+        self.assertIn('id="finder-recommendations"', self.html)
+        self.assertIn('aria-label="Three strongest matches"', self.html)
+        self.assertNotIn('id="finder-closest-match"', self.html)
+        self.assertNotIn('id="finder-show-all"', self.html)
+        self.assertIn('id="finder-landscape-toggle"', self.html)
+        self.assertIn("Destination guide", self.html)
         self.assertIn('data-finder-dossier', self.html)
+
+    def test_landscape_uses_plain_editorial_rules_and_a_compact_mobile_list(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+        self.assertIn(".retirement-finder-page .finder-landscape", design_css)
+        self.assertIn("border-top: 1px solid var(--gha-rule)", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-row", design_css)
+        self.assertIn("grid-template-columns: minmax(190px, 1.15fr) minmax(360px, 3fr) auto", design_css)
+        self.assertIn("@media (max-width: 620px)", design_css)
+        self.assertIn("grid-template-columns: minmax(0, 1fr) auto", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-projection", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-capital-dot", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-distance", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-row.is-on-target .finder-landscape-dot { display: none; }", design_css)
+        self.assertIn(".retirement-finder-page .finder-landscape-row.is-on-target.is-match .finder-landscape-capital-dot", design_css)
+        self.assertIn("@media (max-width: 760px)", design_css)
+        self.assertIn(
+            ".finder-landscape-rows:not(.is-expanded) > .finder-landscape-item:nth-child(n + 6)",
+            design_css,
+        )
+        self.assertIn(".finder-landscape-toggle", design_css)
+        self.assertNotIn("background: linear-gradient(to right", design_css)
+        self.assertNotIn("border-left: 1px solid var(--gha-rule); border-right: 1px solid var(--gha-rule)", design_css)
+        self.assertNotIn(".finder-landscape { border-radius:", design_css)
+
+    def test_projection_does_not_force_results_wider_than_the_mobile_viewport(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+        self.assertIn(".retirement-finder-page .finder-results > * { min-width: 0; }", design_css)
+
+    def test_match_headings_wrap_safely_in_the_three_column_layout(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+        self.assertIn(
+            ".retirement-finder-page .finder-result h3 a { color: var(--gha-ink); white-space: normal; overflow-wrap: anywhere; }",
+            design_css,
+        )
+
+    def test_results_include_a_dedicated_zero_eligible_state(self) -> None:
+        self.assertIn('id="finder-empty-state"', self.html)
+        self.assertIn('id="finder-matches-section"', self.html)
+        self.assertIn('id="finder-projection-section"', self.html)
 
     def test_page_adds_specific_search_supporting_content_and_faq_schema(self) -> None:
         self.assertIn('id="how-matching-works"', self.html)
         self.assertIn('id="within-reach"', self.html)
         self.assertIn('id="rent-or-buy"', self.html)
         self.assertIn('id="finder-faq"', self.html)
-        self.assertIn("Projected liquid capital covers the modeled retirement target", self.html)
+        self.assertIn("Projected liquid capital covers the required retirement capital", self.html)
         self.assertIn("Buying requires separate property capital", self.html)
         self.assertIn('"@type":"FAQPage"', self.html)
 
     def test_mobile_navigation_and_results_use_touch_sized_controls(self) -> None:
         self.assertIn(".mobile-menu>nav{position:absolute", self.html)
         self.assertIn(".mobile-menu>nav a{display:flex;min-height:44px", self.html)
-        self.assertIn(".finder-projection{overflow-x:auto", self.html)
-        self.assertIn(".finder-chart-bar{min-width:44px", self.html)
         self.assertIn(".finder-result header a{display:flex;min-height:44px", self.html)
         self.assertIn(".finder-results{min-width:0", self.html)
         self.assertIn(".finder-projection-wrap{min-width:0", self.html)
+        self.assertIn(".finder-comparison-mobile", self.html)
+        self.assertIn(
+            ".retirement-finder-page .finder-setting-options .check { min-height: 44px;",
+            self.html,
+        )
+
+    def test_mobile_hero_is_compact_enough_to_reach_the_form_quickly(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
+
+        self.assertIn("padding: 24px 0 26px", design_css)
+        self.assertIn("font-size: clamp(38px, 11vw, 52px)", design_css)
+
+    def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
+        self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)
+        self.assertIn('<div class="finder-projection-scroll">', self.html)
+        self.assertIn(".finder-projection-scroll{overflow-x:auto", self.html)
+        self.assertIn(".finder-projection-chart{display:block;width:100%;height:auto", self.html)
+        self.assertIn("min-width:640px", self.html)
+        self.assertIn(".finder-chart-bar{fill:#315e50", self.html)
+        self.assertIn(".finder-chart-target{stroke:#9b6a33", self.html)
+        self.assertIn("@media(prefers-reduced-motion:reduce)", self.html)
+        self.assertIn(
+            ".retirement-finder-page .finder-evidence summary { min-height: 44px; display: flex; align-items: center; font-weight: 500; }",
+            self.html,
+        )
 
     def test_embeds_complete_dynamic_universe(self) -> None:
         self.assertIn(f'data-universe-count="{self.retirement_count}"', self.html)
@@ -178,6 +338,56 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn(expected, calculator)
         self.assertIn(expected, homepage)
         self.assertIn(expected, ranking)
+
+    def test_finder_embeds_the_shared_planning_currency_reference_data(self) -> None:
+        payload = json.loads(
+            self.html.split('<script id="retirement-finder-data" type="application/json">', 1)[1]
+            .split("</script>", 1)[0]
+        )
+
+        self.assertEqual("2026-08-27", payload["planning_currencies"]["as_of"])
+        self.assertEqual(
+            ["USD", "EUR", "GBP", "CAD", "AUD", "CHF", "JPY", "HKD", "SGD"],
+            list(payload["planning_currencies"]["rates_to_usd"]),
+        )
+
+    def test_finder_money_controls_follow_the_selected_planning_currency(self) -> None:
+        self.assertIn(
+            '<select id="finder-currency"><option value="USD" selected>USD — US dollar</option>',
+            self.html,
+        )
+        self.assertIn('<option value="SGD">SGD — Singapore dollar</option>', self.html)
+        self.assertIn(
+            "Reference rates dated 27 August 2026. This changes the presentation currency, not future currency-risk assumptions.",
+            self.html,
+        )
+        for field_id in (
+            "finder-liquid-capital",
+            "finder-monthly-contribution",
+            "finder-property-allocation",
+            "finder-pension",
+            "finder-other-income",
+        ):
+            self.assertRegex(
+                self.html,
+                rf'<input id="{field_id}" type="text" inputmode="numeric" data-money min="\d+" step="\d+" value="[\d,]+"',
+            )
+        self.assertNotIn("(USD)", self.html)
+
+    def test_finder_retirement_income_is_monthly_and_inflation_linked_by_default(self) -> None:
+        self.assertIn("Income continuing after retirement (monthly)", self.html)
+        self.assertIn('<input id="finder-pension-indexed" type="checkbox" checked>', self.html)
+        self.assertIn('<input id="finder-other-income-indexed" type="checkbox" checked>', self.html)
+
+    def test_finder_result_grid_uses_a_valid_three_column_declaration(self) -> None:
+        self.assertIn(
+            ".finder-result dl{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px",
+            self.html,
+        )
+        self.assertNotIn(
+            "<style>.finder-result dl{grid-template-columns:repeat(3,minmax(0,1fr));}</style>",
+            self.html,
+        )
 
 
 if __name__ == "__main__":
