@@ -252,6 +252,11 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn(".retirement-finder-page .finder-landscape-row.is-within .finder-landscape-fill", design_css)
         self.assertIn(".retirement-finder-page .finder-landscape-row.is-over .finder-landscape-fill", design_css)
         self.assertIn("@media (max-width: 760px)", design_css)
+        self.assertIn("@media (max-width: 820px)", design_css)
+        self.assertIn(
+            ".retirement-finder-page .finder-landscape-row { grid-template-columns: minmax(0, 1fr) minmax(120px, auto);",
+            design_css,
+        )
         self.assertIn(
             ".finder-landscape-rows:not(.is-expanded) > .finder-landscape-item:nth-child(n + 6)",
             design_css,

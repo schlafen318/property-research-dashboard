@@ -51,7 +51,7 @@
       ratesToUsd: input.ratesToUsd || { USD: 1 },
     });
     const amount = Math.max(0, converted === null ? 0 : converted);
-    const divisor = amount >= 1_000_000 ? 1_000_000 : amount >= 1_000 ? 1_000 : 1;
+    const divisor = amount >= 999_500 ? 1_000_000 : amount >= 1_000 ? 1_000 : 1;
     const suffix = divisor === 1_000_000 ? "m" : divisor === 1_000 ? "k" : "";
     const value = new Intl.NumberFormat("en-US", {
       maximumFractionDigits: divisor === 1_000_000 ? 2 : 0,

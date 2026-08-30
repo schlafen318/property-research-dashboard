@@ -500,6 +500,12 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .finder-results-intro { grid-template-columns: 1fr; gap: 14px; }
       .retirement-finder-page .finder-list { grid-template-columns: 1fr; }
     }
+    @media (max-width: 820px) {
+      .retirement-finder-page .finder-landscape-axis { display: none; }
+      .retirement-finder-page .finder-landscape-row { grid-template-columns: minmax(0, 1fr) minmax(120px, auto); gap: 4px 14px; padding: 9px 0; }
+      .retirement-finder-page .finder-landscape-track { grid-column: 1 / -1; grid-row: 2; height: 30px; margin-top: 7px; }
+      .retirement-finder-page .finder-landscape-value { min-width: 0; grid-column: 2; grid-row: 1; }
+    }
     @media (max-width: 760px) {
       .retirement-finder-page.finder-wizard-editing { height: 100vh; height: 100svh; overflow: hidden; }
       .retirement-finder-page.finder-wizard-editing .gha-header__inner { min-height: 56px; padding: 0 16px; border-bottom-width: 1px; }

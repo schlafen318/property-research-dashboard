@@ -1035,6 +1035,20 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
                 {"amountUsd": 322_418, "currency": "USD", "ratesToUsd": {"USD": 1}},
             ),
         )
+        self.assertEqual(
+            "$999k",
+            run_ui(
+                "compactResultMoney",
+                {"amountUsd": 999_499, "currency": "USD", "ratesToUsd": {"USD": 1}},
+            ),
+        )
+        self.assertEqual(
+            "$1m",
+            run_ui(
+                "compactResultMoney",
+                {"amountUsd": 999_500, "currency": "USD", "ratesToUsd": {"USD": 1}},
+            ),
+        )
 
     def test_capital_landscape_markup_renders_every_row_as_an_accessible_dossier_link(self) -> None:
         markup = run_ui(
