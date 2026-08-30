@@ -194,6 +194,7 @@ class RetirementDestinationFinderTests(unittest.TestCase):
 
     def test_setting_preference_filters_destinations(self) -> None:
         coast = destination("coast-place")
+        coast["category"] = "Water"
         mountain = destination("mountain-place")
         mountain["category"] = "Mountain"
         payload = {
@@ -213,6 +214,34 @@ class RetirementDestinationFinderTests(unittest.TestCase):
         self.assertEqual(
             ["mountain-place"],
             [item["destinationId"] for item in result["recommendations"]],
+        )
+
+    def test_multiple_setting_preferences_match_any_selected_setting(self) -> None:
+        coast = destination("coast-place")
+        coast["category"] = "Water"
+        mountain = destination("mountain-place")
+        mountain["category"] = "Mountain"
+        city = destination("city-place")
+        city["category"] = "City"
+        destinations = [coast, mountain, city]
+        payload = {
+            "user": user_payload(
+                preferences={
+                    "region": "any",
+                    "settings": ["Water", "Mountain"],
+                    "healthcare": "normal",
+                }
+            ),
+            "destinations": destinations,
+            "retirementCosts": [cost_record(item["id"], 90_000) for item in destinations],
+            "mortgageProfiles": {item["id"]: mortgage_profile() for item in destinations},
+        }
+
+        result = run_finder("recommendDestinations", payload)
+
+        self.assertEqual(
+            {"coast-place", "mountain-place"},
+            {item["destinationId"] for item in result["recommendations"]},
         )
 
     def test_incomplete_mortgage_research_cannot_be_recommended(self) -> None:

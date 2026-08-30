@@ -106,6 +106,7 @@ class RetirementFinderScenarioTests(unittest.TestCase):
         self.assertEqual(1, scenario["v"])
         self.assertEqual(1_250_000, scenario["projectedCapitalUsd"])
         self.assertEqual(["fukuoka", "valencia", "madeira"], scenario["comparisonIds"])
+        self.assertEqual(["coast"], scenario["preferences"]["settings"])
         serialized = json.dumps(scenario)
         for forbidden in ("currentAge", "totalLiquidCapital", "monthlyPortfolioContribution", "incomeStreams"):
             self.assertNotIn(forbidden, serialized)
@@ -119,6 +120,24 @@ class RetirementFinderScenarioTests(unittest.TestCase):
             scenario,
             run_scenario("decodeScenario", {"value": encoded, "destinationIds": destination_ids()}),
         )
+
+    def test_codec_preserves_multiple_setting_filters(self) -> None:
+        payload = scenario_input()
+        payload["user"]["preferences"] = {
+            "region": "Asia",
+            "settings": ["Water", "Mountain"],
+            "healthcare": "high",
+        }
+
+        scenario = run_scenario("buildScenario", payload)
+        encoded = run_scenario("encodeScenario", scenario)
+        decoded = run_scenario(
+            "decodeScenario",
+            {"value": encoded, "destinationIds": destination_ids()},
+        )
+
+        self.assertEqual(["Water", "Mountain"], decoded["preferences"]["settings"])
+        self.assertNotIn("climate", decoded["preferences"])
 
     def test_decode_rejects_unknown_version_and_duplicate_destinations(self) -> None:
         valid = run_scenario("buildScenario", scenario_input())

@@ -89,7 +89,6 @@ const values = {
   "finder-monthly-contribution": "2,000",
   "finder-return": "4",
   "finder-region": "any",
-  "finder-climate": "any",
   "finder-healthcare": "normal",
   "finder-property-allocation": "300,000",
   "finder-purchase-method": "cash",
@@ -107,6 +106,12 @@ const values = {
   "finder-other-income": "0",
 };
 Object.entries(values).forEach(([id, value]) => { el(id).value = value; });
+const settingControls = ["City", "Water", "Mountain", "Lake"].map((value) => {
+  const control = el("finder-setting-" + value.toLowerCase());
+  control.value = value;
+  control.checked = (input.settings || []).includes(value);
+  return control;
+});
 const projectionGroups = Array.from({ length: input.projectionGroupCount || 0 }, (_, index) => {
   const group = new FakeElement("projection-" + index);
   group.dataset.yearIndex = String(index);
@@ -141,7 +146,11 @@ const groups = ["buyNow", "mortgage", "rental", "buyAtRetirement"].map((name) =>
 const document = {
   activeElement: null,
   getElementById: el,
-  querySelectorAll(selector) { return selector === "[data-finder-group]" ? groups : []; },
+  querySelectorAll(selector) {
+    if (selector === "[data-finder-group]") return groups;
+    if (selector === '[name="finder-setting"]') return settingControls;
+    return [];
+  },
 };
 let engineInput = null;
 const engineInputs = [];
@@ -196,8 +205,13 @@ if (input.editLiquid) {
 if (input.submit) el("retirement-destination-finder-form").dispatch("submit");
 if (input.clickShare) el("finder-share").dispatch("click");
 if (input.preferenceChange) {
-  el(input.preferenceChange.id).value = input.preferenceChange.value;
-  el(input.preferenceChange.id).dispatch("change");
+  const control = el(input.preferenceChange.id);
+  if (Object.prototype.hasOwnProperty.call(input.preferenceChange, "checked")) {
+    control.checked = input.preferenceChange.checked;
+  } else {
+    control.value = input.preferenceChange.value;
+  }
+  control.dispatch("change");
 }
 if (input.clickDestination) {
   const target = {
@@ -350,6 +364,21 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertTrue(scenario["propertyDisabled"])
         self.assertEqual(1, scenario["engineCalls"])
         self.assertEqual("rent", scenario["user"]["housingPlan"])
+
+    def test_submission_keeps_all_selected_setting_filters(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "settings": ["Water", "Mountain"],
+                "submit": True,
+            }
+        )
+
+        self.assertEqual(
+            ["Water", "Mountain"],
+            scenario["user"]["preferences"]["settings"],
+        )
+        self.assertNotIn("climate", scenario["user"]["preferences"])
 
     def test_invalid_next_currency_rates_leave_selection_and_values_unchanged(self) -> None:
         for invalid_rate in (0, -1, "Infinity", "not-a-rate"):
@@ -910,12 +939,15 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         scenario = run_ui_dom_scenario(
             {
                 "rates": {"USD": 1},
-                "preferenceChange": {"id": "finder-climate", "value": "Water"},
+                "preferenceChange": {"id": "finder-setting-water", "checked": True},
             }
         )
 
         event = next(item for item in scenario["trackedEvents"] if item["name"] == "retirement_destination_finder_preference_change")
-        self.assertEqual({"preference": "setting", "value": "Water"}, event["fields"])
+        self.assertEqual(
+            {"preference": "setting", "value": "Water", "selected": True},
+            event["fields"],
+        )
 
     def test_comparison_defaults_to_three_and_prevents_duplicate_replacements(self) -> None:
         recommendations = [

@@ -110,15 +110,26 @@
     return String(value || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
   }
 
+  function normalizedSettings(preferences) {
+    const source = Array.isArray(preferences.settings)
+      ? preferences.settings
+      : [preferences.climate];
+    return source.map(normalizedPreference).filter(function (value, index, values) {
+      return value && value !== "any" && values.indexOf(value) === index;
+    });
+  }
+
   function destinationMatchesFilters(destination, preferences) {
     const region = normalizedPreference(preferences.region);
-    const setting = normalizedPreference(preferences.climate);
+    const settings = normalizedSettings(preferences);
     const regionMatches = !region || region === "any" ||
       [destination.continent, destination.country].some(function (value) {
         return normalizedPreference(value) === region;
       });
-    const settingMatches = !setting || setting === "any" ||
-      normalizedPreference(destination.category).includes(setting);
+    const destinationSetting = normalizedPreference(destination.category);
+    const settingMatches = !settings.length || settings.some(function (setting) {
+      return destinationSetting.includes(setting);
+    });
     return regionMatches && settingMatches;
   }
 
@@ -128,8 +139,8 @@
         destinationMatchesFilters(destination, { region: preferences.region, climate: "any" })) {
       matches.push("Preferred region");
     }
-    if (preferences.climate && preferences.climate !== "any" &&
-        String(destination.category || "").toLowerCase().includes(String(preferences.climate).toLowerCase())) {
+    if (normalizedSettings(preferences).length &&
+        destinationMatchesFilters(destination, { region: "any", settings: preferences.settings, climate: preferences.climate })) {
       matches.push("Preferred setting");
     }
     if (preferences.healthcare === "high" && scoreValue(destination, "healthcare") >= 4) {

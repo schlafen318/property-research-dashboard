@@ -6382,7 +6382,7 @@ def build_retirement_capital_scenario_pages(
             "expectedPortfolioReturn": 0.05,
             "emergencyReserveMonths": 12,
             "incomeStreams": [],
-            "preferences": {"region": "any", "climate": "any", "healthcare": "normal"},
+            "preferences": {"region": "any", "settings": [], "healthcare": "normal"},
         },
         "destinations": browser_destinations,
         "retirementCosts": retirement_payload["destinations"],
