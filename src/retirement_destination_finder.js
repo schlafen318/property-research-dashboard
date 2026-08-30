@@ -85,6 +85,7 @@
     return {
       currentAge: user.currentAge,
       retirementAge: user.retirementAge,
+      retirementBeginsNow: user.retirementBeginsNow === true,
       horizonYears: user.horizonYears,
       expenseCategories: categories,
       incomeStreams: user.incomeStreams || [],

@@ -63,7 +63,9 @@
     const currentAge = finiteNonNegative(input.currentAge, "Current age");
     const retirementAge = finiteNonNegative(input.retirementAge, "Retirement age");
     const yearsToRetirement = retirementAge - currentAge;
-    if (yearsToRetirement <= 0) throw new Error("Retirement age must exceed current age");
+    if (yearsToRetirement < 0 || (yearsToRetirement === 0 && input.retirementBeginsNow !== true)) {
+      throw new Error("Retirement age must exceed current age");
+    }
 
     const horizonYears = finiteNonNegative(input.horizonYears, "Retirement horizon");
     if (horizonYears === 0) throw new Error("Retirement horizon must be positive");

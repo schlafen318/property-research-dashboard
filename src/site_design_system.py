@@ -470,6 +470,8 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-comparison h3 { margin: 0; font-size: 26px; }
     .retirement-finder-page .finder-faq details { max-width: 820px; padding: 16px 0; border-top: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-faq summary { min-height: 44px; display: flex; align-items: center; font-weight: 500; cursor: pointer; }
+    .retirement-finder-page .finder-capital-scenarios nav { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+    .retirement-finder-page .finder-capital-scenarios a { font-weight: 400; }
     @media (max-width: 860px) {
       .retirement-finder-page .gha-shell, .retirement-finder-page .page-shell { width: min(100% - 32px, 1220px); }
       .retirement-finder-page .finder-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }

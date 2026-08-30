@@ -6,6 +6,7 @@ import json
 import os
 import re
 import shutil
+import subprocess
 import sys
 import unicodedata
 from copy import deepcopy
@@ -23,6 +24,10 @@ try:
     )
     from src.seo_content_overrides import apply_content_override, load_content_overrides
     from src.retirement_destination_finder_page import build_retirement_destination_finder_html
+    from src.retirement_capital_scenario_page import (
+        SCENARIO_LABELS,
+        build_retirement_capital_scenario_html,
+    )
     from src.site_design_system import (
         foreign_buyer_country_guide_css,
         landing_design_css,
@@ -46,6 +51,10 @@ except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.p
     )
     from seo_content_overrides import apply_content_override, load_content_overrides
     from retirement_destination_finder_page import build_retirement_destination_finder_html
+    from retirement_capital_scenario_page import (
+        SCENARIO_LABELS,
+        build_retirement_capital_scenario_html,
+    )
     from site_design_system import (
         foreign_buyer_country_guide_css,
         landing_design_css,
@@ -114,6 +123,13 @@ RETIREMENT_CALCULATOR_DESCRIPTION = (
     "inflation, pension and passive income, property costs, and required portfolio capital."
 )
 RETIREMENT_FINDER_SLUG = "retirement-destination-finder"
+RETIREMENT_CAPITAL_SCENARIOS = (
+    ("retire-abroad-with-500k", 500_000),
+    ("retire-abroad-with-750k", 750_000),
+    ("retire-abroad-with-1-million", 1_000_000),
+    ("retire-abroad-with-1-5-million", 1_500_000),
+    ("retire-abroad-with-2-million", 2_000_000),
+)
 RETIREMENT_FINDER_TITLE = "Retirement Destination Finder: Where Can I Afford to Retire? | Global Home Atlas"
 RETIREMENT_FINDER_FAQS = [
     (
@@ -178,6 +194,7 @@ PROPERTY_FINANCE_PATH = ROOT / "src" / "property_finance.js"
 RETIREMENT_FINDER_ENGINE_PATH = ROOT / "src" / "retirement_destination_finder.js"
 RETIREMENT_FINDER_SCENARIO_PATH = ROOT / "src" / "retirement_finder_scenario.js"
 RETIREMENT_FINDER_UI_PATH = ROOT / "src" / "retirement_destination_finder_ui.js"
+RETIREMENT_CAPITAL_GENERATOR_PATH = ROOT / "scripts" / "generate_retirement_capital_scenarios.js"
 RETIREMENT_RANKING_TABLE_PATH = ROOT / "src" / "retirement_ranking_table.js"
 CONTINENT_BY_COUNTRY = {
     "Austria": "europe",
@@ -6285,6 +6302,128 @@ def build_retirement_destination_finder_page(
     )
 
 
+def retirement_capital_scenario_schema(slug: str, label: str) -> list[dict]:
+    canonical = page_url(slug)
+    return [
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": f"Retire abroad with {label}", "item": canonical},
+            ],
+        },
+        {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+                {
+                    "@type": "Question",
+                    "name": f"Is {label} enough to retire abroad?",
+                    "acceptedAnswer": {
+                        "@type": "Answer",
+                        "text": "It is within reach where the capital covers required retirement capital under the stated assumptions. Personal results vary.",
+                    },
+                },
+                {
+                    "@type": "Question",
+                    "name": "Does this include buying a home?",
+                    "acceptedAnswer": {"@type": "Answer", "text": "No. This comparison assumes renting."},
+                },
+                {
+                    "@type": "Question",
+                    "name": "Are tax and visa costs included?",
+                    "acceptedAnswer": {"@type": "Answer", "text": "No. Immigration and tax requirements must be checked separately."},
+                },
+            ],
+        },
+    ]
+
+
+def build_retirement_capital_scenario_pages(
+    destinations: list[dict],
+    retirement_payload: dict,
+    mortgage_payload: dict,
+) -> None:
+    retirement_ids = {item["destination_id"] for item in retirement_payload["destinations"]}
+    eligible = [item for item in destinations if item["id"] in retirement_ids]
+    browser_destinations = [
+        {
+            **item,
+            "continent": CONTINENT_BY_COUNTRY.get(item.get("country", ""), ""),
+            "recommendable": is_destination_recommendable(item),
+            "countryGuideHref": next(
+                (f"/{country_path(hub)}/" for hub in COUNTRY_HUBS if hub["country"] == item.get("country")),
+                "",
+            ),
+        }
+        for item in eligible
+    ]
+    base_input = {
+        "user": {
+            "currentAge": 65,
+            "retirementAge": 65,
+            "retirementBeginsNow": True,
+            "horizonYears": 30,
+            "household": "couple",
+            "housingPlan": "rent",
+            "generalInflation": 0.0,
+            "expectedPortfolioReturn": 0.04,
+            "emergencyReserveMonths": 6,
+            "incomeStreams": [],
+            "preferences": {"region": "any", "climate": "any", "healthcare": "normal"},
+        },
+        "destinations": browser_destinations,
+        "retirementCosts": retirement_payload["destinations"],
+        "mortgageProfiles": {
+            item["id"]: resolve_mortgage_profile(item, mortgage_payload)
+            for item in browser_destinations
+        },
+    }
+    completed = subprocess.run(
+        ["node", str(RETIREMENT_CAPITAL_GENERATOR_PATH)],
+        input=json.dumps(
+            {
+                "capitalValues": [capital for _, capital in RETIREMENT_CAPITAL_SCENARIOS],
+                "baseInput": base_input,
+            },
+            separators=(",", ":"),
+        ),
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    results = json.loads(completed.stdout)
+    destinations_by_id = {item["id"]: item for item in browser_destinations}
+    scenario_links = [(slug, f"Retire abroad with {SCENARIO_LABELS[capital]}") for slug, capital in RETIREMENT_CAPITAL_SCENARIOS]
+    for slug, capital in RETIREMENT_CAPITAL_SCENARIOS:
+        label = SCENARIO_LABELS[capital]
+        title = f"Where Can You Retire Abroad With {label}? | Global Home Atlas"
+        description = (
+            f"Compare retirement destinations for {label} in capital, including required capital, "
+            "surplus or shortfall, and destination guides."
+        )
+        page_dir = ARTIFACTS / slug
+        page_dir.mkdir(parents=True, exist_ok=True)
+        page_dir.joinpath("index.html").write_text(
+            clean_generated_html(
+                build_retirement_capital_scenario_html(
+                    slug=slug,
+                    capital_usd=capital,
+                    result=results[str(capital)],
+                    destinations_by_id=destinations_by_id,
+                    head=head_html(title, description, page_url(slug), retirement_capital_scenario_schema(slug, label)).strip(),
+                    navigation=site_header_html(PRIMARY_NAV_LINKS).strip(),
+                    footer=site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
+                    analytics=analytics_event_script(),
+                    design_css=utility_design_css(),
+                    scenario_links=scenario_links,
+                )
+            ),
+            encoding="utf-8",
+        )
+
+
 def retirement_calculator_callout(css_class: str, source_label: str) -> str:
     return f"""
       <section class="{escape(css_class)}">
@@ -6516,6 +6655,7 @@ __UTILITY_CSS__
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
     <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Tax, visa eligibility, currency shocks, individualized healthcare and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
+    <section class="content-section"><h2>Retirement plans by capital</h2><p class="related"><a href="/retire-abroad-with-500k/">$500,000</a><a href="/retire-abroad-with-750k/">$750,000</a><a href="/retire-abroad-with-1-million/">$1 million</a><a href="/retire-abroad-with-1-5-million/">$1.5 million</a><a href="/retire-abroad-with-2-million/">$2 million</a></p></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
   __SITE_FOOTER__
@@ -6863,6 +7003,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
             </div>
           </section>
           {retirement_calculator_callout("guide-research-note", "guide hub")}
+          <section class="guide-research-note"><p>Explore retirement destinations with <a href="/retire-abroad-with-500k/">$500,000</a>, <a href="/retire-abroad-with-750k/">$750,000</a>, <a href="/retire-abroad-with-1-million/">$1 million</a>, <a href="/retire-abroad-with-1-5-million/">$1.5 million</a>, or <a href="/retire-abroad-with-2-million/">$2 million</a>.</p></section>
           <section class="guide-feature" id="featured-research">
             <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
             <div class="guide-feature__copy">
@@ -10432,6 +10573,7 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         (page_url(RETIREMENT_CALCULATOR_SLUG), "0.92"),
         (page_url(RETIREMENT_FINDER_SLUG), "0.92"),
+        *[(page_url(slug), "0.88") for slug, _ in RETIREMENT_CAPITAL_SCENARIOS],
         (page_url(RETIREMENT_DESTINATIONS_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
         *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],
@@ -11836,6 +11978,7 @@ def build() -> Path:
         ),
         encoding="utf-8",
     )
+    build_retirement_capital_scenario_pages(destinations, retirement_costs, mortgage_profiles)
     retirement_article_dir = ARTIFACTS / RETIREMENT_DESTINATIONS_SLUG
     retirement_article_dir.mkdir(parents=True, exist_ok=True)
     (retirement_article_dir / "index.html").write_text(
