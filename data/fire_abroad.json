@@ -1,0 +1,3429 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-08-29",
+  "review_policy": {
+    "immigration_days": 90,
+    "tax_days": 90,
+    "healthcare_days": 180,
+    "financial_infrastructure_days": 180,
+    "active_life_days": 365
+  },
+  "weights": {
+    "active_life": 0.25,
+    "sustainable_annual_cost": 0.2,
+    "healthcare_bridge": 0.15,
+    "stay_flexibility": 0.1,
+    "tax_compatibility": 0.1,
+    "global_access": 0.08,
+    "community_fit": 0.07,
+    "property_exit_flexibility": 0.05
+  },
+  "active_life_weights": {
+    "everyday_movement": 0.3,
+    "active_pursuits": 0.3,
+    "year_round_continuity": 0.25,
+    "activity_ecosystem": 0.15
+  },
+  "launch_destination_ids": [
+    "algarve-cascais",
+    "bali",
+    "croatia-istria-dalmatia",
+    "crete",
+    "da-nang-hoi-an",
+    "fukuoka-itoshima",
+    "madeira",
+    "malaga-costa-del-sol",
+    "phuket-koh-samui",
+    "valencia"
+  ],
+  "countries": {
+    "Portugal": {
+      "stay_routes": {
+        "seasonal": {
+          "status": "conditional",
+          "base_score": 4,
+          "max_days": 90,
+          "minimum_age": null,
+          "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; confirm whether a visa is required.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "portugal-schengen-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "portugal-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; confirm whether a visa is required.",
+              "source_ids": [
+                "portugal-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; confirm whether a visa is required.",
+              "source_ids": [
+                "portugal-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "part_year": {
+          "status": "conditional",
+          "base_score": 3.8,
+          "max_days": null,
+          "minimum_age": null,
+          "summary": "A residence visa for people living on their own income may support a recurring base when the applicant proves qualifying income and meets consular requirements.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "portugal-own-income-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium_high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "portugal-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "A residence visa for people living on their own income may support a recurring base when the applicant proves qualifying income and meets consular requirements.",
+              "source_ids": [
+                "portugal-own-income-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. A residence visa for people living on their own income may support a recurring base when the applicant proves qualifying income and meets consular requirements.",
+              "source_ids": [
+                "portugal-own-income-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "full_relocation": {
+          "status": "conditional",
+          "base_score": 3.8,
+          "max_days": null,
+          "minimum_age": null,
+          "summary": "The own-income residence pathway is profile-dependent and requires a visa followed by residence administration; property purchase alone is not treated as permission to reside.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "portugal-own-income-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium_high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "portugal-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The own-income residence pathway is profile-dependent and requires a visa followed by residence administration; property purchase alone is not treated as permission to reside.",
+              "source_ids": [
+                "portugal-own-income-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The own-income residence pathway is profile-dependent and requires a visa followed by residence administration; property purchase alone is not treated as permission to reside.",
+              "source_ids": [
+                "portugal-own-income-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        }
+      },
+      "tax": {
+        "standard_day_threshold": 183,
+        "non_day_tests": "A habitual home showing an intention to maintain and occupy it can create residence even below the day threshold.",
+        "scope_if_resident": "Residents typically enter Portuguese tax on worldwide income; non-residents generally remain taxable on Portuguese-source income.",
+        "category_flags": {
+          "pensions": "resident scope and treaty treatment require review",
+          "dividends": "resident worldwide-income scope and treaty relief require review",
+          "capital_gains": "asset type, source and residence status require review",
+          "property_income": "Portuguese property income can remain taxable while nonresident",
+          "wealth": "property-related taxes and reporting require review; no personal outcome is assumed",
+          "inheritance": "stamp-duty relationship and situs rules require professional review"
+        },
+        "treaty_reporting_note": "Treaty relief and foreign-tax-credit reporting depend on the other jurisdiction and income category; residence and immigration status are separate tests.",
+        "source_ids": [
+          "portugal-tax-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high",
+        "by_mode": {
+          "seasonal": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 4,
+            "summary": "A sub-threshold stay is comparatively clear, but a habitual home and Portuguese-source income can still matter.",
+            "source_ids": [
+              "portugal-tax-1"
+            ]
+          },
+          "part_year": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3,
+            "summary": "Recurring days and a maintained home make residence analysis and recordkeeping more important.",
+            "source_ids": [
+              "portugal-tax-1"
+            ]
+          },
+          "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.5,
+            "summary": "Worldwide-income scope is generally relevant and treaty, investment and reporting details require professional review.",
+            "source_ids": [
+              "portugal-tax-1"
+            ]
+          }
+        }
+      },
+      "healthcare": {
+        "by_mode": {
+          "seasonal": {
+            "bridge_score": 3.7,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Visitors need valid home-system entitlement or private/travel cover; an SNS user number alone does not guarantee payment coverage.",
+            "age_limit_summary": "The official access guidance states no general visitor age cap, but private policy terms are product-specific.",
+            "pre_existing_condition_summary": "Coverage depends on the home entitlement or private policy and must be checked before travel.",
+            "evacuation_summary": "Confirm island or regional transfer and repatriation cover separately.",
+            "source_ids": [
+              "portugal-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium_high"
+          },
+          "part_year": {
+            "bridge_score": 4,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Legally resident foreigners can obtain an SNS user number, while public payment coverage also requires linked identity, tax, address and residence information.",
+            "age_limit_summary": "No general age limit is stated for legal-resident SNS registration; insurance underwriting remains separate.",
+            "pre_existing_condition_summary": "Public access and private-policy exclusions must be distinguished and verified.",
+            "evacuation_summary": "Confirm transfer and repatriation insurance for island or remote-area use.",
+            "source_ids": [
+              "portugal-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          },
+          "full_relocation": {
+            "bridge_score": 4.2,
+            "eligibility": "conditional",
+            "waiting_period_summary": "A legal resident can register, but cost coverage depends on completing the required identity, tax, address and residence records.",
+            "age_limit_summary": "The official resident-registration guidance states no general age cap.",
+            "pre_existing_condition_summary": "Public entitlement is not the same as a private insurer's underwriting of pre-existing conditions.",
+            "evacuation_summary": "Madeira residents should separately plan inter-island or mainland transfer when clinically necessary.",
+            "source_ids": [
+              "portugal-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          }
+        }
+      },
+      "financial_infrastructure": {
+        "bank_account_opening": "Banco de Portugal lists identity, tax-number or foreign equivalent, address, occupation and source-of-funds documentation; institutions may request more.",
+        "tax_id_dependency": "A Portuguese NIF or equivalent foreign tax number is part of customer identification.",
+        "international_transfer_friction": "International transfers are available, subject to institution due diligence and customer-document updates.",
+        "international_payments": "SEPA and common card/payment services are available, but a bank is not required to offer every payment instrument.",
+        "brokerage_access": "Broker eligibility is provider-specific and must be reconfirmed after a residence or tax-home change.",
+        "source_ids": [
+          "portugal-bank-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high"
+      },
+      "sources": [
+        {
+          "id": "portugal-schengen-1",
+          "metric_supported": "Passport-specific Schengen short-stay framework",
+          "url": "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy/short-stay-visas-issued-schengen-countries_en",
+          "publisher": "European Commission, Directorate-General for Migration and Home Affairs",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Undated live guidance; source_date records the reviewed live-page snapshot, not a claimed publication date. Nationality-specific visa exemptions still require checking."
+        },
+        {
+          "id": "portugal-own-income-1",
+          "metric_supported": "Residence visa for retired people and people living on their own income",
+          "url": "https://www2.gov.pt/en/servicos/pedir-um-visto-de-residencia-para-fixacao-de-residencia-de-reformados-religiosos-e-pessoas-que-vivem-de-rendimentos-proprios/-/asset_publisher/01mjqjlm1jP0/content/1842-srv-ces-fds_lead",
+          "publisher": "Government of Portugal",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Portugal",
+          "notes": "Undated official service page; source_date records the reviewed live-page snapshot. The competent Portuguese consular post controls the application."
+        },
+        {
+          "id": "portugal-tax-1",
+          "metric_supported": "Tax residence tests and resident/nonresident income scope",
+          "url": "https://info.portaldasfinancas.gov.pt/en/tax-information/getting-started-in-portugal/tax-residency/tax-residency-rules/Pages/default.aspx",
+          "publisher": "Portuguese Tax and Customs Authority",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Portugal",
+          "notes": "Undated live tax-authority guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "portugal-health-1",
+          "metric_supported": "SNS access and cost-coverage requirements for foreign residents",
+          "url": "https://www.gov.pt/guias/migrantes-cuidados-de-saude-em-portugal",
+          "publisher": "Government of Portugal",
+          "source_date": "2026-06-23",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Portugal",
+          "notes": "Official guidance distinguishes obtaining an SNS user number from having costs covered."
+        },
+        {
+          "id": "portugal-bank-1",
+          "metric_supported": "Current-account opening and identification requirements",
+          "url": "https://clientebancario.bportugal.pt/en/opening",
+          "publisher": "Banco de Portugal",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Portugal",
+          "notes": "Undated live central-bank customer guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "portugal-algarve-active-1",
+          "metric_supported": "Documented Algarve walking and cycling trail networks",
+          "url": "https://www.visitportugal.com/en/destinos/algarve/304109",
+          "publisher": "Turismo de Portugal",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Algarve",
+          "notes": "Undated official destination guidance; used for infrastructure and activity availability, not marketing superlatives."
+        },
+        {
+          "id": "portugal-cascais-active-1",
+          "metric_supported": "Cascais municipal walking, cycling and outdoor-sport networks",
+          "url": "https://www.cascais.pt/sub-area/oferta-desportiva-em-cascais",
+          "publisher": "Câmara Municipal de Cascais",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Cascais",
+          "notes": "Undated municipal service page; source_date records the reviewed live-page snapshot and supports facilities and route availability only."
+        },
+        {
+          "id": "portugal-madeira-active-1",
+          "metric_supported": "Madeira official hiking routes and trail operations",
+          "url": "https://visitmadeira.com/en/what-to-do/nature-seekers/activities/hiking/",
+          "publisher": "Madeira Promotion Bureau",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Madeira",
+          "notes": "Undated official live route guidance; users must check current trail status and access fees."
+        },
+        {
+          "id": "portugal-algarve-climate-1",
+          "metric_supported": "1991-2020 Faro climate normal for monthly temperature, precipitation and dry-season seasonality",
+          "url": "https://www.ipma.pt/opencms/bin/file.data/climate-normal/cn_91-20_FARO.pdf",
+          "publisher": "Instituto Portugues do Mar e da Atmosfera (IPMA)",
+          "source_date": "2020-12-31",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "regional",
+          "notes": "Official Faro station climate normal; the source date records the end of the published 1991-2020 normal period and does not represent Cascais."
+        },
+        {
+          "id": "portugal-algarve-fire-1",
+          "metric_supported": "Official rural-fire risk definition and operational fire-danger context for Portugal",
+          "url": "https://prociv.gov.pt/pt/prevencao-e-preparacao/avaliacao-de-riscos/riscos-mistos/",
+          "publisher": "Autoridade Nacional de Emergencia e Protecao Civil (ANEPC)",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "national",
+          "notes": "Undated official living risk page; source_date records the reviewed snapshot and supports risk screening rather than local incident probability."
+        },
+        {
+          "id": "portugal-eu-mobility-1",
+          "metric_supported": "EU-citizen residence and work rights in another EU country, including registration conditions after three months",
+          "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/index_en.htm",
+          "publisher": "European Union, Your Europe",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
+        }
+      ]
+    },
+    "Spain": {
+      "stay_routes": {
+        "seasonal": {
+          "status": "conditional",
+          "base_score": 4,
+          "max_days": 90,
+          "minimum_age": null,
+          "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; visitor activity does not itself authorize work.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "spain-schengen-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "spain-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; visitor activity does not itself authorize work.",
+              "source_ids": [
+                "spain-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period; visitor activity does not itself authorize work.",
+              "source_ids": [
+                "spain-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "part_year": {
+          "status": "conditional",
+          "base_score": 3.6,
+          "max_days": 365,
+          "minimum_age": null,
+          "summary": "The non-working residence visa supports residence for applicants with sufficient guaranteed means but prohibits gainful and remote professional activity.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "spain-nonworking-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "spain-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.6,
+              "max_days": 365,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "The non-working residence visa supports residence for applicants with sufficient guaranteed means but prohibits gainful and remote professional activity.",
+              "source_ids": [
+                "spain-nonworking-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.6,
+              "max_days": 365,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The non-working residence visa supports residence for applicants with sufficient guaranteed means but prohibits gainful and remote professional activity.",
+              "source_ids": [
+                "spain-nonworking-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "full_relocation": {
+          "status": "conditional",
+          "base_score": 3.6,
+          "max_days": null,
+          "minimum_age": null,
+          "summary": "The non-working route is renewable when its financial, insurance and residence conditions continue; applicants needing remote work should evaluate the separate telework route.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "spain-nonworking-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "spain-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.6,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "The non-working route is renewable when its financial, insurance and residence conditions continue; applicants needing remote work should evaluate the separate telework route.",
+              "source_ids": [
+                "spain-nonworking-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.6,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The non-working route is renewable when its financial, insurance and residence conditions continue; applicants needing remote work should evaluate the separate telework route.",
+              "source_ids": [
+                "spain-nonworking-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        }
+      },
+      "tax": {
+        "standard_day_threshold": 183,
+        "non_day_tests": "Spain also tests the main core or base of economic interests and applies family presumptions in defined circumstances; sporadic absences can count.",
+        "scope_if_resident": "Spanish tax residents generally enter IRPF on worldwide income; nonresidents remain subject to Spanish-source income under separate rules.",
+        "category_flags": {
+          "pensions": "treaty allocation and pension type require review",
+          "dividends": "worldwide-income reporting and treaty relief require review",
+          "capital_gains": "worldwide gains and asset-reporting duties require review",
+          "property_income": "Spanish property can create nonresident tax and filing duties",
+          "wealth": "wealth and solidarity-tax exposure is asset and region dependent",
+          "inheritance": "regional rules, relationship and situs require professional review"
+        },
+        "treaty_reporting_note": "Treaties can resolve dual residence or allocate income, but Spanish filings and foreign-asset reporting require profile-specific advice.",
+        "source_ids": [
+          "spain-tax-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high",
+        "by_mode": {
+          "seasonal": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3.8,
+            "summary": "A clearly sub-threshold stay is easier to document, while Spanish-source income and non-day tests remain relevant.",
+            "source_ids": [
+              "spain-tax-1"
+            ]
+          },
+          "part_year": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.8,
+            "summary": "Recurring days, sporadic-absence rules and economic-interest tests create material recordkeeping and advice needs.",
+            "source_ids": [
+              "spain-tax-1"
+            ]
+          },
+          "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.3,
+            "summary": "Worldwide-income, asset-reporting, treaty and regional tax questions make full relocation administratively demanding.",
+            "source_ids": [
+              "spain-tax-1"
+            ]
+          }
+        }
+      },
+      "healthcare": {
+        "by_mode": {
+          "seasonal": {
+            "bridge_score": 3.8,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Temporary EU/EEA access depends on home-system entitlement; other visitors need private or travel cover.",
+            "age_limit_summary": "Public temporary-access guidance has no general age cap; policy age limits are insurer-specific.",
+            "pre_existing_condition_summary": "EHIC medical-necessity rules and private-policy exclusions must be checked separately.",
+            "evacuation_summary": "Repatriation is not assumed to be part of public coverage and should be insured separately.",
+            "source_ids": [
+              "spain-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium_high"
+          },
+          "part_year": {
+            "bridge_score": 4,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Economically inactive residents may need qualifying home coverage, private insurance or the paid special agreement where eligible.",
+            "age_limit_summary": "The special-agreement route is eligibility-based; private underwriting must be checked separately.",
+            "pre_existing_condition_summary": "Do not assume a residence-compliant private policy covers every pre-existing condition.",
+            "evacuation_summary": "Confirm repatriation and island transfer cover outside public entitlements.",
+            "source_ids": [
+              "spain-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          },
+          "full_relocation": {
+            "bridge_score": 4.2,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Public entitlement depends on the resident's legal and social-security position; the special agreement can bridge some economically inactive residents.",
+            "age_limit_summary": "No general public-system age exclusion is stated in the cited route; contribution and insurer terms remain profile-specific.",
+            "pre_existing_condition_summary": "Public entitlement and private exclusions must be assessed separately.",
+            "evacuation_summary": "Repatriation remains a separate insurance decision.",
+            "source_ids": [
+              "spain-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          }
+        }
+      },
+      "financial_infrastructure": {
+        "bank_account_opening": "Nonresidents can face proof-of-nonresidence and institution-specific KYC requirements; legal EU residents have a defined basic-account route subject to AML checks.",
+        "tax_id_dependency": "A NIE/TIE or other status documentation is commonly relevant and must be confirmed with the bank.",
+        "international_transfer_friction": "SEPA transfers are broadly available; enhanced source-of-funds checks can delay onboarding or transfers.",
+        "international_payments": "Common cards and transfers are available through regulated institutions.",
+        "brokerage_access": "Broker service and tax reporting are provider- and residence-specific and require verification after relocation.",
+        "source_ids": [
+          "spain-bank-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "medium_high"
+      },
+      "sources": [
+        {
+          "id": "spain-schengen-1",
+          "metric_supported": "Passport-specific Schengen short-stay framework",
+          "url": "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy/short-stay-visas-issued-schengen-countries_en",
+          "publisher": "European Commission, Directorate-General for Migration and Home Affairs",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Undated live guidance; source_date records the reviewed live-page snapshot."
+        },
+        {
+          "id": "spain-nonworking-1",
+          "metric_supported": "Non-working residence visa purpose and work prohibition",
+          "url": "https://exteriores.gob.es/Consulados/washington/en/ServiciosConsulares/Paginas/Consular/Visado-de-residencia-no-lucrativa.aspx",
+          "publisher": "Ministry of Foreign Affairs, European Union and Cooperation of Spain",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Spain",
+          "notes": "Live consular guidance reflecting the immigration regulation effective 20 May 2025; applicants must use the consulate with jurisdiction."
+        },
+        {
+          "id": "spain-tax-1",
+          "metric_supported": "Individual tax-residence day and economic-interest tests",
+          "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/residencia-personas-fisicas-juridicas/persona-fisica-residente-espana.html",
+          "publisher": "Spanish Tax Agency",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Spain",
+          "notes": "Undated live tax-authority guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "spain-health-1",
+          "metric_supported": "Special healthcare agreement and temporary EU healthcare distinction",
+          "url": "https://www.sanidad.gob.es/en/servCiudadanos/internacional/convenioEspecial.htm",
+          "publisher": "Ministry of Health of Spain",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Spain",
+          "notes": "Undated live ministry guidance; confirms that EHIC is for temporary stays and is not residence cover."
+        },
+        {
+          "id": "spain-bank-1",
+          "metric_supported": "Eligibility and AML conditions for basic payment accounts",
+          "url": "https://clientebancario.bde.es/pcb/en/menu-horizontal/productosservici/cuentasdepositos/cuentascorriente/guia-textual/CuentadepagoBasica/quienes-pueden-solicitarla-.html",
+          "publisher": "Banco de España",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Spain",
+          "notes": "Undated live central-bank customer guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "spain-valencia-active-1",
+          "metric_supported": "Valencia cycle network, bike share and Turia Gardens route",
+          "url": "https://www.visitvalencia.com/en/what-to-do-valencia/valencia-by-bike",
+          "publisher": "Visit Valencia Foundation",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Valencia",
+          "notes": "Official destination page used for documented route and infrastructure facts, not promotional claims."
+        },
+        {
+          "id": "spain-malaga-active-1",
+          "metric_supported": "Signed cycling and hiking routes in the Montes de Malaga area",
+          "url": "https://static.costadelsolmalaga.org/visita/subidas/archivos/5/7/arc_25375.pdf",
+          "publisher": "Costa del Sol Malaga Tourism Board",
+          "source_date": "2024-12-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Malaga",
+          "notes": "Official active-tourism guide used for documented trail and cycling-route availability."
+        },
+        {
+          "id": "spain-eu-mobility-1",
+          "metric_supported": "EU-citizen residence and work rights in another EU country, including registration conditions after three months",
+          "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/index_en.htm",
+          "publisher": "European Union, Your Europe",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
+        }
+      ]
+    },
+    "Greece": {
+      "stay_routes": {
+        "seasonal": {
+          "status": "conditional",
+          "base_score": 4,
+          "max_days": 90,
+          "minimum_age": null,
+          "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "greece-schengen-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "greece-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+              "source_ids": [
+                "greece-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+              "source_ids": [
+                "greece-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "part_year": {
+          "status": "conditional",
+          "base_score": 3.6,
+          "max_days": 365,
+          "minimum_age": null,
+          "summary": "The national digital-nomad visa can support up to twelve months for qualifying remote workers with foreign work and documented resources.",
+          "work_permission": "remote_permitted",
+          "source_ids": [
+            "greece-digital-nomad-1",
+            "greece-digital-nomad-details-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium_high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "greece-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.6,
+              "max_days": 365,
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "The national digital-nomad visa can support up to twelve months for qualifying remote workers with foreign work and documented resources.",
+              "source_ids": [
+                "greece-digital-nomad-1",
+                "greece-digital-nomad-details-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.6,
+              "max_days": 365,
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The national digital-nomad visa can support up to twelve months for qualifying remote workers with foreign work and documented resources.",
+              "source_ids": [
+                "greece-digital-nomad-1",
+                "greece-digital-nomad-details-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "full_relocation": {
+          "status": "conditional",
+          "base_score": 3.3,
+          "max_days": null,
+          "minimum_age": null,
+          "summary": "Longer residence depends on the applicant fitting a current residence category and meeting income, insurance and renewal conditions; no universal retirement permission is assumed.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "greece-residence-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "greece-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.3,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Longer residence depends on the applicant fitting a current residence category and meeting income, insurance and renewal conditions; no universal retirement permission is assumed.",
+              "source_ids": [
+                "greece-residence-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.3,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Longer residence depends on the applicant fitting a current residence category and meeting income, insurance and renewal conditions; no universal retirement permission is assumed.",
+              "source_ids": [
+                "greece-residence-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        }
+      },
+      "tax": {
+        "standard_day_threshold": 183,
+        "non_day_tests": "Permanent or principal residence, habitual abode and the centre of vital interests can establish residence independently of the day count.",
+        "scope_if_resident": "Greek tax residence determines worldwide-income exposure; nonresidents are taxable on Greek-source income.",
+        "category_flags": {
+          "pensions": "pension source, treaty and any elective regime require review",
+          "dividends": "resident worldwide-income and treaty-credit treatment require review",
+          "capital_gains": "asset type and source determine treatment",
+          "property_income": "Greek-source rental and property income can remain taxable while nonresident",
+          "wealth": "property-based and deemed-income rules require review",
+          "inheritance": "relationship, residence and situs require professional review"
+        },
+        "treaty_reporting_note": "A tax-residence certificate and the applicable double-tax agreement may be needed; immigration residence does not decide tax residence.",
+        "source_ids": [
+          "greece-tax-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high",
+        "by_mode": {
+          "seasonal": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3.8,
+            "summary": "Tourist-only presence below 183 days can be comparatively clear, while Greek-source income remains relevant.",
+            "source_ids": [
+              "greece-tax-1"
+            ]
+          },
+          "part_year": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.8,
+            "summary": "The rolling twelve-month count and vital-interest tests make recurring stays advice-sensitive.",
+            "source_ids": [
+              "greece-tax-1"
+            ]
+          },
+          "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.5,
+            "summary": "Worldwide-income reporting and treaty coordination are expected planning issues for a Greek tax resident.",
+            "source_ids": [
+              "greece-tax-1"
+            ]
+          }
+        }
+      },
+      "healthcare": {
+        "by_mode": {
+          "seasonal": {
+            "bridge_score": 3.4,
+            "eligibility": "conditional",
+            "waiting_period_summary": "EU/EEA visitors rely on valid home-system entitlement; other visitors need private or travel insurance and may pay providers directly.",
+            "age_limit_summary": "Home-system and insurer rules, rather than a general visitor age rule, determine coverage.",
+            "pre_existing_condition_summary": "Medical necessity under cross-border rules and private exclusions must be confirmed.",
+            "evacuation_summary": "Island transfer and repatriation are not assumed and should be separately insured.",
+            "source_ids": [
+              "greece-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium_high"
+          },
+          "part_year": {
+            "bridge_score": 3.6,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Statutory access depends on insurance status and residence route; applicants should maintain private cover until registration is confirmed.",
+            "age_limit_summary": "No universal age cap is established by the cited cross-border guidance; private terms remain product-specific.",
+            "pre_existing_condition_summary": "Public entitlement and private underwriting must be checked separately.",
+            "evacuation_summary": "Crete-to-mainland transfer and repatriation cover should be confirmed.",
+            "source_ids": [
+              "greece-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium"
+          },
+          "full_relocation": {
+            "bridge_score": 3.8,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Public access depends on completing the relevant residence and statutory-insurance registration.",
+            "age_limit_summary": "Eligibility is status-based; no general public age exclusion is inferred.",
+            "pre_existing_condition_summary": "Private bridge cover may exclude conditions even where later statutory coverage applies.",
+            "evacuation_summary": "Plan separately for mainland transfer when specialist island care is unavailable.",
+            "source_ids": [
+              "greece-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium"
+          }
+        }
+      },
+      "financial_infrastructure": {
+        "bank_account_opening": "Account availability and onboarding documents are institution-specific; use only Bank of Greece-supervised institutions and verify current KYC requirements.",
+        "tax_id_dependency": "A Greek tax number and residence evidence may be requested; confirm with the selected institution.",
+        "international_transfer_friction": "SEPA access is available through supervised institutions, subject to due diligence.",
+        "international_payments": "Common euro payment services are available, with product access determined by the bank.",
+        "brokerage_access": "Investment-account eligibility and reporting must be checked after residence changes.",
+        "source_ids": [
+          "greece-bank-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "medium"
+      },
+      "sources": [
+        {
+          "id": "greece-schengen-1",
+          "metric_supported": "Passport-specific Schengen short-stay framework",
+          "url": "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy/short-stay-visas-issued-schengen-countries_en",
+          "publisher": "European Commission, Directorate-General for Migration and Home Affairs",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Undated live guidance; source_date records the reviewed live-page snapshot."
+        },
+        {
+          "id": "greece-digital-nomad-1",
+          "metric_supported": "Digital-nomad visa for non-European remote professionals working for foreign employers",
+          "url": "https://www.mfa.gr/en/services/working-in-greece-as-a-digital-nomad/",
+          "publisher": "Hellenic Republic Ministry of Foreign Affairs",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Greece",
+          "notes": "Undated live ministry page; source_date records the reviewed snapshot. Current consular requirements control an application."
+        },
+        {
+          "id": "greece-digital-nomad-details-1",
+          "metric_supported": "Digital-nomad national visa duration and documented-resource conditions",
+          "url": "https://www.mfa.gr/uk/images/stories/london/docs/Newsletter/Newsletter_No.28_opt.pdf",
+          "publisher": "Embassy of Greece in the United Kingdom, Ministry of Foreign Affairs",
+          "source_date": "2023-06-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Greece",
+          "notes": "Official consular bulletin supports the twelve-month national-visa description; applicants must reconfirm current amounts and documents with the competent consulate."
+        },
+        {
+          "id": "greece-residence-1",
+          "metric_supported": "Current categories of third-country residence permits",
+          "url": "https://migration.gov.gr/migration-policy/metanasteusi-stin-ellada/katigories-adeion-diamonis-politon-triton-choron-dikaiologitika%E2%80%8B/",
+          "publisher": "Hellenic Ministry of Migration and Asylum",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Greece",
+          "notes": "Undated live permit catalogue; source_date is the reviewed snapshot date. No general retirement route is inferred."
+        },
+        {
+          "id": "greece-tax-1",
+          "metric_supported": "Natural-person tax residence and worldwide-income relevance",
+          "url": "https://aade.gr/en/greeks-abroad-non-residents/income-taxation/tax-residence-natural-persons-itc",
+          "publisher": "Independent Authority for Public Revenue",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Greece",
+          "notes": "Undated live tax-authority guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "greece-health-1",
+          "metric_supported": "Cross-border statutory healthcare entitlement and reimbursement dependence",
+          "url": "https://eu-healthcare.eopyy.gov.gr/en/healthcare-in-greece/",
+          "publisher": "Hellenic National Contact Point for Cross-border Healthcare, EOPYY",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Greece / European Union",
+          "notes": "Undated live official portal; eligibility depends on the person's competent insurance system and status."
+        },
+        {
+          "id": "greece-bank-1",
+          "metric_supported": "Register of supervised credit and payment institutions",
+          "url": "https://www.bankofgreece.gr/en/main-tasks/supervision/supervised-institutions",
+          "publisher": "Bank of Greece",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Greece",
+          "notes": "Official register supports institution verification; it does not guarantee that a particular applicant will be onboarded."
+        },
+        {
+          "id": "greece-crete-active-1",
+          "metric_supported": "Crete mountain, gorge, path, coast and seasonal activity access",
+          "url": "https://www.incrediblecrete.gr/en/home/",
+          "publisher": "Region of Crete tourism portal",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Crete",
+          "notes": "Official regional destination page used for documented physical settings and activity availability, not promotional superlatives."
+        },
+        {
+          "id": "greece-eu-mobility-1",
+          "metric_supported": "EU-citizen residence and work rights in another EU country, including registration conditions after three months",
+          "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/index_en.htm",
+          "publisher": "European Union, Your Europe",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
+        }
+      ]
+    },
+    "Croatia": {
+      "stay_routes": {
+        "seasonal": {
+          "status": "conditional",
+          "base_score": 4,
+          "max_days": 90,
+          "minimum_age": null,
+          "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "croatia-schengen-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "croatia-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+              "source_ids": [
+                "croatia-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Passport-specific Schengen rules generally cap short stays at 90 days in any 180-day period.",
+              "source_ids": [
+                "croatia-schengen-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "part_year": {
+          "status": "conditional",
+          "base_score": 4,
+          "max_days": 548,
+          "minimum_age": null,
+          "summary": "The digital-nomad temporary stay can be granted for up to eighteen months to qualifying third-country remote workers for foreign businesses.",
+          "work_permission": "remote_permitted",
+          "source_ids": [
+            "croatia-digital-nomad-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "croatia-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 548,
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "The digital-nomad temporary stay can be granted for up to eighteen months to qualifying third-country remote workers for foreign businesses.",
+              "source_ids": [
+                "croatia-digital-nomad-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 4,
+              "max_days": 548,
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The digital-nomad temporary stay can be granted for up to eighteen months to qualifying third-country remote workers for foreign businesses.",
+              "source_ids": [
+                "croatia-digital-nomad-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "full_relocation": {
+          "status": "needs_verification",
+          "base_score": null,
+          "max_days": null,
+          "minimum_age": null,
+          "summary": "Digital-nomad stay is temporary and has a reapplication gap; a separate residence category is required for durable full relocation.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "croatia-digital-nomad-1",
+            "croatia-residence-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "conditional",
+              "base_score": 4.8,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "local_permitted",
+              "summary": "EU citizens may live and work in another EU country. Stays beyond three months can require residence registration and conditions based on the person's situation; this result is conditional on actually holding EU free-movement rights.",
+              "source_ids": [
+                "croatia-eu-mobility-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Digital-nomad stay is temporary and has a reapplication gap; a separate residence category is required for durable full relocation.",
+              "source_ids": [
+                "croatia-digital-nomad-1",
+                "croatia-residence-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Digital-nomad stay is temporary and has a reapplication gap; a separate residence category is required for durable full relocation.",
+              "source_ids": [
+                "croatia-digital-nomad-1",
+                "croatia-residence-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        }
+      },
+      "tax": {
+        "standard_day_threshold": null,
+        "non_day_tests": "Croatian residence turns on permanent or habitual residence; treaty tie-breakers can be required where another country also treats the person as resident.",
+        "scope_if_resident": "Residents are taxed on Croatian and foreign income under the worldwide-income principle; nonresidents are taxed on Croatian income.",
+        "category_flags": {
+          "pensions": "foreign pension and treaty allocation require review",
+          "dividends": "resident worldwide-income and treaty-credit treatment require review",
+          "capital_gains": "asset type and holding facts require review",
+          "property_income": "Croatian property income remains a local-source issue",
+          "wealth": "property and local charges require review; no general outcome is assumed",
+          "inheritance": "relationship and asset location require review"
+        },
+        "treaty_reporting_note": "Croatian residence is not reducible to one day count; domestic residence facts and an applicable treaty must be reviewed together.",
+        "source_ids": [
+          "croatia-tax-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "medium_high",
+        "by_mode": {
+          "seasonal": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3.8,
+            "summary": "A documented short visit is comparatively simple, but Croatian-source income and residence facts remain relevant.",
+            "source_ids": [
+              "croatia-tax-1"
+            ]
+          },
+          "part_year": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3.4,
+            "summary": "The digital-nomad route has specific tax treatment, but residence and income-category facts still require advice.",
+            "source_ids": [
+              "croatia-tax-1",
+              "croatia-digital-nomad-1"
+            ]
+          },
+          "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.7,
+            "summary": "Worldwide-income scope and treaty coordination become central once Croatian tax residence applies.",
+            "source_ids": [
+              "croatia-tax-1"
+            ]
+          }
+        }
+      },
+      "healthcare": {
+        "by_mode": {
+          "seasonal": {
+            "bridge_score": 3.5,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Visitors use valid EU/EEA/contracting-state entitlement or private travel cover, depending on status.",
+            "age_limit_summary": "No universal visitor age cap is stated; policy limits are insurer-specific.",
+            "pre_existing_condition_summary": "Home entitlement and private exclusions must be checked before travel.",
+            "evacuation_summary": "Island and coastal transfers plus repatriation should be covered separately.",
+            "source_ids": [
+              "croatia-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          },
+          "part_year": {
+            "bridge_score": 3.6,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Temporary residents are generally subject to Croatian compulsory-insurance rules unless EU rules, an agreement or a special law provides otherwise.",
+            "age_limit_summary": "Eligibility is status-based; private policy age limits require separate checking.",
+            "pre_existing_condition_summary": "Compulsory coverage rules and private-policy exclusions are separate questions.",
+            "evacuation_summary": "Confirm coastal or island transfer and repatriation cover.",
+            "source_ids": [
+              "croatia-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          },
+          "full_relocation": {
+            "bridge_score": 3.8,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Approved residence normally triggers registration duties unless an international or special-law exception applies.",
+            "age_limit_summary": "No general age exclusion is stated in the official registration guidance.",
+            "pre_existing_condition_summary": "Public insurance status should not be confused with private supplementary underwriting.",
+            "evacuation_summary": "Specialist transfer needs should be assessed for island or smaller coastal bases.",
+            "source_ids": [
+              "croatia-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          }
+        }
+      },
+      "financial_infrastructure": {
+        "bank_account_opening": "EU legal residents have a statutory basic-account route at qualifying institutions, subject to identification and anti-money-laundering requirements.",
+        "tax_id_dependency": "An OIB and identity/residence documentation can be required for local administration and banking.",
+        "international_transfer_friction": "Euro/SEPA transfers are available through Croatian institutions, subject to due diligence.",
+        "international_payments": "Common euro cards and transfers are available; product access is bank-specific.",
+        "brokerage_access": "Broker eligibility and cross-border reporting should be checked with the provider after a residence change.",
+        "source_ids": [
+          "croatia-bank-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "medium_high"
+      },
+      "sources": [
+        {
+          "id": "croatia-schengen-1",
+          "metric_supported": "Passport-specific Schengen short-stay framework",
+          "url": "https://home-affairs.ec.europa.eu/policies/schengen-borders-and-visa/visa-policy/short-stay-visas-issued-schengen-countries_en",
+          "publisher": "European Commission, Directorate-General for Migration and Home Affairs",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Undated live guidance; source_date records the reviewed live-page snapshot."
+        },
+        {
+          "id": "croatia-digital-nomad-1",
+          "metric_supported": "Digital-nomad definition, duration, resources, insurance and reapplication gap",
+          "url": "https://mup.gov.hr/aliens-281621/stay-and-work/temporary-residence-of-digital-nomads/286833",
+          "publisher": "Ministry of the Interior of Croatia",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Croatia",
+          "notes": "Undated live official guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "croatia-residence-1",
+          "metric_supported": "Purposes of temporary stay for third-country nationals",
+          "url": "https://mup.gov.hr/aliens-281621/stay-and-work/temporary-stay-of-third-country-nationals/281661",
+          "publisher": "Ministry of the Interior of Croatia",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Croatia",
+          "notes": "Official catalogue; no broad passive-income retirement route is inferred."
+        },
+        {
+          "id": "croatia-tax-1",
+          "metric_supported": "Resident definition, worldwide-income scope and treaty relevance",
+          "url": "https://gov.hr/en/taxation-of-foreign-pensions-a-step-by-step-procedure/2024",
+          "publisher": "Government of Croatia",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Croatia",
+          "notes": "Undated live government guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "croatia-health-1",
+          "metric_supported": "Health-insurance rules for foreign temporary residents and cross-border insured persons",
+          "url": "https://hzzo.hr/en/national-contact-point-ncp/health-insurance-republic-croatia",
+          "publisher": "Croatian Health Insurance Fund",
+          "source_date": "2025-07-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Croatia",
+          "notes": "Official health-insurer guidance; individual status and treaty exceptions must be checked."
+        },
+        {
+          "id": "croatia-bank-1",
+          "metric_supported": "Right to a basic payment account for qualifying EU legal residents",
+          "url": "https://www.hnb.hr/c/document_library/get_file?groupId=20182&uuid=6d1e3cb2-c191-44a5-99eb-aa1bb0540d91",
+          "publisher": "Croatian National Bank",
+          "source_date": "2025-10-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Croatia",
+          "notes": "Official statutory translation; bank onboarding remains subject to identity and AML checks."
+        },
+        {
+          "id": "croatia-istria-active-1",
+          "metric_supported": "Istria cycling, walking and active-tourism offerings",
+          "url": "https://www.istra.hr/en/information/brochures/istra-outdoor",
+          "publisher": "Istria Tourist Board",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Istria",
+          "notes": "Official regional page used for documented route and event availability, not promotional rankings."
+        },
+        {
+          "id": "croatia-dalmatia-active-1",
+          "metric_supported": "Central Dalmatia cycling, hiking and active-tourism offerings",
+          "url": "https://www.dalmatia.hr/active-summer-in-dalmatia/",
+          "publisher": "Split-Dalmatia County Tourist Board",
+          "source_date": "2024-11-07",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Dalmatia",
+          "notes": "Official regional tourism-board page supports documented cycling, hiking and coastal activity availability, not promotional rankings."
+        },
+        {
+          "id": "croatia-eu-mobility-1",
+          "metric_supported": "EU-citizen residence and work rights in another EU country, including registration conditions after three months",
+          "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/index_en.htm",
+          "publisher": "European Union, Your Europe",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "European Union",
+          "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
+        }
+      ]
+    },
+    "Indonesia": {
+      "stay_routes": {
+        "seasonal": {
+          "status": "conditional",
+          "base_score": 3.5,
+          "max_days": 60,
+          "minimum_age": null,
+          "summary": "Visitor stay length, extension and permitted activities depend on the selected visa index and passport; confirm the current immigration catalogue before travel.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "indonesia-immigration-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.5,
+              "max_days": 60,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Visitor stay length, extension and permitted activities depend on the selected visa index and passport; confirm the current immigration catalogue before travel.",
+              "source_ids": [
+                "indonesia-immigration-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.5,
+              "max_days": 60,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Visitor stay length, extension and permitted activities depend on the selected visa index and passport; confirm the current immigration catalogue before travel.",
+              "source_ids": [
+                "indonesia-immigration-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "part_year": {
+          "status": "conditional",
+          "base_score": 3.4,
+          "max_days": 365,
+          "minimum_age": null,
+          "summary": "The E33G remote-worker residence route is profile-dependent and should be checked for income, employer and permitted-activity requirements.",
+          "work_permission": "remote_permitted",
+          "source_ids": [
+            "indonesia-immigration-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.4,
+              "max_days": 365,
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "The E33G remote-worker residence route is profile-dependent and should be checked for income, employer and permitted-activity requirements.",
+              "source_ids": [
+                "indonesia-immigration-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.4,
+              "max_days": 365,
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The E33G remote-worker residence route is profile-dependent and should be checked for income, employer and permitted-activity requirements.",
+              "source_ids": [
+                "indonesia-immigration-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "full_relocation": {
+          "status": "conditional",
+          "base_score": 3,
+          "max_days": 1825,
+          "minimum_age": 55,
+          "summary": "The E33E five-year retiree residence route is expressly limited to applicants aged 55 or older and subject to its financial and immigration conditions.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "indonesia-retiree-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium_high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3,
+              "max_days": 1825,
+              "minimum_age": 55,
+              "work_permission": "unclear",
+              "summary": "The E33E five-year retiree residence route is expressly limited to applicants aged 55 or older and subject to its financial and immigration conditions.",
+              "source_ids": [
+                "indonesia-retiree-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3,
+              "max_days": 1825,
+              "minimum_age": 55,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The E33E five-year retiree residence route is expressly limited to applicants aged 55 or older and subject to its financial and immigration conditions.",
+              "source_ids": [
+                "indonesia-retiree-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        }
+      },
+      "tax": {
+        "standard_day_threshold": 183,
+        "non_day_tests": "Residence or an intention to reside can establish domestic tax-subject status independently of exceeding 183 days in twelve months.",
+        "scope_if_resident": "Domestic tax subjects generally report Indonesian and worldwide income; nonresidents remain taxable on Indonesian-source income.",
+        "category_flags": {
+          "pensions": "source, residence and treaty treatment require review",
+          "dividends": "worldwide-income and foreign-tax-credit treatment require review",
+          "capital_gains": "asset type, source and special final taxes require review",
+          "property_income": "Indonesian property income remains locally relevant",
+          "wealth": "asset disclosure and related reporting require advice",
+          "inheritance": "estate, gift and asset-registration consequences require review"
+        },
+        "treaty_reporting_note": "The 183-day test is not the only residence test; treaty residence, registration and foreign-income reporting require professional advice.",
+        "source_ids": [
+          "indonesia-tax-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high",
+        "by_mode": {
+          "seasonal": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3.2,
+            "summary": "A short stay can remain nonresident, but Indonesian-source income and intention-to-reside facts still matter.",
+            "source_ids": [
+              "indonesia-tax-1"
+            ]
+          },
+          "part_year": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.5,
+            "summary": "Rolling twelve-month day counts and intention-to-reside evidence make recurring stays administratively sensitive.",
+            "source_ids": [
+              "indonesia-tax-1"
+            ]
+          },
+          "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.2,
+            "summary": "Worldwide-income reporting, registration and treaty coordination require professional support.",
+            "source_ids": [
+              "indonesia-tax-1"
+            ]
+          }
+        }
+      },
+      "healthcare": {
+        "by_mode": {
+          "seasonal": {
+            "bridge_score": 2.8,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Visitors should arrange private or travel medical cover before arrival and expect payment requirements.",
+            "age_limit_summary": "Age acceptance is private-policy specific and must be quoted before travel.",
+            "pre_existing_condition_summary": "Exclusions and stabilization clauses are insurer-specific and require written confirmation.",
+            "evacuation_summary": "Medical evacuation cover is strongly recommended, particularly for care beyond Bali's available facilities.",
+            "source_ids": [
+              "indonesia-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium_high"
+          },
+          "part_year": {
+            "bridge_score": 2.9,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Do not assume a residence permit creates comprehensive public cover; confirm local enrollment and maintain private insurance until effective.",
+            "age_limit_summary": "Private insurance age and renewal limits require product-specific verification.",
+            "pre_existing_condition_summary": "Private underwriting may exclude or load pre-existing conditions.",
+            "evacuation_summary": "A funded evacuation path to a regional medical hub should be documented.",
+            "source_ids": [
+              "indonesia-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium"
+          },
+          "full_relocation": {
+            "bridge_score": 2.8,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Long-stay applicants need written confirmation of public or private eligibility; the immigration route alone does not establish coverage.",
+            "age_limit_summary": "The retiree route starts at age 55, while insurance age limits are separate and provider-specific.",
+            "pre_existing_condition_summary": "Obtain explicit terms for chronic and pre-existing care before relocating.",
+            "evacuation_summary": "Maintain evacuation funding or insurance for treatment unavailable locally.",
+            "source_ids": [
+              "indonesia-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium"
+          }
+        }
+      },
+      "financial_infrastructure": {
+        "bank_account_opening": "Bank Indonesia states nonresidents are eligible in principle, subject to bank KYC, identity and source-of-funds requirements.",
+        "tax_id_dependency": "Tax and residence documents may be required by the institution; confirm the exact onboarding list.",
+        "international_transfer_friction": "Rupiah and foreign-exchange transactions are regulated and can require underlying documentation.",
+        "international_payments": "International cards and transfers are available but acceptance and limits vary by institution and merchant.",
+        "brokerage_access": "Local and home-country brokers may restrict service after residence changes; verify before moving assets.",
+        "source_ids": [
+          "indonesia-bank-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "medium_high"
+      },
+      "sources": [
+        {
+          "id": "indonesia-immigration-1",
+          "metric_supported": "Official visa catalogue including visitor and E33G remote-worker routes",
+          "url": "https://kanwilpapuabarat.imigrasi.go.id/service-proxy/8",
+          "publisher": "Directorate General of Immigration, Republic of Indonesia",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Indonesia",
+          "notes": "Live official immigration catalogue; source_date is the reviewed snapshot date and route details must be rechecked before application."
+        },
+        {
+          "id": "indonesia-retiree-1",
+          "metric_supported": "E33E five-year retiree special residence route and minimum age 55",
+          "url": "https://kanwilpapuabarat.imigrasi.go.id/service-proxy/8?url=https%3A%2F%2Fwww.imigrasi.go.id%2Fwna%2Fdaftar-visa-indonesia%2FE33E",
+          "publisher": "Directorate General of Immigration, Republic of Indonesia",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Indonesia",
+          "notes": "Official route page; application approval and permitted activities remain subject to current immigration rules."
+        },
+        {
+          "id": "indonesia-tax-1",
+          "metric_supported": "Foreign-citizen domestic tax-subject tests and worldwide-income reporting",
+          "url": "https://pajak.go.id/en/artikel/tax-return-reporting-foreign-citizens-indonesia",
+          "publisher": "Directorate General of Taxes, Indonesia",
+          "source_date": "2025-04-08",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Indonesia",
+          "notes": "Official tax-authority educational article citing the governing residence rules."
+        },
+        {
+          "id": "indonesia-health-1",
+          "metric_supported": "Visitor medical-payment and evacuation-planning constraints",
+          "url": "https://travel.state.gov/en/international-travel/travel-advisories/indonesia.html",
+          "publisher": "United States Department of State",
+          "source_date": "2026-07-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Indonesia / travel health",
+          "notes": "Official government travel-health evidence used only for payment, insurance and evacuation planning; it does not determine Indonesian public eligibility."
+        },
+        {
+          "id": "indonesia-bank-1",
+          "metric_supported": "Nonresident bank-account eligibility, KYC and rupiah transaction restrictions",
+          "url": "https://www.bi.go.id/en/iru/faq/default.aspx",
+          "publisher": "Bank Indonesia",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Indonesia",
+          "notes": "Undated live central-bank FAQ; source_date is the reviewed snapshot date and banks may impose additional requirements."
+        },
+        {
+          "id": "indonesia-bali-active-1",
+          "metric_supported": "Bali cycling, hiking, rafting and water-activity locations",
+          "url": "https://www.indonesia.travel/uk/en/destination/bali-nusa-tenggara/bali/bali",
+          "publisher": "Ministry of Tourism, Republic of Indonesia",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Bali",
+          "notes": "Official destination page used for documented activity locations, not qualitative marketing claims."
+        }
+      ]
+    },
+    "Thailand": {
+      "stay_routes": {
+        "seasonal": {
+          "status": "conditional",
+          "base_score": 3.5,
+          "max_days": 60,
+          "minimum_age": null,
+          "summary": "Visa exemption or tourist-visa duration is passport-specific; check the official e-visa eligibility tool for the intended stay.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "thailand-visa-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.5,
+              "max_days": 60,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Visa exemption or tourist-visa duration is passport-specific; check the official e-visa eligibility tool for the intended stay.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.5,
+              "max_days": 60,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Visa exemption or tourist-visa duration is passport-specific; check the official e-visa eligibility tool for the intended stay.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "part_year": {
+          "status": "conditional",
+          "base_score": 3.8,
+          "max_days": 180,
+          "minimum_age": null,
+          "summary": "The Destination Thailand Visa includes workcation and other defined activities, with eligibility and each period of stay requiring official confirmation.",
+          "work_permission": "remote_permitted",
+          "source_ids": [
+            "thailand-visa-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium_high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": 180,
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "The Destination Thailand Visa includes workcation and other defined activities, with eligibility and each period of stay requiring official confirmation.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": 180,
+              "minimum_age": null,
+              "work_permission": "remote_permitted",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The Destination Thailand Visa includes workcation and other defined activities, with eligibility and each period of stay requiring official confirmation.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "full_relocation": {
+          "status": "conditional",
+          "base_score": 3.2,
+          "max_days": 365,
+          "minimum_age": 50,
+          "summary": "Retirement visa categories begin at age 50 and require category-specific financial, insurance and renewal compliance; they do not authorize local work.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "thailand-visa-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "medium_high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.2,
+              "max_days": 365,
+              "minimum_age": 50,
+              "work_permission": "passive_only",
+              "summary": "Retirement visa categories begin at age 50 and require category-specific financial, insurance and renewal compliance; they do not authorize local work.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.2,
+              "max_days": 365,
+              "minimum_age": 50,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Retirement visa categories begin at age 50 and require category-specific financial, insurance and renewal compliance; they do not authorize local work.",
+              "source_ids": [
+                "thailand-visa-1"
+              ],
+              "confidence": "medium_high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        }
+      },
+      "tax": {
+        "standard_day_threshold": 180,
+        "non_day_tests": "Residence is based on aggregate days in the calendar tax year; Thai-source income can remain taxable for nonresidents.",
+        "scope_if_resident": "Residents are liable on Thai-source income and foreign-source assessable income under remittance rules; nonresidents are liable on Thai-source income.",
+        "category_flags": {
+          "pensions": "source, remittance timing and treaty treatment require review",
+          "dividends": "source, remittance and foreign-tax-credit treatment require review",
+          "capital_gains": "asset, source and remittance treatment require review",
+          "property_income": "Thai property income remains taxable locally",
+          "wealth": "no personal outcome is assumed; asset and reporting questions require review",
+          "inheritance": "Thai-situs assets, thresholds and relationship rules require advice"
+        },
+        "treaty_reporting_note": "Foreign-income remittance guidance and treaty residence should be reviewed for the relevant year and income categories.",
+        "source_ids": [
+          "thailand-tax-1",
+          "thailand-tax-remittance-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high",
+        "by_mode": {
+          "seasonal": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3.2,
+            "summary": "A stay well below 180 days is easier to document, while Thai-source income remains in scope.",
+            "source_ids": [
+              "thailand-tax-1"
+            ]
+          },
+          "part_year": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.4,
+            "summary": "Approaching or crossing 180 aggregate days materially changes residence and foreign-income remittance analysis.",
+            "source_ids": [
+              "thailand-tax-1",
+              "thailand-tax-remittance-1"
+            ]
+          },
+          "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.1,
+            "summary": "Resident foreign-income, remittance, treaty and annual filing questions require professional review.",
+            "source_ids": [
+              "thailand-tax-1",
+              "thailand-tax-remittance-1"
+            ]
+          }
+        }
+      },
+      "healthcare": {
+        "by_mode": {
+          "seasonal": {
+            "bridge_score": 3.3,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Visitors generally pay for care or use private/travel insurance; providers may require payment or proof of cover up front.",
+            "age_limit_summary": "Private-policy age limits and renewability must be checked before travel.",
+            "pre_existing_condition_summary": "Private exclusions require written confirmation.",
+            "evacuation_summary": "Island and remote-area evacuation cover is strongly recommended.",
+            "source_ids": [
+              "thailand-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          },
+          "part_year": {
+            "bridge_score": 3.2,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Do not assume the visa grants Thai public coverage; maintain private insurance unless a separate employment or statutory route applies.",
+            "age_limit_summary": "Obtain product-specific age and renewal terms for multi-year planning.",
+            "pre_existing_condition_summary": "Chronic and pre-existing care may be excluded or loaded by private insurers.",
+            "evacuation_summary": "Confirm transfer from Samui or smaller facilities to a major-city hospital and onward evacuation.",
+            "source_ids": [
+              "thailand-health-1",
+              "thailand-public-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium_high"
+          },
+          "full_relocation": {
+            "bridge_score": 3.1,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Retirement residence does not itself establish universal public coverage; private insurance or another qualifying scheme is needed.",
+            "age_limit_summary": "Retirement visas start at age 50, while insurance upper-entry and renewal ages are separate constraints.",
+            "pre_existing_condition_summary": "Secure written coverage terms for existing conditions before relocating.",
+            "evacuation_summary": "Long-term island residents need a funded mainland and international evacuation plan.",
+            "source_ids": [
+              "thailand-health-1",
+              "thailand-public-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium_high"
+          }
+        }
+      },
+      "financial_infrastructure": {
+        "bank_account_opening": "Nonresidents may open defined baht and foreign-currency accounts at authorized banks, but retail onboarding documents remain bank-specific.",
+        "tax_id_dependency": "A tax number or residence documents may be required depending on account and activity.",
+        "international_transfer_friction": "Foreign-exchange and cross-border transfers operate under Bank of Thailand purpose and documentation rules.",
+        "international_payments": "Cards and bank transfers are common, but cash and up-front medical payment remain relevant on islands.",
+        "brokerage_access": "Nonresident securities accounts are regulated separately; provider access and home-country restrictions require verification.",
+        "source_ids": [
+          "thailand-bank-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high"
+      },
+      "sources": [
+        {
+          "id": "thailand-visa-1",
+          "metric_supported": "Official tourist, retirement, DTV and long-term visa categories",
+          "url": "https://www.thaievisa.go.th/visa/visa/dtv-visa/",
+          "publisher": "Ministry of Foreign Affairs of Thailand",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Thailand",
+          "notes": "Live official e-visa catalogue; source_date is the reviewed snapshot date and nationality-specific requirements control."
+        },
+        {
+          "id": "thailand-tax-1",
+          "metric_supported": "Personal income tax residence threshold and source scope",
+          "url": "https://www.rd.go.th/english/6045.html",
+          "publisher": "Revenue Department of Thailand",
+          "source_date": "2024-03-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Thailand",
+          "notes": "Official tax-authority overview."
+        },
+        {
+          "id": "thailand-tax-remittance-1",
+          "metric_supported": "Foreign-source income residence and remittance analysis",
+          "url": "https://www.rd.go.th/fileadmin/user_upload/porphor/GuideTaxFromAbroad_EN.pdf",
+          "publisher": "Revenue Department of Thailand",
+          "source_date": "2026-01-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Thailand",
+          "notes": "Official English guide; individual treaty and foreign-tax-credit outcomes are outside this dataset."
+        },
+        {
+          "id": "thailand-health-1",
+          "metric_supported": "Medical payment, urban/island capacity and evacuation constraints",
+          "url": "https://travel.state.gov/en/international-travel/travel-advisories/thailand.html",
+          "publisher": "United States Department of State",
+          "source_date": "2026-08-22",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Thailand / travel health",
+          "notes": "Official government travel-health evidence; it does not determine Thai public eligibility."
+        },
+        {
+          "id": "thailand-public-health-1",
+          "metric_supported": "Citizen-focused universal scheme and separate migrant coverage context",
+          "url": "https://eng.nhso.go.th/view/1/home/Healthcare-rights-of-stateless-people-/158/EN-US",
+          "publisher": "National Health Security Office of Thailand",
+          "source_date": "2020-07-13",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Thailand",
+          "notes": "Official context showing that public-scheme entitlement is not inferred from presence or residence alone."
+        },
+        {
+          "id": "thailand-bank-1",
+          "metric_supported": "Nonresident accounts and cross-border foreign-exchange regulation",
+          "url": "https://www.bot.or.th/en/our-roles/financial-markets/foreign-exchange-regulations/exchange-control-regulation.html",
+          "publisher": "Bank of Thailand",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Thailand",
+          "notes": "Undated live central-bank guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "thailand-samui-active-1",
+          "metric_supported": "Ko Samui water, fitness and outdoor activity availability",
+          "url": "https://www.tourismthailand.org/Destinations/Provinces/Ko-Samui/360",
+          "publisher": "Tourism Authority of Thailand",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Ko Samui",
+          "notes": "Official destination page used for documented activities and island transport caution, not promotional claims."
+        },
+        {
+          "id": "thailand-phuket-active-1",
+          "metric_supported": "Phuket beach, diving, snorkeling, windsurfing and sailing availability",
+          "url": "https://www.tourismthailand.org/Destinations/Provinces/Phuket/350",
+          "publisher": "Tourism Authority of Thailand",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Phuket",
+          "notes": "Undated official destination page; source_date records the reviewed live-page snapshot and supports activity availability only."
+        }
+      ]
+    },
+    "Japan": {
+      "stay_routes": {
+        "seasonal": {
+          "status": "conditional",
+          "base_score": 3.8,
+          "max_days": 90,
+          "minimum_age": null,
+          "summary": "Many listed passports receive visa-exempt short stays, commonly 90 days, while other travelers need a short-stay visa and nationality-specific conditions apply.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "japan-short-stay-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Many listed passports receive visa-exempt short stays, commonly 90 days, while other travelers need a short-stay visa and nationality-specific conditions apply.",
+              "source_ids": [
+                "japan-short-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Many listed passports receive visa-exempt short stays, commonly 90 days, while other travelers need a short-stay visa and nationality-specific conditions apply.",
+              "source_ids": [
+                "japan-short-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "part_year": {
+          "status": "needs_verification",
+          "base_score": null,
+          "max_days": 90,
+          "minimum_age": null,
+          "summary": "No general part-year retirement permission is documented; repeated temporary-visitor use must not be treated as a residence route.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "japan-short-stay-1",
+            "japan-long-stay-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "No general part-year retirement permission is documented; repeated temporary-visitor use must not be treated as a residence route.",
+              "source_ids": [
+                "japan-short-stay-1",
+                "japan-long-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. No general part-year retirement permission is documented; repeated temporary-visitor use must not be treated as a residence route.",
+              "source_ids": [
+                "japan-short-stay-1",
+                "japan-long-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "full_relocation": {
+          "status": "needs_verification",
+          "base_score": null,
+          "max_days": null,
+          "minimum_age": null,
+          "summary": "Japan requires a qualifying status of residence for long-term stay; no general passive-income or retirement category is documented for this launch profile.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "japan-long-stay-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Japan requires a qualifying status of residence for long-term stay; no general passive-income or retirement category is documented for this launch profile.",
+              "source_ids": [
+                "japan-long-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Japan requires a qualifying status of residence for long-term stay; no general passive-income or retirement category is documented for this launch profile.",
+              "source_ids": [
+                "japan-long-stay-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        }
+      },
+      "tax": {
+        "standard_day_threshold": 365,
+        "non_day_tests": "A domicile in Japan can establish residence before one continuous year; residence classification includes non-permanent-resident rules.",
+        "scope_if_resident": "Nonresidents are generally taxed on Japanese-source income; resident scope varies with residence classification and remittance facts.",
+        "category_flags": {
+          "pensions": "source and treaty classification require review",
+          "dividends": "residence class, source, remittance and treaty treatment require review",
+          "capital_gains": "asset, source and residence-class rules require review",
+          "property_income": "Japanese real-estate income remains domestic-source income",
+          "wealth": "exit-tax and asset-reporting questions may arise for qualifying residents",
+          "inheritance": "nationality, domicile, visa and asset-situs rules require specialist review"
+        },
+        "treaty_reporting_note": "Japan's domicile and one-year residence tests are not a simple 183-day rule; treaty and non-permanent-resident analysis is profile-specific.",
+        "source_ids": [
+          "japan-tax-1",
+          "japan-tax-foreign-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high",
+        "by_mode": {
+          "seasonal": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3.8,
+            "summary": "A genuine short visit without Japanese domicile is relatively clear, while Japanese-source income remains relevant.",
+            "source_ids": [
+              "japan-tax-1"
+            ]
+          },
+          "part_year": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3,
+            "summary": "Domicile facts and repeated presence need review even without a 183-day statutory trigger.",
+            "source_ids": [
+              "japan-tax-1"
+            ]
+          },
+          "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.5,
+            "summary": "Residence classification, foreign-income remittance, asset reporting and treaty issues add complexity.",
+            "source_ids": [
+              "japan-tax-1",
+              "japan-tax-foreign-1"
+            ]
+          }
+        }
+      },
+      "healthcare": {
+        "by_mode": {
+          "seasonal": {
+            "bridge_score": 3.4,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Temporary visitors generally need travel/private insurance and may be asked for payment; national insurance is for qualifying longer-term residents.",
+            "age_limit_summary": "Travel-policy age limits are provider-specific.",
+            "pre_existing_condition_summary": "Private exclusions and medical-necessity terms require confirmation.",
+            "evacuation_summary": "National insurance does not cover medical evacuation; insure it separately.",
+            "source_ids": [
+              "japan-health-1",
+              "japan-health-evac-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          },
+          "part_year": {
+            "bridge_score": 3.2,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Eligibility for public insurance generally requires a qualifying registered residence expected to exceed three months.",
+            "age_limit_summary": "Public eligibility is residence-based; private bridge-cover age limits remain separate.",
+            "pre_existing_condition_summary": "Public participation and private underwriting should not be conflated.",
+            "evacuation_summary": "Evacuation is outside national insurance and must be funded separately.",
+            "source_ids": [
+              "japan-health-1",
+              "japan-health-evac-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          },
+          "full_relocation": {
+            "bridge_score": 4.3,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Qualifying foreign residents expected to stay more than three months enter the public health-insurance framework, subject to registration.",
+            "age_limit_summary": "The cited public framework covers eligible residents without a general foreign-resident age cap.",
+            "pre_existing_condition_summary": "Public benefits differ from private-policy underwriting; confirm coverage and copay details locally.",
+            "evacuation_summary": "Medical evacuation remains outside national insurance.",
+            "source_ids": [
+              "japan-health-1",
+              "japan-health-evac-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          }
+        }
+      },
+      "financial_infrastructure": {
+        "bank_account_opening": "The Financial Services Agency publishes a dedicated account-opening and remittance guide for longer-term foreign residents.",
+        "tax_id_dependency": "Residence card, address and identity checks are central; requirements vary by institution.",
+        "international_transfer_friction": "Banks monitor residence-period changes and international remittances under KYC rules.",
+        "international_payments": "Local accounts and cards are available to qualifying residents, while onboarding can be document-intensive.",
+        "brokerage_access": "Securities-provider access and tax reporting can change with residence and must be verified directly.",
+        "source_ids": [
+          "japan-bank-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high"
+      },
+      "sources": [
+        {
+          "id": "japan-short-stay-1",
+          "metric_supported": "Visa exemptions and common temporary-visitor periods",
+          "url": "https://www.mofa.go.jp/j_info/visit/visa/short/novisa.html",
+          "publisher": "Ministry of Foreign Affairs of Japan",
+          "source_date": "2025-09-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Japan",
+          "notes": "Official nationality-specific list; not all passports receive the same period or exemption."
+        },
+        {
+          "id": "japan-long-stay-1",
+          "metric_supported": "Requirement for purpose-specific long-term visa and status of residence",
+          "url": "https://www.mofa.go.jp/j_info/visit/visa/long/index.html",
+          "publisher": "Ministry of Foreign Affairs of Japan",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Japan",
+          "notes": "Undated live official category index; source_date is the reviewed snapshot date. No general retirement category is inferred."
+        },
+        {
+          "id": "japan-tax-1",
+          "metric_supported": "Nonresident definition and Japanese-source income scope",
+          "url": "https://www.nta.go.jp/english/taxes/individual/12006.htm",
+          "publisher": "National Tax Agency of Japan",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Japan",
+          "notes": "Undated live tax-authority guidance; source_date is the reviewed snapshot date."
+        },
+        {
+          "id": "japan-tax-foreign-1",
+          "metric_supported": "Non-permanent resident foreign-income and remittance context",
+          "url": "https://www.nta.go.jp/english/taxes/individual/12007.htm",
+          "publisher": "National Tax Agency of Japan",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Japan",
+          "notes": "Official guidance used for scope complexity, not to calculate liability."
+        },
+        {
+          "id": "japan-health-1",
+          "metric_supported": "Public health-insurance eligibility for qualifying foreign residents",
+          "url": "https://www.mhlw.go.jp/content/12400000/001406614.pdf",
+          "publisher": "Ministry of Health, Labour and Welfare of Japan",
+          "source_date": "2025-04-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Japan",
+          "notes": "Official English overview states that qualifying foreign residents, such as those residing over three months, are included."
+        },
+        {
+          "id": "japan-health-evac-1",
+          "metric_supported": "Temporary-visitor payment and evacuation exclusions",
+          "url": "https://travel.state.gov/en/international-travel/travel-advisories/japan.html",
+          "publisher": "United States Department of State",
+          "source_date": "2025-08-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Japan / travel health",
+          "notes": "Official travel-health evidence used for payment and evacuation planning, not Japanese eligibility law."
+        },
+        {
+          "id": "japan-bank-1",
+          "metric_supported": "Foreign-resident bank-account opening and remittance process",
+          "url": "https://www.fsa.go.jp/en/user/livinginjapan.html",
+          "publisher": "Financial Services Agency of Japan",
+          "source_date": "2025-04-25",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Japan",
+          "notes": "Official guide; each institution still applies its own onboarding checks."
+        },
+        {
+          "id": "japan-fukuoka-active-1",
+          "metric_supported": "Fukuoka-to-Itoshima cycling access and documented route options",
+          "url": "https://www.gofukuoka.jp/en/articles/detail/cfa73819-1f5e-450c-84f1-5da15d4a782c",
+          "publisher": "Fukuoka City Official Tourist Guide",
+          "source_date": "2025-01-01",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Fukuoka City / Itoshima",
+          "notes": "Official destination page used for route and infrastructure facts, not promotional rankings."
+        }
+      ]
+    },
+    "Vietnam": {
+      "stay_routes": {
+        "seasonal": {
+          "status": "conditional",
+          "base_score": 3.8,
+          "max_days": 90,
+          "minimum_age": null,
+          "summary": "Vietnam's official e-visa can be valid for up to 90 days, single or multiple entry, for eligible passport holders.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "vietnam-evisa-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Vietnam's official e-visa can be valid for up to 90 days, single or multiple entry, for eligible passport holders.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "conditional",
+              "base_score": 3.8,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. Vietnam's official e-visa can be valid for up to 90 days, single or multiple entry, for eligible passport holders.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "part_year": {
+          "status": "needs_verification",
+          "base_score": null,
+          "max_days": 90,
+          "minimum_age": null,
+          "summary": "The e-visa is capped at 90 days and cannot be treated as a durable recurring residence route; a separate qualifying sponsored status is required.",
+          "work_permission": "passive_only",
+          "source_ids": [
+            "vietnam-evisa-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "The e-visa is capped at 90 days and cannot be treated as a durable recurring residence route; a separate qualifying sponsored status is required.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": 90,
+              "minimum_age": null,
+              "work_permission": "passive_only",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. The e-visa is capped at 90 days and cannot be treated as a durable recurring residence route; a separate qualifying sponsored status is required.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        },
+        "full_relocation": {
+          "status": "needs_verification",
+          "base_score": null,
+          "max_days": null,
+          "minimum_age": null,
+          "summary": "No general retirement or passive-income residence route is documented in the official e-visa system; full relocation requires a separately qualifying status.",
+          "work_permission": "unclear",
+          "source_ids": [
+            "vietnam-evisa-1"
+          ],
+          "last_reviewed": "2026-08-29",
+          "confidence": "high",
+          "mobility_rights": {
+            "local_free_movement": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "The broad local/free-movement selection does not establish a country-specific legal right. Confirm the exact citizenship or treaty right before relying on unrestricted stay or work.",
+              "source_ids": [],
+              "confidence": "low",
+              "last_reviewed": "2026-08-29"
+            },
+            "general_nonlocal": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "No general retirement or passive-income residence route is documented in the official e-visa system; full relocation requires a separately qualifying status.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            },
+            "prefer_not_to_say": {
+              "status": "needs_verification",
+              "base_score": null,
+              "max_days": null,
+              "minimum_age": null,
+              "work_permission": "unclear",
+              "summary": "Illustrative general-nonlocal baseline only because mobility rights were not provided. No general retirement or passive-income residence route is documented in the official e-visa system; full relocation requires a separately qualifying status.",
+              "source_ids": [
+                "vietnam-evisa-1"
+              ],
+              "confidence": "high",
+              "last_reviewed": "2026-08-29"
+            }
+          }
+        }
+      },
+      "tax": {
+        "standard_day_threshold": 183,
+        "non_day_tests": "A habitual residence, including qualifying registered or leased housing, can establish residence independently of the day count.",
+        "scope_if_resident": "Residents are taxable on income earned inside and outside Vietnam; nonresidents are taxable on Vietnam-source income.",
+        "category_flags": {
+          "pensions": "source and treaty treatment require review",
+          "dividends": "source, residence and treaty-credit treatment require review",
+          "capital_gains": "asset class and source rules require review",
+          "property_income": "Vietnam-source property income remains taxable locally",
+          "wealth": "asset registration and reporting require review; no general result is assumed",
+          "inheritance": "asset category and relationship rules require professional review"
+        },
+        "treaty_reporting_note": "Calendar-year and rolling twelve-month counts plus habitual-residence tests make arrival-year analysis important.",
+        "source_ids": [
+          "vietnam-tax-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "high",
+        "by_mode": {
+          "seasonal": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 3.2,
+            "summary": "A 90-day visit is below the day threshold, but Vietnamese-source income remains relevant.",
+            "source_ids": [
+              "vietnam-tax-1"
+            ]
+          },
+          "part_year": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.4,
+            "summary": "Recurring days, the rolling twelve-month test and housing facts require careful records.",
+            "source_ids": [
+              "vietnam-tax-1"
+            ]
+          },
+          "full_relocation": {
+            "status": "conditional",
+            "rankable": true,
+            "compatibility_score": 2.1,
+            "summary": "Worldwide-income scope, filings and treaty coordination require professional advice.",
+            "source_ids": [
+              "vietnam-tax-1"
+            ]
+          }
+        }
+      },
+      "healthcare": {
+        "by_mode": {
+          "seasonal": {
+            "bridge_score": 2.7,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Visitors should arrange private or travel cover and expect up-front payment at many facilities.",
+            "age_limit_summary": "Private-policy age limits must be checked before travel.",
+            "pre_existing_condition_summary": "Written confirmation of exclusions and stabilization rules is needed.",
+            "evacuation_summary": "Supplemental medical evacuation cover is strongly recommended.",
+            "source_ids": [
+              "vietnam-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "high"
+          },
+          "part_year": {
+            "bridge_score": 2.6,
+            "eligibility": "conditional",
+            "waiting_period_summary": "Do not infer public-insurance eligibility from an e-visa; maintain private cover until a separate qualifying status and enrollment are confirmed.",
+            "age_limit_summary": "Long-stay private-policy age and renewal terms are provider-specific.",
+            "pre_existing_condition_summary": "Chronic and pre-existing care can be excluded by private cover.",
+            "evacuation_summary": "Plan a funded transfer to a regional medical hub for care unavailable in central Vietnam.",
+            "source_ids": [
+              "vietnam-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium_high"
+          },
+          "full_relocation": {
+            "bridge_score": null,
+            "eligibility": "needs_verification",
+            "waiting_period_summary": "Public or social-insurance eligibility depends on a separately qualifying legal and employment status; no retiree pathway is assumed.",
+            "age_limit_summary": "Private insurer entry and renewal ages require verification.",
+            "pre_existing_condition_summary": "Obtain written long-term coverage terms before relocation.",
+            "evacuation_summary": "Maintain evacuation insurance or ring-fenced funding for specialist care abroad.",
+            "source_ids": [
+              "vietnam-health-1"
+            ],
+            "last_reviewed": "2026-08-29",
+            "confidence": "medium"
+          }
+        }
+      },
+      "financial_infrastructure": {
+        "bank_account_opening": "Residents and nonresidents may open defined local or foreign-currency accounts at authorized institutions, subject to bank documentation and account-purpose rules.",
+        "tax_id_dependency": "Tax, visa and residence documents may be requested; confirm the current account-specific list.",
+        "international_transfer_friction": "Foreign-exchange use and outward transfer purposes are regulated and can require supporting documents.",
+        "international_payments": "International cards can be used through authorized channels, while local acceptance and cash needs vary.",
+        "brokerage_access": "Provider eligibility and capital-transfer documentation require verification before moving investment activity.",
+        "source_ids": [
+          "vietnam-bank-1"
+        ],
+        "last_reviewed": "2026-08-29",
+        "confidence": "medium_high"
+      },
+      "sources": [
+        {
+          "id": "vietnam-evisa-1",
+          "metric_supported": "Official e-visa maximum duration, entry types and eligibility conditions",
+          "url": "https://evisa.gov.vn/",
+          "publisher": "Immigration Department, Ministry of Public Security of Vietnam",
+          "source_date": "2026-08-29",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Vietnam",
+          "notes": "Undated live official system; source_date is the reviewed snapshot date. The e-visa is not treated as residence permission."
+        },
+        {
+          "id": "vietnam-tax-1",
+          "metric_supported": "Personal-income-tax residence tests and resident worldwide-income scope",
+          "url": "https://vanban.chinhphu.vn/?docid=75957&pageid=27160",
+          "publisher": "Government of Vietnam legal-document portal",
+          "source_date": "2008-09-08",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Vietnam",
+          "notes": "Official legal text; current implementing guidance and treaty application require professional confirmation."
+        },
+        {
+          "id": "vietnam-health-1",
+          "metric_supported": "Medical-payment, facility and evacuation-planning constraints",
+          "url": "https://travel.state.gov/en/international-travel/travel-advisories/vietnam.html",
+          "publisher": "United States Department of State",
+          "source_date": "2026-07-02",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Vietnam / travel health",
+          "notes": "Official government travel-health evidence used for payment, facility and evacuation planning; it does not determine Vietnamese statutory eligibility."
+        },
+        {
+          "id": "vietnam-bank-1",
+          "metric_supported": "Authorized foreign-currency and Vietnam-dong accounts for residents and nonresidents",
+          "url": "https://vanban.chinhphu.vn/?classid=1&docid=55835&pageid=27160&typegroupid=3",
+          "publisher": "Government of Vietnam legal-document portal",
+          "source_date": "2005-12-13",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Vietnam",
+          "notes": "Official foreign-exchange ordinance; current bank procedures and later implementing rules must be confirmed."
+        },
+        {
+          "id": "vietnam-active-1",
+          "metric_supported": "Da Nang public bicycle stations and city coverage",
+          "url": "https://danangfantasticity.com/en/kham-pha/trai-nghiem-dich-vu-xe-dap-cong-cong-tai-da-nang",
+          "publisher": "Da Nang Tourism Promotion Center",
+          "source_date": "2023-03-13",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Da Nang",
+          "notes": "Official city tourism information; current operation should be rechecked before relying on the bike-share fleet."
+        },
+        {
+          "id": "vietnam-active-2",
+          "metric_supported": "Da Nang coast, swimming, water sports, cycling and forest-trail access",
+          "url": "https://danangfantasticity.com/en/best-beaches-da-nang",
+          "publisher": "Da Nang Tourism Promotion Center",
+          "source_date": "2026-03-18",
+          "accessed_date": "2026-08-29",
+          "jurisdiction_level": "Da Nang / Hoi An",
+          "notes": "Official city tourism page used for documented activity availability, not qualitative marketing claims."
+        }
+      ]
+    }
+  },
+  "destination_overrides": {
+    "algarve-cascais": {
+      "country": "Portugal",
+      "active_life": {
+        "everyday_movement": {
+          "score": 4.1,
+          "summary": "Walkable town centers and documented walking and cycling networks support routine activity, though the combined region varies by base.",
+          "source_ids": [
+            "portugal-algarve-active-1",
+            "portugal-cascais-active-1"
+          ],
+          "confidence": "medium_high"
+        },
+        "active_pursuits": {
+          "score": 4.5,
+          "summary": "Long-distance coastal walking, mountain-bike routes and road cycling are directly documented across the Algarve.",
+          "source_ids": [
+            "portugal-algarve-active-1",
+            "portugal-cascais-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 4,
+          "summary": "Official Faro climate normals show hot, dry summer seasonality; regular activity remains practical with heat and fire-danger adaptation, while Cascais conditions vary.",
+          "source_ids": [
+            "portugal-algarve-active-1",
+            "portugal-cascais-active-1",
+            "portugal-algarve-climate-1"
+          ],
+          "confidence": "medium"
+        },
+        "activity_ecosystem": {
+          "score": 3.8,
+          "summary": "Marked regional routes and established walking and cycling products provide multiple entry points for participation.",
+          "source_ids": [
+            "portugal-algarve-active-1",
+            "portugal-cascais-active-1"
+          ],
+          "confidence": "medium"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "cycling",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.7,
+      "one_time_relocation_usd": 6000,
+      "risk_warnings": [
+        "Hot, dry summer conditions and official rural-fire danger can interrupt outdoor plans; check current ANEPC restrictions and local route closures."
+      ],
+      "source_ids": [
+        "portugal-algarve-active-1",
+        "portugal-cascais-active-1",
+        "portugal-health-1",
+        "portugal-algarve-climate-1",
+        "portugal-algarve-fire-1"
+      ],
+      "confidence": "medium",
+      "last_reviewed": "2026-08-29"
+    },
+    "madeira": {
+      "country": "Portugal",
+      "active_life": {
+        "everyday_movement": {
+          "score": 3.8,
+          "summary": "Funchal supports daily walking, while steep gradients and dispersed island settlements reduce universal everyday mobility.",
+          "source_ids": [
+            "portugal-madeira-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "active_pursuits": {
+          "score": 4.8,
+          "summary": "The official network documents levada and mountain hiking across forest, waterfall, ridge and coastal settings.",
+          "source_ids": [
+            "portugal-madeira-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 4.2,
+          "summary": "Outdoor access spans the year, but route status, mountain weather and temporary closures must be checked for each outing.",
+          "source_ids": [
+            "portugal-madeira-active-1"
+          ],
+          "confidence": "high"
+        },
+        "activity_ecosystem": {
+          "score": 3.7,
+          "summary": "A formal route catalogue and regulated activity operators support participation beyond self-guided use.",
+          "source_ids": [
+            "portugal-madeira-active-1"
+          ],
+          "confidence": "medium_high"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.3,
+      "one_time_relocation_usd": 6500,
+      "risk_warnings": [
+        "Steep terrain, mountain weather and trail closures make current route-status checks essential; specialist transfer to mainland Portugal may need planning."
+      ],
+      "source_ids": [
+        "portugal-madeira-active-1",
+        "portugal-health-1"
+      ],
+      "confidence": "high",
+      "last_reviewed": "2026-08-29"
+    },
+    "valencia": {
+      "country": "Spain",
+      "active_life": {
+        "everyday_movement": {
+          "score": 4.8,
+          "summary": "A flat urban form, more than 200 kilometres of cycle paths, traffic-calmed streets and the Turia Gardens support routine walking and cycling.",
+          "source_ids": [
+            "spain-valencia-active-1"
+          ],
+          "confidence": "high"
+        },
+        "active_pursuits": {
+          "score": 4.3,
+          "summary": "Urban cycling, the Turia corridor and routes toward coastal and green areas offer frequent activity without a long excursion.",
+          "source_ids": [
+            "spain-valencia-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 4.1,
+          "summary": "The official cycling network is permanent, while severe summer heat can constrain the safest hours for exercise.",
+          "source_ids": [
+            "spain-valencia-active-1"
+          ],
+          "confidence": "medium_high"
+        },
+        "activity_ecosystem": {
+          "score": 4.4,
+          "summary": "Bike share, rental operators, connected routes and extensive public cycling infrastructure lower participation friction.",
+          "source_ids": [
+            "spain-valencia-active-1"
+          ],
+          "confidence": "high"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "cycling",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.8,
+      "one_time_relocation_usd": 6500,
+      "risk_warnings": [
+        "Summer heat can compress safe outdoor activity into mornings and evenings; check municipal heat alerts."
+      ],
+      "source_ids": [
+        "spain-valencia-active-1",
+        "spain-health-1"
+      ],
+      "confidence": "high",
+      "last_reviewed": "2026-08-29"
+    },
+    "malaga-costa-del-sol": {
+      "country": "Spain",
+      "active_life": {
+        "everyday_movement": {
+          "score": 4.2,
+          "summary": "Malaga's urban and seafront areas support routine walking, while the wider Costa del Sol varies substantially by municipality and hillside location.",
+          "source_ids": [
+            "spain-malaga-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "active_pursuits": {
+          "score": 4.2,
+          "summary": "The official guide documents signed mountain-bike trails, hiking and other outdoor programs close to Malaga.",
+          "source_ids": [
+            "spain-malaga-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 4,
+          "summary": "Permanent coastal and park infrastructure supports continuity, with summer heat requiring time-of-day adaptation.",
+          "source_ids": [
+            "spain-malaga-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "activity_ecosystem": {
+          "score": 4.2,
+          "summary": "Signed routes, guided nature activities and a large metropolitan service base support social participation.",
+          "source_ids": [
+            "spain-malaga-active-1"
+          ],
+          "confidence": "medium_high"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "cycling",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.6,
+      "one_time_relocation_usd": 6500,
+      "risk_warnings": [
+        "Car dependence rises outside compact centers, and summer heat can restrict midday outdoor activity."
+      ],
+      "source_ids": [
+        "spain-malaga-active-1",
+        "spain-health-1"
+      ],
+      "confidence": "medium_high",
+      "last_reviewed": "2026-08-29"
+    },
+    "crete": {
+      "country": "Greece",
+      "active_life": {
+        "everyday_movement": {
+          "score": 3.2,
+          "summary": "Compact town neighborhoods support walking, but island-wide daily life and access to many landscapes can be vehicle-dependent.",
+          "source_ids": [
+            "greece-crete-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "active_pursuits": {
+          "score": 4.7,
+          "summary": "The regional portal documents mountains, gorges, paths and extensive coast, supporting hiking and water activity.",
+          "source_ids": [
+            "greece-crete-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 3.8,
+          "summary": "Shoulder-season walking is supported, while peak heat, winter mountain conditions and seasonal services reduce seamless continuity.",
+          "source_ids": [
+            "greece-crete-active-1"
+          ],
+          "confidence": "medium_high"
+        },
+        "activity_ecosystem": {
+          "score": 3.3,
+          "summary": "Multiple regional activity settings exist, but organized participation varies significantly between cities, resorts and rural areas.",
+          "source_ids": [
+            "greece-crete-active-1"
+          ],
+          "confidence": "medium"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "cycling",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.5,
+      "one_time_relocation_usd": 6000,
+      "risk_warnings": [
+        "Island specialist-care transfers and seasonal service gaps should be planned before choosing a rural base."
+      ],
+      "source_ids": [
+        "greece-crete-active-1",
+        "greece-health-1"
+      ],
+      "confidence": "medium_high",
+      "last_reviewed": "2026-08-29"
+    },
+    "croatia-istria-dalmatia": {
+      "country": "Croatia",
+      "active_life": {
+        "everyday_movement": {
+          "score": 3.3,
+          "summary": "Historic centers can be highly walkable, while dispersed coast, hills and island links make the broader region base-dependent.",
+          "source_ids": [
+            "croatia-istria-active-1",
+            "croatia-dalmatia-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "active_pursuits": {
+          "score": 4.6,
+          "summary": "The regional tourism evidence documents cycling routes, walking programs and coast-based outdoor access.",
+          "source_ids": [
+            "croatia-istria-active-1",
+            "croatia-dalmatia-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 3.8,
+          "summary": "Walking and cycling extend beyond summer, but island schedules and tourism services are more seasonal.",
+          "source_ids": [
+            "croatia-istria-active-1",
+            "croatia-dalmatia-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "activity_ecosystem": {
+          "score": 3.5,
+          "summary": "Marked routes and recurring organized events support participation, with greater depth in larger coastal towns.",
+          "source_ids": [
+            "croatia-istria-active-1",
+            "croatia-dalmatia-active-1"
+          ],
+          "confidence": "medium_high"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "cycling",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.3,
+      "one_time_relocation_usd": 6000,
+      "risk_warnings": [
+        "The digital-nomad route is temporary and includes a reapplication gap; island transport and healthcare access vary seasonally."
+      ],
+      "source_ids": [
+        "croatia-digital-nomad-1",
+        "croatia-istria-active-1",
+        "croatia-dalmatia-active-1",
+        "croatia-health-1"
+      ],
+      "confidence": "medium_high",
+      "last_reviewed": "2026-08-29"
+    },
+    "bali": {
+      "country": "Indonesia",
+      "active_life": {
+        "everyday_movement": {
+          "score": 3,
+          "summary": "Sanur provides a documented beachfront cycle path, while everyday movement across the wider island is uneven and road-condition dependent.",
+          "source_ids": [
+            "indonesia-bali-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "active_pursuits": {
+          "score": 4.8,
+          "summary": "Official sources document cycling, volcano hiking, rafting, surfing, snorkeling and diving across Bali.",
+          "source_ids": [
+            "indonesia-bali-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 3.4,
+          "summary": "Activities operate across the year, but wet-season conditions and heat materially affect routine outdoor continuity.",
+          "source_ids": [
+            "indonesia-bali-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "activity_ecosystem": {
+          "score": 4.6,
+          "summary": "Multiple established locations and instruction markets support water, fitness and outdoor participation.",
+          "source_ids": [
+            "indonesia-bali-active-1"
+          ],
+          "confidence": "medium_high"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "cycling",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.8,
+      "one_time_relocation_usd": 5500,
+      "risk_warnings": [
+        "Private medical and evacuation cover should be secured before arrival; road access and wet-season conditions vary by base."
+      ],
+      "source_ids": [
+        "indonesia-bali-active-1",
+        "indonesia-health-1"
+      ],
+      "confidence": "medium_high",
+      "last_reviewed": "2026-08-29"
+    },
+    "phuket-koh-samui": {
+      "country": "Thailand",
+      "active_life": {
+        "everyday_movement": {
+          "score": 3.1,
+          "summary": "Beach districts allow local walking, while island-wide routine movement often relies on road transport.",
+          "source_ids": [
+            "thailand-phuket-active-1",
+            "thailand-samui-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "active_pursuits": {
+          "score": 4.7,
+          "summary": "The official destination record documents kayaking, diving, yoga, Muay Thai, golf and extensive beach activity.",
+          "source_ids": [
+            "thailand-phuket-active-1",
+            "thailand-samui-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 3.2,
+          "summary": "A broad activity base exists, but monsoon weather, heat and marine conditions interrupt some outdoor routines.",
+          "source_ids": [
+            "thailand-phuket-active-1",
+            "thailand-samui-active-1"
+          ],
+          "confidence": "medium"
+        },
+        "activity_ecosystem": {
+          "score": 4.5,
+          "summary": "Instruction and facilities across diving, fitness, combat sport, yoga and golf provide many social entry points.",
+          "source_ids": [
+            "thailand-phuket-active-1",
+            "thailand-samui-active-1"
+          ],
+          "confidence": "high"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.9,
+      "one_time_relocation_usd": 5500,
+      "risk_warnings": [
+        "Island residents should plan for road-safety exposure, up-front medical payment and mainland or international evacuation."
+      ],
+      "source_ids": [
+        "thailand-phuket-active-1",
+        "thailand-samui-active-1",
+        "thailand-health-1"
+      ],
+      "confidence": "medium_high",
+      "last_reviewed": "2026-08-29"
+    },
+    "fukuoka-itoshima": {
+      "country": "Japan",
+      "active_life": {
+        "everyday_movement": {
+          "score": 4.6,
+          "summary": "Fukuoka's urban base and documented cycling infrastructure support routine movement, with rail access toward Itoshima.",
+          "source_ids": [
+            "japan-fukuoka-active-1"
+          ],
+          "confidence": "high"
+        },
+        "active_pursuits": {
+          "score": 4.4,
+          "summary": "Official routes connect city, coast and mountain settings, including a direct cycling option toward Itoshima.",
+          "source_ids": [
+            "japan-fukuoka-active-1"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 3.8,
+          "summary": "Permanent urban infrastructure supports continuity, while summer heat, rain and winter weather affect longer coastal rides.",
+          "source_ids": [
+            "japan-fukuoka-active-1"
+          ],
+          "confidence": "medium_high"
+        },
+        "activity_ecosystem": {
+          "score": 4.1,
+          "summary": "Bike lanes, parking, rentals and mapped routes provide a practical participation ecosystem.",
+          "source_ids": [
+            "japan-fukuoka-active-1"
+          ],
+          "confidence": "high"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "cycling",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 3.5,
+      "one_time_relocation_usd": 8000,
+      "risk_warnings": [
+        "Japan has no general passive-income retirement residence route; confirm legal status before treating repeated stays as a base."
+      ],
+      "source_ids": [
+        "japan-short-stay-1",
+        "japan-long-stay-1",
+        "japan-fukuoka-active-1"
+      ],
+      "confidence": "high",
+      "last_reviewed": "2026-08-29"
+    },
+    "da-nang-hoi-an": {
+      "country": "Vietnam",
+      "active_life": {
+        "everyday_movement": {
+          "score": 4,
+          "summary": "Da Nang documented 61 public bicycle stations across five districts, and coastal areas support routine walking.",
+          "source_ids": [
+            "vietnam-active-1",
+            "vietnam-active-2"
+          ],
+          "confidence": "medium_high"
+        },
+        "active_pursuits": {
+          "score": 4.4,
+          "summary": "Official city sources document swimming, SUP, surfing, coastal cycling, snorkeling and forest trekking.",
+          "source_ids": [
+            "vietnam-active-2"
+          ],
+          "confidence": "high"
+        },
+        "year_round_continuity": {
+          "score": 3.5,
+          "summary": "Permanent coast and city infrastructure supports routine activity, while heat, rain and storm seasons interrupt continuity.",
+          "source_ids": [
+            "vietnam-active-1",
+            "vietnam-active-2"
+          ],
+          "confidence": "medium"
+        },
+        "activity_ecosystem": {
+          "score": 3.7,
+          "summary": "Public bike infrastructure and multiple coast and trail activities create varied entry points, though current bike-share operation should be reconfirmed.",
+          "source_ids": [
+            "vietnam-active-1",
+            "vietnam-active-2"
+          ],
+          "confidence": "medium"
+        }
+      },
+      "activity_tags": [
+        "walking",
+        "cycling",
+        "hiking",
+        "water",
+        "fitness_social"
+      ],
+      "rent_flexibility_score": 4,
+      "one_time_relocation_usd": 5000,
+      "risk_warnings": [
+        "The e-visa is not a residence route, and long-term plans need private medical coverage plus evacuation capacity for specialist care."
+      ],
+      "source_ids": [
+        "vietnam-evisa-1",
+        "vietnam-health-1",
+        "vietnam-active-1",
+        "vietnam-active-2"
+      ],
+      "confidence": "medium_high",
+      "last_reviewed": "2026-08-29"
+    }
+  }
+}

@@ -132,6 +132,7 @@ class ChamonixRenderingAndHandoffTests(unittest.TestCase):
             "/assets/chamonix-building-governance.webp",
         ):
             self.assertEqual(1, self.html.count(f'src="{asset}"'), asset)
+            self.assertTrue((ROOT / "src" / "site_assets" / Path(asset).name).exists(), asset)
 
     def test_france_hub_is_substantive_and_bidirectional(self):
         from src.build_unified_app import COUNTRY_HUBS, SEO_PAGES, build_country_hub_page

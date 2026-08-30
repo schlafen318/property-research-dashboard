@@ -1,0 +1,1126 @@
+from __future__ import annotations
+
+import copy
+import json
+import subprocess
+import unittest
+from pathlib import Path
+
+from src.build_unified_app import consolidate_destination, load_json, load_retirement_costs
+from src.fire_abroad import (
+    eligibility_for_mode,
+    load_fire_abroad,
+    normalize_fire_profile,
+    rank_fire_abroad_destinations,
+)
+
+
+ROOT = Path(__file__).resolve().parents[1]
+ENGINE = ROOT / "src" / "fire_abroad.js"
+UI = ROOT / "src" / "fire_abroad_ui.js"
+CONTRACT = ROOT / "tests" / "fixtures" / "fire_abroad_contract.json"
+
+
+def run_js(module: Path, function_name: str, payload: object) -> object:
+    script = (
+        "const mod=require(process.argv[1]);"
+        "const value=JSON.parse(process.argv[2]);"
+        f"process.stdout.write(JSON.stringify(mod.{function_name}(value)));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(module), json.dumps(payload)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
+
+
+def run_js_call(module: Path, function_name: str, *arguments: object) -> object:
+    script = (
+        "const mod=require(process.argv[1]);"
+        "const args=JSON.parse(process.argv[2]);"
+        f"process.stdout.write(JSON.stringify(mod.{function_name}(...args)));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(module), json.dumps(arguments)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
+
+
+def run_js_program(source: str) -> object:
+    result = subprocess.run(
+        ["node", "-e", source, str(UI)],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode:
+        raise RuntimeError(result.stderr)
+    return json.loads(result.stdout)
+
+
+def run_js_stdin(module: Path, function_name: str, payload: object, *arguments: object) -> object:
+    script = (
+        'const fs=require("fs");'
+        "const mod=require(process.argv[1]);"
+        'const value=JSON.parse(fs.readFileSync(0,"utf8"));'
+        f"process.stdout.write(JSON.stringify(mod.{function_name}(value,...JSON.parse(process.argv[2]))));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(module), json.dumps(arguments)],
+        input=json.dumps(payload),
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
+
+
+class FireAbroadJavaScriptParityTests(unittest.TestCase):
+    """These fail if browser scoring diverges from the reviewed Python contract."""
+
+    @staticmethod
+    def route(status: str = "eligible", score: float | None = 4.0) -> dict:
+        return {
+            "status": status,
+            "base_score": score,
+            "summary": "The documented route fits the selected stay.",
+            "work_permission": "remote_permitted",
+            "max_days": None,
+            "confidence": "high",
+            "last_reviewed": "2026-08-25",
+            "mobility_rights": {
+                mobility: {
+                    "status": status if mobility != "prefer_not_to_say" else (
+                        "needs_verification" if status in {"needs_verification", "not_eligible"} else status
+                    ),
+                    "base_score": score,
+                    "max_days": None,
+                    "minimum_age": None,
+                    "work_permission": "remote_permitted",
+                    "summary": "Variant-specific route evidence.",
+                    "source_ids": ["route-source"],
+                    "confidence": "high",
+                    "last_reviewed": "2026-08-25",
+                }
+                for mobility in ("local_free_movement", "general_nonlocal", "prefer_not_to_say")
+            },
+        }
+
+    def country(self) -> dict:
+        return {
+            "stay_routes": {
+                mode: self.route() for mode in ("seasonal", "part_year", "full_relocation")
+            },
+            "tax": {
+                "standard_day_threshold": 183,
+                "non_day_tests": "A permanent home can trigger a separate residence test.",
+                "scope_if_resident": "Residents generally enter worldwide-income scope.",
+                "category_flags": {
+                    "pensions": "Pension treatment needs treaty review.",
+                    "dividends": "Dividend treatment needs treaty review.",
+                    "capital_gains": "Capital-gains treatment depends on asset and source.",
+                    "property_income": "Local property income can remain taxable while nonresident.",
+                    "wealth": "Wealth-related rules need review.",
+                    "inheritance": "Inheritance rules need review.",
+                },
+                "treaty_reporting_note": "Treaty relief and reporting depend on the other jurisdiction.",
+                "confidence": "medium_high",
+                "last_reviewed": "2026-08-24",
+                "by_mode": {
+                    mode: {
+                        "status": "eligible",
+                        "rankable": True,
+                        "compatibility_score": 2.0,
+                        "summary": "Selected-mode tax residence needs a separate review.",
+                    }
+                    for mode in ("seasonal", "part_year", "full_relocation")
+                },
+            },
+            "healthcare": {
+                "by_mode": {
+                    mode: {
+                        "eligibility": "eligible",
+                        "bridge_score": 3.0,
+                        "waiting_period_summary": "Private cover is needed during any wait.",
+                        "age_limit_summary": "Policy entry ages vary.",
+                        "pre_existing_condition_summary": "Written coverage terms are required.",
+                        "evacuation_summary": "Confirm evacuation cover.",
+                        "confidence": "medium",
+                        "last_reviewed": "2026-08-23",
+                    }
+                    for mode in ("seasonal", "part_year", "full_relocation")
+                }
+            },
+            "financial_infrastructure": {
+                "bank_account_opening": "Banks require identity and address evidence.",
+                "tax_id_dependency": "A tax identifier may be required.",
+                "international_transfer_friction": "Transfers can require supporting documents.",
+                "international_payments": "International cards are generally available.",
+                "brokerage_access": "Broker access must be reconfirmed after a tax-home change.",
+                "confidence": "high",
+                "last_reviewed": "2026-08-22",
+            },
+        }
+
+    @staticmethod
+    def destination() -> dict:
+        return {
+            "id": "alpha",
+            "name": "Alpha",
+            "decision_dimensions": [
+                {"key": "global_access", "score": 4.0},
+                {"key": "foreigner_fit", "score": 3.0},
+            ],
+            "scores": {
+                "exit_liquidity": {"score": 4.0},
+                "ownership_clarity": {"score": 2.0},
+            },
+        }
+
+    @staticmethod
+    def cost() -> dict:
+        return {
+            "destination_id": "alpha",
+            "profiles": {
+                "single": {
+                    "categories_usd": {
+                        "food_household": 50000,
+                        "utilities_communications": 0,
+                        "private_healthcare": 0,
+                        "transport": 0,
+                        "dining_leisure": 0,
+                        "travel": 0,
+                        "visa_admin": 0,
+                        "contingency": 0,
+                    },
+                    "annual_rent_usd": 4545,
+                    "annual_owner_costs_usd": 1000,
+                }
+            },
+            "property": {"representative_price_usd": 100000, "acquisition_cost_rate": 0.1},
+            "confidence": {"overall": "medium_high"},
+            "sources": [{"accessed_on": "2026-08-21"}],
+        }
+
+    @staticmethod
+    def override() -> dict:
+        return {
+            "country": "Example",
+            "active_life": {
+                "everyday_movement": {"score": 4.0, "summary": "Daily cycling and year-round park access.", "confidence": "high"},
+                "active_pursuits": {"score": 4.0, "summary": "Trails support regular outdoor pursuits.", "confidence": "medium_high"},
+                "year_round_continuity": {"score": 4.0, "summary": "The climate supports activity through the year.", "confidence": "medium"},
+                "activity_ecosystem": {"score": 4.0, "summary": "Local clubs create a social activity base.", "confidence": "high"},
+            },
+            "activity_tags": ["walking", "cycling"],
+            "rent_flexibility_score": 3.0,
+            "one_time_relocation_usd": 5000,
+            "risk_warnings": ["Heat plans matter in midsummer."],
+            "confidence": "high",
+            "last_reviewed": "2026-08-29",
+        }
+
+    def payload_for(self, case: dict) -> dict:
+        country = self.country()
+        if case["name"] == "exact_minimum_age":
+            country["stay_routes"]["part_year"] = self.route("conditional")
+            country["stay_routes"]["part_year"]["minimum_age"] = 50
+        elif case["name"] == "full_relocation_unavailable":
+            country["stay_routes"]["full_relocation"] = self.route("not_eligible")
+        elif case["name"] == "consulting_passive_only":
+            country["stay_routes"]["part_year"]["work_permission"] = "passive_only"
+            for mapping in country["stay_routes"]["part_year"]["mobility_rights"].values():
+                mapping["work_permission"] = "passive_only"
+        return {
+            "destinations": [self.destination()],
+            "retirement_costs": {"alpha": self.cost()},
+            "countries": {"Example": country},
+            "destination_overrides": {"alpha": self.override()},
+            "profile": case["raw_profile"],
+        }
+
+    def test_contract_cases_match_normalization_and_ranked_result_fields(self) -> None:
+        cases = json.loads(CONTRACT.read_text(encoding="utf-8"))["cases"]
+        self.assertGreaterEqual(len(cases), 6)
+        for case in cases:
+            with self.subTest(case=case["name"]):
+                self.assertEqual(
+                    case["normalized_profile"], run_js(ENGINE, "normalizeProfile", case["raw_profile"])
+                )
+                results = run_js(ENGINE, "rankDestinations", self.payload_for(case))
+                expected = case["expected"]
+                self.assertEqual(expected["ordered_ids"], [item["destination_id"] for item in results])
+                self.assertEqual(expected["statuses"], [item["status"] for item in results])
+                self.assertEqual(expected["scores"], [item["score"] for item in results])
+                self.assertEqual(
+                    expected["annual_budgets"],
+                    [item["resilience_budget"]["annual_total_usd"] for item in results],
+                )
+                warnings = " ".join(results[0]["warnings"])
+                for warning in expected["warning_substrings"]:
+                    self.assertIn(warning, warnings)
+
+    def test_budget_uses_the_destination_relocation_override(self) -> None:
+        profile = run_js(ENGINE, "normalizeProfile", {})
+        budget = run_js_call(
+            ENGINE,
+            "buildResilienceBudget",
+            self.cost(),
+            profile,
+            {"one_time_relocation_usd": 7500},
+        )
+        self.assertEqual(7500, budget["one_time_relocation_usd"])
+        self.assertEqual(60000, budget["annual_total_usd"])
+
+    def test_full_synthetic_view_model_matches_python(self) -> None:
+        payload = self.payload_for({
+            "name": "default", "raw_profile": {"income_type": "portfolio"},
+        })
+        expected = rank_fire_abroad_destinations(
+            payload["destinations"], payload["retirement_costs"],
+            {
+                "countries": payload["countries"],
+                "destination_overrides": payload["destination_overrides"],
+            },
+            payload["profile"],
+        )
+
+        self.assertEqual(expected, run_js(ENGINE, "rankDestinations", payload))
+
+    def test_full_actual_launch_view_models_match_python(self) -> None:
+        fire_payload = load_fire_abroad()
+        launch_ids = set(fire_payload["launch_destination_ids"])
+        destinations = [
+            consolidate_destination(item)
+            for item in load_json("destinations.json")
+            if item.get("id") in launch_ids
+        ]
+        retirement_costs = load_retirement_costs()
+        profile = normalize_fire_profile({
+            "stay_mode": "seasonal",
+            "annual_days": 91,
+            "mobility_rights": "general_nonlocal",
+            "income_type": "portfolio",
+            "housing": "buy_retirement",
+        })
+        payload = {
+            "destinations": destinations,
+            "retirement_costs": retirement_costs,
+            "fire_payload": fire_payload,
+        }
+        expected = rank_fire_abroad_destinations(
+            destinations, retirement_costs, fire_payload, profile,
+        )
+
+        self.assertEqual(
+            expected,
+            run_js_stdin(ENGINE, "rankDestinations", payload, profile),
+        )
+
+    def test_mobility_and_day_cap_results_match_python(self) -> None:
+        country = self.country()
+        route = country["stay_routes"]["seasonal"]
+        route["max_days"] = 90
+        route["mobility_rights"]["general_nonlocal"]["max_days"] = 90
+        route["mobility_rights"]["prefer_not_to_say"]["max_days"] = 90
+        route["mobility_rights"]["local_free_movement"].update({
+            "status": "needs_verification",
+            "base_score": None,
+            "max_days": None,
+            "minimum_age": None,
+            "work_permission": "unclear",
+            "summary": "Country-specific local rights need verification.",
+            "source_ids": [],
+            "confidence": "low",
+        })
+        for mobility, days in (
+            ("general_nonlocal", 90),
+            ("general_nonlocal", 91),
+            ("prefer_not_to_say", 91),
+            ("local_free_movement", 365),
+        ):
+            with self.subTest(mobility=mobility, days=days):
+                profile = {
+                    "stay_mode": "seasonal",
+                    "mobility_rights": mobility,
+                    "annual_days": days,
+                }
+                self.assertEqual(
+                    eligibility_for_mode(country, normalize_fire_profile(profile)),
+                    run_js_call(ENGINE, "eligibilityForMode", country, profile),
+                )
+
+    def test_rounding_ties_match_half_up_fixture(self) -> None:
+        ties = json.loads(CONTRACT.read_text(encoding="utf-8"))["rounding_ties"]
+        active = {
+            key: {"score": ties["active_life_score"]["component_score"]}
+            for key in (
+                "everyday_movement", "active_pursuits",
+                "year_round_continuity", "activity_ecosystem",
+            )
+        }
+
+        self.assertEqual(
+            ties["active_life_score"]["expected"],
+            run_js(ENGINE, "activeLifeScore", active),
+        )
+
+    def test_missing_consolidated_score_stays_unranked(self) -> None:
+        payload = self.payload_for({"name": "default", "raw_profile": {}})
+        payload["destinations"][0]["decision_dimensions"] = [{"key": "foreigner_fit", "score": 3.0}]
+        result = run_js(ENGINE, "rankDestinations", payload)[0]
+        self.assertEqual("needs_verification", result["status"])
+        self.assertIsNone(result["score"])
+        self.assertIsNone(result["components"]["global_access"])
+
+    def test_malformed_cost_records_stay_unranked_like_the_python_model(self) -> None:
+        complete = self.cost()
+        malformed_costs = {
+            "empty_record": {},
+            "empty_profiles": {"profiles": {}},
+            "missing_selected_household": {"profiles": {"couple": {"categories_usd": {}, "annual_rent_usd": 1}}},
+            "missing_required_housing_cost": {"profiles": {"single": {"categories_usd": {"living": 50000}}}},
+            "missing_required_category": copy.deepcopy(complete),
+            "empty_categories": copy.deepcopy(complete),
+            "negative_category": copy.deepcopy(complete),
+            "missing_buy_property": copy.deepcopy(complete),
+            "negative_buy_property_rate": copy.deepcopy(complete),
+        }
+        malformed_costs["missing_required_category"]["profiles"]["single"]["categories_usd"].pop("travel")
+        malformed_costs["empty_categories"]["profiles"]["single"]["categories_usd"] = {}
+        malformed_costs["negative_category"]["profiles"]["single"]["categories_usd"]["travel"] = -1
+        malformed_costs["missing_buy_property"].pop("property")
+        malformed_costs["negative_buy_property_rate"]["property"]["acquisition_cost_rate"] = -0.1
+        for name, cost in malformed_costs.items():
+            with self.subTest(cost=name):
+                payload = self.payload_for({"name": "default", "raw_profile": {}})
+                if name in {"missing_buy_property", "negative_buy_property_rate"}:
+                    payload["profile"] = {"housing": "buy_now"}
+                payload["retirement_costs"] = {"alpha": cost}
+                result = run_js(ENGINE, "rankDestinations", payload)[0]
+                expected = rank_fire_abroad_destinations(
+                    payload["destinations"], payload["retirement_costs"],
+                    {"countries": payload["countries"], "destination_overrides": payload["destination_overrides"]},
+                    payload["profile"],
+                )[0]
+                self.assertEqual("needs_verification", result["status"])
+                self.assertIsNone(result["score"])
+                self.assertIsNone(result["components"]["sustainable_annual_cost"])
+                self.assertIsNone(result["resilience_budget"]["annual_total_usd"])
+                self.assertEqual(expected["status"], result["status"])
+                self.assertEqual(expected["score"], result["score"])
+
+    def test_non_finite_cost_values_stay_unranked_in_browser(self) -> None:
+        base = self.payload_for({"name": "default", "raw_profile": {}})
+        for expression in ("NaN", "Infinity"):
+            with self.subTest(value=expression):
+                script = f'''const engine=require(process.argv[1]);
+const payload=JSON.parse(process.argv[2]);
+payload.retirement_costs.alpha.profiles.single.categories_usd.travel={expression};
+const result=engine.rankDestinations(payload,payload.profile)[0];
+process.stdout.write(JSON.stringify(result));'''
+                completed = subprocess.run(
+                    ["node", "-e", script, str(ENGINE), json.dumps(base)],
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+                result = json.loads(completed.stdout)
+                self.assertEqual("needs_verification", result["status"])
+                self.assertIsNone(result["score"])
+                self.assertIsNone(result["components"]["sustainable_annual_cost"])
+                self.assertIsNone(result["resilience_budget"]["annual_total_usd"])
+
+    def test_eligibility_clamps_out_of_range_numeric_route_scores(self) -> None:
+        for base_score in (0.0, 5.0, 5.5, -1.0):
+            with self.subTest(base_score=base_score):
+                country = {"stay_routes": {"part_year": self.route("eligible", base_score)}}
+                expected = eligibility_for_mode(country, normalize_fire_profile({}))
+                actual = run_js_call(ENGINE, "eligibilityForMode", country, {})
+                self.assertEqual(expected["stay_score"], actual["stay_score"])
+
+    def test_tied_rankings_use_python_code_point_name_order(self) -> None:
+        payload = self.payload_for({"name": "default", "raw_profile": {}})
+        payload["destinations"][0]["name"] = "alpha"
+        beta = self.destination()
+        beta["id"] = "beta"
+        beta["name"] = "Zeta"
+        payload["destinations"].append(beta)
+        payload["retirement_costs"]["beta"] = self.cost()
+        payload["destination_overrides"]["beta"] = self.override()
+        expected = rank_fire_abroad_destinations(
+            payload["destinations"], payload["retirement_costs"],
+            {"countries": payload["countries"], "destination_overrides": payload["destination_overrides"]},
+            payload["profile"],
+        )
+        self.assertEqual(
+            ["beta", "alpha"],
+            [item["destination_id"] for item in run_js(ENGINE, "rankDestinations", payload)],
+        )
+        self.assertEqual(
+            [item["destination_id"] for item in expected],
+            [item["destination_id"] for item in run_js(ENGINE, "rankDestinations", payload)],
+        )
+
+
+class FireAbroadJavaScriptPrivacyTests(unittest.TestCase):
+    """These fail if private profile data can leave the browser or reach a URL."""
+
+    def test_calculator_href_excludes_fire_profile_and_financial_details(self) -> None:
+        href = run_js(UI, "safeCalculatorHref", {
+            "destinationId": "valencia",
+            "profile": {
+                "household": "couple", "housing": "buy_now", "age": 52,
+                "homeTaxContext": "us_person", "annualDays": 190,
+                "incomeType": "business_consulting", "netWorth": 2500000,
+            },
+        })
+        self.assertEqual(
+            "/retirement-abroad-calculator/?destination=valencia&household=couple&housing=buy_now",
+            href,
+        )
+
+    def test_calculator_href_falls_back_for_invalid_slug_or_categories(self) -> None:
+        self.assertEqual(
+            "/retirement-abroad-calculator/?destination=&household=single&housing=rent",
+            run_js(UI, "safeCalculatorHref", {
+                "destinationId": "../contact",
+                "profile": {"household": "invalid", "housing": "own_now"},
+            }),
+        )
+
+    def test_analytics_payload_is_allowlisted_and_drops_sensitive_details(self) -> None:
+        safe = run_js_call(UI, "safeAnalyticsPayload", "calculator_handoff", {
+            "destinationId": "valencia", "stayMode": "part_year", "activityPriority": "cycling",
+            "age": 52, "mobilityRights": "local_free_movement", "homeTaxContext": "us_person",
+            "annualDays": 190, "incomeType": "business_consulting", "annual_total_usd": 64000,
+            "score": 4.2,
+        })
+        self.assertEqual(
+            {"eventName": "calculator_handoff", "destinationId": "valencia"}, safe
+        )
+        self.assertIsNone(run_js_call(UI, "safeAnalyticsPayload", "page_view", {}))
+        self.assertIsNone(run_js_call(UI, "safeAnalyticsPayload", "profile_submit", {"destinationId": "valencia"}))
+
+    def test_result_rows_keep_unranked_items_after_ranked_activity_matches(self) -> None:
+        rows = run_js_call(UI, "resultRowsForDisplay", [
+            {"destination_id": "ranked", "score": 4.0, "status": "eligible", "activity_tags": ["cycling"]},
+            {"destination_id": "conditional", "score": None, "status": "needs_verification", "activity_tags": ["cycling"]},
+            {"destination_id": "other", "score": 3.0, "status": "eligible", "activity_tags": ["walking"]},
+        ], "cycling")
+        self.assertEqual(["ranked", "conditional"], [row["destination_id"] for row in rows])
+
+    def test_dynamic_summary_pluralizes_single_destination_and_verification(self) -> None:
+        self.assertEqual(
+            "1 destination evaluated; 1 eligible, 0 conditional, 0 need verification.",
+            run_js_call(
+                UI,
+                "resultSummary",
+                [{"status": "eligible", "score": 4.0}],
+            ),
+        )
+        self.assertEqual(
+            "1 destination evaluated; 0 eligible, 0 conditional, 1 needs verification.",
+            run_js_call(
+                UI,
+                "resultSummary",
+                [{"status": "needs_verification", "score": None}],
+            ),
+        )
+
+    def test_result_details_expose_complete_human_readable_decision_information(self) -> None:
+        details = run_js_call(
+            UI,
+            "resultDetails",
+            {
+                "destination_id": "valencia",
+                "name": "Valencia",
+                "status": "conditional",
+                "status_reason": "A residence route depends on the applicant profile.",
+                "score": 3.23,
+                "components": {
+                    "active_life": 4.1,
+                    "healthcare_bridge": 3.8,
+                    "stay_flexibility": 3.4,
+                    "tax_compatibility": 2.9,
+                },
+                "resilience_budget": {
+                    "annual_total_usd": 60000,
+                    "currency_inflation_buffer": 4800,
+                    "one_time_relocation_usd": 7000,
+                    "property_capital_usd": 220000,
+                },
+                "work_permission": "passive_only",
+                "stay_facts": {
+                    "summary": "A residence route depends on the applicant profile.",
+                    "max_days": None,
+                    "work_permission": "Passive income only",
+                },
+                "tax_facts": {
+                    "summary": "Recurring stays need a residence review.",
+                    "scope_if_resident": "Residents generally enter worldwide-income scope.",
+                    "income_category": "Dividend and capital-gains treatment needs treaty review.",
+                    "treaty_reporting": "Treaty relief depends on the other jurisdiction.",
+                },
+                "healthcare_facts": {
+                    "eligibility": "Conditional",
+                    "waiting_period": "Private cover is needed during any wait.",
+                    "age_limits": "Policy entry ages vary.",
+                    "pre_existing_conditions": "Written coverage terms are required.",
+                    "evacuation": "Confirm evacuation cover.",
+                },
+                "financial_infrastructure_facts": {
+                    "banking": "Banks require identity, address and tax-number evidence.",
+                    "transfers": "Transfers can require supporting documents.",
+                    "brokerage": "Broker access must be reconfirmed after a tax-home change.",
+                },
+                "warnings": ["Tax residence requires a separate review."],
+                "strongest_activity_reason": "Daily walking and cycling are practical.",
+                "confidence": "medium_high",
+                "last_reviewed": "2026-08-29",
+            },
+            {"household": "couple", "housing": "buy_now", "income_type": "portfolio"},
+        )
+        self.assertEqual("Conditional", details["eligibilityLabel"])
+        self.assertEqual(
+            "Eligibility: Conditional. A residence route depends on the applicant profile.",
+            details["eligibility"],
+        )
+        self.assertEqual("FIRE Abroad score: 3.23 out of 5.", details["score"])
+        self.assertEqual(
+            "Resilience budget: USD 60,000 per year. Currency and inflation buffer: USD 4,800. One-time relocation estimate: USD 7,000. Property capital: USD 220,000.",
+            details["resilienceBudget"],
+        )
+        self.assertEqual(
+            "Active Life: 4.10 out of 5. Daily walking and cycling are practical.",
+            details["activeLife"],
+        )
+        self.assertEqual("Healthcare Bridge: 3.80 out of 5.", details["healthcare"])
+        self.assertEqual(
+            "Stay Flexibility: 3.40 out of 5. Work permission: Passive income only.",
+            details["stayAndWork"],
+        )
+        self.assertEqual("Tax Compatibility: 2.90 out of 5.", details["tax"])
+        self.assertEqual("Selected-mode evidence", details["evidenceSummary"])
+        self.assertEqual(
+            [
+                "Stay: A residence route depends on the applicant profile. Work permission: Passive income only.",
+                "Tax: Recurring stays need a residence review. Resident scope: Residents generally enter worldwide-income scope. Portfolio income: Dividend and capital-gains treatment needs treaty review. Treaty/reporting: Treaty relief depends on the other jurisdiction.",
+                "Healthcare: Conditional. Waiting/access: Private cover is needed during any wait. Age limits: Policy entry ages vary. Pre-existing conditions: Written coverage terms are required. Evacuation: Confirm evacuation cover.",
+                "Financial infrastructure: Banks require identity, address and tax-number evidence. Transfers: Transfers can require supporting documents. Brokerage: Broker access must be reconfirmed after a tax-home change.",
+            ],
+            details["evidenceDetails"],
+        )
+        self.assertEqual(
+            ["Planning warning: Tax residence requires a separate review."],
+            details["warnings"],
+        )
+        self.assertEqual(
+            "Evidence: Medium high confidence; reviewed 2026-08-29.",
+            details["evidence"],
+        )
+        self.assertEqual("Build your plan", details["calculatorLabel"])
+        self.assertEqual(
+            "/retirement-abroad-calculator/?destination=valencia&household=couple&housing=buy_now",
+            details["calculatorHref"],
+        )
+        self.assertEqual("Read destination guide", details["guideLabel"])
+        self.assertEqual("/destinations/valencia/", details["guideHref"])
+
+    def test_property_capital_is_shown_only_for_buy_modes_and_all_money_is_labeled_usd(self) -> None:
+        row = {
+            "destination_id": "valencia",
+            "name": "Valencia",
+            "status": "eligible",
+            "score": 4.0,
+            "components": {},
+            "resilience_budget": {
+                "annual_total_usd": 50000,
+                "currency_inflation_buffer": 4000,
+                "one_time_relocation_usd": 6000,
+                "property_capital_usd": 250000,
+            },
+        }
+        for housing in ("rent", "own", "buy_now", "buy_retirement"):
+            with self.subTest(housing=housing):
+                details = run_js_call(
+                    UI, "resultDetails", row,
+                    {"household": "single", "housing": housing},
+                )
+                self.assertNotIn("$", details["resilienceBudget"])
+                self.assertIn("USD 50,000", details["resilienceBudget"])
+                if housing in {"buy_now", "buy_retirement"}:
+                    self.assertIn("Property capital: USD 250,000", details["resilienceBudget"])
+                else:
+                    self.assertNotIn("Property capital", details["resilienceBudget"])
+
+    def test_result_details_keep_unranked_states_visible_without_raw_enum_values(self) -> None:
+        details = run_js_call(
+            UI,
+            "resultDetails",
+            {
+                "destination_id": "fukuoka-itoshima",
+                "name": "Fukuoka / Itoshima",
+                "status": "needs_verification",
+                "status_reason": "Nationality-dependent rights must be confirmed.",
+                "score": None,
+                "components": {},
+                "resilience_budget": {"annual_total_usd": 47600},
+                "work_permission": "unclear",
+                "warnings": [],
+                "confidence": "low",
+                "last_reviewed": "2026-08-29",
+            },
+            {"household": "single", "housing": "rent"},
+        )
+        self.assertEqual("Needs verification", details["eligibilityLabel"])
+        self.assertNotIn("needs_verification", json.dumps(details))
+        self.assertEqual(
+            "Ranking: Unranked until evidence is verified.", details["score"]
+        )
+        self.assertIn("Needs verification", details["healthcare"])
+        self.assertIn("Work permission needs professional review", details["stayAndWork"])
+
+    def test_initialization_binds_controls_without_replacing_server_results(self) -> None:
+        state = run_js_program(
+            r"""
+const ui = require(process.argv[1]);
+const listeners = {};
+let rankCalls = 0;
+let replaceCalls = 0;
+let allowCreate = false;
+const tracked = [];
+function node(tagName) {
+  return {
+    tagName,
+    textContent: "",
+    children: [],
+    attributes: {},
+    appendChild(child) { this.children.push(child); },
+    setAttribute(name, value) { this.attributes[name] = value; },
+    addEventListener() {},
+  };
+}
+function allText(current) {
+  return [current.textContent].concat(current.children.flatMap(allText)).filter(Boolean).join(" ");
+}
+function allHrefs(current) {
+  return [current.href].concat(current.children.flatMap(allHrefs)).filter(Boolean);
+}
+const form = {
+  dataset: {},
+  addEventListener(type, listener) { listeners[type] = listener; },
+};
+const results = node("div");
+results.replaceChildren = function () { replaceCalls += 1; this.children = []; };
+const summary = { textContent: "SERVER DEFAULT" };
+const controls = {
+  "fire-stay-mode": { value: "part_year" },
+  "fire-age": { value: "50" },
+  "fire-household": { value: "single" },
+  "fire-housing": { value: "rent" },
+  "fire-mobility-rights": { value: "prefer_not_to_say" },
+  "fire-home-tax-context": { value: "prefer_not_to_say" },
+  "fire-annual-days": { value: "" },
+  "fire-income-type": { value: "prefer_not_to_say" },
+  "fire-activity-priority": { value: "balanced" },
+};
+const nodes = Object.assign({}, controls, {
+  "fire-abroad-data": { textContent: JSON.stringify({ destinations: [] }) },
+  "fire-abroad-form": form,
+  "fire-results": results,
+  "fire-results-summary": summary,
+});
+const host = {
+  document: {
+    getElementById(id) { return nodes[id] || null; },
+    createElement(tagName) {
+      if (!allowCreate) throw new Error("initialization must not create result nodes");
+      return node(tagName);
+    },
+    createTextNode(value) {
+      if (!allowCreate) throw new Error("initialization must not create text nodes");
+      const text = node("#text");
+      text.textContent = value;
+      return text;
+    },
+  },
+  GHAFireAbroad: {
+    normalizeProfile() {
+      return { stay_mode: "part_year", household: "single", housing: "rent", activity_priority: "balanced" };
+    },
+    rankDestinations() {
+      rankCalls += 1;
+      return [{
+        destination_id: "valencia",
+        name: "Valencia",
+        status: "conditional",
+        status_reason: "Profile review is required.",
+        score: 3.23,
+        components: { active_life: 4.1, healthcare_bridge: 3.8, stay_flexibility: 3.4, tax_compatibility: 2.9 },
+        resilience_budget: { annual_total_usd: 60000, currency_inflation_buffer: 4800, one_time_relocation_usd: 7000 },
+        work_permission: "passive_only",
+        warnings: ["Tax residence requires a separate review."],
+        strongest_activity_reason: "Daily walking is practical.",
+        confidence: "medium_high",
+        last_reviewed: "2026-08-29",
+      }];
+    },
+  },
+  GHA: { track(name) { tracked.push(name); } },
+};
+ui.initFireAbroad(host);
+const afterInit = {
+  rankCalls,
+  replaceCalls,
+  summary: summary.textContent,
+  bound: form.dataset.fireAbroadBound,
+  listeners: Object.keys(listeners).sort(),
+  tracked: tracked.slice(),
+};
+allowCreate = true;
+listeners.change({ type: "change", target: controls["fire-stay-mode"], preventDefault() {} });
+process.stdout.write(JSON.stringify({
+  afterInit,
+  afterChange: {
+    rankCalls,
+    replaceCalls,
+    summary: summary.textContent,
+    tracked,
+    text: allText(results),
+    hrefs: allHrefs(results),
+  },
+}));
+"""
+        )
+        self.assertEqual(
+            {
+                "rankCalls": 0,
+                "replaceCalls": 0,
+                "summary": "SERVER DEFAULT",
+                "bound": "true",
+                "listeners": ["change", "submit"],
+                "tracked": [],
+            },
+            state["afterInit"],
+        )
+        self.assertEqual(1, state["afterChange"]["rankCalls"])
+        self.assertEqual(1, state["afterChange"]["replaceCalls"])
+        self.assertEqual(
+            "1 destination evaluated; 0 eligible, 1 conditional, 0 need verification.",
+            state["afterChange"]["summary"],
+        )
+        self.assertEqual(
+            ["stay_mode_change"], state["afterChange"]["tracked"]
+        )
+        rendered_text = state["afterChange"]["text"]
+        for expected in (
+            "Eligibility: Conditional",
+            "FIRE Abroad score: 3.23 out of 5",
+            "Resilience budget: USD 60,000 per year",
+            "Active Life: 4.10 out of 5",
+            "Healthcare Bridge: 3.80 out of 5",
+            "Stay Flexibility: 3.40 out of 5",
+            "Work permission: Passive income only",
+            "Tax Compatibility: 2.90 out of 5",
+            "Planning warning: Tax residence requires a separate review",
+            "Evidence: Medium high confidence; reviewed 2026-08-29",
+            "Build your plan",
+            "Read destination guide",
+        ):
+            with self.subTest(expected=expected):
+                self.assertIn(expected, rendered_text)
+        self.assertEqual(
+            [
+                "/retirement-abroad-calculator/?destination=valencia&household=single&housing=rent",
+                "/destinations/valencia/",
+            ],
+            state["afterChange"]["hrefs"],
+        )
+
+    def test_validation_keeps_last_results_and_announces_status_counts_without_moving_focus(self) -> None:
+        state = run_js_program(
+            r"""
+const ui = require(process.argv[1]);
+const listeners = {};
+let rankCalls = 0;
+let focusCalls = 0;
+function node(tagName) {
+  return {
+    tagName: String(tagName).toUpperCase(), textContent: "", children: [], attributes: {}, hidden: true,
+    appendChild(child) { this.children.push(child); },
+    setAttribute(name, value) { this.attributes[name] = String(value); },
+    removeAttribute(name) { delete this.attributes[name]; },
+    addEventListener() {},
+    focus() { focusCalls += 1; },
+  };
+}
+const form = { dataset: {}, addEventListener(type, listener) { listeners[type] = listener; } };
+const results = node("div");
+results.hidden = false;
+results.replaceCalls = 0;
+results.replaceChildren = function () { this.replaceCalls += 1; this.children = []; };
+const summary = { textContent: "SERVER DEFAULT" };
+const controls = {
+  "fire-stay-mode": { value: "part_year", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-age": { value: "50", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-household": { value: "single", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-housing": { value: "rent", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-mobility-rights": { value: "prefer_not_to_say", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-home-tax-context": { value: "prefer_not_to_say", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-annual-days": { value: "", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-income-type": { value: "prefer_not_to_say", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+  "fire-activity-priority": { value: "balanced", setAttribute() {}, removeAttribute() {}, focus() { focusCalls += 1; } },
+};
+const errors = {
+  "fire-stay-mode-error": node("p"), "fire-age-error": node("p"),
+  "fire-household-error": node("p"), "fire-housing-error": node("p"),
+  "fire-annual-days-error": node("p"),
+};
+const nodes = Object.assign({}, controls, errors, {
+  "fire-abroad-data": { textContent: JSON.stringify({ destinations: [] }) },
+  "fire-abroad-form": form, "fire-results": results, "fire-results-summary": summary,
+});
+const rows = [
+  { destination_id: "alpha", name: "Alpha", status: "eligible", score: 4, components: {}, resilience_budget: {}, work_permission: "remote_permitted", warnings: [], confidence: "high" },
+  { destination_id: "bravo", name: "Bravo", status: "conditional", score: 3, components: {}, resilience_budget: {}, work_permission: "passive_only", warnings: [], confidence: "high" },
+  { destination_id: "charlie", name: "Charlie", status: "needs_verification", score: null, components: {}, resilience_budget: {}, work_permission: "unclear", warnings: [], confidence: "low" },
+];
+const host = {
+  document: {
+    getElementById(id) { return nodes[id] || null; },
+    createElement(tagName) { const created = node(tagName); created.hidden = false; return created; },
+    createTextNode(value) { const created = node("#text"); created.hidden = false; created.textContent = value; return created; },
+  },
+  GHAFireAbroad: {
+    normalizeProfile(raw) { return Object.assign({ activity_priority: "balanced" }, raw); },
+    rankDestinations() { rankCalls += 1; return rows; },
+  },
+};
+function submit() { listeners.submit({ type: "submit", preventDefault() {} }); }
+ui.initFireAbroad(host);
+submit();
+const valid = { summary: summary.textContent, replaceCalls: results.replaceCalls, rankCalls };
+controls["fire-age"].value = "17";
+submit();
+const badAge = { summary: summary.textContent, replaceCalls: results.replaceCalls, rankCalls, error: { hidden: errors["fire-age-error"].hidden, textContent: errors["fire-age-error"].textContent }, focusCalls };
+controls["fire-age"].value = "50";
+controls["fire-annual-days"].value = "367";
+submit();
+const badDays = { replaceCalls: results.replaceCalls, rankCalls, error: { hidden: errors["fire-annual-days-error"].hidden, textContent: errors["fire-annual-days-error"].textContent }, focusCalls };
+controls["fire-annual-days"].value = "";
+controls["fire-household"].value = "";
+submit();
+const missingHousehold = { replaceCalls: results.replaceCalls, rankCalls, error: { hidden: errors["fire-household-error"].hidden, textContent: errors["fire-household-error"].textContent }, focusCalls };
+process.stdout.write(JSON.stringify({ valid, badAge, badDays, missingHousehold }));
+"""
+        )
+        self.assertEqual(
+            "3 destinations evaluated; 1 eligible, 1 conditional, 1 needs verification.",
+            state["valid"]["summary"],
+        )
+        self.assertEqual(1, state["valid"]["rankCalls"])
+        self.assertEqual(1, state["valid"]["replaceCalls"])
+        for failure, message in (
+            ("badAge", "Enter an age from 18 to 100."),
+            ("badDays", "Enter days from 1 to 366, or leave this field blank."),
+            ("missingHousehold", "Choose a household."),
+        ):
+            with self.subTest(failure=failure):
+                self.assertEqual(1, state[failure]["rankCalls"])
+                self.assertEqual(1, state[failure]["replaceCalls"])
+                self.assertFalse(state[failure]["error"]["hidden"])
+                self.assertEqual(message, state[failure]["error"]["textContent"])
+                self.assertEqual(0, state[failure]["focusCalls"])
+
+    def test_one_delegated_handler_tracks_static_and_dynamic_result_links_once(self) -> None:
+        state = run_js_program(
+            r"""
+const ui = require(process.argv[1]);
+const formListeners = {};
+const resultListeners = {};
+const tracked = [];
+let anchorListenerCount = 0;
+function node(tagName) {
+  return {
+    tagName: String(tagName).toUpperCase(),
+    textContent: "",
+    href: "",
+    children: [],
+    attributes: {},
+    appendChild(child) { this.children.push(child); },
+    setAttribute(name, value) { this.attributes[name] = String(value); },
+    getAttribute(name) {
+      if (name === "href") return this.href || this.attributes[name] || null;
+      return this.attributes[name] || null;
+    },
+    closest(selector) {
+      if (selector === "a[data-fire-track][data-fire-destination-id]" &&
+          this.tagName === "A" && this.attributes["data-fire-track"] &&
+          this.attributes["data-fire-destination-id"]) return this;
+      if (selector === "a, button" && (this.tagName === "A" || this.tagName === "BUTTON")) return this;
+      return null;
+    },
+    addEventListener() { if (this.tagName === "A") anchorListenerCount += 1; },
+  };
+}
+const form = {
+  dataset: {},
+  addEventListener(type, listener) { formListeners[type] = listener; },
+};
+const results = node("div");
+results.addEventListener = function (type, listener) { resultListeners[type] = listener; };
+results.replaceChildren = function () { this.children = []; };
+const summary = { textContent: "SERVER DEFAULT" };
+const controls = {
+  "fire-stay-mode": { value: "part_year" },
+  "fire-age": { value: "50" },
+  "fire-household": { value: "single" },
+  "fire-housing": { value: "rent" },
+  "fire-mobility-rights": { value: "prefer_not_to_say" },
+  "fire-home-tax-context": { value: "prefer_not_to_say" },
+  "fire-annual-days": { value: "" },
+  "fire-income-type": { value: "prefer_not_to_say" },
+  "fire-activity-priority": { value: "balanced" },
+};
+const nodes = Object.assign({}, controls, {
+  "fire-abroad-data": { textContent: JSON.stringify({ destinations: [] }) },
+  "fire-abroad-form": form,
+  "fire-results": results,
+  "fire-results-summary": summary,
+});
+const host = {
+  document: {
+    getElementById(id) { return nodes[id] || null; },
+    createElement(tagName) { return node(tagName); },
+    createTextNode(value) { const text = node("#text"); text.textContent = value; return text; },
+  },
+  GHAFireAbroad: {
+    normalizeProfile() {
+      return { stay_mode: "part_year", household: "single", housing: "rent", activity_priority: "balanced" };
+    },
+    rankDestinations() {
+      return [{
+        destination_id: "valencia", name: "Valencia", status: "eligible", status_reason: "",
+        score: 4, components: {}, resilience_budget: {}, work_permission: "passive_only",
+        warnings: [], confidence: "high", last_reviewed: "2026-08-29",
+      }];
+    },
+  },
+  GHA: { track(name, params) { tracked.push({ name, params }); } },
+};
+function sharedFallback(event) {
+  const target = event.target.closest("a, button");
+  const href = target ? target.getAttribute("href") || "" : "";
+  if (href.startsWith("/destinations/")) tracked.push({ name: "destination_click", params: { href } });
+  else if (href.startsWith("/")) tracked.push({ name: "internal_page_click", params: { href } });
+}
+function dispatch(link) {
+  let stopped = false;
+  const event = { target: link, stopPropagation() { stopped = true; } };
+  if (typeof resultListeners.click === "function") resultListeners.click(event);
+  if (!stopped) sharedFallback(event);
+}
+function trackedLink(eventName, destinationId, href) {
+  const link = node("a");
+  link.href = href;
+  link.setAttribute("data-fire-track", eventName);
+  link.setAttribute("data-fire-destination-id", destinationId);
+  return link;
+}
+ui.initFireAbroad(host);
+tracked.length = 0;
+dispatch(trackedLink("calculator_handoff", "valencia", "/retirement-abroad-calculator/?destination=valencia&household=single&housing=rent"));
+dispatch(trackedLink("destination_guide_click", "valencia", "/destinations/valencia/"));
+const staticEvents = tracked.slice();
+formListeners.change({ type: "change", target: controls["fire-age"], preventDefault() {} });
+const dynamicLinks = results.children[0].children.filter((child) => child.tagName === "A");
+tracked.length = 0;
+dynamicLinks.forEach(dispatch);
+const dynamicEvents = tracked.slice();
+tracked.length = 0;
+const unrelated = node("a");
+unrelated.href = "/methodology/";
+dispatch(unrelated);
+process.stdout.write(JSON.stringify({
+  delegated: typeof resultListeners.click === "function",
+  staticEvents,
+  dynamicEvents,
+  unrelatedEvents: tracked,
+  dynamicAttributes: dynamicLinks.map((link) => link.attributes),
+  anchorListenerCount,
+}));
+"""
+        )
+        expected = [
+            {
+                "name": "calculator_handoff",
+                "params": {
+                    "eventName": "calculator_handoff",
+                    "destinationId": "valencia",
+                },
+            },
+            {
+                "name": "destination_guide_click",
+                "params": {
+                    "eventName": "destination_guide_click",
+                    "destinationId": "valencia",
+                },
+            },
+        ]
+        self.assertTrue(state["delegated"])
+        self.assertEqual(expected, state["staticEvents"])
+        self.assertEqual(expected, state["dynamicEvents"])
+        self.assertEqual(
+            [
+                {
+                    "name": "internal_page_click",
+                    "params": {"href": "/methodology/"},
+                }
+            ],
+            state["unrelatedEvents"],
+        )
+        self.assertEqual(
+            [
+                {
+                    "data-fire-track": "calculator_handoff",
+                    "data-fire-destination-id": "valencia",
+                },
+                {
+                    "data-fire-track": "destination_guide_click",
+                    "data-fire-destination-id": "valencia",
+                },
+            ],
+            state["dynamicAttributes"],
+        )
+        self.assertEqual(0, state["anchorListenerCount"])
+        self.assertNotIn(
+            "destination_click",
+            [item["name"] for item in state["staticEvents"] + state["dynamicEvents"]],
+        )
+        self.assertNotIn(
+            "internal_page_click",
+            [item["name"] for item in state["staticEvents"] + state["dynamicEvents"]],
+        )
+
+    def test_ui_source_has_no_network_storage_or_sensitive_analytics_fields(self) -> None:
+        source = UI.read_text(encoding="utf-8")
+        for forbidden in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage", "innerHTML"):
+            self.assertNotIn(forbidden, source)
+        analytics_source = source.split("function safeAnalyticsPayload", 1)[1].split(
+            "function resultRowsForDisplay", 1
+        )[0]
+        for sensitive_key in (
+            "age", "mobilityRights", "homeTaxContext", "annualDays", "incomeType",
+            "annual_total_usd", "property_capital_usd", "score",
+        ):
+            self.assertNotIn(sensitive_key, analytics_source)
+
+
+if __name__ == "__main__":
+    unittest.main()

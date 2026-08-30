@@ -24,6 +24,7 @@ EXPECTED_EVENTS = {
     "saved_shortlist_intake_prefill",
     "custom_shortlist_submit",
 }
+FIRE_ABROAD_URL = "https://globalhomeatlas.com/fire-abroad/"
 
 
 class PageParser(HTMLParser):
@@ -91,6 +92,15 @@ def path_for_url(url: str) -> Path:
     return ARTIFACTS / rel.rstrip("/") / "index.html"
 
 
+def tracking_layer_errors(url: str, html: str) -> list[str]:
+    errors: list[str] = []
+    if "window.GHA" not in html or "function track(eventName, params)" not in html:
+        errors.append("missing public tracking interface")
+    if url != FIRE_ABROAD_URL and "gha_event_queue" not in html:
+        errors.append("missing persistent tracking queue")
+    return errors
+
+
 def main() -> int:
     failures: list[tuple[str, str]] = []
     urls = sitemap_urls()
@@ -121,10 +131,11 @@ def main() -> int:
             except json.JSONDecodeError:
                 failures.append((url, "invalid json-ld"))
 
-        if "window.GHA" in html and "gha_event_queue" in html:
+        tracking_errors = tracking_layer_errors(url, html)
+        if not tracking_errors:
             tracking_pages += 1
         else:
-            failures.append((url, "missing tracking layer"))
+            failures.extend((url, error) for error in tracking_errors)
 
     homepage = (ARTIFACTS / "index.html").read_text(encoding="utf-8")
     dashboard = (ARTIFACTS / "dashboard" / "index.html").read_text(encoding="utf-8")
