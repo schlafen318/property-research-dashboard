@@ -366,6 +366,14 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-wizard-progress, .retirement-finder-page .finder-wizard-actions, .retirement-finder-page .finder-adjust-plan { display: none; }
     .retirement-finder-page .finder-section { padding: 30px 0 34px; border: 0; border-bottom: 1px solid var(--gha-rule); border-radius: 0; background: transparent; box-shadow: none; }
     .retirement-finder-page .finder-section:first-child { padding-top: 0; }
+    .retirement-finder-page .finder-step.finder-step-mobile, .retirement-finder-page .finder-mobile-only { display: none; }
+    .retirement-finder-page .finder-profile { padding-bottom: 16px; border-bottom: 0; }
+    .retirement-finder-page .finder-section-split { padding-top: 0; }
+    .retirement-finder-page .finder-review { display: none; }
+    .retirement-finder-page .finder-review-summary { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0; margin: 24px 0; border-top: 1px solid var(--gha-rule); }
+    .retirement-finder-page .finder-review-summary div { padding: 16px 0; border-bottom: 1px solid var(--gha-rule); }
+    .retirement-finder-page .finder-review-summary dt { color: var(--gha-muted); font-size: 12px; }
+    .retirement-finder-page .finder-review-summary dd { margin: 4px 0 0; font-family: var(--gha-display-serif); font-size: 20px; }
     .retirement-finder-page .finder-step { display: block; margin-bottom: 10px; color: var(--gha-accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
     .retirement-finder-page legend, .retirement-finder-page .finder-results h2 { margin: 0 0 8px; font-size: clamp(29px, 3vw, 38px); line-height: 1.05; }
     .retirement-finder-page .section-help, .retirement-finder-page .hint { color: var(--gha-muted); }
@@ -486,14 +494,33 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .finder-list { grid-template-columns: 1fr; }
     }
     @media (max-width: 760px) {
+      .retirement-finder-page.finder-wizard-editing { height: 100vh; height: 100svh; overflow: hidden; }
+      .retirement-finder-page.finder-wizard-editing .gha-header__inner { min-height: 56px; padding: 0 16px; border-bottom-width: 1px; }
+      .retirement-finder-page.finder-wizard-editing .gha-brand img { width: 112px; }
+      .retirement-finder-page.finder-wizard-editing .gha-primary-links, .retirement-finder-page.finder-wizard-editing .gha-mobile-menu { display: none; }
+      .retirement-finder-page.finder-wizard-editing .finder-hero, .retirement-finder-page.finder-wizard-editing .context-link, .retirement-finder-page.finder-wizard-editing .finder-editorial, .retirement-finder-page.finder-wizard-editing .gha-footer { display: none; }
+      .retirement-finder-page.finder-wizard-editing main { height: calc(100svh - 56px); padding: 0; overflow: hidden; }
+      .retirement-finder-page.finder-wizard-editing #retirement-destination-finder > .page-shell { width: 100%; height: 100%; }
+      .retirement-finder-page.finder-wizard-editing .finder-form { display: flex; height: 100%; min-height: 0; flex-direction: column; padding: 0; }
+      .retirement-finder-page.finder-wizard-editing .finder-form-privacy { display: none; }
+      .retirement-finder-page.finder-wizard-editing .finder-wizard-progress { flex: none; margin: 0; padding: 14px 16px 10px; }
+      .retirement-finder-page.finder-wizard-editing .finder-errors { flex: none; margin: 0 16px 8px; padding: 10px 12px; font-size: 13px; }
+      .retirement-finder-page.finder-wizard-editing .finder-section { display: block; min-height: 0; flex: 1 1 auto; overflow-y: auto; overscroll-behavior: contain; padding: 18px 16px calc(92px + env(safe-area-inset-bottom)); border: 0; }
+      .retirement-finder-page.finder-wizard-editing .finder-step-desktop, .retirement-finder-page.finder-wizard-editing .finder-desktop-only { display: none; }
+      .retirement-finder-page.finder-wizard-editing .finder-step-mobile { display: block; }
+      .retirement-finder-page.finder-wizard-editing .finder-mobile-only { display: block; }
+      .retirement-finder-page.finder-wizard-editing .finder-review { display: block; }
+      .retirement-finder-page.finder-wizard-editing .finder-review-summary { grid-template-columns: 1fr; margin-top: 20px; }
       .retirement-finder-page .finder-form { padding-bottom: 84px; }
       .retirement-finder-page .finder-wizard-progress { display: block; margin: 0 0 18px; }
       .retirement-finder-page .finder-wizard-progress p { margin: 0 0 8px; color: var(--gha-accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
       .retirement-finder-page .finder-wizard-progressbar { position: relative; height: 2px; overflow: hidden; background: var(--gha-rule); }
-      .retirement-finder-page .finder-wizard-progressbar::after { position: absolute; inset: 0 auto 0 0; width: 25%; background: var(--gha-accent); content: ""; transition: width .2s ease; }
-      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="2"]::after { width: 50%; }
-      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="3"]::after { width: 75%; }
-      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="4"]::after { width: 100%; }
+      .retirement-finder-page .finder-wizard-progressbar::after { position: absolute; inset: 0 auto 0 0; width: 16.6667%; background: var(--gha-accent); content: ""; transition: width .2s ease; }
+      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="2"]::after { width: 33.3333%; }
+      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="3"]::after { width: 50%; }
+      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="4"]::after { width: 66.6667%; }
+      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="5"]::after { width: 83.3333%; }
+      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="6"]::after { width: 100%; }
       .retirement-finder-page .finder-section[tabindex="-1"]:focus { outline: 0; }
       .retirement-finder-page .finder-section .finder-step { display: none; }
       .retirement-finder-page .finder-wizard-actions { display: grid; position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--gha-rule); background: rgba(245, 241, 232, .97); }

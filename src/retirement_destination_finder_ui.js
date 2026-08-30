@@ -467,10 +467,12 @@
     let wizardStepIndex = 0;
     let wizardView = "editing";
     const wizardSectionIds = [
+      "finder-profile",
       "finder-current-resources",
       "finder-housing",
       "finder-retirement-income",
       "finder-preferences",
+      "finder-review",
     ];
     const wizardMedia = typeof root.matchMedia === "function"
       ? root.matchMedia("(max-width: 760px)")
@@ -569,11 +571,11 @@
 
     function wizardStepErrors(stepIndex) {
       const errors = [];
-      const invalidMoneyIds = stepIndex === 0
+      const invalidMoneyIds = stepIndex === 1
         ? ["finder-liquid-capital", "finder-monthly-contribution"]
-        : stepIndex === 1 && selected("finder-housing-plan") === "buy_now"
+        : stepIndex === 2 && selected("finder-housing-plan") === "buy_now"
           ? ["finder-property-allocation"]
-          : stepIndex === 2
+          : stepIndex === 3
             ? ["finder-pension", "finder-other-income"]
             : [];
       if (invalidMoneyIds.some(function (id) { return validateMoneyControl(element(id)); })) {
@@ -583,7 +585,6 @@
         const currentAge = numeric("finder-current-age");
         const retirementAge = numeric("finder-retirement-age");
         const horizonYears = numeric("finder-horizon");
-        const expectedReturn = numeric("finder-return");
         if (!Number.isFinite(currentAge) || currentAge < 18 || currentAge > 90) {
           errors.push("Enter a current age between 18 and 90.");
         } else if (!Number.isFinite(retirementAge) || retirementAge <= currentAge || retirementAge > 100) {
@@ -592,11 +593,14 @@
         if (!Number.isFinite(horizonYears) || horizonYears < 1 || horizonYears > 60) {
           errors.push("Enter between 1 and 60 years in retirement.");
         }
+      }
+      if (stepIndex === 1) {
+        const expectedReturn = numeric("finder-return");
         if (!Number.isFinite(expectedReturn) || expectedReturn < -5 || expectedReturn > 15) {
           errors.push("Expected return must be between -5% and 15%.");
         }
       }
-      if (stepIndex === 1 && selected("finder-housing-plan") === "buy_now" &&
+      if (stepIndex === 2 && selected("finder-housing-plan") === "buy_now" &&
           moneyNumber("finder-property-allocation") <= 0) {
         errors.push("Enter the maximum amount available for a property purchase.");
       }
@@ -619,6 +623,94 @@
       return errors;
     }
 
+    function updateReview() {
+      const household = selected("finder-household") === "couple" ? "Couple" : "Single";
+      const housingLabels = {
+        rent: "Rent",
+        buy_now: "Buy now",
+        buy_retirement: "Buy at retirement",
+        own: "Already own",
+      };
+      const settings = selectedSettings().map(settingLabel);
+      const region = selected("finder-region") === "any"
+        ? "Any region"
+        : titleCaseFilter(selected("finder-region"));
+      const contributionIndexing = element("finder-contribution-indexed").checked
+        ? ", inflation-linked"
+        : "";
+      const housing = selected("finder-housing-plan");
+      const housingParts = [housingLabels[housing] || "—"];
+      if (housing === "buy_now") {
+        housingParts.push(selectedCurrency + " " + element("finder-property-allocation").value + " budget");
+        const purchaseMethod = selected("finder-purchase-method");
+        if (purchaseMethod === "mortgage") {
+          housingParts.push(
+            "Mortgage, " + selected("finder-requested-ltv") + "% LTV at " +
+            selected("finder-mortgage-rate") + "% for " + selected("finder-mortgage-term") + " years"
+          );
+          const residencyLabels = {
+            non_resident: "Non-resident",
+            resident: "Resident",
+            eu_national: "EU national",
+            non_resident_with_purchase_permit: "Non-resident with purchase permission",
+          };
+          const incomeLabels = {
+            overseas: "Overseas income",
+            documented_overseas_income: "Documented overseas income",
+            eu_income: "EU income",
+            japan_income: "Japan income",
+            swiss_income: "Swiss income",
+          };
+          housingParts.push(
+            (residencyLabels[selected("finder-buyer-residency")] || "Buyer status not set") +
+            ", " + (incomeLabels[selected("finder-income-source")] || "Income source not set")
+          );
+          housingParts.push(selected("finder-mortgage-treatment") === "continue"
+            ? "Continue repayments in retirement"
+            : "Pay off at retirement");
+        } else {
+          housingParts.push(purchaseMethod === "cash" ? "Cash purchase" : "Financing not decided");
+        }
+        if (selected("finder-use-before-retirement") === "rental") {
+          housingParts.push(
+            "Rent before retirement: " + selected("finder-rental-yield") + "% yield, " +
+            selected("finder-vacancy-rate") + "% vacancy, " +
+            selected("finder-operating-cost-rate") + "% operating costs"
+          );
+        } else {
+          housingParts.push("Personal use before retirement");
+        }
+      }
+      const incomeParts = [];
+      if (moneyNumber("finder-pension") > 0) {
+        incomeParts.push(
+          selectedCurrency + " " + element("finder-pension").value + "/month pension" +
+          (element("finder-pension-indexed").checked ? ", inflation-linked" : "")
+        );
+      }
+      if (moneyNumber("finder-other-income") > 0) {
+        incomeParts.push(
+          selectedCurrency + " " + element("finder-other-income").value + "/month other income" +
+          (element("finder-other-income-indexed").checked ? ", inflation-linked" : "")
+        );
+      }
+      element("finder-review-retirement").textContent =
+        "Age " + selected("finder-current-age") + " now · retire at " +
+        selected("finder-retirement-age") + " · " + household + " · " +
+        selected("finder-horizon") + " years";
+      element("finder-review-capital").textContent =
+        selectedCurrency + " " + element("finder-liquid-capital").value + " today · " +
+        selectedCurrency + " " + element("finder-monthly-contribution").value + "/month" +
+        contributionIndexing + " · " + selected("finder-return") + "% return";
+      element("finder-review-housing").textContent = housingParts.join(" · ");
+      element("finder-review-income").textContent = incomeParts.length
+        ? incomeParts.join(" · ")
+        : "No continuing income";
+      element("finder-review-preferences").textContent =
+        region + " · " + (settings.length ? sentenceList(settings) : "Any setting") +
+        " · Healthcare: " + (selected("finder-healthcare") === "high" ? "leading priority" : "important");
+    }
+
     function updateWizardStep(options) {
       const active = Boolean(wizardMedia.matches);
       const progress = element("finder-wizard-progress");
@@ -637,11 +729,13 @@
       element("finder-wizard-next").textContent = wizardStepIndex === sections.length - 1
         ? "View my matches"
         : "Continue";
-      element("finder-wizard-next").disabled = wizardStepIndex === 1 &&
+      element("finder-wizard-next").disabled = wizardStepIndex === 2 &&
         selected("finder-housing-plan") === "own";
+      document.body.classList.toggle("finder-wizard-editing", wizardView === "editing");
+      if (wizardStepIndex === sections.length - 1) updateReview();
       if (options && options.focus) {
-        sections[wizardStepIndex].focus();
-        sections[wizardStepIndex].scrollIntoView({ behavior: "smooth", block: "start" });
+        sections[wizardStepIndex].focus({ preventScroll: true });
+        sections[wizardStepIndex].scrollTop = 0;
       }
     }
 
@@ -669,10 +763,12 @@
     function syncWizardMode() {
       const active = Boolean(wizardMedia.matches);
       if (!active) {
+        document.body.classList.remove("finder-wizard-editing");
         form.hidden = false;
         if (currentResult) results.hidden = wizardView === "editing";
         element("finder-adjust-plan").hidden = true;
       } else if (currentResult && wizardView !== "editing") {
+        document.body.classList.remove("finder-wizard-editing");
         form.hidden = true;
         results.hidden = false;
         element("finder-adjust-plan").hidden = wizardView === "shared";
@@ -1229,6 +1325,7 @@
     function render(result, user) {
       sharedView = false;
       wizardView = "results";
+      document.body.classList.remove("finder-wizard-editing");
       comparisonOpened = false;
       comparisonIds = [];
       currentResult = result;
@@ -1283,6 +1380,7 @@
         }
         sharedView = true;
         wizardView = "shared";
+        document.body.classList.remove("finder-wizard-editing");
         comparisonIds = scenario.comparisonIds.slice();
         currentUser = {
           household: scenario.household,
