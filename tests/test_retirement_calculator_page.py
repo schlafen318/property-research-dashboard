@@ -158,6 +158,18 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertEqual(2, parser.live_regions)
         self.assertGreaterEqual(parser.noscript_sections, 1)
 
+    def test_form_defaults_to_age_45_and_retirement_at_60(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+
+        self.assertIn(
+            'id="ret-current-age" type="number" min="18" max="99" value="45"',
+            form,
+        )
+        self.assertIn(
+            'id="ret-retirement-age" type="number" min="19" max="100" value="60"',
+            form,
+        )
+
     def test_form_supports_dated_planning_currency_conversion_including_sgd(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
         currency_select = form.split('id="ret-currency"', 1)[1].split("</select>", 1)[0]
