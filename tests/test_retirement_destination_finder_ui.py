@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 UI = ROOT / "src" / "retirement_destination_finder_ui.js"
+SCENARIO = ROOT / "src" / "retirement_finder_scenario.js"
 CALCULATOR_UI = ROOT / "src" / "retirement_calculator_ui.js"
 
 
@@ -39,6 +40,7 @@ def run_ui_dom_scenario(payload: object) -> dict:
 const fs = require("fs");
 const vm = require("vm");
 const input = JSON.parse(process.argv[2]);
+const scenarioApi = require(process.argv[3]);
 
 class FakeElement {
   constructor(id) {
@@ -67,6 +69,7 @@ class FakeElement {
   querySelectorAll() { return []; }
   closest() { return null; }
   focus() {}
+  select() { this.selected = true; }
   scrollIntoView() {}
 }
 
@@ -144,8 +147,15 @@ let engineInput = null;
 const engineInputs = [];
 let engineCalls = 0;
 const trackedEvents = [];
-const window = {
+const fakeWindow = {
+  location: {
+    origin: "https://globalhomeatlas.com",
+    pathname: "/retirement-destination-finder/",
+    search: input.search || "",
+  },
+  navigator: input.clipboard ? { clipboard: { writeText(value) { input.copied = value; return Promise.resolve(); } } } : {},
   GHA: { track(name, fields) { trackedEvents.push({ name, fields: fields || {} }); } },
+  GHARetirementFinderScenario: scenarioApi,
   GHARetirementDestinationFinder: {
     recommendDestinations(request) {
       engineInput = request;
@@ -160,12 +170,13 @@ const window = {
     },
   },
 };
-const context = { window, document, Intl, Number, String, Array, Set, Map, Math, JSON };
+const context = { window: fakeWindow, document, Intl, Number, String, Array, Set, Map, Math, JSON };
 vm.runInNewContext(fs.readFileSync(process.argv[1], "utf8"), context);
-window.GHARetirementDestinationFinderUI.initRetirementDestinationFinder("retirement-destination-finder", {
+fakeWindow.GHARetirementDestinationFinderUI.initRetirementDestinationFinder("retirement-destination-finder", {
+  asOf: "2026-08-27",
   planning_currencies: { rates_to_usd: input.rates },
-  destinations: [],
-  retirementCosts: [],
+  destinations: input.destinations || [],
+  retirementCosts: input.retirementCosts || [],
   mortgageProfiles: {},
 });
 
@@ -183,6 +194,7 @@ if (input.editLiquid) {
   el("finder-liquid-capital").dispatch("input");
 }
 if (input.submit) el("retirement-destination-finder-form").dispatch("submit");
+if (input.clickShare) el("finder-share").dispatch("click");
 if (input.preferenceChange) {
   el(input.preferenceChange.id).value = input.preferenceChange.value;
   el(input.preferenceChange.id).dispatch("change");
@@ -217,6 +229,12 @@ process.stdout.write(JSON.stringify({
   strongestMatch: el("finder-strongest-match").textContent,
   landscapeRowsHtml: el("finder-landscape-rows").innerHTML,
   recommendationsHtml: el("finder-recommendations").innerHTML,
+  comparisonHtml: el("finder-comparison-body").innerHTML,
+  comparisonHidden: el("finder-comparison").hidden,
+  shareStatus: el("finder-share-status").textContent,
+  shareUrl: el("finder-share-url").value,
+  shareUrlHidden: el("finder-share-url").hidden,
+  sharedErrorHidden: el("finder-shared-error").hidden,
   landscapeHidden: el("finder-capital-landscape").hidden,
   matchesHidden: el("finder-matches-section").hidden,
   projectionHidden: el("finder-projection-section").hidden,
@@ -225,7 +243,7 @@ process.stdout.write(JSON.stringify({
 }));
 '''
     result = subprocess.run(
-        ["node", "-e", script, str(UI), json.dumps(payload)],
+        ["node", "-e", script, str(UI), json.dumps(payload), str(SCENARIO)],
         check=True,
         capture_output=True,
         text=True,
@@ -531,7 +549,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
 
         self.assertEqual(
-            "Fukuoka / Itoshima, Japan. Retirement target SGD\u00a01,000,000. SGD\u00a0125,000 over projected capital. Close. Strongest modeled match number 1.",
+            "Fukuoka / Itoshima, Japan. Required capital SGD\u00a01,000,000. SGD\u00a0125,000 over projected capital. Close. Recommended match number 1.",
             label,
         )
 
@@ -646,7 +664,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             },
         )
         self.assertIn("No destinations are within reach yet", read)
-        self.assertIn("Fukuoka / Itoshima is the strongest modeled match", read)
+        self.assertIn("Fukuoka / Itoshima is the strongest match", read)
         self.assertIn("SGD\u00a0409,882", read)
 
     def test_result_money_formats_negative_gaps_equity_and_jpy(self) -> None:
@@ -892,6 +910,142 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         event = next(item for item in scenario["trackedEvents"] if item["name"] == "retirement_destination_finder_preference_change")
         self.assertEqual({"preference": "setting", "value": "Water"}, event["fields"])
 
+    def test_comparison_defaults_to_three_and_prevents_duplicate_replacements(self) -> None:
+        recommendations = [
+            {"destinationId": "fukuoka", "name": "Fukuoka"},
+            {"destinationId": "valencia", "name": "Valencia"},
+            {"destinationId": "madeira", "name": "Madeira"},
+            {"destinationId": "algarve", "name": "Algarve"},
+        ]
+        selected = run_ui("comparisonSelection", {"recommendations": recommendations, "selectedIds": []})
+        self.assertEqual(
+            ["fukuoka", "valencia", "madeira"],
+            [item["destinationId"] for item in selected],
+        )
+        self.assertEqual(
+            ["fukuoka", "valencia", "madeira"],
+            run_ui(
+                "replaceComparisonDestination",
+                {
+                    "selectedIds": ["fukuoka", "valencia", "madeira"],
+                    "position": 1,
+                    "destinationId": "fukuoka",
+                    "recommendations": recommendations,
+                },
+            ),
+        )
+        self.assertEqual(
+            ["fukuoka", "algarve", "madeira"],
+            run_ui(
+                "replaceComparisonDestination",
+                {
+                    "selectedIds": ["fukuoka", "valencia", "madeira"],
+                    "position": 1,
+                    "destinationId": "algarve",
+                    "recommendations": recommendations,
+                },
+            ),
+        )
+
+    def test_comparison_markup_uses_decision_fields_and_native_replacement_controls(self) -> None:
+        recommendations = [
+            {
+                "destinationId": "fukuoka", "name": "Fukuoka / Itoshima", "country": "Japan",
+                "retirementTarget": 900_000, "surplusGap": 100_000, "tier": "within_reach",
+                "preferenceMatches": ["Preferred region"], "monthlyRetirementCost": 4_200,
+                "countryGuideHref": "/countries/japan-property/",
+            },
+            {
+                "destinationId": "valencia", "name": "Valencia", "country": "Spain",
+                "retirementTarget": 1_100_000, "surplusGap": -100_000, "tier": "close",
+                "preferenceMatches": [], "monthlyRetirementCost": 4_900,
+                "countryGuideHref": "/countries/spain-property/",
+            },
+        ]
+        markup = run_ui(
+            "comparisonMarkup",
+            {
+                "recommendations": recommendations,
+                "selectedIds": ["fukuoka", "valencia"],
+                "housingPlan": "rent",
+                "currency": "USD",
+                "ratesToUsd": {"USD": 1},
+            },
+        )
+        self.assertIn("Required capital", markup)
+        self.assertIn("Gap versus projected capital", markup)
+        self.assertIn("Monthly retirement cost", markup)
+        self.assertIn('<select data-comparison-position="0"', markup)
+        self.assertIn("Destination guide", markup)
+        self.assertIn("Country guide", markup)
+        self.assertIn('class="finder-comparison-mobile"', markup)
+        self.assertIn('<h4>Fukuoka / Itoshima</h4>', markup)
+        self.assertNotIn("score", markup.lower())
+
+    def test_share_fallback_exposes_a_privacy_safe_results_link(self) -> None:
+        recommendations = [
+            {
+                "destinationId": slug,
+                "name": slug.title(),
+                "country": "Example",
+                "tier": tier,
+                "fundingRatio": ratio,
+                "portfolioAtRetirement": 1_000_000,
+                "retirementTarget": target,
+                "surplusGap": 1_000_000 - target,
+                "preferenceMatches": [],
+                "annualProjection": [],
+            }
+            for slug, tier, ratio, target in (
+                ("fukuoka", "within_reach", 1.1, 900_000),
+                ("valencia", "close", 0.95, 1_050_000),
+                ("madeira", "stretch", 0.8, 1_250_000),
+            )
+        ]
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "engineResult": {
+                    "summary": {"withinReachCount": 1, "closeCount": 1, "stretchCount": 1},
+                    "sharedProjection": {"portfolioAtRetirement": 1_000_000, "annualProjection": []},
+                    "recommendations": recommendations,
+                    "excluded": [],
+                },
+                "submit": True,
+                "clickShare": True,
+            }
+        )
+        self.assertFalse(scenario["shareUrlHidden"])
+        self.assertIn("?scenario=", scenario["shareUrl"])
+        self.assertEqual("Copy this results link.", scenario["shareStatus"])
+        event = next(item for item in scenario["trackedEvents"] if item["name"] == "retirement_destination_finder_share")
+        self.assertEqual({"housing_plan": "rent"}, event["fields"])
+        encoded = scenario["shareUrl"].split("?scenario=", 1)[1]
+        from tests.test_retirement_finder_scenario import run_scenario
+
+        snapshot = run_scenario(
+            "decodeScenario",
+            {"value": encoded, "destinationIds": ["fukuoka", "valencia", "madeira"]},
+        )
+        serialized = json.dumps(snapshot)
+        for forbidden in ("currentAge", "totalLiquidCapital", "monthlyPortfolioContribution", "incomeStreams"):
+            self.assertNotIn(forbidden, serialized)
+
+    def test_invalid_shared_link_keeps_the_calculator_available(self) -> None:
+        state = run_ui_dom_scenario({"rates": {"USD": 1}, "search": "?scenario=not-valid-json"})
+        self.assertFalse(state["sharedErrorHidden"])
+        self.assertEqual(0, state["engineCalls"])
+
+    def test_shared_buy_now_snapshot_does_not_invent_zero_property_values(self) -> None:
+        source = UI.read_text()
+        self.assertIn("user.sharedSnapshot", source)
+        self.assertIn("finder-data-reviewed", source)
+
+    def test_recommendation_card_includes_country_guide_when_available(self) -> None:
+        source = UI.read_text()
+        self.assertIn("item.countryGuideHref", source)
+        self.assertIn('data-action="country_guide"', source)
+
     def test_match_explanation_names_affordability_rank_and_planning_signals(self) -> None:
         explanation = run_ui(
             "finderMatchExplanation",
@@ -909,9 +1063,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
 
         self.assertEqual(
-            "Your projected portfolio exceeds the modeled target by $150,000. "
-            "Overall match #1 in the Within reach tier using Preferred region and Long-stay suitability; "
-            "funding coverage breaks remaining ties.",
+            "Within reach with $150,000 remaining. Matches your preferred region and long-stay priorities. Renting keeps more capital available.",
             explanation,
         )
 
@@ -931,11 +1083,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             },
         )
 
-        self.assertEqual(
-            "Your projected portfolio covers 90% of the modeled target, leaving a $75,000 gap. "
-            "Overall match #2 in the Close tier; funding coverage breaks ties when no planning signals match.",
-            explanation,
-        )
+        self.assertEqual("Close, with a $75,000 gap. Renting keeps more capital available.", explanation)
 
     def test_match_explanation_avoids_one_hundred_percent_when_a_gap_remains(self) -> None:
         explanation = run_ui(
@@ -953,8 +1101,8 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             },
         )
 
-        self.assertIn("covers 99.6% of the modeled target", explanation)
-        self.assertNotIn("covers 100%", explanation)
+        self.assertIn("Close, with a $3,000 gap.", explanation)
+        self.assertNotIn("100%", explanation)
 
     def test_match_explanation_calls_a_zero_gap_an_exact_match(self) -> None:
         explanation = run_ui(
@@ -972,8 +1120,8 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             },
         )
 
-        self.assertTrue(explanation.startswith("Your projected portfolio meets the modeled target."))
-        self.assertNotIn("exceeds the modeled target by $0", explanation)
+        self.assertTrue(explanation.startswith("Within reach at the required capital."))
+        self.assertNotIn("$0", explanation)
 
     def test_recommendation_cards_render_one_concise_explanation_instead_of_a_duplicate_match_label(self) -> None:
         scenario = run_ui_dom_scenario(
@@ -1003,7 +1151,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
 
         self.assertIn('class="finder-rationale"', scenario["recommendationsHtml"])
-        self.assertIn("Overall match #1 in the Within reach tier", scenario["recommendationsHtml"])
+        self.assertIn("Within reach with $150,000 remaining", scenario["recommendationsHtml"])
         self.assertNotIn("Preference match:", scenario["recommendationsHtml"])
         self.assertIn('data-surface="recommended_match"', scenario["recommendationsHtml"])
 

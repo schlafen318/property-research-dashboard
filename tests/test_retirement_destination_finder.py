@@ -326,6 +326,63 @@ class RetirementDestinationFinderTests(unittest.TestCase):
         self.assertEqual(3, result["summary"]["evaluatedCount"])
         self.assertEqual(3, len(result["recommendations"]) + len(result["excluded"]))
 
+    def test_projected_capital_entry_point_reuses_existing_targets_and_ordering(self) -> None:
+        destinations = [destination("low", 3), destination("preferred", 5), destination("high", 2)]
+        payload = {
+            "user": user_payload(
+                currentAge=50,
+                retirementAge=60,
+                horizonYears=30,
+                totalLiquidCapital=500_000,
+                monthlyPortfolioContribution=1_500,
+                expectedPortfolioReturn=0.04,
+            ),
+            "destinations": destinations,
+            "retirementCosts": [
+                cost_record("low", 25_000),
+                cost_record("preferred", 32_000),
+                cost_record("high", 45_000),
+            ],
+            "mortgageProfiles": {item["id"]: mortgage_profile() for item in destinations},
+        }
+        accumulated = run_finder("recommendDestinations", payload)
+        direct = run_finder(
+            "recommendProjectedCapital",
+            {
+                **payload,
+                "projectedCapitalUsd": accumulated["sharedProjection"]["portfolioAtRetirement"],
+            },
+        )
+
+        self.assertEqual(
+            [
+                (item["destinationId"], item["tier"], item["retirementTarget"])
+                for item in accumulated["recommendations"]
+            ],
+            [
+                (item["destinationId"], item["tier"], item["retirementTarget"])
+                for item in direct["recommendations"]
+            ],
+        )
+        self.assertEqual(
+            accumulated["sharedProjection"]["portfolioAtRetirement"],
+            direct["sharedProjection"]["portfolioAtRetirement"],
+        )
+
+    def test_projected_capital_entry_point_rejects_buy_now(self) -> None:
+        place = destination("buy-now")
+        payload = {
+            "projectedCapitalUsd": 1_000_000,
+            "user": user_payload(housingPlan="buy_now"),
+            "destinations": [place],
+            "retirementCosts": [cost_record(place["id"], 30_000)],
+            "mortgageProfiles": {place["id"]: mortgage_profile()},
+        }
+
+        with self.assertRaises(subprocess.CalledProcessError) as caught:
+            run_finder("recommendProjectedCapital", payload)
+        self.assertIn("buy now", caught.exception.stderr.lower())
+
 
 if __name__ == "__main__":
     unittest.main()

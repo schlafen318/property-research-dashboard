@@ -418,6 +418,28 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-landscape figcaption { margin: 18px 0 0; }
     .retirement-finder-page .finder-matches-section { margin-bottom: 46px; }
     .retirement-finder-page .finder-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 24px; }
+    .retirement-finder-page .finder-comparison-section { margin: 8px 0 46px; padding: 32px 0; border-top: 3px solid var(--gha-ink); border-bottom: 1px solid var(--gha-rule); }
+    .retirement-finder-page .finder-comparison-heading h3 { margin: 0 0 22px; font-size: clamp(28px, 3vw, 38px); }
+    .retirement-finder-page .finder-comparison-scroll { overflow-x: auto; }
+    .retirement-finder-page .finder-comparison-table { width: 100%; min-width: 680px; border-collapse: collapse; text-align: left; }
+    .retirement-finder-page .finder-comparison-table caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+    .retirement-finder-page .finder-comparison-table th, .retirement-finder-page .finder-comparison-table td { padding: 12px 14px 12px 0; border-top: 1px solid var(--gha-rule); vertical-align: top; font-weight: 400; }
+    .retirement-finder-page .finder-comparison-table thead th { border-top: 0; font-family: var(--gha-display-serif); font-size: 20px; }
+    .retirement-finder-page .finder-comparison-table tbody th { width: 190px; color: var(--gha-muted); }
+    .retirement-finder-page .finder-comparison-table select { min-width: 0; margin-top: 8px; font-size: 13px; }
+    .retirement-finder-page .finder-comparison-links { display: grid; gap: 5px; }
+    .retirement-finder-page .finder-comparison-mobile { display: none; }
+    .retirement-finder-page .finder-comparison-mobile article { padding: 20px 0; border-top: 1px solid var(--gha-rule); }
+    .retirement-finder-page .finder-comparison-mobile h4 { margin: 0 0 10px; font-family: var(--gha-display-serif); font-size: 25px; font-weight: 500; }
+    .retirement-finder-page .finder-comparison-mobile dl { display: grid; gap: 12px; margin: 18px 0 0; }
+    .retirement-finder-page .finder-comparison-mobile dt { color: var(--gha-muted); font-size: 12px; }
+    .retirement-finder-page .finder-comparison-mobile dd { margin: 2px 0 0; }
+    .retirement-finder-page .finder-comparison-status { min-height: 1.5em; color: var(--gha-muted); font-size: 13px; }
+    .retirement-finder-page .finder-share-section { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 18px; align-items: center; margin: 0 0 46px; padding: 24px 0; border-top: 1px solid var(--gha-rule); border-bottom: 1px solid var(--gha-rule); }
+    .retirement-finder-page .finder-share-section button { min-height: 44px; padding: 0 16px; border: 1px solid var(--gha-ink); border-radius: 0; background: var(--gha-ink); color: var(--gha-paper); font: 500 12px var(--gha-reading-sans); letter-spacing: .05em; text-transform: uppercase; }
+    .retirement-finder-page .finder-share-section p { margin: 0; color: var(--gha-muted); font-size: 13px; }
+    .retirement-finder-page #finder-share-status, .retirement-finder-page #finder-share-url { grid-column: 1 / -1; }
+    .retirement-finder-page #finder-shared-error { max-width: 960px; margin: 0 0 28px; padding: 14px 0; border-top: 1px solid var(--gha-accent); border-bottom: 1px solid var(--gha-accent); }
     .retirement-finder-page .finder-projection-section { padding-top: 38px; border-top: 3px solid var(--gha-ink); }
     .retirement-finder-page .finder-projection-wrap { position: relative; margin-bottom: 36px; padding: 18px 0 32px; border-top: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-projection-wrap h4 { margin: 0 0 12px; font-family: var(--gha-display-serif); font-size: 24px; font-weight: 500; }
@@ -454,6 +476,8 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-comparison h3 { margin: 0; font-size: 26px; }
     .retirement-finder-page .finder-faq details { max-width: 820px; padding: 16px 0; border-top: 1px solid var(--gha-rule); }
     .retirement-finder-page .finder-faq summary { min-height: 44px; display: flex; align-items: center; font-weight: 500; cursor: pointer; }
+    .retirement-finder-page .finder-capital-scenarios nav { display: flex; flex-wrap: wrap; gap: 10px 24px; }
+    .retirement-finder-page .finder-capital-scenarios a { font-weight: 400; }
     @media (max-width: 860px) {
       .retirement-finder-page .gha-shell, .retirement-finder-page .page-shell { width: min(100% - 32px, 1220px); }
       .retirement-finder-page .finder-summary { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -461,6 +485,8 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .finder-list { grid-template-columns: 1fr; }
     }
     @media (max-width: 760px) {
+      .retirement-finder-page .finder-comparison-scroll { display: none; }
+      .retirement-finder-page .finder-comparison-mobile { display: block; }
       .retirement-finder-page .finder-landscape-head { display: block; }
       .retirement-finder-page .finder-landscape-key { margin-top: 12px; }
       .retirement-finder-page .finder-landscape-axis { display: none; }
@@ -475,6 +501,7 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .field-grid, .retirement-finder-page .finder-summary, .retirement-finder-page .finder-result dl, .retirement-finder-page .finder-comparison { grid-template-columns: 1fr; }
       .retirement-finder-page .finder-summary div { padding-right: 0; }
       .retirement-finder-page .finder-submit { width: 100%; }
+      .retirement-finder-page .finder-share-section { grid-template-columns: 1fr; }
     }
     @media (prefers-reduced-motion: reduce) {
       .retirement-finder-page .finder-chart-year { animation: none; opacity: 1; transform: none; }

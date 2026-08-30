@@ -85,6 +85,7 @@
     return {
       currentAge: user.currentAge,
       retirementAge: user.retirementAge,
+      retirementBeginsNow: user.retirementBeginsNow === true,
       horizonYears: user.horizonYears,
       expenseCategories: categories,
       incomeStreams: user.incomeStreams || [],
@@ -173,7 +174,7 @@
     return residencies.includes(residency) && incomeSources.includes(incomeSource);
   }
 
-  function recommendDestinations(input) {
+  function recommendDestinations(input, projectionOverride) {
     if (!input || !Array.isArray(input.destinations) || !Array.isArray(input.retirementCosts)) {
       throw new Error("Destinations and retirement costs are required");
     }
@@ -181,15 +182,15 @@
     const costs = new Map(input.retirementCosts.map(function (item) {
       return [item.destination_id, item];
     }));
-    const sharedProjection = user.housingPlan === "buy_now" ? null : projectPortfolio({
-      currentAge: user.currentAge,
-      retirementAge: user.retirementAge,
-      startingPortfolio: user.totalLiquidCapital,
-      monthlyContribution: user.monthlyPortfolioContribution,
-      contributionInflationLinked: user.contributionInflationLinked,
-      generalInflation: user.generalInflation,
-      expectedPortfolioReturn: user.expectedPortfolioReturn,
-    });
+    const sharedProjection = projectionOverride || (user.housingPlan === "buy_now" ? null : projectPortfolio({
+        currentAge: user.currentAge,
+        retirementAge: user.retirementAge,
+        startingPortfolio: user.totalLiquidCapital,
+        monthlyContribution: user.monthlyPortfolioContribution,
+        contributionInflationLinked: user.contributionInflationLinked,
+        generalInflation: user.generalInflation,
+        expectedPortfolioReturn: user.expectedPortfolioReturn,
+      }));
     const recommendations = [];
     const excluded = [];
 
@@ -203,6 +204,7 @@
         excluded.push({ destinationId: destination.id, name: destination.name, reasonCode: "buyer_access_restricted" });
         return;
       }
+      const retirementProfile = cost.profiles[user.household];
       const targetResult = retirement.calculateRetirementTarget(retirementTargetInput(user, cost));
       let retirementTarget = Number(targetResult.totalCapitalAtRetirement);
       let portfolioAtRetirement = sharedProjection ? sharedProjection.portfolioAtRetirement : 0;
@@ -291,6 +293,14 @@
         portfolioAtRetirement: portfolioAtRetirement,
         annualProjection: annualProjection,
         retirementTarget: retirementTarget,
+        monthlyRetirementCost: (
+          Object.keys(retirementProfile.categories_usd).reduce(function (total, key) {
+            return total + Number(retirementProfile.categories_usd[key] || 0);
+          }, 0) + Number(user.housingPlan === "rent"
+            ? retirementProfile.annual_rent_usd
+            : retirementProfile.annual_owner_costs_usd)
+        ) / 12,
+        countryGuideHref: destination.countryGuideHref || "",
         surplusGap: portfolioAtRetirement - retirementTarget,
         propertyEquity: propertyEquity,
         mortgageBalance: mortgageBalance,
@@ -324,11 +334,30 @@
     };
   }
 
+  function recommendProjectedCapital(input) {
+    const user = input && input.user || {};
+    if (user.housingPlan === "buy_now") {
+      throw new Error("Projected-capital scenarios do not support buy now");
+    }
+    const capital = nonNegative(input && input.projectedCapitalUsd, "Projected capital");
+    const sharedProjection = {
+      annualProjection: [{
+        year: Math.max(0, Number(user.retirementAge) - Number(user.currentAge)),
+        portfolio: capital,
+        contributions: 0,
+      }],
+      portfolioAtRetirement: capital,
+      exhaustedMonth: null,
+    };
+    return recommendDestinations(input, sharedProjection);
+  }
+
   return {
     projectPortfolio: projectPortfolio,
     retirementTargetInput: retirementTargetInput,
     fundingTier: fundingTier,
     profileMatchesBuyer: profileMatchesBuyer,
     recommendDestinations: recommendDestinations,
+    recommendProjectedCapital: recommendProjectedCapital,
   };
 });
