@@ -299,19 +299,17 @@ def active_life_score(record: dict) -> float:
     return round(total, 2)
 
 
-def _destination_score(destination: dict, dimension: str, fallbacks: tuple[str, ...] = ()) -> float | None:
+def _destination_score(destination: dict, dimension: str) -> float | None:
+    decision_dimensions = destination.get("decision_dimensions")
+    if isinstance(decision_dimensions, list):
+        for item in decision_dimensions:
+            if isinstance(item, dict) and item.get("key") == dimension:
+                return _numeric_score(item)
     value = _numeric_score(destination.get(dimension))
     if value is not None:
         return value
-    for container_key in ("dimensions", "scores"):
-        container = destination.get(container_key)
-        if isinstance(container, dict):
-            value = _numeric_score(container.get(dimension))
-            if value is not None:
-                return value
-    fallback_scores = [_destination_score(destination, key) for key in fallbacks]
-    usable = [score for score in fallback_scores if score is not None]
-    return round(sum(usable) / len(usable), 2) if len(usable) == len(fallbacks) else None
+    scores = destination.get("scores")
+    return _numeric_score(scores.get(dimension)) if isinstance(scores, dict) else None
 
 
 def _status_priority(status: str) -> int:
@@ -380,8 +378,8 @@ def rank_fire_abroad_destinations(
         cost = _retirement_cost_for(destination_id, retirement_costs)
         budget = build_resilience_budget(cost or {}, profile, override)
         active = active_life_score(override)
-        global_access = _destination_score(destination, "global_access", ("airport_access", "business_hub_access"))
-        community_fit = _destination_score(destination, "foreigner_fit", ("chinese_foreigner_friendliness",))
+        global_access = _destination_score(destination, "global_access")
+        community_fit = _destination_score(destination, "foreigner_fit")
         exit_liquidity = _destination_score(destination, "exit_liquidity")
         ownership_clarity = _destination_score(destination, "ownership_clarity")
         rent_flexibility = _numeric_score(override.get("rent_flexibility_score"))

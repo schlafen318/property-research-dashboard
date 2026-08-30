@@ -212,7 +212,10 @@ class FireRankingTests(unittest.TestCase):
             "id": destination_id,
             "name": name,
             "country": country,
-            "dimensions": {"global_access": 4.0, "foreigner_fit": 3.0},
+            "decision_dimensions": [
+                {"key": "global_access", "score": 4.0},
+                {"key": "foreigner_fit", "score": 3.0},
+            ],
             "scores": {
                 "exit_liquidity": {"score": 4.0},
                 "ownership_clarity": {"score": 2.0},
@@ -286,6 +289,18 @@ class FireRankingTests(unittest.TestCase):
         self.assertEqual(3.23, result["score"])
         self.assertEqual(60000, result["resilience_budget"]["annual_total_usd"])
         self.assertEqual("Daily cycling and year-round park access.", result["strongest_activity_reason"])
+
+    def test_missing_consolidated_dimension_is_unranked_without_a_legacy_fallback(self) -> None:
+        destination = self.destination("alpha", "Alpha")
+        destination["decision_dimensions"] = [
+            {"key": "foreigner_fit", "score": 3.0},
+        ]
+        result = rank_fire_abroad_destinations(
+            [destination], {"alpha": self.cost("alpha")}, self.payload(), normalize_fire_profile({})
+        )[0]
+        self.assertEqual("needs_verification", result["status"])
+        self.assertIsNone(result["score"])
+        self.assertIsNone(result["components"]["global_access"])
 
     def test_missing_tax_or_health_evidence_remains_unranked(self) -> None:
         missing_tax = self.country(tax_score=None)
