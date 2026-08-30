@@ -275,7 +275,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         head = self.html.split("</head>", 1)[0]
         design_css = head.split('<style id="gha-retirement-finder-design">', 1)[1].split("</style>", 1)[0]
         self.assertIn(
-            ".retirement-finder-page .finder-result h3 a { color: var(--gha-ink); white-space: normal; overflow-wrap: anywhere; }",
+            ".retirement-finder-page .finder-result h3 a { color: var(--gha-ink); font-weight: 400; white-space: normal; overflow-wrap: anywhere; }",
             design_css,
         )
 
