@@ -1020,6 +1020,36 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
             label,
         )
 
+    def test_compact_result_money_rounds_estimates_for_fast_scanning(self) -> None:
+        self.assertEqual(
+            "$1.99m",
+            run_ui(
+                "compactResultMoney",
+                {"amountUsd": 1_985_012, "currency": "USD", "ratesToUsd": {"USD": 1}},
+            ),
+        )
+        self.assertEqual(
+            "$322k",
+            run_ui(
+                "compactResultMoney",
+                {"amountUsd": 322_418, "currency": "USD", "ratesToUsd": {"USD": 1}},
+            ),
+        )
+        self.assertEqual(
+            "$999k",
+            run_ui(
+                "compactResultMoney",
+                {"amountUsd": 999_499, "currency": "USD", "ratesToUsd": {"USD": 1}},
+            ),
+        )
+        self.assertEqual(
+            "$1m",
+            run_ui(
+                "compactResultMoney",
+                {"amountUsd": 999_500, "currency": "USD", "ratesToUsd": {"USD": 1}},
+            ),
+        )
+
     def test_capital_landscape_markup_renders_every_row_as_an_accessible_dossier_link(self) -> None:
         markup = run_ui(
             "finderCapitalLandscapeMarkup",
@@ -1059,24 +1089,25 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertIn('class="finder-landscape-row is-match is-on-target"', markup["rowsHtml"])
         self.assertIn('class="finder-landscape-row is-over"', markup["rowsHtml"])
         self.assertIn(
-            '--capital-position:60.00%;--target-position:75.00%;--distance-start:60.00%;--distance-width:15.00%',
+            '--capital-position:60.00%;--target-position:75.00%',
             markup["rowsHtml"],
         )
-        self.assertIn('class="finder-landscape-capital-dot"', markup["rowsHtml"])
-        self.assertIn('class="finder-landscape-distance"', markup["rowsHtml"])
-        self.assertIn('class="finder-landscape-dot"', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-fill"', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-cost-dot"', markup["rowsHtml"])
+        self.assertIn('class="finder-landscape-plan-marker"', markup["rowsHtml"])
+        self.assertIn('<span class="finder-landscape-scale-zero">$0</span>', markup["rowsHtml"])
+        self.assertIn('<span class="finder-landscape-scale-plan">Your plan</span>', markup["rowsHtml"])
+        self.assertIn('<small class="finder-landscape-rank">Strongest match</small>', markup["rowsHtml"])
         self.assertIn(
-            '<span class="finder-landscape-value"><span>$600,000</span></span>',
+            '<span class="finder-landscape-value"><span class="finder-landscape-required">$600k needed</span><small class="finder-landscape-buffer">Matches your plan</small></span>',
             markup["rowsHtml"],
         )
         self.assertIn(
-            '<span class="finder-landscape-value"><span>$750,000</span></span>',
+            '<span class="finder-landscape-value"><span class="finder-landscape-required">$750k needed</span><small class="finder-landscape-buffer">$150k above your plan</small></span>',
             markup["rowsHtml"],
         )
-        self.assertNotIn("finder-landscape-gap", markup["rowsHtml"])
         self.assertIn('aria-label="Fukuoka / Itoshima, Japan.', markup["rowsHtml"])
-        self.assertIn('class="finder-landscape-capital-label"', markup["axisHtml"])
-        self.assertIn("Projected capital", markup["axisHtml"])
+        self.assertIn("Capital needed", markup["axisHtml"])
 
     def test_render_places_projected_capital_next_to_the_cost_distance_chart(self) -> None:
         result = run_ui_dom_scenario(
