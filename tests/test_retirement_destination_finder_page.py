@@ -300,6 +300,31 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("padding: 24px 0 26px", design_css)
         self.assertIn("font-size: clamp(38px, 11vw, 52px)", design_css)
 
+    def test_mobile_wizard_renders_accessible_fixed_navigation(self) -> None:
+        self.assertIn(
+            'id="finder-wizard-progressbar" role="progressbar" aria-label="Retirement plan progress"',
+            self.html,
+        )
+        self.assertIn('id="finder-wizard-back" type="button"', self.html)
+        self.assertIn('id="finder-wizard-next" type="button">Continue</button>', self.html)
+        self.assertIn('id="finder-adjust-plan" type="button" hidden>Adjust plan</button>', self.html)
+
+        design_css = self.html.split('<style id="gha-retirement-finder-design">', 1)[1].split(
+            "</style>", 1
+        )[0]
+        mobile_css = design_css.split("@media (max-width: 760px)", 1)[1].split(
+            "@media (max-width: 620px)", 1
+        )[0]
+        self.assertRegex(
+            mobile_css,
+            r"\.retirement-finder-page \.finder-wizard-actions\s*\{[^}]*display:\s*grid;[^}]*position:\s*fixed;",
+        )
+        self.assertIn("env(safe-area-inset-bottom)", mobile_css)
+        self.assertRegex(
+            mobile_css,
+            r"\.retirement-finder-page \.finder-wizard-actions button\s*\{[^}]*min-height:\s*48px;",
+        )
+
     def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
         self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)
         self.assertIn('<div class="finder-projection-scroll">', self.html)

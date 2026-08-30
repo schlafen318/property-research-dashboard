@@ -80,6 +80,7 @@ class FakeElement {
   focus() {}
   select() { this.selected = true; }
   scrollIntoView() {}
+  requestSubmit() { this.dispatch("submit"); }
 }
 
 const elements = new Map();
@@ -121,6 +122,15 @@ const settingControls = ["City", "CoastOrIsland", "Mountain", "Lake"].map((value
   control.checked = (input.settings || []).includes(value);
   return control;
 });
+const wizardSections = [
+  el("finder-current-resources"),
+  el("finder-housing"),
+  el("finder-retirement-income"),
+  el("finder-preferences"),
+];
+el("finder-results").hidden = true;
+el("finder-wizard-progress").hidden = true;
+el("finder-wizard-actions").hidden = true;
 const projectionGroups = Array.from({ length: input.projectionGroupCount || 0 }, (_, index) => {
   const group = new FakeElement("projection-" + index);
   group.dataset.yearIndex = String(index);
@@ -158,6 +168,7 @@ const document = {
   querySelectorAll(selector) {
     if (selector === "[data-finder-group]") return groups;
     if (selector === '[name="finder-setting"]') return settingControls;
+    if (selector === ".finder-section") return wizardSections;
     return [];
   },
 };
@@ -172,6 +183,12 @@ const fakeWindow = {
     search: input.search || "",
   },
   navigator: input.clipboard ? { clipboard: { writeText(value) { input.copied = value; return Promise.resolve(); } } } : {},
+  matchMedia() {
+    return {
+      matches: Boolean(input.mobile),
+      addEventListener() {},
+    };
+  },
   GHA: { track(name, fields) { trackedEvents.push({ name, fields: fields || {} }); } },
   GHARetirementFinderScenario: scenarioApi,
   GHARetirementDestinationFinder: {
@@ -212,6 +229,15 @@ if (input.editLiquid) {
   el("finder-liquid-capital").dispatch("input");
 }
 if (input.region) el("finder-region").value = input.region;
+if (input.invalidAges) {
+  el("finder-current-age").value = "65";
+  el("finder-retirement-age").value = "60";
+}
+for (const action of input.wizardActions || []) {
+  if (action === "next") el("finder-wizard-next").dispatch("click");
+  if (action === "back") el("finder-wizard-back").dispatch("click");
+  if (action === "adjust") el("finder-adjust-plan").dispatch("click");
+}
 if (input.submit) el("retirement-destination-finder-form").dispatch("submit");
 if (input.clickLandscapeToggle) el("finder-landscape-toggle").dispatch("click");
 if (input.clickShare) el("finder-share").dispatch("click");
@@ -264,12 +290,23 @@ process.stdout.write(JSON.stringify({
   shareUrl: el("finder-share-url").value,
   shareUrlHidden: el("finder-share-url").hidden,
   sharedErrorHidden: el("finder-shared-error").hidden,
+  resultsHidden: el("finder-results").hidden,
   landscapeHidden: el("finder-capital-landscape").hidden,
   matchesHidden: el("finder-matches-section").hidden,
   projectionHidden: el("finder-projection-section").hidden,
   emptyStateHidden: el("finder-empty-state").hidden,
   emptyStateText: el("finder-empty-state").textContent,
   activeFilters: el("finder-active-filters").textContent,
+  formHidden: el("retirement-destination-finder-form").hidden,
+  wizardProgressHidden: el("finder-wizard-progress").hidden,
+  wizardActionsHidden: el("finder-wizard-actions").hidden,
+  wizardStepText: el("finder-wizard-step").textContent,
+  wizardStepNow: el("finder-wizard-progressbar").attributes["aria-valuenow"],
+  wizardBackHidden: el("finder-wizard-back").hidden,
+  wizardNextText: el("finder-wizard-next").textContent,
+  wizardSectionHidden: wizardSections.map((section) => section.hidden),
+  wizardErrorHidden: el("finder-errors").hidden,
+  adjustPlanHidden: el("finder-adjust-plan").hidden,
   trackedEvents,
 }));
 '''
@@ -283,6 +320,96 @@ process.stdout.write(JSON.stringify({
 
 
 class RetirementDestinationFinderUITests(unittest.TestCase):
+    def test_mobile_wizard_shows_one_step_and_advances_with_clear_progress(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "wizardActions": ["next"],
+            }
+        )
+
+        self.assertFalse(scenario["wizardProgressHidden"])
+        self.assertFalse(scenario["wizardActionsHidden"])
+        self.assertEqual([True, False, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual("Step 2 of 4", scenario["wizardStepText"])
+        self.assertEqual("2", scenario["wizardStepNow"])
+        self.assertFalse(scenario["wizardBackHidden"])
+        self.assertEqual("Continue", scenario["wizardNextText"])
+
+    def test_mobile_wizard_back_returns_to_the_previous_step(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "wizardActions": ["next", "back"],
+            }
+        )
+
+        self.assertEqual([False, True, True, True], scenario["wizardSectionHidden"])
+        self.assertEqual("Step 1 of 4", scenario["wizardStepText"])
+        self.assertTrue(scenario["wizardBackHidden"])
+
+    def test_mobile_wizard_blocks_invalid_step_before_advancing(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "invalidAges": True,
+                "wizardActions": ["next"],
+            }
+        )
+
+        self.assertEqual([False, True, True, True], scenario["wizardSectionHidden"])
+        self.assertFalse(scenario["wizardErrorHidden"])
+
+    def test_mobile_wizard_enter_advances_instead_of_bypassing_remaining_steps(self) -> None:
+        scenario = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "submit": True,
+            }
+        )
+
+        self.assertEqual(0, scenario["engineCalls"])
+        self.assertEqual("Step 2 of 4", scenario["wizardStepText"])
+        self.assertEqual([True, False, True, True], scenario["wizardSectionHidden"])
+
+    def test_mobile_wizard_submits_on_final_step_and_adjust_plan_restores_it(self) -> None:
+        complete = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "wizardActions": ["next", "next", "next", "next"],
+            }
+        )
+
+        self.assertEqual(1, complete["engineCalls"])
+        self.assertTrue(complete["formHidden"])
+        self.assertFalse(complete["resultsHidden"])
+        self.assertFalse(complete["adjustPlanHidden"])
+
+        adjusted = run_ui_dom_scenario(
+            {
+                "rates": {"USD": 1},
+                "mobile": True,
+                "wizardActions": ["next", "next", "next", "next", "adjust"],
+            }
+        )
+
+        self.assertFalse(adjusted["formHidden"])
+        self.assertTrue(adjusted["resultsHidden"])
+        self.assertEqual([True, True, True, False], adjusted["wizardSectionHidden"])
+        self.assertEqual("View my matches", adjusted["wizardNextText"])
+
+    def test_desktop_keeps_the_full_form_and_hides_wizard_navigation(self) -> None:
+        scenario = run_ui_dom_scenario({"rates": {"USD": 1}, "mobile": False})
+
+        self.assertEqual([False, False, False, False], scenario["wizardSectionHidden"])
+        self.assertTrue(scenario["wizardProgressHidden"])
+        self.assertTrue(scenario["wizardActionsHidden"])
+
     def test_money_helpers_match_the_retirement_calculator(self) -> None:
         conversion = {
             "amount": 24000,

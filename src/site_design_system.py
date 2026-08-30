@@ -363,6 +363,7 @@ def retirement_finder_design_css() -> str:
     .retirement-finder-page .finder-hero .lede { max-width: 760px; margin: 26px 0 0; color: #46524d; font-family: var(--gha-display-serif); font-size: clamp(20px, 2vw, 24px); line-height: 1.42; }
     .retirement-finder-page main { padding: 52px 0 76px; }
     .retirement-finder-page .finder-form { gap: 0; }
+    .retirement-finder-page .finder-wizard-progress, .retirement-finder-page .finder-wizard-actions, .retirement-finder-page .finder-adjust-plan { display: none; }
     .retirement-finder-page .finder-section { padding: 30px 0 34px; border: 0; border-bottom: 1px solid var(--gha-rule); border-radius: 0; background: transparent; box-shadow: none; }
     .retirement-finder-page .finder-section:first-child { padding-top: 0; }
     .retirement-finder-page .finder-step { display: block; margin-bottom: 10px; color: var(--gha-accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
@@ -485,6 +486,23 @@ def retirement_finder_design_css() -> str:
       .retirement-finder-page .finder-list { grid-template-columns: 1fr; }
     }
     @media (max-width: 760px) {
+      .retirement-finder-page .finder-form { padding-bottom: 84px; }
+      .retirement-finder-page .finder-wizard-progress { display: block; margin: 0 0 18px; }
+      .retirement-finder-page .finder-wizard-progress p { margin: 0 0 8px; color: var(--gha-accent); font-size: 11px; font-weight: 500; letter-spacing: .08em; text-transform: uppercase; }
+      .retirement-finder-page .finder-wizard-progressbar { position: relative; height: 2px; overflow: hidden; background: var(--gha-rule); }
+      .retirement-finder-page .finder-wizard-progressbar::after { position: absolute; inset: 0 auto 0 0; width: 25%; background: var(--gha-accent); content: ""; transition: width .2s ease; }
+      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="2"]::after { width: 50%; }
+      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="3"]::after { width: 75%; }
+      .retirement-finder-page .finder-wizard-progressbar[aria-valuenow="4"]::after { width: 100%; }
+      .retirement-finder-page .finder-section[tabindex="-1"]:focus { outline: 0; }
+      .retirement-finder-page .finder-section .finder-step { display: none; }
+      .retirement-finder-page .finder-wizard-actions { display: grid; position: fixed; z-index: 20; right: 0; bottom: 0; left: 0; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); border-top: 1px solid var(--gha-rule); background: rgba(245, 241, 232, .97); }
+      .retirement-finder-page .finder-wizard-actions button { min-height: 48px; padding: 0 18px; border-radius: 0; font: 500 12px var(--gha-reading-sans); letter-spacing: .045em; text-transform: uppercase; }
+      .retirement-finder-page .finder-wizard-back { border: 1px solid var(--gha-rule); background: transparent; color: var(--gha-ink); }
+      .retirement-finder-page .finder-wizard-next { border: 1px solid var(--gha-ink); background: var(--gha-ink); color: var(--gha-paper); }
+      .retirement-finder-page .finder-wizard-next:disabled { opacity: .45; }
+      .retirement-finder-page .finder-form > .finder-submit { display: none; }
+      .retirement-finder-page .finder-adjust-plan { min-height: 44px; display: inline-flex; align-items: center; justify-content: center; padding: 0; border: 0; background: transparent; color: var(--gha-link); font: 400 14px var(--gha-reading-sans); text-decoration: underline; text-underline-offset: .18em; }
       .retirement-finder-page .finder-comparison-scroll { display: none; }
       .retirement-finder-page .finder-comparison-mobile { display: block; }
       .retirement-finder-page .finder-landscape-head { display: block; }
