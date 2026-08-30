@@ -348,6 +348,45 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             r"\.finder-wizard-editing \.finder-section\s*\{[^}]*overflow-y:\s*auto;",
         )
 
+    def test_short_mobile_viewports_pair_compact_fields_to_avoid_step_scrolling(self) -> None:
+        design_css = self.html.split('<style id="gha-retirement-finder-design">', 1)[1].split(
+            "</style>", 1
+        )[0]
+        self.assertIn(
+            ".finder-wizard-editing #finder-profile .field-grid",
+            design_css,
+        )
+        self.assertIn(
+            ".finder-wizard-editing #finder-current-resources .field-grid",
+            design_css,
+        )
+        self.assertIn("grid-template-columns: repeat(2, minmax(0, 1fr))", design_css)
+        self.assertIn("#finder-current-resources .field:last-child", design_css)
+        self.assertIn("grid-column: 1 / -1", design_css)
+        self.assertIn(
+            ".finder-wizard-editing #finder-preferences .field-grid",
+            design_css,
+        )
+        self.assertIn(
+            ".finder-wizard-editing #finder-review .finder-review-summary",
+            design_css,
+        )
+        self.assertIn(
+            ".finder-wizard-editing #finder-review .section-help { display: none; }",
+            design_css,
+        )
+        self.assertIn(
+            ".finder-section-conditional > [data-finder-group] { margin-top: 0; padding-top: 0; border-top: 0; }",
+            design_css,
+        )
+        self.assertIn("@media (max-width: 620px) and (max-height: 600px)", design_css)
+        self.assertIn("font-size: 14px", design_css)
+
+        form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
+            "</form>", 1
+        )[0]
+        self.assertIn("Rates dated 27 August 2026. Currency changes display values only.", form)
+
     def test_mobile_wizard_has_six_short_steps_and_a_review_screen(self) -> None:
         form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
             "</form>", 1
@@ -357,6 +396,8 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             "finder-profile",
             "finder-current-resources",
             "finder-housing",
+            "finder-financing",
+            "finder-before-retirement",
             "finder-retirement-income",
             "finder-preferences",
             "finder-review",
@@ -365,6 +406,14 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-review-retirement"', form)
         self.assertIn('id="finder-review-capital"', form)
         self.assertIn('id="finder-review-income"', form)
+        self.assertIn(
+            'matchMedia("(max-width: 760px) and (orientation: portrait)")',
+            self.html,
+        )
+        self.assertIn(
+            ".finder-wizard-editing .finder-form > .finder-submit { display: none; }",
+            self.html,
+        )
 
     def test_desktop_keeps_the_original_four_step_labels_and_combined_opening_section(self) -> None:
         form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(

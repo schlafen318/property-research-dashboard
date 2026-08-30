@@ -466,22 +466,33 @@
     let comparisonOpened = false;
     let wizardStepIndex = 0;
     let wizardView = "editing";
-    const wizardSectionIds = [
+    const allWizardSectionIds = [
       "finder-profile",
       "finder-current-resources",
       "finder-housing",
+      "finder-financing",
+      "finder-before-retirement",
       "finder-retirement-income",
       "finder-preferences",
       "finder-review",
     ];
     const wizardMedia = typeof root.matchMedia === "function"
-      ? root.matchMedia("(max-width: 760px)")
+      ? root.matchMedia("(max-width: 760px) and (orientation: portrait)")
       : { matches: false };
 
     function element(id) { return document.getElementById(id); }
     function numeric(id) { return Number(element(id).value); }
     function checked(id) { return element(id).checked; }
     function selected(id) { return element(id).value; }
+    function activeWizardSectionIds() {
+      const sectionIds = ["finder-profile", "finder-current-resources", "finder-housing"];
+      if (selected("finder-housing-plan") === "buy_now") {
+        if (selected("finder-purchase-method") === "mortgage") sectionIds.push("finder-financing");
+        sectionIds.push("finder-before-retirement");
+      }
+      sectionIds.push("finder-retirement-income", "finder-preferences", "finder-review");
+      return sectionIds;
+    }
     function selectedSettings() {
       return Array.from(document.querySelectorAll('[name="finder-setting"]')).filter(function (control) {
         return control.checked;
@@ -571,17 +582,19 @@
 
     function wizardStepErrors(stepIndex) {
       const errors = [];
-      const invalidMoneyIds = stepIndex === 1
+      const sectionIds = activeWizardSectionIds();
+      const stepId = sectionIds[stepIndex];
+      const invalidMoneyIds = stepId === "finder-current-resources"
         ? ["finder-liquid-capital", "finder-monthly-contribution"]
-        : stepIndex === 2 && selected("finder-housing-plan") === "buy_now"
+        : stepId === "finder-housing" && selected("finder-housing-plan") === "buy_now"
           ? ["finder-property-allocation"]
-          : stepIndex === 3
+          : stepId === "finder-retirement-income"
             ? ["finder-pension", "finder-other-income"]
             : [];
       if (invalidMoneyIds.some(function (id) { return validateMoneyControl(element(id)); })) {
         errors.push("Enter a valid amount in the highlighted money field.");
       }
-      if (stepIndex === 0) {
+      if (stepId === "finder-profile") {
         const currentAge = numeric("finder-current-age");
         const retirementAge = numeric("finder-retirement-age");
         const horizonYears = numeric("finder-horizon");
@@ -594,17 +607,17 @@
           errors.push("Enter between 1 and 60 years in retirement.");
         }
       }
-      if (stepIndex === 1) {
+      if (stepId === "finder-current-resources") {
         const expectedReturn = numeric("finder-return");
         if (!Number.isFinite(expectedReturn) || expectedReturn < -5 || expectedReturn > 15) {
           errors.push("Expected return must be between -5% and 15%.");
         }
       }
-      if (stepIndex === 2 && selected("finder-housing-plan") === "buy_now" &&
+      if (stepId === "finder-housing" && selected("finder-housing-plan") === "buy_now" &&
           moneyNumber("finder-property-allocation") <= 0) {
         errors.push("Enter the maximum amount available for a property purchase.");
       }
-      const activeSection = element(wizardSectionIds[stepIndex]);
+      const activeSection = element(stepId);
       let invalidControl = null;
       Array.from(activeSection.querySelectorAll("input, select, textarea")).forEach(function (control) {
         if (control.disabled || typeof control.checkValidity !== "function") return;
@@ -641,12 +654,12 @@
       const housing = selected("finder-housing-plan");
       const housingParts = [housingLabels[housing] || "—"];
       if (housing === "buy_now") {
-        housingParts.push(selectedCurrency + " " + element("finder-property-allocation").value + " budget");
+        housingParts.push(selectedCurrency + " " + element("finder-property-allocation").value);
         const purchaseMethod = selected("finder-purchase-method");
         if (purchaseMethod === "mortgage") {
           housingParts.push(
-            "Mortgage, " + selected("finder-requested-ltv") + "% LTV at " +
-            selected("finder-mortgage-rate") + "% for " + selected("finder-mortgage-term") + " years"
+            "Mortgage: " + selected("finder-requested-ltv") + "% LTV, " +
+            selected("finder-mortgage-rate") + "%, " + selected("finder-mortgage-term") + " years"
           );
           const residencyLabels = {
             non_resident: "Non-resident",
@@ -654,17 +667,7 @@
             eu_national: "EU national",
             non_resident_with_purchase_permit: "Non-resident with purchase permission",
           };
-          const incomeLabels = {
-            overseas: "Overseas income",
-            documented_overseas_income: "Documented overseas income",
-            eu_income: "EU income",
-            japan_income: "Japan income",
-            swiss_income: "Swiss income",
-          };
-          housingParts.push(
-            (residencyLabels[selected("finder-buyer-residency")] || "Buyer status not set") +
-            ", " + (incomeLabels[selected("finder-income-source")] || "Income source not set")
-          );
+          housingParts.push(residencyLabels[selected("finder-buyer-residency")] || "Buyer status not set");
           housingParts.push(selected("finder-mortgage-treatment") === "continue"
             ? "Continue repayments in retirement"
             : "Pay off at retirement");
@@ -672,11 +675,7 @@
           housingParts.push(purchaseMethod === "cash" ? "Cash purchase" : "Financing not decided");
         }
         if (selected("finder-use-before-retirement") === "rental") {
-          housingParts.push(
-            "Rent before retirement: " + selected("finder-rental-yield") + "% yield, " +
-            selected("finder-vacancy-rate") + "% vacancy, " +
-            selected("finder-operating-cost-rate") + "% operating costs"
-          );
+          housingParts.push("Rent before retirement");
         } else {
           housingParts.push("Personal use before retirement");
         }
@@ -715,21 +714,29 @@
       const active = Boolean(wizardMedia.matches);
       const progress = element("finder-wizard-progress");
       const actions = element("finder-wizard-actions");
-      const sections = wizardSectionIds.map(element);
+      const sectionIds = activeWizardSectionIds();
+      const activeId = sectionIds[wizardStepIndex] || sectionIds[sectionIds.length - 1];
+      if (wizardStepIndex >= sectionIds.length) wizardStepIndex = sectionIds.length - 1;
+      const sections = sectionIds.map(element);
       progress.hidden = !active;
       actions.hidden = !active;
-      sections.forEach(function (section, index) {
-        section.hidden = active && index !== wizardStepIndex;
+      allWizardSectionIds.forEach(function (sectionId) {
+        const section = element(sectionId);
+        const conditional = sectionId === "finder-financing" || sectionId === "finder-before-retirement";
+        section.hidden = active ? sectionId !== activeId : conditional && sectionIds.indexOf(sectionId) === -1;
       });
       if (!active) return;
       const stepNumber = wizardStepIndex + 1;
       element("finder-wizard-step").textContent = "Step " + stepNumber + " of " + sections.length;
-      element("finder-wizard-progressbar").setAttribute("aria-valuenow", String(stepNumber));
+      const progressbar = element("finder-wizard-progressbar");
+      progressbar.setAttribute("aria-valuenow", String(stepNumber));
+      progressbar.setAttribute("aria-valuemax", String(sections.length));
+      progressbar.style.setProperty("--finder-progress", String((stepNumber / sections.length) * 100) + "%");
       element("finder-wizard-back").hidden = wizardStepIndex === 0;
       element("finder-wizard-next").textContent = wizardStepIndex === sections.length - 1
         ? "View my matches"
         : "Continue";
-      element("finder-wizard-next").disabled = wizardStepIndex === 2 &&
+      element("finder-wizard-next").disabled = activeId === "finder-housing" &&
         selected("finder-housing-plan") === "own";
       document.body.classList.toggle("finder-wizard-editing", wizardView === "editing");
       if (wizardStepIndex === sections.length - 1) updateReview();
@@ -740,10 +747,11 @@
     }
 
     function advanceWizard() {
+      const sectionIds = activeWizardSectionIds();
       const errors = wizardStepErrors(wizardStepIndex);
       showFormErrors(errors);
       if (errors.length) return;
-      if (wizardStepIndex === wizardSectionIds.length - 1) {
+      if (wizardStepIndex === sectionIds.length - 1) {
         form.requestSubmit();
         return;
       }
@@ -756,7 +764,7 @@
       form.hidden = false;
       results.hidden = true;
       element("finder-adjust-plan").hidden = true;
-      wizardStepIndex = wizardSectionIds.length - 1;
+      wizardStepIndex = activeWizardSectionIds().length - 1;
       updateWizardStep({ focus: true });
     }
 
@@ -1427,7 +1435,7 @@
 
     form.addEventListener("submit", function (event) {
       event.preventDefault();
-      if (wizardMedia.matches && wizardStepIndex < wizardSectionIds.length - 1) {
+      if (wizardMedia.matches && wizardStepIndex < activeWizardSectionIds().length - 1) {
         advanceWizard();
         return;
       }
