@@ -131,11 +131,11 @@ class RetirementCalculatorUITests(unittest.TestCase):
         )
 
         self.assertEqual(
-            {"clearEditSnapshot": True, "restoreSnapshot": False},
+            {"clearEditSnapshot": True, "restoreSnapshot": False, "submitResult": False},
             run_ui("retirementCalculatorViewportResolution", {"recalculated": True}),
         )
         self.assertEqual(
-            {"clearEditSnapshot": True, "restoreSnapshot": True},
+            {"clearEditSnapshot": True, "restoreSnapshot": True, "submitResult": False},
             run_ui("retirementCalculatorViewportResolution", {"recalculated": False}),
         )
 

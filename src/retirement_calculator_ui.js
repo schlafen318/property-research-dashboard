@@ -92,6 +92,7 @@
     return {
       clearEditSnapshot: true,
       restoreSnapshot: !Boolean(input && input.recalculated),
+      submitResult: false,
     };
   }
 
@@ -700,7 +701,7 @@
       if (action.recalculate) {
         const recalculated = calculate(null);
         const resolution = retirementCalculatorViewportResolution({ recalculated: recalculated });
-        if (recalculated) acceptSubmittedResult(latestResult);
+        if (recalculated && !resolution.submitResult) renderPlanChangeComparison(null);
         if (resolution.restoreSnapshot) {
           restoreFormState(editSnapshot);
           if (latestResult) {
