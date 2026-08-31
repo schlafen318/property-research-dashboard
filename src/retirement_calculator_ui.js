@@ -88,6 +88,13 @@
     };
   }
 
+  function retirementCalculatorViewportResolution(input) {
+    return {
+      clearEditSnapshot: true,
+      restoreSnapshot: !Boolean(input && input.recalculated),
+    };
+  }
+
   function parseMoneyInput(value) {
     const normalized = String(value === null || value === undefined ? "" : value)
       .trim()
@@ -586,8 +593,16 @@
         hasEditSnapshot: Boolean(editSnapshot),
       });
       wasMobile = isMobile;
-      if (action.clearEditSnapshot) editSnapshot = null;
-      if (action.recalculate) calculate(null);
+      if (action.recalculate) {
+        const recalculated = calculate(null);
+        const resolution = retirementCalculatorViewportResolution({ recalculated: recalculated });
+        if (resolution.restoreSnapshot) {
+          restoreFormState(editSnapshot);
+          if (latestResult) render(latestResult);
+          el("ret-errors").textContent = "";
+        }
+        if (resolution.clearEditSnapshot) editSnapshot = null;
+      }
       applyCalculatorView();
     }
 
@@ -1017,7 +1032,7 @@
           errors.textContent = "Check the highlighted numeric input and try again.";
           invalid.focus();
         }
-        return;
+        return false;
       }
       try {
         render(engine.calculateRetirement(calculatorInput()));
@@ -1025,9 +1040,11 @@
           track("retirement_calculator_calculate");
           showResults();
         }
+        return true;
       } catch (error) {
         errors.textContent = error instanceof Error ? error.message : "Unable to calculate this scenario.";
         errors.focus();
+        return false;
       }
     }
 
@@ -1145,6 +1162,7 @@
     preferredPlanningCurrency: preferredPlanningCurrency,
     retirementCalculatorViewState: retirementCalculatorViewState,
     retirementCalculatorViewportAction: retirementCalculatorViewportAction,
+    retirementCalculatorViewportResolution: retirementCalculatorViewportResolution,
     parseMoneyInput: parseMoneyInput,
     formatMoneyInputValue: formatMoneyInputValue,
     isInvalidMoneyInput: isInvalidMoneyInput,

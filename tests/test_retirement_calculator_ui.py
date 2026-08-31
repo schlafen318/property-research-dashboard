@@ -130,6 +130,15 @@ class RetirementCalculatorUITests(unittest.TestCase):
             ),
         )
 
+        self.assertEqual(
+            {"clearEditSnapshot": True, "restoreSnapshot": False},
+            run_ui("retirementCalculatorViewportResolution", {"recalculated": True}),
+        )
+        self.assertEqual(
+            {"clearEditSnapshot": True, "restoreSnapshot": True},
+            run_ui("retirementCalculatorViewportResolution", {"recalculated": False}),
+        )
+
     def test_planning_currency_conversion_preserves_the_usd_scenario(self) -> None:
         rates = {"USD": 1, "SGD": 0.7866117265603891, "EUR": 1.1645}
 
