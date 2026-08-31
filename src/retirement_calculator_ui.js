@@ -269,6 +269,105 @@
       " per month to fund this retirement plan.";
   }
 
+  function retirementPlanChanges(input) {
+    const previous = input && input.previous;
+    const current = input && input.current;
+    if (!previous || !current) return { items: [], outcome: "" };
+    const currency = input.currency || "USD";
+    const ratesToUsd = input.ratesToUsd || { USD: 1 };
+    const displayAmount = function (amountUsd) {
+      const converted = convertPlanningAmount({
+        amount: Number(amountUsd),
+        fromCurrency: "USD",
+        toCurrency: currency,
+        ratesToUsd: ratesToUsd,
+      });
+      return Math.round(converted === null ? 0 : converted);
+    };
+    const formatAmount = function (amount) {
+      return new Intl.NumberFormat("en-US", {
+        style: "currency",
+        currency: currency,
+        maximumFractionDigits: 0,
+      }).format(amount);
+    };
+    const items = [];
+    const moneyMetric = function (label, key) {
+      const before = displayAmount(previous[key]);
+      const after = displayAmount(current[key]);
+      if (before === after) return;
+      items.push({
+        label: label,
+        value: formatAmount(after),
+        change: formatAmount(Math.abs(after - before)) + (after < before ? " lower" : " higher"),
+      });
+    };
+    moneyMetric("Needed today", "totalNeededToday");
+    moneyMetric("Monthly contribution", "monthlyContributionToday");
+    const previousYears = Number(previous.yearsToRetirement);
+    const currentYears = Number(current.yearsToRetirement);
+    if (previousYears !== currentYears) {
+      const difference = Math.abs(currentYears - previousYears);
+      items.push({
+        label: "Retirement timing",
+        value: currentYears + (currentYears === 1 ? " year" : " years") + " to retirement",
+        change: difference + (difference === 1 ? " year " : " years ") +
+          (currentYears < previousYears ? "sooner" : "later"),
+      });
+    }
+    moneyMetric("Needed at retirement", "totalCapitalAtRetirement");
+
+    const todayBefore = displayAmount(previous.totalNeededToday);
+    const todayAfter = displayAmount(current.totalNeededToday);
+    const monthlyBefore = displayAmount(previous.monthlyContributionToday);
+    const monthlyAfter = displayAmount(current.monthlyContributionToday);
+    const todayDirection = Math.sign(todayAfter - todayBefore);
+    const monthlyDirection = Math.sign(monthlyAfter - monthlyBefore);
+    let outcome = "";
+    if (todayDirection < 0 && monthlyDirection < 0) {
+      outcome = "Your updated plan needs less today and each month.";
+    } else if (todayDirection > 0 && monthlyDirection > 0) {
+      outcome = "Your updated plan needs more today and each month.";
+    } else if (todayDirection < 0 && monthlyDirection > 0) {
+      outcome = "Your updated plan trades a lower upfront amount for higher monthly investing.";
+    } else if (todayDirection > 0 && monthlyDirection < 0) {
+      outcome = "Your updated plan trades a higher upfront amount for lower monthly investing.";
+    } else if (todayDirection !== 0) {
+      outcome = "Your updated plan " + (todayDirection < 0 ? "reduces" : "increases") +
+        " the amount needed today.";
+    } else if (monthlyDirection !== 0) {
+      outcome = "Your updated plan " + (monthlyDirection < 0 ? "reduces" : "increases") +
+        " the monthly contribution.";
+    } else if (previousYears !== currentYears) {
+      outcome = "Your updated retirement timing changes how long your investments can grow.";
+    } else if (items.length) {
+      outcome = "Your updated assumptions change the capital needed at retirement.";
+    }
+    return { items: items.slice(0, 3), outcome: outcome };
+  }
+
+  function retirementPlanSubmissionState(input) {
+    const previous = input && input.lastSubmitted ? input.lastSubmitted : null;
+    const current = input && input.current ? input.current : null;
+    if (!input || !input.submitted || !current) {
+      return { comparison: null, lastSubmitted: previous };
+    }
+    return {
+      comparison: previous ? { previous: previous, current: current } : null,
+      lastSubmitted: current,
+    };
+  }
+
+  function retirementAutoCalculationAction(input) {
+    const isCurrencyChange = input && input.controlId === "ret-currency";
+    const isPendingMobileEdit = Boolean(input && input.mobile) &&
+      input.requestedMode === "editing" && Boolean(input.hasEditSnapshot);
+    return {
+      schedule: !isCurrencyChange && !isPendingMobileEdit,
+      clearComparison: !Boolean(input && input.mobile) && !isCurrencyChange,
+    };
+  }
+
   function accumulationTooltipContent(input) {
     const point = input.point;
     const projectedAge = Number(input.currentAge) + Number(point.year);
@@ -448,6 +547,8 @@
     let hasTrackedResult = false;
     let hasTrackedCurrentCostComparison = false;
     let latestResult = null;
+    let lastSubmittedResult = null;
+    let lastPlanComparison = null;
     let requestedViewMode = "editing";
     let editSnapshot = null;
     const mobileQuery = typeof root.matchMedia === "function"
@@ -580,7 +681,10 @@
     function returnToResults() {
       root.clearTimeout(autoCalculationTimer);
       restoreFormState(editSnapshot);
-      if (latestResult) render(latestResult);
+      if (latestResult) {
+        render(latestResult);
+        renderPlanChangeComparison(lastPlanComparison);
+      }
       showResults();
     }
 
@@ -596,9 +700,13 @@
       if (action.recalculate) {
         const recalculated = calculate(null);
         const resolution = retirementCalculatorViewportResolution({ recalculated: recalculated });
+        if (recalculated) acceptSubmittedResult(latestResult);
         if (resolution.restoreSnapshot) {
           restoreFormState(editSnapshot);
-          if (latestResult) render(latestResult);
+          if (latestResult) {
+            render(latestResult);
+            renderPlanChangeComparison(lastPlanComparison);
+          }
           el("ret-errors").textContent = "";
         }
         if (resolution.clearEditSnapshot) editSnapshot = null;
@@ -876,6 +984,44 @@
       }
     }
 
+    function renderPlanChangeComparison(comparison) {
+      const section = el("ret-plan-change-summary");
+      const list = el("ret-plan-change-list");
+      lastPlanComparison = comparison || null;
+      list.replaceChildren();
+      const summary = retirementPlanChanges({
+        previous: comparison && comparison.previous,
+        current: comparison && comparison.current,
+        currency: selectedCurrency,
+        ratesToUsd: ratesToUsd,
+      });
+      el("ret-plan-change-outcome").textContent = summary.outcome;
+      summary.items.forEach(function (item) {
+        const group = document.createElement("div");
+        const label = document.createElement("dt");
+        const value = document.createElement("dd");
+        const change = document.createElement("small");
+        label.textContent = item.label;
+        value.textContent = item.value;
+        change.textContent = item.change;
+        value.appendChild(change);
+        group.appendChild(label);
+        group.appendChild(value);
+        list.appendChild(group);
+      });
+      section.hidden = summary.items.length === 0;
+    }
+
+    function acceptSubmittedResult(result) {
+      const state = retirementPlanSubmissionState({
+        lastSubmitted: lastSubmittedResult,
+        current: result,
+        submitted: true,
+      });
+      lastSubmittedResult = state.lastSubmitted;
+      renderPlanChangeComparison(state.comparison);
+    }
+
     function appendComparisonRow(container, label, rateLabel, value, isSelected) {
       const row = document.createElement("tr");
       const name = document.createElement("th");
@@ -1037,6 +1183,7 @@
       try {
         render(engine.calculateRetirement(calculatorInput()));
         if (event) {
+          acceptSubmittedResult(latestResult);
           track("retirement_calculator_calculate");
           showResults();
         }
@@ -1079,14 +1226,26 @@
       });
       selectedCurrency = nextCurrency;
       updateMonthlyInvestmentPreview();
-      if (latestResult) render(latestResult);
+      if (latestResult) {
+        render(latestResult);
+        renderPlanChangeComparison(lastPlanComparison);
+      }
       if (shouldTrack !== false) track("retirement_calculator_currency_change");
     }
 
-    function scheduleCalculation() {
+    function scheduleCalculation(event) {
       updateMonthlyInvestmentPreview();
       root.clearTimeout(autoCalculationTimer);
-      if (mobileQuery.matches && requestedViewMode === "editing" && editSnapshot) return;
+      const action = retirementAutoCalculationAction({
+        controlId: event && event.target ? event.target.id : "",
+        mobile: mobileQuery.matches,
+        requestedMode: requestedViewMode,
+        hasEditSnapshot: Boolean(editSnapshot),
+      });
+      if (action.clearComparison) {
+        renderPlanChangeComparison(null);
+      }
+      if (!action.schedule) return;
       if (el("ret-expected-return").value === "" || firstInvalidField()) return;
       autoCalculationTimer = root.setTimeout(function () { calculate(null); }, 250);
     }
@@ -1180,6 +1339,9 @@
     accumulationChartModel: accumulationChartModel,
     sensitivityRates: sensitivityRates,
     planningSummary: planningSummary,
+    retirementPlanChanges: retirementPlanChanges,
+    retirementPlanSubmissionState: retirementPlanSubmissionState,
+    retirementAutoCalculationAction: retirementAutoCalculationAction,
     accumulationTooltipContent: accumulationTooltipContent,
     isInvalidNumericControl: isInvalidNumericControl,
     isNegativeRate: isNegativeRate,
