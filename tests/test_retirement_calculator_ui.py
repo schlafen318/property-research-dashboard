@@ -131,11 +131,11 @@ class RetirementCalculatorUITests(unittest.TestCase):
         )
 
         self.assertEqual(
-            {"clearEditSnapshot": True, "restoreSnapshot": False},
+            {"clearEditSnapshot": True, "restoreSnapshot": False, "submitResult": False},
             run_ui("retirementCalculatorViewportResolution", {"recalculated": True}),
         )
         self.assertEqual(
-            {"clearEditSnapshot": True, "restoreSnapshot": True},
+            {"clearEditSnapshot": True, "restoreSnapshot": True, "submitResult": False},
             run_ui("retirementCalculatorViewportResolution", {"recalculated": False}),
         )
 
@@ -631,6 +631,136 @@ class RetirementCalculatorUITests(unittest.TestCase):
             ),
         )
 
+    def test_plan_changes_prioritize_the_actions_a_user_can_take(self) -> None:
+        self.assertEqual(
+            {
+                "items": [
+                    {
+                        "label": "Needed today",
+                        "value": "$420,000",
+                        "change": "$80,000 lower",
+                    },
+                    {
+                        "label": "Monthly contribution",
+                        "value": "$1,650",
+                        "change": "$350 lower",
+                    },
+                    {
+                        "label": "Retirement timing",
+                        "value": "10 years to retirement",
+                        "change": "5 years sooner",
+                    },
+                ],
+                "outcome": "Your updated plan needs less today and each month.",
+            },
+            run_ui(
+                "retirementPlanChanges",
+                {
+                    "previous": {
+                        "totalNeededToday": 500_000,
+                        "monthlyContributionToday": 2_000,
+                        "totalCapitalAtRetirement": 1_200_000,
+                        "yearsToRetirement": 15,
+                    },
+                    "current": {
+                        "totalNeededToday": 420_000,
+                        "monthlyContributionToday": 1_650,
+                        "totalCapitalAtRetirement": 1_100_000,
+                        "yearsToRetirement": 10,
+                    },
+                    "currency": "USD",
+                    "ratesToUsd": {"USD": 1},
+                },
+            ),
+        )
+
+    def test_plan_changes_explain_a_tradeoff_without_judging_it(self) -> None:
+        self.assertEqual(
+            "Your updated plan trades a lower upfront amount for higher monthly investing.",
+            run_ui(
+                "retirementPlanChanges",
+                {
+                    "previous": {
+                        "totalNeededToday": 400_000,
+                        "monthlyContributionToday": 1_200,
+                        "totalCapitalAtRetirement": 1_000_000,
+                        "yearsToRetirement": 15,
+                    },
+                    "current": {
+                        "totalNeededToday": 350_000,
+                        "monthlyContributionToday": 1_600,
+                        "totalCapitalAtRetirement": 1_000_000,
+                        "yearsToRetirement": 15,
+                    },
+                },
+            )["outcome"],
+        )
+
+    def test_plan_changes_stay_hidden_when_the_displayed_values_do_not_change(self) -> None:
+        result = {
+            "totalNeededToday": 400_000,
+            "monthlyContributionToday": 1_200,
+            "totalCapitalAtRetirement": 1_000_000,
+            "yearsToRetirement": 15,
+        }
+        self.assertEqual(
+            {"items": [], "outcome": ""},
+            run_ui("retirementPlanChanges", {"previous": result, "current": result}),
+        )
+
+    def test_only_submitted_recalculations_create_a_plan_comparison(self) -> None:
+        first = {"totalNeededToday": 500_000, "monthlyContributionToday": 2_000}
+        updated = {"totalNeededToday": 420_000, "monthlyContributionToday": 1_650}
+        self.assertEqual(
+            {"comparison": None, "lastSubmitted": first},
+            run_ui(
+                "retirementPlanSubmissionState",
+                {"lastSubmitted": None, "current": first, "submitted": True},
+            ),
+        )
+        self.assertEqual(
+            {"comparison": None, "lastSubmitted": first},
+            run_ui(
+                "retirementPlanSubmissionState",
+                {"lastSubmitted": first, "current": updated, "submitted": False},
+            ),
+        )
+        self.assertEqual(
+            {
+                "comparison": {"previous": first, "current": updated},
+                "lastSubmitted": updated,
+            },
+            run_ui(
+                "retirementPlanSubmissionState",
+                {"lastSubmitted": first, "current": updated, "submitted": True},
+            ),
+        )
+
+    def test_currency_display_changes_do_not_recalculate_or_clear_the_comparison(self) -> None:
+        self.assertEqual(
+            {"schedule": False, "clearComparison": False},
+            run_ui(
+                "retirementAutoCalculationAction",
+                {
+                    "controlId": "ret-currency",
+                    "mobile": False,
+                    "requestedMode": "results",
+                    "hasEditSnapshot": False,
+                },
+            ),
+        )
+        self.assertEqual(
+            {"schedule": True, "clearComparison": True},
+            run_ui(
+                "retirementAutoCalculationAction",
+                {
+                    "controlId": "ret-monthly-income",
+                    "mobile": False,
+                    "requestedMode": "results",
+                    "hasEditSnapshot": False,
+                },
+            ),
+        )
     def test_chart_tooltip_reports_age_and_each_source_for_the_selected_year(self) -> None:
         self.assertEqual(
             {

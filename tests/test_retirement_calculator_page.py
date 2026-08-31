@@ -368,6 +368,20 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             r"#retirement-calculator\s*\{\s*display:none;\s*\}",
         )
 
+    def test_updated_results_have_a_concise_change_summary(self) -> None:
+        results = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
+        self.assertIn(
+            'id="ret-plan-change-summary" hidden aria-labelledby="ret-plan-change-heading"',
+            results,
+        )
+        self.assertIn('<h3 id="ret-plan-change-heading">What changed</h3>', results)
+        self.assertIn('id="ret-plan-change-outcome"', results)
+        self.assertIn('id="ret-plan-change-list"', results)
+        mobile_styles = self.html.split("@media(max-width:780px)", 1)[1].split(
+            "@media(max-width:520px)", 1
+        )[0]
+        self.assertIn(".key-figures { grid-template-columns:1fr; }", mobile_styles)
+
     def test_current_cost_comparison_follows_the_detailed_projection(self) -> None:
         detailed = self.html.index('id="ret-detailed-projection"')
         comparison = self.html.index('id="ret-current-cost-comparison"')
