@@ -52,6 +52,7 @@
   function retirementCalculatorViewState(input) {
     const mobile = Boolean(input && input.mobile);
     const hasResult = Boolean(input && input.hasResult);
+    const hasEditSnapshot = Boolean(input && input.hasEditSnapshot);
     const requestedMode = input && input.requestedMode === "results" ? "results" : "editing";
     if (!mobile) {
       return {
@@ -73,7 +74,17 @@
       mode: "editing",
       formHidden: false,
       resultsHidden: true,
-      backHidden: !hasResult,
+      backHidden: !hasEditSnapshot,
+    };
+  }
+
+  function retirementCalculatorViewportAction(input) {
+    const leavingMobile = Boolean(input && input.wasMobile) && !Boolean(input && input.isMobile);
+    const hasPendingMobileEdit = input && input.requestedMode === "editing" && Boolean(input.hasEditSnapshot);
+    const recalculate = Boolean(leavingMobile && hasPendingMobileEdit);
+    return {
+      recalculate: recalculate,
+      clearEditSnapshot: recalculate,
     };
   }
 
@@ -435,6 +446,7 @@
     const mobileQuery = typeof root.matchMedia === "function"
       ? root.matchMedia("(max-width: 780px)")
       : { matches: false };
+    let wasMobile = mobileQuery.matches;
 
     const prefill = retirementPrefill(root.location && root.location.search);
     [
@@ -530,6 +542,7 @@
         mobile: mobileQuery.matches,
         hasResult: Boolean(latestResult),
         requestedMode: requestedViewMode,
+        hasEditSnapshot: Boolean(editSnapshot),
       });
       form.hidden = state.formHidden;
       el("ret-results").hidden = state.resultsHidden;
@@ -562,6 +575,20 @@
       restoreFormState(editSnapshot);
       if (latestResult) render(latestResult);
       showResults();
+    }
+
+    function handleViewportChange() {
+      const isMobile = mobileQuery.matches;
+      const action = retirementCalculatorViewportAction({
+        wasMobile: wasMobile,
+        isMobile: isMobile,
+        requestedMode: requestedViewMode,
+        hasEditSnapshot: Boolean(editSnapshot),
+      });
+      wasMobile = isMobile;
+      if (action.clearEditSnapshot) editSnapshot = null;
+      if (action.recalculate) calculate(null);
+      applyCalculatorView();
     }
 
     function renderDestinationCosts() {
@@ -1083,7 +1110,7 @@
     el("ret-adjust-plan").addEventListener("click", editPlan);
     el("ret-back-results").addEventListener("click", returnToResults);
     if (typeof mobileQuery.addEventListener === "function") {
-      mobileQuery.addEventListener("change", applyCalculatorView);
+      mobileQuery.addEventListener("change", handleViewportChange);
     }
     ["ret-current-location", "ret-current-monthly-spending"].forEach(function (id) {
       el(id).addEventListener("input", function () { renderCurrentCostComparison(); });
@@ -1117,6 +1144,7 @@
     planningControlConversionStep: planningControlConversionStep,
     preferredPlanningCurrency: preferredPlanningCurrency,
     retirementCalculatorViewState: retirementCalculatorViewState,
+    retirementCalculatorViewportAction: retirementCalculatorViewportAction,
     parseMoneyInput: parseMoneyInput,
     formatMoneyInputValue: formatMoneyInputValue,
     isInvalidMoneyInput: isInvalidMoneyInput,

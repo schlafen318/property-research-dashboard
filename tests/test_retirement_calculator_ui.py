@@ -63,7 +63,30 @@ class RetirementCalculatorUITests(unittest.TestCase):
             },
             run_ui(
                 "retirementCalculatorViewState",
-                {"mobile": True, "hasResult": True, "requestedMode": "editing"},
+                {
+                    "mobile": True,
+                    "hasResult": True,
+                    "requestedMode": "editing",
+                    "hasEditSnapshot": True,
+                },
+            ),
+        )
+
+        self.assertEqual(
+            {
+                "mode": "editing",
+                "formHidden": False,
+                "resultsHidden": True,
+                "backHidden": True,
+            },
+            run_ui(
+                "retirementCalculatorViewState",
+                {
+                    "mobile": True,
+                    "hasResult": True,
+                    "requestedMode": "editing",
+                    "hasEditSnapshot": False,
+                },
             ),
         )
 
@@ -78,6 +101,32 @@ class RetirementCalculatorUITests(unittest.TestCase):
             run_ui(
                 "retirementCalculatorViewState",
                 {"mobile": False, "hasResult": True, "requestedMode": "editing"},
+            ),
+        )
+
+    def test_leaving_mobile_edit_mode_recalculates_before_showing_split_view(self) -> None:
+        self.assertEqual(
+            {"recalculate": True, "clearEditSnapshot": True},
+            run_ui(
+                "retirementCalculatorViewportAction",
+                {
+                    "wasMobile": True,
+                    "isMobile": False,
+                    "requestedMode": "editing",
+                    "hasEditSnapshot": True,
+                },
+            ),
+        )
+        self.assertEqual(
+            {"recalculate": False, "clearEditSnapshot": False},
+            run_ui(
+                "retirementCalculatorViewportAction",
+                {
+                    "wasMobile": False,
+                    "isMobile": True,
+                    "requestedMode": "results",
+                    "hasEditSnapshot": False,
+                },
             ),
         )
 
