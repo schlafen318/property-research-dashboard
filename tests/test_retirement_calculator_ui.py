@@ -29,6 +29,58 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_mobile_calculator_opens_results_after_calculation_and_can_return_to_editing(self) -> None:
+        self.assertEqual(
+            {
+                "mode": "editing",
+                "formHidden": False,
+                "resultsHidden": True,
+                "backHidden": True,
+            },
+            run_ui(
+                "retirementCalculatorViewState",
+                {"mobile": True, "hasResult": False, "requestedMode": "editing"},
+            ),
+        )
+        self.assertEqual(
+            {
+                "mode": "results",
+                "formHidden": True,
+                "resultsHidden": False,
+                "backHidden": True,
+            },
+            run_ui(
+                "retirementCalculatorViewState",
+                {"mobile": True, "hasResult": True, "requestedMode": "results"},
+            ),
+        )
+        self.assertEqual(
+            {
+                "mode": "editing",
+                "formHidden": False,
+                "resultsHidden": True,
+                "backHidden": False,
+            },
+            run_ui(
+                "retirementCalculatorViewState",
+                {"mobile": True, "hasResult": True, "requestedMode": "editing"},
+            ),
+        )
+
+    def test_desktop_calculator_keeps_form_and_results_side_by_side(self) -> None:
+        self.assertEqual(
+            {
+                "mode": "split",
+                "formHidden": False,
+                "resultsHidden": False,
+                "backHidden": True,
+            },
+            run_ui(
+                "retirementCalculatorViewState",
+                {"mobile": False, "hasResult": True, "requestedMode": "editing"},
+            ),
+        )
+
     def test_planning_currency_conversion_preserves_the_usd_scenario(self) -> None:
         rates = {"USD": 1, "SGD": 0.7866117265603891, "EUR": 1.1645}
 

@@ -345,6 +345,29 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         ):
             self.assertIn(f'id="{detail_id}"', detailed)
 
+    def test_results_offer_an_accessible_adjustment_loop_without_resetting_the_form(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        results = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
+
+        self.assertIn(
+            '<form class="calc-panel" id="retirement-calculator" tabindex="-1" novalidate>',
+            self.html,
+        )
+        self.assertIn(
+            'id="ret-back-results" type="button" hidden>Back to results</button>',
+            form,
+        )
+        self.assertIn(
+            'id="ret-adjust-plan" type="button" hidden>Adjust plan</button>',
+            results,
+        )
+        self.assertIn('id="ret-results" tabindex="-1"', self.html)
+        self.assertRegex(
+            self.html,
+            r"@media\(max-width:780px\)\s*\{[^}]*\.calculator-page\.ret-mobile-results "
+            r"#retirement-calculator\s*\{\s*display:none;\s*\}",
+        )
+
     def test_current_cost_comparison_follows_the_detailed_projection(self) -> None:
         detailed = self.html.index('id="ret-detailed-projection"')
         comparison = self.html.index('id="ret-current-cost-comparison"')

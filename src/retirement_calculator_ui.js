@@ -49,6 +49,34 @@
     return "USD";
   }
 
+  function retirementCalculatorViewState(input) {
+    const mobile = Boolean(input && input.mobile);
+    const hasResult = Boolean(input && input.hasResult);
+    const requestedMode = input && input.requestedMode === "results" ? "results" : "editing";
+    if (!mobile) {
+      return {
+        mode: "split",
+        formHidden: false,
+        resultsHidden: false,
+        backHidden: true,
+      };
+    }
+    if (hasResult && requestedMode === "results") {
+      return {
+        mode: "results",
+        formHidden: true,
+        resultsHidden: false,
+        backHidden: true,
+      };
+    }
+    return {
+      mode: "editing",
+      formHidden: false,
+      resultsHidden: true,
+      backHidden: !hasResult,
+    };
+  }
+
   function parseMoneyInput(value) {
     const normalized = String(value === null || value === undefined ? "" : value)
       .trim()
@@ -402,6 +430,11 @@
     let hasTrackedResult = false;
     let hasTrackedCurrentCostComparison = false;
     let latestResult = null;
+    let requestedViewMode = "editing";
+    let editSnapshot = null;
+    const mobileQuery = typeof root.matchMedia === "function"
+      ? root.matchMedia("(max-width: 780px)")
+      : { matches: false };
 
     const prefill = retirementPrefill(root.location && root.location.search);
     [
@@ -422,15 +455,17 @@
       return byId[el("ret-destination").value];
     }
 
-    function syncDestinationDefaults(resetPropertyBudget) {
+    function syncDestinationDefaults(resetPropertyBudget, preserveValues) {
       const record = selectedRecord();
       if (!record) return;
       const profile = record.profiles[el("ret-household").value];
       const plan = el("ret-housing-plan").value;
       const expenseLabels = housingExpenseLabels(plan);
       benchmarkValue = annualBenchmark({ profile: profile, plan: plan });
-      monthlySpendingIsAutomatic = true;
-      el("ret-monthly-spending").value = formatMoneyInputValue(roundToNearestHundred(fromUsd(benchmarkValue / 12)));
+      if (!preserveValues) {
+        monthlySpendingIsAutomatic = true;
+        el("ret-monthly-spending").value = formatMoneyInputValue(roundToNearestHundred(fromUsd(benchmarkValue / 12)));
+      }
       el("ret-monthly-spending-label").textContent = expenseLabels.input;
       el("ret-first-expenses-label").textContent = expenseLabels.result;
       el("ret-housing-guidance").textContent = housingGuidance(plan);
@@ -448,9 +483,85 @@
           Math.round(fromUsd(Number(record.property.representative_price_usd)))
         );
       }
-      el("ret-general-inflation").value = String(record.inflation.general * 100);
-      el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
-      el("ret-property-inflation").value = String(record.inflation.property * 100);
+      if (!preserveValues) {
+        el("ret-general-inflation").value = String(record.inflation.general * 100);
+        el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
+        el("ret-property-inflation").value = String(record.inflation.property * 100);
+      }
+    }
+
+    function captureFormState() {
+      return {
+        monthlySpendingIsAutomatic: monthlySpendingIsAutomatic,
+        controls: Array.from(form.elements).filter(function (control) {
+          return control.id && !["button", "submit"].includes(control.type);
+        }).map(function (control) {
+          return {
+            id: control.id,
+            value: control.value,
+            checked: Boolean(control.checked),
+          };
+        }),
+      };
+    }
+
+    function restoreFormState(snapshot) {
+      if (!snapshot) return;
+      snapshot.controls.forEach(function (saved) {
+        const control = el(saved.id);
+        if (!control) return;
+        control.value = saved.value;
+        if (control.type === "checkbox" || control.type === "radio") control.checked = saved.checked;
+      });
+      monthlySpendingIsAutomatic = snapshot.monthlySpendingIsAutomatic;
+      selectedCurrency = el("ret-currency").value;
+      syncDestinationDefaults(false, true);
+      updateMonthlyInvestmentPreview();
+    }
+
+    function focusSection(section) {
+      if (!section) return;
+      section.scrollIntoView({ behavior: "smooth", block: "start" });
+      section.focus({ preventScroll: true });
+    }
+
+    function applyCalculatorView() {
+      const state = retirementCalculatorViewState({
+        mobile: mobileQuery.matches,
+        hasResult: Boolean(latestResult),
+        requestedMode: requestedViewMode,
+      });
+      form.hidden = state.formHidden;
+      el("ret-results").hidden = state.resultsHidden;
+      el("ret-back-results").hidden = state.backHidden;
+      el("ret-adjust-plan").hidden = !latestResult;
+      document.body.classList.toggle("ret-mobile-results", state.mode === "results");
+      document.body.classList.toggle("ret-mobile-editing", state.mode === "editing" && mobileQuery.matches);
+      return state;
+    }
+
+    function showResults() {
+      requestedViewMode = "results";
+      editSnapshot = null;
+      const state = applyCalculatorView();
+      if (state.mode === "results") focusSection(el("ret-results"));
+    }
+
+    function editPlan() {
+      if (mobileQuery.matches) {
+        editSnapshot = captureFormState();
+        requestedViewMode = "editing";
+        applyCalculatorView();
+      }
+      focusSection(form);
+      track("retirement_calculator_adjust_plan");
+    }
+
+    function returnToResults() {
+      root.clearTimeout(autoCalculationTimer);
+      restoreFormState(editSnapshot);
+      if (latestResult) render(latestResult);
+      showResults();
     }
 
     function renderDestinationCosts() {
@@ -716,6 +827,7 @@
         "uses the same expected return every year. Actual return order and market losses can materially change the outcome. " +
         "Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.";
       el("ret-save-action").hidden = false;
+      applyCalculatorView();
       if (!hasTrackedResult) {
         track("retirement_calculator_result_view");
         hasTrackedResult = true;
@@ -882,7 +994,10 @@
       }
       try {
         render(engine.calculateRetirement(calculatorInput()));
-        if (event) track("retirement_calculator_calculate");
+        if (event) {
+          track("retirement_calculator_calculate");
+          showResults();
+        }
       } catch (error) {
         errors.textContent = error instanceof Error ? error.message : "Unable to calculate this scenario.";
         errors.focus();
@@ -927,6 +1042,7 @@
     function scheduleCalculation() {
       updateMonthlyInvestmentPreview();
       root.clearTimeout(autoCalculationTimer);
+      if (mobileQuery.matches && requestedViewMode === "editing" && editSnapshot) return;
       if (el("ret-expected-return").value === "" || firstInvalidField()) return;
       autoCalculationTimer = root.setTimeout(function () { calculate(null); }, 250);
     }
@@ -964,6 +1080,11 @@
       el("ret-save-intent-button").hidden = true;
       el("ret-save-intent-status").hidden = false;
     });
+    el("ret-adjust-plan").addEventListener("click", editPlan);
+    el("ret-back-results").addEventListener("click", returnToResults);
+    if (typeof mobileQuery.addEventListener === "function") {
+      mobileQuery.addEventListener("change", applyCalculatorView);
+    }
     ["ret-current-location", "ret-current-monthly-spending"].forEach(function (id) {
       el(id).addEventListener("input", function () { renderCurrentCostComparison(); });
     });
@@ -974,6 +1095,7 @@
     }
     updateMonthlyInvestmentPreview();
     initDestinationCostSidecar();
+    applyCalculatorView();
     track("retirement_calculator_open");
   }
 
@@ -994,6 +1116,7 @@
     convertPlanningControlAmount: convertPlanningControlAmount,
     planningControlConversionStep: planningControlConversionStep,
     preferredPlanningCurrency: preferredPlanningCurrency,
+    retirementCalculatorViewState: retirementCalculatorViewState,
     parseMoneyInput: parseMoneyInput,
     formatMoneyInputValue: formatMoneyInputValue,
     isInvalidMoneyInput: isInvalidMoneyInput,
