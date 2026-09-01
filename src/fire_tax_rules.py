@@ -909,6 +909,40 @@ def _validate_rule_type_fields(
             errors.append(f"{path}.resident_when must be a boolean")
     elif rule_type == "rate_band":
         _validate_rate_bands(rule.get("bands"), f"{path}.bands", errors)
+        if rule.get("category") == "retirement_account_withdrawal":
+            classification_operand_id = rule.get("account_classification_operand")
+            classification_operand = (
+                operand_catalog.get(classification_operand_id)
+                if isinstance(classification_operand_id, str)
+                else None
+            )
+            if (
+                classification_operand is None
+                or classification_operand.get("kind") != "profile"
+                or classification_operand.get("value_type") != "string"
+                or not isinstance(classification_operand.get("allowed_values"), list)
+            ):
+                errors.append(
+                    f"{path}.account_classification_operand must reference a profile string operand with allowed values"
+                )
+            supported = rule.get("supported_account_classifications")
+            if (
+                not isinstance(supported, list)
+                or not supported
+                or not all(isinstance(value, str) and value for value in supported)
+                or len(set(supported)) != len(supported)
+            ):
+                errors.append(
+                    f"{path}.supported_account_classifications must contain distinct classifications"
+                )
+            elif classification_operand is not None and isinstance(
+                classification_operand.get("allowed_values"), list
+            ) and not set(supported).issubset(
+                set(classification_operand["allowed_values"])
+            ):
+                errors.append(
+                    f"{path}.supported_account_classifications must be allowed by the classification operand"
+                )
     elif rule_type == "allowance":
         if not _is_number(rule.get("amount")) or rule["amount"] < 0:
             errors.append(f"{path}.amount must be a non-negative finite number")
@@ -940,8 +974,34 @@ def _validate_rule_type_fields(
         categories = rule.get("applies_to_categories")
         if not isinstance(categories, list) or not categories or not all(
             isinstance(category, str) and category for category in categories
-        ):
+        ) or len(set(categories)) != len(categories):
             errors.append(f"{path}.applies_to_categories must contain income categories")
+        if rule.get("credit_basis") != "source_withholding":
+            errors.append(f"{path}.credit_basis must be source_withholding")
+        order = rule.get("order")
+        if not isinstance(order, int) or isinstance(order, bool) or order <= 0:
+            errors.append(f"{path}.order must be a positive integer")
+        formula_operands = (
+            rule.get("formula", {}).get("operands")
+            if isinstance(rule.get("formula"), dict)
+            else []
+        )
+        for field in ("credit_operand", "limit_operand"):
+            operand_id = rule.get(field)
+            operand = (
+                operand_catalog.get(operand_id)
+                if isinstance(operand_id, str)
+                else None
+            )
+            if (
+                operand is None
+                or operand.get("value_type") != "money"
+                or operand.get("currency") != rule.get("currency")
+                or operand_id not in formula_operands
+            ):
+                errors.append(
+                    f"{path}.{field} must reference a formula money operand in the rule currency"
+                )
     elif rule_type == "property_charge":
         lifecycle_stage = rule.get("lifecycle_stage")
         if not isinstance(lifecycle_stage, str) or lifecycle_stage not in PROPERTY_LIFECYCLE_STAGES:
@@ -1496,6 +1556,12 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
             errors.append(f"{jurisdiction_path}.synthetic must be a boolean")
         if not isinstance(jurisdiction.get("detailed_enabled"), bool):
             errors.append(f"{jurisdiction_path}.detailed_enabled must be a boolean")
+        if "calculation_side" in jurisdiction and jurisdiction.get(
+            "calculation_side"
+        ) not in {"destination", "home"}:
+            errors.append(
+                f"{jurisdiction_path}.calculation_side must be destination or home"
+            )
 
         rules = jurisdiction.get("rules")
         if not isinstance(rules, list) or not rules:

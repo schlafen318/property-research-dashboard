@@ -964,6 +964,95 @@ class FireTaxRuleContractTests(unittest.TestCase):
                     f"jurisdictions.synthetic-example.rules[{rule_index}]{expected_suffix}",
                 )
 
+    def test_credit_limit_requires_executable_ordered_category_semantics(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"].update(
+            {
+                "foreign_tax_paid": {
+                    "kind": "profile",
+                    "profile_key": "foreignTaxPaid",
+                    "value_type": "money",
+                    "currency": "EUR",
+                },
+                "domestic_tax_limit": {
+                    "kind": "profile",
+                    "profile_key": "domesticTaxLimit",
+                    "value_type": "money",
+                    "currency": "EUR",
+                },
+            }
+        )
+        rule = payload["jurisdictions"]["synthetic-example"]["rules"][2]
+        rule.pop("bands")
+        rule.update(
+            {
+                "type": "credit_limit",
+                "category": "foreign_tax_credit",
+                "formula": {
+                    "operation": "minimum",
+                    "operands": ["foreign_tax_paid", "domestic_tax_limit"],
+                },
+                "credit_operand": "foreign_tax_paid",
+                "limit_operand": "domestic_tax_limit",
+                "credit_basis": "source_withholding",
+                "order": 1,
+                "applies_to_categories": ["dividends"],
+            }
+        )
+        self.assertEqual([], self.validate(payload))
+
+        for field, invalid in (
+            ("credit_basis", "worldwide_income"),
+            ("order", 0),
+            ("applies_to_categories", []),
+            ("credit_operand", "ordinary_income"),
+        ):
+            with self.subTest(field=field):
+                mutation = copy.deepcopy(payload)
+                mutation["jurisdictions"]["synthetic-example"]["rules"][2][field] = invalid
+                errors = self.validate(mutation)
+                self.assert_path_error(
+                    errors,
+                    f"jurisdictions.synthetic-example.rules[2].{field}",
+                )
+
+    def test_retirement_withdrawal_rule_requires_validated_classification_allowlist(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"]["retirement_classification"] = {
+            "kind": "profile",
+            "profile_key": "retirementAccountClassification",
+            "value_type": "string",
+            "allowed_values": ["traditional", "unsupported"],
+        }
+        rule = payload["jurisdictions"]["synthetic-example"]["rules"][2]
+        rule.update(
+            {
+                "category": "retirement_account_withdrawal",
+                "account_classification_operand": "retirement_classification",
+                "supported_account_classifications": ["traditional"],
+            }
+        )
+        self.assertEqual([], self.validate(payload))
+
+        rule["supported_account_classifications"] = ["not-declared"]
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.rules[2].supported_account_classifications",
+        )
+
+    def test_optional_income_calculation_side_is_validated_when_declared(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        jurisdiction["calculation_side"] = "destination"
+        self.assertEqual([], self.validate(payload))
+
+        jurisdiction["calculation_side"] = "elsewhere"
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.calculation_side"
+        )
+
     def test_progressive_bands_cannot_overlap(self):
         payload = copy.deepcopy(self.payload)
         bands = payload["jurisdictions"]["synthetic-example"]["rules"][2]["bands"]
