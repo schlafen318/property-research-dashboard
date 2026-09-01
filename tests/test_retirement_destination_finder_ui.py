@@ -185,7 +185,10 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
                     "household": "couple",
                     "housingPlan": "buy_now",
                     "taxMode": "destination_estimate",
-                    "taxProfile": {"wealthBand": "above_threshold"},
+                    "taxProfile": {
+                        "stayMode": "full_relocation",
+                        "wealthBand": "above_threshold",
+                    },
                 },
             },
         )

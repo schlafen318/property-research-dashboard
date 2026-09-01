@@ -158,6 +158,8 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertNotIn("each result also shows", tax_section)
         self.assertIn('href="/retirement-abroad-calculator/"', tax_section)
         self.assertNotIn("do not yet change", tax_section)
+        self.assertIn("Initial screen assumes a full-year relocation", tax_section)
+        self.assertIn("refine this later", tax_section)
 
     def test_finder_tax_control_visibility_disables_inapplicable_fields(self) -> None:
         renting = run_ui(

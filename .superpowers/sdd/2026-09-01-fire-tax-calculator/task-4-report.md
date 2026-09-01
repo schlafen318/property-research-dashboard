@@ -321,3 +321,123 @@ artifacts/destinations/chamonix/index.html -> /assets/chamonix-building-governan
 - `user_after_tax` bypasses destination-evidence freshness in both engines and rankers, retaining its single zero-added-tax assumption.
 - No calculator/finder privacy, equity, owner-cost, or handoff code changed in this round.
 - Generated artifacts and unrelated dirty changes remain excluded. The only open repository-level concern remains the pre-existing Spain/Chamonix static-verifier failures above.
+
+## Final calculator whole-plan fix wave
+
+### Outcome
+
+The normal retirement calculator now serializes a deterministic ISO build-date freshness anchor separately from the tax evidence review date. The scenario engine uses the build date only for freshness and preserves the evidence year in every amount audit. Evidence reviewed on 2026-09-01 remains usable on day 366 (2027-09-02) and becomes unavailable on day 367 (2027-09-03).
+
+The finder and calculator now share an explicit full-year relocation assumption for the initial screen. Both pages state that assumption in concise form and tell users they can refine seasonal or part-year plans later; no additional required field was added and the calculator handoff remains limited to destination, household, and housing.
+
+Tax totals now derive inclusions and source IDs only from active included categories. Excluded owner property tax and non-applicable property/wealth allowances carry no source IDs into the total; their excluded or not-applicable state is visible in the rendered audit. Each displayed favorable, central, and adverse tax reserve, total annual requirement, and capital requirement has its own formula, assumptions, inclusions, exclusions, evidence tax year, confidence, and active sources. The `user_after_tax` contract contains exactly one zero-added-tax case and complete zero/excluded amount explanations with user-supplied confidence and no sources.
+
+### Strict TDD evidence
+
+Freshness separation was RED first:
+
+```text
+$ python3 -m unittest tests.test_build_unified_app_auto_links.AutoInternalLinkTests.test_calculator_serializes_deterministic_freshness_separately_from_evidence_review tests.test_fire_tax_scenarios.FireTaxScenarioTests.test_freshness_crosses_after_day_366_while_tax_year_remains_evidence_year -v
+Ran 2 tests in 0.169s
+FAILED (failures=1, errors=1)
+```
+
+The builder did not accept `tax_as_of`, and the boundary audit incorrectly reported the freshness year (2027) instead of the evidence year (2026). The browser input boundary also failed first because no `taxEvidenceContext` function existed (`Ran 1 test in 0.073s`, `FAILED`). All three passed after separating `asOf` and `taxYear`.
+
+Shared stay behavior and visible copy were RED first:
+
+```text
+$ python3 -m unittest tests.test_retirement_destination_finder.RetirementDestinationFinderTests.test_spain_finder_and_calculator_share_explicit_full_relocation_assumption tests.test_retirement_destination_finder_page.RetirementDestinationFinderPageTests.test_finder_tax_profile_explains_live_tax_adjusted_ranking tests.test_retirement_calculator_page.RetirementCalculatorPageTests.test_initial_tax_screen_states_the_shared_full_relocation_assumption -v
+Ran 3 tests in 1.122s
+FAILED (failures=3)
+```
+
+The same Spain profile produced an 8,000 finder reserve and a 22,000 direct calculator reserve because the finder silently defaulted to part-year. The explicit full-relocation default and matching page copy made the group pass (`Ran 3 tests in 1.017s`, `OK`).
+
+Active-category and after-tax audit contracts were RED first:
+
+```text
+$ python3 -m unittest tests.test_fire_tax_scenarios.FireTaxScenarioTests.test_total_audit_uses_only_active_categories_and_sources tests.test_fire_tax_scenarios.FireTaxScenarioTests.test_user_after_tax_has_one_zero_case_with_complete_excluded_audits -v
+Ran 2 tests in 0.166s
+FAILED (failures=1, errors=1)
+```
+
+The old total hardcoded inactive property/wealth categories and their sources, component status metadata was absent, and after-tax produced three cases. Both tests passed after deriving totals from active entries and normalizing the single after-tax case (`Ran 2 tests in 0.148s`, `OK`).
+
+Per-amount audit rendering was RED first:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_ui.RetirementCalculatorUITests.test_each_displayed_scenario_amount_has_complete_audit_metadata tests.test_retirement_calculator_ui.RetirementCalculatorUITests.test_tax_audit_entries_cover_every_displayed_table_amount -v
+Ran 2 tests in 0.321s
+FAILED (errors=2)
+```
+
+Scenario results had no composed amount audits and the UI had no audit-entry rendering boundary. After implementation, all nine displayed scenario amounts had audit entries and the group passed (`Ran 2 tests in 0.336s`, `OK`).
+
+### GREEN, build, and full-suite verification
+
+The final focused suite, including calculator/finder engines, browser helpers, scenario contract, and page copy, passed:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_engine tests.test_retirement_calculator_ui tests.test_retirement_destination_finder tests.test_retirement_destination_finder_ui tests.test_fire_tax_scenarios tests.test_retirement_calculator_page tests.test_retirement_destination_finder_page -q
+Ran 169 tests in 14.087s
+OK
+```
+
+Build and full suite:
+
+```text
+$ python3 src/build_unified_app.py
+/Users/steph-tmp/Documents/GitHub/property-research-dashboard/artifacts/unified_destination_dashboard.html
+exit 0
+
+$ python3 -m unittest discover -s tests -q
+Ran 988 tests in 23.906s
+OK
+```
+
+`node --check` for all four changed JavaScript modules, Python compilation for changed Python/test modules, and `git diff --check` all exited 0.
+
+### Privacy, generated DOM, and browser evidence
+
+- The exact finder handoff test now includes the new `stayMode=full_relocation` tax profile and still returns URLs containing only destination, household, and housing.
+- Existing behavioral privacy tests continue to execute the real finder result-link builder for every recommendation, reject unexpected query keys, and prove analytics/storage/network boundaries contain no tax inputs or results.
+- The built calculator payload contains distinct `tax_planning.as_of=2026-09-01` and `reviewed_on=2026-09-01` fields, and both generated pages contain the shared full-year relocation/refinement copy.
+- Executable Node tests run the real tax scenario, retirement composition, presentation, and audit-entry functions. They prove the rendered-entry boundary emits exactly nine entries covering the three displayed amounts in all three destination-estimate cases, with no inactive wealth source.
+- A bounded Playwright CLI attempt again produced no output within 30 seconds and was stopped. No new visual-browser claim is made for this wave; deterministic executable-JavaScript and generated-page checks are the proportionate fallback. The completed 320/375/390/430/736/1024 responsive and real script-disabled Chrome evidence from Task 4/Fix Round 1 is unaffected because this wave adds only copy and content inside existing responsive containers.
+
+The static verifier again reached its executable runtime finder handoff boundary without a Task 4 error. It exits 1 only for the same unrelated dirty-artifact defects:
+
+```text
+Missing marker 'Buyer Next Step' in artifacts/countries/spain-property/index.html
+Missing marker 'Turn Spain research into a shortlist' in artifacts/countries/spain-property/index.html
+artifacts/destinations/chamonix/index.html -> /assets/chamonix-valley-life.webp
+artifacts/destinations/chamonix/index.html -> /assets/chamonix-winter-access.webp
+artifacts/destinations/chamonix/index.html -> /assets/chamonix-building-governance.webp
+```
+
+### Final-fix files
+
+- `.superpowers/sdd/2026-09-01-fire-tax-calculator/task-4-report.md`
+- `src/build_unified_app.py`
+- `src/fire_tax_scenarios.js`
+- `src/retirement_calculator_ui.js`
+- `src/retirement_destination_finder.js`
+- `src/retirement_destination_finder_page.py`
+- `src/retirement_destination_finder_ui.js`
+- `tests/test_build_unified_app_auto_links.py`
+- `tests/test_fire_tax_scenarios.py`
+- `tests/test_retirement_calculator_page.py`
+- `tests/test_retirement_calculator_ui.py`
+- `tests/test_retirement_destination_finder.py`
+- `tests/test_retirement_destination_finder_page.py`
+- `tests/test_retirement_destination_finder_ui.py`
+
+### Self-review and concerns
+
+- Freshness validation uses the real/current build date in production and a deterministic override in tests; it no longer overloads evidence year metadata.
+- The direct Spain parity test proves both products use full relocation, while the existing handoff privacy contract remains unchanged.
+- Total sources are reduced from active component audits only. Excluded and not-applicable component states are retained in the total exclusions and rendered context, preventing an inactive wealth-tax source from appearing.
+- The annual and capital audit formulas trace the actual calculator composition, retain property equity separation, and reuse the scenario result instead of duplicating tax arithmetic.
+- After-tax remains one zero-added-tax result with `after_fees_and_tax`, zero/excluded component entries, `not_applicable` tax year, user-supplied confidence, and no sources.
+- Generated artifacts remain intentionally uncommitted. The only open repository-level concern is the pre-existing Spain/Chamonix static-verifier failure above; the Playwright CLI limitation is recorded without overstating visual evidence.

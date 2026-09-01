@@ -268,6 +268,7 @@
         returnBasis: "after_fees_and_tax",
         taxMode: selectedTaxMode(),
         taxProfile: {
+          stayMode: "full_relocation",
           dependableIncome: numeric("finder-pension") + numeric("finder-other-income"),
           portfolioWithdrawals: numeric("finder-tax-withdrawals"),
           realizedGainIntensity: selected("finder-tax-gain-intensity"),

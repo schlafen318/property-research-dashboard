@@ -36,6 +36,95 @@ def fixture_country() -> dict:
 
 
 class FireTaxScenarioTests(unittest.TestCase):
+    def test_total_audit_uses_only_active_categories_and_sources(self) -> None:
+        result = run_scenario(
+            {
+                "input": {
+                    "taxMode": "destination_estimate",
+                    "stayMode": "full_relocation",
+                    "dependableIncome": 40_000,
+                    "portfolioWithdrawals": 60_000,
+                    "realizedGainIntensity": "moderate",
+                    "propertyUse": "none",
+                    "wealthBand": "under_threshold",
+                    "asOf": "2026-09-01",
+                },
+                "country": fixture_country(),
+            }
+        )
+        central = result["amountExplanations"]["central"]
+        total = central["total"]
+
+        self.assertEqual("included", central["incomeTaxReserve"]["status"])
+        self.assertEqual("not_applicable", central["propertyTaxReserve"]["status"])
+        self.assertEqual("not_applicable", central["wealthTaxReserve"]["status"])
+        self.assertEqual("included", central["complianceReserve"]["status"])
+        self.assertEqual(
+            ["income tax reserve", "Annual filing and advice allowance"],
+            total["inclusions"],
+        )
+        self.assertIn("Annual property ownership tax allowance (not applicable)", total["exclusions"])
+        self.assertIn("Annual wealth-tax planning allowance (not applicable)", total["exclusions"])
+        self.assertEqual(["tax-residence", "income-scope"], total["sourceIds"])
+        self.assertEqual([], central["wealthTaxReserve"]["sourceIds"])
+        wealth = next(item for item in result["explanations"] if item["category"] == "wealth_tax")
+        self.assertEqual("not_applicable", wealth["status"])
+        self.assertEqual([], wealth["sourceIds"])
+
+    def test_user_after_tax_has_one_zero_case_with_complete_excluded_audits(self) -> None:
+        result = run_scenario(
+            {
+                "input": {"taxMode": "user_after_tax"},
+                "country": {},
+            }
+        )
+
+        self.assertEqual("user_after_tax", result["status"])
+        self.assertEqual(["user_after_tax"], list(result["cases"]))
+        self.assertEqual(["user_after_tax"], list(result["amountExplanations"]))
+        fields = result["amountExplanations"]["user_after_tax"]
+        self.assertEqual(
+            {
+                "total",
+                "incomeTaxReserve",
+                "propertyTaxReserve",
+                "wealthTaxReserve",
+                "complianceReserve",
+            },
+            set(fields),
+        )
+        for field_name, explanation in fields.items():
+            with self.subTest(field=field_name):
+                self.assertEqual(0, result["cases"]["user_after_tax"][field_name])
+                self.assertEqual("excluded", explanation["status"])
+                self.assertTrue(explanation["formula"])
+                self.assertTrue(explanation["assumptions"])
+                self.assertTrue(explanation["inclusions"])
+                self.assertTrue(explanation["exclusions"])
+                self.assertEqual("not_applicable", explanation["taxYear"])
+                self.assertEqual("user_supplied", explanation["confidence"])
+                self.assertEqual([], explanation["sourceIds"])
+
+    def test_freshness_crosses_after_day_366_while_tax_year_remains_evidence_year(self) -> None:
+        country = fixture_country()
+        common = {
+            "taxMode": "destination_estimate",
+            "stayMode": "full_relocation",
+            "dependableIncome": 40_000,
+            "portfolioWithdrawals": 60_000,
+            "realizedGainIntensity": "moderate",
+            "propertyUse": "none",
+            "wealthBand": "under_threshold",
+        }
+
+        boundary = run_scenario({"input": {**common, "asOf": "2027-09-02"}, "country": country})
+        crossed = run_scenario({"input": {**common, "asOf": "2027-09-03"}, "country": country})
+
+        self.assertEqual("available", boundary["status"])
+        self.assertEqual("2026", boundary["amountExplanations"]["central"]["total"]["taxYear"])
+        self.assertEqual("unavailable", crossed["status"])
+        self.assertIn("stale", crossed["explanations"][0]["reason"])
+
     def test_destination_estimate_returns_ordered_data_backed_cases(self) -> None:
         result = run_scenario(
             {

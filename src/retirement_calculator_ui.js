@@ -216,6 +216,14 @@
     };
   }
 
+  function taxEvidenceContext(taxPlanning) {
+    const planning = taxPlanning || {};
+    return {
+      asOf: planning.as_of,
+      taxYear: String(planning.reviewed_on || "").slice(0, 4),
+    };
+  }
+
   function wealthTaxRelevant(countryRecord) {
     const screen = countryRecord && countryRecord.tax_screen || {};
     const allowance = screen.annual_allowances && screen.annual_allowances.wealth_tax;
@@ -261,6 +269,7 @@
         annualTaxReserve: Number(row.annualTaxReserve),
         totalAnnualRequirement: Number(row.firstYearExpenses),
         requiredCapital: Number(row.requiredCapital),
+        amountExplanations: row.amountExplanations || {},
       };
     });
     return {
@@ -272,6 +281,28 @@
       noTaxComparison: scenarioResults.central.noTaxComparison,
       refineAvailable: true,
     };
+  }
+
+  function taxAuditEntries(input) {
+    const labels = {
+      taxReserve: "Tax reserve",
+      annualRequirement: "Total annual requirement",
+      capitalRequirement: "Capital requirement",
+    };
+    const fields = ["taxReserve", "annualRequirement", "capitalRequirement"];
+    return (input && input.rows || []).reduce(function (entries, row) {
+      fields.forEach(function (field) {
+        const explanation = row.amountExplanations && row.amountExplanations[field];
+        if (!explanation) return;
+        entries.push({
+          scenarioKey: row.key,
+          amountKey: field,
+          heading: row.label + " — " + labels[field],
+          explanation: explanation,
+        });
+      });
+      return entries;
+    }, []);
   }
 
   function calculatorEngine() {
@@ -292,7 +323,73 @@
     return input;
   }
 
-  function scenarioResult(key, label, baseInput, taxCase, noTaxResult, taxMode) {
+  function auditMetadata(input) {
+    const explanation = input || {};
+    return {
+      status: explanation.status || "included",
+      label: explanation.label || "tax reserve",
+      formula: explanation.formula || "0; user supplied after-tax assumptions",
+      assumptions: (explanation.assumptions || ["taxMode=user_after_tax", "returnBasis=after_fees_and_tax"]).slice(),
+      inclusions: (explanation.inclusions || ["user-supplied after-tax assumptions"]).slice(),
+      exclusions: (explanation.exclusions || ["destination tax scenario"]).slice(),
+      taxYear: explanation.taxYear || "not_applicable",
+      confidence: explanation.confidence || "user_supplied",
+      sourceIds: (explanation.sourceIds || []).slice(),
+    };
+  }
+
+  function scenarioAmountExplanations(baseInput, result, taxExplanation) {
+    const taxReserve = auditMetadata(taxExplanation || (result.taxMode === "user_after_tax" ? {
+      status: "excluded",
+    } : {}));
+    const shared = {
+      taxYear: taxReserve.taxYear,
+      confidence: taxReserve.confidence,
+      sourceIds: taxReserve.sourceIds,
+    };
+    const annualRequirement = auditMetadata({
+      status: "included",
+      label: "total annual requirement",
+      formula: "firstYearExpenses = projected retirement expenses + annualTaxExpenses",
+      assumptions: [
+        "yearsToRetirement=" + result.yearsToRetirement,
+        "generalInflation=" + Number(baseInput.generalInflation),
+        "taxMode=" + result.taxMode,
+      ],
+      inclusions: ["projected retirement expense categories"].concat(taxReserve.inclusions),
+      exclusions: ["reliable outside income (shown separately)"].concat(taxReserve.exclusions),
+      taxYear: shared.taxYear,
+      confidence: shared.confidence,
+      sourceIds: shared.sourceIds,
+    });
+    const capitalInclusions = ["tax-adjusted annual funding gaps", "emergency reserve"];
+    if (result.propertyCapital > 0) capitalInclusions.push("applicable home purchase capital");
+    const capitalRequirement = auditMetadata({
+      status: "included",
+      label: "capital requirement",
+      formula: "totalNeededToday = max(0, totalCapitalAtRetirement - contributionValueAtRetirement) / (1 + expectedPortfolioReturn)^yearsToRetirement + homePurchaseNeededToday",
+      assumptions: [
+        "currentAge=" + Number(baseInput.currentAge),
+        "retirementAge=" + Number(baseInput.retirementAge),
+        "horizonYears=" + Number(baseInput.horizonYears),
+        "expectedPortfolioReturn=" + Number(baseInput.expectedPortfolioReturn),
+        "monthlyIncomeBeforeRetirement=" + Number(baseInput.monthlyIncomeBeforeRetirement),
+        "incomeInvestedRate=" + Number(baseInput.incomeInvestedRate),
+      ],
+      inclusions: capitalInclusions,
+      exclusions: ["property equity as liquid retirement funding"].concat(taxReserve.exclusions),
+      taxYear: shared.taxYear,
+      confidence: shared.confidence,
+      sourceIds: shared.sourceIds,
+    });
+    return {
+      taxReserve: taxReserve,
+      annualRequirement: annualRequirement,
+      capitalRequirement: capitalRequirement,
+    };
+  }
+
+  function scenarioResult(key, label, baseInput, taxCase, noTaxResult, taxMode, taxExplanation) {
     const annualTaxReserve = Number(taxCase && taxCase.total);
     if (!Number.isFinite(annualTaxReserve) || annualTaxReserve < 0) {
       throw new Error("Tax scenario case " + key + " requires a finite non-negative total");
@@ -315,6 +412,7 @@
         label: "No added destination tax",
         requiredCapital: noTaxResult.totalNeededToday,
       },
+      amountExplanations: scenarioAmountExplanations(baseInput, result, taxExplanation),
       result: result,
     };
   }
@@ -332,15 +430,17 @@
           baseInput,
           { total: 0 },
           noTaxResult,
-          "user_after_tax"
+          "user_after_tax",
+          taxScenario.amountExplanations && taxScenario.amountExplanations.user_after_tax &&
+            taxScenario.amountExplanations.user_after_tax.total
         ),
       };
     }
     const cases = taxScenario.cases || {};
     return {
-      favorable: scenarioResult("favorable", "Favorable", baseInput, cases.favorable, noTaxResult, "destination_estimate"),
-      central: scenarioResult("central", "Central", baseInput, cases.central, noTaxResult, "destination_estimate"),
-      adverse: scenarioResult("adverse", "Adverse", baseInput, cases.adverse, noTaxResult, "destination_estimate"),
+      favorable: scenarioResult("favorable", "Favorable", baseInput, cases.favorable, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.favorable && taxScenario.amountExplanations.favorable.total),
+      central: scenarioResult("central", "Central", baseInput, cases.central, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.central && taxScenario.amountExplanations.central.total),
+      adverse: scenarioResult("adverse", "Adverse", baseInput, cases.adverse, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.adverse && taxScenario.amountExplanations.adverse.total),
     };
   }
 
@@ -757,6 +857,7 @@
     function taxScenarioInput(planOverride) {
       const plan = planOverride || el("ret-housing-plan").value;
       const propertyUseVisible = !el("ret-tax-property-use").disabled;
+      const evidence = taxEvidenceContext(payload.tax_planning);
       return {
         taxMode: selectedTaxMode(),
         stayMode: "full_relocation",
@@ -767,7 +868,8 @@
         propertyUse: plan === "rent" || !propertyUseVisible ? "none" : el("ret-tax-property-use").value,
         wealthBand: el("ret-tax-wealth-band").disabled ? "unknown" : el("ret-tax-wealth-band").value,
         propertyTaxIncludedInRetirementCosts: plan !== "rent",
-        asOf: payload.tax_planning && payload.tax_planning.reviewed_on,
+        asOf: evidence.asOf,
+        taxYear: evidence.taxYear,
       };
     }
 
@@ -866,16 +968,17 @@
       }
     }
 
-    function appendTaxExplanation(container, key, explanation, sourceById) {
+    function appendTaxExplanation(container, headingText, explanation, sourceById) {
       if (!explanation) return;
       const article = document.createElement("article");
       const heading = document.createElement("h3");
       const formula = document.createElement("p");
       const context = document.createElement("p");
       const sources = document.createElement("p");
-      heading.textContent = key.charAt(0).toUpperCase() + key.slice(1) + " tax reserve";
+      heading.textContent = headingText;
       formula.textContent = "Formula: " + explanation.formula;
-      context.textContent = "Assumptions: " + (explanation.assumptions || []).join("; ") +
+      context.textContent = "Status: " + String(explanation.status || "included").replaceAll("_", " ") +
+        ". Assumptions: " + (explanation.assumptions || []).join("; ") +
         ". Included: " + (explanation.inclusions || []).join(", ") +
         ". Excluded: " + (explanation.exclusions || []).join(", ") +
         ". Tax year: " + explanation.taxYear + ". Confidence: " + explanation.confidence + ".";
@@ -936,11 +1039,8 @@
         return [source.id, source];
       }));
       explanationContainer.replaceChildren();
-      view.rows.forEach(function (row) {
-        const explanation = taxScenario.amountExplanations &&
-          taxScenario.amountExplanations[row.key] &&
-          taxScenario.amountExplanations[row.key].total;
-        appendTaxExplanation(explanationContainer, row.key, explanation, sourceById);
+      taxAuditEntries({ rows: view.rows }).forEach(function (entry) {
+        appendTaxExplanation(explanationContainer, entry.heading, entry.explanation, sourceById);
       });
       details.hidden = false;
       refine.hidden = !view.refineAvailable;
@@ -1327,8 +1427,10 @@
     accumulationChartModel: accumulationChartModel,
     sensitivityRates: sensitivityRates,
     taxControlVisibility: taxControlVisibility,
+    taxEvidenceContext: taxEvidenceContext,
     wealthTaxRelevant: wealthTaxRelevant,
     taxResultPresentation: taxResultPresentation,
+    taxAuditEntries: taxAuditEntries,
     calculateTaxAdjustedScenarios: calculateTaxAdjustedScenarios,
     planningSummary: planningSummary,
     accumulationTooltipContent: accumulationTooltipContent,

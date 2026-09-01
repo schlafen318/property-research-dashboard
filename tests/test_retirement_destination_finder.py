@@ -10,6 +10,7 @@ from tests.test_retirement_calculator_engine import base_payload, run_engine as 
 
 ROOT = Path(__file__).resolve().parents[1]
 FINDER = ROOT / "src" / "retirement_destination_finder.js"
+TAX_SCENARIOS = ROOT / "src" / "fire_tax_scenarios.js"
 
 
 def run_finder(function_name: str, payload: object) -> object:
@@ -20,6 +21,22 @@ def run_finder(function_name: str, payload: object) -> object:
     )
     result = subprocess.run(
         ["node", "-e", script, str(FINDER), json.dumps(payload)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
+
+
+def run_tax_scenario(input_payload: object, country: object) -> object:
+    script = (
+        "const engine = require(process.argv[1]);"
+        "const input = JSON.parse(process.argv[2]);"
+        "const country = JSON.parse(process.argv[3]);"
+        "process.stdout.write(JSON.stringify(engine.estimateTaxScenario(input, country)));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(TAX_SCENARIOS), json.dumps(input_payload), json.dumps(country)],
         check=True,
         capture_output=True,
         text=True,
@@ -158,6 +175,49 @@ def user_payload(**overrides: object) -> dict:
 
 
 class RetirementDestinationFinderTests(unittest.TestCase):
+    def test_spain_finder_and_calculator_share_explicit_full_relocation_assumption(self) -> None:
+        place = destination("valencia", country="Spain")
+        country = tax_country()
+        country["tax_screen"]["planning_bands"]["part_year"].update(
+            {"favorable_rate": 0.03, "central_rate": 0.08, "adverse_rate": 0.14}
+        )
+        country["tax_screen"]["planning_bands"]["full_relocation"].update(
+            {"favorable_rate": 0.12, "central_rate": 0.22, "adverse_rate": 0.35}
+        )
+        tax_profile = {
+            "dependableIncome": 0,
+            "portfolioWithdrawals": 100_000,
+            "realizedGainIntensity": "moderate",
+            "propertyUse": "none",
+            "wealthBand": "under_threshold",
+        }
+        direct = run_tax_scenario(
+            {
+                "taxMode": "destination_estimate",
+                "stayMode": "full_relocation",
+                **tax_profile,
+                "asOf": "2026-09-01",
+            },
+            country,
+        )
+        finder = run_finder(
+            "recommendDestinations",
+            {
+                "user": user_payload(taxMode="destination_estimate", taxProfile=tax_profile),
+                "destinations": [place],
+                "retirementCosts": [cost_record(place["id"], 100_000)],
+                "mortgageProfiles": {place["id"]: mortgage_profile()},
+                "taxPlanning": {
+                    "asOf": "2026-09-01",
+                    "reviewedOn": "2026-09-01",
+                    "countries": {"Spain": country},
+                },
+            },
+        )["recommendations"][0]
+
+        self.assertEqual(22_000, direct["cases"]["central"]["total"])
+        self.assertEqual(direct["cases"]["central"]["total"], finder["annualTaxReserve"])
+
     def test_tax_adjusted_central_target_can_change_tier_and_ranking(self) -> None:
         high_tax = destination("high-tax", 5, "High Tax")
         low_tax = destination("low-tax", 1, "Low Tax")

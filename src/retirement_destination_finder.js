@@ -156,7 +156,7 @@
     try {
       return taxScenarios.estimateTaxScenario({
         taxMode: user.taxMode || "user_after_tax",
-        stayMode: profile.stayMode,
+        stayMode: profile.stayMode || "full_relocation",
         dependableIncome: profile.dependableIncome || 0,
         portfolioWithdrawals: profile.portfolioWithdrawals || 0,
         realizedGainIntensity: profile.realizedGainIntensity,

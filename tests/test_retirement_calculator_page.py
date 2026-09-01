@@ -206,6 +206,12 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-tax-explanations"', disclosure)
         self.assertIn('id="ret-tax-refine" type="button" hidden disabled', results)
 
+    def test_initial_tax_screen_states_the_shared_full_relocation_assumption(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+
+        self.assertIn("Initial screen assumes a full-year relocation", form)
+        self.assertIn("refine this later", form)
+
     def test_result_panel_has_one_needed_today_headline_and_distinct_key_figures(self) -> None:
         panel = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
 

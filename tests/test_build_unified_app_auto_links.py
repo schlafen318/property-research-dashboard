@@ -9,6 +9,24 @@ from scripts import verify_static_site
 
 
 class AutoInternalLinkTests(unittest.TestCase):
+    def test_calculator_serializes_deterministic_freshness_separately_from_evidence_review(self) -> None:
+        destinations = build_unified_app.rank_destinations(
+            [build_unified_app.consolidate_destination(item) for item in build_unified_app.load_json("destinations.json")]
+        )
+        html = build_unified_app.build_retirement_calculator_page(
+            destinations,
+            build_unified_app.load_retirement_costs(),
+            build_unified_app.load_fire_abroad(),
+            tax_as_of=date(2027, 9, 2),
+        )
+        payload_text = html.split(
+            '<script id="retirement-destination-data" type="application/json">', 1
+        )[1].split("</script>", 1)[0]
+        tax_planning = json.loads(payload_text)["tax_planning"]
+
+        self.assertEqual("2027-09-02", tax_planning["as_of"])
+        self.assertEqual("2026-09-01", tax_planning["reviewed_on"])
+
     def test_fire_page_serializes_build_date_and_retains_stale_destinations_unranked(self) -> None:
         destinations = build_unified_app.rank_destinations(
             [build_unified_app.consolidate_destination(item) for item in build_unified_app.load_json("destinations.json")]

@@ -64,6 +64,17 @@ def run_engine(function_name: str, payload: object) -> object:
 
 
 def tax_scenario() -> dict:
+    audit = {
+        "status": "included",
+        "label": "tax reserve",
+        "formula": "incomeTaxReserve + complianceReserve",
+        "assumptions": ["taxMode=destination_estimate", "taxYear=2026"],
+        "inclusions": ["income tax reserve", "compliance reserve"],
+        "exclusions": ["wealth tax reserve (not applicable)", "transaction taxes"],
+        "taxYear": "2026",
+        "confidence": "medium_high",
+        "sourceIds": ["tax-source"],
+    }
     return {
         "status": "available",
         "cases": {
@@ -72,9 +83,9 @@ def tax_scenario() -> dict:
             "adverse": {"total": 3_000, "propertyTaxReserve": 0},
         },
         "amountExplanations": {
-            "favorable": {"total": {"formula": "fixture"}},
-            "central": {"total": {"formula": "fixture"}},
-            "adverse": {"total": {"formula": "fixture"}},
+            "favorable": {"total": audit},
+            "central": {"total": audit},
+            "adverse": {"total": audit},
         },
     }
 
@@ -99,6 +110,67 @@ def calculator_payload() -> dict:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_each_displayed_scenario_amount_has_complete_audit_metadata(self) -> None:
+        base = calculator_payload()
+        scenario_results = run_ui_args("calculateTaxAdjustedScenarios", base, tax_scenario())
+        central = scenario_results["central"]["amountExplanations"]
+
+        self.assertEqual(
+            {"taxReserve", "annualRequirement", "capitalRequirement"},
+            set(central),
+        )
+        self.assertEqual(
+            "incomeTaxReserve + complianceReserve",
+            central["taxReserve"]["formula"],
+        )
+        self.assertEqual(
+            "firstYearExpenses = projected retirement expenses + annualTaxExpenses",
+            central["annualRequirement"]["formula"],
+        )
+        self.assertIn("totalNeededToday", central["capitalRequirement"]["formula"])
+        for amount_name, explanation in central.items():
+            with self.subTest(amount=amount_name):
+                self.assertTrue(explanation["assumptions"])
+                self.assertTrue(explanation["inclusions"])
+                self.assertTrue(explanation["exclusions"])
+                self.assertEqual("2026", explanation["taxYear"])
+                self.assertEqual("medium_high", explanation["confidence"])
+                self.assertEqual(["tax-source"], explanation["sourceIds"])
+
+    def test_tax_audit_entries_cover_every_displayed_table_amount(self) -> None:
+        scenario_results = run_ui_args("calculateTaxAdjustedScenarios", calculator_payload(), tax_scenario())
+        presentation = run_ui(
+            "taxResultPresentation",
+            {"taxScenario": tax_scenario(), "scenarioResults": scenario_results},
+        )
+        entries = run_ui("taxAuditEntries", {"rows": presentation["rows"]})
+
+        self.assertEqual(9, len(entries))
+        self.assertEqual(
+            [
+                "Favorable — Tax reserve",
+                "Favorable — Total annual requirement",
+                "Favorable — Capital requirement",
+                "Central — Tax reserve",
+                "Central — Total annual requirement",
+                "Central — Capital requirement",
+                "Adverse — Tax reserve",
+                "Adverse — Total annual requirement",
+                "Adverse — Capital requirement",
+            ],
+            [entry["heading"] for entry in entries],
+        )
+        self.assertTrue(all(entry["explanation"]["formula"] for entry in entries))
+
+    def test_tax_evidence_context_separates_freshness_date_from_evidence_year(self) -> None:
+        self.assertEqual(
+            {"asOf": "2027-09-02", "taxYear": "2026"},
+            run_ui(
+                "taxEvidenceContext",
+                {"as_of": "2027-09-02", "reviewed_on": "2026-09-01"},
+            ),
+        )
+
     def test_tax_adjusted_central_case_matches_direct_engine_destination_estimate(self) -> None:
         base = calculator_payload()
         result = run_ui_args("calculateTaxAdjustedScenarios", base, tax_scenario())
@@ -161,7 +233,7 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertEqual(direct["firstYearExpenses"], result["central"]["firstYearExpenses"])
         self.assertEqual(direct["totalNeededToday"], result["central"]["requiredCapital"])
 
-    def test_user_after_tax_scenario_returns_one_zero_added_tax_result_without_amount_explanations(self) -> None:
+    def test_user_after_tax_scenario_returns_one_zero_added_tax_result_with_excluded_amount_explanations(self) -> None:
         base = calculator_payload()
         base["incomeStreams"] = []
         scenario = {"status": "user_after_tax", "cases": {"central": {"total": 0}}}
@@ -181,6 +253,13 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertEqual(0, result["user_after_tax"]["annualTaxReserve"])
         self.assertEqual(0, result["user_after_tax"]["requiredCapitalDifference"])
         self.assertEqual(direct, result["user_after_tax"]["result"])
+        explanations = result["user_after_tax"]["amountExplanations"]
+        self.assertEqual(
+            {"taxReserve", "annualRequirement", "capitalRequirement"},
+            set(explanations),
+        )
+        self.assertEqual("excluded", explanations["taxReserve"]["status"])
+        self.assertEqual([], explanations["taxReserve"]["sourceIds"])
 
     def test_planning_currency_conversion_preserves_the_usd_scenario(self) -> None:
         rates = {"USD": 1, "SGD": 0.7866117265603891, "EUR": 1.1645}

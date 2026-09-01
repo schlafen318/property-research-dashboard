@@ -6185,7 +6185,10 @@ def build_retirement_calculator_page(
     destinations: list[dict],
     retirement_payload: dict,
     fire_payload: dict | None = None,
+    *,
+    tax_as_of: date | None = None,
 ) -> str:
+    tax_freshness_iso = (tax_as_of or date.today()).isoformat()
     canonical = page_url(RETIREMENT_CALCULATOR_SLUG)
     destination_by_id = {item["id"]: item for item in destinations}
     records = retirement_payload["destinations"]
@@ -6272,6 +6275,7 @@ def build_retirement_calculator_page(
             "planning_currencies": RETIREMENT_PLANNING_CURRENCIES,
             "destinations": browser_records,
             "tax_planning": {
+                "as_of": tax_freshness_iso,
                 "reviewed_on": fire_payload["reviewed_on"],
                 "countries": fire_payload["countries"],
                 "sources": fire_payload["sources"],
@@ -6341,7 +6345,7 @@ __UTILITY_CSS__
           <div class="field"><label for="ret-other-income">Other non-portfolio income</label><input id="ret-other-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><label class="check"><input id="ret-other-indexed" type="checkbox" checked> Inflation-linked</label></div>
           <div class="field"><label for="ret-rental-income">Net rental income</label><input id="ret-rental-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at zero when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox" checked> Inflation-linked</label></div>
         </div></fieldset>
-        <fieldset id="ret-tax-planning"><legend>Destination tax planning</legend><p class="hint">Choose a broad planning range or use figures you already know are after tax.</p>
+        <fieldset id="ret-tax-planning"><legend>Destination tax planning</legend><p class="hint">Choose a broad planning range or use figures you already know are after tax. Initial screen assumes a full-year relocation; you can refine this later for seasonal or part-year plans.</p>
           <div class="tax-mode-choices">
             <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="destination_estimate" checked><span>Use destination planning estimate<small>Add a broad, source-backed tax reserve to the retirement plan.</small></span></label>
             <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="user_after_tax"><span>I know my after-tax figures<small>No destination income-tax reserve is added.</small></span></label>
@@ -11753,7 +11757,14 @@ def build(*, as_of: date | None = None) -> Path:
     retirement_calculator_dir = ARTIFACTS / RETIREMENT_CALCULATOR_SLUG
     retirement_calculator_dir.mkdir(parents=True, exist_ok=True)
     (retirement_calculator_dir / "index.html").write_text(
-        clean_generated_html(build_retirement_calculator_page(destinations, retirement_costs, fire_payload)),
+        clean_generated_html(
+            build_retirement_calculator_page(
+                destinations,
+                retirement_costs,
+                fire_payload,
+                tax_as_of=build_date,
+            )
+        ),
         encoding="utf-8",
     )
     retirement_finder_dir = ARTIFACTS / RETIREMENT_FINDER_SLUG

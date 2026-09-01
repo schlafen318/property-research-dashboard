@@ -110,6 +110,8 @@
 
   function amountExplanation(input) {
     return {
+      status: input.status || "included",
+      label: input.label,
       formula: input.formula,
       assumptions: input.assumptions,
       inclusions: input.inclusions,
@@ -123,6 +125,50 @@
   function estimateTaxScenario(rawInput, countryRecord) {
     const input = rawInput || {};
     const taxMode = selected(input.taxMode, new Set(["destination_estimate", "user_after_tax"]), "destination_estimate", "taxMode");
+    if (taxMode === "user_after_tax") {
+      const zeroCase = {
+        total: 0,
+        incomeTaxReserve: 0,
+        propertyTaxReserve: 0,
+        wealthTaxReserve: 0,
+        complianceReserve: 0,
+      };
+      const excludedLabels = {
+        total: "destination tax scenario",
+        incomeTaxReserve: "destination income tax reserve",
+        propertyTaxReserve: "destination property tax reserve",
+        wealthTaxReserve: "destination wealth tax reserve",
+        complianceReserve: "destination compliance reserve",
+      };
+      const afterTaxExplanations = {};
+      Object.keys(zeroCase).forEach(function (field) {
+        afterTaxExplanations[field] = amountExplanation({
+          status: "excluded",
+          label: field === "total" ? "tax reserve" : excludedLabels[field],
+          formula: "0; user supplied after-tax assumptions",
+          assumptions: ["taxMode=user_after_tax", "returnBasis=after_fees_and_tax"],
+          inclusions: ["user-supplied after-tax income and portfolio return assumptions"],
+          exclusions: [excludedLabels[field]],
+          taxYear: "not_applicable",
+          confidence: "user_supplied",
+          sourceIds: [],
+        });
+      });
+      return {
+        status: "user_after_tax",
+        conditional: false,
+        planningBase: 0,
+        cases: { user_after_tax: zeroCase },
+        amountExplanations: { user_after_tax: afterTaxExplanations },
+        explanations: [{
+          category: "user_after_tax",
+          status: "excluded",
+          reason: "User supplied after-tax inputs, so no destination tax scenario is added.",
+          sourceIds: [],
+        }],
+        sourceIds: [],
+      };
+    }
     const cases = {};
     CASES.forEach(function (key) {
       cases[key] = {
@@ -133,22 +179,6 @@
         complianceReserve: 0,
       };
     });
-    if (taxMode === "user_after_tax") {
-      return {
-        status: "user_after_tax",
-        conditional: false,
-        planningBase: 0,
-        cases: cases,
-        explanations: [{
-          category: "user_after_tax",
-          status: "excluded",
-          reason: "User supplied after-tax inputs, so no destination tax scenario is added.",
-          sourceIds: [],
-        }],
-        sourceIds: [],
-      };
-    }
-
     const screen = countryRecord && countryRecord.tax_screen || {};
     if (screen.status !== "complete") {
       return unavailable("Tax scenario evidence is not complete for this destination.");
@@ -191,7 +221,7 @@
       reason: "Planning reserve uses the selected stay mode and realized-gain intensity.",
       sourceIds: unique([].concat(screen.planning_band_basis_source_ids || [], screen.gain_intensity_source_ids || [])),
     }];
-    const taxYear = String(asOf).slice(0, 4);
+    const taxYear = String(input.taxYear || screen.last_reviewed).slice(0, 4);
     const confidence = screen.confidence || "low";
     const amountExplanations = {};
     CASES.forEach(function (key) {
@@ -199,6 +229,8 @@
       cases[key].incomeTaxReserve = Math.round(planningBase * rate * modifier);
       amountExplanations[key] = {
         incomeTaxReserve: amountExplanation({
+          status: "included",
+          label: "income tax reserve",
           formula: "round((dependableIncome + portfolioWithdrawals) * " + key + "_rate * gain_intensity_modifier)",
           assumptions: [
             "dependableIncome=" + number(input.dependableIncome, "dependableIncome"),
@@ -230,17 +262,19 @@
           category: category,
           status: "excluded",
           reason: "Annual property tax is already included in owner retirement costs.",
-          sourceIds: allowance.source_ids || [],
+          sourceIds: [],
         });
         CASES.forEach(function (key) {
           amountExplanations[key][field] = amountExplanation({
+            status: "excluded",
+            label: allowance.label || category,
             formula: "0; excluded because owner retirement costs already include annual property tax",
             assumptions: ["propertyTaxIncludedInRetirementCosts=true"],
             inclusions: ["evaluated annual property ownership tax allowance"],
             exclusions: ["annual property tax already in owner retirement costs"],
             taxYear: taxYear,
             confidence: confidence,
-            sourceIds: allowance.source_ids || [],
+            sourceIds: [],
           });
         });
         return;
@@ -250,17 +284,19 @@
           category: category,
           status: "not_applicable",
           reason: "The selected profile does not trigger this allowance.",
-          sourceIds: allowance.source_ids || [],
+          sourceIds: [],
         });
         CASES.forEach(function (key) {
           amountExplanations[key][field] = amountExplanation({
+            status: "not_applicable",
+            label: allowance.label || category,
             formula: "0; selected profile does not trigger this allowance",
             assumptions: ["propertyUse=" + propertyUse, "wealthBand=" + wealthBand],
             inclusions: ["evaluated " + (allowance.label || category)],
             exclusions: [allowance.label || category],
             taxYear: taxYear,
             confidence: confidence,
-            sourceIds: allowance.source_ids || [],
+            sourceIds: [],
           });
         });
         return;
@@ -274,6 +310,8 @@
       CASES.forEach(function (key) {
         cases[key][field] = allowanceAmount(allowance, key);
         amountExplanations[key][field] = amountExplanation({
+          status: "included",
+          label: allowance.label || category,
           formula: key + "_usd from annual_allowances." + category,
           assumptions: ["propertyUse=" + propertyUse, "wealthBand=" + wealthBand],
           inclusions: [allowance.label || category],
@@ -290,20 +328,37 @@
         cases[key].propertyTaxReserve +
         cases[key].wealthTaxReserve +
         cases[key].complianceReserve;
+      const componentFields = [
+        "incomeTaxReserve",
+        "propertyTaxReserve",
+        "wealthTaxReserve",
+        "complianceReserve",
+      ];
+      const active = componentFields.map(function (field) {
+        return amountExplanations[key][field];
+      }).filter(function (explanation) {
+        return explanation.status === "included";
+      });
+      const inactive = componentFields.map(function (field) {
+        return amountExplanations[key][field];
+      }).filter(function (explanation) {
+        return explanation.status !== "included";
+      });
       amountExplanations[key].total = amountExplanation({
+        status: "included",
+        label: "tax reserve",
         formula: "incomeTaxReserve + propertyTaxReserve + wealthTaxReserve + complianceReserve",
         assumptions: ["taxMode=destination_estimate", "taxYear=" + taxYear],
-        inclusions: [
-          "income tax reserve",
-          "property tax reserve",
-          "wealth tax reserve",
-          "compliance reserve",
-        ],
-        exclusions: ["transaction taxes", "sale taxes", "succession taxes"],
+        inclusions: active.map(function (explanation) { return explanation.label; }),
+        exclusions: inactive.map(function (explanation) {
+          return explanation.label + (explanation.status === "not_applicable"
+            ? " (not applicable)"
+            : " (excluded: already included in retirement costs)");
+        }).concat(["transaction taxes", "sale taxes", "succession taxes"]),
         taxYear: taxYear,
         confidence: confidence,
-        sourceIds: unique(Object.keys(amountExplanations[key]).reduce(function (all, field) {
-          return all.concat(amountExplanations[key][field].sourceIds || []);
+        sourceIds: unique(active.reduce(function (all, explanation) {
+          return all.concat(explanation.sourceIds || []);
         }, [])),
       });
     });
