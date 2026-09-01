@@ -243,7 +243,13 @@
   function calculateJurisdiction(profile, residence, rules) {
     const incomeCategories = incomeApi().calculateIncomeTax(profile.income, residence, rules.income);
     const credits = creditsApi().applyForeignTaxCredits(incomeCategories, rules.credits);
-    const property = propertyApi().calculatePropertyTaxes(profile.property, residence, rules.property);
+    const property = profile.property && profile.property.enabled === false ? {
+      status: "calculated", currency: profile.property.currency, taxYear: profile.property.taxYear,
+      taxpayerScope: "not_applicable", stages: {},
+      totals: { annualTax: 0, oneTimeTax: 0, allTax: 0, prepayments: 0, nonTax: 0 },
+      retirementIntegration: { annualTaxBeforeBoundary: 0, ownerPropertyTaxAlreadyInLivingCosts: 0, additionalAnnualTaxExpense: 0, excludedRuleIds: [], explanation: "No owned property is included in this exact profile." },
+      ruleIds: [], sourceIds: [], confidence: "high", assumptions: ["The live plan contains no owned property or property income."]
+    } : propertyApi().calculatePropertyTaxes(profile.property, residence, rules.property);
     const jurisdictionId = rules.income.active_jurisdiction_id || Object.keys(rules.income.jurisdictions || {})[0];
     const jurisdiction = rules.income.jurisdictions && rules.income.jurisdictions[jurisdictionId] || {};
     return {

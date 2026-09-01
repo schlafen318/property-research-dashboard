@@ -33,11 +33,12 @@
     if (!record(definition) || definition.detailed_enabled !== true) return { available: false, reason: "Complete current rules do not yet cover this destination together with your home tax jurisdiction." };
     if (definition.synthetic === true) return { available: false, reason: "Synthetic rules cannot be used for a personal estimate." };
     const requiredIncome = ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting"];
-    const requiredLifecycle = ["purchase", "annual", "rental", "sale", "inheritance", "gift"];
+    const capabilities = { supported_activity_types: ["retired_or_employee"], supported_retirement_accounts: ["personal_investment"], supported_housing_plans: ["rent"] };
     const runtime = definition.runtime_definition;
-    if (definition.tax_year !== payload.tax_year || !record(runtime) || runtime.factory !== "hong-kong-to-dubai-v1" || !record(runtime.rule_constants) ||
+    if (definition.tax_year !== payload.tax_year || !record(runtime) || runtime.factory !== "hong-kong-to-dubai-v1" ||
+      Object.keys(capabilities).some(function (key) { return !Array.isArray(runtime[key]) || runtime[key].length !== capabilities[key].length || runtime[key].some(function (value) { return !capabilities[key].includes(value); }); }) ||
       !requiredIncome.every(function (category) { return (definition.income_categories || []).includes(category); }) ||
-      !requiredLifecycle.every(function (stage) { return (definition.property_lifecycle || []).includes(stage); })) {
+      !Array.isArray(definition.property_lifecycle) || definition.property_lifecycle.length !== 0) {
       return { available: false, reason: "The validated rule coverage for this exact profile is incomplete." };
     }
     const sources = Object.fromEntries((payload.sources || []).filter(record).map(function (source) { return [source.id, source]; }));
@@ -45,19 +46,22 @@
       return !record(sources[id]) || sources[id].source_kind !== "official" || !/^https:\/\//.test(sources[id].url || "") || !/^\d{4}-\d{2}-\d{2}$/.test(sources[id].checked_on || "") || !/^\d{4}-\d{2}-\d{2}$/.test(sources[id].effective_from || "");
     })) return { available: false, reason: "The complete official source set for this profile is unavailable." };
     if (record(facts)) {
+      if (Number(facts.annualPension || 0) > 0) return { available: false, reason: "A pension needs its payer country, treaty and withholding rules; this exact profile currently requires zero pension income." };
+      if (Number(facts.annualOtherIncome || 0) > 0) return { available: false, reason: "Generic other income cannot be source-classified safely; this exact profile currently requires it to be zero." };
+      if (Number(facts.annualRentalIncome || 0) > 0) return { available: false, reason: "Rental income needs the property location and licensed-versus-unlicensed letting rules; this exact profile currently requires it to be zero." };
+      if (["annualGovernmentPension", "annualDividends", "annualInterest", "annualRealizedGains"].some(function (key) { return Number(facts[key] || 0) > 0; })) return { available: false, reason: "Separately received pension or investment income needs payer/source-country, treaty and withholding rules; this exact profile requires those amounts to be included in the after-tax portfolio return or set to zero." };
+      if (Number(facts.propertyPrice || 0) > 0 || ["buy_now", "buy_retirement"].includes(facts.housingPlan)) return { available: false, reason: "Exact Dubai purchase and ownership tax coverage is not enabled because official sources do not yet establish every potentially applicable property-tax branch." };
+      if (facts.housingPlan && !runtime.supported_housing_plans.includes(facts.housingPlan)) return { available: false, reason: "This exact profile currently covers renting in Dubai only." };
       if (facts.daysInDestination < 183) return { available: false, reason: "This exact profile requires at least 183 days in the UAE during the relevant 12-month period." };
       if (facts.explicitReturnProvided === false) return { available: false, reason: "Enter the required after-fees-and-tax portfolio return before exact refinement." };
       if (facts.daysInHome > 180) return { available: false, reason: "This exact profile does not cover a continuing Hong Kong residence claim." };
       if (facts.isHongKongTreatyResident === true) return { available: false, reason: "A continuing Hong Kong treaty-residence claim needs a wider dual-residence calculation." };
       if (facts.hasHongKongSourceIncome === true) return { available: false, reason: "Hong Kong-source income requires a broader Hong Kong calculation than this profile supports." };
       if (facts.hasHongKongProperty === true) return { available: false, reason: "A continuing Hong Kong property requires the Hong Kong property lifecycle overlay." };
-      if (facts.activityType === "business_or_consulting") return { available: false, reason: "UAE business or consulting activity requires the natural-person corporate-tax branch." };
-      if (facts.retirementAccountClassification && facts.retirementAccountClassification !== "personal_investment") return { available: false, reason: "This profile covers ordinary personal investments, not retirement-scheme withdrawals." };
-      if (facts.propertyType && facts.propertyType !== "villa_or_apartment") return { available: false, reason: "The current Dubai property fee bundle covers a villa or apartment only." };
-      if (facts.financingType === "mortgage") return { available: false, reason: "A financed purchase needs Dubai mortgage-registration and lender-fee rules; this exact profile covers a cash purchase." };
+      if (facts.activityType && !runtime.supported_activity_types.includes(facts.activityType)) return { available: false, reason: "UAE business or consulting activity requires the natural-person corporate-tax branch." };
+      if (facts.retirementAccountClassification && !runtime.supported_retirement_accounts.includes(facts.retirementAccountClassification)) return { available: false, reason: "This profile covers ordinary personal investments, not retirement-scheme withdrawals." };
       if (facts.dependableIncomeIndexingCompatible === false) return { available: false, reason: "This exact retirement projection currently requires all non-zero dependable income to use the same inflation-linking choice." };
-      if (facts.exitPlan === "gift" && facts.giftRelationship && facts.giftRelationship !== "first_degree_family") return { available: false, reason: "The supported Dubai gift route is limited to a parent, child, or spouse." };
-      if (facts.exitPlan === "gift" && Number(facts.giftValuationAed) < Number(definition.runtime_definition.rule_constants.gift_registration_minimum_aed) / Number(definition.runtime_definition.rule_constants.gift_registration_rate)) return { available: false, reason: "This gift valuation falls under the DLD minimum-fee branch, which is not enabled for an exact result." };
+      if (facts.exitPlan || facts.propertyType || facts.financingType || facts.giftRelationship) return { available: false, reason: "Owned-property lifecycle facts are outside this renter-only exact profile." };
     }
     return { available: true, definition: definition };
   }
@@ -110,11 +114,11 @@
     const purchaseFees = price > 0 && aedPerCurrency > 0 ? price * Number(constants.buyer_sale_registration_rate || 0) + fixedPurchaseAed / aedPerCurrency : 0;
     const annualPropertyCosts = Number(answers.annualServiceCharges || 0) + Number(answers.annualHousingFee || 0);
     const dependableIncomeIndexed = planningFacts.hasLiveDependableIncome === true ? planningFacts.dependableIncomeIndexed === true : answers.detailedIncomeIndexed === true;
-    const activeStages = price > 0 ? ["purchase", "annual"] : ["annual"];
+    const activeStages = price > 0 ? ["purchase", "annual"] : [];
     if (["rental", "mixed"].includes(planningFacts.propertyUse)) activeStages.push("rental");
     if (["sale", "gift", "inheritance"].includes(answers.exitPlan)) activeStages.push(answers.exitPlan);
     const property = {
-      taxYear: year, currency: currency, activeStages: activeStages,
+      enabled: price > 0, taxYear: year, currency: currency, activeStages: activeStages,
       purchasePrice: price, officialAssessmentBase: price, ownershipShare: 1,
       financingBalance: Number(answers.financingBalance || 0), propertyUse: planningFacts.propertyUse || "personal",
       annualRent: Number(planningFacts.annualRentalIncome || 0), deductibleExpenses: Number(answers.deductibleRentalExpenses || 0),
@@ -139,8 +143,8 @@
           expectedPortfolioReturn: Number(planningFacts.selectedAfterTaxReturn), monthlyIncomeBeforeRetirement: Number(planningFacts.monthlyIncomeBeforeRetirement || 0), incomeInvestedRate: Number(planningFacts.incomeInvestedRate || 0),
         },
         selectedAfterTaxReturn: Number(planningFacts.selectedAfterTaxReturn), returnBasis: "after_fees_and_tax",
-        dependableIncomeCategories: ["private_pension", "government_pension", "social_security", "rental_income", "employment_consulting"],
-        returnCoveredCategories: ["dividends", "interest", "realized_gains", "retirement_account_withdrawal"],
+        dependableIncomeCategories: ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "rental_income", "employment_consulting"],
+        returnCoveredCategories: ["retirement_account_withdrawal"],
         annualExpenseCategories: [], dependableIncomeIndexed: dependableIncomeIndexed, dependableIncomeInflationRate: dependableIncomeIndexed ? Number(planningFacts.generalInflation || 0) : 0,
         propertyRentalTaxTreatment: "included_in_income_tax", planningRange: planningFacts.planningRange || null,
       },
@@ -283,13 +287,9 @@
     const money = function (id, fact, label, reason) { return { id: id, fact: fact, control: "number", label: label, reason: reason, acceptedValues: { min: 0, max: 1000000000, step: 1, integer: false } }; };
     const advanced = [
       { id: "retirement-account", fact: "retirementAccountClassification", control: "select", label: "What type of account funds the portfolio withdrawals?", reason: "This profile supports ordinary personal investments, not Hong Kong retirement-scheme withdrawals.", acceptedValues: ["personal_investment", "hong_kong_retirement_scheme", "other_retirement_account"], options: [option("personal_investment", "Ordinary personal investments"), option("hong_kong_retirement_scheme", "Hong Kong MPF or retirement scheme"), option("other_retirement_account", "Another retirement account")] },
-      money("government-pension", "annualGovernmentPension", "Annual government pension", "Separating pension types keeps the income audit complete."),
-      money("dividends", "annualDividends", "Annual dividends outside the modeled portfolio", "Only enter dividends not already included in the portfolio return."),
-      money("interest", "annualInterest", "Annual interest outside the modeled portfolio", "Only enter interest not already included in the portfolio return."),
-      money("realized-gains", "annualRealizedGains", "Annual realized gains outside the modeled portfolio withdrawal", "This prevents gains from being counted twice."),
       money("employment-income", "annualEmploymentIncome", "Annual UAE employment salary", "Salary is explicitly separated from business and consulting turnover."),
     ];
-    if (Number(answers.annualGovernmentPension || 0) + Number(answers.annualEmploymentIncome || 0) > 0) advanced.push({ id: "added-income-indexed", fact: "detailedIncomeIndexed", control: "radio", label: "Will those added income amounts rise with inflation?", reason: "Inflation linking changes the retirement capital calculation.", acceptedValues: [false, true], options: yesNo });
+    if (Number(answers.annualEmploymentIncome || 0) > 0) advanced.push({ id: "added-income-indexed", fact: "detailedIncomeIndexed", control: "radio", label: "Will that employment income rise with inflation?", reason: "Inflation linking changes the retirement capital calculation.", acceptedValues: [false, true], options: yesNo });
     if (Number(planningFacts && planningFacts.propertyPrice || 0) > 0) {
       advanced.push(
         { id: "financing-type", fact: "financingType", control: "radio", label: "How will you fund the Dubai purchase?", reason: "A mortgage adds registration and lender fees outside this narrow profile.", acceptedValues: ["cash", "mortgage"], options: [option("cash", "Cash purchase"), option("mortgage", "Mortgage or other property financing")] },
@@ -317,7 +317,7 @@
   function runRefinement(input) {
     if (!record(input)) throw new TypeError("Detailed refinement input is required");
     if (record(input.uiPayload) && record(input.uiPayload.supported_profiles)) {
-      const detailedIncomeActive = Number(input.answers && input.answers.annualGovernmentPension || 0) + Number(input.answers && input.answers.annualEmploymentIncome || 0) > 0;
+      const detailedIncomeActive = Number(input.answers && input.answers.annualEmploymentIncome || 0) > 0;
       const addedMismatch = detailedIncomeActive && input.planningFacts && input.planningFacts.hasLiveDependableIncome === true && input.answers.detailedIncomeIndexed !== input.planningFacts.dependableIncomeIndexed;
       const eligibilityFacts = Object.assign({}, input.answers || {}, {
         giftValuationAed: Number(input.answers && input.answers.expectedGiftValuation || 0) * Number(input.planningFacts && input.planningFacts.aedPerCurrency || 0),
@@ -400,6 +400,7 @@
         planningRange: null,
       };
     }
+    let answerCurrency = planningFacts().currency;
     function access(facts) { return profileAccess(destination.value, payload, { homeJurisdictionId: home.value }, facts); }
     function supportedHomes() {
       return Object.keys(payload.supported_profiles || {}).map(function (id) { return payload.supported_profiles[id]; }).filter(function (item) {
@@ -409,6 +410,18 @@
     function resetResult() {
       resultContainer.hidden = true;
       resultContainer.innerHTML = "";
+    }
+    function resetIfCurrencyChanged() {
+      const nextCurrency = planningFacts().currency;
+      if (nextCurrency === answerCurrency) return false;
+      answerCurrency = nextCurrency;
+      answers = {};
+      active = false;
+      resetResult();
+      questions.innerHTML = "";
+      section.hidden = true;
+      status.textContent = "Detailed monetary answers were cleared because the planning currency changed.";
+      return true;
     }
     function renderQuestions() {
       const currentQuestions = nextPairQuestions(planningFacts(), answers);
@@ -492,8 +505,8 @@
         status.textContent = error instanceof Error ? error.message : "This exact calculation is unavailable for the current facts.";
       }
     });
-    form.addEventListener("input", function () { if (active) { resetResult(); renderQuestions(); } else sync(); });
-    form.addEventListener("change", sync);
+    form.addEventListener("input", function () { if (resetIfCurrencyChanged()) { sync(); return; } if (active) { resetResult(); renderQuestions(); } else sync(); });
+    form.addEventListener("change", function () { resetIfCurrencyChanged(); sync(); });
     sync();
     return { sync: sync, planningFacts: planningFacts, answers: function () { return Object.assign({}, answers); } };
   }

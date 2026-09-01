@@ -44,10 +44,7 @@ class FireTaxRuleContractTests(unittest.TestCase):
         self.assertFalse(profile["synthetic"])
         self.assertEqual("hong-kong", profile["home_jurisdiction_id"])
         self.assertEqual("dubai", profile["destination_id"])
-        self.assertEqual(
-            {"purchase", "annual", "rental", "sale", "inheritance", "gift"},
-            set(profile["property_lifecycle"]),
-        )
+        self.assertEqual([], profile["property_lifecycle"])
         self.assertNotIn("profile", profile["runtime_definition"])
         self.assertNotIn("personalized_amounts", profile["runtime_definition"])
 
@@ -55,7 +52,7 @@ class FireTaxRuleContractTests(unittest.TestCase):
         payload = copy.deepcopy(self.payload)
         profile = payload["supported_profiles"]["hong-kong-to-dubai"]
         profile["source_ids"] = ["synthetic-example-authority-2026"]
-        profile["property_lifecycle"].remove("gift")
+        profile["property_lifecycle"].append("purchase")
 
         errors = self.validate(payload)
 
@@ -69,6 +66,17 @@ class FireTaxRuleContractTests(unittest.TestCase):
         errors = self.validate(payload)
 
         self.assert_path_error(errors, "supported_profiles.hong-kong-to-dubai.runtime_definition.annualPension")
+
+    def test_enabled_profile_rejects_missing_and_unknown_capabilities(self):
+        payload = copy.deepcopy(self.payload)
+        runtime = payload["supported_profiles"]["hong-kong-to-dubai"]["runtime_definition"]
+        del runtime["supported_housing_plans"]
+        runtime["supported_activity_types"] = ["teleport"]
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(errors, "supported_profiles.hong-kong-to-dubai.runtime_definition.supported_housing_plans")
+        self.assert_path_error(errors, "supported_profiles.hong-kong-to-dubai.runtime_definition.supported_activity_types")
 
     def test_loader_reads_an_explicit_path(self):
         with tempfile.TemporaryDirectory() as directory:

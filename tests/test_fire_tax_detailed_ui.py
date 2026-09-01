@@ -33,20 +33,15 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         ui_payload = build_unified_app.detailed_fire_tax_page_payload()
         planning = {
             "currency": "USD", "currentAge": 50, "retirementAge": 60, "horizonYears": 30,
-            "annualSpending": 72000, "annualPension": 24000, "annualOtherIncome": 6000,
-            "annualRentalIncome": 0, "annualWithdrawals": 18000, "propertyPrice": 500000,
-            "housingPlan": "buy_retirement", "propertyUse": "personal", "selectedAfterTaxReturn": 0.04,
+            "annualSpending": 72000, "annualPension": 0, "annualOtherIncome": 0,
+            "annualRentalIncome": 0, "annualWithdrawals": 18000, "propertyPrice": 0,
+            "housingPlan": "rent", "propertyUse": "personal", "selectedAfterTaxReturn": 0.04,
             "planningRange": {"minimum": 900000, "maximum": 1100000}, "aedPerCurrency": 3.6725,
         }
         answers = {
             "daysInDestination": 200, "daysInHome": 30, "isHongKongTreatyResident": False, "hasHongKongSourceIncome": False,
             "hasHongKongProperty": False, "activityType": "retired_or_employee",
-            "annualServiceCharges": 4000, "annualHousingFee": 2500,
-            "propertyType": "villa_or_apartment", "giftRelationship": "first_degree_family",
-            "financingType": "cash",
-            "retirementAccountClassification": "personal_investment", "exitPlan": "sale", "expectedSalePrice": 600000,
-            "annualGovernmentPension": 0, "annualDividends": 0, "annualInterest": 0,
-            "annualRealizedGains": 0, "annualEmploymentIncome": 0,
+            "retirementAccountClassification": "personal_investment", "annualEmploymentIncome": 0,
         }
 
         response = run_node("api.runRefinement(input)", {
@@ -56,8 +51,6 @@ class DetailedFireTaxUiTests(unittest.TestCase):
 
         self.assertEqual("calculated", response["result"]["status"])
         self.assertEqual(0, response["result"]["totals"]["annualTax"])
-        self.assertGreater(response["result"]["destination"]["property"]["totals"]["nonTax"], 0)
-        self.assertIn("dld-sale-registration-2026", response["result"]["sourceIds"])
         self.assertIn("Hong Kong to Dubai", response["markup"])
 
     def test_live_planning_facts_build_profile_without_bundle_amounts(self) -> None:
@@ -86,6 +79,7 @@ class DetailedFireTaxUiTests(unittest.TestCase):
             "annualHousingFee": 2500, "propertyType": "villa_or_apartment",
             "financingType": "cash",
             "expectedGiftValuation": 575000,
+            "annualDividends": 50000, "annualInterest": 1000, "annualRealizedGains": 2000,
             "giftRelationship": "first_degree_family", "retirementAccountClassification": "personal_investment",
         }
 
@@ -97,6 +91,8 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         self.assertEqual(18000, profile["destination"]["income"]["retirementAccountWithdrawal"])
         self.assertEqual(500000, profile["destination"]["property"]["purchasePrice"])
         self.assertEqual(575000, profile["destination"]["property"]["giftValuation"])
+        self.assertIn("dividends", profile["retirement"]["dependableIncomeCategories"])
+        self.assertNotIn("dividends", profile["retirement"]["returnCoveredCategories"])
         self.assertEqual(72000, profile["retirement"]["baseInput"]["expenseCategories"][0]["amount"])
         self.assertEqual(0.04, profile["retirement"]["selectedAfterTaxReturn"])
         self.assertEqual(8000, profile["retirement"]["baseInput"]["monthlyIncomeBeforeRetirement"])
@@ -104,6 +100,15 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         self.assertEqual(12, profile["retirement"]["baseInput"]["emergencyReserveMonths"])
         self.assertTrue(profile["retirement"]["dependableIncomeIndexed"])
         self.assertNotIn("profile", definition["runtime_definition"])
+
+    def test_renter_profile_marks_property_calculation_not_applicable(self) -> None:
+        definition = {"tax_year": 2026, "destination_id": "dubai"}
+        facts = {"currency": "USD", "propertyPrice": 0, "housingPlan": "rent"}
+
+        profile = run_node("api.buildDetailedProfile(input.definition,input.facts,{})", {"definition": definition, "facts": facts})
+
+        self.assertFalse(profile["destination"]["property"]["enabled"])
+        self.assertEqual([], profile["destination"]["property"]["activeStages"])
 
     def test_profile_access_fails_closed_outside_narrow_supported_facts(self) -> None:
         payload = {
@@ -125,6 +130,7 @@ class DetailedFireTaxUiTests(unittest.TestCase):
                 for source_id in ("uae", "hk", "treaty", "dld")
             ],
         }
+        payload = build_unified_app.detailed_fire_tax_page_payload()
         base = {
             "daysInDestination": 200, "daysInHome": 30,
             "hasHongKongSourceIncome": False, "hasHongKongProperty": False,
@@ -149,6 +155,34 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         self.assertIn("Hong Kong-source", hk_income["reason"])
         self.assertFalse(business["available"])
         self.assertIn("business", business["reason"].lower())
+
+        buyer = run_node(
+            "api.profileAccess('dubai',input.payload,{homeJurisdictionId:'hong-kong'},Object.assign({},input.facts,{propertyPrice:500000,housingPlan:'buy_retirement'}))",
+            {"payload": payload, "facts": base},
+        )
+        self.assertFalse(buyer["available"])
+        self.assertIn("property-tax branch", buyer["reason"])
+
+        pension = run_node(
+            "api.profileAccess('dubai',input.payload,{homeJurisdictionId:'hong-kong'},Object.assign({},input.facts,{annualPension:12000}))",
+            {"payload": payload, "facts": base},
+        )
+        self.assertFalse(pension["available"])
+        self.assertIn("payer country", pension["reason"])
+
+        dividends = run_node(
+            "api.profileAccess('dubai',input.payload,{homeJurisdictionId:'hong-kong'},Object.assign({},input.facts,{annualDividends:50000}))",
+            {"payload": payload, "facts": base},
+        )
+        self.assertFalse(dividends["available"])
+        self.assertIn("source-country", dividends["reason"])
+
+        incomplete = run_node(
+            "(()=>{delete input.payload.supported_profiles['hong-kong-to-dubai'].runtime_definition.supported_housing_plans;return api.profileAccess('dubai',input.payload,{homeJurisdictionId:'hong-kong'},input.facts);})()",
+            {"payload": payload, "facts": base},
+        )
+        self.assertFalse(incomplete["available"])
+        self.assertIn("coverage", incomplete["reason"])
 
     def test_fully_enabled_destination_home_bundle_runs_end_to_end(self) -> None:
         calculation = detailed_payload()

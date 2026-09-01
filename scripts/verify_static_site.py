@@ -235,22 +235,30 @@ def detailed_tax_runtime_evidence(html: str) -> dict[str, object]:
     script = r"""
 let privacyCalls=0;
 class Element {
-  constructor(id,value="") { this.id=id; this.value=String(value); this.hidden=false; this.disabled=false; this.dataset={}; this.listeners={}; this.options=[]; this.checked=false; this._html=""; this.textContent=""; }
+  constructor(id,value="") { this.id=id; this.name=""; this.type=""; this.value=String(value); this.hidden=false; this.disabled=false; this.required=false; this.dataset={}; this.listeners={}; this.options=[]; this.controls=[]; this.checked=false; this._html=""; this.textContent=""; }
   addEventListener(type,fn) { (this.listeners[type] ||= []).push(fn); }
   emit(type,target) { (this.listeners[type]||[]).forEach(fn=>fn({target:target||this,preventDefault(){}})); }
-  querySelector(selector) { if (selector==='[type="submit"]') return elements['detail-submit']; return null; }
-  querySelectorAll() { return []; }
-  checkValidity() { return true; }
+  querySelector(selector) { if (selector==='[type="submit"]') return elements['detail-submit']; if (selector==='input, select') return this.controls[0]||null; return null; }
+  querySelectorAll() { return this.controls.slice(); }
+  checkValidity() { return elements['ret-tax-detailed-questions'].controls.every(control=>!control.required||String(control.value)!==''); }
   focus() {}
-  set innerHTML(value) { this._html=String(value); }
+  set innerHTML(value) {
+    this._html=String(value); this.controls=[];
+    if (this.id!=='ret-tax-detailed-questions') return;
+    const tags=this._html.match(/<(?:input|select)\b[^>]*>/g)||[];
+    for (const tag of tags) {
+      const attr=name=>{const match=tag.match(new RegExp('\\b'+name+'="([^"]*)"'));return match?match[1]:'';};
+      const control=new Element(attr('id')); control.name=attr('name'); control.type=attr('type')||(tag.startsWith('<select')?'select':''); control.required=/\brequired(?:\s|>)/.test(tag); control.value=''; this.controls.push(control);
+    }
+  }
   get innerHTML() { return this._html; }
   get selectedOptions() { return this.options.filter(option=>option.value===this.value); }
 }
 const values={
   'ret-destination':'dubai','ret-home-tax-jurisdiction':'hong-kong','ret-currency':'USD',
   'ret-current-age':50,'ret-retirement-age':60,'ret-horizon':30,'ret-monthly-spending':'6,000',
-  'ret-pension':'24,000','ret-other-income':'6,000','ret-rental-income':'0','ret-tax-withdrawals':'18,000',
-  'ret-housing-plan':'buy_retirement','ret-property-budget':'500,000','ret-tax-property-use':'personal','ret-expected-return':'4'
+  'ret-pension':'0','ret-other-income':'0','ret-rental-income':'0','ret-tax-withdrawals':'18,000',
+  'ret-housing-plan':'rent','ret-property-budget':'0','ret-tax-property-use':'personal','ret-expected-return':'4'
 };
 const ids=['retirement-calculator','ret-destination','ret-home-tax-jurisdiction','ret-home-tax-jurisdiction-field','ret-tax-refine','ret-tax-detailed','ret-tax-detailed-form','ret-tax-detailed-questions','ret-tax-detailed-result','ret-tax-detailed-status','ret-tax-detailed-availability','detail-submit',...Object.keys(values)];
 const elements=Object.fromEntries([...new Set(ids)].map(id=>[id,new Element(id,values[id]===undefined?'':values[id])]));
@@ -270,33 +278,38 @@ const api=require(process.argv[1]);
 const input=JSON.parse(require("fs").readFileSync(0,"utf8"));
 const profiles=Object.values(input.payload.supported_profiles||{});
 const chosen=profiles.find(item=>item.detailed_enabled===true&&item.synthetic===false);
-let initialized=false,resultRendered=false,sourceRendered=false,branchRendered=false,access={};
+let initialized=false,resultRendered=false,sourceRendered=false,branchRendered=false,currencyReset=false,nativeControlEvents=0,access={};
 if (chosen) {
   elements['ret-destination'].value=chosen.destination_id;
   elements['ret-home-tax-jurisdiction'].value=chosen.home_jurisdiction_id;
   const session=api.initDetailedTaxUI('retirement-calculator',input.payload);
   initialized=!!session;
   elements['ret-tax-refine'].emit('click');
-  const supplied={daysInDestination:200,daysInHome:30,isHongKongTreatyResident:false,hasHongKongSourceIncome:false,hasHongKongProperty:false,activityType:'retired_or_employee',retirementAccountClassification:'personal_investment',annualGovernmentPension:0,annualDividends:0,annualInterest:0,annualRealizedGains:0,annualEmploymentIncome:0,financingType:'cash',propertyType:'villa_or_apartment',annualServiceCharges:4000,annualHousingFee:2500,exitPlan:'sale',expectedSalePrice:600000};
+  const supplied={daysInDestination:200,daysInHome:30,isHongKongTreatyResident:false,hasHongKongSourceIncome:false,hasHongKongProperty:false,activityType:'retired_or_employee',retirementAccountClassification:'personal_investment',annualEmploymentIncome:0};
   for (let guard=0;guard<40;guard++) {
     const pending=api.nextPairQuestions(session.planningFacts(),session.answers());
     if (!pending.length) break;
     const question=pending[0], value=supplied[question.fact];
     if (value===undefined) throw new Error('Verifier lacks answer for '+question.fact);
-    elements['ret-tax-detailed-questions'].emit('change',{name:question.fact,value:String(value),checked:true});
+    const control=elements['ret-tax-detailed-questions'].controls.find(item=>item.name===question.fact);
+    if (!control) throw new Error('Rendered native control missing for '+question.fact);
+    control.value=String(value); control.checked=true; nativeControlEvents++;
+    elements['ret-tax-detailed-questions'].emit('change',control);
   }
   elements['ret-tax-detailed-form'].emit('submit');
   const markup=elements['ret-tax-detailed-result'].innerHTML;
   resultRendered=elements['ret-tax-detailed-result'].hidden===false&&markup.includes('<table')&&markup.includes('Capital needed today');
   sourceRendered=/href="https:\/\/(?:www\.)?(?:ird\.gov\.hk|centralbank\.ae|dubailand\.gov\.ae|tax\.gov\.ae|u\.ae)/.test(markup);
   branchRendered=markup.includes('UAE resident; Hong Kong non-resident');
-  access[chosen.id]=api.profileAccess(chosen.destination_id,input.payload,{homeJurisdictionId:chosen.home_jurisdiction_id},Object.assign({},session.answers(),{propertyPriceAed:1836250}));
+  access[chosen.id]=api.profileAccess(chosen.destination_id,input.payload,{homeJurisdictionId:chosen.home_jurisdiction_id},session.answers());
+  elements['ret-currency'].value='HKD'; elements['retirement-calculator'].emit('change',elements['ret-currency']);
+  currencyReset=Object.keys(session.answers()).length===0&&elements['ret-tax-detailed-result'].hidden===true;
 }
 const probe={jurisdictions:{probe:{detailed_enabled:true,synthetic:true,runtime_bundle:{rules:{}}}}};
 const controller=api.createController({questions:[{id:'probe',fact:'probeFact',control:'number',acceptedValues:{min:0,max:2,step:1,integer:true}}]});
 controller.answer('probeFact',1);
 process.stdout.write(JSON.stringify({
-  access,privacyCalls,domInitialized:initialized,resultRendered,officialSourceLinkRendered:sourceRendered,plainBranchRendered:branchRendered,
+  access,privacyCalls,domInitialized:initialized,resultRendered,officialSourceLinkRendered:sourceRendered,plainBranchRendered:branchRendered,currencyReset,nativeControlEvents,
   unsupportedPairAvailable:api.profileAccess('dubai',input.payload,{homeJurisdictionId:'unsupported-home'}).available,
   selectedDestinationPresent:!!chosen&&input.destinationIds.includes(chosen.destination_id),
   syntheticProbeAvailable:api.jurisdictionAccess('probe',probe).available,controllerAnswers:controller.snapshot().answers
@@ -323,6 +336,8 @@ process.stdout.write(JSON.stringify({
         "plain_branch_rendered": bool(runtime["plainBranchRendered"]),
         "unsupported_pair_available": bool(runtime["unsupportedPairAvailable"]),
         "selected_destination_present": bool(runtime["selectedDestinationPresent"]),
+        "currency_reset": bool(runtime["currencyReset"]),
+        "native_control_events": int(runtime["nativeControlEvents"]),
         "claimed_profiles": list(detailed.get("supported_profiles", {}).keys()),
     }
 
@@ -331,7 +346,13 @@ def detailed_tax_runtime_errors(html: str) -> list[str]:
     try:
         evidence = detailed_tax_runtime_evidence(html)
     except (json.JSONDecodeError, OSError, subprocess.CalledProcessError, ValueError) as error:
-        return [f"Detailed tax runtime verification failed: {error}"]
+        errors = [f"Detailed tax runtime verification failed: {error}"]
+        try:
+            claimed = _embedded_json(html, "fire-tax-detailed-data").get("supported_profiles", {})
+            errors.extend(f"Detailed tax profile {profile_id} is claimed enabled but not executable" for profile_id in claimed)
+        except (json.JSONDecodeError, ValueError):
+            pass
+        return errors
     errors: list[str] = []
     if evidence["destination_count"] <= 0:
         errors.append("Detailed tax runtime verification found no calculator destinations")
@@ -341,6 +362,10 @@ def detailed_tax_runtime_errors(html: str) -> list[str]:
         errors.append("Detailed tax enabled profile destination is not selectable in the live calculator")
     if not evidence["dom_initialized"] or not evidence["result_rendered"]:
         errors.append("Detailed tax DOM flow did not initialize, route answers, submit and render")
+    if evidence["native_control_events"] <= 0:
+        errors.append("Detailed tax DOM flow did not interact with rendered native controls")
+    if not evidence["currency_reset"]:
+        errors.append("Detailed tax monetary answers were not cleared after a planning-currency change")
     if not evidence["official_source_link_rendered"] or not evidence["plain_branch_rendered"]:
         errors.append("Detailed tax result did not render official sources and a plain-language branch")
     if evidence["unsupported_pair_available"]:

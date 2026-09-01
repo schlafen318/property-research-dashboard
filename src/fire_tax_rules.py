@@ -164,12 +164,14 @@ SUPPORTED_RUNTIME_KEYS = frozenset(
         "factory",
         "supported_activity_types",
         "supported_retirement_accounts",
-        "supported_property_types",
-        "supported_gift_relationships",
-        "supported_exit_plans",
-        "rule_constants",
+        "supported_housing_plans",
     }
 )
+HK_DUBAI_CAPABILITIES = {
+    "supported_activity_types": frozenset({"retired_or_employee"}),
+    "supported_retirement_accounts": frozenset({"personal_investment"}),
+    "supported_housing_plans": frozenset({"rent"}),
+}
 
 
 def load_fire_tax_rules(path: Path = RULES_PATH) -> dict[str, Any]:
@@ -399,8 +401,9 @@ def _validate_supported_profiles(
         if not isinstance(source_ids, list) or not source_ids or invalid_sources:
             errors.append(f"{path}.source_ids must reference only current official sources")
         lifecycle = profile.get("property_lifecycle")
-        if not isinstance(lifecycle, list) or set(lifecycle) != required_lifecycle:
-            errors.append(f"{path}.property_lifecycle must cover every property lifecycle stage")
+        expected_lifecycle = set() if profile.get("runtime_definition", {}).get("factory") == "hong-kong-to-dubai-v1" else required_lifecycle
+        if not isinstance(lifecycle, list) or set(lifecycle) != expected_lifecycle:
+            errors.append(f"{path}.property_lifecycle must match the enabled profile lifecycle boundary")
         income = profile.get("income_categories")
         if not isinstance(income, list) or set(income) != required_income:
             errors.append(f"{path}.income_categories must cover every detailed income category")
@@ -413,16 +416,12 @@ def _validate_supported_profiles(
                 errors.append(f"{path}.runtime_definition.{key} is not a validated rule setting")
         if runtime.get("factory") != "hong-kong-to-dubai-v1":
             errors.append(f"{path}.runtime_definition.factory is unsupported")
-        constants = runtime.get("rule_constants")
-        if not isinstance(constants, dict) or not constants or not all(
-            isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value >= 0
-            for value in constants.values()
-        ):
-            errors.append(f"{path}.runtime_definition.rule_constants must contain non-negative official rule constants")
-        for key in SUPPORTED_RUNTIME_KEYS - {"factory", "rule_constants"}:
+        for key, allowed in HK_DUBAI_CAPABILITIES.items():
             values = runtime.get(key)
             if not isinstance(values, list) or not values or not all(isinstance(value, str) and value for value in values):
                 errors.append(f"{path}.runtime_definition.{key} must contain supported identifiers")
+            elif set(values) != allowed or len(values) != len(set(values)):
+                errors.append(f"{path}.runtime_definition.{key} contains unsupported identifiers")
         if profile.get("detailed_enabled") and profile.get("synthetic"):
             errors.append(f"{path}.detailed_enabled cannot enable a synthetic profile")
 

@@ -271,14 +271,7 @@
         "uae-natural-person-business-2026",
         "uae-tax-residence-2026",
         "hk-territorial-individual-tax-2026",
-        "hk-uae-treaty-2026",
-        "dld-sale-registration-2026",
-        "dld-gift-registration-2026",
-        "dld-inheritance-registration-2026",
-        "dld-service-charge-index-2026",
-        "uae-residential-property-vat-2026",
-        "cbuae-aed-usd-rate-2026",
-        "dubai-municipality-housing-fee-2026"
+        "hk-uae-treaty-2026"
       ],
       "income_categories": [
         "private_pension",
@@ -291,26 +284,12 @@
         "rental_income",
         "employment_consulting"
       ],
-      "property_lifecycle": ["purchase", "annual", "rental", "sale", "inheritance", "gift"],
+      "property_lifecycle": [],
       "runtime_definition": {
         "factory": "hong-kong-to-dubai-v1",
         "supported_activity_types": ["retired_or_employee"],
         "supported_retirement_accounts": ["personal_investment"],
-        "supported_property_types": ["villa_or_apartment"],
-        "supported_gift_relationships": ["first_degree_family"],
-        "supported_exit_plans": ["sale", "gift", "inheritance", "keep"],
-        "rule_constants": {
-          "buyer_sale_registration_rate": 0.02,
-          "seller_sale_registration_rate": 0.02,
-          "gift_registration_rate": 0.00125,
-          "gift_registration_minimum_aed": 2000,
-          "inheritance_registration_aed": 1000,
-          "title_deed_aed": 250,
-          "unit_map_aed": 250,
-          "knowledge_and_innovation_aed": 20,
-          "inheritance_partner_fee_aed": 130,
-          "vat_rate": 0.05
-        }
+        "supported_housing_plans": ["rent"]
       }
     }
   },

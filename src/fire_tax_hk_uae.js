@@ -125,23 +125,21 @@
       seller_rate: { kind: "constant", value_type: "number", value: constants.seller_sale_registration_rate },
       gift_rate: { kind: "constant", value_type: "number", value: constants.gift_registration_rate },
       purchase_fixed: { kind: "constant", value_type: "money", currency: currency, value: aed(constants.title_deed_aed + constants.unit_map_aed + constants.knowledge_and_innovation_aed + trusteeAed * (1 + constants.vat_rate)) },
-      sale_fixed: { kind: "constant", value_type: "money", currency: currency, value: aed(constants.title_deed_aed + constants.unit_map_aed + constants.knowledge_and_innovation_aed + trusteeAed * (1 + constants.vat_rate)) },
       inheritance_fixed: { kind: "constant", value_type: "money", currency: currency, value: aed(constants.inheritance_registration_aed + constants.title_deed_aed + constants.unit_map_aed + constants.knowledge_and_innovation_aed + constants.inheritance_partner_fee_aed * (1 + constants.vat_rate)) },
       gift_fixed: { kind: "constant", value_type: "money", currency: currency, value: aed(constants.title_deed_aed + constants.unit_map_aed + constants.knowledge_and_innovation_aed + giftTrusteeAed * (1 + constants.vat_rate)) },
     };
-    const dld = ["dld-sale-registration-2026"], gift = ["dld-gift-registration-2026"], inheritance = ["dld-inheritance-registration-2026"];
+    const dld = ["dld-sale-registration-2026"], gift = ["dld-gift-registration-2026"], inheritance = ["dld-inheritance-registration-2026"], fx = ["cbuae-aed-usd-rate-2026"];
     const service = ["dld-service-charge-index-2026"], vat = ["uae-residential-property-vat-2026", "uae-individual-tax-2026"];
     const rules = [
       propertyRule("dubai-purchase-registration-2026", "purchase", currency, sources, { sourceIds: dld, kind: "registration_fee", classification: "non_tax", formula: { operation: "multiply", operands: ["purchase_price", "buyer_rate"] }, rate: constants.buyer_sale_registration_rate, rateOperand: "buyer_rate", explanation: "Buyer share of the DLD sale-registration fee under the standard equal allocation." }),
-      propertyRule("dubai-purchase-services-2026", "purchase", currency, sources, { sourceIds: dld, kind: "registration_service_fees", classification: "non_tax", formula: { operation: "add", operands: ["purchase_fixed"] }, amount: catalog.purchase_fixed.value, amountOperand: "purchase_fixed", explanation: "Current DLD title, unit-map, knowledge, innovation and trustee service fees, including VAT only on the trustee service." }),
+      propertyRule("dubai-purchase-services-2026", "purchase", currency, sources, { sourceIds: dld.concat(fx), kind: "registration_service_fees", classification: "non_tax", formula: { operation: "add", operands: ["purchase_fixed"] }, amount: catalog.purchase_fixed.value, amountOperand: "purchase_fixed", explanation: "Current DLD title, unit-map, knowledge, innovation and trustee service fees, including VAT only on the trustee service; AED amounts use the cited CBUAE conversion." }),
       propertyRule("dubai-annual-service-charge-2026", "annual", currency, sources, { sourceIds: service, kind: "service_charge", classification: "non_tax", formula: { operation: "multiply", operands: ["annual_service_charges", "one_rate"] }, rate: 1, rateOperand: "one_rate", explanation: "User-supplied property-specific service charge from the DLD index; no universal rate is assumed." }),
       propertyRule("dubai-annual-housing-fee-2026", "annual", currency, sources, { sourceIds: ["dubai-municipality-housing-fee-2026"], kind: "municipality_housing_fee", classification: "non_tax", formula: { operation: "multiply", operands: ["annual_housing_fee", "one_rate"] }, rate: 1, rateOperand: "one_rate", explanation: "User-supplied Dubai Municipality housing fee from the owned-unit property bill; it is shown as a fee rather than relabelled as income or property tax." }),
       propertyRule("dubai-residential-rental-no-tax-2026", "rental", currency, sources, { sourceIds: vat, kind: "residential_rental_tax", classification: "tax", formula: { operation: "multiply", operands: ["annual_rent", "zero_rate"] }, rate: 0, rateOperand: "zero_rate", noTax: true, explanation: "Personally held residential rent is outside UAE individual income tax and residential rent carries no owner-charged VAT in this profile." }),
       propertyRule("dubai-sale-registration-2026", "sale", currency, sources, { sourceIds: dld, kind: "sale_registration_fee", classification: "non_tax", formula: { operation: "multiply", operands: ["sale_price", "seller_rate"] }, rate: constants.seller_sale_registration_rate, rateOperand: "seller_rate", explanation: "Seller share of the DLD sale-registration fee under the standard equal allocation." }),
-      propertyRule("dubai-sale-services-2026", "sale", currency, sources, { sourceIds: dld, kind: "sale_service_fees", classification: "non_tax", formula: { operation: "add", operands: ["sale_fixed"] }, amount: catalog.sale_fixed.value, amountOperand: "sale_fixed", explanation: "Current DLD sale service fees for the supported unit transaction." }),
-      propertyRule("dubai-inheritance-registration-2026", "inheritance", currency, sources, { sourceIds: inheritance, kind: "inheritance_registration_fee", classification: "non_tax", formula: { operation: "add", operands: ["inheritance_fixed"] }, amount: catalog.inheritance_fixed.value, amountOperand: "inheritance_fixed", explanation: "Current DLD inheritance title-transfer, title, unit-map, knowledge, innovation and partner service fees." }),
-      propertyRule("dubai-gift-registration-2026", "gift", currency, sources, { sourceIds: gift, kind: "gift_registration_fee", classification: "non_tax", formula: { operation: "multiply", operands: ["gift_valuation", "gift_rate"] }, rate: constants.gift_registration_rate, rateOperand: "gift_rate", explanation: "Qualifying first-degree-family DLD gift registration percentage applied to the user-supplied DLD property valuation; profile eligibility ensures the statutory minimum is not controlling." }),
-      propertyRule("dubai-gift-services-2026", "gift", currency, sources, { sourceIds: gift, kind: "gift_service_fees", classification: "non_tax", formula: { operation: "add", operands: ["gift_fixed"] }, amount: catalog.gift_fixed.value, amountOperand: "gift_fixed", explanation: "Current DLD gift title, unit-map, knowledge, innovation and trustee service fees." }),
+      propertyRule("dubai-inheritance-registration-2026", "inheritance", currency, sources, { sourceIds: inheritance.concat(fx), kind: "inheritance_registration_fee", classification: "non_tax", formula: { operation: "add", operands: ["inheritance_fixed"] }, amount: catalog.inheritance_fixed.value, amountOperand: "inheritance_fixed", explanation: "Current DLD inheritance title-transfer, title, unit-map, knowledge, innovation and partner service fees; AED amounts use the cited CBUAE conversion." }),
+      propertyRule("dubai-gift-registration-2026", "gift", currency, sources, { sourceIds: gift.concat(fx), kind: "gift_registration_fee", classification: "non_tax", formula: { operation: "multiply", operands: ["gift_valuation", "gift_rate"] }, rate: constants.gift_registration_rate, rateOperand: "gift_rate", explanation: "Qualifying first-degree-family DLD gift registration percentage applied to the user-supplied DLD property valuation; the minimum branch check uses the cited CBUAE conversion." }),
+      propertyRule("dubai-gift-services-2026", "gift", currency, sources, { sourceIds: gift.concat(fx), kind: "gift_service_fees", classification: "non_tax", formula: { operation: "add", operands: ["gift_fixed"] }, amount: catalog.gift_fixed.value, amountOperand: "gift_fixed", explanation: "Current DLD gift title, unit-map, knowledge, innovation and trustee service fees; AED amounts use the cited CBUAE conversion." }),
     ];
     const coverage = {};
     STAGES.forEach(function (stage) {
@@ -159,18 +157,22 @@
 
   function buildRuntimeBundle(definition, profile, sources) {
     if (!record(definition) || !record(profile) || definition.runtime_definition.factory !== "hong-kong-to-dubai-v1") throw new TypeError("Unsupported detailed profile factory");
+    if (!record(profile.destination) || !record(profile.destination.property) || profile.destination.property.enabled !== false) throw new TypeError("The enabled Hong Kong to Dubai exact factory is renter-only; owned-property rules are not published.");
     const currency = profile.destination.income.currency;
     const residence = residenceRules(definition, currency, sources);
     const destinationIncomeSources = ["uae-individual-tax-2026", "uae-natural-person-business-2026"];
     const homeIncomeSources = ["hk-territorial-individual-tax-2026", "hk-uae-treaty-2026"];
     const destinationIncome = incomeRules("dubai", "destination", currency, destinationIncomeSources, sources);
     const homeIncome = incomeRules("hong-kong", "home", currency, homeIncomeSources, sources);
+    const noProperty = function (id, side) { return { schema_version: 1, tax_year: 2026, checked_on: "2026-09-01", operand_catalog: {}, sources: [], active_jurisdiction_id: id, jurisdictions: { [id]: { id: id, label: id === "dubai" ? "Dubai" : "Hong Kong", synthetic: false, detailed_enabled: true, calculation_side: side, resident_scope: "worldwide_income", nonresident_scope: "source_income", property_coverage: {}, rules: [] } } }; };
+    const destinationProperty = noProperty("dubai", "destination");
+    const homeProperty = noProperty("hong-kong", "home");
     return {
       residence: residence,
       rules: {
         residence: residence,
-        destination: { income: destinationIncome, credits: [], property: propertyRules(definition, profile, currency, sources) },
-        continuingHome: { income: homeIncome, credits: [], property: propertyRules(definition, profile, currency, sources) },
+        destination: { income: destinationIncome, credits: [], property: destinationProperty },
+        continuingHome: { income: homeIncome, credits: [], property: homeProperty },
       },
     };
   }
