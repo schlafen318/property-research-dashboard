@@ -81,29 +81,28 @@
         confidence: "low",
       };
     }
-    const bandMode = {
-      under_90: "seasonal",
-      "90_182": "part_year",
-      "183_plus": "full_relocation",
-      unsure: profile.stay_mode,
-    }[profile.annual_day_band];
-    const band = screen.planning_bands[bandMode];
-    const rates = {
-      favorable: Number(band.favorable_rate),
-      central: Number(band.central_rate),
-      adverse: Number(band.adverse_rate),
-    };
-    const bypass = profile.tax_mode === "user_after_tax";
-    function reserve(key) {
-      if (bypass) return 0;
-      return profile.planning_base === null ? null : Math.round(profile.planning_base * rates[key]);
-    }
     const residence = {
       under_90: "residence_depends_on_days_and_ties",
       "90_182": "residence_depends_on_days_and_ties",
       "183_plus": "likely_resident",
       unsure: "residence_depends_on_days_and_ties",
     }[profile.annual_day_band];
+    const bands = screen.planning_bands;
+    const bandValues = Object.keys(bands).map(function (key) { return bands[key]; });
+    const rates = residence === "residence_depends_on_days_and_ties" ? {
+      favorable: Math.min.apply(null, bandValues.map(function (item) { return Number(item.favorable_rate); })),
+      central: Number(bands[profile.stay_mode].central_rate),
+      adverse: Math.max.apply(null, bandValues.map(function (item) { return Number(item.adverse_rate); })),
+    } : {
+      favorable: Number(bands.full_relocation.favorable_rate),
+      central: Number(bands.full_relocation.central_rate),
+      adverse: Number(bands.full_relocation.adverse_rate),
+    };
+    const bypass = profile.tax_mode === "user_after_tax";
+    function reserve(key) {
+      if (bypass) return 0;
+      return profile.planning_base === null ? null : Math.round(profile.planning_base * rates[key]);
+    }
     const fallbackFundingNotes = {
       portfolio: "Portfolio income needs category-specific review.",
       pension: "Pension income needs treaty and pension-type review.",
@@ -115,6 +114,9 @@
       fallbackFundingNotes[profile.funding_source];
     const materialFlags = (screen.material_flags || []).slice();
     const warnings = [];
+    if (residence === "residence_depends_on_days_and_ties") {
+      warnings.push("The reserve range spans nonresident and resident branches because ties remain unresolved.");
+    }
     if (profile.housing !== "rent" && (profile.property_use === "rental" || profile.property_use === "mixed")) {
       materialFlags.push("property_rental_tax");
       warnings.push("Rental or mixed home use can create local income and filing obligations.");

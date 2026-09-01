@@ -79,9 +79,9 @@ class FireAbroadModelTests(unittest.TestCase):
             country,
             normalize_fire_profile({"planning_base": 100000, "tax_mode": "user_after_tax"}),
         )
-        self.assertEqual(3000, estimated["favorable_reserve"])
+        self.assertEqual(0, estimated["favorable_reserve"])
         self.assertEqual(12000, estimated["central_reserve"])
-        self.assertEqual(22000, estimated["adverse_reserve"])
+        self.assertEqual(35000, estimated["adverse_reserve"])
         self.assertEqual(0, supplied["central_reserve"])
 
     def test_day_band_funding_property_use_and_home_context_change_tax_screen(self):
@@ -122,6 +122,20 @@ class FireAbroadModelTests(unittest.TestCase):
         territorial = screen_tax(country, {**base, "home_tax_context": "territorial"})
         residence_based = screen_tax(country, {**base, "home_tax_context": "residence_based"})
         self.assertNotEqual(territorial["warnings"], residence_based["warnings"])
+
+    def test_unresolved_residence_spans_nonresident_and_resident_tax_branches(self):
+        result = screen_tax(
+            {"tax_screen": complete_tax_screen()},
+            normalize_fire_profile({
+                "stay_mode": "full_relocation",
+                "annual_day_band": "under_90",
+                "planning_base": 100000,
+            }),
+        )
+        self.assertEqual("residence_depends_on_days_and_ties", result["residence_outcome"])
+        self.assertEqual(0, result["favorable_reserve"])
+        self.assertEqual(22000, result["central_reserve"])
+        self.assertEqual(35000, result["adverse_reserve"])
 
     def test_eligibility_must_be_supported_before_ranking(self):
         country = {"eligibility": eligibility_screen()}

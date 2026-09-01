@@ -25,9 +25,9 @@
       "expected": {
         "status": "planning_estimate",
         "residence_outcome": "residence_depends_on_days_and_ties",
-        "favorable_reserve": 3000,
+        "favorable_reserve": 0,
         "central_reserve": 12000,
-        "adverse_reserve": 22000
+        "adverse_reserve": 35000
       }
     },
     {

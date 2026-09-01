@@ -344,18 +344,26 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
             "confidence": "low",
         }
 
-    band_mode = {
-        "under_90": "seasonal",
-        "90_182": "part_year",
-        "183_plus": "full_relocation",
-        "unsure": profile["stay_mode"],
+    residence_outcome = {
+        "under_90": "residence_depends_on_days_and_ties",
+        "90_182": "residence_depends_on_days_and_ties",
+        "183_plus": "likely_resident",
+        "unsure": "residence_depends_on_days_and_ties",
     }[profile["annual_day_band"]]
-    band = screen["planning_bands"][band_mode]
-    rates = {
-        "favorable": float(band["favorable_rate"]),
-        "central": float(band["central_rate"]),
-        "adverse": float(band["adverse_rate"]),
-    }
+    bands = screen["planning_bands"]
+    if residence_outcome == "residence_depends_on_days_and_ties":
+        rates = {
+            "favorable": min(float(item["favorable_rate"]) for item in bands.values()),
+            "central": float(bands[profile["stay_mode"]]["central_rate"]),
+            "adverse": max(float(item["adverse_rate"]) for item in bands.values()),
+        }
+    else:
+        band = bands["full_relocation"]
+        rates = {
+            "favorable": float(band["favorable_rate"]),
+            "central": float(band["central_rate"]),
+            "adverse": float(band["adverse_rate"]),
+        }
     planning_base = profile.get("planning_base")
     bypass = profile["tax_mode"] == "user_after_tax"
 
@@ -366,12 +374,6 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
             return None
         return round(planning_base * rates[key])
 
-    residence_outcome = {
-        "under_90": "residence_depends_on_days_and_ties",
-        "90_182": "residence_depends_on_days_and_ties",
-        "183_plus": "likely_resident",
-        "unsure": "residence_depends_on_days_and_ties",
-    }[profile["annual_day_band"]]
     scope = screen.get("scope_if_resident", "unknown")
     fallback_funding_notes = {
         "portfolio": "Portfolio income needs category-specific review.",
@@ -385,6 +387,8 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
     )
     material_flags = list(screen.get("material_flags", []))
     warnings: list[str] = []
+    if residence_outcome == "residence_depends_on_days_and_ties":
+        warnings.append("The reserve range spans nonresident and resident branches because ties remain unresolved.")
     if profile["housing"] != "rent" and profile["property_use"] in {"rental", "mixed"}:
         material_flags.append("property_rental_tax")
         warnings.append("Rental or mixed home use can create local income and filing obligations.")
