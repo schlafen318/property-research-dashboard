@@ -92,6 +92,35 @@ class AutoInternalLinkTests(unittest.TestCase):
         self.assertIn("taxMode", errors[0])
         self.assertIn("wealthBand", errors[0])
 
+    def test_static_verifier_executes_detailed_tax_routing_and_privacy_contract(self) -> None:
+        destinations = build_unified_app.rank_destinations(
+            [build_unified_app.consolidate_destination(item) for item in build_unified_app.load_json("destinations.json")]
+        )
+        html = build_unified_app.build_retirement_calculator_page(
+            destinations,
+            build_unified_app.load_retirement_costs(),
+            build_unified_app.load_fire_abroad(),
+        )
+
+        evidence = verify_static_site.detailed_tax_runtime_evidence(html)
+
+        self.assertGreater(evidence["destination_count"], 0)
+        self.assertEqual(0, evidence["privacy_calls"])
+        self.assertFalse(evidence["synthetic_probe_available"])
+        self.assertEqual([], verify_static_site.detailed_tax_runtime_errors(html))
+
+    def test_static_verifier_rejects_a_claimed_enabled_bundle_that_cannot_run(self) -> None:
+        html = (
+            '<script id="retirement-destination-data" type="application/json">'
+            '{"destinations":[{"destination_id":"dubai"}]}</script>'
+            '<script id="fire-tax-detailed-data" type="application/json">'
+            '{"jurisdictions":{"dubai":{"detailed_enabled":true,"synthetic":false}}}</script>'
+        )
+
+        errors = verify_static_site.detailed_tax_runtime_errors(html)
+
+        self.assertTrue(any("dubai" in error and "not executable" in error for error in errors))
+
     def test_contextual_related_guides_includes_machine_approved_links_first(self) -> None:
         source = {
             "slug": "buy-property-abroad",

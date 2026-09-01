@@ -15,6 +15,7 @@ ARTIFACTS = ROOT / "artifacts"
 SITE_ORIGIN = "https://globalhomeatlas.com"
 FINDER_ENGINE = ROOT / "src" / "retirement_destination_finder.js"
 FINDER_UI = ROOT / "src" / "retirement_destination_finder_ui.js"
+DETAILED_TAX_UI = ROOT / "src" / "fire_tax_detailed_ui.js"
 
 KEY_PAGES = [
     ARTIFACTS / "guides" / "index.html",
@@ -209,6 +210,88 @@ def finder_handoff_privacy_errors(html: str) -> list[str]:
     return errors
 
 
+def _embedded_json(html: str, element_id: str) -> dict[str, object]:
+    match = re.search(
+        rf'<script\b[^>]*\bid="{re.escape(element_id)}"[^>]*>(.*?)</script>',
+        html,
+        re.DOTALL,
+    )
+    if not match:
+        raise ValueError(f"Embedded payload {element_id} is missing")
+    payload = json.loads(match.group(1))
+    if not isinstance(payload, dict):
+        raise ValueError(f"Embedded payload {element_id} is not an object")
+    return payload
+
+
+def detailed_tax_runtime_evidence(html: str) -> dict[str, object]:
+    calculator = _embedded_json(html, "retirement-destination-data")
+    detailed = _embedded_json(html, "fire-tax-detailed-data")
+    destination_ids = [
+        item.get("destination_id")
+        for item in calculator.get("destinations", [])
+        if isinstance(item, dict) and isinstance(item.get("destination_id"), str)
+    ]
+    script = r"""
+let privacyCalls=0;
+global.window={
+  history:{pushState(){privacyCalls++;},replaceState(){privacyCalls++;}},
+  localStorage:{getItem(){privacyCalls++;},setItem(){privacyCalls++;}},
+  sessionStorage:{getItem(){privacyCalls++;},setItem(){privacyCalls++;}},
+  fetch(){privacyCalls++;}
+};
+const api=require(process.argv[1]);
+const input=JSON.parse(require("fs").readFileSync(0,"utf8"));
+const access=Object.fromEntries(input.destinationIds.map(id=>[id,api.jurisdictionAccess(id,input.payload)]));
+const probe={jurisdictions:{probe:{detailed_enabled:true,synthetic:true,runtime_bundle:{rules:{}}}}};
+const controller=api.createController({questions:[{id:"probe",fact:"probeFact",control:"number",acceptedValues:{min:0,max:2,step:1,integer:true}}]});
+controller.answer("probeFact",1);
+process.stdout.write(JSON.stringify({
+  access,
+  privacyCalls,
+  syntheticProbeAvailable:api.jurisdictionAccess("probe",probe).available,
+  controllerAnswers:controller.snapshot().answers
+}));
+"""
+    completed = subprocess.run(
+        ["node", "-e", script, str(DETAILED_TAX_UI)],
+        input=json.dumps({"destinationIds": destination_ids, "payload": detailed}),
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    runtime = json.loads(completed.stdout)
+    return {
+        "destination_count": len(destination_ids),
+        "access": runtime["access"],
+        "privacy_calls": int(runtime["privacyCalls"]),
+        "synthetic_probe_available": bool(runtime["syntheticProbeAvailable"]),
+        "controller_answers": runtime["controllerAnswers"],
+        "claimed_jurisdictions": list(detailed.get("jurisdictions", {}).keys()),
+    }
+
+
+def detailed_tax_runtime_errors(html: str) -> list[str]:
+    try:
+        evidence = detailed_tax_runtime_evidence(html)
+    except (json.JSONDecodeError, OSError, subprocess.CalledProcessError, ValueError) as error:
+        return [f"Detailed tax runtime verification failed: {error}"]
+    errors: list[str] = []
+    if evidence["destination_count"] <= 0:
+        errors.append("Detailed tax runtime verification found no calculator destinations")
+    if evidence["privacy_calls"] != 0:
+        errors.append("Detailed tax runtime accessed URL, storage, or network APIs")
+    if evidence["synthetic_probe_available"]:
+        errors.append("Detailed tax runtime exposed a synthetic jurisdiction")
+    if evidence["controller_answers"] != {"probeFact": 1}:
+        errors.append("Detailed tax runtime did not retain an answer in memory")
+    access = evidence["access"]
+    for jurisdiction_id in evidence["claimed_jurisdictions"]:
+        if not isinstance(access, dict) or not access.get(jurisdiction_id, {}).get("available"):
+            errors.append(f"Detailed tax jurisdiction {jurisdiction_id} is claimed enabled but not executable")
+    return errors
+
+
 def verify(min_sitemap_urls: int) -> list[str]:
     errors: list[str] = []
     for page in KEY_PAGES:
@@ -227,6 +310,9 @@ def verify(min_sitemap_urls: int) -> list[str]:
     finder_page = ARTIFACTS / "retirement-destination-finder" / "index.html"
     if finder_page.exists():
         errors.extend(finder_handoff_privacy_errors(finder_page.read_text(encoding="utf-8")))
+    calculator_page = ARTIFACTS / "retirement-abroad-calculator" / "index.html"
+    if calculator_page.exists():
+        errors.extend(detailed_tax_runtime_errors(calculator_page.read_text(encoding="utf-8")))
     errors.extend(broken_local_links())
     return errors
 

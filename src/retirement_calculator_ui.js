@@ -283,6 +283,10 @@
     };
   }
 
+  function detailedRefineAvailable(input) {
+    return Boolean(input && input.planningAvailable === true && input.enabledMarker === "true");
+  }
+
   function taxAuditEntries(input) {
     const labels = {
       taxReserve: "Tax reserve",
@@ -1176,8 +1180,12 @@
         appendTaxExplanation(explanationContainer, entry.heading, entry.explanation, sourceById);
       });
       details.hidden = false;
-      refine.hidden = !view.refineAvailable;
-      refine.disabled = !view.refineAvailable;
+      const canRefine = detailedRefineAvailable({
+        planningAvailable: view.refineAvailable,
+        enabledMarker: refine.dataset.detailedAvailable,
+      });
+      refine.hidden = !canRefine;
+      refine.disabled = !canRefine;
       return view;
     }
 
@@ -1563,6 +1571,7 @@
     taxEvidenceContext: taxEvidenceContext,
     wealthTaxRelevant: wealthTaxRelevant,
     taxResultPresentation: taxResultPresentation,
+    detailedRefineAvailable: detailedRefineAvailable,
     taxAuditEntries: taxAuditEntries,
     auditEvidencePresentation: auditEvidencePresentation,
     calculateTaxAdjustedScenarios: calculateTaxAdjustedScenarios,

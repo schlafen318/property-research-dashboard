@@ -298,7 +298,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         }
         self.assertTrue(expected_controls.issubset(parser.control_ids))
         self.assertTrue(expected_controls - {"ret-calculate"} <= parser.label_targets)
-        self.assertEqual(2, parser.live_regions)
+        self.assertEqual(3, parser.live_regions)
         self.assertGreaterEqual(parser.noscript_sections, 1)
 
     def test_form_supports_dated_planning_currency_conversion_including_sgd(self) -> None:
@@ -403,6 +403,26 @@ class RetirementCalculatorPageTests(unittest.TestCase):
     def test_disclosure_summaries_use_regular_weight(self) -> None:
         self.assertIn("summary { cursor:pointer; font-weight:400; }", self.html)
         self.assertNotIn("details.assumptions summary { font-weight:400; }", self.html)
+
+    def test_detailed_tax_refinement_is_embedded_but_unavailable_jurisdictions_have_no_entry_point(self) -> None:
+        self.assertIn("GHAFireTaxDetailedUI", self.html)
+        self.assertIn('id="ret-tax-detailed" hidden', self.html)
+        self.assertIn('id="ret-tax-refine" type="button" hidden disabled', self.html)
+        self.assertIn('id="ret-tax-detailed-availability" role="status"', self.html)
+        self.assertIn("Exact refinement is unavailable until complete current rules cover both this destination and your home tax jurisdiction.", self.html)
+        payload_text = self.html.split(
+            '<script id="fire-tax-detailed-data" type="application/json">', 1
+        )[1].split("</script>", 1)[0]
+        payload = json.loads(payload_text)
+        self.assertEqual({}, payload["jurisdictions"])
+        self.assertNotIn("synthetic-example", payload_text)
+
+    def test_detailed_tax_section_has_one_question_region_one_table_and_live_updates(self) -> None:
+        section = self.html.split('id="ret-tax-detailed"', 1)[1].split("</section>", 1)[0]
+        self.assertEqual(1, section.count('id="ret-tax-detailed-questions"'))
+        self.assertEqual(1, section.count("<table"))
+        self.assertIn('id="ret-tax-detailed-status" role="status" aria-live="polite"', section)
+        self.assertIn("Calculation details and official sources", section)
 
     def test_personalized_form_uses_cash_flow_inputs(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
