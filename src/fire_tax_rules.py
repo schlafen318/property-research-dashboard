@@ -1420,7 +1420,10 @@ def _validate_property_coverage(
                 errors.append(f"{scope_path} must declare supported or no_tax coverage")
                 continue
             treatment = entry.get("treatment")
-            if treatment not in {"supported", "no_tax"}:
+            if not isinstance(treatment, str) or treatment not in {
+                "supported",
+                "no_tax",
+            }:
                 errors.append(f"{scope_path}.treatment must be supported or no_tax")
             rule_ids = entry.get("rule_ids")
             expected_ids = {
@@ -1499,6 +1502,7 @@ def _validate_property_relationship_domains(
             not isinstance(domain, list)
             or not domain
             or not all(isinstance(value, str) and value for value in domain)
+            or "unknown" in domain
             or len(set(domain)) != len(domain)
         ):
             errors.append(

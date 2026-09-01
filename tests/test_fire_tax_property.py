@@ -260,6 +260,7 @@ class FireTaxPropertyTests(unittest.TestCase):
         cases = (
             ["child", "unrelated", 7],
             ["child", "unrelated", ""],
+            ["child", "unrelated", "unknown"],
             ["child", "child"],
         )
         for domain in cases:

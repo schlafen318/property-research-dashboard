@@ -123,7 +123,7 @@
       if (operand.kind === "profile" && typeof operand.profile_key !== "string") {
         throw new FireTaxPropertyRuleError("operand " + operandId + " is missing its profile key");
       }
-      if (operand.kind === "profile" && operand.profile_key === "heirRelationship" && (!Array.isArray(operand.allowed_values) || operand.allowed_values.length < 2 || !operand.allowed_values.every(function (value) { return typeof value === "string" && value.length > 0; }) || new Set(operand.allowed_values).size !== operand.allowed_values.length)) {
+      if (operand.kind === "profile" && operand.profile_key === "heirRelationship" && (!Array.isArray(operand.allowed_values) || operand.allowed_values.length < 2 || !operand.allowed_values.every(function (value) { return typeof value === "string" && value.length > 0 && value !== "unknown"; }) || new Set(operand.allowed_values).size !== operand.allowed_values.length)) {
         throw new FireTaxPropertyRuleError("operand " + operandId + " must declare complete allowed relationship values");
       }
       if (operand.kind === "constant" && !valueMatches(operand.value, operand)) {

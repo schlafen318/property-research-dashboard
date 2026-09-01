@@ -1310,6 +1310,8 @@ class FireTaxPropertyRuleSchemaTests(unittest.TestCase):
             (lambda jurisdiction: jurisdiction["property_coverage"]["annual"].pop("resident"), f"{base_path}.annual.resident"),
             (lambda jurisdiction: jurisdiction["property_coverage"]["annual"]["resident"]["rule_ids"].remove("synthetic-resident-property-tax-2026"), f"{base_path}.annual.resident.rule_ids"),
             (lambda jurisdiction: jurisdiction["property_coverage"]["annual"]["resident"].update({"treatment": "no_tax"}), f"{base_path}.annual.resident.rule_ids"),
+            (lambda jurisdiction: jurisdiction["property_coverage"]["annual"]["resident"].update({"treatment": []}), f"{base_path}.annual.resident.treatment"),
+            (lambda jurisdiction: jurisdiction["property_coverage"]["annual"]["resident"].update({"treatment": {}}), f"{base_path}.annual.resident.treatment"),
         )
         for mutate, expected_path in cases:
             with self.subTest(path=expected_path):
@@ -1325,6 +1327,15 @@ class FireTaxPropertyRuleSchemaTests(unittest.TestCase):
             ),
             (
                 lambda payload: payload["operand_catalog"]["heir_relationship"]["allowed_values"].append("spouse"),
+                "operand_catalog.heir_relationship.allowed_values",
+            ),
+            (
+                lambda payload: (
+                    payload["operand_catalog"]["heir_relationship"]["allowed_values"].append("unknown"),
+                    payload["jurisdictions"]["synthetic-destination"]["rules"][15]["applies_when"][1].update(
+                        {"operator": "not_equals", "value": "child"}
+                    ),
+                ),
                 "operand_catalog.heir_relationship.allowed_values",
             ),
             (
