@@ -180,6 +180,7 @@ def _validate_hk_dubai_runtime_graph(
     required_income: set[str],
     known_source_ids: set[str],
     source_kinds: dict[str, Any],
+    as_of: date,
     errors: list[str],
 ) -> None:
     graph = profile.get("runtime_rule_graph")
@@ -200,6 +201,8 @@ def _validate_hk_dubai_runtime_graph(
         errors.append(f"{graph_path}.review_interval_days must be a positive integer")
     if not isinstance(graph.get("recheck_trigger"), str) or not graph["recheck_trigger"].strip():
         errors.append(f"{graph_path}.recheck_trigger must be non-empty")
+    if graph.get("confidence") not in CONFIDENCE_LEVELS:
+        errors.append(f"{graph_path}.confidence must be a supported confidence level")
     profile_sources = set(profile.get("source_ids", []))
     declared_graph_sources: set[str] = set()
 
@@ -214,12 +217,23 @@ def _validate_hk_dubai_runtime_graph(
     if not isinstance(residence, dict):
         errors.append(f"{graph_path}.residence must define destination and home graphs")
     else:
+        expected_residence = {
+            "destination": ("dubai", "Dubai", "destination", "uae-domestic-183-day-residence-2026"),
+            "home": ("hong-kong", "Hong Kong", "home", "hong-kong-supported-domestic-residence-2026"),
+        }
         for side in ("destination", "home"):
             item = residence.get(side)
             item_path = f"{graph_path}.residence.{side}"
             if not isinstance(item, dict):
                 errors.append(f"{item_path} must be an object")
                 continue
+            expected_jurisdiction, expected_label, expected_side, expected_rule_id = expected_residence[side]
+            if item.get("jurisdiction_id") != expected_jurisdiction:
+                errors.append(f"{item_path}.jurisdiction_id must match the enabled profile jurisdiction")
+            if item.get("label") != expected_label:
+                errors.append(f"{item_path}.label must match the enabled profile label")
+            if item.get("calculation_side") != expected_side:
+                errors.append(f"{item_path}.calculation_side must match the enabled profile side")
             graph_sources = validate_sources(item.get("source_ids"), f"{item_path}.source_ids")
             operands = item.get("operands")
             rules = item.get("rules")
@@ -234,6 +248,16 @@ def _validate_hk_dubai_runtime_graph(
                 if not isinstance(rule, dict):
                     errors.append(f"{rule_path} must be an object")
                     continue
+                if rule.get("id") != expected_rule_id:
+                    errors.append(f"{rule_path}.id must be the enabled profile residence rule")
+                if rule.get("type") != "residence_test":
+                    errors.append(f"{rule_path}.type must be residence_test")
+                if rule.get("category") != "tax_residence":
+                    errors.append(f"{rule_path}.category must be tax_residence")
+                if rule.get("taxpayer_scope") != ["individual"]:
+                    errors.append(f"{rule_path}.taxpayer_scope must contain only individual")
+                if rule.get("resident_when") is not True:
+                    errors.append(f"{rule_path}.resident_when must be true for this route")
                 validate_sources(rule.get("source_ids"), f"{rule_path}.source_ids")
                 if not set(rule.get("source_ids", [])).issubset(graph_sources):
                     errors.append(f"{rule_path}.source_ids must be declared by its graph")
@@ -242,17 +266,40 @@ def _validate_hk_dubai_runtime_graph(
                 formula_operands = formula.get("operands") if isinstance(formula, dict) else None
                 if operation not in FORMULA_OPERATIONS or not isinstance(formula_operands, list) or any(operand not in operands for operand in formula_operands):
                     errors.append(f"{rule_path}.formula must use a supported operation and declared operands")
+                normalized_rule = dict(rule)
+                normalized_rule.update({
+                    "tax_year": graph.get("tax_year"), "currency": "USD",
+                    "effective_from": graph.get("effective_from"), "checked_on": graph.get("checked_on"),
+                    "review_interval_days": graph.get("review_interval_days"),
+                    "confidence": graph.get("confidence"), "recheck_trigger": graph.get("recheck_trigger"),
+                })
+                _validate_rule(normalized_rule, rule_path, known_source_ids, operands, profile.get("tax_year"), as_of, errors)
 
     income = graph.get("income")
     if not isinstance(income, dict):
         errors.append(f"{graph_path}.income must define destination and continuing_home graphs")
     else:
+        expected_income = {
+            "destination": ("dubai", "Dubai", "destination"),
+            "continuing_home": ("hong-kong", "Hong Kong", "home"),
+        }
         for side in ("destination", "continuing_home"):
             item = income.get(side)
             item_path = f"{graph_path}.income.{side}"
             if not isinstance(item, dict):
                 errors.append(f"{item_path} must be an object")
                 continue
+            expected_jurisdiction, expected_label, expected_side = expected_income[side]
+            if item.get("jurisdiction_id") != expected_jurisdiction:
+                errors.append(f"{item_path}.jurisdiction_id must match the enabled profile jurisdiction")
+            if item.get("label") != expected_label:
+                errors.append(f"{item_path}.label must match the enabled profile label")
+            if item.get("calculation_side") != expected_side:
+                errors.append(f"{item_path}.calculation_side must match the enabled profile side")
+            if item.get("rule_type") != "rate_band":
+                errors.append(f"{item_path}.rule_type must be rate_band")
+            if item.get("taxpayer_scope") != ["resident", "nonresident"]:
+                errors.append(f"{item_path}.taxpayer_scope must cover resident and nonresident")
             validate_sources(item.get("source_ids"), f"{item_path}.source_ids")
             if set(item.get("categories", [])) != required_income:
                 errors.append(f"{item_path}.categories must cover every detailed income category")
@@ -268,11 +315,38 @@ def _validate_hk_dubai_runtime_graph(
                 for value in rule_ids.values()
             ) or (isinstance(rule_ids, dict) and len(set(rule_ids.values())) != len(rule_ids)):
                 errors.append(f"{item_path}.rule_ids must uniquely version every category rule")
+            elif any(
+                rule_ids[category] != f"{expected_jurisdiction}-{category.replace('_', '-')}-{profile.get('tax_year')}"
+                for category in required_income
+            ):
+                errors.append(f"{item_path}.rule_ids must identify this jurisdiction, category and tax year")
             formula = item.get("formula")
             if not isinstance(formula, dict) or formula.get("operation") != "progressive_rate" or formula.get("operand_prefix") != "income_":
                 errors.append(f"{item_path}.formula must be the validated progressive-rate template")
             if item.get("no_tax") is not True or item.get("bands") != [{"from": 0, "up_to": None, "rate": 0}]:
                 errors.append(f"{item_path}.bands must explicitly encode the validated no-tax treatment")
+            if isinstance(profile_keys, dict) and isinstance(rule_ids, dict):
+                for category in sorted(required_income & set(profile_keys) & set(rule_ids)):
+                    operand_id = f"income_{category}"
+                    operand_catalog = {operand_id: {"kind": "profile", "profile_key": profile_keys[category], "value_type": "money", "currency": "USD"}}
+                    normalized_rule = {
+                        "id": rule_ids[category], "type": item.get("rule_type"),
+                        "tax_year": graph.get("tax_year"), "taxpayer_scope": item.get("taxpayer_scope"),
+                        "category": category, "currency": "USD", "source_ids": item.get("source_ids"),
+                        "formula": {"operation": formula.get("operation") if isinstance(formula, dict) else None, "operands": [operand_id]},
+                        "bands": item.get("bands"), "no_tax": item.get("no_tax"),
+                        "effective_from": graph.get("effective_from"), "checked_on": graph.get("checked_on"),
+                        "review_interval_days": graph.get("review_interval_days"), "confidence": graph.get("confidence"),
+                        "recheck_trigger": graph.get("recheck_trigger"), "explanation": item.get("explanation"),
+                    }
+                    if category == "retirement_account_withdrawal":
+                        operand_catalog["retirement_classification"] = {
+                            "kind": "profile", "profile_key": "retirementAccountClassification",
+                            "value_type": "string", "allowed_values": ["personal_investment"],
+                        }
+                        normalized_rule["account_classification_operand"] = "retirement_classification"
+                        normalized_rule["supported_account_classifications"] = ["personal_investment"]
+                    _validate_rule(normalized_rule, f"{item_path}.rules.{category}", known_source_ids, operand_catalog, profile.get("tax_year"), as_of, errors)
 
     credits = graph.get("credits")
     if credits != {"destination": [], "continuing_home": []}:
@@ -281,11 +355,23 @@ def _validate_hk_dubai_runtime_graph(
     if not isinstance(property_graph, dict):
         errors.append(f"{graph_path}.property must define both not-applicable overlays")
     else:
+        expected_property = {
+            "destination": ("dubai", "Dubai", "destination"),
+            "continuing_home": ("hong-kong", "Hong Kong", "home"),
+        }
         for side in ("destination", "continuing_home"):
             item = property_graph.get(side)
             item_path = f"{graph_path}.property.{side}"
             if not isinstance(item, dict) or item.get("taxpayer_scope") != "not_applicable" or item.get("rules") != [] or item.get("source_ids") != []:
                 errors.append(f"{item_path} must be an explicit source-free not-applicable property overlay")
+                continue
+            expected_jurisdiction, expected_label, expected_side = expected_property[side]
+            if item.get("jurisdiction_id") != expected_jurisdiction:
+                errors.append(f"{item_path}.jurisdiction_id must match the enabled profile jurisdiction")
+            if item.get("label") != expected_label:
+                errors.append(f"{item_path}.label must match the enabled profile label")
+            if item.get("calculation_side") != expected_side:
+                errors.append(f"{item_path}.calculation_side must match the enabled profile side")
     if profile_sources != declared_graph_sources:
         errors.append(f"{path}.source_ids must exactly cover the executable runtime rule graph")
 
@@ -468,6 +554,7 @@ def _validate_supported_profiles(
     payload: dict[str, Any],
     known_source_ids: set[str],
     source_kinds: dict[str, Any],
+    as_of: date,
     errors: list[str],
 ) -> None:
     profiles = payload.get("supported_profiles")
@@ -539,7 +626,7 @@ def _validate_supported_profiles(
             elif set(values) != allowed or len(values) != len(set(values)):
                 errors.append(f"{path}.runtime_definition.{key} contains unsupported identifiers")
         _validate_hk_dubai_runtime_graph(
-            profile, path, required_income, known_source_ids, source_kinds, errors
+            profile, path, required_income, known_source_ids, source_kinds, as_of, errors
         )
         if profile.get("detailed_enabled") and profile.get("synthetic"):
             errors.append(f"{path}.detailed_enabled cannot enable a synthetic profile")
@@ -2086,7 +2173,7 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
                 if isinstance(source, dict):
                     source_kinds[source_id] = source.get("source_kind")
 
-    _validate_supported_profiles(payload, known_source_ids, source_kinds, errors)
+    _validate_supported_profiles(payload, known_source_ids, source_kinds, as_of, errors)
 
     jurisdictions = payload.get("jurisdictions")
     if not isinstance(jurisdictions, dict) or not jurisdictions:

@@ -23,12 +23,12 @@
       effective_from: graph.effective_from,
       checked_on: graph.checked_on,
       review_interval_days: graph.review_interval_days,
-      confidence: "high",
+      confidence: graph.confidence,
       recheck_trigger: graph.recheck_trigger,
     });
   }
 
-  function residenceBundle(item, graph, currency, sources, side) {
+  function residenceBundle(item, graph, currency, sources) {
     const rules = item.rules.map(function (rule) { return ruleMetadata(rule, graph, currency); });
     return {
       schema_version: graph.schema_version,
@@ -42,7 +42,7 @@
         label: item.label,
         synthetic: false,
         detailed_enabled: true,
-        calculation_side: side,
+        calculation_side: item.calculation_side,
         resident_scope: "worldwide_income",
         nonresident_scope: "source_income",
         residence_logic: { operation: "any", rule_ids: rules.map(function (rule) { return rule.id; }) },
@@ -58,8 +58,8 @@
       catalog[operandId] = { kind: "profile", profile_key: item.profile_keys[category], value_type: "money", currency: currency };
       const rule = ruleMetadata({
         id: item.rule_ids[category],
-        type: "rate_band",
-        taxpayer_scope: ["resident", "nonresident"],
+        type: item.rule_type,
+        taxpayer_scope: clone(item.taxpayer_scope),
         category: category,
         source_ids: item.source_ids,
         formula: { operation: item.formula.operation, operands: [operandId] },
@@ -123,8 +123,8 @@
     const graph = definition.runtime_rule_graph;
     const currency = profile.destination.income.currency;
     const residence = {
-      destination: residenceBundle(graph.residence.destination, graph, currency, sources, "destination"),
-      home: residenceBundle(graph.residence.home, graph, currency, sources, "home"),
+      destination: residenceBundle(graph.residence.destination, graph, currency, sources),
+      home: residenceBundle(graph.residence.home, graph, currency, sources),
     };
     return {
       residence: residence,

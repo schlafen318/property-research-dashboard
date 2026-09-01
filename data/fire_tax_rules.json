@@ -310,11 +310,13 @@
         "effective_from": "2026-01-01",
         "checked_on": "2026-09-01",
         "review_interval_days": 90,
+        "confidence": "high",
         "recheck_trigger": "Revalidate every linked official source and the serialized graph before the next tax-year release.",
         "residence": {
           "destination": {
             "jurisdiction_id": "dubai",
             "label": "Dubai",
+            "calculation_side": "destination",
             "source_ids": ["uae-tax-residence-2026"],
             "operands": {
               "days_in_destination": {"kind": "profile", "profile_key": "daysInDestination", "value_type": "number", "minimum": 0, "maximum": 365, "integer": true, "day_count": true},
@@ -334,6 +336,7 @@
           "home": {
             "jurisdiction_id": "hong-kong",
             "label": "Hong Kong",
+            "calculation_side": "home",
             "source_ids": ["hk-uae-treaty-2026", "hk-ordinary-residence-facts-2026"],
             "operands": {"home_resident": {"kind": "profile", "profile_key": "homeTreatyResident", "value_type": "boolean"}},
             "rules": [{
@@ -353,6 +356,8 @@
             "jurisdiction_id": "dubai",
             "label": "Dubai",
             "calculation_side": "destination",
+            "rule_type": "rate_band",
+            "taxpayer_scope": ["resident", "nonresident"],
             "source_ids": ["uae-individual-tax-2026", "uae-natural-person-business-2026"],
             "categories": ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting"],
             "profile_keys": {"private_pension": "privatePension", "government_pension": "governmentPension", "social_security": "socialSecurity", "dividends": "dividends", "interest": "interest", "realized_gains": "realizedGains", "retirement_account_withdrawal": "retirementAccountWithdrawal", "rental_income": "rentalIncome", "employment_consulting": "employmentConsulting"},
@@ -366,6 +371,8 @@
             "jurisdiction_id": "hong-kong",
             "label": "Hong Kong",
             "calculation_side": "home",
+            "rule_type": "rate_band",
+            "taxpayer_scope": ["resident", "nonresident"],
             "source_ids": ["hk-territorial-individual-tax-2026", "hk-uae-treaty-2026"],
             "categories": ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting"],
             "profile_keys": {"private_pension": "privatePension", "government_pension": "governmentPension", "social_security": "socialSecurity", "dividends": "dividends", "interest": "interest", "realized_gains": "realizedGains", "retirement_account_withdrawal": "retirementAccountWithdrawal", "rental_income": "rentalIncome", "employment_consulting": "employmentConsulting"},

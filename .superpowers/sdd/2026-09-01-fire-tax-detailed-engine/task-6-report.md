@@ -114,3 +114,16 @@ Final verification evidence:
 - Fresh refused flow: UAE 200 days, Hong Kong current 150, previous 100 and following 160 produced “Hong Kong residence or possible dual residence,” disabled submit, no result and no treaty tie-break questions.
 - Currency change to HKD hid the detailed section/result and removed all generated detailed controls, confirming the browser-local reset.
 - At 320, 375, 390, 430, 736 and 1024 CSS pixels, `body.scrollWidth` and `main.scrollWidth` exactly matched the viewport. A fresh isolated 320px JavaScript-disabled context exposed “The interactive calculator requires JavaScript” and no refine control.
+
+## Final fix wave 2
+
+- The production serialized graph is now validated through the same full `_validate_rule` schema used by standard jurisdiction rules. Residence rules are normalized with the graph's tax year, effective/check dates, review interval, confidence, recheck trigger and validation currency; income templates are expanded category-by-category into standard `rate_band` rules with standard operands before validation. Profile-specific checks additionally lock jurisdiction, label, calculation side, rule identity, type, category, scope and residence result so a different formally valid rule cannot be substituted.
+- Reviewer mutation coverage now proves canonical `validate_fire_tax_rules` rejects: residence type changed to `rate_band`, category changed to `dividends`, resident-only scope, `resident_when: false`, empty explanation, unrelated stable ID, empty labels, and changed jurisdiction/calculation-side fields. Runtime hydration parity covers labels, calculation side, rule type/scope, confidence, check date, formulas, IDs and sources.
+- Broad planning cases now carry explicit `currency: "USD"` from the USD retirement engine. Before detailed rendering, every favorable/central/adverse tax and capital amount is converted into the selected planning currency through the same `rates_to_usd` dataset used by the calculator. Missing or invalid source/destination FX fails closed; amounts are never merely relabeled.
+
+Final fix wave 2 verification:
+
+- Focused rule/engine/UI/calculator suite: 181 tests passed.
+- Full repository suite: 1,220 tests passed in 49.741 seconds on the final code; build succeeded.
+- Detailed static verification passed. The repository-wide command remains non-zero only for the unchanged Spain markers and three missing Chamonix images.
+- Fresh Chrome HKD flow completed through every generated native control. The raw current planning case remained explicitly USD 1,328,891 while the comparison rendered HKD 10,416,817 using the current validated rate. A subsequent full USD regression rendered the current comparison as USD 1,339,696 and the exact result as USD 1,296,352.

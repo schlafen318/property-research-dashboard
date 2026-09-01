@@ -292,6 +292,7 @@
     const fallbackCapital = Number(fallbackResult && fallbackResult.totalNeededToday);
     return {
       status: scenarioResults && scenarioResults.central ? "broad_tax_adjusted" : "current_plan_baseline",
+      currency: "USD",
       cases: Object.fromEntries(keys.map(function (key) {
         const row = scenarioResults && scenarioResults[key];
         const capital = row ? Number(row.requiredCapital) : fallbackCapital;

@@ -13,6 +13,32 @@
     return value !== null && typeof value === "object" && !Array.isArray(value);
   }
 
+  function convertPlanningCases(range, toCurrency, ratesToUsd) {
+    if (!record(range) || !record(range.cases)) return range || null;
+    const fromCurrency = range.currency;
+    const fromRate = record(ratesToUsd) ? Number(ratesToUsd[fromCurrency]) : NaN;
+    const toRate = record(ratesToUsd) ? Number(ratesToUsd[toCurrency]) : NaN;
+    if (typeof fromCurrency !== "string" || !fromCurrency || typeof toCurrency !== "string" || !toCurrency || !(fromRate > 0) || !(toRate > 0)) {
+      throw new TypeError("Explicit current FX rates are required to convert the broad planning cases.");
+    }
+    const keys = ["favorable", "central", "adverse"];
+    if (Object.keys(range.cases).length !== keys.length || keys.some(function (key) { return !record(range.cases[key]); })) {
+      throw new TypeError("Broad planning comparison requires favorable, central and adverse cases.");
+    }
+    const converted = Object.assign({}, range, { currency: toCurrency, cases: {} });
+    keys.forEach(function (key) {
+      const item = range.cases[key];
+      if (!record(item)) throw new TypeError("Every broad planning case must be an object.");
+      const tax = Number(item.annualTaxReserve), capital = Number(item.requiredCapital);
+      if (!Number.isFinite(tax) || !Number.isFinite(capital)) throw new TypeError("Every broad planning case requires finite amounts.");
+      converted.cases[key] = Object.assign({}, item, {
+        annualTaxReserve: tax * fromRate / toRate,
+        requiredCapital: capital * fromRate / toRate,
+      });
+    });
+    return converted;
+  }
+
   function escapeHtml(value) {
     return String(value === undefined || value === null ? "" : value)
       .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")
@@ -68,6 +94,8 @@
       return !record(sources[id]) || sources[id].source_kind !== "official" || !/^https:\/\//.test(sources[id].url || "") || !/^\d{4}-\d{2}-\d{2}$/.test(sources[id].checked_on || "") || !/^\d{4}-\d{2}-\d{2}$/.test(sources[id].effective_from || "");
     })) return { available: false, reason: "The complete official source set for this profile is unavailable." };
     if (record(facts)) {
+      if (facts.planningRangeCurrencyValid === false) return { available: false, reason: "A current FX rate is required to compare the broad planning cases in this currency." };
+      if (record(facts.planningRange) && record(facts.planningRange.cases) && facts.planningRange.currency !== facts.currency) return { available: false, reason: "Broad planning cases must be converted into the selected planning currency before exact refinement." };
       if (Number(facts.annualPension || 0) > 0) return { available: false, reason: "A pension needs its payer country, treaty and withholding rules; this exact profile currently requires zero pension income." };
       if (Number(facts.annualOtherIncome || 0) > 0) return { available: false, reason: "Generic other income cannot be source-classified safely; this exact profile currently requires it to be zero." };
       if (Number(facts.annualRentalIncome || 0) > 0) return { available: false, reason: "Rental income needs the property location and licensed-versus-unlicensed letting rules; this exact profile currently requires it to be zero." };
@@ -447,11 +475,13 @@
       ].filter(function (item) { return item.amount > 0; });
       const indexChoices = Array.from(new Set(dependable.map(function (item) { return item.indexed === true; })));
       let planningRange = null;
+      let planningRangeCurrencyValid = true;
       try {
         const parsed = JSON.parse(button.dataset.planningCases || "null");
-        if (record(parsed) && record(parsed.cases)) planningRange = parsed;
+        if (record(parsed) && record(parsed.cases)) planningRange = convertPlanningCases(parsed, currency, rates);
       } catch (error) {
         planningRange = null;
+        planningRangeCurrencyValid = false;
       }
       return {
         currency: currency,
@@ -469,6 +499,7 @@
         dependableIncomeIndexingCompatible: indexChoices.length <= 1,
         aedPerCurrency: Number(rates[currency]) * Number(payload.aed_per_usd),
         planningRange: planningRange,
+        planningRangeCurrencyValid: planningRangeCurrencyValid,
       };
     }
     let answerCurrency = planningFacts().currency;
@@ -591,6 +622,7 @@
     createController: createController,
     coerceAnswer: coerceAnswer,
     shouldHandlePlanningEvent: shouldHandlePlanningEvent,
+    convertPlanningCases: convertPlanningCases,
     hongKongDomesticResidence: hongKongDomesticResidence,
     nextPairQuestions: nextPairQuestions,
     materialQuestions: materialQuestions,

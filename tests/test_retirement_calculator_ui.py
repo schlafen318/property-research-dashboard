@@ -122,6 +122,8 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertEqual(2000, first["cases"]["central"]["annualTaxReserve"])
         self.assertEqual(975000, second["cases"]["central"]["requiredCapital"])
         self.assertEqual("current_plan_baseline", second["status"])
+        self.assertEqual("USD", first["currency"])
+        self.assertEqual("USD", second["currency"])
 
     def test_refine_entry_point_requires_planning_result_and_enabled_exact_bundle(self):
         self.assertFalse(run_ui("detailedRefineAvailable", {"planningAvailable": True, "enabledMarker": "false"}))

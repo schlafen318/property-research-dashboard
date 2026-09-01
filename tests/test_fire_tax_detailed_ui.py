@@ -42,6 +42,37 @@ def run_hk_graph(expression: str, payload: dict) -> object:
 
 
 class DetailedFireTaxUiTests(unittest.TestCase):
+    def test_planning_cases_convert_from_explicit_usd_to_selected_currency(self) -> None:
+        source = {"status": "broad_tax_adjusted", "currency": "USD", "cases": {
+            "favorable": {"annualTaxReserve": 1000, "requiredCapital": 900000},
+            "central": {"annualTaxReserve": 2000, "requiredCapital": 1000000},
+            "adverse": {"annualTaxReserve": 3000, "requiredCapital": 1100000},
+        }}
+        rates = {"USD": 1, "HKD": 0.128, "EUR": 1.25, "GBP": 1.6}
+
+        for currency, expected in (("HKD", 7812500), ("EUR", 800000), ("GBP", 625000)):
+            with self.subTest(currency=currency):
+                converted = run_node("api.convertPlanningCases(input.range,input.currency,input.rates)", {
+                    "range": source, "currency": currency, "rates": rates,
+                })
+                self.assertEqual(currency, converted["currency"])
+                self.assertEqual(expected, converted["cases"]["central"]["requiredCapital"])
+
+    def test_planning_case_conversion_fails_closed_without_explicit_fx(self) -> None:
+        source = {"status": "broad_tax_adjusted", "currency": "USD", "cases": {
+            "central": {"annualTaxReserve": 0, "requiredCapital": 1000000},
+        }}
+        script = (
+            "const api=require(process.argv[1]);const input=JSON.parse(process.argv[2]);"
+            "try{api.convertPlanningCases(input.range,'HKD',{USD:1});process.stdout.write('no-error')}"
+            "catch(error){process.stdout.write(error.message)}"
+        )
+        completed = subprocess.run(
+            ["node", "-e", script, str(MODULE), json.dumps({"range": source})],
+            cwd=ROOT, check=True, capture_output=True, text=True,
+        )
+        self.assertIn("FX", completed.stdout)
+
     def test_real_hong_kong_to_dubai_pair_executes_from_live_amounts(self) -> None:
         ui_payload = build_unified_app.detailed_fire_tax_page_payload()
         planning = {
@@ -49,7 +80,7 @@ class DetailedFireTaxUiTests(unittest.TestCase):
             "annualSpending": 72000, "annualPension": 0, "annualOtherIncome": 0,
             "annualRentalIncome": 0, "annualWithdrawals": 18000, "propertyPrice": 0,
             "housingPlan": "rent", "propertyUse": "personal", "selectedAfterTaxReturn": 0.04, "explicitReturnProvided": True,
-            "planningRange": {"status": "broad_tax_adjusted", "cases": {
+            "planningRange": {"status": "broad_tax_adjusted", "currency": "USD", "cases": {
                 "favorable": {"annualTaxReserve": 1000, "requiredCapital": 900000},
                 "central": {"annualTaxReserve": 2000, "requiredCapital": 1000000},
                 "adverse": {"annualTaxReserve": 3000, "requiredCapital": 1100000},
@@ -101,6 +132,16 @@ class DetailedFireTaxUiTests(unittest.TestCase):
             graph["residence"]["destination"]["rules"][0]["formula"],
             runtime["residence"]["destination"]["jurisdictions"]["dubai"]["rules"][0]["formula"],
         )
+        runtime_residence = runtime["residence"]["destination"]["jurisdictions"]["dubai"]
+        self.assertEqual(graph["residence"]["destination"]["label"], runtime_residence["label"])
+        self.assertEqual(graph["residence"]["destination"]["calculation_side"], runtime_residence["calculation_side"])
+        runtime_destination = runtime["rules"]["destination"]["income"]["jurisdictions"]["dubai"]
+        self.assertEqual(graph_destination["label"], runtime_destination["label"])
+        self.assertEqual(graph_destination["calculation_side"], runtime_destination["calculation_side"])
+        self.assertEqual({graph_destination["rule_type"]}, {rule["type"] for rule in destination_rules})
+        self.assertEqual(set(graph_destination["taxpayer_scope"]), set(destination_rules[0]["taxpayer_scope"]))
+        self.assertEqual(graph["confidence"], destination_rules[0]["confidence"])
+        self.assertEqual(graph["checked_on"], destination_rules[0]["checked_on"])
 
     def test_live_planning_facts_build_profile_without_bundle_amounts(self) -> None:
         definition = {

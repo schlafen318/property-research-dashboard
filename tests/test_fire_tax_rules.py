@@ -79,6 +79,43 @@ class FireTaxRuleContractTests(unittest.TestCase):
         self.assert_path_error(self.validate(broken_profile_key), "supported_profiles.hong-kong-to-dubai.runtime_rule_graph.income.destination.profile_keys")
         self.assert_path_error(self.validate(broken_rule_id), "supported_profiles.hong-kong-to-dubai.runtime_rule_graph.income.destination.rule_ids")
 
+    def test_enabled_profile_rejects_every_mutated_executable_residence_field(self):
+        base_path = "supported_profiles.hong-kong-to-dubai.runtime_rule_graph.residence.destination"
+        mutations = {
+            "rules[0].type": "rate_band",
+            "rules[0].category": "dividends",
+            "rules[0].taxpayer_scope": ["resident"],
+            "rules[0].resident_when": False,
+            "rules[0].explanation": "",
+            "rules[0].id": "unrelated-residence-2026",
+            "label": "",
+            "jurisdiction_id": "unrelated",
+            "calculation_side": "home",
+        }
+        for relative_path, value in mutations.items():
+            with self.subTest(field=relative_path):
+                payload = copy.deepcopy(self.payload)
+                destination = payload["supported_profiles"]["hong-kong-to-dubai"]["runtime_rule_graph"]["residence"]["destination"]
+                if relative_path.startswith("rules[0]."):
+                    destination["rules"][0][relative_path.removeprefix("rules[0].")] = value
+                else:
+                    destination[relative_path] = value
+                self.assert_path_error(self.validate(payload), f"{base_path}.{relative_path}")
+
+    def test_enabled_profile_rejects_mutated_income_jurisdiction_side_and_label(self):
+        mutations = {
+            "jurisdiction_id": "unrelated",
+            "calculation_side": "home",
+            "label": "",
+        }
+        base_path = "supported_profiles.hong-kong-to-dubai.runtime_rule_graph.income.destination"
+        for field, value in mutations.items():
+            with self.subTest(field=field):
+                payload = copy.deepcopy(self.payload)
+                destination = payload["supported_profiles"]["hong-kong-to-dubai"]["runtime_rule_graph"]["income"]["destination"]
+                destination[field] = value
+                self.assert_path_error(self.validate(payload), f"{base_path}.{field}")
+
     def test_enabled_profile_rejects_canned_personal_amounts(self):
         payload = copy.deepcopy(self.payload)
         payload["supported_profiles"]["hong-kong-to-dubai"]["runtime_definition"]["annualPension"] = 12000
