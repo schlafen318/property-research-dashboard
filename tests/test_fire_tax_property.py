@@ -121,6 +121,65 @@ class FireTaxPropertyTests(unittest.TestCase):
         self.assertEqual(2, len(result["branches"]))
         self.assertIn("synthetic-resident-property-tax-2026", result["controllingRuleIds"])
 
+    def test_unknown_assessment_is_expanded_only_inside_applicable_relationship_branch(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        jurisdiction = rules["jurisdictions"]["synthetic-destination"]
+        property_rule = jurisdiction["rules"][3]
+        property_rule.pop("unknown_operand_range")
+        property_rule["formula"]["operands"][0] = "owned_purchase_value"
+        imputed_rule = jurisdiction["rules"][6]
+        imputed_rule["applies_when"].append(
+            {"operand": "heir_relationship", "operator": "equals", "value": "child"}
+        )
+        rules["operand_catalog"]["zero_rate"] = {
+            "kind": "constant",
+            "value_type": "number",
+            "value": 0,
+        }
+        unrelated_rule = copy.deepcopy(imputed_rule)
+        unrelated_rule.update(
+            {
+                "id": "synthetic-unrelated-imputed-no-tax-2026",
+                "no_tax": True,
+                "rate": 0,
+                "rate_operand": "zero_rate",
+                "unknown_operand_range": None,
+                "formula": {
+                    "operation": "multiply",
+                    "operands": ["owned_purchase_value", "zero_rate"],
+                },
+                "explanation": "Explicit synthetic no-tax imputed-income branch for an unrelated successor.",
+            }
+        )
+        unrelated_rule.pop("unknown_operand_range")
+        unrelated_rule["applies_when"][-1] = {
+            "operand": "heir_relationship",
+            "operator": "equals",
+            "value": "unrelated",
+        }
+        jurisdiction["rules"].append(unrelated_rule)
+        for scope in ("resident", "nonresident"):
+            jurisdiction["property_coverage"]["annual"][scope]["rule_ids"].append(
+                unrelated_rule["id"]
+            )
+        profile = {
+            **data["profile"],
+            "activeStages": ["annual"],
+            "propertyUse": "personal",
+            "heirRelationship": "unknown",
+            "officialAssessmentBase": "unknown",
+        }
+        result = calculate(profile=profile, rules=rules)
+        self.assertEqual("conditional", result["status"])
+        self.assertEqual(3, len(result["branches"]))
+        unrelated = next(
+            branch
+            for branch in result["branches"]
+            if branch["assumedFacts"]["heirRelationship"] == "unrelated"
+        )
+        self.assertNotIn("officialAssessmentBase", unrelated["assumedFacts"])
+
     def test_unknown_heir_relationship_returns_allowance_branches(self):
         data = fixture()
         profile = {
@@ -134,6 +193,126 @@ class FireTaxPropertyTests(unittest.TestCase):
         self.assertEqual({"minimum": 15000, "maximum": 24000}, result["totals"]["allTax"])
         self.assertEqual({"child", "unrelated"}, {branch["assumedFacts"]["heirRelationship"] for branch in result["branches"]})
 
+    def test_conditional_stage_lines_preserve_branch_identity_and_reconcile(self):
+        data = fixture()
+        profile = {
+            **data["profile"],
+            "activeStages": ["inheritance"],
+            "heirRelationship": "unknown",
+        }
+        result = calculate(profile=profile)
+        stage = result["stages"]["inheritance"]
+        self.assertNotIn("lines", stage)
+        self.assertEqual(2, len(stage["branchBreakdown"]))
+        for total_key in ("taxTotal", "nonTaxTotal", "prepaymentTotal"):
+            branch_values = [branch[total_key] for branch in stage["branchBreakdown"]]
+            self.assertEqual(
+                {"minimum": min(branch_values), "maximum": max(branch_values)},
+                stage[total_key],
+            )
+        for branch in stage["branchBreakdown"]:
+            with self.subTest(branch=branch["assumedFacts"]):
+                liability = sum(
+                    line["amount"]
+                    for line in branch["lines"]
+                    if line["classification"] == "tax"
+                )
+                self.assertEqual(branch["taxTotal"], liability)
+                self.assertIn("heirRelationship", branch["assumedFacts"])
+
+    def test_unknown_relationship_uses_full_validated_domain_for_not_equals(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        child_rule = rules["jurisdictions"]["synthetic-destination"]["rules"][14]
+        child_rule["applies_when"][1] = {
+            "operand": "heir_relationship",
+            "operator": "not_equals",
+            "value": "unrelated",
+        }
+        profile = {
+            **data["profile"],
+            "activeStages": ["inheritance"],
+            "heirRelationship": "unknown",
+        }
+        result = calculate(profile=profile, rules=rules)
+        self.assertEqual("conditional", result["status"])
+        self.assertEqual(
+            {"child", "unrelated"},
+            {branch["assumedFacts"]["heirRelationship"] for branch in result["branches"]},
+        )
+
+    def test_missing_relationship_domain_is_a_typed_rule_error(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        rules["operand_catalog"]["heir_relationship"].pop("allowed_values")
+        profile = {
+            **data["profile"],
+            "activeStages": ["inheritance"],
+            "heirRelationship": "unknown",
+        }
+        response = calculate(profile=profile, rules=rules, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+        self.assertIn("allowed", response.get("message", "").lower())
+
+    def test_malformed_relationship_domains_are_typed_rule_errors(self):
+        data = fixture()
+        cases = (
+            ["child", "unrelated", 7],
+            ["child", "unrelated", ""],
+            ["child", "child"],
+        )
+        for domain in cases:
+            with self.subTest(domain=domain):
+                rules = copy.deepcopy(data["rules"])
+                rules["operand_catalog"]["heir_relationship"]["allowed_values"] = domain
+                rules["jurisdictions"]["synthetic-destination"]["rules"][15]["applies_when"][1] = {
+                    "operand": "heir_relationship",
+                    "operator": "not_equals",
+                    "value": "child",
+                }
+                profile = {
+                    **data["profile"],
+                    "activeStages": ["inheritance"],
+                    "heirRelationship": "unknown",
+                }
+                response = calculate(profile=profile, rules=rules, expect_error=True)
+                self.assertFalse(response["ok"])
+                self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+                self.assertIn("allowed", response.get("message", "").lower())
+
+        rules = copy.deepcopy(data["rules"])
+        jurisdiction = rules["jurisdictions"]["synthetic-destination"]
+        rules["operand_catalog"]["heir_relationship"]["allowed_values"] = ["child"]
+        jurisdiction["rules"] = [
+            rule for rule in jurisdiction["rules"]
+            if rule["id"] != "synthetic-unrelated-inheritance-tax-2026"
+        ]
+        for scope in ("resident", "nonresident"):
+            jurisdiction["property_coverage"]["inheritance"][scope]["rule_ids"].remove(
+                "synthetic-unrelated-inheritance-tax-2026"
+            )
+        profile = {
+            **data["profile"],
+            "activeStages": ["inheritance"],
+            "heirRelationship": "unknown",
+        }
+        response = calculate(profile=profile, rules=rules, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+        self.assertIn("allowed", response.get("message", "").lower())
+
+    def test_malformed_relationship_conditions_fail_with_a_typed_rule_error(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        rules["jurisdictions"]["synthetic-destination"]["rules"][14][
+            "applies_when"
+        ] = {}
+        response = calculate(rules=rules, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+        self.assertIn("applies_when", response.get("message", ""))
+
     def test_gift_allowance_is_selected_by_transfer_type(self):
         data = fixture()
         profile = {
@@ -144,7 +323,13 @@ class FireTaxPropertyTests(unittest.TestCase):
         }
         result = calculate(profile=profile)
         self.assertEqual(23000, result["stages"]["gift"]["taxTotal"])
-        self.assertEqual(["synthetic-gift-tax-2026"], result["stages"]["gift"]["lines"][0]["ruleIds"])
+        line = result["stages"]["gift"]["lines"][0]
+        self.assertEqual(["synthetic-gift-tax-2026"], line["ruleIds"])
+        self.assertEqual(
+            [{"operandId": "gift_relief", "amount": 20000, "currency": "EUR"}],
+            line.get("allowances"),
+        )
+        self.assertEqual("subtract", (line.get("operandAudit") or [{}])[0].get("operation"))
 
     def test_false_transfer_condition_does_not_request_heir_relationship(self):
         data = fixture()
@@ -154,9 +339,11 @@ class FireTaxPropertyTests(unittest.TestCase):
             "transferType": "gift",
         }
         profile.pop("heirRelationship")
-        result = calculate(profile=profile)
-        self.assertEqual("calculated", result["status"])
-        self.assertEqual(0, result["stages"]["inheritance"]["taxTotal"])
+        response = calculate(profile=profile, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+        self.assertIn("inheritance.resident", response.get("message", ""))
+        self.assertNotIn("heirRelationship", response.get("message", ""))
 
     def test_dormant_stages_do_not_require_irrelevant_facts(self):
         data = fixture()
@@ -188,6 +375,60 @@ class FireTaxPropertyTests(unittest.TestCase):
         self.assertEqual("conditional", result["status"])
         self.assertEqual({"minimum": 2250, "maximum": 2550}, result["totals"]["annualTax"])
         self.assertIn("daysInDestination", result["unresolvedFacts"])
+        branch_rules = [set(branch["ruleIds"]) for branch in result["branches"]]
+        self.assertTrue(any("synthetic-resident-property-tax-2026" in ids for ids in branch_rules))
+        self.assertTrue(any("synthetic-nonresident-property-tax-2026" in ids for ids in branch_rules))
+        self.assertFalse(any({"synthetic-resident-property-tax-2026", "synthetic-nonresident-property-tax-2026"}.issubset(ids) for ids in branch_rules))
+
+    def test_missing_selected_scope_coverage_is_a_typed_error_not_zero(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        rules["jurisdictions"]["synthetic-destination"]["property_coverage"]["annual"].pop("resident")
+        profile = {**data["profile"], "activeStages": ["annual"]}
+        response = calculate(profile=profile, rules=rules, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+        self.assertIn("annual.resident", response.get("message", ""))
+
+    def test_coverage_cannot_omit_an_applicable_scope_rule(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        coverage = rules["jurisdictions"]["synthetic-destination"]["property_coverage"]["annual"]["resident"]["rule_ids"]
+        coverage.remove("synthetic-resident-property-tax-2026")
+        profile = {**data["profile"], "activeStages": ["annual"]}
+        response = calculate(profile=profile, rules=rules, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+        self.assertIn("coverage", response.get("message", "").lower())
+
+    def test_explicit_executable_no_tax_coverage_returns_a_zero_line(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        jurisdiction = rules["jurisdictions"]["synthetic-destination"]
+        gift_rule = jurisdiction["rules"][16]
+        gift_rule["no_tax"] = True
+        gift_rule["rate"] = 0
+        rules["operand_catalog"]["gift_rate"]["value"] = 0
+        for scope in ("resident", "nonresident"):
+            jurisdiction["property_coverage"]["gift"][scope]["treatment"] = "no_tax"
+        profile = {
+            **data["profile"],
+            "activeStages": ["gift"],
+            "transferType": "gift",
+        }
+        result = calculate(profile=profile, rules=rules)
+        self.assertEqual(0, result["stages"]["gift"]["taxTotal"])
+        self.assertEqual(1, len(result["stages"]["gift"]["lines"]))
+        self.assertEqual("synthetic-gift-tax-2026", result["stages"]["gift"]["lines"][0]["ruleIds"][0])
+
+    def test_invalid_allowance_audit_role_is_a_typed_rule_error(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        rules["operand_catalog"]["gift_relief"]["audit_role"] = "guess"
+        response = calculate(rules=rules, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+        self.assertIn("audit role", response.get("message", ""))
 
     def test_each_amount_has_formula_scope_year_confidence_and_sources(self):
         data = fixture()

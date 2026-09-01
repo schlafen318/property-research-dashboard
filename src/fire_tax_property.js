@@ -81,6 +81,9 @@
     if (!record(operand) || operand.kind !== "profile") {
       throw new FireTaxPropertyRuleError(path + ".operand must reference a profile operand");
     }
+    if (operand.profile_key === "heirRelationship" && (!Array.isArray(operand.allowed_values) || operand.allowed_values.length === 0 || new Set(operand.allowed_values).size !== operand.allowed_values.length)) {
+      throw new FireTaxPropertyRuleError(path + ".operand must declare complete allowed relationship values");
+    }
     const values = condition.operator === "in" ? condition.value : [condition.value];
     if (!Array.isArray(values) || values.length === 0 || !values.every(function (value) { return valueMatches(value, operand); })) {
       throw new FireTaxPropertyRuleError(path + ".value does not match the operand contract");
@@ -120,8 +123,14 @@
       if (operand.kind === "profile" && typeof operand.profile_key !== "string") {
         throw new FireTaxPropertyRuleError("operand " + operandId + " is missing its profile key");
       }
+      if (operand.kind === "profile" && operand.profile_key === "heirRelationship" && (!Array.isArray(operand.allowed_values) || operand.allowed_values.length < 2 || !operand.allowed_values.every(function (value) { return typeof value === "string" && value.length > 0; }) || new Set(operand.allowed_values).size !== operand.allowed_values.length)) {
+        throw new FireTaxPropertyRuleError("operand " + operandId + " must declare complete allowed relationship values");
+      }
       if (operand.kind === "constant" && !valueMatches(operand.value, operand)) {
         throw new FireTaxPropertyRuleError("operand " + operandId + " has an invalid constant value");
+      }
+      if (operand.audit_role !== undefined && (operand.audit_role !== "allowance" || operand.kind !== "constant" || operand.value_type !== "money" || !finite(operand.value) || operand.value < 0)) {
+        throw new FireTaxPropertyRuleError("operand " + operandId + " has an invalid audit role");
       }
       if (operand.kind === "derived" && (!record(operand.derivation) || !["add", "subtract", "multiply", "minimum", "maximum"].includes(operand.derivation.operation) || !Array.isArray(operand.derivation.operands) || operand.derivation.operands.length < 2)) {
         throw new FireTaxPropertyRuleError("operand " + operandId + " has an invalid derivation");
@@ -205,6 +214,12 @@
       if (Object.prototype.hasOwnProperty.call(rule, "floor_at_zero") && typeof rule.floor_at_zero !== "boolean") {
         throw new FireTaxPropertyRuleError("property rule " + rule.id + " has an invalid floor_at_zero marker");
       }
+      if (Object.prototype.hasOwnProperty.call(rule, "allowance_amount")) {
+        throw new FireTaxPropertyRuleError("property rule " + rule.id + " allowance audit must derive from formula operands");
+      }
+      if (rule.applies_when !== undefined && (!Array.isArray(rule.applies_when) || rule.applies_when.length === 0)) {
+        throw new FireTaxPropertyRuleError("property rule " + rule.id + ".applies_when must contain executable conditions");
+      }
       (rule.applies_when || []).forEach(function (condition, conditionIndex) {
         validateCondition(condition, bundle, "property rule " + rule.id + ".applies_when[" + conditionIndex + "]");
       });
@@ -219,6 +234,64 @@
       if (rule.retirement_cost_boundary !== undefined && (rule.retirement_cost_boundary !== "owner_property_tax" || rule.lifecycle_stage !== "annual" || rule.tax_or_non_tax !== "tax" || rule.payment_treatment !== "current_liability")) {
         throw new FireTaxPropertyRuleError("property rule " + rule.id + " has an invalid retirement cost boundary");
       }
+    });
+    const coverage = jurisdiction.property_coverage;
+    if (!record(coverage) || Object.keys(coverage).length !== STAGES.length || !STAGES.every(function (stage) { return Object.prototype.hasOwnProperty.call(coverage, stage); })) {
+      throw new FireTaxPropertyRuleError("property coverage must declare every lifecycle stage");
+    }
+    bundle.coverageRules = {};
+    STAGES.forEach(function (stage) {
+      if (!record(coverage[stage])) throw new FireTaxPropertyRuleError("property coverage " + stage + " must declare resident and nonresident scopes");
+      bundle.coverageRules[stage] = {};
+      ["resident", "nonresident"].forEach(function (scope) {
+        const entry = coverage[stage][scope];
+        const path = stage + "." + scope;
+        if (!record(entry) || !["supported", "no_tax"].includes(entry.treatment) || !Array.isArray(entry.rule_ids) || entry.rule_ids.length === 0 || new Set(entry.rule_ids).size !== entry.rule_ids.length) {
+          throw new FireTaxPropertyRuleError("property coverage " + path + " is missing or invalid");
+        }
+        const expected = rules.filter(function (rule) {
+          return rule.lifecycle_stage === stage && rule.taxpayer_scope.includes(scope);
+        });
+        const expectedIds = expected.map(function (rule) { return rule.id; }).sort();
+        const declaredIds = entry.rule_ids.slice().sort();
+        if (expectedIds.length !== declaredIds.length || expectedIds.some(function (id, index) { return id !== declaredIds[index]; })) {
+          throw new FireTaxPropertyRuleError("property coverage " + path + " must exactly include its applicable rules");
+        }
+        if (entry.treatment === "no_tax" && expected.some(function (rule) {
+          if (rule.no_tax !== true) return true;
+          if (rule.formula.operation === "multiply") return rule.rate !== 0;
+          if (rule.formula.operation === "progressive_rate") return rule.bands.some(function (band) { return band.rate !== 0; });
+          return true;
+        })) {
+          throw new FireTaxPropertyRuleError("property coverage " + path + " no_tax must use explicit executable zero-tax rules");
+        }
+        bundle.coverageRules[stage][scope] = expected;
+      });
+    });
+    const relationshipOperandIds = unique(rules.flatMap(function (rule) {
+      return (rule.applies_when || []).filter(function (condition) {
+        const operand = bundle.catalog[condition.operand];
+        return record(operand) && operand.profile_key === "heirRelationship";
+      }).map(function (condition) { return condition.operand; });
+    }));
+    relationshipOperandIds.forEach(function (operandId) {
+      const domain = bundle.catalog[operandId].allowed_values;
+      STAGES.forEach(function (stage) {
+        ["resident", "nonresident"].forEach(function (scope) {
+          const scoped = bundle.coverageRules[stage][scope].filter(function (rule) {
+            return (rule.applies_when || []).some(function (condition) { return condition.operand === operandId; });
+          });
+          if (scoped.length === 0) return;
+          domain.forEach(function (value) {
+            const covered = scoped.some(function (rule) {
+              return (rule.applies_when || []).filter(function (condition) { return condition.operand === operandId; }).every(function (condition) {
+                return compare(value, condition);
+              });
+            });
+            if (!covered) throw new FireTaxPropertyRuleError("relationship allowed value " + value + " has no executable " + stage + "." + scope + " branch");
+          });
+        });
+      });
     });
     bundle.rules = rules;
     return bundle;
@@ -308,6 +381,41 @@
     return round(tax);
   }
 
+  function auditOperand(operandId, profile, bundle, cache) {
+    const operand = bundle.catalog[operandId];
+    const audit = {
+      operandId: operandId,
+      kind: operand.kind,
+      value: resolveOperand(operandId, profile, bundle, cache, new Set()),
+      currency: operand.currency || null,
+      auditRole: operand.audit_role || null
+    };
+    if (operand.kind === "profile") audit.profileKey = operand.profile_key;
+    if (operand.kind === "derived") {
+      audit.operation = operand.derivation.operation;
+      audit.operands = operand.derivation.operands.map(function (nestedId) {
+        return auditOperand(nestedId, profile, bundle, cache);
+      });
+    }
+    return audit;
+  }
+
+  function collectAllowances(audits) {
+    const found = new Map();
+    function visit(audit) {
+      if (audit.kind === "constant" && audit.auditRole === "allowance") {
+        found.set(audit.operandId, {
+          operandId: audit.operandId,
+          amount: audit.value,
+          currency: audit.currency
+        });
+      }
+      (audit.operands || []).forEach(visit);
+    }
+    audits.forEach(visit);
+    return Array.from(found.values());
+  }
+
   function executeRule(rule, profile, taxpayerScope, bundle) {
     const cache = {};
     const operandValues = rule.formula.operands.map(function (operandId) {
@@ -323,6 +431,9 @@
     const operator = rule.formula.operation === "progressive_rate" ? "progressive_rate" : rule.formula.operation;
     const formulaInputs = rule.formula.operands.map(function (operandId, index) {
       return operandId + "=" + operandValues[index];
+    });
+    const operandAudit = rule.formula.operands.map(function (operandId) {
+      return auditOperand(operandId, profile, bundle, cache);
     });
     return {
       label: rule.explanation,
@@ -341,13 +452,18 @@
       sourceIds: rule.source_ids.slice(),
       effectiveFrom: rule.effective_from,
       retirementCostBoundary: rule.retirement_cost_boundary || null,
-      allowanceAmount: finite(rule.allowance_amount) ? rule.allowance_amount : null
+      operandAudit: operandAudit,
+      allowances: collectAllowances(operandAudit)
     };
   }
 
   function activeRules(profile, taxpayerScope, bundle) {
-    return bundle.rules.filter(function (rule) {
-      return profile.activeStages.includes(rule.lifecycle_stage) && rule.taxpayer_scope.includes(taxpayerScope);
+    return profile.activeStages.flatMap(function (stage) {
+      const scoped = bundle.coverageRules[stage] && bundle.coverageRules[stage][taxpayerScope];
+      if (!Array.isArray(scoped) || scoped.length === 0) {
+        throw new FireTaxPropertyRuleError("property coverage " + stage + "." + taxpayerScope + " is unavailable");
+      }
+      return scoped;
     });
   }
 
@@ -383,11 +499,7 @@
       if (key !== "heirRelationship") {
         throw new FireTaxPropertyInputError(key + " is required by an active property branch");
       }
-      const supported = unique(relevantRules.flatMap(function (rule) {
-        return (rule.applies_when || []).filter(function (condition) { return condition.operand === operandId; }).flatMap(function (condition) {
-          return condition.operator === "in" ? condition.value : [condition.value];
-        });
-      })).filter(function (item) { return operand.allowed_values.includes(item); });
+      const supported = operand.allowed_values.slice();
       alternatives = alternatives.flatMap(function (item) {
         return supported.map(function (assumed) {
           return {
@@ -401,23 +513,29 @@
       });
     });
 
-    const unknownRanges = new Map();
-    candidateRules.forEach(function (rule) {
-      const range = rule.unknown_operand_range;
-      if (!record(range)) return;
-      if (!ruleCouldApplyWithout(rule, range.operand, alternative.profile, bundle)) return;
-      const operand = bundle.catalog[range.operand];
-      const key = operand.profile_key;
-      const value = alternative.profile[key];
-      if (value !== undefined && value !== null && value !== "unknown") return;
-      const signature = [range.reference_operand, range.minimum_ratio, range.maximum_ratio].join("|");
-      const existing = unknownRanges.get(key);
-      if (existing && existing.signature !== signature) throw new FireTaxPropertyRuleError("active rules disagree on the supported range for " + key);
-      if (!existing) unknownRanges.set(key, { range: range, signature: signature, ruleIds: [] });
-      unknownRanges.get(key).ruleIds.push(rule.id);
-    });
-    unknownRanges.forEach(function (entry, key) {
+    const rangeOperandIds = unique(candidateRules.filter(function (rule) {
+      return record(rule.unknown_operand_range);
+    }).map(function (rule) { return rule.unknown_operand_range.operand; }));
+    rangeOperandIds.forEach(function (rangeOperandId) {
       alternatives = alternatives.flatMap(function (item) {
+        const operand = bundle.catalog[rangeOperandId];
+        const key = operand.profile_key;
+        const supplied = item.profile[key];
+        if (supplied !== undefined && supplied !== null && supplied !== "unknown") return [item];
+        const relevantRules = activeRules(item.profile, taxpayerScope, bundle).filter(function (rule) {
+          return record(rule.unknown_operand_range) && rule.unknown_operand_range.operand === rangeOperandId &&
+            ruleCouldApplyWithout(rule, rangeOperandId, item.profile, bundle);
+        });
+        if (relevantRules.length === 0) return [item];
+        const signatures = unique(relevantRules.map(function (rule) {
+          const range = rule.unknown_operand_range;
+          return [range.reference_operand, range.minimum_ratio, range.maximum_ratio].join("|");
+        }));
+        if (signatures.length !== 1) throw new FireTaxPropertyRuleError("active rules disagree on the supported range for " + key);
+        const entry = {
+          range: relevantRules[0].unknown_operand_range,
+          ruleIds: relevantRules.map(function (rule) { return rule.id; })
+        };
         const reference = resolveOperand(entry.range.reference_operand, item.profile, bundle, {}, new Set());
         return [entry.range.minimum_ratio, entry.range.maximum_ratio].map(function (ratio) {
           return {
@@ -449,6 +567,12 @@
     alternative.profile.activeStages.forEach(function (stage) { stages[stage] = emptyStage(); });
     const applicable = activeRules(alternative.profile, taxpayerScope, bundle).filter(function (rule) {
       return applies(rule, alternative.profile, bundle);
+    });
+    alternative.profile.activeStages.forEach(function (stage) {
+      const coveredLines = applicable.filter(function (rule) { return rule.lifecycle_stage === stage; });
+      if (coveredLines.length === 0) {
+        throw new FireTaxPropertyRuleError("property coverage " + stage + "." + taxpayerScope + " has no executable branch for the supplied facts");
+      }
     });
     applicable.forEach(function (rule) {
       const line = executeRule(rule, alternative.profile, taxpayerScope, bundle);
@@ -504,10 +628,17 @@
       taxTotal: range(branches.map(function (branch) { return branch.stages[stage] ? branch.stages[stage].taxTotal : 0; })),
       nonTaxTotal: range(branches.map(function (branch) { return branch.stages[stage] ? branch.stages[stage].nonTaxTotal : 0; })),
       prepaymentTotal: range(branches.map(function (branch) { return branch.stages[stage] ? branch.stages[stage].prepaymentTotal : 0; })),
-      lines: unique(branches.flatMap(function (branch) { return branch.stages[stage] ? branch.stages[stage].lines.map(function (line) { return line.ruleIds[0]; }) : []; })).map(function (ruleId) {
-        const lines = branches.flatMap(function (branch) { return branch.stages[stage] ? branch.stages[stage].lines : []; }).filter(function (line) { return line.ruleIds[0] === ruleId; });
-        const sample = lines[0];
-        return Object.assign({}, sample, { amount: range(lines.map(function (line) { return line.amount; })), branchCount: lines.length });
+      branchBreakdown: branches.map(function (branch, index) {
+        const branchStage = branch.stages[stage] || emptyStage();
+        return {
+          branchIndex: index,
+          taxpayerScope: branch.taxpayerScope,
+          assumedFacts: Object.assign({}, branch.assumedFacts),
+          taxTotal: branchStage.taxTotal,
+          nonTaxTotal: branchStage.nonTaxTotal,
+          prepaymentTotal: branchStage.prepaymentTotal,
+          lines: branchStage.lines
+        };
       })
     };
   }

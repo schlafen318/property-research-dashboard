@@ -382,6 +382,16 @@ def _validate_operand_catalog(
             operand.get("value"), value_type
         ):
             errors.append(f"{path}.value must match value_type")
+        if "audit_role" in operand and (
+            operand.get("audit_role") != "allowance"
+            or kind != "constant"
+            or value_type != "money"
+            or not _is_number(operand.get("value"))
+            or operand["value"] < 0
+        ):
+            errors.append(
+                f"{path}.audit_role must mark a non-negative constant money allowance"
+            )
         if kind == "profile":
             profile_key = operand.get("profile_key")
             if not isinstance(profile_key, str) or not PROFILE_KEY_PATTERN.fullmatch(
@@ -1048,11 +1058,10 @@ def _validate_rule_type_fields(
             errors.append(f"{path}.payment_treatment prepayment must classify as tax")
         if "floor_at_zero" in rule and not isinstance(rule.get("floor_at_zero"), bool):
             errors.append(f"{path}.floor_at_zero must be a boolean")
-        if "allowance_amount" in rule and (
-            not _is_number(rule.get("allowance_amount"))
-            or rule["allowance_amount"] < 0
-        ):
-            errors.append(f"{path}.allowance_amount must be a non-negative amount")
+        if "allowance_amount" in rule:
+            errors.append(
+                f"{path}.allowance_amount is unsupported; allowance audit must derive from formula operands"
+            )
         _validate_property_conditions(rule, path, operand_catalog, errors)
         _validate_property_unknown_range(rule, path, operand_catalog, errors)
         boundary = rule.get("retirement_cost_boundary")
@@ -1111,9 +1120,9 @@ def _validate_property_conditions(
     operand_catalog: dict[str, dict[str, Any]],
     errors: list[str],
 ) -> None:
-    conditions = rule.get("applies_when")
-    if conditions is None:
+    if "applies_when" not in rule:
         return
+    conditions = rule.get("applies_when")
     if not isinstance(conditions, list) or not conditions:
         errors.append(f"{path}.applies_when must contain property conditions")
         return
@@ -1148,6 +1157,10 @@ def _validate_property_conditions(
             )
         else:
             value_valid = _value_matches_type(value, operand.get("value_type"))
+        allowed_values = operand.get("allowed_values")
+        if value_valid and isinstance(allowed_values, list):
+            tested_values = value if operator == "in" else [value]
+            value_valid = all(item in allowed_values for item in tested_values)
         if not value_valid:
             errors.append(f"{condition_path}.value must match operand value_type")
         if (
@@ -1370,6 +1383,169 @@ def _validate_category_coverage(
                 f"{category_path}.rule_ids must include executable "
                 + ", ".join(missing_types)
             )
+
+
+def _validate_property_coverage(
+    jurisdiction: dict[str, Any],
+    jurisdiction_path: str,
+    rules_by_id: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    property_rules = {
+        rule_id: rule
+        for rule_id, rule in rules_by_id.items()
+        if rule.get("type") == "property_charge"
+    }
+    if not property_rules:
+        return
+    coverage = jurisdiction.get("property_coverage")
+    coverage_path = f"{jurisdiction_path}.property_coverage"
+    if not isinstance(coverage, dict):
+        errors.append(
+            f"{coverage_path} must explicitly cover every property stage and taxpayer scope"
+        )
+        return
+    if set(coverage) != set(PROPERTY_LIFECYCLE_STAGES):
+        errors.append(f"{coverage_path} must contain every supported property stage")
+    for stage in sorted(PROPERTY_LIFECYCLE_STAGES):
+        stage_path = f"{coverage_path}.{stage}"
+        stage_coverage = coverage.get(stage)
+        if not isinstance(stage_coverage, dict):
+            errors.append(f"{stage_path} must cover resident and nonresident scopes")
+            continue
+        for scope in ("resident", "nonresident"):
+            scope_path = f"{stage_path}.{scope}"
+            entry = stage_coverage.get(scope)
+            if not isinstance(entry, dict):
+                errors.append(f"{scope_path} must declare supported or no_tax coverage")
+                continue
+            treatment = entry.get("treatment")
+            if treatment not in {"supported", "no_tax"}:
+                errors.append(f"{scope_path}.treatment must be supported or no_tax")
+            rule_ids = entry.get("rule_ids")
+            expected_ids = {
+                rule_id
+                for rule_id, rule in property_rules.items()
+                if rule.get("lifecycle_stage") == stage
+                and scope
+                in (
+                    rule.get("taxpayer_scope")
+                    if isinstance(rule.get("taxpayer_scope"), list)
+                    else []
+                )
+            }
+            if (
+                not isinstance(rule_ids, list)
+                or not rule_ids
+                or not all(isinstance(rule_id, str) for rule_id in rule_ids)
+                or len(set(rule_ids)) != len(rule_ids)
+                or set(rule_ids) != expected_ids
+            ):
+                errors.append(
+                    f"{scope_path}.rule_ids must exactly cover applicable {stage} {scope} property rules"
+                )
+                continue
+            if treatment == "no_tax":
+                for index, rule_id in enumerate(rule_ids):
+                    rule = property_rules[rule_id]
+                    if rule.get("no_tax") is not True or not _rule_encodes_zero_tax(rule):
+                        errors.append(
+                            f"{scope_path}.rule_ids[{index}] must reference an explicit executable no_tax rule"
+                        )
+
+
+def _property_condition_matches(value: Any, condition: dict[str, Any]) -> bool:
+    operator = condition.get("operator")
+    expected = condition.get("value")
+    if operator == "equals":
+        return value == expected
+    if operator == "not_equals":
+        return value != expected
+    if operator == "in":
+        return isinstance(expected, list) and value in expected
+    return False
+
+
+def _validate_property_relationship_domains(
+    jurisdiction_path: str,
+    rules_by_id: dict[str, dict[str, Any]],
+    operand_catalog: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    property_rules = [
+        rule
+        for rule in rules_by_id.values()
+        if rule.get("type") == "property_charge"
+    ]
+    relationship_operands = {
+        condition.get("operand")
+        for rule in property_rules
+        for condition in (
+            rule.get("applies_when")
+            if isinstance(rule.get("applies_when"), list)
+            else []
+        )
+        if isinstance(condition, dict)
+        and isinstance(condition.get("operand"), str)
+        and isinstance(operand_catalog.get(condition["operand"]), dict)
+        and operand_catalog[condition["operand"]].get("profile_key")
+        == "heirRelationship"
+    }
+    for operand_id in sorted(relationship_operands):
+        operand = operand_catalog[operand_id]
+        domain = operand.get("allowed_values")
+        domain_path = f"operand_catalog.{operand_id}.allowed_values"
+        if (
+            not isinstance(domain, list)
+            or not domain
+            or not all(isinstance(value, str) and value for value in domain)
+            or len(set(domain)) != len(domain)
+        ):
+            errors.append(
+                f"{domain_path} must contain the complete relationship branch domain"
+            )
+            continue
+        for stage in PROPERTY_LIFECYCLE_STAGES:
+            for scope in ("resident", "nonresident"):
+                scoped = [
+                    rule
+                    for rule in property_rules
+                    if rule.get("lifecycle_stage") == stage
+                    and scope
+                    in (
+                        rule.get("taxpayer_scope")
+                        if isinstance(rule.get("taxpayer_scope"), list)
+                        else []
+                    )
+                    and any(
+                        isinstance(condition, dict)
+                        and condition.get("operand") == operand_id
+                        for condition in (
+                            rule.get("applies_when")
+                            if isinstance(rule.get("applies_when"), list)
+                            else []
+                        )
+                    )
+                ]
+                if not scoped:
+                    continue
+                for value in domain:
+                    if not any(
+                        all(
+                            _property_condition_matches(value, condition)
+                            for condition in (
+                                rule.get("applies_when")
+                                if isinstance(rule.get("applies_when"), list)
+                                else []
+                            )
+                            if isinstance(condition, dict)
+                            and condition.get("operand") == operand_id
+                        )
+                        for rule in scoped
+                    ):
+                        errors.append(
+                            f"{domain_path} value {value!r} has no executable {stage} {scope} relationship branch"
+                        )
 
 
 def _rule_encodes_zero_tax(rule: dict[str, Any]) -> bool:
@@ -1776,6 +1952,18 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
             rules_by_id,
             operand_catalog,
             dataset_tax_year,
+            errors,
+        )
+        _validate_property_coverage(
+            jurisdiction,
+            jurisdiction_path,
+            rules_by_id,
+            errors,
+        )
+        _validate_property_relationship_domains(
+            jurisdiction_path,
+            rules_by_id,
+            operand_catalog,
             errors,
         )
 

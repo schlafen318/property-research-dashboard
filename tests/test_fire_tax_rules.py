@@ -1304,6 +1304,85 @@ class FireTaxPropertyRuleSchemaTests(unittest.TestCase):
                     f"jurisdictions.synthetic-destination.rules[{rule_index}]{suffix}",
                 )
 
+    def test_property_coverage_requires_every_stage_scope_and_exact_rules(self):
+        base_path = "jurisdictions.synthetic-destination.property_coverage"
+        cases = (
+            (lambda jurisdiction: jurisdiction["property_coverage"]["annual"].pop("resident"), f"{base_path}.annual.resident"),
+            (lambda jurisdiction: jurisdiction["property_coverage"]["annual"]["resident"]["rule_ids"].remove("synthetic-resident-property-tax-2026"), f"{base_path}.annual.resident.rule_ids"),
+            (lambda jurisdiction: jurisdiction["property_coverage"]["annual"]["resident"].update({"treatment": "no_tax"}), f"{base_path}.annual.resident.rule_ids"),
+        )
+        for mutate, expected_path in cases:
+            with self.subTest(path=expected_path):
+                payload = copy.deepcopy(self.payload)
+                mutate(payload["jurisdictions"]["synthetic-destination"])
+                self.assert_path_error(self.validate(payload), expected_path)
+
+    def test_relationship_branching_requires_a_complete_validated_domain(self):
+        cases = (
+            (
+                lambda payload: payload["operand_catalog"]["heir_relationship"].pop("allowed_values"),
+                "operand_catalog.heir_relationship.allowed_values",
+            ),
+            (
+                lambda payload: payload["operand_catalog"]["heir_relationship"]["allowed_values"].append("spouse"),
+                "operand_catalog.heir_relationship.allowed_values",
+            ),
+            (
+                lambda payload: payload["jurisdictions"]["synthetic-destination"]["rules"][14]["applies_when"][1].update({"value": "spouse"}),
+                "jurisdictions.synthetic-destination.rules[14].applies_when[1].value",
+            ),
+        )
+        for mutate, expected_path in cases:
+            with self.subTest(path=expected_path):
+                payload = copy.deepcopy(self.payload)
+                mutate(payload)
+                self.assert_path_error(self.validate(payload), expected_path)
+
+    def test_property_allowance_audit_must_come_from_formula_operands(self):
+        payload = copy.deepcopy(self.payload)
+        payload["jurisdictions"]["synthetic-destination"]["rules"][14][
+            "allowance_amount"
+        ] = 99999
+        self.assert_path_error(
+            self.validate(payload),
+            "jurisdictions.synthetic-destination.rules[14].allowance_amount",
+        )
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"]["gift_relief"]["audit_role"] = "guess"
+        self.assert_path_error(
+            self.validate(payload),
+            "operand_catalog.gift_relief.audit_role",
+        )
+
+    def test_malformed_relationship_condition_is_path_error_not_validator_crash(self):
+        cases = (
+            (
+                lambda payload: payload["jurisdictions"]["synthetic-destination"]["rules"][14].update({"applies_when": {}}),
+                "jurisdictions.synthetic-destination.rules[14].applies_when",
+            ),
+            (
+                lambda payload: payload["jurisdictions"]["synthetic-destination"]["rules"][14].update({"applies_when": None}),
+                "jurisdictions.synthetic-destination.rules[14].applies_when",
+            ),
+            (
+                lambda payload: payload["jurisdictions"]["synthetic-destination"]["rules"][14].update({"applies_when": 7}),
+                "jurisdictions.synthetic-destination.rules[14].applies_when",
+            ),
+            (
+                lambda payload: payload["jurisdictions"]["synthetic-destination"]["rules"][0].update({"taxpayer_scope": None}),
+                "jurisdictions.synthetic-destination.rules[0].taxpayer_scope",
+            ),
+        )
+        for mutate, expected_path in cases:
+            with self.subTest(path=expected_path):
+                payload = copy.deepcopy(self.payload)
+                mutate(payload)
+                try:
+                    errors = self.validate(payload)
+                except Exception as error:  # pragma: no cover - failure explains totality regression
+                    self.fail(f"validator crashed instead of returning path errors: {error!r}")
+                self.assert_path_error(errors, expected_path)
+
 
 if __name__ == "__main__":
     unittest.main()
