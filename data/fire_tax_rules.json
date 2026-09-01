@@ -156,6 +156,17 @@
       "recheck_trigger": "Recheck the individual source rules and 2026/27 assessment guidance."
     },
     {
+      "id": "hk-ordinary-residence-facts-2026",
+      "publisher": "Hong Kong Inland Revenue Department",
+      "url": "https://www.ird.gov.hk/eng/faq/pa.htm",
+      "source_kind": "official",
+      "effective_from": "2026-04-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "IRD factual guidance for ordinary residence: normal settled daily life and objective home, work or business, family, social and economic connections. The calculator asks these facts and does not ask the user for a legal conclusion.",
+      "recheck_trigger": "Recheck IRD ordinary-residence guidance and objective factors before each tax-year release."
+    },
+    {
       "id": "hk-uae-treaty-2026",
       "publisher": "Hong Kong Inland Revenue Department",
       "url": "https://www.ird.gov.hk/eng/pdf/Synthesised_Text_HKSAR_UAE.pdf",
@@ -163,7 +174,7 @@
       "effective_from": "2016-04-01",
       "checked_on": "2026-09-01",
       "review_interval_days": 120,
-      "scope": "Article 4 residence tests and individual tie-breaker sequence: ordinary residence/day counts, permanent home, centre of vital interests, habitual abode, then Hong Kong right of abode or UAE nationality; unresolved cases require competent-authority agreement.",
+      "scope": "Article 4 residence tests: more than 180 days in the relevant assessment year or more than 300 days in either pair of consecutive assessment years containing it, followed where dual resident by permanent home, centre of vital interests, habitual abode, then Hong Kong right of abode or UAE nationality; unresolved cases require competent-authority agreement.",
       "recheck_trigger": "Recheck treaty, MLI reservations and competent-authority updates."
     },
     {
@@ -271,6 +282,7 @@
         "uae-natural-person-business-2026",
         "uae-tax-residence-2026",
         "hk-territorial-individual-tax-2026",
+        "hk-ordinary-residence-facts-2026",
         "hk-uae-treaty-2026"
       ],
       "income_categories": [

@@ -153,38 +153,41 @@
       taxYear: result.taxYear,
       branchIds: allScenarioIds(result)
     };
+    const propertyOverlays = [result.destination && result.destination.property, result.continuingHome && result.continuingHome.property].filter(record);
+    const propertyNotApplicable = propertyOverlays.length > 0 && propertyOverlays.every(function (property) { return property.taxpayerScope === "not_applicable"; });
+    const lines = [
+      auditLine(Object.assign({}, shared, {
+        key: "annual_tax",
+        label: "Total annual tax",
+        value: result.totals.annualTax,
+        formula: "dependable-income tax netted from income + return-covered tax + living-cost-covered property tax + added annual tax expense including any excess dependable tax",
+        assumptions: ["Each supported annual liability is included once across destination and continuing-home overlays."],
+        exclusions: ["One-time property taxes, tax payments already withheld, and non-tax costs."],
+        endpointScenarioIds: endpointScenarioIds(result, "annualTax", result.totals.annualTax)
+      }))
+    ];
+    if (!propertyNotApplicable) lines.push(auditLine(Object.assign({}, shared, {
+      key: "one_time_taxes",
+      label: "One-time property taxes",
+      value: result.totals.oneTimeTaxes,
+      formula: "purchase + sale + inheritance + gift tax liabilities across active jurisdictions",
+      assumptions: ["Only selected active lifecycle stages are included."],
+      exclusions: ["Annual taxes, prepayments, registration fees, and other non-tax costs."],
+      endpointScenarioIds: endpointScenarioIds(result, "oneTimeTaxes", result.totals.oneTimeTaxes)
+    })));
+    lines.push(auditLine(Object.assign({}, shared, {
+      key: "after_tax_dependable_income",
+      label: "After-tax dependable income",
+      value: result.totals.afterTaxDependableIncome,
+      formula: "gross dependable income - minimum(gross dependable income, dependable-income tax liability)",
+      assumptions: ["The selected dependable categories are not portfolio returns; tax beyond their gross income is moved to annual expense."],
+      exclusions: ["Portfolio income represented by the selected after-tax return and property equity."],
+      endpointScenarioIds: endpointScenarioIds(result, "afterTaxDependableIncome", result.totals.afterTaxDependableIncome)
+    })));
     return {
       id: "reconciled_totals",
       label: "Reconciled totals",
-      lines: [
-        auditLine(Object.assign({}, shared, {
-          key: "annual_tax",
-          label: "Total annual tax",
-          value: result.totals.annualTax,
-          formula: "dependable-income tax netted from income + return-covered tax + living-cost-covered property tax + added annual tax expense including any excess dependable tax",
-          assumptions: ["Each supported annual liability is included once across destination and continuing-home overlays."],
-          exclusions: ["One-time property taxes, tax payments already withheld, and non-tax costs."],
-          endpointScenarioIds: endpointScenarioIds(result, "annualTax", result.totals.annualTax)
-        })),
-        auditLine(Object.assign({}, shared, {
-          key: "one_time_taxes",
-          label: "One-time property taxes",
-          value: result.totals.oneTimeTaxes,
-          formula: "purchase + sale + inheritance + gift tax liabilities across active jurisdictions",
-          assumptions: ["Only selected active lifecycle stages are included."],
-          exclusions: ["Annual taxes, prepayments, registration fees, and other non-tax costs."],
-          endpointScenarioIds: endpointScenarioIds(result, "oneTimeTaxes", result.totals.oneTimeTaxes)
-        })),
-        auditLine(Object.assign({}, shared, {
-          key: "after_tax_dependable_income",
-          label: "After-tax dependable income",
-          value: result.totals.afterTaxDependableIncome,
-          formula: "gross dependable income - minimum(gross dependable income, dependable-income tax liability)",
-          assumptions: ["The selected dependable categories are not portfolio returns; tax beyond their gross income is moved to annual expense."],
-          exclusions: ["Portfolio income represented by the selected after-tax return and property equity."],
-          endpointScenarioIds: endpointScenarioIds(result, "afterTaxDependableIncome", result.totals.afterTaxDependableIncome)
-        }))
-      ]
+      lines: lines
     };
   }
 

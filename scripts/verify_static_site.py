@@ -285,7 +285,7 @@ if (chosen) {
   const session=api.initDetailedTaxUI('retirement-calculator',input.payload);
   initialized=!!session;
   elements['ret-tax-refine'].emit('click');
-  const supplied={daysInDestination:200,daysInHome:30,ordinarilyResidesHongKong:'no',daysInHomePreviousYear:20,hasHongKongSourceIncome:false,hasHongKongProperty:false,activityType:'retired_or_employee',retirementAccountClassification:'personal_investment',annualEmploymentIncome:0};
+  const supplied={daysInDestination:200,daysInHome:30,daysInHomePreviousYear:20,followingYearDaysKnown:'yes',daysInHomeFollowingYear:20,hongKongSettledDailyLife:'no',hongKongFixedHome:'no',hongKongWorkOrBusiness:'no',hongKongCloseFamily:'no',hasHongKongSourceIncome:false,hasHongKongProperty:false,activityType:'retired_or_employee',retirementAccountClassification:'personal_investment',annualEmploymentIncome:0};
   for (let guard=0;guard<40;guard++) {
     const pending=api.nextPairQuestions(session.planningFacts(),session.answers());
     if (!pending.length) break;

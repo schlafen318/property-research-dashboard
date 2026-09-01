@@ -33,7 +33,7 @@
 
   function residenceRules(definition, currency, sources) {
     const destinationSource = ["uae-tax-residence-2026"];
-    const homeSource = ["hk-uae-treaty-2026", "hk-territorial-individual-tax-2026"];
+    const homeSource = ["hk-uae-treaty-2026", "hk-ordinary-residence-facts-2026", "hk-territorial-individual-tax-2026"];
     const destination = {
       schema_version: 1, tax_year: 2026, checked_on: "2026-09-01",
       operand_catalog: {
@@ -61,7 +61,7 @@
         residence_logic: { operation: "any", rule_ids: ["hong-kong-treaty-residence-2026"] },
         rules: [audit("hong-kong-treaty-residence-2026", "residence_test", "tax_residence", currency, homeSource, {
           taxpayer_scope: ["individual"], formula: { operation: "flag", operands: ["home_resident"] }, resident_when: true,
-          explanation: "The factual Article 4 sequence—Hong Kong domestic residence, permanent homes, closest personal/economic relations, habitual abode, and right-of-abode/nationality where needed—must produce a supported UAE treaty outcome before this flag is false.",
+          explanation: "The factual Article 4 sequence—both adjacent-year day-count pairs, IRD settled-daily-life factors, permanent homes, closest personal/economic relations, habitual abode, and right-of-abode/nationality where needed—must produce a supported UAE treaty outcome before this flag is false.",
         })],
       } },
     };

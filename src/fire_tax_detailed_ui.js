@@ -28,17 +28,23 @@
 
   function hongKongDomesticResidence(facts) {
     facts = record(facts) ? facts : {};
-    const ordinary = facts.ordinarilyResidesHongKong;
     const currentDays = Number(facts.daysInHome);
-    if (!Number.isFinite(currentDays) || !["yes", "no", "not_sure"].includes(ordinary)) return "incomplete";
-    if (ordinary === "not_sure") return "unresolved";
-    let hongKongResident = ordinary === "yes" || currentDays > 180;
-    if (!hongKongResident) {
-      const previousDays = Number(facts.daysInHomePreviousYear);
-      if (!Number.isFinite(previousDays)) return "incomplete";
-      hongKongResident = currentDays + previousDays > 300;
-    }
-    return hongKongResident ? "resident" : "not_resident";
+    const validDays = function (value) { return Number.isInteger(value) && value >= 0 && value <= 366; };
+    if (!validDays(currentDays)) return "incomplete";
+    if (currentDays > 180) return "resident";
+    const previousDays = Number(facts.daysInHomePreviousYear);
+    if (!validDays(previousDays)) return "incomplete";
+    if (currentDays + previousDays > 300) return "resident";
+    if (!["yes", "no", "not_sure"].includes(facts.followingYearDaysKnown)) return "incomplete";
+    if (facts.followingYearDaysKnown !== "yes") return "unresolved";
+    const followingDays = Number(facts.daysInHomeFollowingYear);
+    if (!validDays(followingDays)) return "incomplete";
+    if (currentDays + followingDays > 300) return "resident";
+    const settledFacts = [facts.hongKongSettledDailyLife, facts.hongKongFixedHome, facts.hongKongWorkOrBusiness, facts.hongKongCloseFamily];
+    if (settledFacts.some(function (value) { return !["yes", "no", "not_sure"].includes(value); })) return "incomplete";
+    if (settledFacts.includes("not_sure")) return "unresolved";
+    if (facts.hongKongSettledDailyLife === "yes") return "resident";
+    return settledFacts.every(function (value) { return value === "no"; }) ? "not_resident" : "unresolved";
   }
 
   function hongKongTreatyOutcome(facts) {
@@ -328,12 +334,23 @@
     const yesNoUnsure = [option("no", "No"), option("yes", "Yes"), option("not_sure", "Not sure")];
     const residence = [
       { id: "uae-days", fact: "daysInDestination", control: "number", label: "Days in the UAE during the relevant 12 months", reason: "This profile uses the official 183-day residence route.", acceptedValues: { min: 183, max: 365, step: 1, integer: true } },
-      { id: "hong-kong-days", fact: "daysInHome", control: "number", label: "Days in Hong Kong during the tax year", reason: "Hong Kong treaty residence includes day-count tests.", acceptedValues: { min: 0, max: 365, step: 1, integer: true } },
-      { id: "hong-kong-ordinary-residence", fact: "ordinarilyResidesHongKong", control: "radio", label: "Will you ordinarily reside in Hong Kong during the tax year?", reason: "This is a factual Hong Kong residence test in the agreement; choose Not sure if uncertain.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
+      { id: "hong-kong-days", fact: "daysInHome", control: "number", label: "Days in Hong Kong during the tax year", reason: "The agreement tests the current year and either adjacent assessment year.", acceptedValues: { min: 0, max: 366, step: 1, integer: true } },
     ];
     let pending = residence.filter(function (question) { return !has(question.fact); });
     if (pending.length) return pending;
-    if (answers.ordinarilyResidesHongKong === "no" && Number(answers.daysInHome) <= 180 && !has("daysInHomePreviousYear")) return [{ id: "hong-kong-prior-days", fact: "daysInHomePreviousYear", control: "number", label: "Days in Hong Kong in the previous tax year", reason: "More than 300 Hong Kong days across two consecutive assessment years can establish treaty residence.", acceptedValues: { min: 0, max: 366, step: 1, integer: true } }];
+    if (Number(answers.daysInHome) <= 180 && !has("daysInHomePreviousYear")) return [{ id: "hong-kong-prior-days", fact: "daysInHomePreviousYear", control: "number", label: "Days in Hong Kong in the previous tax year", reason: "More than 300 days across the current and either adjacent assessment year establishes residence under the agreement.", acceptedValues: { min: 0, max: 366, step: 1, integer: true } }];
+    if (Number(answers.daysInHome) <= 180 && Number(answers.daysInHome) + Number(answers.daysInHomePreviousYear) <= 300 && !has("followingYearDaysKnown")) return [{ id: "hong-kong-following-known", fact: "followingYearDaysKnown", control: "radio", label: "Can you give the Hong Kong days for the following tax year?", reason: "The following adjacent year can change the agreement's residence result; choose Not sure if it is future or uncertain.", acceptedValues: ["yes", "no", "not_sure"], options: [option("yes", "Yes"), option("no", "Not yet — future or unknown"), option("not_sure", "Not sure")] }];
+    if (answers.followingYearDaysKnown === "yes" && !has("daysInHomeFollowingYear")) return [{ id: "hong-kong-following-days", fact: "daysInHomeFollowingYear", control: "number", label: "Days in Hong Kong in the following tax year", reason: "The agreement counts two consecutive assessment years when either one is the relevant year.", acceptedValues: { min: 0, max: 366, step: 1, integer: true } }];
+    const dayOutcome = hongKongDomesticResidence(answers);
+    if (dayOutcome === "incomplete" && Number(answers.daysInHome) <= 180 && answers.followingYearDaysKnown === "yes" && has("daysInHomeFollowingYear")) {
+      pending = [
+        { id: "hong-kong-settled-daily-life", fact: "hongKongSettledDailyLife", control: "radio", label: "Apart from temporary trips, was Hong Kong the place of your normal settled daily life?", reason: "IRD guidance looks at where a person habitually and normally lives for daily life; this asks for the fact, not a legal conclusion.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
+        { id: "hong-kong-fixed-home", fact: "hongKongFixedHome", control: "radio", label: "Did you keep a fixed home available in Hong Kong?", reason: "IRD lists a fixed Hong Kong residence as an objective ordinary-residence factor.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
+        { id: "hong-kong-work-business", fact: "hongKongWorkOrBusiness", control: "radio", label: "Did you work or run a business in Hong Kong?", reason: "IRD lists Hong Kong work or business as an objective ordinary-residence factor.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
+        { id: "hong-kong-close-family", fact: "hongKongCloseFamily", control: "radio", label: "Did your close family mainly live in Hong Kong?", reason: "IRD lists where family and relatives mainly live as an objective ordinary-residence factor.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
+      ].filter(function (question) { return !has(question.fact); });
+      if (pending.length) return pending;
+    }
     const domesticOutcome = hongKongDomesticResidence(answers);
     if (domesticOutcome === "incomplete" || domesticOutcome === "unresolved") return [];
     if (domesticOutcome === "resident") {
@@ -610,6 +627,7 @@
     createController: createController,
     coerceAnswer: coerceAnswer,
     shouldHandlePlanningEvent: shouldHandlePlanningEvent,
+    hongKongDomesticResidence: hongKongDomesticResidence,
     hongKongTreatyOutcome: hongKongTreatyOutcome,
     nextPairQuestions: nextPairQuestions,
     materialQuestions: materialQuestions,

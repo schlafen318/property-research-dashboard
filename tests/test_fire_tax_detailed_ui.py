@@ -39,7 +39,10 @@ class DetailedFireTaxUiTests(unittest.TestCase):
             "planningRange": {"minimum": 900000, "maximum": 1100000}, "aedPerCurrency": 3.6725,
         }
         answers = {
-            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20, "ordinarilyResidesHongKong": "no", "hasHongKongSourceIncome": False,
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 20,
+            "hongKongSettledDailyLife": "no", "hongKongFixedHome": "no",
+            "hongKongWorkOrBusiness": "no", "hongKongCloseFamily": "no", "hasHongKongSourceIncome": False,
             "hasHongKongProperty": False, "activityType": "retired_or_employee",
             "retirementAccountClassification": "personal_investment", "annualEmploymentIncome": 0,
         }
@@ -54,6 +57,7 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         self.assertIn("Hong Kong to Dubai", response["markup"])
         self.assertIn("Owned-property calculation not applicable; include renter municipal/housing fees in annual spending", response["markup"])
         self.assertTrue(any(line.get("notApplicable") for section in response["audit"] for line in section.get("lines", [])))
+        self.assertFalse(any(line.get("key") == "one_time_taxes" for section in response["audit"] for line in section.get("lines", [])))
 
     def test_live_planning_facts_build_profile_without_bundle_amounts(self) -> None:
         definition = {
@@ -75,7 +79,10 @@ class DetailedFireTaxUiTests(unittest.TestCase):
             "hasLiveDependableIncome": True, "dependableIncomeIndexed": True,
         }
         answers = {
-            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20, "ordinarilyResidesHongKong": "no",
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 20,
+            "hongKongSettledDailyLife": "no", "hongKongFixedHome": "no",
+            "hongKongWorkOrBusiness": "no", "hongKongCloseFamily": "no",
             "hasHongKongSourceIncome": False, "hasHongKongProperty": False,
             "activityType": "retired_or_employee", "annualServiceCharges": 4000,
             "annualHousingFee": 2500, "propertyType": "villa_or_apartment",
@@ -134,7 +141,10 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         }
         payload = build_unified_app.detailed_fire_tax_page_payload()
         base = {
-            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20, "ordinarilyResidesHongKong": "no",
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 20,
+            "hongKongSettledDailyLife": "no", "hongKongFixedHome": "no",
+            "hongKongWorkOrBusiness": "no", "hongKongCloseFamily": "no",
             "hasHongKongSourceIncome": False, "hasHongKongProperty": False,
             "activityType": "retired_or_employee",
         }
@@ -197,7 +207,9 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         }
         answers = {
             "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20,
-            "ordinarilyResidesHongKong": "no", "hasHongKongSourceIncome": False,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 20,
+            "hongKongSettledDailyLife": "no", "hongKongFixedHome": "no",
+            "hongKongWorkOrBusiness": "no", "hongKongCloseFamily": "no", "hasHongKongSourceIncome": False,
             "hasHongKongProperty": False, "activityType": "retired_or_employee",
             "retirementAccountClassification": "personal_investment", "annualEmploymentIncome": 0,
         }
@@ -221,8 +233,15 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         self.assertNotEqual("calculated", unsupported_account)
 
     def test_treaty_router_uses_facts_and_fails_closed_when_uncertain(self) -> None:
-        not_dual = {"daysInDestination": 200, "daysInHome": 30, "ordinarilyResidesHongKong": "no", "daysInHomePreviousYear": 20}
-        dual = {"daysInDestination": 200, "daysInHome": 190, "ordinarilyResidesHongKong": "yes"}
+        settled_elsewhere = {
+            "hongKongSettledDailyLife": "no", "hongKongFixedHome": "no",
+            "hongKongWorkOrBusiness": "no", "hongKongCloseFamily": "no",
+        }
+        not_dual = {
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 20, **settled_elsewhere,
+        }
+        dual = {"daysInDestination": 200, "daysInHome": 190}
 
         self.assertEqual("not_dual", run_node("api.hongKongTreatyOutcome(input)", not_dual))
         self.assertEqual("unresolved", run_node("api.hongKongTreatyOutcome(input)", {**dual, "permanentHomeHongKong": "not_sure", "permanentHomeUae": "yes"}))
@@ -233,6 +252,49 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         self.assertIn("permanentHomeHongKong", facts)
         self.assertIn("permanentHomeUae", facts)
         self.assertNotIn("closestPersonalRelations", facts)
+
+    def test_hong_kong_day_test_uses_both_adjacent_years_and_strict_threshold(self) -> None:
+        settled_elsewhere = {
+            "hongKongSettledDailyLife": "no", "hongKongFixedHome": "no",
+            "hongKongWorkOrBusiness": "no", "hongKongCloseFamily": "no",
+        }
+        following_establishes = {
+            "daysInHome": 150, "daysInHomePreviousYear": 100,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 160,
+        }
+        boundary = {
+            "daysInHome": 150, "daysInHomePreviousYear": 150,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 150, **settled_elsewhere,
+        }
+        unknown_following = {
+            "daysInHome": 150, "daysInHomePreviousYear": 100,
+            "followingYearDaysKnown": "not_sure", **settled_elsewhere,
+        }
+
+        self.assertEqual("resident", run_node("api.hongKongDomesticResidence(input)", following_establishes))
+        self.assertEqual("not_resident", run_node("api.hongKongDomesticResidence(input)", boundary))
+        self.assertEqual("unresolved", run_node("api.hongKongDomesticResidence(input)", unknown_following))
+        payload = build_unified_app.detailed_fire_tax_page_payload()
+        access_expression = "api.profileAccess('dubai',input.payload,{homeJurisdictionId:'hong-kong'},Object.assign({daysInDestination:200,requireCompleteEligibility:true,explicitReturnProvided:true,selectedAfterTaxReturn:.04},input.facts))"
+        following_access = run_node(access_expression, {"payload": payload, "facts": following_establishes})
+        unknown_access = run_node(access_expression, {"payload": payload, "facts": unknown_following})
+        self.assertFalse(following_access["available"])
+        self.assertIn("residence questions", following_access["reason"])
+        self.assertFalse(unknown_access["available"])
+        self.assertIn("uncertain", unknown_access["reason"])
+
+    def test_settled_life_router_uses_plain_facts_and_not_sure_fails_closed(self) -> None:
+        day_facts = {
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 20,
+        }
+        questions = run_node("api.nextPairQuestions({},input)", day_facts)
+        labels = [question["label"] for question in questions]
+
+        self.assertTrue(any("normal settled daily life" in label for label in labels))
+        self.assertFalse(any("ordinarily reside" in label for label in labels))
+        uncertain = {**day_facts, "hongKongSettledDailyLife": "not_sure", "hongKongFixedHome": "no", "hongKongWorkOrBusiness": "no", "hongKongCloseFamily": "no"}
+        self.assertEqual("unresolved", run_node("api.hongKongDomesticResidence(input)", uncertain))
 
     def test_fully_enabled_destination_home_bundle_runs_end_to_end(self) -> None:
         calculation = detailed_payload()
@@ -331,13 +393,16 @@ class DetailedFireTaxUiTests(unittest.TestCase):
     def test_pair_questions_reveal_only_applicable_plain_language_followups(self) -> None:
         planning = {"propertyPrice": 500000, "housingPlan": "buy_retirement", "propertyUse": "personal"}
         eligibility = {
-            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20, "ordinarilyResidesHongKong": "no",
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20,
+            "followingYearDaysKnown": "yes", "daysInHomeFollowingYear": 20,
+            "hongKongSettledDailyLife": "no", "hongKongFixedHome": "no",
+            "hongKongWorkOrBusiness": "no", "hongKongCloseFamily": "no",
             "hasHongKongSourceIncome": False, "hasHongKongProperty": False,
             "activityType": "retired_or_employee",
         }
 
         first = run_node("api.nextPairQuestions(input.planning,{})", {"planning": planning})
-        after_treaty = run_node("api.nextPairQuestions(input.planning,input.answers)", {"planning": planning, "answers": {key: eligibility[key] for key in ("daysInDestination", "daysInHome", "daysInHomePreviousYear", "ordinarilyResidesHongKong")}})
+        after_treaty = run_node("api.nextPairQuestions(input.planning,input.answers)", {"planning": planning, "answers": {key: eligibility[key] for key in ("daysInDestination", "daysInHome", "daysInHomePreviousYear", "followingYearDaysKnown", "daysInHomeFollowingYear", "hongKongSettledDailyLife", "hongKongFixedHome", "hongKongWorkOrBusiness", "hongKongCloseFamily")}})
         advanced = run_node("api.nextPairQuestions(input.planning,input.answers)", {"planning": planning, "answers": eligibility})
         gift = run_node("api.nextPairQuestions(input.planning,Object.assign({},input.answers,{exitPlan:'gift'}))", {"planning": planning, "answers": eligibility})
 
