@@ -207,14 +207,12 @@ class RetirementCalculatorUITests(unittest.TestCase):
 
     def test_planning_summary_formats_results_in_singapore_dollars(self) -> None:
         self.assertEqual(
-            "Invest SGD\u00a01,271 today and SGD\u00a0254 per month to fund this retirement plan.",
+            "Central estimate needed today: SGD\u00a01,271.",
             run_ui(
                 "planningSummary",
                 {
                     "result": {
-                        "investmentNeededToday": 1_000,
-                        "monthlyContributionToday": 200,
-                        "homePurchaseNeededToday": 0,
+                        "totalNeededToday": 1_000,
                     },
                     "currency": "SGD",
                     "ratesToUsd": {"USD": 1, "SGD": 0.7866117265603891},
@@ -656,26 +654,23 @@ class RetirementCalculatorUITests(unittest.TestCase):
             run_ui("sensitivityRates", 0.05),
         )
 
-    def test_planning_summary_leads_with_investment_and_monthly_contribution(self) -> None:
+    def test_planning_summary_is_the_single_central_needed_today_headline(self) -> None:
         self.assertEqual(
-            "Invest $986,656 today and $2,000 per month to fund this retirement plan.",
+            "Central estimate needed today: $986,656.",
             run_ui(
                 "planningSummary",
                 {
-                    "investmentNeededToday": 986_656,
-                    "monthlyContributionToday": 2_000,
-                    "homePurchaseNeededToday": 0,
+                    "totalNeededToday": 986_656,
                 },
             ),
         )
         self.assertEqual(
-            "Invest $986,656 today and $2,000 per month for retirement, plus $500,000 for the home purchase.",
+            "Estimate needed today: $986,656.",
             run_ui(
                 "planningSummary",
                 {
-                    "investmentNeededToday": 986_656,
-                    "monthlyContributionToday": 2_000,
-                    "homePurchaseNeededToday": 500_000,
+                    "result": {"totalNeededToday": 986_656},
+                    "taxScenario": {"status": "user_after_tax"},
                 },
             ),
         )

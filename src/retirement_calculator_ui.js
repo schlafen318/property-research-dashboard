@@ -237,6 +237,7 @@
         rows: [],
         capitalRange: [],
         noTaxComparison: null,
+        refineAvailable: false,
       };
     }
     if (taxScenario.status === "user_after_tax") {
@@ -247,6 +248,7 @@
         rows: [],
         capitalRange: [],
         noTaxComparison: null,
+        refineAvailable: false,
       };
     }
     const keys = ["favorable", "central", "adverse"];
@@ -268,6 +270,7 @@
       rows: rows,
       capitalRange: [rows[0].requiredCapital, rows[2].requiredCapital],
       noTaxComparison: scenarioResults.central.noTaxComparison,
+      refineAvailable: true,
     };
   }
 
@@ -348,15 +351,10 @@
     const format = function (amountUsd) {
       return formatPlanningMoney({ amountUsd: amountUsd, currency: currency, ratesToUsd: ratesToUsd });
     };
-    const investment = format(Number(result.investmentNeededToday));
-    const contribution = format(Number(result.monthlyContributionToday));
-    const home = Number(result.homePurchaseNeededToday);
-    if (home > 0) {
-      return "Invest " + investment + " today and " + contribution +
-        " per month for retirement, plus " + format(home) + " for the home purchase.";
-    }
-    return "Invest " + investment + " today and " + contribution +
-      " per month to fund this retirement plan.";
+    const label = input && input.taxScenario && input.taxScenario.status === "user_after_tax"
+      ? "Estimate needed today: "
+      : "Central estimate needed today: ";
+    return label + format(Number(result.totalNeededToday)) + ".";
   }
 
   function accumulationTooltipContent(input) {
@@ -588,8 +586,9 @@
       el("ret-tax-property-use").disabled = !visibility.propertyUse;
       el("ret-tax-wealth-band-field").hidden = !visibility.wealthBand;
       el("ret-tax-wealth-band").disabled = !visibility.wealthBand;
-      el("ret-tax-refine").hidden = !visibility.estimate;
-      if (!visibility.estimate) el("ret-tax-refine-status").hidden = true;
+      el("ret-tax-refine").hidden = true;
+      el("ret-tax-refine").disabled = true;
+      el("ret-tax-refine-status").hidden = true;
       ["ret-tax-withdrawals", "ret-tax-gain-intensity"].forEach(function (id) {
         el(id).disabled = !visibility.estimate;
       });
@@ -903,25 +902,23 @@
         taxScenario: taxScenario,
         scenarioResults: scenarioResults,
       });
-      const centralSection = el("ret-tax-central");
       const range = el("ret-tax-range");
       const unavailable = el("ret-tax-unavailable");
       const comparison = el("ret-tax-no-tax-comparison");
       const details = el("ret-tax-details");
-      centralSection.hidden = true;
+      const refine = el("ret-tax-refine");
       range.hidden = true;
       unavailable.hidden = true;
       comparison.hidden = true;
       details.hidden = true;
+      refine.hidden = true;
+      refine.disabled = true;
+      el("ret-tax-refine-status").hidden = true;
       if (view.status === "unavailable") {
         unavailable.hidden = false;
         return view;
       }
       if (view.status !== "available") return view;
-      const central = view.rows[1];
-      centralSection.hidden = false;
-      setMoney("ret-tax-central-capital", central.requiredCapital);
-      setMoney("ret-tax-central-reserve", central.annualTaxReserve);
       range.hidden = false;
       el("ret-tax-range-capital").textContent = displayMoney(view.capitalRange[0]) + "–" + displayMoney(view.capitalRange[1]);
       if (view.noTaxComparison) {
@@ -946,6 +943,8 @@
         appendTaxExplanation(explanationContainer, row.key, explanation, sourceById);
       });
       details.hidden = false;
+      refine.hidden = !view.refineAvailable;
+      refine.disabled = !view.refineAvailable;
       return view;
     }
 
@@ -957,16 +956,16 @@
       el("ret-detailed-projection").hidden = false;
       el("ret-plan-summary").textContent = planningSummary({
         result: result,
+        taxScenario: taxScenario,
         currency: selectedCurrency,
         ratesToUsd: ratesToUsd,
       });
-      setMoney("ret-total-today", result.totalNeededToday);
       setMoney("ret-invest-today", result.investmentNeededToday);
-      setMoney("ret-home-today", result.homePurchaseNeededToday);
       setMoney("ret-monthly-contribution", result.monthlyContributionToday);
       setMoney("ret-contribution-retirement", result.contributionValueAtRetirement);
       setMoney("ret-total-retirement", result.totalCapitalAtRetirement);
       setMoney("ret-total-retirement-summary", result.totalCapitalAtRetirement);
+      setMoney("ret-property-summary", result.propertyCapital);
       setMoney("ret-liquid-portfolio", result.liquidPortfolio);
       setMoney("ret-property-retirement", result.propertyTiming === "retirement" ? result.propertyCapital : 0);
       setMoney("ret-emergency-reserve", result.emergencyReserve);
@@ -986,10 +985,6 @@
       el("ret-net-return-explanation").textContent = netReturnIsNegative
         ? "Expected return minus first-year portfolio withdrawal. Withdrawals exceed the assumed return."
         : "Expected return minus first-year portfolio withdrawal.";
-      el("ret-home-today-label").textContent = result.propertyTiming === "today"
-        ? "Home purchase needed now"
-        : "Home purchase today";
-      el("ret-home-summary").hidden = result.propertyTiming !== "today";
       el("ret-property-retirement-label").textContent = result.propertyTiming === "retirement"
         ? "Home purchase at retirement"
         : "No home purchase at retirement";

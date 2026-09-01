@@ -189,10 +189,11 @@ class RetirementCalculatorPageTests(unittest.TestCase):
 
     def test_tax_result_targets_put_central_first_and_details_in_one_disclosure(self) -> None:
         results = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
-        self.assertIn('id="ret-tax-central" hidden', results)
-        self.assertIn('id="ret-tax-central-capital"', results)
+        self.assertIn('id="ret-plan-summary"', results)
+        self.assertNotIn('id="ret-tax-central"', results)
+        self.assertNotIn('id="ret-tax-central-capital"', results)
         self.assertIn('id="ret-tax-range"', results)
-        self.assertLess(results.index('id="ret-tax-central"'), results.index('id="ret-tax-range"'))
+        self.assertLess(results.index('id="ret-plan-summary"'), results.index('id="ret-tax-range"'))
         self.assertIn('id="ret-tax-no-tax-comparison"', results)
         self.assertIn("No added destination tax comparison", results)
         self.assertIn('id="ret-tax-details"', results)
@@ -203,7 +204,17 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         for scenario in ("favorable", "central", "adverse"):
             self.assertIn(f'id="ret-tax-{scenario}-row"', disclosure)
         self.assertIn('id="ret-tax-explanations"', disclosure)
-        self.assertIn('id="ret-tax-refine" type="button"', results)
+        self.assertIn('id="ret-tax-refine" type="button" hidden disabled', results)
+
+    def test_result_panel_has_one_needed_today_headline_and_distinct_key_figures(self) -> None:
+        panel = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
+
+        self.assertEqual(1, panel.count('id="ret-plan-summary"'))
+        self.assertNotIn('id="ret-total-today"', panel)
+        self.assertNotIn('id="ret-tax-central-capital"', panel)
+        self.assertIn('<span>Monthly contribution</span><strong id="ret-monthly-contribution">', panel)
+        self.assertIn('<span>Retirement capital</span><strong id="ret-total-retirement-summary">', panel)
+        self.assertIn('<span>Property capital</span><strong id="ret-property-summary">', panel)
 
     def test_tax_result_presentation_preserves_order_and_unavailable_state(self) -> None:
         available = run_ui(
@@ -226,6 +237,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertEqual(["favorable", "central", "adverse"], [row["key"] for row in available["rows"]])
         self.assertEqual([700000, 900000], available["capitalRange"])
         self.assertEqual("No added destination tax", available["noTaxComparison"]["label"])
+        self.assertTrue(available.get("refineAvailable", False))
         unavailable = run_ui(
             "taxResultPresentation",
             {"taxScenario": {"status": "unavailable", "conditional": True}, "scenarioResults": {}},
@@ -233,6 +245,12 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertEqual("unavailable", unavailable["status"])
         self.assertTrue(unavailable["conditional"])
         self.assertEqual([], unavailable["rows"])
+        self.assertFalse(unavailable.get("refineAvailable", False))
+        bypass = run_ui(
+            "taxResultPresentation",
+            {"taxScenario": {"status": "user_after_tax"}, "scenarioResults": {}},
+        )
+        self.assertFalse(bypass.get("refineAvailable", False))
 
     def test_tax_values_are_not_added_to_calculator_handoff_query(self) -> None:
         prefill = run_ui(
@@ -429,10 +447,9 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         result_panel = top_layout.split('id="ret-results"', 1)[1]
         self.assertIn('id="ret-plan-summary"', result_panel)
         self.assertIn('id="ret-today-section"', result_panel)
-        self.assertIn('id="ret-total-today"', result_panel)
         self.assertIn('id="ret-total-retirement-summary"', result_panel)
         self.assertIn('id="ret-monthly-contribution"', result_panel)
-        self.assertIn('id="ret-home-summary" hidden', result_panel)
+        self.assertIn('id="ret-property-summary"', result_panel)
         for detail_id in (
             "ret-accumulation-figure",
             "ret-sensitivity",
@@ -526,9 +543,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
         for element_id in (
             "ret-today-section",
-            "ret-total-today",
+            "ret-property-summary",
             "ret-invest-today",
-            "ret-home-today",
             "ret-retirement-section",
             "ret-total-retirement",
             "ret-property-retirement",
@@ -542,7 +558,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-contribution-retirement",
         ):
             self.assertIn(f'id="{element_id}"', results)
-        self.assertIn("Needed today", results)
+        self.assertIn("Central estimate needed today", results)
         self.assertIn("What you need at retirement", results)
         self.assertIn("First retirement year", results)
         self.assertIn('id="ret-first-expenses-label">Annual spending incl. rent</span>', results)
@@ -588,9 +604,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-expected-return",
             "ret-reserve-months",
             "ret-errors",
-            "ret-total-today",
+            "ret-property-summary",
             "ret-invest-today",
-            "ret-home-today",
             "ret-total-retirement",
             "ret-liquid-portfolio",
             "ret-property-retirement",

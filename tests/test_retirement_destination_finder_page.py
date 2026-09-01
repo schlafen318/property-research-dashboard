@@ -149,6 +149,14 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-tax-wealth-band-field"', form)
         self.assertIn("Expected annual portfolio return after fees and tax (%)", form)
 
+    def test_finder_tax_profile_is_honest_about_preparatory_ranking_status(self) -> None:
+        tax_section = self.html.split('id="finder-tax-planning"', 1)[1].split("</fieldset>", 1)[0]
+
+        self.assertIn("prepare your tax profile", tax_section)
+        self.assertIn("do not yet change finder rankings or retirement targets", tax_section)
+        self.assertIn('href="/retirement-abroad-calculator/"', tax_section)
+        self.assertIn("tax-adjusted result", tax_section)
+
     def test_finder_tax_control_visibility_disables_inapplicable_fields(self) -> None:
         renting = run_ui(
             "taxControlVisibility",

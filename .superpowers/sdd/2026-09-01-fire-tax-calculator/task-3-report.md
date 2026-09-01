@@ -135,3 +135,104 @@ Playwright exercised the generated HTML served locally, rather than inspecting s
 - The finder now collects the progressive tax profile in memory, but Task 4 remains responsible for applying the tax-adjusted target to its ranking.
 - “Refine the tax profile” is an honest unavailable hook in this task; it does not claim a workflow that has not been built.
 - These are broad scenario allowances, not individualized tax or treaty advice; unsupported or stale jurisdiction evidence intentionally remains unavailable.
+
+## Fix Round 1
+
+Review fixes applied on 2026-09-01:
+
+- The finder now states beside the tax controls that the profile is preparatory, does not yet alter rankings or retirement targets, and links to the detailed calculator for tax-adjusted results.
+- The calculator now has one needed-today headline. Its adjacent figures are distinct: monthly contribution, retirement capital, and property capital. The duplicate tax headline and legacy needed-today figure were removed.
+- The refine hook begins hidden and disabled, appears only after an available destination estimate, and hides again for unavailable evidence or the after-tax bypass. Its status is reset whenever result state changes.
+
+### TDD evidence
+
+Finder preparatory-copy RED:
+
+```text
+$ python3 -m unittest tests.test_retirement_destination_finder_page.RetirementDestinationFinderPageTests.test_finder_tax_profile_is_honest_about_preparatory_ranking_status -v
+Ran 1 test in 0.462s
+FAILED (failures=1)
+```
+
+Finder preparatory-copy GREEN:
+
+```text
+Ran 1 test in 0.352s
+OK
+```
+
+Single-headline and distinct-key-figures RED:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_page.RetirementCalculatorPageTests.test_result_panel_has_one_needed_today_headline_and_distinct_key_figures tests.test_retirement_calculator_page.RetirementCalculatorPageTests.test_tax_result_targets_put_central_first_and_details_in_one_disclosure tests.test_retirement_calculator_ui.RetirementCalculatorUITests.test_planning_summary_is_the_single_central_needed_today_headline -v
+Ran 3 tests in 0.437s
+FAILED (failures=3)
+```
+
+Single-headline and currency-formatting GREEN:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_page.RetirementCalculatorPageTests.test_result_panel_has_one_needed_today_headline_and_distinct_key_figures tests.test_retirement_calculator_page.RetirementCalculatorPageTests.test_tax_result_targets_put_central_first_and_details_in_one_disclosure tests.test_retirement_calculator_ui.RetirementCalculatorUITests.test_planning_summary_is_the_single_central_needed_today_headline tests.test_retirement_calculator_ui.RetirementCalculatorUITests.test_planning_summary_formats_results_in_singapore_dollars -v
+Ran 4 tests in 0.599s
+OK
+```
+
+Executable refine-transition RED:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_page.RetirementCalculatorPageTests.test_tax_result_targets_put_central_first_and_details_in_one_disclosure tests.test_retirement_calculator_page.RetirementCalculatorPageTests.test_tax_result_presentation_preserves_order_and_unavailable_state -v
+Ran 2 tests in 0.477s
+FAILED (failures=2)
+```
+
+Executable refine-transition GREEN:
+
+```text
+Ran 2 tests in 0.552s
+OK
+```
+
+The first covering run found two stale assertions for the removed legacy property/needed-today nodes:
+
+```text
+Ran 128 tests in 9.098s
+FAILED (failures=2)
+```
+
+After removing the dead renderer references and updating the old contracts, the covering suites passed:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_page tests.test_retirement_calculator_ui tests.test_retirement_destination_finder_page tests.test_retirement_destination_finder_ui tests.test_fire_abroad_page tests.test_fire_abroad_js -v
+Ran 128 tests in 10.404s
+OK
+```
+
+Full suite:
+
+```text
+$ python3 -m unittest -q 2>&1 | rg "^Ran [0-9]+ tests|^OK$|^FAILED"
+Ran 958 tests in 20.291s
+OK
+```
+
+### Generated-browser evidence
+
+Playwright exercised the built calculator through all refine states:
+
+```text
+initial:     headline="Central estimate needed today: —." refineHidden=true  refineDisabled=true
+available:   headline="Central estimate needed today: $1,408,697." refineHidden=false refineDisabled=false
+after click: refineStatusHidden=false
+unavailable: refineHidden=true refineDisabled=true refineStatusHidden=true
+after-tax:   headline="Estimate needed today: $3,893,013." refineHidden=true refineDisabled=true
+```
+
+At every state, the supporting labels were exactly `Monthly contribution`, `Retirement capital`, and `Property capital`, and the legacy `#ret-tax-central-capital` / `#ret-total-today` node count was zero.
+
+The generated finder disclosed:
+
+```text
+These inputs prepare your tax profile but do not yet change finder rankings or retirement targets. Use the detailed calculator for a tax-adjusted result.
+```
+
+Its detailed-calculator link resolved to `/retirement-abroad-calculator/`. Both generated pages retained `bodyWidth=320` at a `320px` viewport.
