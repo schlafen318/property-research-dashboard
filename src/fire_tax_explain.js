@@ -36,6 +36,7 @@
       taxYear: input.taxYear,
       branchIds: unique(input.branchIds)
     }, amountField(input.value));
+    if (input.notApplicable === true) line.notApplicable = true;
     if (record(input.endpointScenarioIds)) line.endpointScenarioIds = input.endpointScenarioIds;
     return line;
   }
@@ -89,6 +90,20 @@
 
   function propertyLines(property, jurisdictionLabel, result) {
     if (!property) return [];
+    if (property.taxpayerScope === "not_applicable") {
+      return [auditLine({
+        key: jurisdictionLabel + "_property_not_applicable",
+        label: jurisdictionLabel + " owned-property calculation",
+        value: null,
+        currency: property.currency,
+        formula: "Owned-property calculation not applicable; include renter municipal/housing fees in annual spending.",
+        assumptions: property.assumptions || ["The live plan contains no owned property or property income."],
+        exclusions: ["No zero-tax owned-property conclusion is made."],
+        confidence: property.confidence,
+        ruleIds: [], sourceIds: [], taxYear: property.taxYear,
+        notApplicable: true,
+      })];
+    }
     if (property.status === "conditional") {
       return Object.keys(property.stages).map(function (stage) {
         const value = property.stages[stage].taxTotal;

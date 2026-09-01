@@ -284,7 +284,7 @@
   }
 
   function detailedRefineAvailable(input) {
-    return Boolean(input && input.planningAvailable === true && input.enabledMarker === "true");
+    return Boolean(input && input.enabledMarker === "true");
   }
 
   function taxAuditEntries(input) {
@@ -1154,6 +1154,9 @@
       refine.disabled = true;
       if (view.status === "unavailable") {
         unavailable.hidden = false;
+        const canRefineUnavailable = detailedRefineAvailable({ planningAvailable: false, enabledMarker: refine.dataset.detailedAvailable });
+        refine.hidden = !canRefineUnavailable;
+        refine.disabled = !canRefineUnavailable;
         return view;
       }
       if (view.status !== "available") return view;

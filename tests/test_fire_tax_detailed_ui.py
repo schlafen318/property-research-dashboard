@@ -35,11 +35,11 @@ class DetailedFireTaxUiTests(unittest.TestCase):
             "currency": "USD", "currentAge": 50, "retirementAge": 60, "horizonYears": 30,
             "annualSpending": 72000, "annualPension": 0, "annualOtherIncome": 0,
             "annualRentalIncome": 0, "annualWithdrawals": 18000, "propertyPrice": 0,
-            "housingPlan": "rent", "propertyUse": "personal", "selectedAfterTaxReturn": 0.04,
+            "housingPlan": "rent", "propertyUse": "personal", "selectedAfterTaxReturn": 0.04, "explicitReturnProvided": True,
             "planningRange": {"minimum": 900000, "maximum": 1100000}, "aedPerCurrency": 3.6725,
         }
         answers = {
-            "daysInDestination": 200, "daysInHome": 30, "isHongKongTreatyResident": False, "hasHongKongSourceIncome": False,
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20, "ordinarilyResidesHongKong": "no", "hasHongKongSourceIncome": False,
             "hasHongKongProperty": False, "activityType": "retired_or_employee",
             "retirementAccountClassification": "personal_investment", "annualEmploymentIncome": 0,
         }
@@ -52,6 +52,8 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         self.assertEqual("calculated", response["result"]["status"])
         self.assertEqual(0, response["result"]["totals"]["annualTax"])
         self.assertIn("Hong Kong to Dubai", response["markup"])
+        self.assertIn("Owned-property calculation not applicable; include renter municipal/housing fees in annual spending", response["markup"])
+        self.assertTrue(any(line.get("notApplicable") for section in response["audit"] for line in section.get("lines", [])))
 
     def test_live_planning_facts_build_profile_without_bundle_amounts(self) -> None:
         definition = {
@@ -73,7 +75,7 @@ class DetailedFireTaxUiTests(unittest.TestCase):
             "hasLiveDependableIncome": True, "dependableIncomeIndexed": True,
         }
         answers = {
-            "daysInDestination": 200, "daysInHome": 30,
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20, "ordinarilyResidesHongKong": "no",
             "hasHongKongSourceIncome": False, "hasHongKongProperty": False,
             "activityType": "retired_or_employee", "annualServiceCharges": 4000,
             "annualHousingFee": 2500, "propertyType": "villa_or_apartment",
@@ -132,7 +134,7 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         }
         payload = build_unified_app.detailed_fire_tax_page_payload()
         base = {
-            "daysInDestination": 200, "daysInHome": 30,
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20, "ordinarilyResidesHongKong": "no",
             "hasHongKongSourceIncome": False, "hasHongKongProperty": False,
             "activityType": "retired_or_employee",
         }
@@ -183,6 +185,54 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         )
         self.assertFalse(incomplete["available"])
         self.assertIn("coverage", incomplete["reason"])
+
+    def test_run_refinement_cannot_bypass_live_profile_eligibility(self) -> None:
+        payload = build_unified_app.detailed_fire_tax_page_payload()
+        planning = {
+            "currency": "USD", "currentAge": 50, "retirementAge": 60, "horizonYears": 30,
+            "annualSpending": 72000, "annualPension": 0, "annualOtherIncome": 0,
+            "annualRentalIncome": 0, "annualWithdrawals": 18000, "propertyPrice": 0,
+            "housingPlan": "rent", "propertyUse": "personal", "selectedAfterTaxReturn": 0.04,
+            "explicitReturnProvided": True, "aedPerCurrency": 3.6725,
+        }
+        answers = {
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20,
+            "ordinarilyResidesHongKong": "no", "hasHongKongSourceIncome": False,
+            "hasHongKongProperty": False, "activityType": "retired_or_employee",
+            "retirementAccountClassification": "personal_investment", "annualEmploymentIncome": 0,
+        }
+        expression = "(()=>{try{api.runRefinement(input);return 'calculated';}catch(error){return error.message;}})()"
+        cases = {
+            "pension": {"annualPension": 12000}, "other": {"annualOtherIncome": 12000},
+            "rent": {"annualRentalIncome": 12000}, "property": {"propertyPrice": 500000, "housingPlan": "buy_retirement"},
+            "return": {"explicitReturnProvided": False},
+        }
+        for label, override in cases.items():
+            with self.subTest(label=label):
+                result = run_node(expression, {
+                    "destinationId": "dubai", "homeJurisdictionId": "hong-kong", "uiPayload": payload,
+                    "planningFacts": {**planning, **override}, "answers": answers,
+                })
+                self.assertNotEqual("calculated", result)
+        unsupported_account = run_node(expression, {
+            "destinationId": "dubai", "homeJurisdictionId": "hong-kong", "uiPayload": payload,
+            "planningFacts": planning, "answers": {**answers, "retirementAccountClassification": "other_retirement_account"},
+        })
+        self.assertNotEqual("calculated", unsupported_account)
+
+    def test_treaty_router_uses_facts_and_fails_closed_when_uncertain(self) -> None:
+        not_dual = {"daysInDestination": 200, "daysInHome": 30, "ordinarilyResidesHongKong": "no", "daysInHomePreviousYear": 20}
+        dual = {"daysInDestination": 200, "daysInHome": 190, "ordinarilyResidesHongKong": "yes"}
+
+        self.assertEqual("not_dual", run_node("api.hongKongTreatyOutcome(input)", not_dual))
+        self.assertEqual("unresolved", run_node("api.hongKongTreatyOutcome(input)", {**dual, "permanentHomeHongKong": "not_sure", "permanentHomeUae": "yes"}))
+        self.assertEqual("uae", run_node("api.hongKongTreatyOutcome(input)", {**dual, "permanentHomeHongKong": "no", "permanentHomeUae": "yes"}))
+
+        pending = run_node("api.nextPairQuestions({},input)", dual)
+        facts = [item["fact"] for item in pending]
+        self.assertIn("permanentHomeHongKong", facts)
+        self.assertIn("permanentHomeUae", facts)
+        self.assertNotIn("closestPersonalRelations", facts)
 
     def test_fully_enabled_destination_home_bundle_runs_end_to_end(self) -> None:
         calculation = detailed_payload()
@@ -281,12 +331,13 @@ class DetailedFireTaxUiTests(unittest.TestCase):
     def test_pair_questions_reveal_only_applicable_plain_language_followups(self) -> None:
         planning = {"propertyPrice": 500000, "housingPlan": "buy_retirement", "propertyUse": "personal"}
         eligibility = {
-            "daysInDestination": 200, "daysInHome": 30, "isHongKongTreatyResident": False,
+            "daysInDestination": 200, "daysInHome": 30, "daysInHomePreviousYear": 20, "ordinarilyResidesHongKong": "no",
             "hasHongKongSourceIncome": False, "hasHongKongProperty": False,
             "activityType": "retired_or_employee",
         }
 
         first = run_node("api.nextPairQuestions(input.planning,{})", {"planning": planning})
+        after_treaty = run_node("api.nextPairQuestions(input.planning,input.answers)", {"planning": planning, "answers": {key: eligibility[key] for key in ("daysInDestination", "daysInHome", "daysInHomePreviousYear", "ordinarilyResidesHongKong")}})
         advanced = run_node("api.nextPairQuestions(input.planning,input.answers)", {"planning": planning, "answers": eligibility})
         gift = run_node("api.nextPairQuestions(input.planning,Object.assign({},input.answers,{exitPlan:'gift'}))", {"planning": planning, "answers": eligibility})
 
@@ -296,7 +347,7 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         self.assertNotIn("giftRelationship", [item["fact"] for item in advanced])
         self.assertIn("giftRelationship", [item["fact"] for item in gift])
         self.assertIn("expectedGiftValuation", [item["fact"] for item in gift])
-        activity = next(item for item in first if item["fact"] == "activityType")
+        activity = next(item for item in after_treaty if item["fact"] == "activityType")
         self.assertEqual("Retired or employee only", activity["options"][0]["label"])
 
     def test_option_markup_shows_plain_language_labels_not_internal_values(self) -> None:
@@ -332,7 +383,7 @@ class DetailedFireTaxUiTests(unittest.TestCase):
                     "capitalRange": {"minimum": 540000, "maximum": 610000},
                 },
                 "scenarios": [
-                    {"id": "resident", "totals": {"annualTax": 1800}},
+                    {"id": "resident", "totals": {"annualTax": 1800}, "destination": {"property": {"taxpayerScope": "not_applicable", "stages": {}, "totals": {"nonTax": 0}}}},
                     {"id": "nonresident", "totals": {"annualTax": 1000}},
                 ],
             },
@@ -351,11 +402,13 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         markup = run_node("api.resultMarkup(input.result,input.audit,input.sources)", payload)
 
         self.assertEqual(1, markup.count("<table"))
+        self.assertIn('<div class="table-wrap"><table', markup)
         self.assertIn("Current broad planning estimate", markup)
         self.assertIn("Capital needed today", markup)
         self.assertIn("Resident branch", markup)
         self.assertIn("Non-resident branch", markup)
         self.assertIn("Annual property fees", markup)
+        self.assertIn("Owned-property calculation not applicable; include renter municipal/housing fees in annual spending", markup)
         self.assertIn("<details", markup)
         self.assertIn('href="https://tax.example.gov/rule"', markup)
         self.assertNotIn('aria-live="polite"', markup)
@@ -396,6 +449,12 @@ class DetailedFireTaxUiTests(unittest.TestCase):
         expression = "input.map(x=>api.coerceAnswer(x.question,x.value,x.checked))"
 
         self.assertEqual([183, True, "destination"], run_node(expression, payload))
+
+    def test_detailed_input_events_do_not_reset_the_planning_form(self) -> None:
+        expression = "api.shouldHandlePlanningEvent({contains:target=>target.inside===true},input)"
+
+        self.assertFalse(run_node(expression, {"inside": True}))
+        self.assertTrue(run_node(expression, {"inside": False}))
 
 
 if __name__ == "__main__":

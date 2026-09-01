@@ -68,3 +68,19 @@ The repository-wide static verifier still reports unrelated pre-existing generat
 ## Privacy
 
 Detailed answers/results remain in memory only. The flow does not write personal values to URLs, generated personal HTML, storage, analytics or network APIs.
+
+## Round 2 review fixes
+
+- The public `runRefinement` path now requires live planning facts and merges every live fact over detailed answers before the same profile-access check used by the UI. Direct calls therefore fail closed for non-zero pension, other income, rental income or property amounts, unsupported housing/use, unsupported retirement accounts, and a missing or invalid after-fees-and-tax return.
+- Renter property output is now `N/A`, including audit lines and both property columns in the reconciled table. The result says: “Owned-property calculation not applicable; include renter municipal/housing fees in annual spending.” No zero property-tax conclusion is shown.
+- The former legal self-classification was removed. Progressive native controls now collect the Hong Kong–UAE agreement's factual Article 4 sequence: domestic Hong Kong day/ordinary-residence facts, permanent-home availability, closest personal/family and economic relations, habitual abode, and—only when needed—right of abode/nationality. Every judgment-sensitive choice includes `Not sure` and fails closed. Exact access proceeds only for a deterministic non-dual or UAE treaty outcome.
+- Exact refinement is no longer suppressed merely because the broad destination estimate is unavailable. It remains independently gated by the complete supported home-to-destination profile and live facts.
+- The reconciled table is inside a responsive horizontal scroll container. A real-browser pass initially found body overflow at 320–430px; the final rerun had no body or main overflow at 320, 375, 390, 430, 736 or 1024px.
+
+Final Round 2 verification:
+
+- Focused tax/page/UI suite: 261 tests passed in 24.433 seconds.
+- Full repository suite: 1,211 tests passed in 49.727 seconds.
+- Detailed static runtime evidence: zero errors. The repository-wide verifier remains non-zero only for the same unrelated Spain markers and three missing Chamonix image files recorded above.
+- Real Playwright/Chrome: eligible renter completed using native controls and keyboard blur; initial submit was disabled with three required controls, follow-ups rerouted after each answer, the completed form had zero invalid controls, and the result contained one reconciled table, the plain-language branch, property `N/A`, and 57 official-source audit links. A currency change cleared detailed answers/results. A non-zero live pension hid exact access with the specific payer-country/treaty/withholding reason.
+- A separate real browser context at 320px with `javaScriptEnabled: false` exposed the no-JavaScript fallback in the accessibility tree and exposed no refine/exact controls.

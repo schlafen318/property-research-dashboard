@@ -61,7 +61,7 @@
         residence_logic: { operation: "any", rule_ids: ["hong-kong-treaty-residence-2026"] },
         rules: [audit("hong-kong-treaty-residence-2026", "residence_test", "tax_residence", currency, homeSource, {
           taxpayer_scope: ["individual"], formula: { operation: "flag", operands: ["home_resident"] }, resident_when: true,
-          explanation: "The user confirms whether Hong Kong treaty residence continues; this profile is available only when it does not.",
+          explanation: "The factual Article 4 sequence—Hong Kong domestic residence, permanent homes, closest personal/economic relations, habitual abode, and right-of-abode/nationality where needed—must produce a supported UAE treaty outcome before this flag is false.",
         })],
       } },
     };
