@@ -125,8 +125,28 @@
     "da-nang-hoi-an": {"country": "Vietnam"},
     "fukuoka-itoshima": {"country": "Japan"},
     "madeira": {"country": "Portugal"},
-    "malaga-costa-del-sol": {"country": "Spain"},
+    "malaga-costa-del-sol": {
+      "country": "Spain",
+      "scores": {
+        "active_life": 4.2,
+        "healthcare_bridge": 4.0,
+        "stay_flexibility": 3.5,
+        "global_access": 4.1,
+        "community_fit": 4.2,
+        "property_exit_flexibility": 3.8
+      }
+    },
     "phuket-koh-samui": {"country": "Thailand"},
-    "valencia": {"country": "Spain"}
+    "valencia": {
+      "country": "Spain",
+      "scores": {
+        "active_life": 4.4,
+        "healthcare_bridge": 4.1,
+        "stay_flexibility": 3.5,
+        "global_access": 4.2,
+        "community_fit": 4.3,
+        "property_exit_flexibility": 4.0
+      }
+    }
   }
 }

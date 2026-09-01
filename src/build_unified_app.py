@@ -14,6 +14,8 @@ from urllib.parse import urlparse
 
 try:
     from src.country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
+    from src.fire_abroad import load_fire_abroad, rank_fire_abroad_destinations, validate_fire_abroad_payload
+    from src.fire_abroad_page import build_fire_abroad_html
     from src.foreign_buyer_country_guides import (
         build_foreign_buyer_country_guide,
         get_foreign_buyer_country_guide,
@@ -37,6 +39,8 @@ try:
     )
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
     from country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
+    from fire_abroad import load_fire_abroad, rank_fire_abroad_destinations, validate_fire_abroad_payload
+    from fire_abroad_page import build_fire_abroad_html
     from foreign_buyer_country_guides import (
         build_foreign_buyer_country_guide,
         get_foreign_buyer_country_guide,
@@ -134,6 +138,12 @@ RETIREMENT_FINDER_DESCRIPTION = (
     "Project your retirement savings and monthly investing, then compare destinations "
     "you may be able to afford when renting or buying abroad."
 )
+FIRE_ABROAD_SLUG = "fire-abroad"
+FIRE_ABROAD_TITLE = "FIRE Abroad: Best Places for an Active Life Overseas | Global Home Atlas"
+FIRE_ABROAD_DESCRIPTION = (
+    "Compare active-life destinations abroad with a concise tax-residence screen, "
+    "planning tax ranges, property-tax lifecycle flags, and source-backed evidence."
+)
 RETIREMENT_DESTINATIONS_SLUG = "retirement-destinations-ranked-by-cost"
 RETIREMENT_DESTINATIONS_TITLE = "Retirement Destinations Ranked by Cost (2026) | Global Home Atlas"
 RETIREMENT_DESTINATIONS_H1 = "Retirement Destinations Ranked by How Much You Need"
@@ -170,6 +180,8 @@ RETIREMENT_PLANNING_CURRENCIES = {
 PROPERTY_FINANCE_PATH = ROOT / "src" / "property_finance.js"
 RETIREMENT_FINDER_ENGINE_PATH = ROOT / "src" / "retirement_destination_finder.js"
 RETIREMENT_FINDER_UI_PATH = ROOT / "src" / "retirement_destination_finder_ui.js"
+FIRE_ABROAD_ENGINE_PATH = ROOT / "src" / "fire_abroad.js"
+FIRE_ABROAD_UI_PATH = ROOT / "src" / "fire_abroad_ui.js"
 RETIREMENT_RANKING_TABLE_PATH = ROOT / "src" / "retirement_ranking_table.js"
 CONTINENT_BY_COUNTRY = {
     "Austria": "europe",
@@ -6060,6 +6072,71 @@ def build_retirement_destination_finder_page(
     )
 
 
+def schema_for_fire_abroad(canonical: str) -> list[dict]:
+    return [
+        *global_schema_entities(),
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "FIRE Abroad",
+            "url": canonical,
+            "description": FIRE_ABROAD_DESCRIPTION,
+        },
+    ]
+
+
+def build_fire_abroad_page(
+    destinations: list[dict],
+    retirement_payload: dict,
+    fire_payload: dict,
+) -> str:
+    launch_ids = set(fire_payload["launch_destination_ids"])
+    launch_destinations = [item for item in destinations if item["id"] in launch_ids]
+    retirement_costs = {
+        item["destination_id"]: item
+        for item in retirement_payload["destinations"]
+        if item["destination_id"] in launch_ids
+    }
+    rows = rank_fire_abroad_destinations(
+        launch_destinations,
+        retirement_costs,
+        fire_payload,
+        {"stay_mode": "part_year", "household": "single", "housing": "rent"},
+    )
+    canonical = page_url(FIRE_ABROAD_SLUG)
+    browser_payload = {
+        "reviewedOn": fire_payload["reviewed_on"],
+        "destinations": launch_destinations,
+        "retirementCosts": retirement_costs,
+        "fire": fire_payload,
+        "defaultProfile": {
+            "stay_mode": "part_year",
+            "household": "single",
+            "housing": "rent",
+            "tax_mode": "destination_estimate",
+        },
+    }
+    return build_fire_abroad_html(
+        head=head_html(
+            FIRE_ABROAD_TITLE,
+            FIRE_ABROAD_DESCRIPTION,
+            canonical,
+            schema_for_fire_abroad(canonical),
+        ).strip(),
+        navigation=site_header_html(PRIMARY_NAV_LINKS).strip(),
+        footer=site_footer_html(SITE_NAME, CONTACT_EMAIL).strip(),
+        rows=rows,
+        countries=fire_payload["countries"],
+        sources=fire_payload["sources"],
+        reviewed_on=fire_payload["reviewed_on"],
+        payload_json=json.dumps(browser_payload, separators=(",", ":")).replace("</", "<\\/"),
+        engine_js=FIRE_ABROAD_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        ui_js=FIRE_ABROAD_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        design_css=top_level_page_design_css(),
+        analytics=analytics_event_script(),
+    )
+
+
 def retirement_calculator_callout(css_class: str, source_label: str) -> str:
     return f"""
       <section class="{escape(css_class)}">
@@ -10204,6 +10281,7 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
         (page_url(GUIDE_HUB_SLUG), "0.90"),
         (page_url(RETIREMENT_CALCULATOR_SLUG), "0.92"),
         (page_url(RETIREMENT_FINDER_SLUG), "0.92"),
+        (page_url(FIRE_ABROAD_SLUG), "0.92"),
         (page_url(RETIREMENT_DESTINATIONS_SLUG), "0.90"),
         *[(page_url(page["slug"]), "0.85") for page in SEO_PAGES],
         *[(country_url(hub), "0.82") for hub in COUNTRY_HUBS],
@@ -10218,6 +10296,15 @@ def build() -> Path:
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = rank_destinations(destinations)
     retirement_costs = load_retirement_costs()
+    fire_payload = load_fire_abroad()
+    fire_errors = validate_fire_abroad_payload(
+        fire_payload,
+        destination_ids={item["id"] for item in destinations},
+        retirement_ids={item["destination_id"] for item in retirement_costs["destinations"]},
+        as_of=date.today(),
+    )
+    if fire_errors:
+        raise ValueError("Invalid FIRE Abroad data:\n- " + "\n- ".join(fire_errors))
     mortgage_profiles = load_mortgage_profiles()
     guide_pages = [RETIREMENT_DESTINATIONS_PAGE, *SEO_PAGES]
     listings = load_json("listings.json")
@@ -11606,6 +11693,12 @@ def build() -> Path:
         clean_generated_html(
             build_retirement_destination_finder_page(destinations, retirement_costs, mortgage_profiles)
         ),
+        encoding="utf-8",
+    )
+    fire_abroad_dir = ARTIFACTS / FIRE_ABROAD_SLUG
+    fire_abroad_dir.mkdir(parents=True, exist_ok=True)
+    (fire_abroad_dir / "index.html").write_text(
+        clean_generated_html(build_fire_abroad_page(destinations, retirement_costs, fire_payload)),
         encoding="utf-8",
     )
     retirement_article_dir = ARTIFACTS / RETIREMENT_DESTINATIONS_SLUG
