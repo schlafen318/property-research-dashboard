@@ -30,9 +30,113 @@
       "&household=" + household + "&housing=" + housing;
   }
 
+  function money(value) {
+    return value === null || value === undefined
+      ? "—"
+      : new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(value);
+  }
+
+  function label(value) {
+    const labels = {
+      likely_nonresident: "Likely nonresident",
+      residence_depends_on_days_and_ties: "Depends on days and ties",
+      likely_resident: "Likely resident",
+      straightforward: "Straightforward",
+      moderate: "Moderate",
+      complex: "Complex",
+      highly_profile_dependent: "Highly profile-dependent",
+    };
+    return labels[value] || String(value || "").replaceAll("_", " ");
+  }
+
+  function textElement(tag, value) {
+    const element = document.createElement(tag);
+    element.textContent = value;
+    return element;
+  }
+
+  function renderRows(rows, profile, tbody) {
+    const fragments = rows.map(function (row) {
+      const tr = document.createElement("tr");
+      const heading = textElement("th", row.name);
+      heading.scope = "row";
+      heading.appendChild(textElement("small", row.country));
+      tr.appendChild(heading);
+      if (!row.rankable) {
+        const pending = document.createElement("td");
+        pending.colSpan = 5;
+        pending.appendChild(textElement("strong", "Research pending"));
+        pending.appendChild(document.createTextNode(" — this destination remains unranked until its tax evidence is complete."));
+        tr.appendChild(pending);
+        return tr;
+      }
+      tr.appendChild(textElement("td", row.overall_score.toFixed(2) + "/5"));
+      const residence = textElement("td", label(row.tax.residence_outcome));
+      residence.appendChild(textElement("small", row.tax.scope_summary));
+      tr.appendChild(residence);
+      const readiness = textElement("td", label(row.tax.readiness));
+      readiness.appendChild(textElement("small", String(row.tax.confidence).replaceAll("_", "-") + " confidence"));
+      tr.appendChild(readiness);
+      const reserve = textElement("td", money(row.budget.central_tax_reserve));
+      reserve.appendChild(textElement("small", money(row.budget.favorable_tax_reserve) + "–" + money(row.budget.adverse_tax_reserve)));
+      tr.appendChild(reserve);
+      const action = document.createElement("td");
+      const link = textElement("a", "Build your plan");
+      link.href = safeCalculatorHref({
+        destinationId: row.destination_id,
+        household: profile.household,
+        housing: profile.housing,
+      });
+      action.appendChild(link);
+      tr.appendChild(action);
+      return tr;
+    });
+    tbody.replaceChildren.apply(tbody, fragments);
+  }
+
   function initFireAbroad(rootId) {
     const element = typeof document === "undefined" ? null : document.getElementById(rootId);
     if (!element) return false;
+    const dataElement = document.getElementById("fire-abroad-data");
+    const tbody = document.getElementById("fire-results-body");
+    if (!dataElement || !tbody || typeof GHAFireAbroad === "undefined") return false;
+    const payload = JSON.parse(dataElement.textContent);
+    const controls = {
+      stay: document.getElementById("fire-stay"),
+      days: document.getElementById("fire-days"),
+      income: document.getElementById("fire-income"),
+      housing: document.getElementById("fire-housing"),
+      propertyUse: document.getElementById("fire-property-use"),
+    };
+    const propertyGroup = document.querySelector('[data-fire-group="property-use"]');
+    function update() {
+      const profile = {
+        stay_mode: controls.stay.value,
+        annual_day_band: controls.days.value,
+        funding_source: controls.income.value,
+        housing: controls.housing.value,
+        property_use: controls.propertyUse.value,
+        household: "single",
+        tax_mode: "destination_estimate",
+      };
+      const visibility = taxControlVisibility({
+        housing: profile.housing,
+        taxMode: profile.tax_mode,
+        wealthTaxRelevant: false,
+      });
+      propertyGroup.hidden = !visibility.propertyUse;
+      const rows = GHAFireAbroad.rankDestinations({
+        destinations: payload.destinations,
+        retirementCosts: payload.retirementCosts,
+        firePayload: payload.fire,
+        profile: profile,
+      });
+      renderRows(rows, profile, tbody);
+    }
+    Object.keys(controls).forEach(function (key) {
+      controls[key].addEventListener("change", update);
+    });
+    update();
     return true;
   }
 

@@ -158,6 +158,13 @@ class FireAbroadJavaScriptTests(unittest.TestCase):
         ):
             self.assertNotIn(sensitive_key, source)
 
+    def test_ui_reranks_in_memory_when_quick_controls_change(self):
+        source = UI.read_text(encoding="utf-8")
+        self.assertIn('addEventListener("change"', source)
+        self.assertIn("GHAFireAbroad.rankDestinations", source)
+        self.assertIn("replaceChildren", source)
+        self.assertNotIn("innerHTML", source)
+
 
 if __name__ == "__main__":
     unittest.main()
