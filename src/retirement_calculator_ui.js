@@ -205,6 +205,76 @@
     ];
   }
 
+  function calculatorEngine() {
+    if (root && root.GHARetirementCalculator) return root.GHARetirementCalculator;
+    if (typeof require === "function") return require("./retirement_calculator.js");
+    throw new Error("Retirement calculator engine is required");
+  }
+
+  function clonedInput(input) {
+    return JSON.parse(JSON.stringify(input || {}));
+  }
+
+  function taxAdjustedEngineInput(baseInput, taxAmount, taxMode) {
+    const input = clonedInput(baseInput);
+    input.annualTaxExpenses = Number(taxAmount);
+    input.taxMode = taxMode;
+    input.returnBasis = "after_fees_and_tax";
+    return input;
+  }
+
+  function scenarioResult(key, label, baseInput, taxCase, noTaxResult, taxMode) {
+    const annualTaxReserve = Number(taxCase && taxCase.total);
+    if (!Number.isFinite(annualTaxReserve) || annualTaxReserve < 0) {
+      throw new Error("Tax scenario case " + key + " requires a finite non-negative total");
+    }
+    const result = calculatorEngine().calculateRetirement(
+      taxAdjustedEngineInput(baseInput, annualTaxReserve, taxMode)
+    );
+    return {
+      key: key,
+      label: label,
+      annualTaxReserve: annualTaxReserve,
+      annualTaxExpenses: result.annualTaxExpenses,
+      firstYearExpenses: result.firstYearExpenses,
+      fundingGap: result.fundingGap,
+      requiredCapital: result.totalNeededToday,
+      requiredCapitalDifference: result.totalNeededToday - noTaxResult.totalNeededToday,
+      noTaxComparisonLabel: "No added destination tax",
+      noTaxRequiredCapital: noTaxResult.totalNeededToday,
+      noTaxComparison: {
+        label: "No added destination tax",
+        requiredCapital: noTaxResult.totalNeededToday,
+      },
+      result: result,
+    };
+  }
+
+  function calculateTaxAdjustedScenarios(baseInput, taxScenario) {
+    if (!taxScenario || typeof taxScenario !== "object") throw new Error("Tax scenario is required");
+    const noTaxResult = calculatorEngine().calculateRetirement(
+      taxAdjustedEngineInput(baseInput, 0, "user_after_tax")
+    );
+    if (taxScenario.status === "user_after_tax") {
+      return {
+        user_after_tax: scenarioResult(
+          "user_after_tax",
+          "User after-tax",
+          baseInput,
+          { total: 0 },
+          noTaxResult,
+          "user_after_tax"
+        ),
+      };
+    }
+    const cases = taxScenario.cases || {};
+    return {
+      favorable: scenarioResult("favorable", "Favorable", baseInput, cases.favorable, noTaxResult, "destination_estimate"),
+      central: scenarioResult("central", "Central", baseInput, cases.central, noTaxResult, "destination_estimate"),
+      adverse: scenarioResult("adverse", "Adverse", baseInput, cases.adverse, noTaxResult, "destination_estimate"),
+    };
+  }
+
   function planningSummary(input) {
     const result = input && input.result ? input.result : input;
     const currency = input && input.currency ? input.currency : "USD";
@@ -1012,6 +1082,7 @@
     housingExpenseLabels: housingExpenseLabels,
     accumulationChartModel: accumulationChartModel,
     sensitivityRates: sensitivityRates,
+    calculateTaxAdjustedScenarios: calculateTaxAdjustedScenarios,
     planningSummary: planningSummary,
     accumulationTooltipContent: accumulationTooltipContent,
     isInvalidNumericControl: isInvalidNumericControl,

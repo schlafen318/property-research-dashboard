@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 UI_MODULE = ROOT / "src" / "retirement_calculator_ui.js"
+ENGINE_MODULE = ROOT / "src" / "retirement_calculator.js"
 
 
 def run_ui(function_name: str, payload: object) -> object:
@@ -28,7 +29,159 @@ def run_ui(function_name: str, payload: object) -> object:
     return json.loads(result.stdout)
 
 
+def run_ui_args(function_name: str, *args: object) -> object:
+    script = (
+        "const ui = require(process.argv[1]);"
+        "const input = JSON.parse(process.argv[2]);"
+        f"const fn = ui.{function_name};"
+        "process.stdout.write(JSON.stringify(fn.apply(null, input)));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(UI_MODULE), json.dumps(args)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise AssertionError(result.stderr)
+    return json.loads(result.stdout)
+
+
+def run_engine(function_name: str, payload: object) -> object:
+    script = (
+        "const engine = require(process.argv[1]);"
+        "const input = JSON.parse(process.argv[2]);"
+        f"process.stdout.write(JSON.stringify(engine.{function_name}(input)));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(ENGINE_MODULE), json.dumps(payload)],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=True,
+    )
+    return json.loads(result.stdout)
+
+
+def tax_scenario() -> dict:
+    return {
+        "status": "available",
+        "cases": {
+            "favorable": {"total": 1_000, "propertyTaxReserve": 0},
+            "central": {"total": 2_000, "propertyTaxReserve": 0},
+            "adverse": {"total": 3_000, "propertyTaxReserve": 0},
+        },
+        "amountExplanations": {
+            "favorable": {"total": {"formula": "fixture"}},
+            "central": {"total": {"formula": "fixture"}},
+            "adverse": {"total": {"formula": "fixture"}},
+        },
+    }
+
+
+def calculator_payload() -> dict:
+    return {
+        "currentAge": 59,
+        "retirementAge": 60,
+        "horizonYears": 2,
+        "expenseCategories": [{"amount": 10_000, "inflationRate": 0}],
+        "incomeStreams": [{"amount": 2_000, "indexed": False, "inflationRate": 0}],
+        "housingPlan": "rent",
+        "propertyPrice": 0,
+        "propertyInflation": 0,
+        "acquisitionCostRate": 0,
+        "generalInflation": 0,
+        "emergencyReserveMonths": 0,
+        "expectedPortfolioReturn": 0,
+        "monthlyIncomeBeforeRetirement": 0,
+        "incomeInvestedRate": 0,
+    }
+
+
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_tax_adjusted_central_case_matches_direct_engine_destination_estimate(self) -> None:
+        base = calculator_payload()
+        result = run_ui_args("calculateTaxAdjustedScenarios", base, tax_scenario())
+        direct = run_engine(
+            "calculateRetirement",
+            {
+                **base,
+                "annualTaxExpenses": 2_000,
+                "taxMode": "destination_estimate",
+                "returnBasis": "after_fees_and_tax",
+            },
+        )
+
+        self.assertEqual(["favorable", "central", "adverse"], list(result))
+        self.assertEqual(direct, result["central"]["result"])
+        self.assertEqual(2_000, result["central"]["annualTaxReserve"])
+        self.assertEqual(2_000, result["central"]["annualTaxExpenses"])
+        self.assertEqual(12_000, result["central"]["firstYearExpenses"])
+        self.assertEqual(10_000, result["central"]["fundingGap"])
+        self.assertEqual(20_000, result["central"]["requiredCapital"])
+        self.assertEqual(4_000, result["central"]["requiredCapitalDifference"])
+        self.assertEqual("No added destination tax", result["central"]["noTaxComparisonLabel"])
+
+    def test_tax_adjusted_scenario_bands_remain_ordered_by_required_capital(self) -> None:
+        result = run_ui_args("calculateTaxAdjustedScenarios", calculator_payload(), tax_scenario())
+
+        self.assertLessEqual(result["favorable"]["requiredCapital"], result["central"]["requiredCapital"])
+        self.assertLessEqual(result["central"]["requiredCapital"], result["adverse"]["requiredCapital"])
+
+    def test_tax_adjusted_scenarios_replace_existing_tax_and_preserve_property_tax_exclusion(self) -> None:
+        base = calculator_payload()
+        base.update(
+            {
+                "annualTaxExpenses": 9_000,
+                "taxMode": "destination_estimate",
+                "returnBasis": "after_fees_and_tax",
+            }
+        )
+        scenario = tax_scenario()
+        scenario["cases"]["central"] = {
+            "total": 1_000,
+            "incomeTaxReserve": 0,
+            "propertyTaxReserve": 0,
+            "wealthTaxReserve": 0,
+            "complianceReserve": 1_000,
+        }
+        direct = run_engine(
+            "calculateRetirement",
+            {
+                **calculator_payload(),
+                "annualTaxExpenses": 1_000,
+                "taxMode": "destination_estimate",
+                "returnBasis": "after_fees_and_tax",
+            },
+        )
+
+        result = run_ui_args("calculateTaxAdjustedScenarios", base, scenario)
+
+        self.assertEqual(1_000, result["central"]["annualTaxReserve"])
+        self.assertEqual(direct["firstYearExpenses"], result["central"]["firstYearExpenses"])
+        self.assertEqual(direct["totalNeededToday"], result["central"]["requiredCapital"])
+
+    def test_user_after_tax_scenario_returns_one_zero_added_tax_result_without_amount_explanations(self) -> None:
+        base = calculator_payload()
+        base["incomeStreams"] = []
+        scenario = {"status": "user_after_tax", "cases": {"central": {"total": 0}}}
+        direct = run_engine(
+            "calculateRetirement",
+            {
+                **base,
+                "annualTaxExpenses": 0,
+                "taxMode": "user_after_tax",
+                "returnBasis": "after_fees_and_tax",
+            },
+        )
+
+        result = run_ui_args("calculateTaxAdjustedScenarios", base, scenario)
+
+        self.assertEqual(["user_after_tax"], list(result))
+        self.assertEqual(0, result["user_after_tax"]["annualTaxReserve"])
+        self.assertEqual(0, result["user_after_tax"]["requiredCapitalDifference"])
+        self.assertEqual(direct, result["user_after_tax"]["result"])
+
     def test_planning_currency_conversion_preserves_the_usd_scenario(self) -> None:
         rates = {"USD": 1, "SGD": 0.7866117265603891, "EUR": 1.1645}
 
