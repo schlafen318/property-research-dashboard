@@ -123,6 +123,39 @@ def detailed_payload(*, continuing_home: bool = True) -> dict:
     return {"profile": profile, "rules": rules}
 
 
+def add_home_only_income_category(payload: dict, amount: int = 1_000) -> None:
+    home_profile = payload["profile"]["continuingHome"]["income"]
+    home_profile["homeAnnuity"] = amount
+    home_profile["incomeSourceJurisdictions"]["home_annuity"] = "home"
+    income_rules = payload["rules"]["continuingHome"]["income"]
+    income_rules["operand_catalog"]["home_annuity"] = {
+        "kind": "profile",
+        "profile_key": "homeAnnuity",
+        "value_type": "money",
+        "currency": "EUR",
+    }
+    jurisdiction = income_rules["jurisdictions"]["synthetic-home"]
+    jurisdiction["rules"].append(
+        {
+            "id": "synthetic-home-annuity-2026",
+            "type": "rate_band",
+            "tax_year": 2026,
+            "taxpayer_scope": ["resident", "nonresident"],
+            "category": "home_annuity",
+            "currency": "EUR",
+            "formula": {"operation": "progressive_rate", "operands": ["home_annuity"]},
+            "bands": [{"from": 0, "up_to": None, "rate": 0.1}],
+            "source_ids": ["synthetic-income-authority-2026"],
+            "effective_from": "2026-01-01",
+            "checked_on": "2026-09-01",
+            "review_interval_days": 365,
+            "confidence": "high",
+            "recheck_trigger": "Replace before enabling a real jurisdiction.",
+            "explanation": "Apply a synthetic rate to the home-only annuity.",
+        }
+    )
+
+
 def run_detailed(payload: dict, *, expect_error: bool = False) -> dict:
     script = (
         "const api=require(process.argv[1]);const input=JSON.parse(process.argv[2]);"
@@ -275,7 +308,7 @@ class DetailedFireTaxTests(unittest.TestCase):
         self.assertEqual("conditional", result["residence"]["status"])
         self.assertIn("splitYear", result["residence"]["unresolvedFacts"])
         self.assertEqual(
-            {"minimum": 4_250, "maximum": 12_100},
+            {"minimum": 4_550, "maximum": 12_100},
             result["totals"]["annualTax"],
         )
         self.assertEqual(
@@ -340,6 +373,134 @@ class DetailedFireTaxTests(unittest.TestCase):
         self.assertFalse(response["ok"])
         self.assertEqual("DetailedFireTaxInputError", response["error"])
         self.assertIn("currency", response["message"].lower())
+
+    def test_likely_home_scope_does_not_erase_canonical_dependable_income(self):
+        payload = detailed_payload()
+        payload["profile"]["residence"].update(
+            {"daysInDestination": 100, "daysInHome": 200}
+        )
+        result = run_detailed(payload)
+
+        self.assertEqual("likely_home_resident", result["residence"]["status"])
+        self.assertEqual(33_000, result["totals"]["grossDependableIncome"])
+        self.assertEqual(
+            33_000,
+            sum(
+                item["grossAmount"]
+                for item in result["canonicalIncome"]["categories"]
+                if item["treatment"] == "dependable_income"
+            ),
+        )
+
+    def test_treaty_alternatives_are_composed_as_aligned_leaf_scenarios(self):
+        payload = detailed_payload()
+        payload["profile"]["residence"].update(
+            {
+                "daysInDestination": 200,
+                "daysInHome": 200,
+                "treatyPermanentHome": "unknown",
+                "treatyCentreOfVitalInterests": "unknown",
+            }
+        )
+        result = run_detailed(payload)
+
+        self.assertEqual("conditional", result["status"])
+        self.assertGreaterEqual(len(result["scenarios"]), 2)
+        self.assertEqual(
+            len(result["scenarios"]),
+            len({scenario["id"] for scenario in result["scenarios"]}),
+        )
+        for scenario in result["scenarios"]:
+            with self.subTest(scenario=scenario["id"]):
+                self.assertEqual(scenario["id"], scenario["destination"]["branchId"])
+                self.assertEqual(scenario["id"], scenario["continuingHome"]["branchId"])
+                self.assertEqual(scenario["id"], scenario["retirementProjection"]["branchId"])
+                self.assertNotEqual("conditional", scenario["residence"]["status"])
+        annual_values = [scenario["totals"]["annualTax"] for scenario in result["scenarios"]]
+        self.assertEqual(
+            {"minimum": min(annual_values), "maximum": max(annual_values)},
+            result["totals"]["annualTax"],
+        )
+
+    def test_shared_withholding_is_counted_once_and_credits_share_one_global_pool(self):
+        result = run_detailed(detailed_payload())
+        reconciliation = result["globalReconciliation"]
+
+        self.assertEqual(17_700, reconciliation["totalDomesticLiability"])
+        self.assertEqual(1_350, reconciliation["totalUniqueWithholding"])
+        self.assertEqual(2_700, reconciliation["totalCreditClaimed"])
+        self.assertEqual(1_350, reconciliation["totalCreditApplied"])
+        self.assertEqual(17_700, reconciliation["totalNetIncomeTax"])
+        for withholding in reconciliation["withholdings"]:
+            with self.subTest(identity=withholding["identity"]):
+                self.assertEqual(withholding["amount"], withholding["countedAmount"])
+                self.assertEqual(len(withholding["observedBy"]), 2)
+                self.assertTrue(withholding["countedOnce"])
+
+    def test_known_split_year_is_outer_conditional_with_aligned_period_scenarios(self):
+        payload = detailed_payload(continuing_home=False)
+        payload["profile"]["residence"].update(
+            {"splitYear": True, "moveDate": "2026-07-01"}
+        )
+        result = run_detailed(payload)
+
+        self.assertEqual("likely_destination_resident", result["residence"]["status"])
+        self.assertEqual("conditional", result["status"])
+        self.assertEqual(2, len(result["scenarios"]))
+        self.assertEqual(
+            {"likely_home_resident", "likely_destination_resident"},
+            {scenario["residence"]["status"] for scenario in result["scenarios"]},
+        )
+        self.assertEqual("conditional", result["retirementProjection"]["status"])
+
+    def test_home_only_category_is_included_once_when_it_has_a_treatment(self):
+        payload = detailed_payload()
+        add_home_only_income_category(payload)
+        payload["profile"]["retirement"]["dependableIncomeCategories"].append(
+            "home_annuity"
+        )
+        result = run_detailed(payload)
+
+        annuity = next(
+            category
+            for category in result["canonicalIncome"]["categories"]
+            if category["category"] == "home_annuity"
+        )
+        self.assertEqual(1_000, annuity["grossAmount"])
+        self.assertEqual("dependable_income", annuity["treatment"])
+        self.assertEqual(34_000, result["totals"]["grossDependableIncome"])
+
+    def test_home_only_category_without_treatment_is_rejected(self):
+        payload = detailed_payload()
+        add_home_only_income_category(payload)
+        response = run_detailed(payload, expect_error=True)
+
+        self.assertFalse(response["ok"])
+        self.assertEqual("DetailedFireTaxInputError", response["error"])
+        self.assertIn("home_annuity", response["message"])
+
+    def test_duplicate_profile_category_amounts_must_match(self):
+        payload = detailed_payload()
+        payload["profile"]["continuingHome"]["income"]["privatePension"] = 13_000
+        response = run_detailed(payload, expect_error=True)
+
+        self.assertFalse(response["ok"])
+        self.assertEqual("DetailedFireTaxInputError", response["error"])
+        self.assertIn("private_pension", response["message"])
+        self.assertIn("canonical", response["message"].lower())
+
+    def test_profile_income_category_without_rule_coverage_is_rejected(self):
+        payload = detailed_payload()
+        payload["profile"]["continuingHome"]["income"]["homeBonus"] = 2_000
+        payload["profile"]["continuingHome"]["income"]["incomeSourceJurisdictions"][
+            "home_bonus"
+        ] = "home"
+        response = run_detailed(payload, expect_error=True)
+
+        self.assertFalse(response["ok"])
+        self.assertEqual("DetailedFireTaxInputError", response["error"])
+        self.assertIn("home_bonus", response["message"])
+        self.assertIn("coverage", response["message"].lower())
 
 
 if __name__ == "__main__":
