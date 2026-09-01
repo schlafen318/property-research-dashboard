@@ -156,6 +156,35 @@ def add_home_only_income_category(payload: dict, amount: int = 1_000) -> None:
     )
 
 
+def set_dependable_tax_liability_to_58_000(payload: dict) -> None:
+    dependable = {
+        "private_pension",
+        "government_pension",
+        "social_security",
+        "rental_income",
+        "employment_consulting",
+    }
+    for side in ("destination", "continuingHome"):
+        income_rules = payload["rules"][side]["income"]
+        income_rules["operand_catalog"]["private_pension_allowance"]["value"] = 0
+        for jurisdiction in income_rules["jurisdictions"].values():
+            for rule in jurisdiction["rules"]:
+                if rule.get("id") == "synthetic-private-pension-allowance-2026":
+                    rule["amount"] = 0
+                if rule.get("type") == "rate_band" and rule.get("category") in dependable:
+                    for band in rule["bands"]:
+                        band["rate"] = 1
+                    rule["no_tax"] = False
+        payload["rules"][side]["credits"] = []
+
+
+def share_official_assessment(payload: dict, shared_id: str = "shared.official-assessment-base") -> None:
+    for side in ("destination", "continuingHome"):
+        payload["profile"][side]["property"]["sharedFactIds"] = {
+            "officialAssessmentBase": shared_id
+        }
+
+
 def run_detailed(payload: dict, *, expect_error: bool = False) -> dict:
     script = (
         "const api=require(process.argv[1]);const input=JSON.parse(process.argv[2]);"
@@ -644,6 +673,114 @@ class DetailedFireTaxTests(unittest.TestCase):
                     result["totals"]["oneTimeTaxes"][endpoint],
                     tuples[scenario_id]["oneTimeTaxes"],
                 )
+
+    def test_excess_dependable_tax_is_added_once_to_annual_expenses(self):
+        payload = detailed_payload()
+        set_dependable_tax_liability_to_58_000(payload)
+        result = run_detailed(payload)
+
+        integration = result["retirementIntegration"]
+        self.assertEqual(33_000, result["totals"]["grossDependableIncome"])
+        self.assertEqual(58_000, integration["dependableIncomeTax"])
+        self.assertIn("dependableIncomeTaxNetted", integration)
+        self.assertEqual(33_000, integration.get("dependableIncomeTaxNetted"))
+        self.assertEqual(25_000, integration.get("excessDependableIncomeTax"))
+        self.assertEqual(0, result["totals"]["afterTaxDependableIncome"])
+        self.assertEqual(1_500, integration["nonDependableAnnualTaxExpense"])
+        self.assertEqual(26_500, integration["annualTaxExpense"])
+        self.assertEqual(26_500, result["taxAdjustedCapitalInput"]["annualTaxExpenses"])
+        self.assertEqual(72_500, result["totals"]["annualTax"])
+        scenario = result["scenarioTuples"][0]
+        self.assertEqual(
+            scenario["dependableIncomeTax"],
+            scenario["dependableIncomeTaxNetted"]
+            + scenario["excessDependableIncomeTax"],
+        )
+        self.assertEqual(
+            scenario["annualTax"],
+            scenario["dependableIncomeTaxNetted"]
+            + scenario["returnCoveredTax"]
+            + scenario["livingCostCoveredTax"]
+            + scenario["annualTaxExpense"],
+        )
+        retirement_lines = {
+            line["key"]: line
+            for section in explain(result)
+            if section["id"] == "retirement_integration"
+            for line in section["lines"]
+        }
+        self.assertEqual(25_000, retirement_lines["excess_dependable_tax_expense"]["amount"])
+
+    def test_shared_fact_known_and_assumed_values_must_match(self):
+        payload = detailed_payload()
+        share_official_assessment(payload)
+        payload["profile"]["destination"]["property"]["officialAssessmentBase"] = 200_000
+        payload["profile"]["continuingHome"]["property"]["officialAssessmentBase"] = "unknown"
+        result = run_detailed(payload)
+
+        self.assertEqual(1, len(result["scenarios"]))
+        self.assertEqual(
+            {"shared.official-assessment-base": 200_000},
+            result["scenarios"][0]["branchIdentity"]["sharedPropertyFacts"],
+        )
+
+    def test_shared_fact_known_value_without_matching_assumption_fails_closed(self):
+        payload = detailed_payload()
+        share_official_assessment(payload)
+        payload["profile"]["destination"]["property"]["officialAssessmentBase"] = 300_000
+        payload["profile"]["continuingHome"]["property"]["officialAssessmentBase"] = "unknown"
+        response = run_detailed(payload, expect_error=True)
+
+        self.assertFalse(response["ok"])
+        self.assertIn("shared.official-assessment-base", response["message"])
+        self.assertNotIn("300000", response["message"])
+        self.assertNotIn("200000", response["message"])
+        self.assertNotIn("350000", response["message"])
+
+    def test_shared_fact_both_known_values_must_be_equal(self):
+        payload = detailed_payload()
+        share_official_assessment(payload)
+        result = run_detailed(payload)
+        self.assertEqual(1, len(result["scenarios"]))
+
+        payload = detailed_payload()
+        share_official_assessment(payload)
+        payload["profile"]["continuingHome"]["property"]["officialAssessmentBase"] = 350_000
+        response = run_detailed(payload, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertIn("shared.official-assessment-base", response["message"])
+
+    def test_shared_fact_declarations_must_be_paired(self):
+        payload = detailed_payload()
+        payload["profile"]["destination"]["property"]["sharedFactIds"] = {
+            "officialAssessmentBase": "shared.orphan"
+        }
+        response = run_detailed(payload, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertIn("shared.orphan", response["message"])
+
+    def test_shared_fact_declarations_must_have_consistent_mapping(self):
+        payload = detailed_payload()
+        payload["profile"]["destination"]["property"]["sharedFactIds"] = {
+            "officialAssessmentBase": "shared.incompatible-schema"
+        }
+        payload["profile"]["continuingHome"]["property"]["sharedFactIds"] = {
+            "heirRelationship": "shared.incompatible-schema"
+        }
+        response = run_detailed(payload, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertIn("shared.incompatible-schema", response["message"])
+
+    def test_shared_fact_declarations_must_have_compatible_schema(self):
+        payload = detailed_payload()
+        share_official_assessment(payload, "shared.schema")
+        payload["rules"]["continuingHome"]["property"]["operand_catalog"][
+            "official_assessment_base"
+        ]["currency"] = "USD"
+        response = run_detailed(payload, expect_error=True)
+
+        self.assertFalse(response["ok"])
+        self.assertIn("shared.schema", response["message"])
 
 
 if __name__ == "__main__":

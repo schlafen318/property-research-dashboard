@@ -117,14 +117,15 @@
     if (!record(profile.destination.income) || !record(profile.destination.property)) {
       throw new DetailedFireTaxInputError("destination profile must include income and property facts");
     }
-    validateSharedFactIds(profile.destination.property, "destination");
+    const destinationSharedFactIds = validateSharedFactIds(profile.destination.property, "destination");
     const home = profile.continuingHome || { enabled: false };
     if (home.enabled !== true && home.enabled !== false) throw new DetailedFireTaxInputError("continuingHome.enabled must be boolean");
     if (home.enabled && (!record(home.income) || !record(home.property) || !record(rules.continuingHome) ||
         !record(rules.continuingHome.income) || !Array.isArray(rules.continuingHome.credits) || !record(rules.continuingHome.property))) {
       throw new DetailedFireTaxInputError("enabled continuing-home overlay requires validated income, credit, and property bundles");
     }
-    if (home.enabled) validateSharedFactIds(home.property, "continuingHome");
+    const homeSharedFactIds = home.enabled ? validateSharedFactIds(home.property, "continuingHome") : {};
+    validateSharedFactPairs(destinationSharedFactIds, homeSharedFactIds, rules);
     if (profile.retirement.returnBasis !== "after_fees_and_tax") {
       throw new DetailedFireTaxInputError("selected return must use the explicit after_fees_and_tax basis");
     }
@@ -153,6 +154,39 @@
       ids.push(sharedFactId);
     });
     return propertyProfile.sharedFactIds;
+  }
+
+  function propertyFactSchema(propertyRules, factName, sharedFactId) {
+    const operands = Object.keys(propertyRules.operand_catalog || {}).map(function (key) { return propertyRules.operand_catalog[key]; })
+      .filter(function (operand) { return record(operand) && operand.kind === "profile" && operand.profile_key === factName; });
+    if (operands.length !== 1) {
+      throw new DetailedFireTaxInputError("shared fact " + sharedFactId + " must map to one validated property profile operand");
+    }
+    return {
+      valueType: operands[0].value_type,
+      currency: operands[0].currency || null,
+      allowedValues: Array.isArray(operands[0].allowed_values) ? operands[0].allowed_values.slice().sort() : null
+    };
+  }
+
+  function validateSharedFactPairs(destinationIds, homeIds, rules) {
+    const destinationById = Object.fromEntries(Object.keys(destinationIds).map(function (factName) { return [destinationIds[factName], factName]; }));
+    const homeById = Object.fromEntries(Object.keys(homeIds).map(function (factName) { return [homeIds[factName], factName]; }));
+    unique(Object.keys(destinationById).concat(Object.keys(homeById))).forEach(function (sharedFactId) {
+      const destinationFact = destinationById[sharedFactId];
+      const homeFact = homeById[sharedFactId];
+      if (!destinationFact || !homeFact) {
+        throw new DetailedFireTaxInputError("shared fact " + sharedFactId + " must be declared once in both destination and continuing-home property profiles");
+      }
+      if (destinationFact !== homeFact) {
+        throw new DetailedFireTaxInputError("shared fact " + sharedFactId + " has inconsistent destination and continuing-home property mappings");
+      }
+      const destinationSchema = propertyFactSchema(rules.destination.property, destinationFact, sharedFactId);
+      const homeSchema = propertyFactSchema(rules.continuingHome.property, homeFact, sharedFactId);
+      if (JSON.stringify(destinationSchema) !== JSON.stringify(homeSchema)) {
+        throw new DetailedFireTaxInputError("shared fact " + sharedFactId + " has incompatible validated property schemas");
+      }
+    });
   }
 
   function concreteResidence(node, period) {
@@ -240,15 +274,20 @@
     const namespaced = {};
     const shared = {};
     Object.keys(assumedFacts || {}).forEach(function (factName) {
-      if (ids[factName]) shared[ids[factName]] = assumedFacts[factName];
-      else namespaced[side + ".property." + factName] = assumedFacts[factName];
+      if (!ids[factName]) namespaced[side + ".property." + factName] = assumedFacts[factName];
+    });
+    Object.keys(ids).forEach(function (factName) {
+      shared[ids[factName]] = Object.prototype.hasOwnProperty.call(assumedFacts || {}, factName)
+        ? assumedFacts[factName]
+        : propertyProfile[factName];
     });
     return { namespaced: namespaced, shared: shared };
   }
 
-  function compatibleSharedFacts(left, right) {
-    const shared = Object.keys(left).filter(function (key) { return Object.prototype.hasOwnProperty.call(right, key); });
-    return shared.every(function (key) { return left[key] === right[key]; });
+  function conflictingSharedFacts(left, right) {
+    return Object.keys(left).filter(function (key) {
+      return Object.prototype.hasOwnProperty.call(right, key) && left[key] !== right[key];
+    });
   }
 
   function treatmentMap(retirement, categories) {
@@ -562,18 +601,24 @@
     const incomeExpenseTax = treatmentTax("annual_expense");
     const grossDependableIncome = round(canonical.categories.filter(function (category) { return category.treatment === "dependable_income"; })
       .reduce(function (sum, category) { return sum + category.grossAmount; }, 0));
-    const afterTaxDependableIncome = round(Math.max(0, grossDependableIncome - dependableTax));
-    const annualTaxExpense = addAmounts([incomeExpenseTax, property.annualExpense], "retirement annual tax expense");
+    const dependableIncomeTaxNetted = round(Math.min(grossDependableIncome, dependableTax));
+    const excessDependableIncomeTax = round(Math.max(0, dependableTax - grossDependableIncome));
+    const afterTaxDependableIncome = round(grossDependableIncome - dependableIncomeTaxNetted);
+    const nonDependableAnnualTaxExpense = addAmounts([incomeExpenseTax, property.annualExpense], "non-dependable annual tax expense");
+    const annualTaxExpense = addAmounts([nonDependableAnnualTaxExpense, excessDependableIncomeTax], "retirement annual tax expense");
     const annualTax = addAmounts([reconciliation.totalAnnualIncomeTaxLiability, property.uniqueAnnual], "reconciled annual tax liability");
     const audit = scenarioAudit(residence, destinationWithId, homeWithId);
     const integration = {
       dependableIncomeTax: dependableTax,
+      dependableIncomeTaxNetted: dependableIncomeTaxNetted,
+      excessDependableIncomeTax: excessDependableIncomeTax,
+      nonDependableAnnualTaxExpense: nonDependableAnnualTaxExpense,
       returnCoveredTax: returnCoveredTax,
       livingCostCoveredTax: property.ownerCovered,
       annualTaxExpense: annualTaxExpense,
       propertyRentalTaxTreatment: retirement.propertyRentalTaxTreatment || null,
       exclusions: [
-        "Dependable-income tax is netted from the dependable income stream.",
+        "Dependable-income tax is netted only up to gross dependable income; any excess is included once in annual tax expense.",
         "Tax on return-covered income is represented by the selected after-fees-and-tax return.",
         "Owner property tax already included in living costs is not added again.",
         "Property value and equity remain outside liquid retirement income."
@@ -712,6 +757,9 @@
       grossDependableIncome: scenario.totals.grossDependableIncome,
       afterTaxDependableIncome: scenario.totals.afterTaxDependableIncome,
       dependableIncomeTax: scenario.retirementIntegration.dependableIncomeTax,
+      dependableIncomeTaxNetted: scenario.retirementIntegration.dependableIncomeTaxNetted,
+      excessDependableIncomeTax: scenario.retirementIntegration.excessDependableIncomeTax,
+      nonDependableAnnualTaxExpense: scenario.retirementIntegration.nonDependableAnnualTaxExpense,
       returnCoveredTax: scenario.retirementIntegration.returnCoveredTax,
       livingCostCoveredTax: scenario.retirementIntegration.livingCostCoveredTax,
       annualTaxExpense: scenario.retirementIntegration.annualTaxExpense,
@@ -777,6 +825,7 @@
     const canonical = normalizedCanonicalIncome(seeds[0].destination, seeds[0].continuingHome, profile);
     seeds.forEach(function (seed) { assertUnifiedUnits(seed.residence, seed.destination, seed.continuingHome, canonical); });
     const scenarios = [];
+    const controllingSharedFactIds = new Set();
     seeds.forEach(function (seed) {
       const destinationProperties = propertyLeaves(seed.destination.property);
       const homeProperties = seed.continuingHome.enabled ? propertyLeaves(seed.continuingHome.property) : [null];
@@ -786,7 +835,11 @@
           const homeFacts = homeProperty && homeProperty.assumedFacts || {};
           const destinationFactSet = propertyFactSet("destination", profile.destination.property, destinationFacts);
           const homeFactSet = propertyFactSet("continuing_home", profile.continuingHome && profile.continuingHome.property || {}, homeFacts);
-          if (!compatibleSharedFacts(destinationFactSet.shared, homeFactSet.shared)) return;
+          const conflicts = conflictingSharedFacts(destinationFactSet.shared, homeFactSet.shared);
+          if (conflicts.length) {
+            conflicts.forEach(function (sharedFactId) { controllingSharedFactIds.add(sharedFactId); });
+            return;
+          }
           const id = [seed.id, "destination-property-" + destinationIndex, "home-property-" + homeIndex].join("|");
           const identity = Object.assign({}, seed.identity, {
             destinationPropertyFacts: destinationFactSet.namespaced,
@@ -799,7 +852,12 @@
         });
       });
     });
-    if (!scenarios.length) throw new DetailedFireTaxInputError("no compatible aligned residence and property scenarios remain");
+    if (!scenarios.length) {
+      if (controllingSharedFactIds.size) {
+        throw new DetailedFireTaxInputError("no compatible aligned scenario remains for shared fact " + Array.from(controllingSharedFactIds).sort()[0]);
+      }
+      throw new DetailedFireTaxInputError("no compatible aligned residence and property scenarios remain");
+    }
     const destination = aggregateJurisdiction(seeds, scenarios, "destination");
     const home = aggregateJurisdiction(seeds, scenarios, "continuingHome");
     const projection = aggregateProjection(scenarios, profile.retirement.planningRange);
@@ -832,6 +890,9 @@
       afterTaxReturnBasis: { rate: profile.retirement.selectedAfterTaxReturn, basis: profile.retirement.returnBasis, formula: "User-selected portfolio return after fees and tax." },
       retirementIntegration: {
         dependableIncomeTax: integrationField("dependableIncomeTax"),
+        dependableIncomeTaxNetted: integrationField("dependableIncomeTaxNetted"),
+        excessDependableIncomeTax: integrationField("excessDependableIncomeTax"),
+        nonDependableAnnualTaxExpense: integrationField("nonDependableAnnualTaxExpense"),
         returnCoveredTax: integrationField("returnCoveredTax"),
         livingCostCoveredTax: integrationField("livingCostCoveredTax"),
         annualTaxExpense: integrationField("annualTaxExpense"),

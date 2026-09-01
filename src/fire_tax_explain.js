@@ -146,7 +146,7 @@
           key: "annual_tax",
           label: "Total annual tax",
           value: result.totals.annualTax,
-          formula: "dependable-income tax + return-covered tax + living-cost-covered property tax + added annual tax expense",
+          formula: "dependable-income tax netted from income + return-covered tax + living-cost-covered property tax + added annual tax expense including any excess dependable tax",
           assumptions: ["Each supported annual liability is included once across destination and continuing-home overlays."],
           exclusions: ["One-time property taxes, tax payments already withheld, and non-tax costs."],
           endpointScenarioIds: endpointScenarioIds(result, "annualTax", result.totals.annualTax)
@@ -164,8 +164,8 @@
           key: "after_tax_dependable_income",
           label: "After-tax dependable income",
           value: result.totals.afterTaxDependableIncome,
-          formula: "gross dependable income - destination and continuing-home tax assigned to dependable categories",
-          assumptions: ["The selected dependable categories are not portfolio returns."],
+          formula: "gross dependable income - minimum(gross dependable income, dependable-income tax liability)",
+          assumptions: ["The selected dependable categories are not portfolio returns; tax beyond their gross income is moved to annual expense."],
           exclusions: ["Portfolio income represented by the selected after-tax return and property equity."],
           endpointScenarioIds: endpointScenarioIds(result, "afterTaxDependableIncome", result.totals.afterTaxDependableIncome)
         }))
@@ -187,10 +187,37 @@
       label: "Retirement projection inputs",
       lines: [
         auditLine(Object.assign({}, shared, {
+          key: "dependable_income_tax_liability",
+          label: "Dependable-income tax liability",
+          value: result.retirementIntegration.dependableIncomeTax,
+          formula: "sum of annual tax liability assigned to dependable-income categories",
+          assumptions: ["This is the full liability before dividing it between income netting and annual expense."],
+          exclusions: ["Return-covered tax, property tax, and annual-expense-category tax."],
+          endpointScenarioIds: endpointScenarioIds(result, "dependableIncomeTax", result.retirementIntegration.dependableIncomeTax)
+        })),
+        auditLine(Object.assign({}, shared, {
+          key: "dependable_tax_netted_from_income",
+          label: "Dependable tax netted from income",
+          value: result.retirementIntegration.dependableIncomeTaxNetted,
+          formula: "minimum(gross dependable income, dependable-income tax liability)",
+          assumptions: ["After-tax dependable income cannot fall below zero."],
+          exclusions: ["Any dependable tax above gross dependable income; that excess is added to annual expense."],
+          endpointScenarioIds: endpointScenarioIds(result, "dependableIncomeTaxNetted", result.retirementIntegration.dependableIncomeTaxNetted)
+        })),
+        auditLine(Object.assign({}, shared, {
+          key: "excess_dependable_tax_expense",
+          label: "Excess dependable tax added to expenses",
+          value: result.retirementIntegration.excessDependableIncomeTax,
+          formula: "maximum(0, dependable-income tax liability - gross dependable income)",
+          assumptions: ["The excess is included exactly once in annual tax expense."],
+          exclusions: ["The portion already netted from dependable income."],
+          endpointScenarioIds: endpointScenarioIds(result, "excessDependableIncomeTax", result.retirementIntegration.excessDependableIncomeTax)
+        })),
+        auditLine(Object.assign({}, shared, {
           key: "added_annual_tax_expense",
           label: "Annual tax added to living expenses",
           value: result.retirementIntegration.annualTaxExpense,
-          formula: "annual-expense-category tax + unique property tax not already in living costs or income tax",
+          formula: "annual-expense-category tax + unique property tax not already in living costs or income tax + excess dependable-income tax",
           assumptions: ["The explicit category and property boundaries in the detailed profile are applied."],
           exclusions: result.retirementIntegration.exclusions,
           endpointScenarioIds: endpointScenarioIds(result, "annualTaxExpense", result.retirementIntegration.annualTaxExpense)
