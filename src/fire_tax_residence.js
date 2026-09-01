@@ -111,7 +111,7 @@
       rule.tax_year === payload.tax_year && Array.isArray(rule.taxpayer_scope) && rule.taxpayer_scope.length > 0 && rule.taxpayer_scope.every(function (scope) { return typeof scope === "string" && scope.length > 0; }) &&
       typeof rule.category === "string" && rule.category.length > 0 && typeof rule.currency === "string" && /^[A-Z]{3}$/.test(rule.currency) &&
       Array.isArray(rule.source_ids) && rule.source_ids.length > 0 && rule.source_ids.every(function (id) { return knownSources.has(id); }) &&
-      validDatedAudit(rule, payloadDate) && ["high", "medium", "low"].includes(rule.confidence) &&
+      validDatedAudit(rule, payloadDate) && ["high", "medium_high", "medium", "low"].includes(rule.confidence) &&
       typeof rule.recheck_trigger === "string" && rule.recheck_trigger.trim().length > 0 &&
       typeof rule.explanation === "string" && rule.explanation.trim().length > 0;
   }
@@ -387,6 +387,78 @@
     return [{ start: year + "-01-01", end: year + "-12-31", status: status, scopes: Object.assign({}, scopes) }];
   }
 
+  function splitPeriods(split, parsed, taxYear) {
+    const before = split.periods.find(function (period) { return period.position === "before"; });
+    const from = split.periods.find(function (period) { return period.position === "from"; });
+    const periods = [];
+    if (parsed.text !== taxYear + "-01-01") {
+      periods.push({
+        start: taxYear + "-01-01",
+        end: new Date(parsed.time - 86400000).toISOString().slice(0, 10),
+        status: before.status,
+        scopes: Object.assign({}, before.scopes),
+      });
+    }
+    periods.push({ start: parsed.text, end: taxYear + "-12-31", status: from.status, scopes: Object.assign({}, from.scopes) });
+    return periods;
+  }
+
+  function splitCandidateDates(profile, bundle, split, taxYear) {
+    const dateOperand = bundle.catalog[split.date_operand];
+    const profileValue = profile[dateOperand.profile_key];
+    const parsedProfile = parseDate(profileValue);
+    if (parsedProfile && parsedProfile.year === taxYear) return [{ parsed: parsedProfile, assumed: false }];
+    if (!Array.isArray(bundle.jurisdiction.questions)) return [];
+    const question = bundle.jurisdiction.questions.find(function (candidate) {
+      return record(candidate) && candidate.operand_id === split.date_operand && candidate.control === "date" &&
+        Array.isArray(candidate.affects_rule_ids) && candidate.affects_rule_ids.includes(split.id);
+    });
+    if (!record(question) || !Array.isArray(question.materiality_values)) return [];
+    return question.materiality_values.reduce(function (dates, value) {
+      const parsed = parseDate(value);
+      if (parsed && parsed.year === taxYear && !dates.some(function (item) { return item.parsed.text === parsed.text; })) dates.push({ parsed: parsed, assumed: true });
+      return dates;
+    }, []);
+  }
+
+  function splitActivationAlternatives(profile, bundle, taxYear, baseStatus, baseScopes) {
+    const split = bundle.split;
+    const activationFact = bundle.catalog[split.activation_operand].profile_key;
+    const dateFact = bundle.catalog[split.date_operand].profile_key;
+    const ruleIds = [split.id];
+    const auditSourceIds = sourceIds(split);
+    const domesticPeriods = fullYear(taxYear, baseStatus, baseScopes);
+    const alternatives = [{
+      status: baseStatus,
+      scopes: Object.assign({}, baseScopes),
+      periods: domesticPeriods,
+      controllingFact: activationFact,
+      assumedValue: false,
+      assumptions: { [activationFact]: false },
+      unresolvedFacts: [],
+      ruleIds: ruleIds,
+      sourceIds: auditSourceIds,
+    }];
+    for (const candidate of splitCandidateDates(profile, bundle, split, taxYear)) {
+      const periods = splitPeriods(split, candidate.parsed, taxYear);
+      if (JSON.stringify(periods) === JSON.stringify(domesticPeriods)) continue;
+      const assumptions = { [activationFact]: true };
+      if (candidate.assumed) assumptions[dateFact] = candidate.parsed.text;
+      alternatives.push({
+        status: baseStatus,
+        scopes: Object.assign({}, baseScopes),
+        periods: periods,
+        controllingFact: activationFact,
+        assumedValue: true,
+        assumptions: assumptions,
+        unresolvedFacts: [],
+        ruleIds: ruleIds,
+        sourceIds: auditSourceIds,
+      });
+    }
+    return alternatives;
+  }
+
   function unavailable(facts) {
     return {
       status: "conditional",
@@ -402,6 +474,9 @@
       explanations: [{ code: "residence_rules_unavailable", message: "Validated residence rules are unavailable or malformed.", ruleIds: [], sourceIds: [] }],
       ruleIds: [],
       sourceIds: [],
+      controllingFact: null,
+      controllingRuleIds: [],
+      controllingSourceIds: [],
     };
   }
 
@@ -422,6 +497,10 @@
     let ruleIds = destinationResult.ruleIds.concat(homeResult.ruleIds);
     let allSourceIds = destinationResult.sourceIds.concat(homeResult.sourceIds);
     let explanations = destinationResult.explanations.concat(homeResult.explanations);
+    let explicitBranches = null;
+    let controllingFact = null;
+    let controllingRuleIds = [];
+    let controllingSourceIds = [];
 
     if (destinationResult.resident !== null && homeResult.resident !== null) {
       const outcome = statusForKnown(profile, destinationResult.resident, homeResult.resident, destination, home);
@@ -446,6 +525,12 @@
       const activation = readOperand(profile, destination, destination.split.activation_operand, new Set());
       if (activation.invalid) return unavailable(["residenceRules"]);
       if (!activation.known) {
+        const baseStatus = status;
+        const baseScopes = scopes;
+        explicitBranches = splitActivationAlternatives(profile, destination, taxYear, baseStatus, baseScopes);
+        controllingFact = destination.catalog[destination.split.activation_operand].profile_key;
+        controllingRuleIds = [destination.split.id];
+        controllingSourceIds = sourceIds(destination.split);
         status = "conditional";
         unresolvedFacts = unresolvedFacts.concat(activation.facts);
         scopes = scopesFor(status, destination, home);
@@ -460,18 +545,14 @@
           scopes = scopesFor(status, destination, home);
           periods = fullYear(taxYear, status, scopes);
         } else {
-          const before = destination.split.periods.find(function (period) { return period.position === "before"; });
-          const from = destination.split.periods.find(function (period) { return period.position === "from"; });
-          periods = [];
-          if (parsed.text !== taxYear + "-01-01") periods.push({ start: taxYear + "-01-01", end: new Date(parsed.time - 86400000).toISOString().slice(0, 10), status: before.status, scopes: Object.assign({}, before.scopes) });
-          periods.push({ start: parsed.text, end: taxYear + "-12-31", status: from.status, scopes: Object.assign({}, from.scopes) });
+          periods = splitPeriods(destination.split, parsed, taxYear);
         }
       }
     }
 
     unresolvedFacts = unique(unresolvedFacts);
     const branches = status === "conditional" && unresolvedFacts.length > 0
-      ? possibleBranches(profile, destinationResult.resident, homeResult.resident, destination, home)
+      ? explicitBranches || possibleBranches(profile, destinationResult.resident, homeResult.resident, destination, home)
       : [];
     return {
       status: status,
@@ -487,6 +568,9 @@
       explanations: explanations,
       ruleIds: unique(ruleIds),
       sourceIds: unique(allSourceIds),
+      controllingFact: controllingFact,
+      controllingRuleIds: controllingRuleIds,
+      controllingSourceIds: controllingSourceIds,
     };
   }
 

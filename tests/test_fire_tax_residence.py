@@ -201,6 +201,143 @@ class FireTaxResidenceTests(unittest.TestCase):
         self.assertIn("splitYear", result["unresolvedFacts"])
         self.assertIn("synthetic-split-year-2026", result["ruleIds"])
         self.assertIn("synthetic-destination-authority-2026", result["sourceIds"])
+        self.assertEqual("splitYear", result["controllingFact"])
+        self.assertEqual(["synthetic-split-year-2026"], result["controllingRuleIds"])
+        self.assertEqual(["synthetic-destination-authority-2026"], result["controllingSourceIds"])
+        self.assertIn(False, [branch.get("assumedValue") for branch in result["branches"]])
+        self.assertIn(True, [branch.get("assumedValue") for branch in result["branches"]])
+        self.assertTrue(any(len(branch.get("periods", [])) == 2 for branch in result["branches"]))
+
+    def test_unknown_split_activation_returns_full_year_and_calculated_split_alternatives(self):
+        cases = (
+            (
+                "likely_destination_resident",
+                {**BASE, "daysInDestination": 200, "daysInHome": 100},
+            ),
+            (
+                "likely_home_resident",
+                {**BASE, "daysInDestination": 100, "daysInHome": 200},
+            ),
+            (
+                "possible_dual_resident",
+                {
+                    **BASE,
+                    "daysInDestination": 200,
+                    "daysInHome": 200,
+                    "treatyPermanentHome": "both",
+                    "treatyCentreOfVitalInterests": "both",
+                },
+            ),
+        )
+        for base_status, profile in cases:
+            profile.pop("splitYear")
+            profile["moveDate"] = "2026-07-01"
+
+            def mutate(destination, _home, supported_status=base_status):
+                split = destination_rule(destination, "synthetic-split-year-2026")
+                split["applies_to_statuses"] = [supported_status]
+
+            with self.subTest(base_status=base_status):
+                result = run_residence(profile, mutate=mutate)
+                self.assertEqual("conditional", result["status"])
+                self.assertEqual("splitYear", result["controllingFact"])
+                self.assertIn("synthetic-split-year-2026", result["ruleIds"])
+                self.assertEqual(["synthetic-split-year-2026"], result["controllingRuleIds"])
+                self.assertEqual(["synthetic-destination-authority-2026"], result["controllingSourceIds"])
+                alternatives = {
+                    branch["assumedValue"]: branch
+                    for branch in result["branches"]
+                    if branch.get("controllingFact") == "splitYear"
+                }
+                self.assertEqual({False, True}, set(alternatives))
+                self.assertEqual(base_status, alternatives[False]["status"])
+                self.assertEqual(1, len(alternatives[False]["periods"]))
+                self.assertEqual(2, len(alternatives[True]["periods"]))
+                self.assertNotEqual(alternatives[False]["periods"], alternatives[True]["periods"])
+                for branch in alternatives.values():
+                    self.assertEqual(["synthetic-split-year-2026"], branch["ruleIds"])
+                    self.assertEqual(["synthetic-destination-authority-2026"], branch["sourceIds"])
+
+    def test_python_and_js_executable_residence_projection_have_mutation_parity(self):
+        cases = []
+        for confidence in ("low", "medium", "medium_high", "high", "medium-ish"):
+            cases.append((
+                f"confidence:{confidence}",
+                lambda destination, value=confidence: destination_rule(
+                    destination, "synthetic-destination-days-2026"
+                ).update({"confidence": value}),
+                confidence in {"low", "medium", "medium_high", "high"},
+            ))
+        for operation in (
+            "greater_than",
+            "greater_than_or_equal",
+            "less_than",
+            "less_than_or_equal",
+            "equals",
+            "not_equals",
+            "approximately",
+        ):
+            cases.append((
+                f"operation:{operation}",
+                lambda destination, value=operation: destination_rule(
+                    destination, "synthetic-destination-days-2026"
+                )["formula"].update({"operation": value}),
+                operation != "approximately",
+            ))
+
+        def valid_flag_operation(destination):
+            destination_rule(destination, "synthetic-destination-days-2026")["formula"].update(
+                {"operation": "flag", "operands": ["destination_available_home"]}
+            )
+            questions = destination["jurisdictions"]["synthetic-destination"]["questions"]
+            questions[:] = [question for question in questions if question["id"] != "fire-tax-days-destination"]
+
+        cases.extend(
+            [
+                (
+                    "operation:flag",
+                    valid_flag_operation,
+                    True,
+                ),
+                (
+                    "operation:flag-invalid-arity",
+                    lambda destination: destination_rule(
+                        destination, "synthetic-destination-days-2026"
+                    )["formula"].update(
+                        {
+                            "operation": "flag",
+                            "operands": ["destination_available_home", "home_available_home"],
+                        }
+                    ),
+                    False,
+                ),
+                (
+                    "operation:missing",
+                    lambda destination: destination_rule(
+                        destination, "synthetic-destination-days-2026"
+                    )["formula"].pop("operation"),
+                    False,
+                ),
+            ]
+        )
+        for value, expected in ((183, True), (183.5, True), ("183", False), (True, False), (None, False)):
+            def mutate_value(destination, candidate=value):
+                operand = destination["operand_catalog"]["residence_day_threshold"]
+                if candidate is None:
+                    operand.pop("value", None)
+                else:
+                    operand["value"] = candidate
+
+            cases.append((f"constant:{value!r}", mutate_value, expected))
+
+        for label, mutation, expected in cases:
+            destination, home = bundles(lambda destination, _home, change=mutation: change(destination))
+            python_accepts = validate_fire_tax_rules(destination, as_of=date(2026, 9, 1)) == []
+            result = run_residence(BASE, mutate=lambda destination, _home, change=mutation: change(destination))
+            javascript_accepts = result["availability"] != "unavailable"
+            with self.subTest(case=label):
+                self.assertEqual(expected, python_accepts)
+                self.assertEqual(python_accepts, javascript_accepts)
 
     def test_split_year_does_not_apply_outside_its_validated_base_status(self):
         result = run_residence({**BASE, "splitYear": True, "moveDate": "2026-07-01"})
