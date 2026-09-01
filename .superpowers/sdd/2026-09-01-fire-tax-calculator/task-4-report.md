@@ -441,3 +441,53 @@ artifacts/destinations/chamonix/index.html -> /assets/chamonix-building-governan
 - The annual and capital audit formulas trace the actual calculator composition, retain property equity separation, and reuse the scenario result instead of duplicating tax arithmetic.
 - After-tax remains one zero-added-tax result with `after_fees_and_tax`, zero/excluded component entries, `not_applicable` tax year, user-supplied confidence, and no sources.
 - Generated artifacts remain intentionally uncommitted. The only open repository-level concern is the pre-existing Spain/Chamonix static-verifier failure above; the Playwright CLI limitation is recorded without overstating visual evidence.
+
+## Final scoped combined-amount evidence fix
+
+The total annual requirement and capital requirement remain mixed-input amounts, but their audit semantics no longer present tax confidence or citations as substantiating the whole amount. Both combined audits now carry `confidenceScope=tax_component_only` and `sourceScope=tax_component_only`. Their input-evidence records separately identify:
+
+- the source-backed tax planning component, with its own confidence and source IDs;
+- destination costs as the destination estimate used, explicitly stating that no separate source metadata is attached to this audit;
+- household and housing values as user-supplied inputs; and
+- return and timing values as user-supplied assumptions.
+
+The DOM renderer consumes the same semantic presentation helper used by tests. A tax-reserve audit may render `Confidence` and `Sources`, because those sources substantiate that amount. Combined annual/capital entries instead render `Tax component confidence` and `Tax-component sources`, followed by the separately scoped input-evidence statuses. Tax-only citations therefore cannot appear beneath a generic `Sources` label for a combined amount.
+
+### TDD evidence
+
+The semantic tests were RED first:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_ui.RetirementCalculatorUITests.test_combined_amount_audits_scope_tax_evidence_and_identify_other_inputs tests.test_retirement_calculator_ui.RetirementCalculatorUITests.test_audit_evidence_presentation_uses_component_scoped_labels_for_combined_amounts -v
+Ran 2 tests in 0.310s
+FAILED (errors=3)
+```
+
+Annual and capital audits had no confidence/source scope or input-evidence metadata, and no renderer presentation helper existed. After the minimal implementation, the same two tests passed (`Ran 2 tests in 0.318s`, `OK`).
+
+Focused verification:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_engine tests.test_retirement_calculator_ui tests.test_fire_tax_scenarios tests.test_retirement_destination_finder tests.test_retirement_destination_finder_ui -q
+Ran 108 tests in 12.516s
+OK
+```
+
+Final verification:
+
+```text
+$ node --check src/retirement_calculator_ui.js
+$ python3 -m py_compile tests/test_retirement_calculator_ui.py
+$ git diff --check
+all exit 0
+
+$ python3 src/build_unified_app.py
+/Users/steph-tmp/Documents/GitHub/property-research-dashboard/artifacts/unified_destination_dashboard.html
+exit 0
+
+$ python3 -m unittest discover -s tests -q
+Ran 990 tests in 23.808s
+OK
+```
+
+Only `src/retirement_calculator_ui.js`, its semantic test module, and this report are in scope. Generated artifacts remain excluded from the commit. No additional browser run was needed: the pure presentation helper tested here is the function called directly by the already-verified DOM renderer, and the change adds only audit text inside the existing responsive disclosure container.

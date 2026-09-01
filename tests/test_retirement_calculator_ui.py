@@ -137,6 +137,58 @@ class RetirementCalculatorUITests(unittest.TestCase):
                 self.assertEqual("medium_high", explanation["confidence"])
                 self.assertEqual(["tax-source"], explanation["sourceIds"])
 
+    def test_combined_amount_audits_scope_tax_evidence_and_identify_other_inputs(self) -> None:
+        scenario_results = run_ui_args(
+            "calculateTaxAdjustedScenarios",
+            calculator_payload(),
+            tax_scenario(),
+        )
+        explanations = scenario_results["central"]["amountExplanations"]
+
+        self.assertNotIn("sourceScope", explanations["taxReserve"])
+        for amount_name in ("annualRequirement", "capitalRequirement"):
+            with self.subTest(amount=amount_name):
+                explanation = explanations[amount_name]
+                self.assertEqual("tax_component_only", explanation["confidenceScope"])
+                self.assertEqual("tax_component_only", explanation["sourceScope"])
+                evidence = {item["component"]: item for item in explanation["inputEvidence"]}
+                self.assertEqual(
+                    {
+                        "tax component",
+                        "destination costs",
+                        "household and housing",
+                        "return and timing",
+                    },
+                    set(evidence),
+                )
+                self.assertEqual(["tax-source"], evidence["tax component"]["sourceIds"])
+                self.assertEqual("medium_high", evidence["tax component"]["confidence"])
+                self.assertEqual(
+                    "destination estimate used; no separate source metadata attached to this audit",
+                    evidence["destination costs"]["status"],
+                )
+                self.assertEqual("user-supplied inputs", evidence["household and housing"]["status"])
+                self.assertEqual("user-supplied assumptions", evidence["return and timing"]["status"])
+
+    def test_audit_evidence_presentation_uses_component_scoped_labels_for_combined_amounts(self) -> None:
+        scenario_results = run_ui_args(
+            "calculateTaxAdjustedScenarios",
+            calculator_payload(),
+            tax_scenario(),
+        )
+        explanations = scenario_results["central"]["amountExplanations"]
+
+        tax_reserve = run_ui("auditEvidencePresentation", explanations["taxReserve"])
+        annual = run_ui("auditEvidencePresentation", explanations["annualRequirement"])
+
+        self.assertEqual("Confidence", tax_reserve["confidenceLabel"])
+        self.assertEqual("Sources", tax_reserve["sourcesLabel"])
+        self.assertEqual("Tax component confidence", annual["confidenceLabel"])
+        self.assertEqual("Tax-component sources", annual["sourcesLabel"])
+        self.assertIn("Destination costs: destination estimate used", annual["inputEvidenceText"])
+        self.assertIn("Household and housing: user-supplied inputs", annual["inputEvidenceText"])
+        self.assertNotEqual("Sources", annual["sourcesLabel"])
+
     def test_tax_audit_entries_cover_every_displayed_table_amount(self) -> None:
         scenario_results = run_ui_args("calculateTaxAdjustedScenarios", calculator_payload(), tax_scenario())
         presentation = run_ui(

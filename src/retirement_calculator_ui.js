@@ -325,7 +325,7 @@
 
   function auditMetadata(input) {
     const explanation = input || {};
-    return {
+    const audit = {
       status: explanation.status || "included",
       label: explanation.label || "tax reserve",
       formula: explanation.formula || "0; user supplied after-tax assumptions",
@@ -336,6 +336,19 @@
       confidence: explanation.confidence || "user_supplied",
       sourceIds: (explanation.sourceIds || []).slice(),
     };
+    if (explanation.confidenceScope) audit.confidenceScope = explanation.confidenceScope;
+    if (explanation.sourceScope) audit.sourceScope = explanation.sourceScope;
+    if (explanation.inputEvidence) {
+      audit.inputEvidence = explanation.inputEvidence.map(function (item) {
+        return {
+          component: item.component,
+          status: item.status,
+          confidence: item.confidence,
+          sourceIds: (item.sourceIds || []).slice(),
+        };
+      });
+    }
+    return audit;
   }
 
   function scenarioAmountExplanations(baseInput, result, taxExplanation) {
@@ -347,6 +360,34 @@
       confidence: taxReserve.confidence,
       sourceIds: taxReserve.sourceIds,
     };
+    const combinedInputEvidence = [
+      {
+        component: "tax component",
+        status: taxReserve.status === "included"
+          ? "source-backed planning estimate"
+          : "excluded; user supplied after-tax assumptions",
+        confidence: taxReserve.confidence,
+        sourceIds: taxReserve.sourceIds,
+      },
+      {
+        component: "destination costs",
+        status: "destination estimate used; no separate source metadata attached to this audit",
+        confidence: "not_assessed",
+        sourceIds: [],
+      },
+      {
+        component: "household and housing",
+        status: "user-supplied inputs",
+        confidence: "not_applicable",
+        sourceIds: [],
+      },
+      {
+        component: "return and timing",
+        status: "user-supplied assumptions",
+        confidence: "not_applicable",
+        sourceIds: [],
+      },
+    ];
     const annualRequirement = auditMetadata({
       status: "included",
       label: "total annual requirement",
@@ -361,6 +402,9 @@
       taxYear: shared.taxYear,
       confidence: shared.confidence,
       sourceIds: shared.sourceIds,
+      confidenceScope: "tax_component_only",
+      sourceScope: "tax_component_only",
+      inputEvidence: combinedInputEvidence,
     });
     const capitalInclusions = ["tax-adjusted annual funding gaps", "emergency reserve"];
     if (result.propertyCapital > 0) capitalInclusions.push("applicable home purchase capital");
@@ -381,11 +425,29 @@
       taxYear: shared.taxYear,
       confidence: shared.confidence,
       sourceIds: shared.sourceIds,
+      confidenceScope: "tax_component_only",
+      sourceScope: "tax_component_only",
+      inputEvidence: combinedInputEvidence,
     });
     return {
       taxReserve: taxReserve,
       annualRequirement: annualRequirement,
       capitalRequirement: capitalRequirement,
+    };
+  }
+
+  function auditEvidencePresentation(explanation) {
+    const audit = explanation || {};
+    const taxComponentOnly = audit.sourceScope === "tax_component_only" ||
+      audit.confidenceScope === "tax_component_only";
+    return {
+      confidenceLabel: taxComponentOnly ? "Tax component confidence" : "Confidence",
+      sourcesLabel: taxComponentOnly ? "Tax-component sources" : "Sources",
+      inputEvidenceText: (audit.inputEvidence || []).map(function (item) {
+        const component = String(item.component || "Input");
+        return component.charAt(0).toUpperCase() + component.slice(1) + ": " +
+          String(item.status || "status unavailable");
+      }).join("; "),
     };
   }
 
@@ -970,6 +1032,7 @@
 
     function appendTaxExplanation(container, headingText, explanation, sourceById) {
       if (!explanation) return;
+      const evidence = auditEvidencePresentation(explanation);
       const article = document.createElement("article");
       const heading = document.createElement("h3");
       const formula = document.createElement("p");
@@ -981,8 +1044,12 @@
         ". Assumptions: " + (explanation.assumptions || []).join("; ") +
         ". Included: " + (explanation.inclusions || []).join(", ") +
         ". Excluded: " + (explanation.exclusions || []).join(", ") +
-        ". Tax year: " + explanation.taxYear + ". Confidence: " + explanation.confidence + ".";
-      sources.appendChild(document.createTextNode("Sources: "));
+        ". Tax year: " + explanation.taxYear + ". " + evidence.confidenceLabel + ": " + explanation.confidence + "." +
+        (evidence.inputEvidenceText ? " Input evidence: " + evidence.inputEvidenceText + "." : "");
+      sources.appendChild(document.createTextNode(evidence.sourcesLabel + ": "));
+      if (!(explanation.sourceIds || []).length) {
+        sources.appendChild(document.createTextNode("None"));
+      }
       (explanation.sourceIds || []).forEach(function (sourceId, index) {
         const source = sourceById[sourceId];
         if (index) sources.appendChild(document.createTextNode(", "));
@@ -1431,6 +1498,7 @@
     wealthTaxRelevant: wealthTaxRelevant,
     taxResultPresentation: taxResultPresentation,
     taxAuditEntries: taxAuditEntries,
+    auditEvidencePresentation: auditEvidencePresentation,
     calculateTaxAdjustedScenarios: calculateTaxAdjustedScenarios,
     planningSummary: planningSummary,
     accumulationTooltipContent: accumulationTooltipContent,
