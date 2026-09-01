@@ -175,3 +175,244 @@ def validate_fire_abroad_payload(
         _validate_complete_tax_screen(screen, path, seen_sources, errors)
 
     return errors
+
+
+VALID_HOUSEHOLDS = frozenset({"single", "couple"})
+VALID_HOUSING = frozenset({"rent", "own", "buy_now", "buy_retirement"})
+VALID_TAX_MODES = frozenset({"destination_estimate", "user_after_tax"})
+VALID_FUNDING_SOURCES = frozenset(
+    {"portfolio", "pension", "property", "work_business", "mixed"}
+)
+VALID_PROPERTY_USES = frozenset({"personal", "rental", "mixed"})
+
+
+def _enum(value: Any, allowed: frozenset[str], default: str, label: str) -> str:
+    selected = default if value in (None, "") else str(value)
+    if selected not in allowed:
+        raise ValueError(f"{label} must be one of {', '.join(sorted(allowed))}")
+    return selected
+
+
+def normalize_fire_profile(raw: dict[str, Any] | None) -> dict[str, Any]:
+    raw = raw or {}
+    planning_base = raw.get("planning_base")
+    if planning_base in (None, ""):
+        planning_base = None
+    else:
+        planning_base = float(planning_base)
+        if planning_base < 0:
+            raise ValueError("planning_base must be non-negative")
+    age = float(raw.get("age", 50))
+    if age < 18 or age > 100:
+        raise ValueError("age must be between 18 and 100")
+    return {
+        "stay_mode": _enum(raw.get("stay_mode"), VALID_STAY_MODES, "part_year", "stay_mode"),
+        "age": age,
+        "household": _enum(raw.get("household"), VALID_HOUSEHOLDS, "single", "household"),
+        "housing": _enum(raw.get("housing"), VALID_HOUSING, "rent", "housing"),
+        "tax_mode": _enum(raw.get("tax_mode"), VALID_TAX_MODES, "destination_estimate", "tax_mode"),
+        "funding_source": _enum(
+            raw.get("funding_source"), VALID_FUNDING_SOURCES, "portfolio", "funding_source"
+        ),
+        "property_use": _enum(
+            raw.get("property_use"), VALID_PROPERTY_USES, "personal", "property_use"
+        ),
+        "annual_day_band": str(raw.get("annual_day_band") or "unsure"),
+        "home_tax_context": str(raw.get("home_tax_context") or "prefer_not_to_say"),
+        "planning_base": planning_base,
+    }
+
+
+def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
+    screen = country.get("tax_screen", {})
+    if screen.get("status") != "complete":
+        return {
+            "status": "tax_impact_unavailable",
+            "conditional": True,
+            "residence_outcome": "needs_evidence",
+            "scope_summary": "Tax-impact research is not complete for this destination.",
+            "readiness": "highly_profile_dependent",
+            "readiness_score": None,
+            "favorable_reserve": None,
+            "central_reserve": None,
+            "adverse_reserve": None,
+            "rates": None,
+            "included_categories": [],
+            "material_flags": [],
+            "source_ids": [],
+            "confidence": "low",
+        }
+
+    band = screen["planning_bands"][profile["stay_mode"]]
+    rates = {
+        "favorable": float(band["favorable_rate"]),
+        "central": float(band["central_rate"]),
+        "adverse": float(band["adverse_rate"]),
+    }
+    planning_base = profile.get("planning_base")
+    bypass = profile["tax_mode"] == "user_after_tax"
+
+    def reserve(key: str) -> int | None:
+        if bypass:
+            return 0
+        if planning_base is None:
+            return None
+        return round(planning_base * rates[key])
+
+    residence_outcome = {
+        "seasonal": "likely_nonresident",
+        "part_year": "residence_depends_on_days_and_ties",
+        "full_relocation": "likely_resident",
+    }[profile["stay_mode"]]
+    scope = screen.get("scope_if_resident", "unknown")
+    return {
+        "status": "user_after_tax" if bypass else "planning_estimate",
+        "conditional": residence_outcome == "residence_depends_on_days_and_ties",
+        "residence_outcome": residence_outcome,
+        "scope_summary": (
+            "Worldwide income may enter scope if destination tax residence applies."
+            if scope == "worldwide_income"
+            else "Local-source income may remain taxable."
+        ),
+        "readiness": screen["tax_readiness"],
+        "readiness_score": float(screen["tax_readiness_score"]),
+        "favorable_reserve": reserve("favorable"),
+        "central_reserve": reserve("central"),
+        "adverse_reserve": reserve("adverse"),
+        "rates": rates,
+        "included_categories": list(screen.get("included_categories", [])),
+        "material_flags": list(screen.get("material_flags", [])),
+        "source_ids": list(screen.get("source_ids", [])),
+        "confidence": screen.get("confidence", "low"),
+    }
+
+
+def _profile_cost(cost: dict[str, Any], profile: dict[str, Any]) -> tuple[dict[str, Any], float]:
+    household = cost.get("profiles", {}).get(profile["household"])
+    if not household:
+        raise ValueError(f"Missing {profile['household']} retirement-cost profile")
+    categories = household.get("categories_usd", {})
+    recurring = sum(float(value) for value in categories.values())
+    housing = (
+        float(household.get("annual_rent_usd", 0))
+        if profile["housing"] == "rent"
+        else float(household.get("annual_owner_costs_usd", 0))
+    )
+    return household, recurring + housing
+
+
+def build_resilience_budget(
+    cost: dict[str, Any], profile: dict[str, Any], tax_screen: dict[str, Any]
+) -> dict[str, Any]:
+    _, base_annual_cost = _profile_cost(cost, profile)
+    rates = tax_screen.get("rates")
+    if tax_screen.get("status") == "tax_impact_unavailable":
+        return {
+            "base_annual_cost": round(base_annual_cost),
+            "favorable_annual_cost": None,
+            "central_annual_cost": None,
+            "adverse_annual_cost": None,
+            "conditional": True,
+        }
+
+    planning_base = profile.get("planning_base")
+    reserve_base = base_annual_cost if planning_base is None else planning_base
+    if profile["tax_mode"] == "user_after_tax":
+        reserves = {"favorable": 0, "central": 0, "adverse": 0}
+    else:
+        reserves = {key: round(reserve_base * rates[key]) for key in rates}
+    return {
+        "base_annual_cost": round(base_annual_cost),
+        "favorable_tax_reserve": reserves["favorable"],
+        "central_tax_reserve": reserves["central"],
+        "adverse_tax_reserve": reserves["adverse"],
+        "favorable_annual_cost": round(base_annual_cost + reserves["favorable"]),
+        "central_annual_cost": round(base_annual_cost + reserves["central"]),
+        "adverse_annual_cost": round(base_annual_cost + reserves["adverse"]),
+        "conditional": bool(tax_screen.get("conditional")),
+    }
+
+
+def _cost_scores(rows: list[dict[str, Any]]) -> dict[str, float]:
+    ranked_costs = [row["budget"]["central_annual_cost"] for row in rows if row["rankable"]]
+    if not ranked_costs:
+        return {}
+    low, high = min(ranked_costs), max(ranked_costs)
+    if low == high:
+        return {row["destination_id"]: 3.0 for row in rows if row["rankable"]}
+    return {
+        row["destination_id"]: 5.0 - 4.0 * (row["budget"]["central_annual_cost"] - low) / (high - low)
+        for row in rows
+        if row["rankable"]
+    }
+
+
+def rank_fire_abroad_destinations(
+    destinations: list[dict[str, Any]],
+    retirement_costs: dict[str, dict[str, Any]],
+    fire_payload: dict[str, Any],
+    profile: dict[str, Any] | None,
+) -> list[dict[str, Any]]:
+    normalized = normalize_fire_profile(profile)
+    countries = fire_payload.get("countries", {})
+    overrides = fire_payload.get("destination_overrides", {})
+    rows: list[dict[str, Any]] = []
+    for destination in destinations:
+        destination_id = destination["id"]
+        override = overrides.get(destination_id, {})
+        country_name = override.get("country", destination.get("country"))
+        country = countries.get(country_name, {"tax_screen": {"status": "research_pending"}})
+        tax_result = screen_tax(country, normalized)
+        cost = retirement_costs.get(destination_id)
+        scores = override.get("scores")
+        rankable = bool(cost and scores and tax_result["status"] != "tax_impact_unavailable")
+        budget = (
+            build_resilience_budget(cost, normalized, tax_result)
+            if cost
+            else {
+                "base_annual_cost": None,
+                "central_annual_cost": None,
+                "conditional": True,
+            }
+        )
+        rows.append(
+            {
+                "destination_id": destination_id,
+                "name": destination.get("name", destination_id),
+                "country": country_name,
+                "rankable": rankable,
+                "overall_score": None,
+                "tax": tax_result,
+                "budget": budget,
+                "scores": scores or {},
+            }
+        )
+
+    cost_scores = _cost_scores(rows)
+    for row in rows:
+        if not row["rankable"]:
+            continue
+        scores = row["scores"]
+        dimension_scores = {
+            "active_life": float(scores["active_life"]),
+            "sustainable_annual_cost": cost_scores[row["destination_id"]],
+            "healthcare_bridge": float(scores["healthcare_bridge"]),
+            "stay_flexibility": float(scores["stay_flexibility"]),
+            "tax_readiness": float(row["tax"]["readiness_score"]),
+            "global_access": float(scores["global_access"]),
+            "community_fit": float(scores["community_fit"]),
+            "property_exit_flexibility": float(scores["property_exit_flexibility"]),
+        }
+        row["overall_score"] = round(
+            sum(dimension_scores[key] * FIRE_WEIGHTS[key] for key in FIRE_WEIGHTS), 2
+        )
+        row["dimension_scores"] = dimension_scores
+
+    return sorted(
+        rows,
+        key=lambda row: (
+            0 if row["rankable"] else 1,
+            -(row["overall_score"] or 0),
+            row["name"],
+        ),
+    )
