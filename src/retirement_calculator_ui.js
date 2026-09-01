@@ -506,6 +506,72 @@
     };
   }
 
+  function detailedAmountRange(value, label) {
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+      return { minimum: value, maximum: value };
+    }
+    if (value && typeof value === "object" && Number.isFinite(value.minimum) &&
+        Number.isFinite(value.maximum) && value.minimum >= 0 && value.minimum <= value.maximum) {
+      return { minimum: Number(value.minimum), maximum: Number(value.maximum) };
+    }
+    throw new Error(label + " must be a non-negative amount or calculated range");
+  }
+
+  function detailedRetirementInput(baseInput, integration, annualTaxExpenses, afterTaxIncome) {
+    const input = clonedInput(baseInput);
+    input.annualTaxExpenses = annualTaxExpenses;
+    input.taxMode = "destination_estimate";
+    input.returnBasis = "after_fees_and_tax";
+    input.expectedPortfolioReturn = Number(integration.selectedAfterTaxReturn);
+    input.incomeStreams = [{
+      amount: afterTaxIncome,
+      indexed: integration.dependableIncomeIndexed === true,
+      inflationRate: Number(integration.dependableIncomeInflationRate || 0),
+    }];
+    return input;
+  }
+
+  function calculateDetailedRetirement(baseInput, integration) {
+    if (!integration || integration.returnBasis !== "after_fees_and_tax") {
+      throw new Error("Detailed retirement integration requires returnBasis after_fees_and_tax");
+    }
+    const selectedReturn = Number(integration.selectedAfterTaxReturn);
+    if (!Number.isFinite(selectedReturn)) throw new Error("Detailed retirement integration requires an explicit after-tax return");
+    const tax = detailedAmountRange(integration.annualTaxExpenses, "annualTaxExpenses");
+    const income = detailedAmountRange(integration.afterTaxDependableIncome, "afterTaxDependableIncome");
+    const exact = tax.minimum === tax.maximum && income.minimum === income.maximum;
+    if (exact) {
+      const input = detailedRetirementInput(baseInput, integration, tax.minimum, income.minimum);
+      return {
+        status: "calculated",
+        input: input,
+        refined: calculatorEngine().calculateRetirement(input),
+        planningRange: integration.planningRange || null,
+      };
+    }
+    const favorableInput = detailedRetirementInput(baseInput, integration, tax.minimum, income.maximum);
+    const adverseInput = detailedRetirementInput(baseInput, integration, tax.maximum, income.minimum);
+    const favorable = calculatorEngine().calculateRetirement(favorableInput);
+    const adverse = calculatorEngine().calculateRetirement(adverseInput);
+    return {
+      status: "conditional",
+      input: {
+        status: "conditional",
+        returnBasis: "after_fees_and_tax",
+        expectedPortfolioReturn: selectedReturn,
+        annualTaxExpenses: { minimum: tax.minimum, maximum: tax.maximum },
+        afterTaxDependableIncome: { minimum: income.minimum, maximum: income.maximum },
+        cases: { favorable: favorableInput, adverse: adverseInput },
+      },
+      cases: { favorable: favorable, adverse: adverse },
+      capitalRange: {
+        minimum: Math.min(favorable.totalNeededToday, adverse.totalNeededToday),
+        maximum: Math.max(favorable.totalNeededToday, adverse.totalNeededToday),
+      },
+      planningRange: integration.planningRange || null,
+    };
+  }
+
   function planningSummary(input) {
     const result = input && input.result ? input.result : input;
     const currency = input && input.currency ? input.currency : "USD";
@@ -1500,6 +1566,7 @@
     taxAuditEntries: taxAuditEntries,
     auditEvidencePresentation: auditEvidencePresentation,
     calculateTaxAdjustedScenarios: calculateTaxAdjustedScenarios,
+    calculateDetailedRetirement: calculateDetailedRetirement,
     planningSummary: planningSummary,
     accumulationTooltipContent: accumulationTooltipContent,
     isInvalidNumericControl: isInvalidNumericControl,
