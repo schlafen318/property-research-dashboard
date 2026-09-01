@@ -117,18 +117,42 @@
     if (!record(profile.destination.income) || !record(profile.destination.property)) {
       throw new DetailedFireTaxInputError("destination profile must include income and property facts");
     }
+    validateSharedFactIds(profile.destination.property, "destination");
     const home = profile.continuingHome || { enabled: false };
     if (home.enabled !== true && home.enabled !== false) throw new DetailedFireTaxInputError("continuingHome.enabled must be boolean");
     if (home.enabled && (!record(home.income) || !record(home.property) || !record(rules.continuingHome) ||
         !record(rules.continuingHome.income) || !Array.isArray(rules.continuingHome.credits) || !record(rules.continuingHome.property))) {
       throw new DetailedFireTaxInputError("enabled continuing-home overlay requires validated income, credit, and property bundles");
     }
+    if (home.enabled) validateSharedFactIds(home.property, "continuingHome");
     if (profile.retirement.returnBasis !== "after_fees_and_tax") {
       throw new DetailedFireTaxInputError("selected return must use the explicit after_fees_and_tax basis");
     }
     if (typeof profile.retirement.selectedAfterTaxReturn !== "number" || !Number.isFinite(profile.retirement.selectedAfterTaxReturn)) {
       throw new DetailedFireTaxInputError("selectedAfterTaxReturn must be a finite explicit rate");
     }
+  }
+
+  function validateSharedFactIds(propertyProfile, label) {
+    if (propertyProfile.sharedFactIds === undefined) return {};
+    if (!record(propertyProfile.sharedFactIds)) {
+      throw new DetailedFireTaxInputError(label + ".property.sharedFactIds must be an object");
+    }
+    const ids = [];
+    Object.keys(propertyProfile.sharedFactIds).forEach(function (factName) {
+      const sharedFactId = propertyProfile.sharedFactIds[factName];
+      if (!Object.prototype.hasOwnProperty.call(propertyProfile, factName) || factName === "sharedFactIds") {
+        throw new DetailedFireTaxInputError(label + ".property.sharedFactIds references unknown property fact " + factName);
+      }
+      if (typeof sharedFactId !== "string" || !/^[A-Za-z][A-Za-z0-9._:-]{2,127}$/.test(sharedFactId)) {
+        throw new DetailedFireTaxInputError(label + ".property.sharedFactIds." + factName + " must be a validated explicit fact ID");
+      }
+      if (ids.includes(sharedFactId)) {
+        throw new DetailedFireTaxInputError(label + ".property.sharedFactIds must assign a distinct ID to each local property fact");
+      }
+      ids.push(sharedFactId);
+    });
+    return propertyProfile.sharedFactIds;
   }
 
   function concreteResidence(node, period) {
@@ -186,7 +210,15 @@
     const incomeCategories = incomeApi().calculateIncomeTax(profile.income, residence, rules.income);
     const credits = creditsApi().applyForeignTaxCredits(incomeCategories, rules.credits);
     const property = propertyApi().calculatePropertyTaxes(profile.property, residence, rules.property);
-    return { incomeCategories: incomeCategories, credits: credits, property: property };
+    const jurisdictionId = rules.income.active_jurisdiction_id || Object.keys(rules.income.jurisdictions || {})[0];
+    const jurisdiction = rules.income.jurisdictions && rules.income.jurisdictions[jurisdictionId] || {};
+    return {
+      jurisdictionId: jurisdictionId,
+      calculationSide: jurisdiction.calculation_side,
+      incomeCategories: incomeCategories,
+      credits: credits,
+      property: property
+    };
   }
 
   function disabledHome() {
@@ -203,8 +235,19 @@
     return [result];
   }
 
-  function compatibleFacts(left, right) {
-    const shared = Object.keys(left || {}).filter(function (key) { return Object.prototype.hasOwnProperty.call(right || {}, key); });
+  function propertyFactSet(side, propertyProfile, assumedFacts) {
+    const ids = propertyProfile.sharedFactIds || {};
+    const namespaced = {};
+    const shared = {};
+    Object.keys(assumedFacts || {}).forEach(function (factName) {
+      if (ids[factName]) shared[ids[factName]] = assumedFacts[factName];
+      else namespaced[side + ".property." + factName] = assumedFacts[factName];
+    });
+    return { namespaced: namespaced, shared: shared };
+  }
+
+  function compatibleSharedFacts(left, right) {
+    const shared = Object.keys(left).filter(function (key) { return Object.prototype.hasOwnProperty.call(right, key); });
     return shared.every(function (key) { return left[key] === right[key]; });
   }
 
@@ -291,10 +334,16 @@
     }));
   }
 
+  function isSourceJurisdiction(entry, sourceJurisdiction) {
+    const aliases = [entry.side, entry.result.jurisdictionId, entry.result.calculationSide];
+    if (entry.side === "continuing_home") aliases.push("home");
+    return aliases.includes(sourceJurisdiction);
+  }
+
   function reconcileIncome(destination, home, canonical) {
     const jurisdictionEntries = [{ side: "destination", result: destination }];
     if (home.enabled) jurisdictionEntries.push({ side: "continuing_home", result: home });
-    const withholdings = [];
+    const payments = [];
     const liabilities = [];
     const credits = [];
     const categories = canonical.categories.map(function (canonicalCategory) {
@@ -311,76 +360,140 @@
           jurisdiction: observation.side,
           category: canonicalCategory.category,
           amount: observation.category.domesticTax,
+          basis: "calculated_domestic_liability",
+          paymentApplied: 0,
+          foreignCreditApplied: 0,
           ruleIds: observation.category.ruleIds,
           sourceIds: observation.category.sourceIds
         };
         liabilities.push(item);
         return item;
       });
+      const calculatedDomesticLiability = round(categoryLiabilities.reduce(function (sum, item) { return sum + item.amount; }, 0));
       const positiveWithholding = categoryObservations.filter(function (observation) { return observation.category.sourceWithholding > 0; });
       let uniqueWithholding = 0;
-      let withholdingIdentity = null;
+      let taxPaymentsApplied = 0;
+      let excessTaxPayments = 0;
+      let paymentIdentity = null;
+      let sourceLiability = categoryLiabilities.find(function (liability) {
+        const entry = jurisdictionEntries.find(function (candidate) { return candidate.side === liability.jurisdiction; });
+        return isSourceJurisdiction(entry, canonicalCategory.sourceJurisdiction);
+      });
       if (positiveWithholding.length) {
-        withholdingIdentity = [canonicalCategory.category, canonicalCategory.sourceJurisdiction, canonicalCategory.taxYear].join("|");
+        paymentIdentity = [canonicalCategory.sourceJurisdiction, canonicalCategory.category, canonicalCategory.taxYear, "withholding"].join("|");
         const amounts = new Set(positiveWithholding.map(function (observation) { return observation.category.sourceWithholding; }));
-        if (amounts.size !== 1) throw new DetailedFireTaxInputError("shared withholding identity " + withholdingIdentity + " has inconsistent amounts");
+        if (amounts.size !== 1) throw new DetailedFireTaxInputError("shared withholding identity " + paymentIdentity + " has inconsistent amounts");
         uniqueWithholding = positiveWithholding[0].category.sourceWithholding;
-        withholdings.push({
-          identity: withholdingIdentity,
+        if (!sourceLiability) {
+          sourceLiability = {
+            identity: "external:" + canonicalCategory.sourceJurisdiction + "|" + canonicalCategory.category + "|" + canonicalCategory.taxYear,
+            jurisdiction: canonicalCategory.sourceJurisdiction,
+            category: canonicalCategory.category,
+            amount: uniqueWithholding,
+            basis: "withholding_evidenced_external_source_liability",
+            paymentApplied: 0,
+            foreignCreditApplied: 0,
+            ruleIds: unique(positiveWithholding.flatMap(function (observation) { return observation.category.ruleIds; })),
+            sourceIds: unique(positiveWithholding.flatMap(function (observation) { return observation.category.sourceIds; }))
+          };
+          categoryLiabilities.push(sourceLiability);
+          liabilities.push(sourceLiability);
+        }
+        taxPaymentsApplied = round(Math.min(uniqueWithholding, sourceLiability.amount));
+        excessTaxPayments = round(uniqueWithholding - taxPaymentsApplied);
+        sourceLiability.paymentApplied = taxPaymentsApplied;
+        payments.push({
+          identity: paymentIdentity,
           category: canonicalCategory.category,
           sourceJurisdiction: canonicalCategory.sourceJurisdiction,
+          liabilityId: sourceLiability.identity,
           amount: uniqueWithholding,
-          countedAmount: uniqueWithholding,
+          appliedAmount: taxPaymentsApplied,
+          excessPayment: excessTaxPayments,
           observedBy: positiveWithholding.map(function (observation) { return observation.side; }),
           countedOnce: true,
           ruleIds: unique(positiveWithholding.flatMap(function (observation) { return observation.category.ruleIds; })),
           sourceIds: unique(positiveWithholding.flatMap(function (observation) { return observation.category.sourceIds; }))
         });
       }
-      const categoryCreditClaims = categoryObservations.filter(function (observation) { return observation.category.creditApplied > 0; }).map(function (observation) {
+      const categoryCreditClaims = categoryObservations.filter(function (observation) {
+        const entry = jurisdictionEntries.find(function (candidate) { return candidate.side === observation.side; });
+        return observation.category.creditApplied > 0 && !isSourceJurisdiction(entry, canonicalCategory.sourceJurisdiction);
+      }).map(function (observation) {
+        const targetLiability = categoryLiabilities.find(function (liability) { return liability.jurisdiction === observation.side; });
         return {
           jurisdiction: observation.side,
           category: canonicalCategory.category,
-          withholdingIdentity: withholdingIdentity,
+          paymentIdentity: paymentIdentity,
+          sourceLiabilityId: sourceLiability && sourceLiability.identity,
+          targetLiabilityId: targetLiability.identity,
           claimedAmount: observation.category.creditApplied,
           ruleIds: observation.category.creditRuleIds,
           sourceIds: observation.category.creditSourceIds
         };
       });
-      const domesticLiability = round(categoryLiabilities.reduce(function (sum, item) { return sum + item.amount; }, 0));
+      const grossTaxLiability = round(categoryLiabilities.reduce(function (sum, item) { return sum + item.amount; }, 0));
+      const externalSourceLiability = round(grossTaxLiability - calculatedDomesticLiability);
       const creditClaimed = round(categoryCreditClaims.reduce(function (sum, item) { return sum + item.claimedAmount; }, 0));
-      const creditApplied = round(Math.min(creditClaimed, uniqueWithholding, domesticLiability));
-      let remainingCredit = creditApplied;
+      const foreignTaxAvailableForCredit = sourceLiability ? Math.min(uniqueWithholding, sourceLiability.amount) : 0;
+      let remainingCredit = foreignTaxAvailableForCredit;
+      let creditApplied = 0;
       categoryCreditClaims.forEach(function (claim) {
-        const applied = round(Math.min(claim.claimedAmount, remainingCredit));
+        const targetLiability = categoryLiabilities.find(function (liability) { return liability.identity === claim.targetLiabilityId; });
+        const applied = round(Math.min(claim.claimedAmount, remainingCredit, targetLiability.amount - targetLiability.foreignCreditApplied));
         remainingCredit = round(remainingCredit - applied);
+        creditApplied = round(creditApplied + applied);
+        targetLiability.foreignCreditApplied = round(targetLiability.foreignCreditApplied + applied);
         credits.push(Object.assign({}, claim, { appliedAmount: applied }));
       });
-      const netTax = round(domesticLiability + uniqueWithholding - creditApplied);
+      categoryLiabilities.forEach(function (liability) {
+        liability.annualLiabilityAfterCredits = round(liability.amount - liability.foreignCreditApplied);
+        liability.remainingBalanceDue = round(Math.max(0, liability.annualLiabilityAfterCredits - liability.paymentApplied));
+      });
+      const annualTaxLiability = round(grossTaxLiability - creditApplied);
+      const remainingBalanceDue = round(categoryLiabilities.reduce(function (sum, item) { return sum + item.remainingBalanceDue; }, 0));
       return {
         category: canonicalCategory.category,
         treatment: canonicalCategory.treatment,
         grossAmount: canonicalCategory.grossAmount,
-        domesticLiability: domesticLiability,
+        domesticLiability: calculatedDomesticLiability,
+        externalSourceLiability: externalSourceLiability,
+        grossTaxLiability: grossTaxLiability,
         uniqueWithholding: uniqueWithholding,
+        taxPayments: uniqueWithholding,
+        taxPaymentsApplied: taxPaymentsApplied,
+        excessTaxPayments: excessTaxPayments,
         creditClaimed: creditClaimed,
         creditApplied: creditApplied,
-        netTax: netTax,
-        withholdingIdentity: withholdingIdentity,
+        annualTaxLiability: annualTaxLiability,
+        remainingBalanceDue: remainingBalanceDue,
+        netTax: annualTaxLiability,
+        paymentIdentity: paymentIdentity,
         liabilityIds: categoryLiabilities.map(function (item) { return item.identity; })
       };
     });
+    const total = function (field) { return round(categories.reduce(function (sum, item) { return sum + item[field]; }, 0)); };
     return {
       status: "calculated",
       categories: categories,
       liabilities: liabilities,
-      withholdings: withholdings,
+      payments: payments,
+      withholdings: payments,
       credits: credits,
-      totalDomesticLiability: round(categories.reduce(function (sum, item) { return sum + item.domesticLiability; }, 0)),
-      totalUniqueWithholding: round(categories.reduce(function (sum, item) { return sum + item.uniqueWithholding; }, 0)),
-      totalCreditClaimed: round(categories.reduce(function (sum, item) { return sum + item.creditClaimed; }, 0)),
-      totalCreditApplied: round(categories.reduce(function (sum, item) { return sum + item.creditApplied; }, 0)),
-      totalNetIncomeTax: round(categories.reduce(function (sum, item) { return sum + item.netTax; }, 0))
+      ruleIds: unique(liabilities.concat(payments, credits).flatMap(function (item) { return item.ruleIds || []; })),
+      sourceIds: unique(liabilities.concat(payments, credits).flatMap(function (item) { return item.sourceIds || []; })),
+      totalDomesticLiability: total("domesticLiability"),
+      totalExternalSourceLiability: total("externalSourceLiability"),
+      totalGrossTaxLiability: total("grossTaxLiability"),
+      totalTaxPayments: total("taxPayments"),
+      totalTaxPaymentsApplied: total("taxPaymentsApplied"),
+      totalExcessTaxPayments: total("excessTaxPayments"),
+      totalUniqueWithholding: total("uniqueWithholding"),
+      totalCreditClaimed: total("creditClaimed"),
+      totalCreditApplied: total("creditApplied"),
+      totalAnnualIncomeTaxLiability: total("annualTaxLiability"),
+      totalRemainingBalanceDue: total("remainingBalanceDue"),
+      totalNetIncomeTax: total("annualTaxLiability")
     };
   }
 
@@ -442,7 +555,7 @@
     const property = propertyAmounts([destinationWithId].concat(home.enabled ? [homeWithId] : []), retirement.propertyRentalTaxTreatment);
     const treatmentTax = function (treatment) {
       return round(reconciliation.categories.filter(function (category) { return category.treatment === treatment; })
-        .reduce(function (sum, category) { return sum + category.netTax; }, 0));
+        .reduce(function (sum, category) { return sum + category.annualTaxLiability; }, 0));
     };
     const dependableTax = treatmentTax("dependable_income");
     const returnCoveredTax = treatmentTax("return_covered");
@@ -451,7 +564,7 @@
       .reduce(function (sum, category) { return sum + category.grossAmount; }, 0));
     const afterTaxDependableIncome = round(Math.max(0, grossDependableIncome - dependableTax));
     const annualTaxExpense = addAmounts([incomeExpenseTax, property.annualExpense], "retirement annual tax expense");
-    const annualTax = addAmounts([reconciliation.totalNetIncomeTax, property.uniqueAnnual], "reconciled annual tax");
+    const annualTax = addAmounts([reconciliation.totalAnnualIncomeTaxLiability, property.uniqueAnnual], "reconciled annual tax liability");
     const audit = scenarioAudit(residence, destinationWithId, homeWithId);
     const integration = {
       dependableIncomeTax: dependableTax,
@@ -482,7 +595,14 @@
       destination: destinationWithId,
       continuingHome: homeWithId,
       globalReconciliation: reconciliation,
-      totals: { annualTax: annualTax, oneTimeTaxes: property.oneTime, grossDependableIncome: grossDependableIncome, afterTaxDependableIncome: afterTaxDependableIncome },
+      totals: {
+        annualTax: annualTax,
+        annualIncomeTaxLiability: reconciliation.totalAnnualIncomeTaxLiability,
+        annualPropertyTaxLiability: property.uniqueAnnual,
+        oneTimeTaxes: property.oneTime,
+        grossDependableIncome: grossDependableIncome,
+        afterTaxDependableIncome: afterTaxDependableIncome
+      },
       retirementIntegration: integration,
       taxAdjustedCapitalInput: projection.input,
       retirementProjection: Object.assign({ branchId: id }, projection),
@@ -579,12 +699,44 @@
     return { enabled: key === "destination" ? undefined : true, incomeCategories: credits.categories, credits: credits, property: aggregateProperty(scenarios, key) };
   }
 
+  function scenarioTuple(scenario) {
+    return {
+      scenarioId: scenario.id,
+      branchIdentity: scenario.branchIdentity,
+      annualTax: scenario.totals.annualTax,
+      annualTaxComponents: {
+        incomeTaxLiability: scenario.totals.annualIncomeTaxLiability,
+        propertyTaxLiability: scenario.totals.annualPropertyTaxLiability
+      },
+      oneTimeTaxes: scenario.totals.oneTimeTaxes,
+      grossDependableIncome: scenario.totals.grossDependableIncome,
+      afterTaxDependableIncome: scenario.totals.afterTaxDependableIncome,
+      dependableIncomeTax: scenario.retirementIntegration.dependableIncomeTax,
+      returnCoveredTax: scenario.retirementIntegration.returnCoveredTax,
+      livingCostCoveredTax: scenario.retirementIntegration.livingCostCoveredTax,
+      annualTaxExpense: scenario.retirementIntegration.annualTaxExpense,
+      totalDomesticLiability: scenario.globalReconciliation.totalDomesticLiability,
+      totalExternalSourceLiability: scenario.globalReconciliation.totalExternalSourceLiability,
+      totalGrossTaxLiability: scenario.globalReconciliation.totalGrossTaxLiability,
+      totalTaxPayments: scenario.globalReconciliation.totalTaxPayments,
+      totalTaxPaymentsApplied: scenario.globalReconciliation.totalTaxPaymentsApplied,
+      totalExcessTaxPayments: scenario.globalReconciliation.totalExcessTaxPayments,
+      totalCreditApplied: scenario.globalReconciliation.totalCreditApplied,
+      totalAnnualIncomeTaxLiability: scenario.globalReconciliation.totalAnnualIncomeTaxLiability,
+      totalRemainingBalanceDue: scenario.globalReconciliation.totalRemainingBalanceDue
+    };
+  }
+
   function aggregateReconciliation(scenarios) {
     if (scenarios.length === 1) return scenarios[0].globalReconciliation;
-    const fields = ["totalDomesticLiability", "totalUniqueWithholding", "totalCreditClaimed", "totalCreditApplied", "totalNetIncomeTax"];
-    const result = { status: "conditional", branches: scenarios.map(function (scenario) { return { scenarioId: scenario.id, reconciliation: scenario.globalReconciliation }; }) };
+    const fields = ["totalDomesticLiability", "totalExternalSourceLiability", "totalGrossTaxLiability", "totalTaxPayments", "totalTaxPaymentsApplied", "totalExcessTaxPayments", "totalUniqueWithholding", "totalCreditClaimed", "totalCreditApplied", "totalAnnualIncomeTaxLiability", "totalRemainingBalanceDue", "totalNetIncomeTax"];
+    const result = {
+      status: "conditional",
+      branches: scenarios.map(function (scenario) { return { scenarioId: scenario.id, reconciliation: scenario.globalReconciliation }; }),
+      scenarioTuples: scenarios.map(scenarioTuple)
+    };
     fields.forEach(function (field) { result[field] = rangeOf(scenarios.map(function (scenario) { return scenario.globalReconciliation[field]; }), "global reconciliation " + field); });
-    result.withholdings = unique(scenarios.flatMap(function (scenario) { return scenario.globalReconciliation.withholdings.map(function (item) { return item.identity; }); }));
+    result.paymentIdentities = unique(scenarios.flatMap(function (scenario) { return scenario.globalReconciliation.payments.map(function (item) { return item.identity; }); }));
     return result;
   }
 
@@ -632,9 +784,15 @@
         homeProperties.forEach(function (homeProperty, homeIndex) {
           const destinationFacts = destinationProperty.assumedFacts || {};
           const homeFacts = homeProperty && homeProperty.assumedFacts || {};
-          if (!compatibleFacts(destinationFacts, homeFacts)) return;
+          const destinationFactSet = propertyFactSet("destination", profile.destination.property, destinationFacts);
+          const homeFactSet = propertyFactSet("continuing_home", profile.continuingHome && profile.continuingHome.property || {}, homeFacts);
+          if (!compatibleSharedFacts(destinationFactSet.shared, homeFactSet.shared)) return;
           const id = [seed.id, "destination-property-" + destinationIndex, "home-property-" + homeIndex].join("|");
-          const identity = Object.assign({}, seed.identity, { destinationPropertyFacts: destinationFacts, continuingHomePropertyFacts: homeFacts });
+          const identity = Object.assign({}, seed.identity, {
+            destinationPropertyFacts: destinationFactSet.namespaced,
+            continuingHomePropertyFacts: homeFactSet.namespaced,
+            sharedPropertyFacts: Object.assign({}, destinationFactSet.shared, homeFactSet.shared)
+          });
           const destination = Object.assign({}, seed.destination, { property: destinationProperty });
           const home = seed.continuingHome.enabled ? Object.assign({}, seed.continuingHome, { property: homeProperty }) : disabledHome();
           scenarios.push(scenarioResult(id, identity, seed.residence, destination, home, canonical, profile.retirement));
@@ -668,6 +826,7 @@
       destination: destination,
       continuingHome: home,
       scenarios: scenarios,
+      scenarioTuples: scenarios.map(scenarioTuple),
       globalReconciliation: globalReconciliation,
       totals: { annualTax: total("annualTax"), oneTimeTaxes: total("oneTimeTaxes"), grossDependableIncome: total("grossDependableIncome"), afterTaxDependableIncome: total("afterTaxDependableIncome") },
       afterTaxReturnBasis: { rate: profile.retirement.selectedAfterTaxReturn, basis: profile.retirement.returnBasis, formula: "User-selected portfolio return after fees and tax." },

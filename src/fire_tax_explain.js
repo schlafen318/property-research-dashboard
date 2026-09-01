@@ -23,7 +23,7 @@
   }
 
   function auditLine(input) {
-    return Object.assign({
+    const line = Object.assign({
       key: input.key,
       label: input.label,
       currency: input.currency,
@@ -33,28 +33,61 @@
       confidence: input.confidence,
       ruleIds: unique(input.ruleIds),
       sourceIds: unique(input.sourceIds),
-      taxYear: input.taxYear
+      taxYear: input.taxYear,
+      branchIds: unique(input.branchIds)
     }, amountField(input.value));
+    if (record(input.endpointScenarioIds)) line.endpointScenarioIds = input.endpointScenarioIds;
+    return line;
   }
 
-  function categoryLine(category, jurisdictionLabel, result) {
-    if (category.status === "out_of_scope" || category.netTax === null) return null;
-    return auditLine({
-      key: jurisdictionLabel + "_" + category.category,
-      label: jurisdictionLabel + " — " + category.category.replace(/_/g, " "),
-      value: category.netTax,
-      currency: category.currency,
-      formula: category.formula + "; " + (category.creditFormula || "no foreign-tax credit applied"),
-      assumptions: (category.assumptions || []).concat(category.creditAssumptions || []),
-      exclusions: ["Property lifecycle charges and non-tax costs are calculated separately."],
-      confidence: category.confidence,
-      ruleIds: (category.ruleIds || []).concat(category.creditRuleIds || []),
-      sourceIds: (category.sourceIds || []).concat(category.creditSourceIds || []),
-      taxYear: category.taxYear
+  function allScenarioIds(result) {
+    return (result.scenarioTuples || []).map(function (item) { return item.scenarioId; });
+  }
+
+  function endpointScenarioIds(result, field, value) {
+    if (!record(value)) return undefined;
+    const tuples = result.scenarioTuples || [];
+    return {
+      minimum: tuples.filter(function (tuple) { return tuple[field] === value.minimum; }).map(function (tuple) { return tuple.scenarioId; }),
+      maximum: tuples.filter(function (tuple) { return tuple[field] === value.maximum; }).map(function (tuple) { return tuple.scenarioId; })
+    };
+  }
+
+  function expandedBranchIds(result, branchId) {
+    return allScenarioIds(result).filter(function (scenarioId) {
+      return scenarioId === branchId || scenarioId.indexOf(branchId + "|") === 0;
     });
   }
 
-  function propertyLines(property, jurisdictionLabel) {
+  function branchEndpointIds(result, branches, field, value) {
+    if (!record(value) || !Array.isArray(branches)) return undefined;
+    const ids = function (endpoint) {
+      return unique(branches.filter(function (branch) { return branch[field] === value[endpoint]; })
+        .flatMap(function (branch) { return expandedBranchIds(result, branch.branchId); }));
+    };
+    return { minimum: ids("minimum"), maximum: ids("maximum") };
+  }
+
+  function categoryLine(category, jurisdictionLabel, result) {
+    if (category.status === "out_of_scope" || category.domesticTax === null) return null;
+    return auditLine({
+      key: jurisdictionLabel + "_" + category.category,
+      label: jurisdictionLabel + " domestic liability — " + category.category.replace(/_/g, " "),
+      value: category.domesticTax,
+      currency: category.currency,
+      formula: category.formula + "; matching tax payments and foreign-tax credits are allocated only in the global reconciliation",
+      assumptions: category.assumptions || [],
+      exclusions: ["Tax payments, foreign-tax credits, property lifecycle charges, and non-tax costs are calculated separately."],
+      confidence: category.confidence,
+      ruleIds: category.ruleIds || [],
+      sourceIds: category.sourceIds || [],
+      taxYear: category.taxYear,
+      branchIds: allScenarioIds(result),
+      endpointScenarioIds: branchEndpointIds(result, category.branches, "domesticTax", category.domesticTax)
+    });
+  }
+
+  function propertyLines(property, jurisdictionLabel, result) {
     if (!property) return [];
     if (property.status === "conditional") {
       return Object.keys(property.stages).map(function (stage) {
@@ -70,7 +103,9 @@
           confidence: property.confidence,
           ruleIds: property.ruleIds,
           sourceIds: property.sourceIds,
-          taxYear: property.taxYear
+          taxYear: property.taxYear,
+          branchIds: allScenarioIds(result),
+          endpointScenarioIds: branchEndpointIds(result, property.stages[stage].branchBreakdown, "taxTotal", value)
         });
       });
     }
@@ -87,7 +122,8 @@
           confidence: line.confidence,
           ruleIds: line.ruleIds,
           sourceIds: line.sourceIds,
-          taxYear: line.taxYear
+          taxYear: line.taxYear,
+          branchIds: allScenarioIds(result)
         });
       });
     });
@@ -99,7 +135,8 @@
       confidence: result.confidence,
       ruleIds: result.ruleIds,
       sourceIds: result.sourceIds,
-      taxYear: result.taxYear
+      taxYear: result.taxYear,
+      branchIds: allScenarioIds(result)
     };
     return {
       id: "reconciled_totals",
@@ -111,7 +148,8 @@
           value: result.totals.annualTax,
           formula: "dependable-income tax + return-covered tax + living-cost-covered property tax + added annual tax expense",
           assumptions: ["Each supported annual liability is included once across destination and continuing-home overlays."],
-          exclusions: ["One-time property taxes, tax prepayments, and non-tax costs."]
+          exclusions: ["One-time property taxes, tax payments already withheld, and non-tax costs."],
+          endpointScenarioIds: endpointScenarioIds(result, "annualTax", result.totals.annualTax)
         })),
         auditLine(Object.assign({}, shared, {
           key: "one_time_taxes",
@@ -119,7 +157,8 @@
           value: result.totals.oneTimeTaxes,
           formula: "purchase + sale + inheritance + gift tax liabilities across active jurisdictions",
           assumptions: ["Only selected active lifecycle stages are included."],
-          exclusions: ["Annual taxes, prepayments, registration fees, and other non-tax costs."]
+          exclusions: ["Annual taxes, prepayments, registration fees, and other non-tax costs."],
+          endpointScenarioIds: endpointScenarioIds(result, "oneTimeTaxes", result.totals.oneTimeTaxes)
         })),
         auditLine(Object.assign({}, shared, {
           key: "after_tax_dependable_income",
@@ -127,7 +166,8 @@
           value: result.totals.afterTaxDependableIncome,
           formula: "gross dependable income - destination and continuing-home tax assigned to dependable categories",
           assumptions: ["The selected dependable categories are not portfolio returns."],
-          exclusions: ["Portfolio income represented by the selected after-tax return and property equity."]
+          exclusions: ["Portfolio income represented by the selected after-tax return and property equity."],
+          endpointScenarioIds: endpointScenarioIds(result, "afterTaxDependableIncome", result.totals.afterTaxDependableIncome)
         }))
       ]
     };
@@ -139,7 +179,8 @@
       confidence: result.confidence,
       ruleIds: result.ruleIds,
       sourceIds: result.sourceIds,
-      taxYear: result.taxYear
+      taxYear: result.taxYear,
+      branchIds: allScenarioIds(result)
     };
     return {
       id: "retirement_integration",
@@ -151,7 +192,8 @@
           value: result.retirementIntegration.annualTaxExpense,
           formula: "annual-expense-category tax + unique property tax not already in living costs or income tax",
           assumptions: ["The explicit category and property boundaries in the detailed profile are applied."],
-          exclusions: result.retirementIntegration.exclusions
+          exclusions: result.retirementIntegration.exclusions,
+          endpointScenarioIds: endpointScenarioIds(result, "annualTaxExpense", result.retirementIntegration.annualTaxExpense)
         })),
         auditLine(Object.assign({}, shared, {
           key: "selected_after_tax_return",
@@ -164,6 +206,73 @@
           sourceIds: ["user-supplied"]
         }))
       ]
+    };
+  }
+
+  function reconciliationSection(result) {
+    const scenarios = result.scenarios || [];
+    const shared = {
+      currency: result.currency,
+      confidence: result.confidence,
+      ruleIds: result.ruleIds,
+      sourceIds: result.sourceIds,
+      taxYear: result.taxYear
+    };
+    const definitions = [
+      {
+        key: "annual_income_tax_liability",
+        label: "Annual income-tax liability",
+        field: "totalAnnualIncomeTaxLiability",
+        auditCollections: ["liabilities", "credits"],
+        formula: "gross destination and source-jurisdiction liabilities - allocated foreign-tax credits",
+        exclusions: ["Tax payments already withheld and property tax liabilities."]
+      },
+      {
+        key: "tax_payments_already_withheld",
+        label: "Tax payments already withheld",
+        field: "totalTaxPayments",
+        auditCollections: ["payments"],
+        formula: "unique source-jurisdiction withholding collected once; applied and excess amounts remain separate in the payment audit",
+        exclusions: ["Unpaid liability and foreign-tax credits."]
+      },
+      {
+        key: "foreign_tax_credits_applied",
+        label: "Foreign-tax credits applied",
+        field: "totalCreditApplied",
+        auditCollections: ["credits"],
+        formula: "foreign tax paid allocated only against the matching other-jurisdiction category liability",
+        exclusions: ["Source-jurisdiction tax payments and unused credit claims."]
+      },
+      {
+        key: "remaining_income_tax_balance",
+        label: "Remaining income-tax balance due",
+        field: "totalRemainingBalanceDue",
+        auditCollections: ["liabilities", "credits", "payments"],
+        formula: "sum of each liability after allocated foreign-tax credit and matching tax payment, floored at zero",
+        exclusions: ["Property taxes, tax overpayments, and non-tax costs."]
+      }
+    ];
+    return {
+      id: "global_reconciliation",
+      label: "Global liability, payment, and credit reconciliation",
+      lines: scenarios.flatMap(function (scenario, index) {
+        return definitions.map(function (definition) {
+          const auditItems = definition.auditCollections.flatMap(function (key) { return scenario.globalReconciliation[key] || []; });
+          const ruleIds = unique(auditItems.flatMap(function (item) { return item.ruleIds || []; }));
+          const sourceIds = unique(auditItems.flatMap(function (item) { return item.sourceIds || []; }));
+          return auditLine(Object.assign({}, shared, {
+            key: definition.key + "_scenario_" + index,
+            label: definition.label + " — " + scenario.id,
+            value: scenario.globalReconciliation[definition.field],
+            formula: definition.formula,
+            assumptions: ["This line belongs only to the complete aligned scenario " + scenario.id + "."],
+            exclusions: definition.exclusions,
+            branchIds: [scenario.id],
+            ruleIds: ruleIds.length ? ruleIds : ["no-applicable-global-allocation-rule"],
+            sourceIds: sourceIds.length ? sourceIds : ["calculation-derived"]
+          }));
+        });
+      })
     };
   }
 
@@ -181,7 +290,7 @@
       {
         id: key + "_property",
         label: label + " property tax",
-        lines: propertyLines(jurisdiction.property, label)
+        lines: propertyLines(jurisdiction.property, label, result)
       }
     ];
   }
@@ -192,7 +301,7 @@
     }
     return jurisdictionSections(result, "destination", "Destination")
       .concat(jurisdictionSections(result, "continuingHome", "Continuing home"))
-      .concat([totalsSection(result), retirementSection(result)]);
+      .concat([reconciliationSection(result), totalsSection(result), retirementSection(result)]);
   }
 
   return { explainCalculation: explainCalculation };

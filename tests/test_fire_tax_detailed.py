@@ -204,11 +204,11 @@ class DetailedFireTaxTests(unittest.TestCase):
         self.assertEqual(7_850, result["continuingHome"]["credits"]["totalNetTax"])
         self.assertEqual(64_550, result["continuingHome"]["property"]["totals"]["allTax"])
 
-        self.assertEqual(22_500, result["totals"]["annualTax"])
+        self.assertEqual(21_150, result["totals"]["annualTax"])
         self.assertEqual(114_000, result["totals"]["oneTimeTaxes"])
         self.assertEqual(33_000, result["totals"]["grossDependableIncome"])
-        self.assertEqual(8_000, result["retirementIntegration"]["dependableIncomeTax"])
-        self.assertEqual(25_000, result["totals"]["afterTaxDependableIncome"])
+        self.assertEqual(7_400, result["retirementIntegration"]["dependableIncomeTax"])
+        self.assertEqual(25_600, result["totals"]["afterTaxDependableIncome"])
         self.assertEqual(3_300, result["retirementIntegration"]["livingCostCoveredTax"])
         self.assertEqual(1_500, result["retirementIntegration"]["annualTaxExpense"])
         self.assertEqual(
@@ -229,11 +229,11 @@ class DetailedFireTaxTests(unittest.TestCase):
         self.assertEqual(0.03, capital_input["expectedPortfolioReturn"])
         self.assertEqual(1_500, capital_input["annualTaxExpenses"])
         self.assertEqual(
-            [{"amount": 25_000, "indexed": False, "inflationRate": 0}],
+            [{"amount": 25_600, "indexed": False, "inflationRate": 0}],
             capital_input["incomeStreams"],
         )
         self.assertEqual("after_fees_and_tax", projection["refined"]["returnBasis"])
-        self.assertEqual(25_000, projection["refined"]["outsideIncome"])
+        self.assertEqual(25_600, projection["refined"]["outsideIncome"])
         self.assertEqual(1_500, projection["refined"]["annualTaxExpenses"])
         self.assertEqual(0.03, projection["refined"]["expectedPortfolioReturn"])
         self.assertEqual({"minimum": 500_000, "maximum": 700_000}, projection["planningRange"])
@@ -252,6 +252,7 @@ class DetailedFireTaxTests(unittest.TestCase):
             "ruleIds",
             "sourceIds",
             "taxYear",
+            "branchIds",
         }
 
         self.assertGreaterEqual(len(sections), 5)
@@ -266,12 +267,21 @@ class DetailedFireTaxTests(unittest.TestCase):
                 self.assertTrue(line["exclusions"])
                 self.assertTrue(line["ruleIds"])
                 self.assertTrue(line["sourceIds"])
+                self.assertTrue(line["branchIds"])
+                if "amountRange" in line:
+                    self.assertEqual(
+                        {"minimum", "maximum"},
+                        set(line["endpointScenarioIds"]),
+                    )
+                    for scenario_ids in line["endpointScenarioIds"].values():
+                        self.assertTrue(scenario_ids)
+                        self.assertTrue(set(scenario_ids).issubset(line["branchIds"]))
 
         totals = next(section for section in sections if section["id"] == "reconciled_totals")
         amounts = {line["key"]: line["amount"] for line in totals["lines"]}
-        self.assertEqual(22_500, amounts["annual_tax"])
+        self.assertEqual(21_150, amounts["annual_tax"])
         self.assertEqual(114_000, amounts["one_time_taxes"])
-        self.assertEqual(25_000, amounts["after_tax_dependable_income"])
+        self.assertEqual(25_600, amounts["after_tax_dependable_income"])
 
     def test_conditional_property_result_retains_calculated_range_and_branches(self):
         payload = detailed_payload(continuing_home=False)
@@ -427,15 +437,24 @@ class DetailedFireTaxTests(unittest.TestCase):
         reconciliation = result["globalReconciliation"]
 
         self.assertEqual(17_700, reconciliation["totalDomesticLiability"])
+        self.assertEqual(1_350, reconciliation["totalTaxPayments"])
         self.assertEqual(1_350, reconciliation["totalUniqueWithholding"])
-        self.assertEqual(2_700, reconciliation["totalCreditClaimed"])
+        self.assertEqual(1_350, reconciliation["totalCreditClaimed"])
         self.assertEqual(1_350, reconciliation["totalCreditApplied"])
-        self.assertEqual(17_700, reconciliation["totalNetIncomeTax"])
-        for withholding in reconciliation["withholdings"]:
-            with self.subTest(identity=withholding["identity"]):
-                self.assertEqual(withholding["amount"], withholding["countedAmount"])
-                self.assertEqual(len(withholding["observedBy"]), 2)
-                self.assertTrue(withholding["countedOnce"])
+        self.assertEqual(16_350, reconciliation["totalAnnualIncomeTaxLiability"])
+        self.assertEqual(15_000, reconciliation["totalRemainingBalanceDue"])
+        self.assertEqual(16_350, reconciliation["totalNetIncomeTax"])
+        for payment in reconciliation["payments"]:
+            with self.subTest(identity=payment["identity"]):
+                self.assertEqual(payment["amount"], payment["appliedAmount"])
+                self.assertEqual(len(payment["observedBy"]), 2)
+                self.assertTrue(payment["countedOnce"])
+                self.assertTrue(payment["liabilityId"].startswith("continuing_home|"))
+        for credit in reconciliation["credits"]:
+            with self.subTest(target=credit["targetLiabilityId"]):
+                self.assertTrue(credit["sourceLiabilityId"].startswith("continuing_home|"))
+                self.assertTrue(credit["targetLiabilityId"].startswith("destination|"))
+                self.assertGreater(credit["appliedAmount"], 0)
 
     def test_known_split_year_is_outer_conditional_with_aligned_period_scenarios(self):
         payload = detailed_payload(continuing_home=False)
@@ -501,6 +520,130 @@ class DetailedFireTaxTests(unittest.TestCase):
         self.assertEqual("DetailedFireTaxInputError", response["error"])
         self.assertIn("home_bonus", response["message"])
         self.assertIn("coverage", response["message"].lower())
+
+    def test_source_withholding_is_payment_toward_source_liability_not_extra_tax(self):
+        payload = detailed_payload()
+        payload["rules"]["destination"]["credits"] = []
+        payload["rules"]["continuingHome"]["credits"] = []
+        result = run_detailed(payload)
+
+        dividends = next(
+            item
+            for item in result["globalReconciliation"]["categories"]
+            if item["category"] == "dividends"
+        )
+        self.assertEqual(1_800, dividends["domesticLiability"])
+        self.assertIn("taxPayments", dividends)
+        self.assertEqual(750, dividends.get("taxPayments"))
+        self.assertEqual(0, dividends["creditApplied"])
+        self.assertEqual(1_800, dividends["annualTaxLiability"])
+        self.assertEqual(1_050, dividends["remainingBalanceDue"])
+        payment = next(
+            item
+            for item in result["globalReconciliation"]["payments"]
+            if item["category"] == "dividends"
+        )
+        self.assertEqual("continuing_home|dividends|2026", payment["liabilityId"])
+        self.assertEqual(750, payment["appliedAmount"])
+
+    def test_property_unknown_facts_are_independent_without_shared_fact_id(self):
+        payload = detailed_payload()
+        payload["profile"]["destination"]["property"]["officialAssessmentBase"] = "unknown"
+        payload["profile"]["continuingHome"]["property"]["officialAssessmentBase"] = "unknown"
+        result = run_detailed(payload)
+
+        self.assertEqual(4, len(result["scenarios"]))
+        combinations = {
+            (
+                scenario["branchIdentity"]["destinationPropertyFacts"][
+                    "destination.property.officialAssessmentBase"
+                ],
+                scenario["branchIdentity"]["continuingHomePropertyFacts"][
+                    "continuing_home.property.officialAssessmentBase"
+                ],
+            )
+            for scenario in result["scenarios"]
+        }
+        self.assertEqual(4, len(combinations))
+
+    def test_valid_shared_fact_id_correlates_property_branches(self):
+        payload = detailed_payload()
+        for key in ("destination", "continuingHome"):
+            payload["profile"][key]["property"]["officialAssessmentBase"] = "unknown"
+            payload["profile"][key]["property"]["sharedFactIds"] = {
+                "officialAssessmentBase": "shared.official-assessment-base"
+            }
+        result = run_detailed(payload)
+
+        self.assertEqual(2, len(result["scenarios"]))
+        for scenario in result["scenarios"]:
+            self.assertIn("sharedPropertyFacts", scenario["branchIdentity"])
+            shared = scenario["branchIdentity"].get("sharedPropertyFacts")
+            self.assertEqual(
+                {"shared.official-assessment-base": shared["shared.official-assessment-base"]},
+                shared,
+            )
+
+    def test_invalid_shared_fact_id_is_rejected(self):
+        payload = detailed_payload()
+        payload["profile"]["destination"]["property"]["sharedFactIds"] = {
+            "officialAssessmentBase": "not valid spaces"
+        }
+        response = run_detailed(payload, expect_error=True)
+
+        self.assertFalse(response["ok"])
+        self.assertEqual("DetailedFireTaxInputError", response["error"])
+        self.assertIn("sharedFactIds", response["message"])
+
+    def test_conditional_explanations_reconcile_coherent_scenario_endpoints(self):
+        payload = detailed_payload(continuing_home=False)
+        payload["profile"]["destination"]["property"].update(
+            {"activeStages": ["inheritance"], "heirRelationship": "unknown"}
+        )
+        result = run_detailed(payload)
+        sections = explain(result)
+
+        self.assertIn("scenarioTuples", result)
+        self.assertEqual(
+            {scenario["id"] for scenario in result["scenarios"]},
+            {item["scenarioId"] for item in result.get("scenarioTuples", [])},
+        )
+        for item in result["scenarioTuples"]:
+            self.assertIn("annualTaxComponents", item)
+            self.assertEqual(
+                item["annualTax"],
+                item.get("annualTaxComponents", {}).get("incomeTaxLiability", 0)
+                + item.get("annualTaxComponents", {}).get("propertyTaxLiability", 0),
+            )
+        reconciliation = next(
+            section for section in sections if section["id"] == "global_reconciliation"
+        )
+        self.assertEqual(
+            {
+                "annual_income_tax_liability",
+                "tax_payments_already_withheld",
+                "foreign_tax_credits_applied",
+                "remaining_income_tax_balance",
+            },
+            {line["key"].rsplit("_scenario_", 1)[0] for line in reconciliation["lines"]},
+        )
+        one_time = next(
+            line
+            for section in sections
+            for line in section["lines"]
+            if line["key"] == "one_time_taxes"
+        )
+        self.assertEqual(
+            set(result["totals"]["oneTimeTaxes"].keys()),
+            set(one_time["endpointScenarioIds"].keys()),
+        )
+        tuples = {item["scenarioId"]: item for item in result["scenarioTuples"]}
+        for endpoint, scenario_ids in one_time["endpointScenarioIds"].items():
+            for scenario_id in scenario_ids:
+                self.assertEqual(
+                    result["totals"]["oneTimeTaxes"][endpoint],
+                    tuples[scenario_id]["oneTimeTaxes"],
+                )
 
 
 if __name__ == "__main__":
