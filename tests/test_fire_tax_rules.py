@@ -45,6 +45,7 @@ class FireTaxRuleContractTests(unittest.TestCase):
         self.assertEqual("hong-kong", profile["home_jurisdiction_id"])
         self.assertEqual("dubai", profile["destination_id"])
         self.assertEqual([], profile["property_lifecycle"])
+        self.assertIn("runtime_rule_graph", profile)
         self.assertNotIn("profile", profile["runtime_definition"])
         self.assertNotIn("personalized_amounts", profile["runtime_definition"])
 
@@ -58,6 +59,25 @@ class FireTaxRuleContractTests(unittest.TestCase):
 
         self.assert_path_error(errors, "supported_profiles.hong-kong-to-dubai.source_ids")
         self.assert_path_error(errors, "supported_profiles.hong-kong-to-dubai.property_lifecycle")
+
+    def test_enabled_profile_rejects_runtime_graph_source_and_formula_mutations(self):
+        missing_profile_source = copy.deepcopy(self.payload)
+        missing_profile_source["supported_profiles"]["hong-kong-to-dubai"]["source_ids"].remove("uae-individual-tax-2026")
+        missing_rule_source = copy.deepcopy(self.payload)
+        destination_income = missing_rule_source["supported_profiles"]["hong-kong-to-dubai"]["runtime_rule_graph"]["income"]["destination"]
+        destination_income["source_ids"] = []
+        broken_formula = copy.deepcopy(self.payload)
+        broken_formula["supported_profiles"]["hong-kong-to-dubai"]["runtime_rule_graph"]["income"]["destination"]["formula"] = {"operation": "invented", "operands": []}
+        broken_profile_key = copy.deepcopy(self.payload)
+        broken_profile_key["supported_profiles"]["hong-kong-to-dubai"]["runtime_rule_graph"]["income"]["destination"]["profile_keys"].pop("interest")
+        broken_rule_id = copy.deepcopy(self.payload)
+        broken_rule_id["supported_profiles"]["hong-kong-to-dubai"]["runtime_rule_graph"]["income"]["destination"]["rule_ids"]["interest"] = "invented"
+
+        self.assert_path_error(self.validate(missing_profile_source), "supported_profiles.hong-kong-to-dubai.source_ids")
+        self.assert_path_error(self.validate(missing_rule_source), "supported_profiles.hong-kong-to-dubai.runtime_rule_graph.income.destination.source_ids")
+        self.assert_path_error(self.validate(broken_formula), "supported_profiles.hong-kong-to-dubai.runtime_rule_graph.income.destination.formula")
+        self.assert_path_error(self.validate(broken_profile_key), "supported_profiles.hong-kong-to-dubai.runtime_rule_graph.income.destination.profile_keys")
+        self.assert_path_error(self.validate(broken_rule_id), "supported_profiles.hong-kong-to-dubai.runtime_rule_graph.income.destination.rule_ids")
 
     def test_enabled_profile_rejects_canned_personal_amounts(self):
         payload = copy.deepcopy(self.payload)

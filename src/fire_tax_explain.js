@@ -23,6 +23,9 @@
   }
 
   function auditLine(input) {
+    const valueField = input.valueType === "percentage"
+      ? { valueType: "percentage", percentage: input.value }
+      : amountField(input.value);
     const line = Object.assign({
       key: input.key,
       label: input.label,
@@ -35,7 +38,7 @@
       sourceIds: unique(input.sourceIds),
       taxYear: input.taxYear,
       branchIds: unique(input.branchIds)
-    }, amountField(input.value));
+    }, valueField);
     if (input.notApplicable === true) line.notApplicable = true;
     if (record(input.endpointScenarioIds)) line.endpointScenarioIds = input.endpointScenarioIds;
     return line;
@@ -244,11 +247,13 @@
           key: "selected_after_tax_return",
           label: "Selected after-tax portfolio return",
           value: result.afterTaxReturnBasis.rate,
+          valueType: "percentage",
           formula: result.afterTaxReturnBasis.formula,
           assumptions: ["Return basis is " + result.afterTaxReturnBasis.basis + "."],
           exclusions: ["Property appreciation and property equity are not liquid portfolio returns."],
           ruleIds: ["user-selected-after-tax-return"],
-          sourceIds: ["user-supplied"]
+          sourceIds: ["user-supplied"],
+          confidence: "user_supplied/not_assessed"
         }))
       ]
     };

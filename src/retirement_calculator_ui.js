@@ -287,6 +287,21 @@
     return Boolean(input && input.enabledMarker === "true");
   }
 
+  function detailedPlanningCases(scenarioResults, fallbackResult) {
+    const keys = ["favorable", "central", "adverse"];
+    const fallbackCapital = Number(fallbackResult && fallbackResult.totalNeededToday);
+    return {
+      status: scenarioResults && scenarioResults.central ? "broad_tax_adjusted" : "current_plan_baseline",
+      cases: Object.fromEntries(keys.map(function (key) {
+        const row = scenarioResults && scenarioResults[key];
+        const capital = row ? Number(row.requiredCapital) : fallbackCapital;
+        const tax = row ? Number(row.annualTaxReserve) : 0;
+        if (!Number.isFinite(capital) || !Number.isFinite(tax)) throw new Error("Current planning cases require finite live calculator amounts");
+        return [key, { label: key.charAt(0).toUpperCase() + key.slice(1), annualTaxReserve: tax, requiredCapital: capital }];
+      })),
+    };
+  }
+
   function taxAuditEntries(input) {
     const labels = {
       taxReserve: "Tax reserve",
@@ -1416,6 +1431,8 @@
       try {
         const taxScenario = estimateTaxScenario();
         if (taxScenario.status === "unavailable") {
+          const baseResult = calculatorEngine().calculateRetirement(calculatorInput());
+          el("ret-tax-refine").dataset.planningCases = JSON.stringify(detailedPlanningCases({}, baseResult));
           latestResult = null;
           latestTaxScenario = taxScenario;
           latestScenarioResults = {};
@@ -1433,6 +1450,7 @@
           ? scenarioResults.user_after_tax.result
           : scenarioResults.central.result;
         el("ret-today-section").hidden = false;
+        el("ret-tax-refine").dataset.planningCases = JSON.stringify(detailedPlanningCases(scenarioResults, result));
         render(result, taxScenario, scenarioResults);
         if (event) track("retirement_calculator_calculate");
       } catch (error) {
@@ -1570,6 +1588,7 @@
     wealthTaxRelevant: wealthTaxRelevant,
     taxResultPresentation: taxResultPresentation,
     detailedRefineAvailable: detailedRefineAvailable,
+    detailedPlanningCases: detailedPlanningCases,
     taxAuditEntries: taxAuditEntries,
     auditEvidencePresentation: auditEvidencePresentation,
     calculateTaxAdjustedScenarios: calculateTaxAdjustedScenarios,

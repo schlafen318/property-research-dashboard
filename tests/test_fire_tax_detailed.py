@@ -290,7 +290,8 @@ class DetailedFireTaxTests(unittest.TestCase):
         for line in lines:
             with self.subTest(label=line.get("label")):
                 self.assertTrue(required.issubset(line))
-                self.assertNotEqual(bool("amount" in line), bool("amountRange" in line))
+                value_fields = [field for field in ("amount", "amountRange", "percentage") if field in line]
+                self.assertEqual(1, len(value_fields))
                 self.assertTrue(line["formula"])
                 self.assertTrue(line["assumptions"])
                 self.assertTrue(line["exclusions"])
@@ -305,6 +306,13 @@ class DetailedFireTaxTests(unittest.TestCase):
                     for scenario_ids in line["endpointScenarioIds"].values():
                         self.assertTrue(scenario_ids)
                         self.assertTrue(set(scenario_ids).issubset(line["branchIds"]))
+
+        return_line = next(line for line in lines if line["key"] == "selected_after_tax_return")
+        self.assertEqual("percentage", return_line["valueType"])
+        self.assertEqual(0.03, return_line["percentage"])
+        self.assertEqual("user_supplied/not_assessed", return_line["confidence"])
+        self.assertNotIn("amount", return_line)
+        self.assertNotIn("amountRange", return_line)
 
         totals = next(section for section in sections if section["id"] == "reconciled_totals")
         amounts = {line["key"]: line["amount"] for line in totals["lines"]}

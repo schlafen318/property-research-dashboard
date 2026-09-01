@@ -47,36 +47,6 @@
     return settledFacts.every(function (value) { return value === "no"; }) ? "not_resident" : "unresolved";
   }
 
-  function hongKongTreatyOutcome(facts) {
-    facts = record(facts) ? facts : {};
-    const domestic = hongKongDomesticResidence(facts);
-    if (domestic === "incomplete" || domestic === "unresolved") return domestic;
-    if (domestic === "not_resident") return "not_dual";
-    const hkHome = facts.permanentHomeHongKong, uaeHome = facts.permanentHomeUae;
-    if (!["yes", "no", "not_sure"].includes(hkHome) || !["yes", "no", "not_sure"].includes(uaeHome)) return "incomplete";
-    if (hkHome === "not_sure" || uaeHome === "not_sure") return "unresolved";
-    if (hkHome === "no" && uaeHome === "yes") return "uae";
-    if (hkHome === "yes" && uaeHome === "no") return "hong_kong";
-    if (hkHome === "yes" && uaeHome === "yes") {
-      const personal = facts.closestPersonalRelations, economic = facts.closestEconomicRelations;
-      const choices = ["uae", "hong_kong", "equal", "not_sure"];
-      if (!choices.includes(personal) || !choices.includes(economic)) return "incomplete";
-      if (personal === "not_sure" || economic === "not_sure") return "unresolved";
-      if (personal === "uae" && economic === "uae") return "uae";
-      if (personal === "hong_kong" && economic === "hong_kong") return "hong_kong";
-    }
-    const habitual = facts.habitualAbode;
-    if (!["uae", "hong_kong", "both", "neither", "not_sure"].includes(habitual)) return "incomplete";
-    if (habitual === "not_sure") return "unresolved";
-    if (habitual === "uae" || habitual === "hong_kong") return habitual;
-    const hkRight = facts.hongKongRightOfAbode, uaeNational = facts.uaeNational;
-    if (!["yes", "no", "not_sure"].includes(hkRight) || !["yes", "no", "not_sure"].includes(uaeNational)) return "incomplete";
-    if (hkRight === "not_sure" || uaeNational === "not_sure") return "unresolved";
-    if (hkRight === "no" && uaeNational === "yes") return "uae";
-    if (hkRight === "yes" && uaeNational === "no") return "hong_kong";
-    return "unresolved";
-  }
-
   function profileAccess(destinationId, payload, profile, facts) {
     const homeId = record(profile) && typeof profile.homeJurisdictionId === "string" ? profile.homeJurisdictionId : "";
     if (!homeId) return { available: false, reason: "Choose your home tax jurisdiction before using exact refinement." };
@@ -84,10 +54,11 @@
     if (!record(definition) || definition.detailed_enabled !== true) return { available: false, reason: "Complete current rules do not yet cover this destination together with your home tax jurisdiction." };
     if (definition.synthetic === true) return { available: false, reason: "Synthetic rules cannot be used for a personal estimate." };
     const requiredIncome = ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting"];
-    const capabilities = { supported_activity_types: ["retired_or_employee"], supported_retirement_accounts: ["personal_investment"], supported_housing_plans: ["rent"] };
+    const capabilities = { supported_activity_types: ["retired_nonworking"], supported_retirement_accounts: ["personal_investment"], supported_housing_plans: ["rent"] };
     const runtime = definition.runtime_definition;
     if (definition.tax_year !== payload.tax_year || !record(runtime) || runtime.factory !== "hong-kong-to-dubai-v1" ||
       Object.keys(capabilities).some(function (key) { return !Array.isArray(runtime[key]) || runtime[key].length !== capabilities[key].length || runtime[key].some(function (value) { return !capabilities[key].includes(value); }); }) ||
+      !record(definition.runtime_rule_graph) || definition.runtime_rule_graph.schema_version !== 1 ||
       !requiredIncome.every(function (category) { return (definition.income_categories || []).includes(category); }) ||
       !Array.isArray(definition.property_lifecycle) || definition.property_lifecycle.length !== 0) {
       return { available: false, reason: "The validated rule coverage for this exact profile is incomplete." };
@@ -106,13 +77,14 @@
       if (facts.daysInDestination < 183) return { available: false, reason: "This exact profile requires at least 183 days in the UAE during the relevant 12-month period." };
       if (facts.explicitReturnProvided === false) return { available: false, reason: "Enter the required after-fees-and-tax portfolio return before exact refinement." };
       if (facts.requireCompleteEligibility === true && (facts.explicitReturnProvided !== true || !Number.isFinite(Number(facts.selectedAfterTaxReturn)) || Number(facts.selectedAfterTaxReturn) <= -1 || Number(facts.selectedAfterTaxReturn) > 1)) return { available: false, reason: "A finite after-fees-and-tax portfolio return is required for exact refinement." };
-      const treatyOutcome = hongKongTreatyOutcome(facts);
-      if (treatyOutcome === "hong_kong") return { available: false, reason: "These treaty facts point to Hong Kong rather than the UAE, which is outside this narrow exact profile." };
-      if (treatyOutcome === "unresolved") return { available: false, reason: "The Hong Kong–UAE treaty outcome is uncertain from these facts, so exact refinement is unavailable." };
-      if (facts.requireCompleteEligibility === true && treatyOutcome === "incomplete") return { available: false, reason: "Complete the factual Hong Kong–UAE residence questions before exact refinement." };
+      const hongKongResidence = hongKongDomesticResidence(facts);
+      if (hongKongResidence === "resident") return { available: false, reason: "This narrow exact profile is unavailable when the supported facts indicate Hong Kong residence or possible dual residence." };
+      if (hongKongResidence === "unresolved") return { available: false, reason: "Hong Kong residence remains possible or uncertain from these facts, so exact refinement is unavailable." };
+      if (facts.requireCompleteEligibility === true && hongKongResidence === "incomplete") return { available: false, reason: "Complete the factual Hong Kong residence questions before exact refinement." };
       if (facts.hasHongKongSourceIncome === true) return { available: false, reason: "Hong Kong-source income requires a broader Hong Kong calculation than this profile supports." };
       if (facts.hasHongKongProperty === true) return { available: false, reason: "A continuing Hong Kong property requires the Hong Kong property lifecycle overlay." };
-      if (facts.activityType && !runtime.supported_activity_types.includes(facts.activityType)) return { available: false, reason: "UAE business or consulting activity requires the natural-person corporate-tax branch." };
+      if (facts.activityType && !runtime.supported_activity_types.includes(facts.activityType)) return { available: false, reason: "This exact profile is limited to a retired, nonworking period with no employment, business or consulting activity." };
+      if (Number(facts.annualEmploymentIncome || facts.annualEmploymentConsulting || facts.employmentConsulting || 0) > 0) return { available: false, reason: "This exact profile is limited to a retired, nonworking period; UAE salary, employment, business and consulting amounts must be zero." };
       if (facts.retirementAccountClassification && !runtime.supported_retirement_accounts.includes(facts.retirementAccountClassification)) return { available: false, reason: "This profile covers ordinary personal investments, not retirement-scheme withdrawals." };
       if (facts.dependableIncomeIndexingCompatible === false) return { available: false, reason: "This exact retirement projection currently requires all non-zero dependable income to use the same inflation-linking choice." };
       if (facts.exitPlan || facts.propertyType || facts.financingType || facts.giftRelationship) return { available: false, reason: "Owned-property lifecycle facts are outside this renter-only exact profile." };
@@ -152,7 +124,7 @@
       retirementAccountWithdrawal: Number(planningFacts.annualWithdrawals || 0),
       retirementAccountClassification: answers.retirementAccountClassification || "personal_investment",
       rentalIncome: Number(planningFacts.annualRentalIncome || 0),
-      employmentConsulting: Number(answers.annualEmploymentIncome || 0),
+      employmentConsulting: 0,
       incomeSourceJurisdictions: {
         private_pension: source, government_pension: source, social_security: source,
         dividends: source, interest: source, realized_gains: source,
@@ -183,10 +155,9 @@
     };
     return {
       residence: {
-        taxYear: year, daysInDestination: Number(answers.daysInDestination), destinationAvailableHome: answers.permanentHomeUae === "yes",
-        daysInHome: Number(answers.daysInHome), homeAvailableHome: answers.permanentHomeHongKong === "yes", homeTreatyResident: false,
-        familyTies: answers.closestPersonalRelations === "uae" ? "destination" : answers.closestPersonalRelations === "hong_kong" ? "home" : answers.closestPersonalRelations === "equal" ? "both" : "unknown",
-        economicTies: answers.closestEconomicRelations === "uae" ? "destination" : answers.closestEconomicRelations === "hong_kong" ? "home" : answers.closestEconomicRelations === "equal" ? "both" : "unknown", splitYear: false,
+        taxYear: year, daysInDestination: Number(answers.daysInDestination), destinationAvailableHome: false,
+        daysInHome: Number(answers.daysInHome), homeAvailableHome: false, homeTreatyResident: false,
+        familyTies: "unknown", economicTies: "unknown", splitYear: false,
       },
       destination: { income: income, property: property },
       continuingHome: { enabled: false },
@@ -259,6 +230,18 @@
     }).join(", ");
   }
 
+  function auditValueText(line, currency) {
+    if (line.notApplicable === true) return "N/A";
+    if (line.valueType === "percentage") {
+      const percentage = Number(line.percentage);
+      if (!Number.isFinite(percentage)) return "—";
+      return new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(percentage * 100) + "%";
+    }
+    if (line.amountRange !== undefined) return amountText(line.amountRange, line.currency || currency);
+    if (line.amount !== undefined) return amountText(line.amount, line.currency || currency);
+    return "—";
+  }
+
   function resultMarkup(result, auditSections, sources) {
     if (!record(result) || !record(result.totals)) return '<p role="status" aria-live="polite">A refined result is not available.</p>';
     const currency = result.currency || "";
@@ -266,7 +249,7 @@
     const branchLabel = function (scenario) {
       const identity = record(scenario.branchIdentity) ? scenario.branchIdentity : {};
       const labels = {
-        likely_destination_resident: "UAE treaty outcome; Hong Kong source basis",
+        likely_destination_resident: "UAE domestic 183-day route; not a Hong Kong resident",
         likely_home_resident: "Hong Kong resident",
         dual_resident_treaty_destination: "Treaty resident in the UAE",
         unresolved: "Residence facts unresolved",
@@ -275,7 +258,12 @@
     };
     const scenarios = Array.isArray(result.scenarios) && result.scenarios.length ? result.scenarios : [{ id: "calculated", totals: result.totals, retirementProjection: projection, destination: result.destination }];
     const rows = [];
-    if (projection.planningRange) rows.push(["Current broad planning estimate", null, null, null, null, projection.planningRange]);
+    if (record(projection.planningRange) && record(projection.planningRange.cases)) {
+      ["favorable", "central", "adverse"].forEach(function (key) {
+        const planningCase = projection.planningRange.cases[key];
+        if (record(planningCase)) rows.push(["Current " + key + " planning case", planningCase.annualTaxReserve, null, null, null, planningCase.requiredCapital]);
+      });
+    } else if (projection.planningRange) rows.push(["Current broad planning estimate", null, null, null, null, projection.planningRange]);
     scenarios.forEach(function (scenario) {
       const property = record(scenario.destination) && record(scenario.destination.property) ? scenario.destination.property : record(result.destination) ? result.destination.property : null;
       const stages = record(property) && record(property.stages) ? property.stages : {};
@@ -288,7 +276,7 @@
     });
     const sourceById = Object.fromEntries((sources || []).filter(record).map(function (source) { return [source.id, source]; }));
     const audit = (auditSections || []).flatMap(function (section) { return Array.isArray(section.lines) ? section.lines : []; }).map(function (line) {
-      return '<article><h4>' + escapeHtml(line.label) + '</h4><p>' + (line.notApplicable === true ? "N/A" : amountText(line.value, currency)) + " · " + escapeHtml(line.formula) + '</p><p class="hint">Assumptions: ' + escapeHtml((line.assumptions || []).join("; ") || "None") + ". Exclusions: " + escapeHtml((line.exclusions || []).join("; ") || "None") + ". Confidence: " + escapeHtml(line.confidence) + ". Tax year: " + escapeHtml(line.taxYear || result.taxYear) + ". Rules: " + escapeHtml((line.ruleIds || []).join(", ")) + ". Sources: " + sourceLinks(line.sourceIds, sourceById) + "</p></article>";
+      return '<article><h4>' + escapeHtml(line.label) + '</h4><p>' + auditValueText(line, currency) + " · " + escapeHtml(line.formula) + '</p><p class="hint">Assumptions: ' + escapeHtml((line.assumptions || []).join("; ") || "None") + ". Exclusions: " + escapeHtml((line.exclusions || []).join("; ") || "None") + ". Confidence: " + escapeHtml(line.confidence) + ". Tax year: " + escapeHtml(line.taxYear || result.taxYear) + ". Rules: " + escapeHtml((line.ruleIds || []).join(", ")) + ". Sources: " + sourceLinks(line.sourceIds, sourceById) + "</p></article>";
     }).join("");
     const propertyNote = rows.some(function (row) { return row.some(function (value) { return record(value) && value.notApplicable === true; }); }) ? '<p>Owned-property calculation not applicable; include renter municipal/housing fees in annual spending.</p>' : "";
     return '<div><div class="table-wrap"><table class="result-table"><caption>Reconciled tax, income, property costs and capital</caption><thead><tr><th scope="col">Calculated branch</th><th scope="col">Annual tax</th><th scope="col">After-tax dependable income</th><th scope="col">Annual property fees</th><th scope="col">Lifecycle registration fees</th><th scope="col">Capital needed today</th></tr></thead><tbody>' + rows.map(function (row) { return '<tr><th scope="row">' + escapeHtml(row[0]) + "</th>" + row.slice(1).map(function (value) { return "<td>" + (record(value) && value.notApplicable === true ? "N/A" : amountText(value, currency)) + "</td>"; }).join("") + "</tr>"; }).join("") + "</tbody></table></div>" + propertyNote + '<details><summary>Calculation details and official sources</summary>' + audit + "</details></div>";
@@ -352,49 +340,20 @@
       if (pending.length) return pending;
     }
     const domesticOutcome = hongKongDomesticResidence(answers);
-    if (domesticOutcome === "incomplete" || domesticOutcome === "unresolved") return [];
-    if (domesticOutcome === "resident") {
-      pending = [
-        { id: "permanent-home-hk", fact: "permanentHomeHongKong", control: "radio", label: "Will a permanent home be available to you in Hong Kong?", reason: "The treaty first compares permanent homes available in each place.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
-        { id: "permanent-home-uae", fact: "permanentHomeUae", control: "radio", label: "Will a permanent home be available to you in the UAE?", reason: "The treaty first compares permanent homes available in each place.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
-      ].filter(function (question) { return !has(question.fact); });
-      if (pending.length) return pending;
-      if (answers.permanentHomeHongKong === "yes" && answers.permanentHomeUae === "yes") {
-        pending = [
-          { id: "personal-relations", fact: "closestPersonalRelations", control: "radio", label: "Where will your closest personal and family relationships be?", reason: "This is the personal-relations part of the treaty's centre-of-vital-interests test.", acceptedValues: ["uae", "hong_kong", "equal", "not_sure"], options: [option("uae", "UAE"), option("hong_kong", "Hong Kong"), option("equal", "About equal"), option("not_sure", "Not sure")] },
-          { id: "economic-relations", fact: "closestEconomicRelations", control: "radio", label: "Where will your closest economic relationships be?", reason: "This is the economic-relations part of the treaty's centre-of-vital-interests test.", acceptedValues: ["uae", "hong_kong", "equal", "not_sure"], options: [option("uae", "UAE"), option("hong_kong", "Hong Kong"), option("equal", "About equal"), option("not_sure", "Not sure")] },
-        ].filter(function (question) { return !has(question.fact); });
-        if (pending.length) return pending;
-      }
-      const afterCentre = hongKongTreatyOutcome(answers);
-      if (afterCentre === "incomplete") return [{ id: "habitual-abode", fact: "habitualAbode", control: "radio", label: "Where will you habitually live?", reason: "The treaty uses habitual abode when permanent home or closest-relations facts do not decide residence.", acceptedValues: ["uae", "hong_kong", "both", "neither", "not_sure"], options: [option("uae", "UAE"), option("hong_kong", "Hong Kong"), option("both", "Both"), option("neither", "Neither"), option("not_sure", "Not sure")] }];
-      if (["both", "neither"].includes(answers.habitualAbode)) {
-        pending = [
-          { id: "hk-right-of-abode", fact: "hongKongRightOfAbode", control: "radio", label: "Do you have the right of abode in Hong Kong?", reason: "This is the next treaty tie-breaker when habitual abode is both or neither.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
-          { id: "uae-national", fact: "uaeNational", control: "radio", label: "Are you a UAE national?", reason: "This is the corresponding UAE fact in the treaty tie-breaker.", acceptedValues: ["no", "yes", "not_sure"], options: yesNoUnsure },
-        ].filter(function (question) { return !has(question.fact); });
-        if (pending.length) return pending;
-      }
-    }
-    const treatyOutcome = hongKongTreatyOutcome(answers);
-    if (!["not_dual", "uae"].includes(treatyOutcome)) return [];
+    if (domesticOutcome !== "not_resident") return [];
     const eligibility = [
       { id: "hong-kong-source-income", fact: "hasHongKongSourceIncome", control: "radio", label: "Will any income come from Hong Kong services, business, property, or a Hong Kong pension fund?", reason: "Hong Kong taxes relevant Hong Kong-source income even for non-residents.", acceptedValues: [false, true], options: yesNo },
       { id: "hong-kong-property", fact: "hasHongKongProperty", control: "radio", label: "Will you keep any Hong Kong property?", reason: "A Hong Kong property needs its own complete property lifecycle calculation.", acceptedValues: [false, true], options: yesNo },
-      { id: "activity-type", fact: "activityType", control: "radio", label: "Which work situation will apply in the UAE?", reason: "Salary is separate from natural-person business or consulting activity.", acceptedValues: ["retired_or_employee", "business_or_consulting"], options: [option("retired_or_employee", "Retired or employee only"), option("business_or_consulting", "I run a business or provide consulting services")] },
     ];
     const unansweredEligibility = eligibility.filter(function (question) { return !has(question.fact); });
     if (unansweredEligibility.length || eligibility.some(function (question) {
       return question.fact === "hasHongKongSourceIncome" && answers[question.fact] === true ||
-        question.fact === "hasHongKongProperty" && answers[question.fact] === true ||
-        question.fact === "activityType" && answers[question.fact] === "business_or_consulting";
+        question.fact === "hasHongKongProperty" && answers[question.fact] === true;
     })) return unansweredEligibility;
     const money = function (id, fact, label, reason) { return { id: id, fact: fact, control: "number", label: label, reason: reason, acceptedValues: { min: 0, max: 1000000000, step: 1, integer: false } }; };
     const advanced = [
-      { id: "retirement-account", fact: "retirementAccountClassification", control: "select", label: "What type of account funds the portfolio withdrawals?", reason: "This profile supports ordinary personal investments, not Hong Kong retirement-scheme withdrawals.", acceptedValues: ["personal_investment", "hong_kong_retirement_scheme", "other_retirement_account"], options: [option("personal_investment", "Ordinary personal investments"), option("hong_kong_retirement_scheme", "Hong Kong MPF or retirement scheme"), option("other_retirement_account", "Another retirement account")] },
-      money("employment-income", "annualEmploymentIncome", "Annual UAE employment salary", "Salary is explicitly separated from business and consulting turnover."),
+      { id: "retirement-account", fact: "retirementAccountClassification", control: "select", label: "What type of account funds the portfolio withdrawals?", reason: "This retired, nonworking profile supports ordinary personal investments, not employment income or retirement-scheme withdrawals.", acceptedValues: ["personal_investment", "hong_kong_retirement_scheme", "other_retirement_account"], options: [option("personal_investment", "Ordinary personal investments"), option("hong_kong_retirement_scheme", "Hong Kong MPF or retirement scheme"), option("other_retirement_account", "Another retirement account")] },
     ];
-    if (Number(answers.annualEmploymentIncome || 0) > 0) advanced.push({ id: "added-income-indexed", fact: "detailedIncomeIndexed", control: "radio", label: "Will that employment income rise with inflation?", reason: "Inflation linking changes the retirement capital calculation.", acceptedValues: [false, true], options: yesNo });
     if (Number(planningFacts && planningFacts.propertyPrice || 0) > 0) {
       advanced.push(
         { id: "financing-type", fact: "financingType", control: "radio", label: "How will you fund the Dubai purchase?", reason: "A mortgage adds registration and lender fees outside this narrow profile.", acceptedValues: ["cash", "mortgage"], options: [option("cash", "Cash purchase"), option("mortgage", "Mortgage or other property financing")] },
@@ -423,11 +382,9 @@
     if (!record(input)) throw new TypeError("Detailed refinement input is required");
     if (record(input.uiPayload) && record(input.uiPayload.supported_profiles)) {
       if (!record(input.planningFacts)) throw new TypeError("Live planning facts are required");
-      const detailedIncomeActive = Number(input.answers && input.answers.annualEmploymentIncome || 0) > 0;
-      const addedMismatch = detailedIncomeActive && input.planningFacts && input.planningFacts.hasLiveDependableIncome === true && input.answers.detailedIncomeIndexed !== input.planningFacts.dependableIncomeIndexed;
       const eligibilityFacts = Object.assign({}, input.answers || {}, input.planningFacts, {
         giftValuationAed: Number(input.answers && input.answers.expectedGiftValuation || 0) * Number(input.planningFacts && input.planningFacts.aedPerCurrency || 0),
-        dependableIncomeIndexingCompatible: input.planningFacts && input.planningFacts.dependableIncomeIndexingCompatible !== false && !addedMismatch,
+        dependableIncomeIndexingCompatible: input.planningFacts && input.planningFacts.dependableIncomeIndexingCompatible !== false,
         requireCompleteEligibility: true,
       });
       const access = profileAccess(input.destinationId, input.uiPayload, { homeJurisdictionId: input.homeJurisdictionId }, eligibilityFacts);
@@ -489,6 +446,13 @@
         { amount: number("ret-rental-income"), indexed: field("ret-rental-indexed") && field("ret-rental-indexed").checked },
       ].filter(function (item) { return item.amount > 0; });
       const indexChoices = Array.from(new Set(dependable.map(function (item) { return item.indexed === true; })));
+      let planningRange = null;
+      try {
+        const parsed = JSON.parse(button.dataset.planningCases || "null");
+        if (record(parsed) && record(parsed.cases)) planningRange = parsed;
+      } catch (error) {
+        planningRange = null;
+      }
       return {
         currency: currency,
         currentAge: number("ret-current-age"), retirementAge: number("ret-retirement-age"), horizonYears: number("ret-horizon"),
@@ -504,7 +468,7 @@
         dependableIncomeIndexed: indexChoices.length === 1 && indexChoices[0] === true,
         dependableIncomeIndexingCompatible: indexChoices.length <= 1,
         aedPerCurrency: Number(rates[currency]) * Number(payload.aed_per_usd),
-        planningRange: null,
+        planningRange: planningRange,
       };
     }
     let answerCurrency = planningFacts().currency;
@@ -628,7 +592,6 @@
     coerceAnswer: coerceAnswer,
     shouldHandlePlanningEvent: shouldHandlePlanningEvent,
     hongKongDomesticResidence: hongKongDomesticResidence,
-    hongKongTreatyOutcome: hongKongTreatyOutcome,
     nextPairQuestions: nextPairQuestions,
     materialQuestions: materialQuestions,
     runRefinement: runRefinement,

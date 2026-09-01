@@ -299,9 +299,88 @@
       "property_lifecycle": [],
       "runtime_definition": {
         "factory": "hong-kong-to-dubai-v1",
-        "supported_activity_types": ["retired_or_employee"],
+        "supported_activity_types": ["retired_nonworking"],
         "supported_retirement_accounts": ["personal_investment"],
         "supported_housing_plans": ["rent"]
+      },
+      "runtime_rule_graph": {
+        "schema_version": 1,
+        "currency_binding": "planning_currency",
+        "tax_year": 2026,
+        "effective_from": "2026-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "recheck_trigger": "Revalidate every linked official source and the serialized graph before the next tax-year release.",
+        "residence": {
+          "destination": {
+            "jurisdiction_id": "dubai",
+            "label": "Dubai",
+            "source_ids": ["uae-tax-residence-2026"],
+            "operands": {
+              "days_in_destination": {"kind": "profile", "profile_key": "daysInDestination", "value_type": "number", "minimum": 0, "maximum": 365, "integer": true, "day_count": true},
+              "threshold": {"kind": "constant", "value_type": "number", "value": 183}
+            },
+            "rules": [{
+              "id": "uae-domestic-183-day-residence-2026",
+              "type": "residence_test",
+              "category": "tax_residence",
+              "taxpayer_scope": ["individual"],
+              "source_ids": ["uae-tax-residence-2026"],
+              "formula": {"operation": "greater_than_or_equal", "operands": ["days_in_destination", "threshold"]},
+              "resident_when": true,
+              "explanation": "UAE domestic tax residence under the supported 183-day route; this is not a treaty-residence determination."
+            }]
+          },
+          "home": {
+            "jurisdiction_id": "hong-kong",
+            "label": "Hong Kong",
+            "source_ids": ["hk-uae-treaty-2026", "hk-ordinary-residence-facts-2026"],
+            "operands": {"home_resident": {"kind": "profile", "profile_key": "homeTreatyResident", "value_type": "boolean"}},
+            "rules": [{
+              "id": "hong-kong-supported-domestic-residence-2026",
+              "type": "residence_test",
+              "category": "tax_residence",
+              "taxpayer_scope": ["individual"],
+              "source_ids": ["hk-uae-treaty-2026", "hk-ordinary-residence-facts-2026"],
+              "formula": {"operation": "flag", "operands": ["home_resident"]},
+              "resident_when": true,
+              "explanation": "The enabled profile proceeds only when supported Hong Kong day-count and settled-life facts establish that the user is not a Hong Kong resident; possible dual residence is unavailable."
+            }]
+          }
+        },
+        "income": {
+          "destination": {
+            "jurisdiction_id": "dubai",
+            "label": "Dubai",
+            "calculation_side": "destination",
+            "source_ids": ["uae-individual-tax-2026", "uae-natural-person-business-2026"],
+            "categories": ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting"],
+            "profile_keys": {"private_pension": "privatePension", "government_pension": "governmentPension", "social_security": "socialSecurity", "dividends": "dividends", "interest": "interest", "realized_gains": "realizedGains", "retirement_account_withdrawal": "retirementAccountWithdrawal", "rental_income": "rentalIncome", "employment_consulting": "employmentConsulting"},
+            "rule_ids": {"private_pension": "dubai-private-pension-2026", "government_pension": "dubai-government-pension-2026", "social_security": "dubai-social-security-2026", "dividends": "dubai-dividends-2026", "interest": "dubai-interest-2026", "realized_gains": "dubai-realized-gains-2026", "retirement_account_withdrawal": "dubai-retirement-account-withdrawal-2026", "rental_income": "dubai-rental-income-2026", "employment_consulting": "dubai-employment-consulting-2026"},
+            "formula": {"operation": "progressive_rate", "operand_prefix": "income_"},
+            "bands": [{"from": 0, "up_to": null, "rate": 0}],
+            "no_tax": true,
+            "explanation": "The UAE individual no-tax rule applies only to this nonworking renter profile; business, consulting and employment are excluded."
+          },
+          "continuing_home": {
+            "jurisdiction_id": "hong-kong",
+            "label": "Hong Kong",
+            "calculation_side": "home",
+            "source_ids": ["hk-territorial-individual-tax-2026", "hk-uae-treaty-2026"],
+            "categories": ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting"],
+            "profile_keys": {"private_pension": "privatePension", "government_pension": "governmentPension", "social_security": "socialSecurity", "dividends": "dividends", "interest": "interest", "realized_gains": "realizedGains", "retirement_account_withdrawal": "retirementAccountWithdrawal", "rental_income": "rentalIncome", "employment_consulting": "employmentConsulting"},
+            "rule_ids": {"private_pension": "hong-kong-private-pension-2026", "government_pension": "hong-kong-government-pension-2026", "social_security": "hong-kong-social-security-2026", "dividends": "hong-kong-dividends-2026", "interest": "hong-kong-interest-2026", "realized_gains": "hong-kong-realized-gains-2026", "retirement_account_withdrawal": "hong-kong-retirement-account-withdrawal-2026", "rental_income": "hong-kong-rental-income-2026", "employment_consulting": "hong-kong-employment-consulting-2026"},
+            "formula": {"operation": "progressive_rate", "operand_prefix": "income_"},
+            "bands": [{"from": 0, "up_to": null, "rate": 0}],
+            "no_tax": true,
+            "explanation": "Only non-Hong Kong-source personal-investment withdrawals reach this territorial overlay; all other income categories must be zero."
+          }
+        },
+        "credits": {"destination": [], "continuing_home": []},
+        "property": {
+          "destination": {"jurisdiction_id": "dubai", "label": "Dubai", "calculation_side": "destination", "taxpayer_scope": "not_applicable", "source_ids": [], "rules": []},
+          "continuing_home": {"jurisdiction_id": "hong-kong", "label": "Hong Kong", "calculation_side": "home", "taxpayer_scope": "not_applicable", "source_ids": [], "rules": []}
+        }
       }
     }
   },

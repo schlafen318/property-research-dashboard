@@ -285,7 +285,7 @@ if (chosen) {
   const session=api.initDetailedTaxUI('retirement-calculator',input.payload);
   initialized=!!session;
   elements['ret-tax-refine'].emit('click');
-  const supplied={daysInDestination:200,daysInHome:30,daysInHomePreviousYear:20,followingYearDaysKnown:'yes',daysInHomeFollowingYear:20,hongKongSettledDailyLife:'no',hongKongFixedHome:'no',hongKongWorkOrBusiness:'no',hongKongCloseFamily:'no',hasHongKongSourceIncome:false,hasHongKongProperty:false,activityType:'retired_or_employee',retirementAccountClassification:'personal_investment',annualEmploymentIncome:0};
+  const supplied={daysInDestination:200,daysInHome:30,daysInHomePreviousYear:20,followingYearDaysKnown:'yes',daysInHomeFollowingYear:20,hongKongSettledDailyLife:'no',hongKongFixedHome:'no',hongKongWorkOrBusiness:'no',hongKongCloseFamily:'no',hasHongKongSourceIncome:false,hasHongKongProperty:false,retirementAccountClassification:'personal_investment'};
   for (let guard=0;guard<40;guard++) {
     const pending=api.nextPairQuestions(session.planningFacts(),session.answers());
     if (!pending.length) break;
@@ -300,7 +300,7 @@ if (chosen) {
   const markup=elements['ret-tax-detailed-result'].innerHTML;
   resultRendered=elements['ret-tax-detailed-result'].hidden===false&&markup.includes('<table')&&markup.includes('Capital needed today');
   sourceRendered=/href="https:\/\/(?:www\.)?(?:ird\.gov\.hk|centralbank\.ae|dubailand\.gov\.ae|tax\.gov\.ae|u\.ae)/.test(markup);
-  branchRendered=markup.includes('UAE treaty outcome; Hong Kong source basis');
+  branchRendered=markup.includes('UAE domestic 183-day route; not a Hong Kong resident');
   access[chosen.id]=api.profileAccess(chosen.destination_id,input.payload,{homeJurisdictionId:chosen.home_jurisdiction_id},session.answers());
   elements['ret-currency'].value='HKD'; elements['retirement-calculator'].emit('change',elements['ret-currency']);
   currencyReset=Object.keys(session.answers()).length===0&&elements['ret-tax-detailed-result'].hidden===true;

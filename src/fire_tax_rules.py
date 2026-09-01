@@ -168,10 +168,126 @@ SUPPORTED_RUNTIME_KEYS = frozenset(
     }
 )
 HK_DUBAI_CAPABILITIES = {
-    "supported_activity_types": frozenset({"retired_or_employee"}),
+    "supported_activity_types": frozenset({"retired_nonworking"}),
     "supported_retirement_accounts": frozenset({"personal_investment"}),
     "supported_housing_plans": frozenset({"rent"}),
 }
+
+
+def _validate_hk_dubai_runtime_graph(
+    profile: dict[str, Any],
+    path: str,
+    required_income: set[str],
+    known_source_ids: set[str],
+    source_kinds: dict[str, Any],
+    errors: list[str],
+) -> None:
+    graph = profile.get("runtime_rule_graph")
+    graph_path = f"{path}.runtime_rule_graph"
+    if not isinstance(graph, dict):
+        errors.append(f"{graph_path} must be a versioned executable rule graph")
+        return
+    if graph.get("schema_version") != 1 or graph.get("currency_binding") != "planning_currency":
+        errors.append(f"{graph_path}.schema_version and currency_binding must use the supported contract")
+    if graph.get("tax_year") != profile.get("tax_year"):
+        errors.append(f"{graph_path}.tax_year must match the enabled profile")
+    graph_effective = _require_date(graph, "effective_from", graph_path, errors)
+    graph_checked = _require_date(graph, "checked_on", graph_path, errors)
+    if graph_effective is not None and graph_checked is not None and graph_checked < graph_effective:
+        errors.append(f"{graph_path}.checked_on cannot predate effective_from")
+    interval = graph.get("review_interval_days")
+    if not isinstance(interval, int) or isinstance(interval, bool) or interval <= 0:
+        errors.append(f"{graph_path}.review_interval_days must be a positive integer")
+    if not isinstance(graph.get("recheck_trigger"), str) or not graph["recheck_trigger"].strip():
+        errors.append(f"{graph_path}.recheck_trigger must be non-empty")
+    profile_sources = set(profile.get("source_ids", []))
+    declared_graph_sources: set[str] = set()
+
+    def validate_sources(value: Any, source_path: str, *, allow_empty: bool = False) -> set[str]:
+        ids = set(value) if isinstance(value, list) and all(isinstance(item, str) for item in value) else set()
+        declared_graph_sources.update(ids)
+        if (not ids and not allow_empty) or any(source_id not in known_source_ids or source_kinds.get(source_id) != "official" for source_id in ids) or not ids.issubset(profile_sources):
+            errors.append(f"{source_path} must reference current official profile sources")
+        return ids
+
+    residence = graph.get("residence")
+    if not isinstance(residence, dict):
+        errors.append(f"{graph_path}.residence must define destination and home graphs")
+    else:
+        for side in ("destination", "home"):
+            item = residence.get(side)
+            item_path = f"{graph_path}.residence.{side}"
+            if not isinstance(item, dict):
+                errors.append(f"{item_path} must be an object")
+                continue
+            graph_sources = validate_sources(item.get("source_ids"), f"{item_path}.source_ids")
+            operands = item.get("operands")
+            rules = item.get("rules")
+            if not isinstance(operands, dict) or not operands:
+                errors.append(f"{item_path}.operands must be a non-empty object")
+                operands = {}
+            if not isinstance(rules, list) or not rules:
+                errors.append(f"{item_path}.rules must be non-empty")
+                continue
+            for index, rule in enumerate(rules):
+                rule_path = f"{item_path}.rules[{index}]"
+                if not isinstance(rule, dict):
+                    errors.append(f"{rule_path} must be an object")
+                    continue
+                validate_sources(rule.get("source_ids"), f"{rule_path}.source_ids")
+                if not set(rule.get("source_ids", [])).issubset(graph_sources):
+                    errors.append(f"{rule_path}.source_ids must be declared by its graph")
+                formula = rule.get("formula")
+                operation = formula.get("operation") if isinstance(formula, dict) else None
+                formula_operands = formula.get("operands") if isinstance(formula, dict) else None
+                if operation not in FORMULA_OPERATIONS or not isinstance(formula_operands, list) or any(operand not in operands for operand in formula_operands):
+                    errors.append(f"{rule_path}.formula must use a supported operation and declared operands")
+
+    income = graph.get("income")
+    if not isinstance(income, dict):
+        errors.append(f"{graph_path}.income must define destination and continuing_home graphs")
+    else:
+        for side in ("destination", "continuing_home"):
+            item = income.get(side)
+            item_path = f"{graph_path}.income.{side}"
+            if not isinstance(item, dict):
+                errors.append(f"{item_path} must be an object")
+                continue
+            validate_sources(item.get("source_ids"), f"{item_path}.source_ids")
+            if set(item.get("categories", [])) != required_income:
+                errors.append(f"{item_path}.categories must cover every detailed income category")
+            profile_keys = item.get("profile_keys")
+            if not isinstance(profile_keys, dict) or set(profile_keys) != required_income or any(
+                not isinstance(value, str) or PROFILE_KEY_PATTERN.fullmatch(value) is None
+                for value in profile_keys.values()
+            ):
+                errors.append(f"{item_path}.profile_keys must map every category to a valid live profile key")
+            rule_ids = item.get("rule_ids")
+            if not isinstance(rule_ids, dict) or set(rule_ids) != required_income or any(
+                not isinstance(value, str) or RULE_ID_PATTERN.fullmatch(value) is None
+                for value in rule_ids.values()
+            ) or (isinstance(rule_ids, dict) and len(set(rule_ids.values())) != len(rule_ids)):
+                errors.append(f"{item_path}.rule_ids must uniquely version every category rule")
+            formula = item.get("formula")
+            if not isinstance(formula, dict) or formula.get("operation") != "progressive_rate" or formula.get("operand_prefix") != "income_":
+                errors.append(f"{item_path}.formula must be the validated progressive-rate template")
+            if item.get("no_tax") is not True or item.get("bands") != [{"from": 0, "up_to": None, "rate": 0}]:
+                errors.append(f"{item_path}.bands must explicitly encode the validated no-tax treatment")
+
+    credits = graph.get("credits")
+    if credits != {"destination": [], "continuing_home": []}:
+        errors.append(f"{graph_path}.credits must explicitly contain the supported empty credit overlays")
+    property_graph = graph.get("property")
+    if not isinstance(property_graph, dict):
+        errors.append(f"{graph_path}.property must define both not-applicable overlays")
+    else:
+        for side in ("destination", "continuing_home"):
+            item = property_graph.get(side)
+            item_path = f"{graph_path}.property.{side}"
+            if not isinstance(item, dict) or item.get("taxpayer_scope") != "not_applicable" or item.get("rules") != [] or item.get("source_ids") != []:
+                errors.append(f"{item_path} must be an explicit source-free not-applicable property overlay")
+    if profile_sources != declared_graph_sources:
+        errors.append(f"{path}.source_ids must exactly cover the executable runtime rule graph")
 
 
 def load_fire_tax_rules(path: Path = RULES_PATH) -> dict[str, Any]:
@@ -422,6 +538,9 @@ def _validate_supported_profiles(
                 errors.append(f"{path}.runtime_definition.{key} must contain supported identifiers")
             elif set(values) != allowed or len(values) != len(set(values)):
                 errors.append(f"{path}.runtime_definition.{key} contains unsupported identifiers")
+        _validate_hk_dubai_runtime_graph(
+            profile, path, required_income, known_source_ids, source_kinds, errors
+        )
         if profile.get("detailed_enabled") and profile.get("synthetic"):
             errors.append(f"{path}.detailed_enabled cannot enable a synthetic profile")
 

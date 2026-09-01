@@ -110,6 +110,19 @@ def calculator_payload() -> dict:
 
 
 class RetirementCalculatorUITests(unittest.TestCase):
+    def test_detailed_planning_cases_come_from_live_calculator_results(self):
+        first = run_ui_args("detailedPlanningCases", {
+            "favorable": {"annualTaxReserve": 1000, "requiredCapital": 800000},
+            "central": {"annualTaxReserve": 2000, "requiredCapital": 850000},
+            "adverse": {"annualTaxReserve": 3000, "requiredCapital": 900000},
+        }, {"totalNeededToday": 700000})
+        second = run_ui_args("detailedPlanningCases", {}, {"totalNeededToday": 975000})
+
+        self.assertEqual(850000, first["cases"]["central"]["requiredCapital"])
+        self.assertEqual(2000, first["cases"]["central"]["annualTaxReserve"])
+        self.assertEqual(975000, second["cases"]["central"]["requiredCapital"])
+        self.assertEqual("current_plan_baseline", second["status"])
+
     def test_refine_entry_point_requires_planning_result_and_enabled_exact_bundle(self):
         self.assertFalse(run_ui("detailedRefineAvailable", {"planningAvailable": True, "enabledMarker": "false"}))
         self.assertTrue(run_ui("detailedRefineAvailable", {"planningAvailable": False, "enabledMarker": "true"}))

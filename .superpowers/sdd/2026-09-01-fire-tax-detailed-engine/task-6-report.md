@@ -94,3 +94,23 @@ Final Round 2 verification:
 Round 3 browser evidence: the eligible flow routed through previous- and following-year days and all four settled-life controls before calculating; the result contained one table, the renter `N/A` note and audit, no numeric one-time property-tax total, and no lifecycle additive formula. Current-year 150 + previous-year 100 + following-year 160 routed to the dual-residence permanent-home questions with submission disabled. An unknown following-year count produced the explicit uncertain-outcome message, disabled submission, and no result. The factual form had no horizontal overflow at 320, 375, 390, 430, 736 or 1024px. A fresh 320px JavaScript-disabled context showed the fallback and no refine/exact control.
 
 Round 3 verification: 263 focused tests passed in 24.934 seconds; the full repository suite passed all 1,213 tests in 49.666 seconds; the build succeeded; and the detailed static runtime verifier returned zero errors. The repository-wide verifier continues to report only the unrelated generated Spain markers and missing Chamonix images documented above.
+
+## Final whole-plan review wave
+
+This wave supersedes the earlier treaty-outcome and employee-profile descriptions above.
+
+- The production profile is now strictly a retired/nonworking renter profile. Any non-zero UAE salary, employment, business or consulting amount fails closed, and the detailed form no longer asks for an employment amount.
+- UAE Cabinet Decision No. 85's 183-day branch is labeled and executed only as a UAE domestic residence route. It is not used as a treaty-residence conclusion. Exact access proceeds only when the supported Hong Kong day-count and objective settled-life facts resolve to **not Hong Kong resident**. Hong Kong residence, possible dual residence, future-day uncertainty and `Not sure` all fail closed; the production form has no treaty tie-break path.
+- The complete executable Hong Kong→Dubai residence, income, credit and explicit renter-property-`N/A` graph now lives in versioned `data/fire_tax_rules.json`. The canonical Python validator checks graph metadata, official profile source closure, residence operands/formulas, complete income category/profile-key/rule-ID coverage, explicit no-tax bands, empty credit overlays and source-free property `N/A`. JavaScript hydrates this serialized graph instead of manufacturing production rules. Mutation and parity tests cover missing profile/rule sources and changed formulas, keys and rule IDs.
+- The current broad calculator output is preserved as live favorable, central and adverse cases. When broad destination tax is unavailable, the cases honestly use the current live no-added-tax baseline; they are still derived from the current calculator state and are shown alongside the refined result rather than replaced with canned amounts.
+- The selected after-fees-and-tax return audit is a percentage (`4%` in the browser verification), carries `user_supplied/not_assessed` confidence, and is never currency-formatted.
+
+Final verification evidence:
+
+- Focused rule/engine/UI/calculator suite: 177 tests passed.
+- Full repository suite: 1,216 tests passed in 51.210 seconds.
+- Static build: succeeded. Detailed-tax static verifier tests passed. The repository-wide verifier remains non-zero only for the unchanged Spain markers and three missing Chamonix images documented above.
+- Fresh Playwright/Chrome eligible flow: generated native required controls rerouted after each factual answer; exact submit stayed disabled until completion; result rendered current favorable/central/adverse planning rows, the `UAE domestic 183-day route; not a Hong Kong resident` branch, renter property `N/A`, official links, and a `4%` user-supplied return audit.
+- Fresh refused flow: UAE 200 days, Hong Kong current 150, previous 100 and following 160 produced “Hong Kong residence or possible dual residence,” disabled submit, no result and no treaty tie-break questions.
+- Currency change to HKD hid the detailed section/result and removed all generated detailed controls, confirming the browser-local reset.
+- At 320, 375, 390, 430, 736 and 1024 CSS pixels, `body.scrollWidth` and `main.scrollWidth` exactly matched the viewport. A fresh isolated 320px JavaScript-disabled context exposed “The interactive calculator requires JavaScript” and no refine control.
