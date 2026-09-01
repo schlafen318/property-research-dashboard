@@ -344,7 +344,13 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
             "confidence": "low",
         }
 
-    band = screen["planning_bands"][profile["stay_mode"]]
+    band_mode = {
+        "under_90": "seasonal",
+        "90_182": "part_year",
+        "183_plus": "full_relocation",
+        "unsure": profile["stay_mode"],
+    }[profile["annual_day_band"]]
+    band = screen["planning_bands"][band_mode]
     rates = {
         "favorable": float(band["favorable_rate"]),
         "central": float(band["central_rate"]),
@@ -361,7 +367,7 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
         return round(planning_base * rates[key])
 
     residence_outcome = {
-        "under_90": "likely_nonresident",
+        "under_90": "residence_depends_on_days_and_ties",
         "90_182": "residence_depends_on_days_and_ties",
         "183_plus": "likely_resident",
         "unsure": "residence_depends_on_days_and_ties",
@@ -378,12 +384,20 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
         profile["funding_source"], fallback_funding_notes[profile["funding_source"]]
     )
     material_flags = list(screen.get("material_flags", []))
+    warnings: list[str] = []
     if profile["housing"] != "rent" and profile["property_use"] in {"rental", "mixed"}:
         material_flags.append("property_rental_tax")
+        warnings.append("Rental or mixed home use can create local income and filing obligations.")
     if profile["home_tax_context"] == "citizenship_based_worldwide":
         material_flags.append("continuing_home_country_tax")
+        warnings.append("Home-country taxation and filing may continue after moving.")
+    elif profile["home_tax_context"] == "residence_based":
+        warnings.append("Ending home-country tax residence depends on departure facts and continuing ties.")
+    elif profile["home_tax_context"] == "territorial":
+        warnings.append("A mainly local-source home system still requires departure-status verification.")
     elif profile["home_tax_context"] == "prefer_not_to_say":
         material_flags.append("home_country_tax_interaction")
+        warnings.append("Home-country tax interaction has not been screened.")
     return {
         "status": "user_after_tax" if bypass else "planning_estimate",
         "conditional": (
@@ -404,6 +418,7 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
         "rates": rates,
         "included_categories": list(screen.get("included_categories", [])),
         "material_flags": material_flags,
+        "warnings": warnings,
         "source_ids": list(screen.get("source_ids", [])),
         "confidence": screen.get("confidence", "low"),
     }

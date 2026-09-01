@@ -100,11 +100,28 @@ class FireAbroadModelTests(unittest.TestCase):
             "home_tax_context": "residence_based",
         }))
         self.assertEqual("likely_resident", resident["residence_outcome"])
-        self.assertEqual("likely_nonresident", visitor["residence_outcome"])
+        self.assertEqual("residence_depends_on_days_and_ties", visitor["residence_outcome"])
         self.assertIn("Portfolio income", resident["scope_summary"])
         self.assertIn("property_rental_tax", resident["material_flags"])
         self.assertIn("continuing_home_country_tax", resident["material_flags"])
         self.assertNotEqual(resident["scope_summary"], visitor["scope_summary"])
+
+    def test_each_visible_tax_control_changes_a_relevant_output(self):
+        country = {"tax_screen": complete_tax_screen()}
+        base = normalize_fire_profile({"planning_base": 100000, "annual_day_band": "unsure"})
+        seasonal = screen_tax(country, {**base, "stay_mode": "seasonal"})
+        relocated = screen_tax(country, {**base, "stay_mode": "full_relocation"})
+        self.assertNotEqual(seasonal["central_reserve"], relocated["central_reserve"])
+        under_90 = screen_tax(country, {**base, "annual_day_band": "under_90"})
+        over_183 = screen_tax(country, {**base, "annual_day_band": "183_plus"})
+        self.assertNotEqual(under_90["rates"], over_183["rates"])
+        pension = screen_tax(country, {**base, "funding_source": "pension"})
+        self.assertNotEqual(seasonal["scope_summary"], pension["scope_summary"])
+        rental = screen_tax(country, {**base, "housing": "buy_now", "property_use": "rental"})
+        self.assertTrue(any("Rental" in warning for warning in rental["warnings"]))
+        territorial = screen_tax(country, {**base, "home_tax_context": "territorial"})
+        residence_based = screen_tax(country, {**base, "home_tax_context": "residence_based"})
+        self.assertNotEqual(territorial["warnings"], residence_based["warnings"])
 
     def test_eligibility_must_be_supported_before_ranking(self):
         country = {"eligibility": eligibility_screen()}

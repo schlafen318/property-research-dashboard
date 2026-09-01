@@ -81,7 +81,13 @@
         confidence: "low",
       };
     }
-    const band = screen.planning_bands[profile.stay_mode];
+    const bandMode = {
+      under_90: "seasonal",
+      "90_182": "part_year",
+      "183_plus": "full_relocation",
+      unsure: profile.stay_mode,
+    }[profile.annual_day_band];
+    const band = screen.planning_bands[bandMode];
     const rates = {
       favorable: Number(band.favorable_rate),
       central: Number(band.central_rate),
@@ -93,7 +99,7 @@
       return profile.planning_base === null ? null : Math.round(profile.planning_base * rates[key]);
     }
     const residence = {
-      under_90: "likely_nonresident",
+      under_90: "residence_depends_on_days_and_ties",
       "90_182": "residence_depends_on_days_and_ties",
       "183_plus": "likely_resident",
       unsure: "residence_depends_on_days_and_ties",
@@ -108,13 +114,21 @@
     const fundingNote = (screen.funding_source_notes || {})[profile.funding_source] ||
       fallbackFundingNotes[profile.funding_source];
     const materialFlags = (screen.material_flags || []).slice();
+    const warnings = [];
     if (profile.housing !== "rent" && (profile.property_use === "rental" || profile.property_use === "mixed")) {
       materialFlags.push("property_rental_tax");
+      warnings.push("Rental or mixed home use can create local income and filing obligations.");
     }
     if (profile.home_tax_context === "citizenship_based_worldwide") {
       materialFlags.push("continuing_home_country_tax");
+      warnings.push("Home-country taxation and filing may continue after moving.");
+    } else if (profile.home_tax_context === "residence_based") {
+      warnings.push("Ending home-country tax residence depends on departure facts and continuing ties.");
+    } else if (profile.home_tax_context === "territorial") {
+      warnings.push("A mainly local-source home system still requires departure-status verification.");
     } else if (profile.home_tax_context === "prefer_not_to_say") {
       materialFlags.push("home_country_tax_interaction");
+      warnings.push("Home-country tax interaction has not been screened.");
     }
     return {
       status: bypass ? "user_after_tax" : "planning_estimate",
@@ -133,6 +147,7 @@
       rates: rates,
       included_categories: (screen.included_categories || []).slice(),
       material_flags: materialFlags,
+      warnings: warnings,
       source_ids: (screen.source_ids || []).slice(),
       confidence: screen.confidence || "low",
     };

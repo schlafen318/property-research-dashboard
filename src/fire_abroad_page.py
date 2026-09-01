@@ -54,7 +54,7 @@ def _result_rows(rows: list[dict[str, Any]]) -> str:
               <th scope="row">{escape(row['name'])}<small>{escape(row['country'])}</small></th>
               <td>{row['overall_score']:.2f}/5</td>
               <td><strong>{_label(row['eligibility']['status'])}</strong><small>{escape(row['eligibility']['summary'])}</small></td>
-              <td><strong>{_label(tax['residence_outcome'])}</strong><small>{escape(tax['scope_summary'])}</small></td>
+              <td><strong>{_label(tax['residence_outcome'])}</strong><small>{escape(tax['scope_summary'])}</small><small><strong>Watch:</strong> {escape(' '.join(tax.get('warnings', [])))}</small></td>
               <td><strong>{_label(tax['readiness'])}</strong><small>{escape(tax['confidence'].replace('_', '-'))} confidence</small></td>
               <td><strong>{_money(budget['central_tax_reserve'])}</strong><small>{_money(budget['favorable_tax_reserve'])}–{_money(budget['adverse_tax_reserve'])}</small></td>
               <td><a href="{calculator}">Build your plan</a></td>
@@ -64,15 +64,7 @@ def _result_rows(rows: list[dict[str, Any]]) -> str:
     return "".join(rendered)
 
 
-def _property_lifecycle(countries: dict[str, Any]) -> tuple[str, str]:
-    complete = next(
-        ((name, country["tax_screen"]) for name, country in countries.items() if country["tax_screen"].get("status") == "complete"),
-        None,
-    )
-    if not complete:
-        return "", ""
-    country_name, screen = complete
-    lifecycle = screen["property_lifecycle"]
+def _property_lifecycle(countries: dict[str, Any]) -> str:
     stages = (
         ("Purchase", "purchase"),
         ("Annual ownership", "annual"),
@@ -80,10 +72,20 @@ def _property_lifecycle(countries: dict[str, Any]) -> tuple[str, str]:
         ("Sale", "sale"),
         ("Inheritance or gift", "succession"),
     )
-    return country_name, "".join(
-        f"<dt>{escape(label)}</dt><dd>{escape(lifecycle[key]['summary'])}</dd>"
-        for label, key in stages
-    )
+    rendered = []
+    for country_name, country in countries.items():
+        screen = country.get("tax_screen", {})
+        if screen.get("status") != "complete":
+            continue
+        lifecycle = screen["property_lifecycle"]
+        items = "".join(
+            f"<dt>{escape(label)}</dt><dd>{escape(lifecycle[key]['summary'])}</dd>"
+            for label, key in stages
+        )
+        rendered.append(
+            f'<details class="fire-country-lifecycle"><summary>{escape(country_name)}</summary><dl class="fire-lifecycle">{items}</dl></details>'
+        )
+    return "".join(rendered)
 
 
 def _sources(sources: list[dict[str, Any]]) -> str:
@@ -109,7 +111,7 @@ def build_fire_abroad_html(
     analytics: str,
 ) -> str:
     reviewed = datetime.strptime(reviewed_on, "%Y-%m-%d").strftime("%-d %B %Y")
-    lifecycle_country, lifecycle_html = _property_lifecycle(countries)
+    lifecycle_html = _property_lifecycle(countries)
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -154,20 +156,21 @@ def build_fire_abroad_html(
       <label for="fire-income">Main source of spending money<select id="fire-income"><option value="portfolio" selected>Investment portfolio</option><option value="pension">Pension</option><option value="property">Property income</option><option value="work_business">Work or business</option><option value="mixed">Mixed</option></select></label>
       <label for="fire-housing">Housing plan<select id="fire-housing"><option value="rent" selected>Rent</option><option value="own">Already own</option><option value="buy_now">Buy now</option><option value="buy_retirement">Buy later</option></select></label>
       <label data-fire-group="property-use" hidden for="fire-property-use">How would you use the home?<select id="fire-property-use"><option value="personal">Personal use</option><option value="rental">Rental</option><option value="mixed">Mixed use</option></select></label>
-      <label for="fire-mobility">Your mobility rights<select id="fire-mobility"><option value="prefer_not_to_say" selected>Not sure</option><option value="local_free_movement">Local or free-movement rights</option><option value="general_nonlocal">Need a visa or residence route</option></select></label>
+      <label for="fire-mobility">Your mobility rights<select id="fire-mobility"><option value="local_free_movement" selected>Local or free-movement rights</option><option value="general_nonlocal">Need a visa or residence route</option><option value="prefer_not_to_say">Not sure</option></select></label>
       <label for="fire-tax-home">Current tax-home system<select id="fire-tax-home"><option value="prefer_not_to_say" selected>Not sure</option><option value="residence_based">Usually based on residence</option><option value="citizenship_based_worldwide">Can continue after moving</option><option value="territorial">Mainly local-source income</option></select></label>
     </div>
   </div></section>
   <section class="fire-results" aria-labelledby="fire-results-heading"><div class="fire-shell">
     <h2 id="fire-results-heading">Tax-aware destination screen</h2>
+    <p class="fire-tax-note"><strong>Reference view:</strong> Results start with local or free-movement rights so the no-JavaScript page remains useful. Change that control first if it does not describe you.</p>
     <p class="fire-tax-note"><strong>Planning tax reserve</strong> is a broad screening allowance, not a statutory rate or assessment. It is shown separately from <strong>Tax Readiness</strong>, which describes rule clarity and administrative complexity. Likely tax residence is a screen, not an immigration conclusion.</p>
     <div class="fire-table-wrap"><table class="fire-table"><thead><tr><th>Destination</th><th>FIRE score</th><th>Stay eligibility</th><th>Likely tax residence</th><th>Tax Readiness</th><th>Planning tax reserve</th><th>Next step</th></tr></thead><tbody id="fire-results-body" aria-live="polite">{_result_rows(rows)}</tbody></table></div>
     <p><a href="/retirement-abroad-calculator/">Open the retirement calculator</a></p>
   </div></section>
   <section class="fire-method"><div class="fire-shell">
-    <h2>{escape(lifecycle_country)} property-tax lifecycle</h2>
+    <h2>Property-tax lifecycle by country</h2>
     <p>Property tax does not stop at the purchase. Open these stages before relying on a home budget.</p>
-    <dl class="fire-lifecycle">{lifecycle_html}</dl>
+    {lifecycle_html}
     <details><summary>Assumptions and primary sources</summary><p>Data checked {escape(reviewed)}. Legal and tax claims use current primary-source evidence; incomplete destinations remain visibly unranked. Planning reserve percentages are product-defined stress-test allowances, not statutory rates or tax estimates.</p><ul class="fire-sources">{_sources(sources)}</ul></details>
   </div></section>
 </main>

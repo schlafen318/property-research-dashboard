@@ -4,6 +4,8 @@ import subprocess
 import unittest
 from pathlib import Path
 
+from src.fire_abroad_page import _property_lifecycle
+
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT = ROOT / "artifacts" / "fire-abroad" / "index.html"
@@ -57,7 +59,8 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn("Planning tax reserve", self.html)
         self.assertIn("Likely tax residence", self.html)
         self.assertIn("Stay eligibility", self.html)
-        self.assertIn("Eligibility check needed", self.html)
+        self.assertIn("Reference view:", self.html)
+        self.assertIn("/5", self.html)
         self.assertIn("not a statutory rate or assessment", self.html)
         self.assertIn("Research pending", self.html)
 
@@ -67,7 +70,23 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn("Agencia Tributaria", self.html)
         self.assertIn("Data checked 1 September 2026", self.html)
         self.assertNotIn("data-fire-refine", self.html)
-        self.assertIn("Spain property-tax lifecycle", self.html)
+        self.assertIn("Property-tax lifecycle by country", self.html)
+        self.assertIn("<summary>Spain</summary>", self.html)
+
+    def test_lifecycle_disclosure_scales_to_every_complete_country(self):
+        screen = {
+            "status": "complete",
+            "property_lifecycle": {
+                stage: {"summary": f"{stage} summary"}
+                for stage in ("purchase", "annual", "rental", "sale", "succession")
+            },
+        }
+        rendered = _property_lifecycle({
+            "Spain": {"tax_screen": screen},
+            "Portugal": {"tax_screen": screen},
+        })
+        self.assertIn("Spain", rendered)
+        self.assertIn("Portugal", rendered)
 
     def test_calculator_links_do_not_include_tax_or_financial_inputs(self):
         self.assertIn('href="/retirement-abroad-calculator/"', self.html)

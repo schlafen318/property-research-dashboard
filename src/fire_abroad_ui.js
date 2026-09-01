@@ -80,6 +80,7 @@
       tr.appendChild(eligibility);
       const residence = textElement("td", label(row.tax.residence_outcome));
       residence.appendChild(textElement("small", row.tax.scope_summary));
+      residence.appendChild(textElement("small", "Watch: " + (row.tax.warnings || []).join(" ")));
       tr.appendChild(residence);
       const readiness = textElement("td", label(row.tax.readiness));
       readiness.appendChild(textElement("small", String(row.tax.confidence).replaceAll("_", "-") + " confidence"));

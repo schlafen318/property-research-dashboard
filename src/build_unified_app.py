@@ -6110,7 +6110,12 @@ def build_fire_abroad_page(
         launch_destinations,
         retirement_costs,
         fire_payload,
-        {"stay_mode": "part_year", "household": "single", "housing": "rent"},
+        {
+            "stay_mode": "part_year",
+            "household": "single",
+            "housing": "rent",
+            "mobility_rights": "local_free_movement",
+        },
     )
     canonical = page_url(FIRE_ABROAD_SLUG)
     browser_payload = {
@@ -6123,6 +6128,7 @@ def build_fire_abroad_page(
             "household": "single",
             "housing": "rent",
             "tax_mode": "destination_estimate",
+            "mobility_rights": "local_free_movement",
         },
     }
     return build_fire_abroad_html(
