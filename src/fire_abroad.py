@@ -51,6 +51,9 @@ DESTINATION_SCORE_KEYS = (
     "community_fit",
     "property_exit_flexibility",
 )
+VALID_GAIN_INTENSITIES = frozenset({"low", "moderate", "high"})
+VALID_WEALTH_BANDS = frozenset({"under_threshold", "above_threshold", "unknown"})
+SCENARIO_ALLOWANCE_KEYS = ("property_tax", "wealth_tax", "compliance")
 
 
 def load_fire_abroad(path: Path = FIRE_ABROAD_PATH) -> dict[str, Any]:
@@ -195,6 +198,60 @@ def _validate_complete_tax_screen(
                 errors.append(f"{band_path} rates must be between 0 and 1")
             elif not values[0] <= values[1] <= values[2]:
                 errors.append(f"{band_path} rates must be ordered favorable, central, adverse")
+
+    modifiers = screen.get("gain_intensity_modifiers")
+    if not isinstance(modifiers, dict) or set(modifiers) != set(VALID_GAIN_INTENSITIES):
+        errors.append(f"{path}.gain_intensity_modifiers must contain low, moderate and high")
+    else:
+        values = [modifiers[key] for key in ("low", "moderate", "high")]
+        if not all(isinstance(value, (int, float)) and 0 <= value <= 2 for value in values):
+            errors.append(f"{path}.gain_intensity_modifiers values must be between 0 and 2")
+        elif not values[0] <= values[1] <= values[2]:
+            errors.append(f"{path}.gain_intensity_modifiers must be ordered low, moderate, high")
+    _validate_claim_source_ids(
+        screen.get("gain_intensity_source_ids"),
+        f"{path}.gain_intensity_source_ids",
+        screen_source_ids,
+        source_ids,
+        errors,
+    )
+
+    allowances = screen.get("annual_allowances")
+    if not isinstance(allowances, dict) or set(allowances) != set(SCENARIO_ALLOWANCE_KEYS):
+        errors.append(f"{path}.annual_allowances must contain property_tax, wealth_tax and compliance")
+    else:
+        for key in SCENARIO_ALLOWANCE_KEYS:
+            allowance_path = f"{path}.annual_allowances.{key}"
+            allowance = allowances.get(key)
+            if not isinstance(allowance, dict):
+                errors.append(f"{allowance_path} must be an object")
+                continue
+            if not allowance.get("label"):
+                errors.append(f"{allowance_path}.label is required")
+            values = [
+                allowance.get("favorable_usd"),
+                allowance.get("central_usd"),
+                allowance.get("adverse_usd"),
+            ]
+            if not all(isinstance(value, (int, float)) and value >= 0 for value in values):
+                errors.append(f"{allowance_path} amounts must be non-negative numbers")
+            elif not values[0] <= values[1] <= values[2]:
+                errors.append(f"{allowance_path} amounts must be ordered favorable, central, adverse")
+            _validate_claim_source_ids(
+                allowance.get("source_ids"),
+                f"{allowance_path}.source_ids",
+                screen_source_ids,
+                source_ids,
+                errors,
+            )
+            if key == "property_tax":
+                uses = allowance.get("applies_to_property_uses")
+                if not isinstance(uses, list) or not set(uses).issubset(VALID_PROPERTY_USES - {"none"}):
+                    errors.append(f"{allowance_path}.applies_to_property_uses must contain supported owned uses")
+            if key == "wealth_tax":
+                bands = allowance.get("applies_to_wealth_bands")
+                if not isinstance(bands, list) or not set(bands).issubset(VALID_WEALTH_BANDS):
+                    errors.append(f"{allowance_path}.applies_to_wealth_bands must contain supported wealth bands")
 
     included = screen.get("included_categories")
     if not isinstance(included, list) or not included:

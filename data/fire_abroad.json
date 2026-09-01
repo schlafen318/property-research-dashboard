@@ -672,6 +672,53 @@
           "spain-income-scope",
           "spain-real-estate"
         ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "spain-income-scope",
+          "spain-real-estate"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 500,
+            "central_usd": 2000,
+            "adverse_usd": 5000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "spain-real-estate"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 2000,
+            "adverse_usd": 8000,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "spain-wealth-tax"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 1000,
+            "central_usd": 2500,
+            "adverse_usd": 5000,
+            "source_ids": [
+              "spain-income-scope"
+            ]
+          }
+        },
         "included_categories": [
           "income_tax_reserve",
           "social_tax_reserve",
@@ -807,6 +854,53 @@
           "portugal-residence-scope",
           "portugal-tax-system"
         ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "portugal-residence-scope",
+          "portugal-tax-system"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 500,
+            "central_usd": 1500,
+            "adverse_usd": 4000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "portugal-annual-property"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 1000,
+            "adverse_usd": 5000,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "portugal-annual-property"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 800,
+            "central_usd": 2000,
+            "adverse_usd": 4500,
+            "source_ids": [
+              "portugal-tax-system"
+            ]
+          }
+        },
         "included_categories": [
           "income_tax_reserve",
           "social_tax_reserve",
@@ -942,6 +1036,53 @@
           "indonesia-scope",
           "indonesia-nonresident-income"
         ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "indonesia-scope",
+          "indonesia-nonresident-income"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 300,
+            "central_usd": 1000,
+            "adverse_usd": 3000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "indonesia-land-tax"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "indonesia-scope"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 1000,
+            "central_usd": 2500,
+            "adverse_usd": 5000,
+            "source_ids": [
+              "indonesia-scope"
+            ]
+          }
+        },
         "included_categories": [
           "income_tax_reserve",
           "withholding_reserve",
@@ -1078,6 +1219,52 @@
           "croatia-residence",
           "croatia-income-law"
         ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "croatia-income-law"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 300,
+            "central_usd": 1000,
+            "adverse_usd": 2500,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "croatia-annual-property"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "croatia-income-law"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 800,
+            "central_usd": 2000,
+            "adverse_usd": 4000,
+            "source_ids": [
+              "croatia-income-law"
+            ]
+          }
+        },
         "included_categories": [
           "income_tax_reserve",
           "social_tax_reserve",
@@ -1217,6 +1404,53 @@
           "greece-income",
           "greece-nonresident"
         ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "greece-income",
+          "greece-nonresident"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 500,
+            "central_usd": 1500,
+            "adverse_usd": 4000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "greece-property"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 1000,
+            "adverse_usd": 4000,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "greece-property"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 1000,
+            "central_usd": 2500,
+            "adverse_usd": 5000,
+            "source_ids": [
+              "greece-income"
+            ]
+          }
+        },
         "included_categories": [
           "income_tax_reserve",
           "social_tax_reserve",
@@ -1354,6 +1588,53 @@
           "vietnam-scope",
           "vietnam-pit-law"
         ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "vietnam-scope",
+          "vietnam-pit-law"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 200,
+            "central_usd": 800,
+            "adverse_usd": 2500,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "vietnam-land-tax"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "vietnam-scope"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 800,
+            "central_usd": 2000,
+            "adverse_usd": 4500,
+            "source_ids": [
+              "vietnam-pit-law"
+            ]
+          }
+        },
         "included_categories": [
           "income_tax_reserve",
           "withholding_reserve",
@@ -1491,6 +1772,53 @@
           "japan-residence-scope",
           "japan-nonresident"
         ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "japan-residence-scope",
+          "japan-nonresident"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 1000,
+            "central_usd": 3000,
+            "adverse_usd": 7000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "japan-property-tax"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "japan-residence-scope"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 1200,
+            "central_usd": 3000,
+            "adverse_usd": 6000,
+            "source_ids": [
+              "japan-nonresident"
+            ]
+          }
+        },
         "included_categories": [
           "income_tax_reserve",
           "local_tax_reserve",
@@ -1622,6 +1950,53 @@
           "thailand-pit",
           "thailand-property-income"
         ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "thailand-pit",
+          "thailand-property-income"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 300,
+            "central_usd": 1000,
+            "adverse_usd": 3000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "thailand-annual-property-tax"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "thailand-pit"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 800,
+            "central_usd": 2000,
+            "adverse_usd": 4500,
+            "source_ids": [
+              "thailand-pit"
+            ]
+          }
+        },
         "included_categories": [
           "income_tax_reserve",
           "withholding_reserve",

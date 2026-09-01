@@ -1,0 +1,58 @@
+{
+  "country": {
+    "tax_screen": {
+      "status": "complete",
+      "last_reviewed": "2026-09-01",
+      "source_ids": ["tax-residence", "income-scope", "property-tax", "wealth-tax"],
+      "planning_bands": {
+        "seasonal": {
+          "favorable_rate": 0.02,
+          "central_rate": 0.04,
+          "adverse_rate": 0.08
+        },
+        "part_year": {
+          "favorable_rate": 0.04,
+          "central_rate": 0.08,
+          "adverse_rate": 0.14
+        },
+        "full_relocation": {
+          "favorable_rate": 0.08,
+          "central_rate": 0.16,
+          "adverse_rate": 0.24
+        }
+      },
+      "planning_band_basis_source_ids": ["tax-residence", "income-scope"],
+      "gain_intensity_modifiers": {
+        "low": 0.75,
+        "moderate": 1,
+        "high": 1.25
+      },
+      "gain_intensity_source_ids": ["income-scope"],
+      "annual_allowances": {
+        "property_tax": {
+          "label": "Annual property ownership tax allowance",
+          "favorable_usd": 1500,
+          "central_usd": 2500,
+          "adverse_usd": 4000,
+          "applies_to_property_uses": ["personal", "rental", "mixed"],
+          "source_ids": ["property-tax"]
+        },
+        "wealth_tax": {
+          "label": "Annual wealth-tax planning allowance",
+          "favorable_usd": 0,
+          "central_usd": 3000,
+          "adverse_usd": 8000,
+          "applies_to_wealth_bands": ["above_threshold"],
+          "source_ids": ["wealth-tax"]
+        },
+        "compliance": {
+          "label": "Annual filing and advice allowance",
+          "favorable_usd": 1000,
+          "central_usd": 2000,
+          "adverse_usd": 4000,
+          "source_ids": ["income-scope"]
+        }
+      }
+    }
+  }
+}

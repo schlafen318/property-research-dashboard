@@ -184,6 +184,37 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertEqual([13200, 14520], result["annualFundingGaps"])
         self.assertEqual(27720, result["liquidPortfolio"])
 
+    def test_annual_tax_expenses_are_inflated_with_general_expenses(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "horizonYears": 2,
+                "expenseCategories": [{"amount": 10_000, "inflationRate": 0}],
+                "incomeStreams": [],
+                "annualTaxExpenses": 2_000,
+                "taxMode": "destination_estimate",
+                "returnBasis": "after_fees_and_tax",
+                "generalInflation": 0.10,
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual([12200, 12420], result["annualFundingGaps"])
+        self.assertEqual(24620, result["liquidPortfolio"])
+        self.assertEqual(2200, result["annualTaxExpenses"])
+
+    def test_destination_estimate_requires_scenario_expenses(self) -> None:
+        payload = level_cash_flow_payload()
+        payload["taxMode"] = "destination_estimate"
+        payload["returnBasis"] = "after_fees_and_tax"
+        with self.assertRaises(subprocess.CalledProcessError):
+            calculate(payload)
+
+    def test_tax_adjusted_expenses_require_after_tax_return_basis(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update({"annualTaxExpenses": 1_000, "returnBasis": "gross"})
+        with self.assertRaises(subprocess.CalledProcessError):
+            calculate(payload)
+
     def test_fixed_and_indexed_income_follow_different_paths(self) -> None:
         payload = level_cash_flow_payload()
         payload.update(
