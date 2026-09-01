@@ -1,0 +1,132 @@
+{
+  "schema_version": 1,
+  "reviewed_on": "2026-09-01",
+  "weights": {
+    "active_life": 0.25,
+    "sustainable_annual_cost": 0.2,
+    "healthcare_bridge": 0.15,
+    "stay_flexibility": 0.1,
+    "tax_readiness": 0.1,
+    "global_access": 0.08,
+    "community_fit": 0.07,
+    "property_exit_flexibility": 0.05
+  },
+  "active_life_weights": {
+    "everyday_movement": 0.3,
+    "active_pursuits": 0.3,
+    "year_round_continuity": 0.25,
+    "activity_ecosystem": 0.15
+  },
+  "launch_destination_ids": [
+    "algarve-cascais",
+    "bali",
+    "croatia-istria-dalmatia",
+    "crete",
+    "da-nang-hoi-an",
+    "fukuoka-itoshima",
+    "madeira",
+    "malaga-costa-del-sol",
+    "phuket-koh-samui",
+    "valencia"
+  ],
+  "sources": [
+    {
+      "id": "spain-tax-residence",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/residencia-personas-fisicas-juridicas/persona-fisica-residente-espana.html",
+      "metric_supported": "Spanish individual tax-residence day, economic-interest and family tests",
+      "source_date": "Current guidance",
+      "accessed_on": "2026-09-01",
+      "notes": "Domestic residence guidance; treaty residence may require a separate analysis."
+    },
+    {
+      "id": "spain-resident-income-scope",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/no-residentes/residencia-personas-fisicas-juridicas/clases-contribuyentes-imposicion-sobre-renta.html",
+      "metric_supported": "Worldwide-income scope for Spanish residents and Spanish-source scope for nonresidents",
+      "source_date": "Current guidance",
+      "accessed_on": "2026-09-01",
+      "notes": "Treaty provisions can modify the domestic-law result."
+    },
+    {
+      "id": "spain-nonresident-wealth-tax",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/impuesto-sobre-patrimonio/exigibilidad-impuesto-sobre-patrimonio-no-residentes.html",
+      "metric_supported": "Spanish wealth-tax exposure for nonresidents holding Spanish assets",
+      "source_date": "Current guidance",
+      "accessed_on": "2026-09-01",
+      "notes": "Regional rules, exemptions, ownership, debt and treaty facts can change the result."
+    }
+  ],
+  "countries": {
+    "Spain": {
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "183_plus",
+          "summary": "A full relocation or extended part-year stay can create Spanish tax residence.",
+          "non_day_tests": [
+            "Main centre or base of economic activities or interests",
+            "Rebuttable spouse and dependent-minor family presumption"
+          ],
+          "source_ids": ["spain-tax-residence"]
+        },
+        "scope_if_resident": "worldwide_income",
+        "funding_source_notes": {
+          "portfolio": "Resident taxation can reach worldwide dividends, interest and realized gains.",
+          "pension": "Pension treatment depends on pension type, source country and any applicable treaty.",
+          "property": "Spanish property can create income, wealth and disposal exposure even while nonresident.",
+          "work_business": "Work and business income require residence, source and social-tax review.",
+          "mixed": "Mixed-income FIRE plans require category-by-category treatment."
+        },
+        "tax_readiness": "complex",
+        "tax_readiness_score": 2.5,
+        "planning_bands": {
+          "seasonal": {"favorable_rate": 0.0, "central_rate": 0.03, "adverse_rate": 0.08},
+          "part_year": {"favorable_rate": 0.03, "central_rate": 0.12, "adverse_rate": 0.22},
+          "full_relocation": {"favorable_rate": 0.12, "central_rate": 0.22, "adverse_rate": 0.35}
+        },
+        "planning_band_method": "Broad screening reserve applied to modeled dependable income and portfolio withdrawals; not a statutory rate or assessment.",
+        "included_categories": [
+          "income_tax_reserve",
+          "social_tax_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": ["wealth_tax", "inheritance_tax", "regional_variation"],
+        "property_lifecycle": {
+          "purchase": {"summary": "Purchase taxes vary by region, property type and whether the sale is new or resale."},
+          "annual": {"summary": "Local property tax and possible wealth or imputed-income exposure require property and residence facts."},
+          "rental": {"summary": "Rental income remains taxable and deductions can depend on residence and treaty context."},
+          "sale": {"summary": "Capital-gains tax and nonresident sale withholding can apply."},
+          "succession": {"summary": "Inheritance and gift exposure depends on residence, location, relationship and regional rules."}
+        },
+        "source_ids": [
+          "spain-tax-residence",
+          "spain-resident-income-scope",
+          "spain-nonresident-wealth-tax"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium_high"
+      }
+    },
+    "Portugal": {"tax_screen": {"status": "research_pending"}},
+    "Indonesia": {"tax_screen": {"status": "research_pending"}},
+    "Croatia": {"tax_screen": {"status": "research_pending"}},
+    "Greece": {"tax_screen": {"status": "research_pending"}},
+    "Vietnam": {"tax_screen": {"status": "research_pending"}},
+    "Japan": {"tax_screen": {"status": "research_pending"}},
+    "Thailand": {"tax_screen": {"status": "research_pending"}}
+  },
+  "destination_overrides": {
+    "algarve-cascais": {"country": "Portugal"},
+    "bali": {"country": "Indonesia"},
+    "croatia-istria-dalmatia": {"country": "Croatia"},
+    "crete": {"country": "Greece"},
+    "da-nang-hoi-an": {"country": "Vietnam"},
+    "fukuoka-itoshima": {"country": "Japan"},
+    "madeira": {"country": "Portugal"},
+    "malaga-costa-del-sol": {"country": "Spain"},
+    "phuket-koh-samui": {"country": "Thailand"},
+    "valencia": {"country": "Spain"}
+  }
+}
