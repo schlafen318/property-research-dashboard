@@ -21,6 +21,17 @@
     };
   }
 
+  function taxControlVisibility(input) {
+    const estimate = String(input && input.taxMode || "destination_estimate") === "destination_estimate";
+    const housingPlan = String(input && input.housingPlan || "rent");
+    return {
+      estimate: estimate,
+      propertyUse: estimate && housingPlan !== "rent",
+      wealthBand: estimate && Boolean(input && input.wealthTaxRelevant),
+      afterTax: !estimate,
+    };
+  }
+
   function safeDetailHref(input) {
     const destinations = /^[a-z0-9-]+$/;
     const households = new Set(["single", "couple"]);
@@ -105,6 +116,39 @@
       if (root.GHA && typeof root.GHA.track === "function") root.GHA.track(name, fields || {});
     }
 
+    function selectedTaxMode() {
+      const control = form.querySelector('input[name="finder-tax-mode"]:checked');
+      return control ? control.value : "destination_estimate";
+    }
+
+    function finderHasWealthTaxEvidence() {
+      const countries = payload.taxPlanning && payload.taxPlanning.countries || {};
+      return Object.values(countries).some(function (country) {
+        const screen = country && country.tax_screen || {};
+        const allowance = screen.annual_allowances && screen.annual_allowances.wealth_tax;
+        return allowance && ["favorable_usd", "central_usd", "adverse_usd"].some(function (key) {
+          return Number(allowance[key]) > 0;
+        });
+      });
+    }
+
+    function syncTaxControls() {
+      const visibility = taxControlVisibility({
+        taxMode: selectedTaxMode(),
+        housingPlan: selected("finder-housing-plan"),
+        wealthTaxRelevant: finderHasWealthTaxEvidence(),
+      });
+      element("finder-tax-estimate-fields").hidden = !visibility.estimate;
+      element("finder-tax-after-tax-note").hidden = !visibility.afterTax;
+      element("finder-tax-property-use-field").hidden = !visibility.propertyUse;
+      element("finder-tax-property-use").disabled = !visibility.propertyUse;
+      element("finder-tax-wealth-band-field").hidden = !visibility.wealthBand;
+      element("finder-tax-wealth-band").disabled = !visibility.wealthBand;
+      ["finder-tax-withdrawals", "finder-tax-gain-intensity"].forEach(function (id) {
+        element(id).disabled = !visibility.estimate;
+      });
+    }
+
     function syncHousing() {
       const visible = housingVisibility({
         housingPlan: selected("finder-housing-plan"),
@@ -118,6 +162,7 @@
       });
       element("finder-own-guidance").hidden = selected("finder-housing-plan") !== "own";
       element("finder-submit").disabled = selected("finder-housing-plan") === "own";
+      syncTaxControls();
     }
 
     function incomeStreams() {
@@ -147,6 +192,19 @@
         monthlyPortfolioContribution: numeric("finder-monthly-contribution"),
         contributionInflationLinked: checked("finder-contribution-indexed"),
         expectedPortfolioReturn: numeric("finder-return") / 100,
+        returnBasis: "after_fees_and_tax",
+        taxMode: selectedTaxMode(),
+        taxProfile: {
+          dependableIncome: numeric("finder-pension") + numeric("finder-other-income"),
+          portfolioWithdrawals: numeric("finder-tax-withdrawals"),
+          realizedGainIntensity: selected("finder-tax-gain-intensity"),
+          propertyUse: housingPlan === "rent" || element("finder-tax-property-use").disabled
+            ? "none"
+            : selected("finder-tax-property-use"),
+          wealthBand: element("finder-tax-wealth-band").disabled
+            ? "unknown"
+            : selected("finder-tax-wealth-band"),
+        },
         generalInflation: 0.026,
         emergencyReserveMonths: 12,
         incomeStreams: incomeStreams(),
@@ -369,6 +427,9 @@
         }
       });
     });
+    form.querySelectorAll('input[name="finder-tax-mode"]').forEach(function (control) {
+      control.addEventListener("change", syncTaxControls);
+    });
     element("finder-projection-bars").addEventListener("mouseover", function (event) {
       if (event.target.matches(".finder-chart-bar")) showTooltip(event.target);
     });
@@ -389,6 +450,7 @@
 
   return {
     housingVisibility: housingVisibility,
+    taxControlVisibility: taxControlVisibility,
     safeDetailHref: safeDetailHref,
     safeDossierHref: safeDossierHref,
     recommendationsForDisplay: recommendationsForDisplay,

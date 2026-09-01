@@ -8,6 +8,24 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACT = ROOT / "artifacts" / "retirement-destination-finder" / "index.html"
+UI_MODULE = ROOT / "src" / "retirement_destination_finder_ui.js"
+
+
+def run_ui(function_name: str, payload: object) -> object:
+    script = (
+        "const ui = require(process.argv[1]);"
+        "const input = JSON.parse(process.argv[2]);"
+        "process.stdout.write(JSON.stringify(ui[process.argv[3]](input)));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(UI_MODULE), json.dumps(payload), function_name],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise AssertionError(result.stderr)
+    return json.loads(result.stdout)
 
 
 class RetirementDestinationFinderPageTests(unittest.TestCase):
@@ -117,6 +135,38 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             self.assertIn(f'id="{field_id}"', self.html)
         self.assertIn('<option value="not_sure">Not sure</option>', self.html)
 
+    def test_finder_tax_controls_are_plain_progressive_and_after_tax_explicit(self) -> None:
+        form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split("</form>", 1)[0]
+        self.assertIn('id="finder-tax-planning"', form)
+        self.assertIn('value="destination_estimate" checked', form)
+        self.assertIn('value="user_after_tax"', form)
+        self.assertIn("Use destination planning estimates", form)
+        self.assertIn("I know my after-tax figures", form)
+        self.assertIn("Dependable annual income", form)
+        self.assertIn("Expected annual portfolio withdrawals", form)
+        self.assertIn("How much of those withdrawals may be realized gains?", form)
+        self.assertIn('id="finder-tax-property-use-field" hidden', form)
+        self.assertIn('id="finder-tax-wealth-band-field"', form)
+        self.assertIn("Expected annual portfolio return after fees and tax (%)", form)
+
+    def test_finder_tax_control_visibility_disables_inapplicable_fields(self) -> None:
+        renting = run_ui(
+            "taxControlVisibility",
+            {"taxMode": "destination_estimate", "housingPlan": "rent", "wealthTaxRelevant": True},
+        )
+        self.assertEqual(
+            {"estimate": True, "propertyUse": False, "wealthBand": True, "afterTax": False},
+            renting,
+        )
+        bypass = run_ui(
+            "taxControlVisibility",
+            {"taxMode": "user_after_tax", "housingPlan": "buy_retirement", "wealthTaxRelevant": True},
+        )
+        self.assertEqual(
+            {"estimate": False, "propertyUse": False, "wealthBand": False, "afterTax": True},
+            bypass,
+        )
+
     def test_results_are_concise_and_accessible(self) -> None:
         self.assertIn('id="finder-within-count"', self.html)
         self.assertIn('id="finder-projection" role="img"', self.html)
@@ -165,6 +215,10 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn("Mortgage availability is indicative", self.html)
         self.assertIn("Your financial details stay in this browser", self.html)
         self.assertIn('id="finder-financing-evidence"', self.html)
+
+    def test_script_disabled_page_keeps_context_and_warns_that_results_need_javascript(self) -> None:
+        self.assertIn("The interactive destination comparison requires JavaScript", self.html)
+        self.assertIn("The tax controls below remain a planning checklist", self.html)
 
     def test_sitemap_contains_route(self) -> None:
         sitemap = (ROOT / "artifacts" / "sitemap.xml").read_text()

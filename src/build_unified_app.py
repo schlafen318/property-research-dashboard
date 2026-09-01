@@ -182,6 +182,7 @@ RETIREMENT_FINDER_ENGINE_PATH = ROOT / "src" / "retirement_destination_finder.js
 RETIREMENT_FINDER_UI_PATH = ROOT / "src" / "retirement_destination_finder_ui.js"
 FIRE_ABROAD_ENGINE_PATH = ROOT / "src" / "fire_abroad.js"
 FIRE_ABROAD_UI_PATH = ROOT / "src" / "fire_abroad_ui.js"
+FIRE_TAX_SCENARIOS_PATH = ROOT / "src" / "fire_tax_scenarios.js"
 RETIREMENT_RANKING_TABLE_PATH = ROOT / "src" / "retirement_ranking_table.js"
 CONTINENT_BY_COUNTRY = {
     "Austria": "europe",
@@ -6024,7 +6025,9 @@ def build_retirement_destination_finder_page(
     destinations: list[dict],
     retirement_payload: dict,
     mortgage_payload: dict,
+    fire_payload: dict | None = None,
 ) -> str:
+    fire_payload = fire_payload or load_fire_abroad()
     retirement_ids = {item["destination_id"] for item in retirement_payload["destinations"]}
     eligible_destinations = [item for item in destinations if item["id"] in retirement_ids]
     mortgage_profiles = {
@@ -6045,6 +6048,11 @@ def build_retirement_destination_finder_page(
         "retirementCosts": retirement_payload["destinations"],
         "mortgageProfiles": mortgage_profiles,
         "defaultBuyerProfile": mortgage_payload["default_buyer_profile"],
+        "taxPlanning": {
+            "reviewedOn": fire_payload["reviewed_on"],
+            "countries": fire_payload["countries"],
+            "sources": fire_payload["sources"],
+        },
     }
     region_options = "".join(
         f'<option value="{escape(region)}">{escape(region.replace("-", " ").title())}</option>'
@@ -6065,6 +6073,7 @@ def build_retirement_destination_finder_page(
         retirement_engine=RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         property_engine=PROPERTY_FINANCE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        tax_scenario_engine=FIRE_TAX_SCENARIOS_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_ui=RETIREMENT_FINDER_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         analytics=analytics_event_script(),
         design_css=retirement_finder_design_css(),
@@ -6162,7 +6171,11 @@ def retirement_calculator_callout(css_class: str, source_label: str) -> str:
     """
 
 
-def build_retirement_calculator_page(destinations: list[dict], retirement_payload: dict) -> str:
+def build_retirement_calculator_page(
+    destinations: list[dict],
+    retirement_payload: dict,
+    fire_payload: dict | None = None,
+) -> str:
     canonical = page_url(RETIREMENT_CALCULATOR_SLUG)
     destination_by_id = {item["id"]: item for item in destinations}
     records = retirement_payload["destinations"]
@@ -6182,6 +6195,7 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         )
     if len(browser_records) < 4:
         raise ValueError("Retirement calculator quick answer requires at least four destinations")
+    fire_payload = fire_payload or load_fire_abroad()
     default_destination_id = "fukuoka-itoshima" if any(
         item["destination_id"] == "fukuoka-itoshima" for item in browser_records
     ) else browser_records[0]["destination_id"]
@@ -6247,11 +6261,17 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
             "currency": retirement_payload["currency"],
             "planning_currencies": RETIREMENT_PLANNING_CURRENCIES,
             "destinations": browser_records,
+            "tax_planning": {
+                "reviewed_on": fire_payload["reviewed_on"],
+                "countries": fire_payload["countries"],
+                "sources": fire_payload["sources"],
+            },
         },
         ensure_ascii=False,
         separators=(",", ":"),
     ).replace("</", "<\\/")
     engine_js = RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
+    tax_scenario_js = FIRE_TAX_SCENARIOS_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
     ui_js = RETIREMENT_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>") if RETIREMENT_UI_PATH.exists() else ""
     html = """<!doctype html>
 <html lang="en">
@@ -6260,12 +6280,13 @@ __HEAD__
   <style>
     :root { color: #24312d; background: #f5f1e9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#24312d; --muted:#66736c; --line:#d8d1c4; --paper:#fffdf7; --green:#315e50; }
     * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
-    .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
+    .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; } [hidden] { display:none!important; }
     .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; } .calc-modes { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-weight:750; } .calc-modes a { color:#fff; } .calc-modes a[aria-current] { color:#d8c28d; text-decoration:none; border-bottom:2px solid #d8c28d; }
-    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } .planning-currency { grid-column:1 / -1; } .planning-currency select { max-width:280px; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:400; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
+    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } .planning-currency { grid-column:1 / -1; } .planning-currency select { max-width:280px; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { min-width:0; border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:400; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
     .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .save-intent { padding-top:2px; } .save-intent .text-button { font-weight:750; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
     .accumulation-figure { position:relative; margin:0; padding:18px 0; border-top:1px solid var(--line); } .accumulation-figure h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .chart-legend { display:flex; gap:18px; color:var(--muted); font-size:12px; margin-bottom:8px; } .chart-key::before { content:""; display:inline-block; width:10px; height:10px; margin-right:6px; background:#315e50; } .chart-key.contribution::before { background:#c29b45; } .accumulation-chart { display:block; width:100%; height:auto; overflow:visible; } .chart-axis { stroke:var(--line); stroke-width:1; } .chart-target { stroke:#9b6a33; stroke-width:1.5; stroke-dasharray:5 4; } .chart-target-label { fill:#7a5227; font-size:11px; font-weight:700; } .chart-axis-label { fill:var(--muted); font-size:10px; } .chart-lump { fill:#315e50; } .chart-contribution { fill:#c29b45; } .chart-year { opacity:0; transform:translateY(8px); animation:ret-year-in .35s ease forwards; animation-delay:var(--year-delay); cursor:pointer; outline:none; } .chart-year.is-active rect,.chart-year:focus-visible rect { stroke:#24312d; stroke-width:2px; } .chart-tooltip { position:absolute; z-index:2; top:60px; right:0; width:min(245px,calc(100% - 20px)); padding:11px 13px; border-radius:6px; background:#24312d; color:#fff; box-shadow:0 8px 24px rgba(36,49,45,.2); font-size:12px; } .chart-tooltip strong { display:block; font-size:14px; margin-bottom:5px; } .chart-tooltip div { display:flex; justify-content:space-between; gap:12px; } .chart-tooltip span { color:#dfe7e3; } .result-comparison { padding:16px 0; border-top:1px solid var(--line); } .result-comparison h3,.result-comparison summary { font-family:Georgia,serif; font-size:21px; } .result-table { min-width:0; font-size:13px; background:transparent; } .result-table th,.result-table td { padding:8px 5px; white-space:normal; } .result-table td { text-align:right; } .result-table .is-selected { background:#f1eee4; } @keyframes ret-year-in { to { opacity:1; transform:translateY(0); } }
     .text-button { width:auto; min-height:0; padding:0; border:0; border-radius:0; background:none; color:#245c4b; text-decoration:underline; cursor:pointer; font-size:13px; }
+    .tax-mode-choices { display:grid; gap:10px; margin-bottom:16px; } .tax-mode-choice { display:grid; grid-template-columns:20px 1fr; gap:9px; align-items:start; margin:0; font-weight:650; } .tax-mode-choice input { width:20px; min-height:20px; margin-top:2px; } .tax-mode-choice small { display:block; color:var(--muted); font-weight:400; } .tax-central { margin:14px 0; padding:14px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); } .tax-central span,.tax-range span { display:block; color:var(--muted); font-size:12px; } .tax-central strong { display:block; font-family:Georgia,serif; font-size:30px; } .tax-range { margin:0 0 12px; } .tax-range strong { display:block; font-size:18px; } .tax-details .result-table { margin-top:12px; } .tax-details .result-table th,.tax-details .result-table td { white-space:normal; } .tax-explanations { margin-top:16px; font-size:13px; } .tax-explanations article { padding:12px 0; border-top:1px solid var(--line); } .tax-explanations h3 { margin:0 0 6px; font-size:18px; }
     .current-cost-comparison { margin-top:24px; } .current-cost-comparison h2 { margin:0 0 8px; } .current-cost-layout { display:grid; grid-template-columns:minmax(230px,.72fr) minmax(0,1.28fr); gap:28px; align-items:start; margin-top:20px; } .optional-label { color:var(--muted); font-weight:400; } .current-cost-result { border-left:1px solid var(--line); padding-left:28px; } .current-cost-summary { margin:0; font-family:Georgia,serif; font-size:23px; line-height:1.28; } .current-cost-annual { margin:7px 0 20px; color:var(--muted); } .current-cost-bars { display:grid; gap:14px; } .current-cost-bar-heading { display:flex; justify-content:space-between; gap:16px; margin-bottom:5px; } .current-cost-bar-heading span { color:var(--muted); white-space:nowrap; } .current-cost-track { height:10px; background:#e7e1d6; } .current-cost-fill { display:block; height:100%; background:#7d968b; transition:width .35s ease; } .current-cost-row.destination .current-cost-fill { background:var(--green); } .target-comparison { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); } .target-comparison h3 { margin:0 0 12px; font-family:Georgia,serif; font-size:21px; } .target-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .target-figures div { border-top:1px solid var(--line); padding-top:9px; } .target-figures span { display:block; color:var(--muted); font-size:12px; } .target-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:24px; } .target-difference { margin:12px 0 0; font-weight:750; }
     .cost-sidecar { width:min(560px,100%); max-width:none; height:100dvh; max-height:none; margin:0 0 0 auto; padding:0; border:0; background:transparent; overflow:hidden; } .cost-sidecar[open] { animation:cost-sidecar-in .25s ease-out; } .cost-sidecar::backdrop { background:rgba(24,34,30,.42); } .cost-sidecar-panel { height:100%; padding:24px; overflow:auto; background:var(--paper); box-shadow:-12px 0 32px rgba(36,49,45,.18); } .cost-sidecar-header { position:sticky; top:-24px; z-index:1; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin:-24px -24px 14px; padding:24px; border-bottom:1px solid var(--line); background:var(--paper); } .cost-sidecar-header h2 { margin:0; font-size:30px; } .cost-sidecar-close { width:auto; min-height:40px; padding:7px 10px; background:transparent; cursor:pointer; } .cost-sidecar-chart { display:grid; gap:5px; } .cost-row { min-height:0; padding:9px 10px; border:1px solid transparent; border-radius:3px; background:transparent; text-align:left; cursor:pointer; } .cost-row:hover,.cost-row:focus-visible { border-color:var(--line); background:#f5f1e9; } .cost-row.is-current { border-color:var(--green); } .cost-row-heading { display:flex; justify-content:space-between; gap:16px; } .cost-row-heading > span { color:var(--muted); white-space:nowrap; } .cost-bar-track { display:block; height:8px; margin-top:6px; background:#e7e1d6; } .cost-bar-fill { display:block; height:100%; background:#56806f; } @keyframes cost-sidecar-in { from { transform:translateX(100%); } to { transform:translateX(0); } }
     .quick-answer { padding:4px 0 36px; } .quick-answer h2 { max-width:760px; margin:.2rem 0 1rem; } .quick-answer > p { max-width:850px; } .quick-answer .table-wrap { margin-top:20px; } .quick-benchmark { min-width:560px; } .quick-benchmark td:last-child { font-family:Georgia,serif; font-size:18px; }
@@ -6305,13 +6326,26 @@ __UTILITY_CSS__
           <div class="field"><label for="ret-monthly-income">After-tax monthly income</label><input id="ret-monthly-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"></div>
           <div class="field"><label for="ret-income-invested-rate">Share invested from income (%)</label><input id="ret-income-invested-rate" type="number" min="0" max="100" step="1" value="20"><p class="hint" id="ret-monthly-investment-preview">Monthly contribution: $0</p></div>
         </div></fieldset>
-        <fieldset><legend>Income continuing after retirement (annual)</legend><p class="hint">Use after-tax amounts expected to continue in retirement. Do not include dividends from the portfolio being calculated.</p><div class="field-grid">
+        <fieldset><legend>Income continuing after retirement (annual)</legend><p class="hint" id="ret-retirement-income-note">Enter dependable amounts before destination tax. Do not include dividends from the portfolio being calculated.</p><div class="field-grid">
           <div class="field"><label for="ret-pension">Pension</label><input id="ret-pension" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><label class="check"><input id="ret-pension-indexed" type="checkbox" checked> Inflation-linked</label></div>
           <div class="field"><label for="ret-other-income">Other non-portfolio income</label><input id="ret-other-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><label class="check"><input id="ret-other-indexed" type="checkbox" checked> Inflation-linked</label></div>
           <div class="field"><label for="ret-rental-income">Net rental income</label><input id="ret-rental-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at zero when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox" checked> Inflation-linked</label></div>
         </div></fieldset>
+        <fieldset id="ret-tax-planning"><legend>Destination tax planning</legend><p class="hint">Choose a broad planning range or use figures you already know are after tax.</p>
+          <div class="tax-mode-choices">
+            <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="destination_estimate" checked><span>Use destination planning estimate<small>Add a broad, source-backed tax reserve to the retirement plan.</small></span></label>
+            <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="user_after_tax"><span>I know my after-tax figures<small>No destination income-tax reserve is added.</small></span></label>
+          </div>
+          <div id="ret-tax-estimate-fields"><p class="hint">Dependable annual income is taken from the retirement-income amounts above.</p><div class="field-grid">
+            <div class="field"><label for="ret-tax-withdrawals">Expected annual portfolio withdrawals</label><input id="ret-tax-withdrawals" type="text" inputmode="numeric" data-money min="0" step="100" value="0"></div>
+            <div class="field"><label for="ret-tax-gain-intensity">How much of those withdrawals may be realized gains?</label><select id="ret-tax-gain-intensity"><option value="low">Little or none</option><option value="moderate" selected>A moderate share</option><option value="high">A large share</option></select></div>
+            <div class="field" id="ret-tax-property-use-field" hidden><label for="ret-tax-property-use">How will you use the destination home?</label><select id="ret-tax-property-use" disabled><option value="personal" selected>Personal use</option><option value="rental">Rental</option><option value="mixed">Personal and rental use</option></select></div>
+            <div class="field" id="ret-tax-wealth-band-field" hidden><label for="ret-tax-wealth-band">Broad household wealth band</label><select id="ret-tax-wealth-band" disabled><option value="under_threshold">Below the destination threshold</option><option value="above_threshold">Above the destination threshold</option><option value="unknown" selected>Not sure</option></select><p class="hint">Shown only where the destination evidence identifies a material wealth-tax exposure.</p></div>
+          </div></div>
+          <p class="hint" id="ret-tax-after-tax-note" hidden>Your dependable income and portfolio return must already reflect tax.</p>
+        </fieldset>
         <fieldset><legend>Portfolio assumption</legend>
-          <label for="ret-expected-return">Expected annual portfolio return after fees (%)</label>
+          <label for="ret-expected-return">Expected annual portfolio return after fees and tax (%)</label>
           <input id="ret-expected-return" type="number" min="-5" max="15" step="0.1" required>
           <p class="hint">Required. Enter your own straight-line return assumption; this is not a guaranteed return or probability-of-success estimate.</p>
           <p class="hint"><button class="text-button" id="ret-example-return" type="button">Use an illustrative 4% example</button> to explore the model; it is not a forecast or recommendation.</p>
@@ -6327,6 +6361,12 @@ __UTILITY_CSS__
       <section class="calc-panel result-panel" id="ret-results" aria-live="polite" aria-atomic="true">
         <h2>Your planning estimate</h2><p class="hint" id="ret-result-status">Complete the inputs and calculate.</p>
         <p class="result-decision" id="ret-plan-summary">Enter your assumptions to see what to invest today and each month.</p>
+        <section class="tax-central" id="ret-tax-central" hidden aria-label="Central tax-adjusted estimate"><span>Central estimate needed today</span><strong id="ret-tax-central-capital">—</strong><p class="hint">Includes an annual planning tax reserve of <span id="ret-tax-central-reserve">—</span>.</p></section>
+        <p class="tax-range" id="ret-tax-range" hidden><span>Favorable to adverse range</span><strong id="ret-tax-range-capital">—</strong></p>
+        <p class="hint" id="ret-tax-unavailable" hidden>This destination tax estimate is conditional because current evidence is unavailable.</p>
+        <p class="hint" id="ret-tax-no-tax-comparison" hidden>No added destination tax comparison: <strong id="ret-tax-no-tax-capital">—</strong>.</p>
+        <details class="tax-details" id="ret-tax-details" hidden><summary>Assumptions and sources</summary><div class="table-wrap"><table class="result-table"><thead><tr><th>Scenario</th><th>Tax reserve</th><th>Total annual requirement</th><th>Capital requirement</th></tr></thead><tbody><tr id="ret-tax-favorable-row"><th scope="row">Favorable</th><td></td><td></td><td></td></tr><tr id="ret-tax-central-row"><th scope="row">Central</th><td></td><td></td><td></td></tr><tr id="ret-tax-adverse-row"><th scope="row">Adverse</th><td></td><td></td><td></td></tr></tbody></table></div><div class="tax-explanations" id="ret-tax-explanations"></div></details>
+        <p><button class="text-button" id="ret-tax-refine" type="button">Refine this tax estimate</button></p><p class="hint" id="ret-tax-refine-status" role="status" hidden>Detailed tax refinement is not available yet. The planning range above has not changed.</p>
         <section class="result-period" id="ret-today-section" aria-label="Key planning figures"><div class="key-figures">
           <div><span>Needed today</span><strong id="ret-total-today">—</strong></div><div><span>Needed at retirement</span><strong id="ret-total-retirement-summary">—</strong></div><div><span>Monthly contribution</span><strong id="ret-monthly-contribution">—</strong></div><div id="ret-home-summary" hidden><span id="ret-home-today-label">Home purchase today</span><strong id="ret-home-today">—</strong></div>
         </div>
@@ -6348,7 +6388,7 @@ __UTILITY_CSS__
         </section>
         <details class="result-comparison" id="ret-housing-comparison" hidden><summary>Compare housing plans</summary><p class="hint">Uses your current lifestyle level and destination assumptions.</p><table class="result-table"><thead><tr><th>Plan</th><th>Needed today</th><th>At retirement</th></tr></thead><tbody id="ret-housing-comparison-rows"></tbody></table></details>
         <section class="result-period" id="ret-first-year-section" aria-labelledby="ret-first-year-heading"><h3 id="ret-first-year-heading">First retirement year</h3>
-          <div class="result-grid"><div><span id="ret-first-expenses-label">Annual spending incl. rent</span><strong id="ret-first-expenses">—</strong></div><div><span>Reliable outside income</span><strong id="ret-outside-income">—</strong></div><div><span>Portfolio withdrawal needed</span><strong id="ret-funding-gap">—</strong></div><div><span>Expected return after fees</span><strong id="ret-result-return">—</strong></div><div><span>First-year portfolio withdrawal</span><strong id="ret-result-implied-withdrawal">—</strong><small id="ret-withdrawal-explanation">First-year funding gap ÷ liquid portfolio. Descriptive only—not a recommended safe withdrawal rate.</small></div><div><span>Net return after withdrawal</span><strong id="ret-result-net-return">—</strong><small id="ret-net-return-explanation">Expected return minus first-year portfolio withdrawal.</small></div></div>
+          <div class="result-grid"><div><span id="ret-first-expenses-label">Annual spending incl. rent</span><strong id="ret-first-expenses">—</strong></div><div><span>Reliable outside income</span><strong id="ret-outside-income">—</strong></div><div><span>Portfolio withdrawal needed</span><strong id="ret-funding-gap">—</strong></div><div><span>Expected return after fees and tax</span><strong id="ret-result-return">—</strong></div><div><span>First-year portfolio withdrawal</span><strong id="ret-result-implied-withdrawal">—</strong><small id="ret-withdrawal-explanation">First-year funding gap ÷ liquid portfolio. Descriptive only—not a recommended safe withdrawal rate.</small></div><div><span>Net return after withdrawal</span><strong id="ret-result-net-return">—</strong><small id="ret-net-return-explanation">Expected return minus first-year portfolio withdrawal.</small></div></div>
         </section>
         </div>
         <p class="hint" id="ret-result-assumptions">Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.</p>
@@ -6382,12 +6422,13 @@ __UTILITY_CSS__
       <div class="cost-sidecar-panel"><header class="cost-sidecar-header"><div><h2 id="ret-cost-sidecar-title">Compare monthly living expenses</h2><p class="hint" id="ret-cost-sidecar-context"></p></div><button class="cost-sidecar-close" id="ret-cost-sidecar-close" type="button" aria-label="Close destination comparison">Close</button></header><div class="cost-sidecar-chart" id="ret-cost-sidecar-chart"></div></div>
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
-    <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Tax, visa eligibility, currency shocks, individualized healthcare and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
+    <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. It also adds a broad destination tax allowance. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Individual tax or treaty advice, visa eligibility, currency shocks, individualized healthcare, and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a></p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
   __SITE_FOOTER__
   <script id="retirement-destination-data" type="application/json">__DATA__</script>
   <script>__ENGINE__</script>
+  <script>__TAX_SCENARIO_ENGINE__</script>
   <script>__UI__</script>
 __ANALYTICS__
   <script>if(window.GHARetirementCalculatorUI){window.GHARetirementCalculatorUI.initRetirementCalculator("retirement-calculator",JSON.parse(document.getElementById("retirement-destination-data").textContent));}</script>
@@ -6404,6 +6445,7 @@ __ANALYTICS__
         "__FAQ__": faq_html,
         "__DATA__": page_data,
         "__ENGINE__": engine_js,
+        "__TAX_SCENARIO_ENGINE__": tax_scenario_js,
         "__UI__": ui_js,
         "__ANALYTICS__": analytics_event_script(),
     }
@@ -11700,14 +11742,16 @@ def build() -> Path:
     retirement_calculator_dir = ARTIFACTS / RETIREMENT_CALCULATOR_SLUG
     retirement_calculator_dir.mkdir(parents=True, exist_ok=True)
     (retirement_calculator_dir / "index.html").write_text(
-        clean_generated_html(build_retirement_calculator_page(destinations, retirement_costs)),
+        clean_generated_html(build_retirement_calculator_page(destinations, retirement_costs, fire_payload)),
         encoding="utf-8",
     )
     retirement_finder_dir = ARTIFACTS / RETIREMENT_FINDER_SLUG
     retirement_finder_dir.mkdir(parents=True, exist_ok=True)
     (retirement_finder_dir / "index.html").write_text(
         clean_generated_html(
-            build_retirement_destination_finder_page(destinations, retirement_costs, mortgage_profiles)
+            build_retirement_destination_finder_page(
+                destinations, retirement_costs, mortgage_profiles, fire_payload
+            )
         ),
         encoding="utf-8",
     )

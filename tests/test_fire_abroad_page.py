@@ -54,6 +54,10 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertNotIn("Cost basis", self.html)
         self.assertNotIn("Treaty tie-breaker", self.html)
 
+    def test_hidden_property_use_overrides_the_grid_label_rule(self):
+        head = self.html.split("</head>", 1)[0]
+        self.assertIn(".fire-fields [hidden]{display:none!important}", head)
+
     def test_default_results_explain_tax_without_false_precision(self):
         self.assertIn("Tax Readiness", self.html)
         self.assertIn("Planning tax reserve", self.html)

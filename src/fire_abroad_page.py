@@ -123,6 +123,7 @@ def build_fire_abroad_html(
     .fire-form{{padding:28px 0;border-top:1px solid rgba(36,49,45,.15);border-bottom:1px solid rgba(36,49,45,.15)}}
     .fire-fields{{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px}}
     .fire-fields label{{display:grid;gap:7px;font-weight:600}}
+    .fire-fields [hidden]{{display:none!important}}
     .fire-fields select{{width:100%;min-height:44px;padding:8px;border:1px solid #9aa59f;background:#fff}}
     .fire-results,.fire-method{{padding:38px 0}}
     .fire-table-wrap{{overflow-x:auto}}

@@ -205,6 +205,72 @@
     ];
   }
 
+  function taxControlVisibility(input) {
+    const estimate = String(input && input.taxMode || "destination_estimate") === "destination_estimate";
+    const housingPlan = String(input && input.housingPlan || "rent");
+    return {
+      estimate: estimate,
+      propertyUse: estimate && housingPlan !== "rent",
+      wealthBand: estimate && Boolean(input && input.wealthTaxRelevant),
+      afterTax: !estimate,
+    };
+  }
+
+  function wealthTaxRelevant(countryRecord) {
+    const screen = countryRecord && countryRecord.tax_screen || {};
+    const allowance = screen.annual_allowances && screen.annual_allowances.wealth_tax;
+    if (!allowance || !Array.isArray(allowance.applies_to_wealth_bands)) return false;
+    return allowance.applies_to_wealth_bands.length > 0 &&
+      ["favorable_usd", "central_usd", "adverse_usd"].some(function (key) {
+        return Number(allowance[key]) > 0;
+      });
+  }
+
+  function taxResultPresentation(input) {
+    const taxScenario = input && input.taxScenario || {};
+    const scenarioResults = input && input.scenarioResults || {};
+    if (taxScenario.status === "unavailable") {
+      return {
+        status: "unavailable",
+        conditional: taxScenario.conditional !== false,
+        headlineKey: null,
+        rows: [],
+        capitalRange: [],
+        noTaxComparison: null,
+      };
+    }
+    if (taxScenario.status === "user_after_tax") {
+      return {
+        status: "user_after_tax",
+        conditional: false,
+        headlineKey: "user_after_tax",
+        rows: [],
+        capitalRange: [],
+        noTaxComparison: null,
+      };
+    }
+    const keys = ["favorable", "central", "adverse"];
+    const rows = keys.map(function (key) {
+      const row = scenarioResults[key];
+      if (!row) throw new Error("Tax-adjusted result " + key + " is required");
+      return {
+        key: key,
+        label: row.label || key.charAt(0).toUpperCase() + key.slice(1),
+        annualTaxReserve: Number(row.annualTaxReserve),
+        totalAnnualRequirement: Number(row.firstYearExpenses),
+        requiredCapital: Number(row.requiredCapital),
+      };
+    });
+    return {
+      status: "available",
+      conditional: false,
+      headlineKey: "central",
+      rows: rows,
+      capitalRange: [rows[0].requiredCapital, rows[2].requiredCapital],
+      noTaxComparison: scenarioResults.central.noTaxComparison,
+    };
+  }
+
   function calculatorEngine() {
     if (root && root.GHARetirementCalculator) return root.GHARetirementCalculator;
     if (typeof require === "function") return require("./retirement_calculator.js");
@@ -443,6 +509,7 @@
       "ret-pension",
       "ret-other-income",
       "ret-rental-income",
+      "ret-tax-withdrawals",
       "ret-current-monthly-spending",
     ];
     const formatMoneyControl = function (control) {
@@ -472,6 +539,8 @@
     let hasTrackedResult = false;
     let hasTrackedCurrentCostComparison = false;
     let latestResult = null;
+    let latestTaxScenario = null;
+    let latestScenarioResults = null;
 
     const prefill = retirementPrefill(root.location && root.location.search);
     [
@@ -490,6 +559,40 @@
 
     function selectedRecord() {
       return byId[el("ret-destination").value];
+    }
+
+    function selectedTaxMode() {
+      const selected = form.querySelector('input[name="ret-tax-mode"]:checked');
+      return selected ? selected.value : "destination_estimate";
+    }
+
+    function selectedCountryRecord() {
+      const planning = payload.tax_planning || {};
+      const countries = planning.countries || {};
+      const record = selectedRecord();
+      return record && countries[record.country] || null;
+    }
+
+    function syncTaxControls() {
+      const visibility = taxControlVisibility({
+        taxMode: selectedTaxMode(),
+        housingPlan: el("ret-housing-plan").value,
+        wealthTaxRelevant: wealthTaxRelevant(selectedCountryRecord()),
+      });
+      el("ret-tax-estimate-fields").hidden = !visibility.estimate;
+      el("ret-tax-after-tax-note").hidden = !visibility.afterTax;
+      el("ret-retirement-income-note").textContent = visibility.afterTax
+        ? "Enter amounts that already reflect tax. Do not include dividends from the portfolio being calculated."
+        : "Enter dependable amounts before destination tax. Do not include dividends from the portfolio being calculated.";
+      el("ret-tax-property-use-field").hidden = !visibility.propertyUse;
+      el("ret-tax-property-use").disabled = !visibility.propertyUse;
+      el("ret-tax-wealth-band-field").hidden = !visibility.wealthBand;
+      el("ret-tax-wealth-band").disabled = !visibility.wealthBand;
+      el("ret-tax-refine").hidden = !visibility.estimate;
+      if (!visibility.estimate) el("ret-tax-refine-status").hidden = true;
+      ["ret-tax-withdrawals", "ret-tax-gain-intensity"].forEach(function (id) {
+        el(id).disabled = !visibility.estimate;
+      });
     }
 
     function syncDestinationDefaults(resetPropertyBudget) {
@@ -521,6 +624,7 @@
       el("ret-general-inflation").value = String(record.inflation.general * 100);
       el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
       el("ret-property-inflation").value = String(record.inflation.property * 100);
+      syncTaxControls();
     }
 
     function renderDestinationCosts() {
@@ -646,9 +750,36 @@
         expectedPortfolioReturn: rate("ret-expected-return"),
         monthlyIncomeBeforeRetirement: moneyNumber("ret-monthly-income"),
         incomeInvestedRate: rate("ret-income-invested-rate"),
-        taxMode: "unspecified",
-        returnBasis: "after_fees",
+        taxMode: "user_after_tax",
+        returnBasis: "after_fees_and_tax",
       };
+    }
+
+    function taxScenarioInput(planOverride) {
+      const plan = planOverride || el("ret-housing-plan").value;
+      const propertyUseVisible = !el("ret-tax-property-use").disabled;
+      return {
+        taxMode: selectedTaxMode(),
+        stayMode: "full_relocation",
+        dependableIncome: moneyNumber("ret-pension") + moneyNumber("ret-other-income") + moneyNumber("ret-rental-income"),
+        portfolioWithdrawals: moneyNumber("ret-tax-withdrawals"),
+        realizedGainIntensity: el("ret-tax-gain-intensity").value,
+        propertyPrice: usesPropertyBudget(plan) ? moneyNumber("ret-property-budget") : 0,
+        propertyUse: plan === "rent" || !propertyUseVisible ? "none" : el("ret-tax-property-use").value,
+        wealthBand: el("ret-tax-wealth-band").disabled ? "unknown" : el("ret-tax-wealth-band").value,
+        propertyTaxIncludedInRetirementCosts: plan !== "rent",
+        asOf: payload.tax_planning && payload.tax_planning.reviewed_on,
+      };
+    }
+
+    function estimateTaxScenario(planOverride) {
+      if (!root.GHAFireTaxScenarios || typeof root.GHAFireTaxScenarios.estimateTaxScenario !== "function") {
+        throw new Error("Destination tax scenario engine is required");
+      }
+      return root.GHAFireTaxScenarios.estimateTaxScenario(
+        taxScenarioInput(planOverride),
+        selectedCountryRecord()
+      );
     }
 
     function setMoney(id, value) {
@@ -736,9 +867,93 @@
       }
     }
 
-    function render(result) {
+    function appendTaxExplanation(container, key, explanation, sourceById) {
+      if (!explanation) return;
+      const article = document.createElement("article");
+      const heading = document.createElement("h3");
+      const formula = document.createElement("p");
+      const context = document.createElement("p");
+      const sources = document.createElement("p");
+      heading.textContent = key.charAt(0).toUpperCase() + key.slice(1) + " tax reserve";
+      formula.textContent = "Formula: " + explanation.formula;
+      context.textContent = "Assumptions: " + (explanation.assumptions || []).join("; ") +
+        ". Included: " + (explanation.inclusions || []).join(", ") +
+        ". Excluded: " + (explanation.exclusions || []).join(", ") +
+        ". Tax year: " + explanation.taxYear + ". Confidence: " + explanation.confidence + ".";
+      sources.appendChild(document.createTextNode("Sources: "));
+      (explanation.sourceIds || []).forEach(function (sourceId, index) {
+        const source = sourceById[sourceId];
+        if (index) sources.appendChild(document.createTextNode(", "));
+        if (!source) {
+          sources.appendChild(document.createTextNode(sourceId));
+          return;
+        }
+        const link = document.createElement("a");
+        link.href = source.url;
+        link.rel = "noopener noreferrer";
+        link.textContent = source.publisher;
+        sources.appendChild(link);
+      });
+      article.append(heading, formula, context, sources);
+      container.appendChild(article);
+    }
+
+    function renderTaxResults(taxScenario, scenarioResults) {
+      const view = taxResultPresentation({
+        taxScenario: taxScenario,
+        scenarioResults: scenarioResults,
+      });
+      const centralSection = el("ret-tax-central");
+      const range = el("ret-tax-range");
+      const unavailable = el("ret-tax-unavailable");
+      const comparison = el("ret-tax-no-tax-comparison");
+      const details = el("ret-tax-details");
+      centralSection.hidden = true;
+      range.hidden = true;
+      unavailable.hidden = true;
+      comparison.hidden = true;
+      details.hidden = true;
+      if (view.status === "unavailable") {
+        unavailable.hidden = false;
+        return view;
+      }
+      if (view.status !== "available") return view;
+      const central = view.rows[1];
+      centralSection.hidden = false;
+      setMoney("ret-tax-central-capital", central.requiredCapital);
+      setMoney("ret-tax-central-reserve", central.annualTaxReserve);
+      range.hidden = false;
+      el("ret-tax-range-capital").textContent = displayMoney(view.capitalRange[0]) + "–" + displayMoney(view.capitalRange[1]);
+      if (view.noTaxComparison) {
+        comparison.hidden = false;
+        setMoney("ret-tax-no-tax-capital", view.noTaxComparison.requiredCapital);
+      }
+      view.rows.forEach(function (row) {
+        const cells = el("ret-tax-" + row.key + "-row").children;
+        cells[1].textContent = displayMoney(row.annualTaxReserve);
+        cells[2].textContent = displayMoney(row.totalAnnualRequirement);
+        cells[3].textContent = displayMoney(row.requiredCapital);
+      });
+      const explanationContainer = el("ret-tax-explanations");
+      const sourceById = Object.fromEntries(((payload.tax_planning || {}).sources || []).map(function (source) {
+        return [source.id, source];
+      }));
+      explanationContainer.replaceChildren();
+      view.rows.forEach(function (row) {
+        const explanation = taxScenario.amountExplanations &&
+          taxScenario.amountExplanations[row.key] &&
+          taxScenario.amountExplanations[row.key].total;
+        appendTaxExplanation(explanationContainer, row.key, explanation, sourceById);
+      });
+      details.hidden = false;
+      return view;
+    }
+
+    function render(result, taxScenario, scenarioResults) {
       const record = selectedRecord();
       latestResult = result;
+      latestTaxScenario = taxScenario;
+      latestScenarioResults = scenarioResults;
       el("ret-detailed-projection").hidden = false;
       el("ret-plan-summary").textContent = planningSummary({
         result: result,
@@ -779,6 +994,7 @@
         ? "Home purchase at retirement"
         : "No home purchase at retirement";
       el("ret-result-status").textContent = record.name + " · " + el("ret-household").selectedOptions[0].textContent + " · " + result.yearsToRetirement + " years to retirement";
+      renderTaxResults(taxScenario, scenarioResults);
       renderSensitivity();
       renderHousingComparison();
       renderAccumulationChart(result.annualAccumulation, result.totalCapitalAtRetirement);
@@ -808,14 +1024,21 @@
       container.appendChild(row);
     }
 
+    function resultForTaxScenario(baseInput, taxScenario) {
+      const scenarios = calculateTaxAdjustedScenarios(baseInput, taxScenario);
+      return taxScenario.status === "user_after_tax"
+        ? scenarios.user_after_tax.result
+        : scenarios.central.result;
+    }
+
     function renderSensitivity() {
       const container = el("ret-sensitivity-rows");
       const baseInput = calculatorInput();
       container.replaceChildren();
       sensitivityRates(baseInput.expectedPortfolioReturn).forEach(function (scenario) {
-        const result = engine.calculateRetirement(Object.assign({}, baseInput, {
+        const result = resultForTaxScenario(Object.assign({}, baseInput, {
           expectedPortfolioReturn: scenario.rate,
-        }));
+        }), latestTaxScenario);
         appendComparisonRow(
           container,
           scenario.label,
@@ -838,7 +1061,8 @@
       ];
       container.replaceChildren();
       plans.forEach(function (plan) {
-        const result = engine.calculateRetirement(calculatorInput(plan.value));
+        const scenario = estimateTaxScenario(plan.value);
+        const result = resultForTaxScenario(calculatorInput(plan.value), scenario);
         const row = document.createElement("tr");
         const name = document.createElement("th");
         const today = document.createElement("td");
@@ -953,7 +1177,26 @@
         return;
       }
       try {
-        render(engine.calculateRetirement(calculatorInput()));
+        const taxScenario = estimateTaxScenario();
+        if (taxScenario.status === "unavailable") {
+          latestResult = null;
+          latestTaxScenario = taxScenario;
+          latestScenarioResults = {};
+          renderTaxResults(taxScenario, {});
+          el("ret-plan-summary").textContent = "A tax-adjusted estimate is unavailable for this destination. Choose another destination or use after-tax figures you already know.";
+          el("ret-result-status").textContent = selectedRecord().name + " · Conditional tax evidence";
+          el("ret-today-section").hidden = true;
+          el("ret-detailed-projection").hidden = true;
+          el("ret-current-cost-comparison").hidden = true;
+          el("ret-save-action").hidden = true;
+          return;
+        }
+        const scenarioResults = calculateTaxAdjustedScenarios(calculatorInput(), taxScenario);
+        const result = taxScenario.status === "user_after_tax"
+          ? scenarioResults.user_after_tax.result
+          : scenarioResults.central.result;
+        el("ret-today-section").hidden = false;
+        render(result, taxScenario, scenarioResults);
         if (event) track("retirement_calculator_calculate");
       } catch (error) {
         errors.textContent = error instanceof Error ? error.message : "Unable to calculate this scenario.";
@@ -992,7 +1235,7 @@
       });
       selectedCurrency = nextCurrency;
       updateMonthlyInvestmentPreview();
-      if (latestResult) render(latestResult);
+      if (latestResult) render(latestResult, latestTaxScenario, latestScenarioResults);
       if (shouldTrack !== false) track("retirement_calculator_currency_change");
     }
 
@@ -1015,6 +1258,9 @@
     form.addEventListener("submit", calculate);
     form.addEventListener("input", scheduleCalculation);
     form.addEventListener("change", scheduleCalculation);
+    form.querySelectorAll('input[name="ret-tax-mode"]').forEach(function (control) {
+      control.addEventListener("change", syncTaxControls);
+    });
     moneyControlIds.forEach(function (id) {
       const control = el(id);
       if (!control) return;
@@ -1035,6 +1281,9 @@
     el("ret-save-intent-button").addEventListener("click", function () {
       el("ret-save-intent-button").hidden = true;
       el("ret-save-intent-status").hidden = false;
+    });
+    el("ret-tax-refine").addEventListener("click", function () {
+      el("ret-tax-refine-status").hidden = false;
     });
     ["ret-current-location", "ret-current-monthly-spending"].forEach(function (id) {
       el(id).addEventListener("input", function () { renderCurrentCostComparison(); });
@@ -1082,6 +1331,9 @@
     housingExpenseLabels: housingExpenseLabels,
     accumulationChartModel: accumulationChartModel,
     sensitivityRates: sensitivityRates,
+    taxControlVisibility: taxControlVisibility,
+    wealthTaxRelevant: wealthTaxRelevant,
+    taxResultPresentation: taxResultPresentation,
     calculateTaxAdjustedScenarios: calculateTaxAdjustedScenarios,
     planningSummary: planningSummary,
     accumulationTooltipContent: accumulationTooltipContent,
