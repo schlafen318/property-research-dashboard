@@ -1266,5 +1266,44 @@ class FireTaxRuleContractTests(unittest.TestCase):
         self.assert_path_error(errors, "jurisdictions.synthetic-example.rules[2].id")
 
 
+class FireTaxPropertyRuleSchemaTests(unittest.TestCase):
+    def setUp(self):
+        fixture_path = ROOT / "tests" / "fixtures" / "fire_tax_property.json"
+        self.payload = json.loads(fixture_path.read_text(encoding="utf-8"))["rules"]
+
+    def validate(self, payload):
+        return validate_fire_tax_rules(payload, as_of=date(2026, 9, 1))
+
+    def assert_path_error(self, errors, path):
+        self.assertTrue(
+            any(error.startswith(path) for error in errors),
+            f"Expected an error at {path!r}; got {errors!r}",
+        )
+
+    def test_property_execution_metadata_is_part_of_the_shared_contract(self):
+        self.assertEqual([], self.validate(self.payload))
+        rule_path = "jurisdictions.synthetic-destination.rules[0]"
+        for field in ("charge_kind", "tax_or_non_tax", "payment_treatment"):
+            with self.subTest(field=field):
+                payload = copy.deepcopy(self.payload)
+                payload["jurisdictions"]["synthetic-destination"]["rules"][0].pop(field)
+                self.assert_path_error(self.validate(payload), f"{rule_path}.{field}")
+
+    def test_property_conditions_ranges_and_retirement_boundary_are_validated(self):
+        cases = (
+            (7, lambda rule: rule["applies_when"][0].update({"operand": "missing"}), ".applies_when[0].operand"),
+            (3, lambda rule: rule["unknown_operand_range"].update({"maximum_ratio": 2}), ".unknown_operand_range.maximum_ratio"),
+            (3, lambda rule: rule.update({"retirement_cost_boundary": "anything"}), ".retirement_cost_boundary"),
+        )
+        for rule_index, mutate, suffix in cases:
+            with self.subTest(rule_index=rule_index, suffix=suffix):
+                payload = copy.deepcopy(self.payload)
+                mutate(payload["jurisdictions"]["synthetic-destination"]["rules"][rule_index])
+                self.assert_path_error(
+                    self.validate(payload),
+                    f"jurisdictions.synthetic-destination.rules[{rule_index}]{suffix}",
+                )
+
+
 if __name__ == "__main__":
     unittest.main()

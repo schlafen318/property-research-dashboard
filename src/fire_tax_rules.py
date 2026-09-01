@@ -99,6 +99,14 @@ OPERAND_ID_PATTERN = re.compile(r"^[a-z][a-z0-9_]*$")
 PROPERTY_LIFECYCLE_STAGES = frozenset(
     {"purchase", "annual", "rental", "sale", "inheritance", "gift"}
 )
+PROPERTY_STAGE_CATEGORIES = {
+    "purchase": "property_purchase",
+    "annual": "property_annual",
+    "rental": "property_rental",
+    "sale": "property_sale",
+    "inheritance": "property_inheritance",
+    "gift": "property_gift",
+}
 MINIMUM_ENABLEMENT_CATEGORIES = frozenset(
     {
         "tax_residence",
@@ -1020,6 +1028,43 @@ def _validate_rule_type_fields(
         lifecycle_stage = rule.get("lifecycle_stage")
         if not isinstance(lifecycle_stage, str) or lifecycle_stage not in PROPERTY_LIFECYCLE_STAGES:
             errors.append(f"{path}.lifecycle_stage must be a supported property stage")
+        elif rule.get("category") != PROPERTY_STAGE_CATEGORIES[lifecycle_stage]:
+            errors.append(f"{path}.category must match lifecycle_stage")
+        charge_kind = rule.get("charge_kind")
+        if (
+            not isinstance(charge_kind, str)
+            or not OPERAND_ID_PATTERN.fullmatch(charge_kind)
+        ):
+            errors.append(f"{path}.charge_kind must be a stable snake_case charge ID")
+        classification = rule.get("tax_or_non_tax")
+        if classification not in {"tax", "non_tax"}:
+            errors.append(f"{path}.tax_or_non_tax must be tax or non_tax")
+        payment = rule.get("payment_treatment")
+        if payment not in {"current_liability", "prepayment"}:
+            errors.append(
+                f"{path}.payment_treatment must be current_liability or prepayment"
+            )
+        elif payment == "prepayment" and classification != "tax":
+            errors.append(f"{path}.payment_treatment prepayment must classify as tax")
+        if "floor_at_zero" in rule and not isinstance(rule.get("floor_at_zero"), bool):
+            errors.append(f"{path}.floor_at_zero must be a boolean")
+        if "allowance_amount" in rule and (
+            not _is_number(rule.get("allowance_amount"))
+            or rule["allowance_amount"] < 0
+        ):
+            errors.append(f"{path}.allowance_amount must be a non-negative amount")
+        _validate_property_conditions(rule, path, operand_catalog, errors)
+        _validate_property_unknown_range(rule, path, operand_catalog, errors)
+        boundary = rule.get("retirement_cost_boundary")
+        if boundary is not None and (
+            boundary != "owner_property_tax"
+            or lifecycle_stage != "annual"
+            or classification != "tax"
+            or payment != "current_liability"
+        ):
+            errors.append(
+                f"{path}.retirement_cost_boundary must mark a current annual owner property tax"
+            )
         if operation == "multiply":
             rate = rule.get("rate")
             if not _is_number(rate) or not 0 <= rate <= 1:
@@ -1058,6 +1103,110 @@ def _validate_rule_type_fields(
             not isinstance(rule.get("branches"), list) or not rule["branches"]
         ):
             errors.append(f"{path}.branches must contain at least one branch")
+
+
+def _validate_property_conditions(
+    rule: dict[str, Any],
+    path: str,
+    operand_catalog: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    conditions = rule.get("applies_when")
+    if conditions is None:
+        return
+    if not isinstance(conditions, list) or not conditions:
+        errors.append(f"{path}.applies_when must contain property conditions")
+        return
+    for index, condition in enumerate(conditions):
+        condition_path = f"{path}.applies_when[{index}]"
+        if not isinstance(condition, dict):
+            errors.append(f"{condition_path} must be an object")
+            continue
+        operand_id = condition.get("operand")
+        operand = (
+            operand_catalog.get(operand_id) if isinstance(operand_id, str) else None
+        )
+        if operand is None or operand.get("kind") != "profile":
+            errors.append(f"{condition_path}.operand must reference a profile operand")
+        operator = condition.get("operator")
+        if operator not in BRANCH_OPERATORS:
+            errors.append(f"{condition_path}.operator is unsupported")
+        if "value" not in condition:
+            errors.append(f"{condition_path}.value is required")
+            continue
+        if operand is None:
+            continue
+        value = condition["value"]
+        if operator == "in":
+            value_valid = (
+                isinstance(value, list)
+                and bool(value)
+                and all(
+                    _value_matches_type(item, operand.get("value_type"))
+                    for item in value
+                )
+            )
+        else:
+            value_valid = _value_matches_type(value, operand.get("value_type"))
+        if not value_valid:
+            errors.append(f"{condition_path}.value must match operand value_type")
+        if (
+            operator
+            not in {"equals", "not_equals", "in"}
+            and operand.get("value_type") not in {"number", "money", "date"}
+        ):
+            errors.append(
+                f"{condition_path}.operator is incompatible with operand value_type"
+            )
+
+
+def _validate_property_unknown_range(
+    rule: dict[str, Any],
+    path: str,
+    operand_catalog: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    value_range = rule.get("unknown_operand_range")
+    if value_range is None:
+        return
+    range_path = f"{path}.unknown_operand_range"
+    if not isinstance(value_range, dict):
+        errors.append(f"{range_path} must be an object")
+        return
+    operand_id = value_range.get("operand")
+    reference_id = value_range.get("reference_operand")
+    operand = operand_catalog.get(operand_id) if isinstance(operand_id, str) else None
+    reference = (
+        operand_catalog.get(reference_id) if isinstance(reference_id, str) else None
+    )
+    if (
+        operand is None
+        or operand.get("kind") != "profile"
+        or operand.get("value_type") != "money"
+    ):
+        errors.append(f"{range_path}.operand must reference a profile money operand")
+    if (
+        reference is None
+        or reference.get("kind") != "profile"
+        or reference.get("value_type") != "money"
+    ):
+        errors.append(
+            f"{range_path}.reference_operand must reference a profile money operand"
+        )
+    if (
+        operand is not None
+        and reference is not None
+        and operand.get("currency") != reference.get("currency")
+    ):
+        errors.append(f"{range_path}.reference_operand currency must match operand")
+    minimum = value_range.get("minimum_ratio")
+    maximum = value_range.get("maximum_ratio")
+    if not _is_number(minimum) or not 0 <= minimum <= 1:
+        errors.append(f"{range_path}.minimum_ratio must be between 0 and 1")
+    if not _is_number(maximum) or not 0 <= maximum <= 1:
+        errors.append(f"{range_path}.maximum_ratio must be between 0 and 1")
+    elif _is_number(minimum) and maximum < minimum:
+        errors.append(f"{range_path}.maximum_ratio must be at least minimum_ratio")
 
 
 def _validate_rule(
