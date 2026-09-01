@@ -3,6 +3,37 @@
   "dataset_id": "fire-tax-rules-v1",
   "tax_year": 2026,
   "checked_on": "2026-09-01",
+  "enablement_contract": {
+    "required_rule_types": [
+      "residence_test",
+      "rate_band",
+      "allowance",
+      "withholding",
+      "credit_limit",
+      "property_charge",
+      "reporting_flag",
+      "branch"
+    ],
+    "required_categories": [
+      "tax_residence",
+      "private_pension",
+      "government_pension",
+      "social_security",
+      "dividends",
+      "interest",
+      "realized_gains",
+      "retirement_account_withdrawal",
+      "rental_income",
+      "employment_consulting",
+      "property_purchase",
+      "property_annual",
+      "property_rental",
+      "property_sale",
+      "property_inheritance",
+      "property_gift",
+      "tax_reporting"
+    ]
+  },
   "operand_catalog": {
     "days_in_jurisdiction": {
       "kind": "profile",
