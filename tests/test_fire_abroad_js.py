@@ -1,0 +1,163 @@
+from __future__ import annotations
+
+import json
+import subprocess
+import unittest
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+ENGINE = ROOT / "src" / "fire_abroad.js"
+UI = ROOT / "src" / "fire_abroad_ui.js"
+FIXTURE = ROOT / "tests" / "fixtures" / "fire_abroad_screen_contract.json"
+
+
+def run_js(module: Path, function_name: str, payload: object) -> object:
+    script = (
+        "const api = require(process.argv[1]);"
+        "const input = JSON.parse(process.argv[2]);"
+        f"process.stdout.write(JSON.stringify(api.{function_name}(input)));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(module), json.dumps(payload)],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(result.stdout)
+
+
+class FireAbroadJavaScriptTests(unittest.TestCase):
+    def test_profile_defaults_match_python_contract(self):
+        profile = run_js(ENGINE, "normalizeProfile", {})
+        self.assertEqual("part_year", profile["stay_mode"])
+        self.assertEqual("single", profile["household"])
+        self.assertEqual("rent", profile["housing"])
+        self.assertEqual("destination_estimate", profile["tax_mode"])
+        self.assertIsNone(profile["planning_base"])
+
+    def test_screen_tax_matches_shared_python_fixture(self):
+        fixture = json.loads(FIXTURE.read_text(encoding="utf-8"))
+        for case in fixture["cases"]:
+            result = run_js(
+                ENGINE,
+                "screenTax",
+                {"country": {"tax_screen": case["tax_screen"]}, "profile": case["profile"]},
+            )
+            self.assertEqual(case["expected"], {
+                "status": result["status"],
+                "residence_outcome": result["residence_outcome"],
+                "favorable_reserve": result["favorable_reserve"],
+                "central_reserve": result["central_reserve"],
+                "adverse_reserve": result["adverse_reserve"],
+            })
+
+    def test_tax_control_visibility_is_progressive(self):
+        personal_renter = run_js(
+            UI,
+            "taxControlVisibility",
+            {"housing": "rent", "taxMode": "destination_estimate", "wealthTaxRelevant": False},
+        )
+        self.assertEqual(
+            {"propertyUse": False, "wealthBand": False, "planningInputs": True},
+            personal_renter,
+        )
+        buyer = run_js(
+            UI,
+            "taxControlVisibility",
+            {"housing": "buy_now", "taxMode": "destination_estimate", "wealthTaxRelevant": True},
+        )
+        self.assertEqual(
+            {"propertyUse": True, "wealthBand": True, "planningInputs": True},
+            buyer,
+        )
+
+    def test_resilience_budget_uses_central_reserve_once(self):
+        result = run_js(
+            ENGINE,
+            "buildResilienceBudget",
+            {
+                "cost": {
+                    "profiles": {
+                        "single": {
+                            "categories_usd": {"living": 16000},
+                            "annual_rent_usd": 10000,
+                            "annual_owner_costs_usd": 6000
+                        }
+                    }
+                },
+                "profile": {"planning_base": 50000},
+                "taxScreen": {
+                    "status": "planning_estimate",
+                    "conditional": False,
+                    "rates": {"favorable": 0.03, "central": 0.10, "adverse": 0.20}
+                }
+            },
+        )
+        self.assertEqual(26000, result["base_annual_cost"])
+        self.assertEqual(31000, result["central_annual_cost"])
+
+    def test_ranking_keeps_pending_tax_evidence_unranked(self):
+        complete = json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"][0]["tax_screen"]
+        result = run_js(
+            ENGINE,
+            "rankDestinations",
+            {
+                "destinations": [
+                    {"id": "alpha", "name": "Alpha", "country": "Spain"},
+                    {"id": "beta", "name": "Beta", "country": "Portugal"}
+                ],
+                "retirementCosts": {
+                    "alpha": {"profiles": {"single": {"categories_usd": {"living": 16000}, "annual_rent_usd": 10000, "annual_owner_costs_usd": 6000}}},
+                    "beta": {"profiles": {"single": {"categories_usd": {"living": 16000}, "annual_rent_usd": 8000, "annual_owner_costs_usd": 6000}}}
+                },
+                "firePayload": {
+                    "countries": {
+                        "Spain": {"tax_screen": complete},
+                        "Portugal": {"tax_screen": {"status": "research_pending"}}
+                    },
+                    "destination_overrides": {
+                        "alpha": {"country": "Spain", "scores": {"active_life": 4, "healthcare_bridge": 4, "stay_flexibility": 4, "global_access": 4, "community_fit": 4, "property_exit_flexibility": 4}},
+                        "beta": {"country": "Portugal", "scores": {"active_life": 4, "healthcare_bridge": 4, "stay_flexibility": 4, "global_access": 4, "community_fit": 4, "property_exit_flexibility": 4}}
+                    }
+                },
+                "profile": {}
+            },
+        )
+        self.assertEqual("alpha", result[0]["destination_id"])
+        self.assertTrue(result[0]["rankable"])
+        self.assertFalse(result[1]["rankable"])
+
+    def test_calculator_link_contains_only_existing_allowlisted_values(self):
+        href = run_js(
+            UI,
+            "safeCalculatorHref",
+            {
+                "destinationId": "valencia",
+                "household": "couple",
+                "housing": "buy_now",
+                "taxHome": "HK",
+                "planningBase": 900000,
+            },
+        )
+        self.assertEqual(
+            "/retirement-abroad-calculator/?destination=valencia&household=couple&housing=buy_now",
+            href,
+        )
+
+    def test_ui_does_not_persist_or_transmit_tax_inputs(self):
+        source = UI.read_text(encoding="utf-8")
+        for forbidden in ("fetch(", "XMLHttpRequest", "localStorage", "sessionStorage"):
+            self.assertNotIn(forbidden, source)
+        for sensitive_key in (
+            "tax_home:",
+            "annual_days:",
+            "wealth_band:",
+            "planning_base:",
+            "tax_result:",
+        ):
+            self.assertNotIn(sensitive_key, source)
+
+
+if __name__ == "__main__":
+    unittest.main()
