@@ -26,6 +26,31 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementDestinationFinderUITests(unittest.TestCase):
+    def test_user_after_tax_presentation_has_one_target_and_gap_without_scenario_bounds(self) -> None:
+        presentation = run_ui(
+            "taxResultPresentation",
+            {
+                "taxStatus": "user_after_tax",
+                "retirementTarget": 100_000,
+                "surplusGap": 25_000,
+                "annualTaxReserve": 0,
+            },
+        )
+
+        self.assertEqual(
+            [
+                {"label": "User-supplied after-tax target", "value": "$100,000"},
+                {"label": "Surplus or gap", "value": "+$25,000"},
+            ],
+            presentation["fields"],
+        )
+        self.assertEqual(
+            "User-supplied after-tax assumptions; no destination tax scenario is added.",
+            presentation["note"],
+        )
+        self.assertNotIn("Favorable", json.dumps(presentation))
+        self.assertNotIn("Adverse", json.dumps(presentation))
+
     def test_tax_result_fields_are_written_as_text_not_generated_html(self) -> None:
         script = (
             "const ui = require(process.argv[1]);"
@@ -141,6 +166,37 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         )
         self.assertNotIn("900000", href)
         self.assertNotIn("passport", href)
+
+    def test_result_handoff_builder_sanitizes_every_recommendation_and_ignores_engine_hrefs(self) -> None:
+        hrefs = run_ui(
+            "calculatorHrefsForResults",
+            {
+                "recommendations": [
+                    {
+                        "destinationId": "valencia",
+                        "detailHref": "/retirement-abroad-calculator/?taxMode=destination_estimate",
+                    },
+                    {
+                        "destinationId": "fukuoka-itoshima",
+                        "detailHref": "/retirement-abroad-calculator/?wealthBand=above_threshold",
+                    },
+                ],
+                "user": {
+                    "household": "couple",
+                    "housingPlan": "buy_now",
+                    "taxMode": "destination_estimate",
+                    "taxProfile": {"wealthBand": "above_threshold"},
+                },
+            },
+        )
+
+        self.assertEqual(
+            [
+                "/retirement-abroad-calculator/?destination=valencia&household=couple&housing=buy_now",
+                "/retirement-abroad-calculator/?destination=fukuoka-itoshima&household=couple&housing=buy_now",
+            ],
+            hrefs,
+        )
 
     def test_dossier_href_accepts_only_destination_slugs(self) -> None:
         self.assertEqual(

@@ -46,6 +46,22 @@
       "&housing=" + encodeURIComponent(housingPlan);
   }
 
+  function resultDetailHref(item, user) {
+    return safeDetailHref({
+      destinationId: item.destinationId,
+      household: user.household,
+      housingPlan: user.housingPlan,
+    });
+  }
+
+  function calculatorHrefsForResults(input) {
+    const recommendations = Array.isArray(input && input.recommendations) ? input.recommendations : [];
+    const user = input && input.user || {};
+    return recommendations.map(function (item) {
+      return resultDetailHref(item, user);
+    });
+  }
+
   function safeDossierHref(destinationId) {
     const slug = /^[a-z0-9-]+$/.test(String(destinationId || "")) ? String(destinationId) : "";
     return "/destinations/" + (slug ? encodeURIComponent(slug) + "/" : "");
@@ -96,6 +112,19 @@
     nodes.centralGap.textContent = unavailable ? "Unavailable" : signedMoney(item.surplusGap);
     nodes.favorableGap.textContent = unavailable ? "Unavailable" : signedMoney(item.favorableGap);
     nodes.adverseGap.textContent = unavailable ? "Unavailable" : signedMoney(item.adverseGap);
+  }
+
+  function taxResultPresentation(item) {
+    if (item.taxStatus === "user_after_tax") {
+      return {
+        fields: [
+          { label: "User-supplied after-tax target", value: money.format(Number(item.retirementTarget)) },
+          { label: "Surplus or gap", value: signedMoney(item.surplusGap) },
+        ],
+        note: "User-supplied after-tax assumptions; no destination tax scenario is added.",
+      };
+    }
+    return null;
   }
 
   function finderAnalyticsPayload(user) {
@@ -338,11 +367,7 @@
 
     function resultRow(item, user) {
       const dossierHref = safeDossierHref(item.destinationId);
-      const detailHref = safeDetailHref({
-        destinationId: item.destinationId,
-        household: user.household,
-        housingPlan: user.housingPlan,
-      });
+      const detailHref = resultDetailHref(item, user);
       const article = document.createElement("article");
       article.className = "finder-result";
       const header = document.createElement("header");
@@ -360,18 +385,25 @@
 
       const facts = document.createElement("dl");
       definition(facts, "Projected portfolio", money.format(item.portfolioAtRetirement));
-      const target = definition(facts, "Central tax-adjusted target", "");
-      const range = definition(facts, "Favorable–adverse target range", "");
-      const centralGap = definition(facts, "Central surplus or gap", "");
-      const favorableGap = definition(facts, "Favorable gap", "");
-      const adverseGap = definition(facts, "Adverse gap", "");
-      writeTaxResultFields({
-        target: target,
-        range: range,
-        centralGap: centralGap,
-        favorableGap: favorableGap,
-        adverseGap: adverseGap,
-      }, item);
+      const afterTaxPresentation = taxResultPresentation(item);
+      if (afterTaxPresentation) {
+        afterTaxPresentation.fields.forEach(function (field) {
+          definition(facts, field.label, field.value);
+        });
+      } else {
+        const target = definition(facts, "Central tax-adjusted target", "");
+        const range = definition(facts, "Favorable–adverse target range", "");
+        const centralGap = definition(facts, "Central surplus or gap", "");
+        const favorableGap = definition(facts, "Favorable gap", "");
+        const adverseGap = definition(facts, "Adverse gap", "");
+        writeTaxResultFields({
+          target: target,
+          range: range,
+          centralGap: centralGap,
+          favorableGap: favorableGap,
+          adverseGap: adverseGap,
+        }, item);
+      }
       if (user.housingPlan === "buy_now") {
         definition(facts, "Property equity", money.format(item.propertyEquity));
         definition(facts, "Mortgage remaining", money.format(item.mortgageBalance));
@@ -380,6 +412,10 @@
         }
       }
       article.appendChild(facts);
+
+      if (afterTaxPresentation) {
+        article.appendChild(textElement("p", "finder-financing", afterTaxPresentation.note));
+      }
 
       if (item.taxStatus === "unavailable") {
         article.appendChild(textElement(
@@ -560,11 +596,13 @@
     housingVisibility: housingVisibility,
     taxControlVisibility: taxControlVisibility,
     safeDetailHref: safeDetailHref,
+    calculatorHrefsForResults: calculatorHrefsForResults,
     safeDossierHref: safeDossierHref,
     recommendationsForDisplay: recommendationsForDisplay,
     resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,
     writeTaxResultFields: writeTaxResultFields,
+    taxResultPresentation: taxResultPresentation,
     finderAnalyticsPayload: finderAnalyticsPayload,
     finderEvidenceSummary: finderEvidenceSummary,
     chartTooltip: chartTooltip,

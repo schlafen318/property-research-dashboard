@@ -1,13 +1,30 @@
 from __future__ import annotations
 
+import json
 import unittest
+from datetime import date
 
 from src import build_unified_app
 from scripts import verify_static_site
 
 
 class AutoInternalLinkTests(unittest.TestCase):
-    def test_generated_finder_handoffs_expose_only_destination_household_and_housing(self) -> None:
+    def test_finder_serializes_deterministic_build_date_as_tax_freshness_anchor(self) -> None:
+        destinations = build_unified_app.rank_destinations(
+            [build_unified_app.consolidate_destination(item) for item in build_unified_app.load_json("destinations.json")]
+        )
+        html = build_unified_app.build_retirement_destination_finder_page(
+            destinations,
+            build_unified_app.load_retirement_costs(),
+            build_unified_app.load_mortgage_profiles(),
+            build_unified_app.load_fire_abroad(),
+            tax_as_of=date(2027, 9, 3),
+        )
+        payload_text = html.split('id="retirement-finder-data">', 1)[1].split("</script>", 1)[0]
+
+        self.assertEqual("2027-09-03", json.loads(payload_text)["taxPlanning"]["asOf"])
+
+    def test_generated_finder_runtime_handoffs_cover_every_result_and_are_private(self) -> None:
         destinations = build_unified_app.rank_destinations(
             [build_unified_app.consolidate_destination(item) for item in build_unified_app.load_json("destinations.json")]
         )
@@ -18,15 +35,19 @@ class AutoInternalLinkTests(unittest.TestCase):
             build_unified_app.load_fire_abroad(),
         )
 
+        evidence = verify_static_site.finder_runtime_handoff_evidence(html)
+
+        self.assertGreater(evidence["recommendation_count"], 0)
+        self.assertEqual(evidence["recommendation_count"], len(evidence["links"]))
         self.assertEqual([], verify_static_site.finder_handoff_privacy_errors(html))
 
     def test_static_verifier_rejects_sensitive_finder_handoff_parameters(self) -> None:
-        html = (
-            '<a href="/retirement-abroad-calculator/?destination=valencia&amp;household=couple'
-            '&amp;housing=rent&amp;taxMode=destination_estimate&amp;wealthBand=above_threshold">Plan</a>'
-        )
+        links = [
+            "/retirement-abroad-calculator/?destination=valencia&household=couple"
+            "&housing=rent&taxMode=destination_estimate&wealthBand=above_threshold"
+        ]
 
-        errors = verify_static_site.finder_handoff_privacy_errors(html)
+        errors = verify_static_site.finder_handoff_link_errors(links)
 
         self.assertEqual(1, len(errors))
         self.assertIn("taxMode", errors[0])

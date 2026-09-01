@@ -6026,8 +6026,11 @@ def build_retirement_destination_finder_page(
     retirement_payload: dict,
     mortgage_payload: dict,
     fire_payload: dict | None = None,
+    *,
+    tax_as_of: date | None = None,
 ) -> str:
     fire_payload = fire_payload or load_fire_abroad()
+    tax_freshness_iso = (tax_as_of or date.today()).isoformat()
     retirement_ids = {item["destination_id"] for item in retirement_payload["destinations"]}
     eligible_destinations = [item for item in destinations if item["id"] in retirement_ids]
     mortgage_profiles = {
@@ -6049,6 +6052,7 @@ def build_retirement_destination_finder_page(
         "mortgageProfiles": mortgage_profiles,
         "defaultBuyerProfile": mortgage_payload["default_buyer_profile"],
         "taxPlanning": {
+            "asOf": tax_freshness_iso,
             "reviewedOn": fire_payload["reviewed_on"],
             "countries": fire_payload["countries"],
             "sources": fire_payload["sources"],
@@ -10349,7 +10353,8 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
     ]
 
 
-def build() -> Path:
+def build(*, as_of: date | None = None) -> Path:
+    build_date = as_of or date.today()
     content_overrides = load_content_overrides()
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = rank_destinations(destinations)
@@ -10359,7 +10364,8 @@ def build() -> Path:
         fire_payload,
         destination_ids={item["id"] for item in destinations},
         retirement_ids={item["destination_id"] for item in retirement_costs["destinations"]},
-        as_of=date.today(),
+        as_of=build_date,
+        allow_stale_tax_evidence=True,
     )
     if fire_errors:
         raise ValueError("Invalid FIRE Abroad data:\n- " + "\n- ".join(fire_errors))
@@ -11750,7 +11756,11 @@ def build() -> Path:
     (retirement_finder_dir / "index.html").write_text(
         clean_generated_html(
             build_retirement_destination_finder_page(
-                destinations, retirement_costs, mortgage_profiles, fire_payload
+                destinations,
+                retirement_costs,
+                mortgage_profiles,
+                fire_payload,
+                tax_as_of=build_date,
             )
         ),
         encoding="utf-8",

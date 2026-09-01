@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import argparse
+import json
 import re
+import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
@@ -11,6 +13,8 @@ from urllib.parse import parse_qs, unquote, urlparse
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = ROOT / "artifacts"
 SITE_ORIGIN = "https://globalhomeatlas.com"
+FINDER_ENGINE = ROOT / "src" / "retirement_destination_finder.js"
+FINDER_UI = ROOT / "src" / "retirement_destination_finder_ui.js"
 
 KEY_PAGES = [
     ARTIFACTS / "guides" / "index.html",
@@ -96,22 +100,112 @@ def broken_local_links() -> list[str]:
     return broken
 
 
-def finder_handoff_privacy_errors(html: str) -> list[str]:
-    parser = LinkParser()
-    parser.feed(html)
-    allowed = {"destination", "household", "housing"}
+def finder_handoff_link_errors(links: list[str]) -> list[str]:
+    required = {"destination", "household", "housing"}
     errors: list[str] = []
-    for link in parser.links:
+    for link in links:
         parsed = urlparse(link)
-        if parsed.path != "/retirement-abroad-calculator/" or not parsed.query:
+        if parsed.path != "/retirement-abroad-calculator/":
+            errors.append(f"Finder runtime handoff has unexpected path: {parsed.path}")
             continue
-        keys = set(parse_qs(parsed.query, keep_blank_values=True))
-        unexpected = sorted(keys - allowed)
+        query = parse_qs(parsed.query, keep_blank_values=True)
+        keys = set(query)
+        unexpected = sorted(keys - required)
+        missing = sorted(required - keys)
         if unexpected:
             errors.append(
                 "Finder calculator handoff exposes unexpected query parameters: "
                 + ", ".join(unexpected)
             )
+        if missing:
+            errors.append(
+                "Finder calculator handoff is missing required query parameters: "
+                + ", ".join(missing)
+            )
+        destination = query.get("destination", [])
+        household = query.get("household", [])
+        housing = query.get("housing", [])
+        if len(destination) != 1 or not re.fullmatch(r"[a-z0-9-]+", destination[0]):
+            errors.append("Finder calculator handoff has an invalid destination")
+        if len(household) != 1 or household[0] not in {"single", "couple"}:
+            errors.append("Finder calculator handoff has an invalid household")
+        if len(housing) != 1 or housing[0] not in {"rent", "own", "buy_now", "buy_retirement"}:
+            errors.append("Finder calculator handoff has an invalid housing plan")
+    return errors
+
+
+def finder_runtime_handoff_evidence(html: str) -> dict[str, object]:
+    payload_match = re.search(
+        r'<script\b[^>]*\bid="retirement-finder-data"[^>]*>(.*?)</script>',
+        html,
+        re.DOTALL,
+    )
+    if not payload_match:
+        raise ValueError("Finder runtime payload is missing")
+    payload = json.loads(payload_match.group(1))
+    script = r"""
+const fs = require("fs");
+const finder = require(process.argv[1]);
+const ui = require(process.argv[2]);
+const payload = JSON.parse(fs.readFileSync(0, "utf8"));
+const user = {
+  currentAge: 50,
+  retirementAge: 65,
+  horizonYears: 25,
+  household: "single",
+  housingPlan: "rent",
+  totalLiquidCapital: 500000,
+  monthlyPortfolioContribution: 1000,
+  contributionInflationLinked: false,
+  expectedPortfolioReturn: 0.05,
+  returnBasis: "after_fees_and_tax",
+  generalInflation: 0.026,
+  emergencyReserveMonths: 12,
+  incomeStreams: [],
+  taxMode: "user_after_tax",
+  taxProfile: {
+    dependableIncome: 0,
+    portfolioWithdrawals: 0,
+    realizedGainIntensity: "moderate",
+    propertyUse: "none",
+    wealthBand: "unknown"
+  },
+  preferences: {region: "any", climate: "any", healthcare: "normal"},
+  purchaseMethod: "cash"
+};
+const result = finder.recommendDestinations(Object.assign({}, payload, {user}));
+const links = ui.calculatorHrefsForResults({recommendations: result.recommendations, user});
+process.stdout.write(JSON.stringify({recommendation_count: result.recommendations.length, links}));
+"""
+    result = subprocess.run(
+        ["node", "-e", script, str(FINDER_ENGINE), str(FINDER_UI)],
+        input=json.dumps(payload),
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    evidence = json.loads(result.stdout)
+    return {
+        "recommendation_count": int(evidence.get("recommendation_count", 0)),
+        "links": list(evidence.get("links", [])),
+    }
+
+
+def finder_handoff_privacy_errors(html: str) -> list[str]:
+    try:
+        evidence = finder_runtime_handoff_evidence(html)
+    except (json.JSONDecodeError, OSError, subprocess.CalledProcessError, ValueError) as error:
+        return [f"Finder runtime handoff verification failed: {error}"]
+    count = int(evidence["recommendation_count"])
+    links = evidence["links"]
+    errors: list[str] = []
+    if count <= 0:
+        errors.append("Finder runtime handoff verification produced no recommendations")
+    if len(links) != count:
+        errors.append(
+            f"Finder runtime handoff verification produced {len(links)} links for {count} recommendations"
+        )
+    errors.extend(finder_handoff_link_errors(links))
     return errors
 
 

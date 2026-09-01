@@ -166,6 +166,7 @@ class RetirementDestinationFinderTests(unittest.TestCase):
             "retirementCosts": [cost_record(item["id"], 100_000) for item in (high_tax, low_tax)],
             "mortgageProfiles": {item["id"]: mortgage_profile() for item in (high_tax, low_tax)},
             "taxPlanning": {
+                "asOf": "2026-09-01",
                 "reviewedOn": "2026-09-01",
                 "countries": {
                     "High Tax": tax_country(0.1, 0.2, 0.3),
@@ -232,6 +233,7 @@ class RetirementDestinationFinderTests(unittest.TestCase):
             "retirementCosts": [cost_record(item["id"], 90_000) for item in (stale, invalid)],
             "mortgageProfiles": {item["id"]: mortgage_profile() for item in (stale, invalid)},
             "taxPlanning": {
+                "asOf": "2026-09-01",
                 "reviewedOn": "2026-09-01",
                 "countries": {
                     "Stale": tax_country(last_reviewed="2024-01-01"),
@@ -269,7 +271,58 @@ class RetirementDestinationFinderTests(unittest.TestCase):
         self.assertEqual("user_after_tax", item["taxStatus"])
         self.assertEqual("after_fees_and_tax", item["returnBasis"])
         self.assertEqual(0, item["annualTaxReserve"])
-        self.assertEqual([100_000, 100_000], item["retirementTargetRange"])
+        self.assertEqual(100_000, item["retirementTarget"])
+        self.assertEqual(0, item["surplusGap"])
+        self.assertNotIn("retirementTargetRange", item)
+        self.assertNotIn("favorableGap", item)
+        self.assertNotIn("adverseGap", item)
+        self.assertNotIn("detailHref", item)
+
+    def test_tax_freshness_crosses_from_available_to_conditional_after_366_days(self) -> None:
+        place = destination("threshold", country="Threshold")
+        common = {
+            "user": user_payload(
+                taxMode="destination_estimate",
+                taxProfile={
+                    "dependableIncome": 0,
+                    "portfolioWithdrawals": 10_000,
+                    "realizedGainIntensity": "moderate",
+                    "propertyUse": "none",
+                    "wealthBand": "unknown",
+                },
+            ),
+            "destinations": [place],
+            "retirementCosts": [cost_record(place["id"], 100_000)],
+            "mortgageProfiles": {place["id"]: mortgage_profile()},
+        }
+
+        boundary = run_finder(
+            "recommendDestinations",
+            {
+                **common,
+                "taxPlanning": {
+                    "asOf": "2027-09-02",
+                    "reviewedOn": "2026-09-01",
+                    "countries": {"Threshold": tax_country(last_reviewed="2026-09-01")},
+                },
+            },
+        )["recommendations"][0]
+        crossed = run_finder(
+            "recommendDestinations",
+            {
+                **common,
+                "taxPlanning": {
+                    "asOf": "2027-09-03",
+                    "reviewedOn": "2026-09-01",
+                    "countries": {"Threshold": tax_country(last_reviewed="2026-09-01")},
+                },
+            },
+        )["recommendations"][0]
+
+        self.assertNotEqual("unavailable", boundary["taxStatus"])
+        self.assertEqual("unavailable", crossed["taxStatus"])
+        self.assertEqual("conditional", crossed["tier"])
+        self.assertIn("stale", crossed["taxReason"].lower())
 
     def test_owner_costs_exclude_property_tax_from_the_integrated_tax_target(self) -> None:
         place = destination("owner-tax", country="Owner Tax")
@@ -296,6 +349,7 @@ class RetirementDestinationFinderTests(unittest.TestCase):
                 "retirementCosts": [cost_record(place["id"], 100_000)],
                 "mortgageProfiles": {place["id"]: mortgage_profile()},
                 "taxPlanning": {
+                    "asOf": "2026-09-01",
                     "reviewedOn": "2026-09-01",
                     "countries": {"Owner Tax": country},
                 },

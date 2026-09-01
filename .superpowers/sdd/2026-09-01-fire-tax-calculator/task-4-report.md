@@ -138,3 +138,91 @@ Generated artifacts and unrelated existing changes are intentionally excluded fr
 ## Concerns
 
 The only open repository-level concern is the unrelated static-verifier failure from the already dirty Spain and Chamonix generated artifacts listed above. Task 4 does not modify or commit those artifacts.
+
+## Fix Round 1
+
+### Reviewer findings addressed
+
+1. `user_after_tax` now has one target and one gap only. The finder result object omits `retirementTargetRange`, `favorableGap`, and `adverseGap`; the UI labels the result as a user-supplied after-tax target and states that no destination tax scenario is added.
+2. Tax freshness now uses an ISO build-date anchor (`taxPlanning.asOf`) rather than the evidence review date. Production defaults to `date.today()` and tests can pass a deterministic `date`. The runtime test proves evidence is available at 366 days and becomes conditional/unavailable at 367 days. Strict data-quality validation still rejects stale evidence by default, while the build explicitly permits structurally valid stale screens to reach the runtime conditional path.
+3. The static verifier now parses the generated finder payload, runs the actual finder engine, passes every runtime recommendation through the same UI result-link builder used by rendering, rejects an empty result set or link-count mismatch, and validates every URL path, exact query-key set, enum, and destination slug. The built artifact produced 31 recommendations and 31 sanitized links with zero handoff errors.
+4. The duplicate `detailHref` was removed from finder engine results. UI result rendering owns the URL and routes it through the categorical allowlist.
+
+### TDD RED evidence
+
+Central-only after-tax behavior:
+
+```text
+$ python3 -m unittest tests.test_retirement_destination_finder.RetirementDestinationFinderTests.test_user_after_tax_bypass_is_one_zero_added_tax_target tests.test_retirement_destination_finder_ui.RetirementDestinationFinderUITests.test_user_after_tax_presentation_has_one_target_and_gap_without_scenario_bounds -v
+Ran 2 tests in 0.166s
+FAILED (failures=1, errors=1)
+```
+
+Freshness/build validation:
+
+```text
+$ python3 -m unittest tests.test_retirement_destination_finder.RetirementDestinationFinderTests.test_tax_freshness_crosses_from_available_to_conditional_after_366_days tests.test_build_unified_app_auto_links.AutoInternalLinkTests.test_finder_serializes_deterministic_build_date_as_tax_freshness_anchor tests.test_fire_abroad_data.FireAbroadDataTests.test_build_validation_allows_structurally_valid_stale_tax_evidence_for_runtime_fallback -v
+Ran 3 tests in 0.179s
+FAILED (failures=1, errors=2)
+```
+
+Runtime handoff and duplicate engine link:
+
+```text
+$ python3 -m unittest tests.test_retirement_destination_finder.RetirementDestinationFinderTests.test_user_after_tax_bypass_is_one_zero_added_tax_target tests.test_retirement_destination_finder_ui.RetirementDestinationFinderUITests.test_result_handoff_builder_sanitizes_every_recommendation_and_ignores_engine_hrefs tests.test_build_unified_app_auto_links.AutoInternalLinkTests.test_generated_finder_runtime_handoffs_cover_every_result_and_are_private tests.test_build_unified_app_auto_links.AutoInternalLinkTests.test_static_verifier_rejects_sensitive_finder_handoff_parameters -v
+Ran 4 tests in 0.179s
+FAILED (failures=1, errors=3)
+```
+
+The clarified page copy also failed first because it still claimed every result had favorable/adverse bounds (`Ran 1`, `FAILED (failures=1)`).
+
+### GREEN and final verification
+
+Each red group passed after its minimal implementation. Fresh final commands:
+
+```text
+$ python3 -m unittest tests.test_retirement_calculator_engine tests.test_retirement_calculator_ui tests.test_retirement_destination_finder tests.test_retirement_destination_finder_ui -v
+Ran 90 tests in 10.595s
+OK
+
+$ python3 -m unittest tests.test_build_unified_app_auto_links tests.test_retirement_destination_finder_page tests.test_fire_abroad_data -v
+Ran 41 tests in 0.851s
+OK
+
+$ python3 src/build_unified_app.py
+/Users/steph-tmp/Documents/GitHub/property-research-dashboard/artifacts/unified_destination_dashboard.html
+exit 0
+
+$ python3 -m unittest discover -s tests -q
+Ran 973 tests in 21.971s
+OK
+```
+
+JavaScript syntax, Python compilation, and `git diff --check` exited 0.
+
+Runtime privacy evidence from the built artifact:
+
+```text
+{'recommendations': 31, 'links': 31, 'errors': [], 'first': '/retirement-abroad-calculator/?destination=fukuoka-itoshima&household=single&housing=rent'}
+```
+
+The full static verifier still exits 1 only for the same two Spain markers and three missing Chamonix assets documented above; it reports no finder handoff error.
+
+At a real 390px Chrome viewport, the submitted `user_after_tax` result had document width 375, no overflow, and exactly these financial labels: `Projected portfolio`, `User-supplied after-tax target`, and `Surplus or gap`. The explanatory after-tax note was visible, favorable/adverse labels were absent, and the rendered handoff contained only destination/household/housing. Switching to destination estimates restored central target, target range, central gap, favorable gap, and adverse gap.
+
+### Fix Round 1 files
+
+- `.superpowers/sdd/2026-09-01-fire-tax-calculator/task-4-report.md`
+- `scripts/verify_static_site.py`
+- `src/build_unified_app.py`
+- `src/fire_abroad.py`
+- `src/retirement_destination_finder.js`
+- `src/retirement_destination_finder_page.py`
+- `src/retirement_destination_finder_ui.js`
+- `tests/test_build_unified_app_auto_links.py`
+- `tests/test_fire_abroad_data.py`
+- `tests/test_retirement_destination_finder.py`
+- `tests/test_retirement_destination_finder_page.py`
+- `tests/test_retirement_destination_finder_ui.py`
+
+Generated artifacts remain excluded from the commit.

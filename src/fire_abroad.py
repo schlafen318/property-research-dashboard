@@ -284,6 +284,7 @@ def validate_fire_abroad_payload(
     destination_ids: set[str],
     retirement_ids: set[str],
     as_of: date,
+    allow_stale_tax_evidence: bool = False,
 ) -> list[str]:
     errors: list[str] = []
     for key, expected in (("weights", FIRE_WEIGHTS), ("active_life_weights", ACTIVE_LIFE_WEIGHTS)):
@@ -338,7 +339,7 @@ def validate_fire_abroad_payload(
             reviewed_date = datetime.strptime(reviewed, "%Y-%m-%d").date()
             if reviewed_date > as_of:
                 errors.append(f"{path}.last_reviewed cannot be after the validation date")
-            elif (as_of - reviewed_date).days > 366:
+            elif not allow_stale_tax_evidence and (as_of - reviewed_date).days > 366:
                 errors.append(f"{path}.last_reviewed is stale")
         eligibility_path = f"countries.{country_name}.eligibility"
         eligibility = country.get("eligibility") if isinstance(country, dict) else None

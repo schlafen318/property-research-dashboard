@@ -154,6 +154,8 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
         self.assertIn("change finder rankings and retirement targets", tax_section)
         self.assertIn("central tax-adjusted target", tax_section)
+        self.assertIn("Destination planning estimates also show favorable and adverse bounds", tax_section)
+        self.assertNotIn("each result also shows", tax_section)
         self.assertIn('href="/retirement-abroad-calculator/"', tax_section)
         self.assertNotIn("do not yet change", tax_section)
 

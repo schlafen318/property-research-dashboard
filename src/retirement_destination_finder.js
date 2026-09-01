@@ -164,7 +164,7 @@
         wealthBand: profile.wealthBand,
         propertyTaxIncludedInRetirementCosts: user.housingPlan !== "rent",
         propertyPrice: Number(cost.property.representative_price_usd),
-        asOf: planning.reviewedOn,
+        asOf: planning.asOf,
       }, country);
     } catch (error) {
       return unavailableTaxScenario(error && error.message ? error.message : "Tax scenario inputs are invalid.");
@@ -178,9 +178,7 @@
       const row = results.user_after_tax;
       const target = Number(row.result.totalCapitalAtRetirement);
       return {
-        favorable: target,
         central: target,
-        adverse: target,
         annualTaxReserve: Number(row.annualTaxReserve),
         returnBasis: row.result.returnBasis,
       };
@@ -323,9 +321,9 @@
         netRentalCashFlow = propertyResult.netRentalCashFlowAtRetirement;
         const mortgageLiability = mortgageLiabilityAtRetirement(propertyResult, Number(user.expectedPortfolioReturn));
         if (targets) {
-          targets.favorable += mortgageLiability;
           targets.central += mortgageLiability;
-          targets.adverse += mortgageLiability;
+          if (Number.isFinite(targets.favorable)) targets.favorable += mortgageLiability;
+          if (Number.isFinite(targets.adverse)) targets.adverse += mortgageLiability;
           retirementTarget = targets.central;
         }
         financingReason = propertyResult.reasons[0] || (mortgageProfile.conditions || [])[0] || "";
@@ -336,9 +334,7 @@
         : (retirementTarget > 0 ? portfolioAtRetirement / retirementTarget : Infinity);
       const tier = fundingRatio === null ? "conditional" : fundingTier(fundingRatio);
       const matches = preferenceMatches(destination, user.preferences || {});
-      const favorableGap = targets ? portfolioAtRetirement - targets.favorable : null;
-      const adverseGap = targets ? portfolioAtRetirement - targets.adverse : null;
-      recommendations.push({
+      const recommendation = {
         destinationId: destination.id,
         name: destination.name,
         country: destination.country,
@@ -347,9 +343,6 @@
         portfolioAtRetirement: portfolioAtRetirement,
         retirementTarget: retirementTarget,
         surplusGap: retirementTarget === null ? null : portfolioAtRetirement - retirementTarget,
-        retirementTargetRange: targets ? [targets.favorable, targets.adverse] : [null, null],
-        favorableGap: favorableGap,
-        adverseGap: adverseGap,
         taxStatus: taxScenario.status,
         taxReason: taxScenario.explanations && taxScenario.explanations[0]
           ? taxScenario.explanations[0].reason
@@ -363,11 +356,16 @@
         financingStatus: financingLabel(mortgageProfile, user.purchaseMethod),
         financingReason: financingReason,
         preferenceMatches: matches,
-        detailHref: "/retirement-abroad-calculator/?destination=" + encodeURIComponent(destination.id) +
-          "&household=" + encodeURIComponent(user.household) +
-          "&housing=" + encodeURIComponent(user.housingPlan),
         evidenceConfidence: mortgageProfile.confidence || "low",
-      });
+      };
+      if (taxScenario.status !== "user_after_tax") {
+        recommendation.retirementTargetRange = targets
+          ? [targets.favorable, targets.adverse]
+          : [null, null];
+        recommendation.favorableGap = targets ? portfolioAtRetirement - targets.favorable : null;
+        recommendation.adverseGap = targets ? portfolioAtRetirement - targets.adverse : null;
+      }
+      recommendations.push(recommendation);
     });
 
     recommendations.sort(function (left, right) {

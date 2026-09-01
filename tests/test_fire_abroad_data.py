@@ -206,6 +206,17 @@ class FireAbroadDataTests(unittest.TestCase):
         errors = self.validate(payload)
         self.assertTrue(any("last_reviewed is stale" in error for error in errors), errors)
 
+    def test_build_validation_allows_structurally_valid_stale_tax_evidence_for_runtime_fallback(self):
+        errors = validate_fire_abroad_payload(
+            self.payload,
+            destination_ids=self.destination_ids,
+            retirement_ids=self.retirement_ids,
+            as_of=date(2027, 9, 3),
+            allow_stale_tax_evidence=True,
+        )
+
+        self.assertEqual([], errors)
+
     def test_complete_country_requires_eligibility_evidence(self):
         payload = copy.deepcopy(self.payload)
         del payload["countries"]["Spain"]["eligibility"]
