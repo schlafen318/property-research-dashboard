@@ -171,6 +171,7 @@ FIRE_TAX_CREDITS_PATH = ROOT / "src" / "fire_tax_credits.js"
 FIRE_TAX_PROPERTY_PATH = ROOT / "src" / "fire_tax_property.js"
 FIRE_TAX_DETAILED_PATH = ROOT / "src" / "fire_tax_detailed.js"
 FIRE_TAX_EXPLAIN_PATH = ROOT / "src" / "fire_tax_explain.js"
+FIRE_TAX_HK_UAE_PATH = ROOT / "src" / "fire_tax_hk_uae.js"
 FIRE_TAX_DETAILED_UI_PATH = ROOT / "src" / "fire_tax_detailed_ui.js"
 RETIREMENT_PLANNING_CURRENCIES = {
     "as_of": "2026-08-27",
@@ -1396,6 +1397,13 @@ def detailed_fire_tax_page_payload(path: Path = FIRE_TAX_RULES_PATH) -> dict:
         "tax_year": rules["tax_year"],
         "checked_on": rules["checked_on"],
         "jurisdictions": jurisdictions,
+        "supported_profiles": {
+            profile_id: deepcopy(profile)
+            for profile_id, profile in rules.get("supported_profiles", {}).items()
+            if profile.get("detailed_enabled") is True and profile.get("synthetic") is False
+        },
+        "planning_currencies": deepcopy(RETIREMENT_PLANNING_CURRENCIES),
+        "aed_per_usd": 3.6725,
         "sources": [source for source in rules.get("sources", []) if source.get("source_kind") == "official"],
     }
 
@@ -6347,6 +6355,7 @@ def build_retirement_calculator_page(
             FIRE_TAX_PROPERTY_PATH,
             FIRE_TAX_DETAILED_PATH,
             FIRE_TAX_EXPLAIN_PATH,
+            FIRE_TAX_HK_UAE_PATH,
             FIRE_TAX_DETAILED_UI_PATH,
         )
     )
@@ -6395,6 +6404,7 @@ __UTILITY_CSS__
         </div></fieldset>
         <fieldset><legend>Destination and housing</legend><div class="field-grid">
           <div class="field"><label for="ret-destination">Destination</label><select id="ret-destination">__OPTIONS__</select><p class="hint"><button class="text-button" id="ret-cost-compare-open" type="button">Compare destination retirement costs</button></p></div>
+          <div class="field" id="ret-home-tax-jurisdiction-field" hidden><label for="ret-home-tax-jurisdiction">Home tax jurisdiction</label><select id="ret-home-tax-jurisdiction"><option value="">Choose one</option><option value="hong-kong">Hong Kong</option></select><p class="hint">Shown only where a complete destination-and-home calculation is supported.</p></div>
           <div class="field"><label for="ret-housing-plan">Housing plan</label><select id="ret-housing-plan"><option value="rent" selected>Rent</option><option value="own">Already own</option><option value="buy_now">Buy now</option><option value="buy_retirement">Buy at retirement</option></select></div>
           <div class="field"><label id="ret-monthly-spending-label" for="ret-monthly-spending">Monthly retirement living expenses including rent</label><input id="ret-monthly-spending" type="text" inputmode="numeric" data-money min="0" step="1" value="0"><p class="hint" id="ret-housing-guidance">Monthly retirement living expenses, including rent.</p></div>
           <div class="field" id="ret-property-field"><label for="ret-property-budget">Home purchase budget today</label><input id="ret-property-budget" type="text" inputmode="numeric" data-money min="0" step="1" value="0"><p class="hint">Prefilled with today's representative destination price. Edit it to match the home you expect to buy.</p><p class="hint" id="ret-acquisition-cost-guidance">The selected destination’s modeled acquisition-cost allowance—or explicit exclusion—is shown here.</p></div>
@@ -6442,7 +6452,7 @@ __UTILITY_CSS__
         <p class="hint" id="ret-tax-unavailable" hidden>This destination tax estimate is conditional because current evidence is unavailable.</p>
         <p class="hint" id="ret-tax-no-tax-comparison" hidden>No added destination tax comparison: <strong id="ret-tax-no-tax-capital">—</strong>.</p>
         <details class="tax-details" id="ret-tax-details" hidden><summary>Assumptions and sources</summary><div class="table-wrap"><table class="result-table"><thead><tr><th>Scenario</th><th>Tax reserve</th><th>Total annual requirement</th><th>Capital requirement</th></tr></thead><tbody><tr id="ret-tax-favorable-row"><th scope="row">Favorable</th><td></td><td></td><td></td></tr><tr id="ret-tax-central-row"><th scope="row">Central</th><td></td><td></td><td></td></tr><tr id="ret-tax-adverse-row"><th scope="row">Adverse</th><td></td><td></td><td></td></tr></tbody></table></div><div class="tax-explanations" id="ret-tax-explanations"></div></details>
-          <p><button class="text-button" id="ret-tax-refine" type="button" hidden disabled>Refine this tax estimate</button></p><p class="hint" id="ret-tax-detailed-availability" role="status">Exact refinement is unavailable until complete current rules cover both this destination and your home tax jurisdiction.</p><p class="hint" id="ret-tax-refine-status" role="status" hidden>Detailed tax refinement is not available yet. The displayed planning range remains unchanged.</p>
+          <p><button class="text-button" id="ret-tax-refine" type="button" hidden disabled>Refine this tax estimate</button></p><p class="hint" id="ret-tax-detailed-availability" role="status">Exact refinement is unavailable until complete current rules cover both this destination and your home tax jurisdiction.</p>
         <section class="result-period" id="ret-today-section" aria-label="Key planning figures"><div class="key-figures">
           <div><span>Monthly contribution</span><strong id="ret-monthly-contribution">—</strong></div><div><span>Retirement capital</span><strong id="ret-total-retirement-summary">—</strong></div><div><span>Property capital</span><strong id="ret-property-summary">—</strong></div>
         </div>
@@ -6473,8 +6483,8 @@ __UTILITY_CSS__
       <h2 id="ret-tax-detailed-heading">Refine your tax estimate</h2>
       <p class="hint">Answer only facts that can change a validated rule. Your answers and results remain in this browser's memory and are not added to links or analytics.</p>
       <p id="ret-tax-detailed-status" role="status" aria-live="polite"></p>
-      <div class="detailed-tax-question-list" id="ret-tax-detailed-questions"></div>
-      <div id="ret-tax-detailed-result"><table class="result-table"><caption>Reconciled tax and retirement calculation</caption><thead><tr><th scope="col">Line</th><th scope="col">Amount</th></tr></thead><tbody></tbody></table><details><summary>Calculation details and official sources</summary></details></div>
+      <form id="ret-tax-detailed-form"><div class="detailed-tax-question-list" id="ret-tax-detailed-questions"></div><button type="submit">Calculate exact profile</button></form>
+      <div id="ret-tax-detailed-result" hidden></div>
     </section>
     <section class="calc-panel current-cost-comparison" id="ret-current-cost-comparison" hidden aria-labelledby="ret-current-cost-heading">
       <h2 id="ret-current-cost-heading">Compare with where you live now</h2>

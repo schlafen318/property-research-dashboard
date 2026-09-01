@@ -234,23 +234,72 @@ def detailed_tax_runtime_evidence(html: str) -> dict[str, object]:
     ]
     script = r"""
 let privacyCalls=0;
-global.window={
+class Element {
+  constructor(id,value="") { this.id=id; this.value=String(value); this.hidden=false; this.disabled=false; this.dataset={}; this.listeners={}; this.options=[]; this.checked=false; this._html=""; this.textContent=""; }
+  addEventListener(type,fn) { (this.listeners[type] ||= []).push(fn); }
+  emit(type,target) { (this.listeners[type]||[]).forEach(fn=>fn({target:target||this,preventDefault(){}})); }
+  querySelector(selector) { if (selector==='[type="submit"]') return elements['detail-submit']; return null; }
+  querySelectorAll() { return []; }
+  checkValidity() { return true; }
+  focus() {}
+  set innerHTML(value) { this._html=String(value); }
+  get innerHTML() { return this._html; }
+  get selectedOptions() { return this.options.filter(option=>option.value===this.value); }
+}
+const values={
+  'ret-destination':'dubai','ret-home-tax-jurisdiction':'hong-kong','ret-currency':'USD',
+  'ret-current-age':50,'ret-retirement-age':60,'ret-horizon':30,'ret-monthly-spending':'6,000',
+  'ret-pension':'24,000','ret-other-income':'6,000','ret-rental-income':'0','ret-tax-withdrawals':'18,000',
+  'ret-housing-plan':'buy_retirement','ret-property-budget':'500,000','ret-tax-property-use':'personal','ret-expected-return':'4'
+};
+const ids=['retirement-calculator','ret-destination','ret-home-tax-jurisdiction','ret-home-tax-jurisdiction-field','ret-tax-refine','ret-tax-detailed','ret-tax-detailed-form','ret-tax-detailed-questions','ret-tax-detailed-result','ret-tax-detailed-status','ret-tax-detailed-availability','detail-submit',...Object.keys(values)];
+const elements=Object.fromEntries([...new Set(ids)].map(id=>[id,new Element(id,values[id]===undefined?'':values[id])]));
+elements['ret-home-tax-jurisdiction'].options=[{value:'',hidden:false,disabled:false},{value:'hong-kong',hidden:false,disabled:false}];
+const document={getElementById(id){return elements[id]||null;}};
+global.document=document;
+global.window={document,
   history:{pushState(){privacyCalls++;},replaceState(){privacyCalls++;}},
   localStorage:{getItem(){privacyCalls++;},setItem(){privacyCalls++;}},
   sessionStorage:{getItem(){privacyCalls++;},setItem(){privacyCalls++;}},
-  fetch(){privacyCalls++;}
+  fetch(){privacyCalls++;},dataLayer:{push(){privacyCalls++;}}
 };
+global.fetch=()=>{privacyCalls++;};
+global.XMLHttpRequest=function(){privacyCalls++;};
+global.navigator={sendBeacon(){privacyCalls++;}};
 const api=require(process.argv[1]);
 const input=JSON.parse(require("fs").readFileSync(0,"utf8"));
-const access=Object.fromEntries(input.destinationIds.map(id=>[id,api.jurisdictionAccess(id,input.payload)]));
+const profiles=Object.values(input.payload.supported_profiles||{});
+const chosen=profiles.find(item=>item.detailed_enabled===true&&item.synthetic===false);
+let initialized=false,resultRendered=false,sourceRendered=false,branchRendered=false,access={};
+if (chosen) {
+  elements['ret-destination'].value=chosen.destination_id;
+  elements['ret-home-tax-jurisdiction'].value=chosen.home_jurisdiction_id;
+  const session=api.initDetailedTaxUI('retirement-calculator',input.payload);
+  initialized=!!session;
+  elements['ret-tax-refine'].emit('click');
+  const supplied={daysInDestination:200,daysInHome:30,isHongKongTreatyResident:false,hasHongKongSourceIncome:false,hasHongKongProperty:false,activityType:'retired_or_employee',retirementAccountClassification:'personal_investment',annualGovernmentPension:0,annualDividends:0,annualInterest:0,annualRealizedGains:0,annualEmploymentIncome:0,financingType:'cash',propertyType:'villa_or_apartment',annualServiceCharges:4000,annualHousingFee:2500,exitPlan:'sale',expectedSalePrice:600000};
+  for (let guard=0;guard<40;guard++) {
+    const pending=api.nextPairQuestions(session.planningFacts(),session.answers());
+    if (!pending.length) break;
+    const question=pending[0], value=supplied[question.fact];
+    if (value===undefined) throw new Error('Verifier lacks answer for '+question.fact);
+    elements['ret-tax-detailed-questions'].emit('change',{name:question.fact,value:String(value),checked:true});
+  }
+  elements['ret-tax-detailed-form'].emit('submit');
+  const markup=elements['ret-tax-detailed-result'].innerHTML;
+  resultRendered=elements['ret-tax-detailed-result'].hidden===false&&markup.includes('<table')&&markup.includes('Capital needed today');
+  sourceRendered=/href="https:\/\/(?:www\.)?(?:ird\.gov\.hk|centralbank\.ae|dubailand\.gov\.ae|tax\.gov\.ae|u\.ae)/.test(markup);
+  branchRendered=markup.includes('UAE resident; Hong Kong non-resident');
+  access[chosen.id]=api.profileAccess(chosen.destination_id,input.payload,{homeJurisdictionId:chosen.home_jurisdiction_id},Object.assign({},session.answers(),{propertyPriceAed:1836250}));
+}
 const probe={jurisdictions:{probe:{detailed_enabled:true,synthetic:true,runtime_bundle:{rules:{}}}}};
-const controller=api.createController({questions:[{id:"probe",fact:"probeFact",control:"number",acceptedValues:{min:0,max:2,step:1,integer:true}}]});
-controller.answer("probeFact",1);
+const controller=api.createController({questions:[{id:'probe',fact:'probeFact',control:'number',acceptedValues:{min:0,max:2,step:1,integer:true}}]});
+controller.answer('probeFact',1);
 process.stdout.write(JSON.stringify({
-  access,
-  privacyCalls,
-  syntheticProbeAvailable:api.jurisdictionAccess("probe",probe).available,
-  controllerAnswers:controller.snapshot().answers
+  access,privacyCalls,domInitialized:initialized,resultRendered,officialSourceLinkRendered:sourceRendered,plainBranchRendered:branchRendered,
+  unsupportedPairAvailable:api.profileAccess('dubai',input.payload,{homeJurisdictionId:'unsupported-home'}).available,
+  selectedDestinationPresent:!!chosen&&input.destinationIds.includes(chosen.destination_id),
+  syntheticProbeAvailable:api.jurisdictionAccess('probe',probe).available,controllerAnswers:controller.snapshot().answers
 }));
 """
     completed = subprocess.run(
@@ -267,7 +316,14 @@ process.stdout.write(JSON.stringify({
         "privacy_calls": int(runtime["privacyCalls"]),
         "synthetic_probe_available": bool(runtime["syntheticProbeAvailable"]),
         "controller_answers": runtime["controllerAnswers"],
-        "claimed_jurisdictions": list(detailed.get("jurisdictions", {}).keys()),
+        "supported_profile_count": len(detailed.get("supported_profiles", {})),
+        "dom_initialized": bool(runtime["domInitialized"]),
+        "result_rendered": bool(runtime["resultRendered"]),
+        "official_source_link_rendered": bool(runtime["officialSourceLinkRendered"]),
+        "plain_branch_rendered": bool(runtime["plainBranchRendered"]),
+        "unsupported_pair_available": bool(runtime["unsupportedPairAvailable"]),
+        "selected_destination_present": bool(runtime["selectedDestinationPresent"]),
+        "claimed_profiles": list(detailed.get("supported_profiles", {}).keys()),
     }
 
 
@@ -279,6 +335,16 @@ def detailed_tax_runtime_errors(html: str) -> list[str]:
     errors: list[str] = []
     if evidence["destination_count"] <= 0:
         errors.append("Detailed tax runtime verification found no calculator destinations")
+    if evidence["supported_profile_count"] <= 0:
+        errors.append("Detailed tax runtime verification found no real enabled destination-and-home profile")
+    if not evidence["selected_destination_present"]:
+        errors.append("Detailed tax enabled profile destination is not selectable in the live calculator")
+    if not evidence["dom_initialized"] or not evidence["result_rendered"]:
+        errors.append("Detailed tax DOM flow did not initialize, route answers, submit and render")
+    if not evidence["official_source_link_rendered"] or not evidence["plain_branch_rendered"]:
+        errors.append("Detailed tax result did not render official sources and a plain-language branch")
+    if evidence["unsupported_pair_available"]:
+        errors.append("Detailed tax runtime exposed an unsupported destination-and-home pair")
     if evidence["privacy_calls"] != 0:
         errors.append("Detailed tax runtime accessed URL, storage, or network APIs")
     if evidence["synthetic_probe_available"]:
@@ -286,9 +352,9 @@ def detailed_tax_runtime_errors(html: str) -> list[str]:
     if evidence["controller_answers"] != {"probeFact": 1}:
         errors.append("Detailed tax runtime did not retain an answer in memory")
     access = evidence["access"]
-    for jurisdiction_id in evidence["claimed_jurisdictions"]:
-        if not isinstance(access, dict) or not access.get(jurisdiction_id, {}).get("available"):
-            errors.append(f"Detailed tax jurisdiction {jurisdiction_id} is claimed enabled but not executable")
+    for profile_id in evidence["claimed_profiles"]:
+        if not isinstance(access, dict) or not access.get(profile_id, {}).get("available"):
+            errors.append(f"Detailed tax profile {profile_id} is claimed enabled but not executable")
     return errors
 
 

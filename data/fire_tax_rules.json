@@ -112,6 +112,138 @@
   },
   "sources": [
     {
+      "id": "uae-individual-tax-2026",
+      "publisher": "Official Platform of the UAE Government",
+      "url": "https://u.ae/en/information-and-services/finance-and-investment/taxation",
+      "source_kind": "official",
+      "effective_from": "2023-06-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "The UAE does not levy income tax on individuals.",
+      "recheck_trigger": "Recheck before each tax-year release or any announced personal-income-tax change."
+    },
+    {
+      "id": "uae-natural-person-business-2026",
+      "publisher": "UAE Federal Tax Authority",
+      "url": "https://tax.gov.ae/en/taxes/corporate.tax/corporate.tax.topics/basis.of.taxation.natural.person.aspx",
+      "source_kind": "official",
+      "effective_from": "2024-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Natural-person corporate-tax scope and the exclusions for wages, personal investment income and real-estate investment income.",
+      "recheck_trigger": "Recheck any natural-person threshold, excluded-income or corporate-tax amendment."
+    },
+    {
+      "id": "uae-tax-residence-2026",
+      "publisher": "UAE Federal Tax Authority",
+      "url": "https://tax.gov.ae/en/content/cabinet.decision.no.85.of.2022.on.determination.of.tax.residency.home.aspx",
+      "source_kind": "official",
+      "effective_from": "2023-03-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Cabinet Decision No. 85 of 2022, including the natural-person 183-day residence route.",
+      "recheck_trigger": "Recheck any UAE tax-residence decision or implementing guidance change."
+    },
+    {
+      "id": "hk-territorial-individual-tax-2026",
+      "publisher": "Hong Kong Inland Revenue Department",
+      "url": "https://www.ird.gov.hk/eng/tax/ind_nr.htm",
+      "source_kind": "official",
+      "effective_from": "2026-04-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Non-resident individuals remain liable for Hong Kong services and business on a territorial source basis.",
+      "recheck_trigger": "Recheck the individual source rules and 2026/27 assessment guidance."
+    },
+    {
+      "id": "hk-uae-treaty-2026",
+      "publisher": "Hong Kong Inland Revenue Department",
+      "url": "https://www.ird.gov.hk/eng/pdf/Synthesised_Text_HKSAR_UAE.pdf",
+      "source_kind": "official",
+      "effective_from": "2016-04-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Synthesised Hong Kong–UAE income-tax agreement and MLI text, including residence and double-tax relief.",
+      "recheck_trigger": "Recheck treaty, MLI reservations and competent-authority updates."
+    },
+    {
+      "id": "dld-sale-registration-2026",
+      "publisher": "Dubai Land Department",
+      "url": "https://dubailand.gov.ae/en/eservices/property-sale-registration/",
+      "source_kind": "official",
+      "effective_from": "2013-10-02",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Sale registration shares and current title, map and trustee service fees.",
+      "recheck_trigger": "Recheck DLD sale-registration and trustee fee schedules."
+    },
+    {
+      "id": "dld-gift-registration-2026",
+      "publisher": "Dubai Land Department",
+      "url": "https://dubailand.gov.ae/en/eservices/property-gift-registration/",
+      "source_kind": "official",
+      "effective_from": "2013-10-02",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Qualifying gift relationships and current gift registration and service fees.",
+      "recheck_trigger": "Recheck DLD gift eligibility, valuation and service fees."
+    },
+    {
+      "id": "dld-inheritance-registration-2026",
+      "publisher": "Dubai Land Department",
+      "url": "https://dubailand.gov.ae/en/eservices/inheritance-title-transfer/",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Current inheritance title-transfer, document, map and service-partner fees.",
+      "recheck_trigger": "Recheck DLD inheritance transfer requirements and fees."
+    },
+    {
+      "id": "dld-service-charge-index-2026",
+      "publisher": "Dubai Land Department",
+      "url": "https://dubailand.gov.ae/en/eservices/service-charge-index-overview/service-charge-index",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Property-specific approved service charges; the calculator requires the user's property-specific amount.",
+      "recheck_trigger": "Recheck the property-specific service-charge index."
+    },
+    {
+      "id": "uae-residential-property-vat-2026",
+      "publisher": "Official Platform of the UAE Government",
+      "url": "https://u.ae/participate/-/media/Information-and-services/Finance-and-Investment/VAt-guidelines/vattreatmentofproperties-Eng.ashx?la=en",
+      "source_kind": "official",
+      "effective_from": "2018-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Residential-property owner does not charge VAT on residential rent or sale; commercial-property treatment is excluded from this profile.",
+      "recheck_trigger": "Recheck UAE VAT legislation and FTA residential-property guidance."
+    },
+    {
+      "id": "cbuae-aed-usd-rate-2026",
+      "publisher": "Central Bank of the UAE",
+      "url": "https://www.centralbank.ae/umbraco/Surface/Exchange/GetExchangeRateAllCurrency",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 30,
+      "scope": "Official VAT exchange table; the calculator uses the published USD rate of AED 3.6725 to translate AED-denominated registration fees.",
+      "recheck_trigger": "Recheck the CBUAE official exchange-rate publication before release."
+    },
+    {
+      "id": "dubai-municipality-housing-fee-2026",
+      "publisher": "Dubai Municipality",
+      "url": "https://www.dm.gov.ae/dubai-municipality-services/",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Housing fees on leased or owned units are property-specific and based on rental value; the calculator requires the user's current billed amount.",
+      "recheck_trigger": "Recheck Dubai Municipality housing-fee services and the property bill before release."
+    },
+    {
       "id": "synthetic-example-authority-2026",
       "publisher": "Synthetic test fixture — not a legal authority",
       "url": "https://example.invalid/fire-tax-rules-2026",
@@ -123,6 +255,65 @@
       "recheck_trigger": "Replace with current official primary sources before enabling any jurisdiction."
     }
   ],
+  "supported_profiles": {
+    "hong-kong-to-dubai": {
+      "id": "hong-kong-to-dubai",
+      "label": "Hong Kong to Dubai",
+      "synthetic": false,
+      "detailed_enabled": true,
+      "home_jurisdiction_id": "hong-kong",
+      "home_label": "Hong Kong",
+      "destination_id": "dubai",
+      "destination_label": "Dubai",
+      "tax_year": 2026,
+      "source_ids": [
+        "uae-individual-tax-2026",
+        "uae-natural-person-business-2026",
+        "uae-tax-residence-2026",
+        "hk-territorial-individual-tax-2026",
+        "hk-uae-treaty-2026",
+        "dld-sale-registration-2026",
+        "dld-gift-registration-2026",
+        "dld-inheritance-registration-2026",
+        "dld-service-charge-index-2026",
+        "uae-residential-property-vat-2026",
+        "cbuae-aed-usd-rate-2026",
+        "dubai-municipality-housing-fee-2026"
+      ],
+      "income_categories": [
+        "private_pension",
+        "government_pension",
+        "social_security",
+        "dividends",
+        "interest",
+        "realized_gains",
+        "retirement_account_withdrawal",
+        "rental_income",
+        "employment_consulting"
+      ],
+      "property_lifecycle": ["purchase", "annual", "rental", "sale", "inheritance", "gift"],
+      "runtime_definition": {
+        "factory": "hong-kong-to-dubai-v1",
+        "supported_activity_types": ["retired_or_employee"],
+        "supported_retirement_accounts": ["personal_investment"],
+        "supported_property_types": ["villa_or_apartment"],
+        "supported_gift_relationships": ["first_degree_family"],
+        "supported_exit_plans": ["sale", "gift", "inheritance", "keep"],
+        "rule_constants": {
+          "buyer_sale_registration_rate": 0.02,
+          "seller_sale_registration_rate": 0.02,
+          "gift_registration_rate": 0.00125,
+          "gift_registration_minimum_aed": 2000,
+          "inheritance_registration_aed": 1000,
+          "title_deed_aed": 250,
+          "unit_map_aed": 250,
+          "knowledge_and_innovation_aed": 20,
+          "inheritance_partner_fee_aed": 130,
+          "vat_rate": 0.05
+        }
+      }
+    }
+  },
   "jurisdictions": {
     "synthetic-example": {
       "id": "synthetic-example",

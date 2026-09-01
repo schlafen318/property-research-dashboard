@@ -159,6 +159,17 @@ RESIDENCE_SCOPES = frozenset({"worldwide_income", "source_income", "conditional"
 QUESTION_CONTROLS = frozenset({"number", "select", "radio", "date", "checkbox"})
 PROFILE_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9]*$")
 QUESTION_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+SUPPORTED_RUNTIME_KEYS = frozenset(
+    {
+        "factory",
+        "supported_activity_types",
+        "supported_retirement_accounts",
+        "supported_property_types",
+        "supported_gift_relationships",
+        "supported_exit_plans",
+        "rule_constants",
+    }
+)
 
 
 def load_fire_tax_rules(path: Path = RULES_PATH) -> dict[str, Any]:
@@ -333,6 +344,87 @@ def _validate_enablement_contract(
             key: set(value) for key, value in MINIMUM_CATEGORY_CAPABILITIES.items()
         }
     return type_set, category_set, capability_set
+
+
+def _validate_supported_profiles(
+    payload: dict[str, Any],
+    known_source_ids: set[str],
+    source_kinds: dict[str, Any],
+    errors: list[str],
+) -> None:
+    profiles = payload.get("supported_profiles")
+    # Standalone rule-graph fixtures and reusable engine payloads do not publish
+    # site profiles.  When the publication layer is present, validate it fully.
+    if profiles is None:
+        return
+    if not isinstance(profiles, dict) or not profiles:
+        errors.append("supported_profiles must contain at least one profile")
+        return
+    required_lifecycle = set(PROPERTY_LIFECYCLE_STAGES)
+    required_income = set(MINIMUM_ENABLEMENT_CATEGORIES) & {
+        "private_pension",
+        "government_pension",
+        "social_security",
+        "dividends",
+        "interest",
+        "realized_gains",
+        "retirement_account_withdrawal",
+        "rental_income",
+        "employment_consulting",
+    }
+    for profile_id, profile in profiles.items():
+        path = f"supported_profiles.{profile_id}"
+        if not isinstance(profile, dict):
+            errors.append(f"{path} must be an object")
+            continue
+        if profile.get("id") != profile_id:
+            errors.append(f"{path}.id must match its profile key")
+        for key in ("label", "home_jurisdiction_id", "home_label", "destination_id", "destination_label"):
+            if not isinstance(profile.get(key), str) or not profile[key].strip():
+                errors.append(f"{path}.{key} is required")
+        if not isinstance(profile.get("synthetic"), bool):
+            errors.append(f"{path}.synthetic must be a boolean")
+        if not isinstance(profile.get("detailed_enabled"), bool):
+            errors.append(f"{path}.detailed_enabled must be a boolean")
+        if profile.get("tax_year") != payload.get("tax_year"):
+            errors.append(f"{path}.tax_year must match the dataset tax year")
+        source_ids = profile.get("source_ids")
+        invalid_sources = [] if isinstance(source_ids, list) else ["missing"]
+        if isinstance(source_ids, list):
+            invalid_sources = [
+                source_id
+                for source_id in source_ids
+                if source_id not in known_source_ids or source_kinds.get(source_id) != "official"
+            ]
+        if not isinstance(source_ids, list) or not source_ids or invalid_sources:
+            errors.append(f"{path}.source_ids must reference only current official sources")
+        lifecycle = profile.get("property_lifecycle")
+        if not isinstance(lifecycle, list) or set(lifecycle) != required_lifecycle:
+            errors.append(f"{path}.property_lifecycle must cover every property lifecycle stage")
+        income = profile.get("income_categories")
+        if not isinstance(income, list) or set(income) != required_income:
+            errors.append(f"{path}.income_categories must cover every detailed income category")
+        runtime = profile.get("runtime_definition")
+        if not isinstance(runtime, dict):
+            errors.append(f"{path}.runtime_definition must be an object")
+            continue
+        for key in runtime:
+            if key not in SUPPORTED_RUNTIME_KEYS:
+                errors.append(f"{path}.runtime_definition.{key} is not a validated rule setting")
+        if runtime.get("factory") != "hong-kong-to-dubai-v1":
+            errors.append(f"{path}.runtime_definition.factory is unsupported")
+        constants = runtime.get("rule_constants")
+        if not isinstance(constants, dict) or not constants or not all(
+            isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value) and value >= 0
+            for value in constants.values()
+        ):
+            errors.append(f"{path}.runtime_definition.rule_constants must contain non-negative official rule constants")
+        for key in SUPPORTED_RUNTIME_KEYS - {"factory", "rule_constants"}:
+            values = runtime.get(key)
+            if not isinstance(values, list) or not values or not all(isinstance(value, str) and value for value in values):
+                errors.append(f"{path}.runtime_definition.{key} must contain supported identifiers")
+        if profile.get("detailed_enabled") and profile.get("synthetic"):
+            errors.append(f"{path}.detailed_enabled cannot enable a synthetic profile")
 
 
 def _value_matches_type(value: Any, value_type: Any) -> bool:
@@ -1875,6 +1967,8 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
                 known_source_ids.add(source_id)
                 if isinstance(source, dict):
                     source_kinds[source_id] = source.get("source_kind")
+
+    _validate_supported_profiles(payload, known_source_ids, source_kinds, errors)
 
     jurisdictions = payload.get("jurisdictions")
     if not isinstance(jurisdictions, dict) or not jurisdictions:

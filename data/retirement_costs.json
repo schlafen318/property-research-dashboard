@@ -4,6 +4,86 @@
   "methodology_note": "Comfortable but not luxury annual budgets modeled from current city cost and rent observations, private-health allowances, recurring travel, and contingency. Property prices use the median of three representative listings already captured by Global Home Atlas. Values are planning estimates, not personal financial advice.",
   "destinations": [
     {
+      "destination_id": "dubai",
+      "display_currency": "AED",
+      "fx_to_usd": 0.272294,
+      "inflation": {
+        "general": 0.025,
+        "healthcare": 0.04,
+        "property": 0.03
+      },
+      "profiles": {
+        "single": {
+          "categories_usd": {
+            "food_household": 3600,
+            "utilities_communications": 3000,
+            "private_healthcare": 2400,
+            "transport": 1200,
+            "dining_leisure": 1800,
+            "travel": 2400,
+            "visa_admin": 500,
+            "contingency": 1500
+          },
+          "annual_rent_usd": 18250,
+          "annual_owner_costs_usd": 7000
+        },
+        "couple": {
+          "categories_usd": {
+            "food_household": 6000,
+            "utilities_communications": 4000,
+            "private_healthcare": 4800,
+            "transport": 2400,
+            "dining_leisure": 3000,
+            "travel": 4800,
+            "visa_admin": 800,
+            "contingency": 2500
+          },
+          "annual_rent_usd": 30000,
+          "annual_owner_costs_usd": 7000
+        }
+      },
+      "property": {
+        "representative_price_usd": 520000,
+        "acquisition_cost_rate": 0.0225,
+        "price_basis": "A 100 m² planning home at the Atlas Dubai market benchmark; replace it with the intended property's price."
+      },
+      "confidence": {
+        "overall": "medium",
+        "proxy_categories": [
+          "private_healthcare",
+          "visa_admin",
+          "inflation",
+          "owner_costs"
+        ]
+      },
+      "sources": [
+        {
+          "name": "Numbeo — Dubai cost of living",
+          "url": "https://www.numbeo.com/cost-of-living/in/Dubai",
+          "metric_supported": "Current rent, utilities, transport, food and local cost observations",
+          "source_date": "31 August 2026",
+          "accessed_on": "2026-09-01",
+          "notes": "City-level crowdsourced observations used as a transparent planning benchmark; users can replace every material cash-flow amount."
+        },
+        {
+          "name": "Dubai Data and Statistics — household expenditure survey",
+          "url": "https://www.digitaldubai.ae/newsroom/news/dubai-data-and-statistics-completes-the-household-income-and-expenditure-survey-2024",
+          "metric_supported": "Official local household-expenditure survey context",
+          "source_date": "2024 survey completed February 2025",
+          "accessed_on": "2026-09-01",
+          "notes": "Used as context rather than a personalized spending assumption."
+        },
+        {
+          "name": "Dubai Land Department — property market and fee evidence",
+          "url": "https://dubailand.gov.ae/en/eservices/property-sale-registration/",
+          "metric_supported": "Property transaction fee and acquisition context",
+          "source_date": "2026",
+          "accessed_on": "2026-09-01",
+          "notes": "Exact detailed refinement recalculates the supported buyer registration and service fees from the user's price."
+        }
+      ]
+    },
+    {
       "destination_id": "fukuoka-itoshima",
       "display_currency": "JPY",
       "fx_to_usd": 0.006199,

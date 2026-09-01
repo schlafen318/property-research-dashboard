@@ -105,6 +105,13 @@ class AutoInternalLinkTests(unittest.TestCase):
         evidence = verify_static_site.detailed_tax_runtime_evidence(html)
 
         self.assertGreater(evidence["destination_count"], 0)
+        self.assertGreater(evidence["supported_profile_count"], 0)
+        self.assertTrue(evidence["selected_destination_present"])
+        self.assertTrue(evidence["dom_initialized"])
+        self.assertTrue(evidence["result_rendered"])
+        self.assertTrue(evidence["official_source_link_rendered"])
+        self.assertTrue(evidence["plain_branch_rendered"])
+        self.assertFalse(evidence["unsupported_pair_available"])
         self.assertEqual(0, evidence["privacy_calls"])
         self.assertFalse(evidence["synthetic_probe_available"])
         self.assertEqual([], verify_static_site.detailed_tax_runtime_errors(html))
@@ -114,12 +121,13 @@ class AutoInternalLinkTests(unittest.TestCase):
             '<script id="retirement-destination-data" type="application/json">'
             '{"destinations":[{"destination_id":"dubai"}]}</script>'
             '<script id="fire-tax-detailed-data" type="application/json">'
-            '{"jurisdictions":{"dubai":{"detailed_enabled":true,"synthetic":false}}}</script>'
+            '{"supported_profiles":{"broken-pair":{"id":"broken-pair","detailed_enabled":true,"synthetic":false,'
+            '"destination_id":"dubai","home_jurisdiction_id":"hong-kong","source_ids":[]}},"sources":[]}</script>'
         )
 
         errors = verify_static_site.detailed_tax_runtime_errors(html)
 
-        self.assertTrue(any("dubai" in error and "not executable" in error for error in errors))
+        self.assertTrue(any("broken-pair" in error and "not executable" in error for error in errors))
 
     def test_contextual_related_guides_includes_machine_approved_links_first(self) -> None:
         source = {

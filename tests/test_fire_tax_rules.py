@@ -37,6 +37,39 @@ class FireTaxRuleContractTests(unittest.TestCase):
             {rule["type"] for rule in jurisdiction["rules"]},
         )
 
+    def test_packaged_rules_enable_a_real_hong_kong_to_dubai_profile(self):
+        self.assertEqual([], self.validate(self.payload))
+        profile = self.payload["supported_profiles"]["hong-kong-to-dubai"]
+        self.assertTrue(profile["detailed_enabled"])
+        self.assertFalse(profile["synthetic"])
+        self.assertEqual("hong-kong", profile["home_jurisdiction_id"])
+        self.assertEqual("dubai", profile["destination_id"])
+        self.assertEqual(
+            {"purchase", "annual", "rental", "sale", "inheritance", "gift"},
+            set(profile["property_lifecycle"]),
+        )
+        self.assertNotIn("profile", profile["runtime_definition"])
+        self.assertNotIn("personalized_amounts", profile["runtime_definition"])
+
+    def test_enabled_profile_rejects_missing_official_sources_and_lifecycle(self):
+        payload = copy.deepcopy(self.payload)
+        profile = payload["supported_profiles"]["hong-kong-to-dubai"]
+        profile["source_ids"] = ["synthetic-example-authority-2026"]
+        profile["property_lifecycle"].remove("gift")
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(errors, "supported_profiles.hong-kong-to-dubai.source_ids")
+        self.assert_path_error(errors, "supported_profiles.hong-kong-to-dubai.property_lifecycle")
+
+    def test_enabled_profile_rejects_canned_personal_amounts(self):
+        payload = copy.deepcopy(self.payload)
+        payload["supported_profiles"]["hong-kong-to-dubai"]["runtime_definition"]["annualPension"] = 12000
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(errors, "supported_profiles.hong-kong-to-dubai.runtime_definition.annualPension")
+
     def test_loader_reads_an_explicit_path(self):
         with tempfile.TemporaryDirectory() as directory:
             path = Path(directory) / "rules.json"

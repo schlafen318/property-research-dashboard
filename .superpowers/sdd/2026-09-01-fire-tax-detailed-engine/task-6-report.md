@@ -1,69 +1,73 @@
 # Task 6 report: detailed FIRE tax refinement UI
 
 Date: 2026-09-01
+
 Base revision: `d446aef`
+
+Round 1 integration base: `3573eb5`
 
 ## Outcome
 
-The retirement calculator now contains a progressive detailed-tax refinement runtime, but production exposes no exact-refinement entry point until a validated destination-and-home jurisdiction pair is available. Exact means the reconciled destination and continuing-home result; it is not a destination-only estimate.
+The retirement calculator now publishes one real, executable exact profile: **Hong Kong home jurisdiction → Dubai destination**. It is a narrow destination-and-home result, not a destination-only estimate. Unsupported profiles and material facts fail closed with a specific plain-language reason.
 
-The runtime is ready to accept a data-provided, profile-level bundle. Access requires all of the following:
+The normal calculator remains non-technical. Dubai selection reveals the native home-jurisdiction control, and Hong Kong is its only production option. Exact refinement appears only after a required after-fees-and-tax return is entered. A separate detailed form then asks only facts that can change an enabled branch; every answer is retained in memory and re-routes the remaining questions.
 
-- an explicitly enabled, non-synthetic destination;
-- a selected home tax jurisdiction;
-- the home jurisdiction in the destination's supported-home allow-list; and
-- an executable destination-and-home rule/profile bundle.
+## Supported profile boundary
 
-Unsupported profiles receive the plain-language reason: “Complete current rules do not yet cover this destination together with your home tax jurisdiction.” The general server-rendered status says exact refinement remains unavailable until complete current rules cover both jurisdictions.
+Exact access currently requires all of the following:
 
-## Implementation
+- at least 183 UAE days under the supported domestic-residence route;
+- no continuing Hong Kong treaty residence;
+- no Hong Kong-source services, business, property income, Hong Kong pension-fund amount, or retained Hong Kong property;
+- retirement or UAE employment salary only, with no natural-person business or consulting activity;
+- ordinary personal investments rather than MPF or another retirement-scheme withdrawal;
+- a cash purchase, if buying, of a Dubai villa or apartment;
+- property-specific service charge and municipality housing-fee amounts supplied by the user, with zero allowed when already included in living expenses;
+- a supported keep, sale, qualifying first-degree-family gift, or inheritance path; and
+- for a gift, a value high enough that the DLD AED 2,000 minimum is not the controlling branch.
 
-- Added `src/fire_tax_detailed_ui.js` with strict profile-level routing, native accessible material-question controls, in-memory answer handling, detailed calculation orchestration, one reconciled table, branch comparison, and expandable calculation/source audit.
-- Embedded the approved residence, income, credit, property, detailed, explanation, profile, and detailed-UI engines in the retirement calculator page.
-- Added a hidden server-rendered detailed section and fail-closed refine hook. Ordinary planning recalculation cannot reveal the hook unless the detailed runtime marked the current profile available.
-- Added a validated page-payload builder that strips synthetic and non-official candidates. The current production payload contains no enabled jurisdiction.
-- Added a behavioral static verifier. It executes routing for all calculator destinations, rejects synthetic exposure, exercises in-memory validated answers, and traps URL history, storage, and network access.
-- Added a synthetic fully enabled destination-and-home bundle test that runs the approved detailed engine end to end and renders the reconciled result. The synthetic bundle is test-only and never appears in the generated site.
+Mixed inflation-linking choices across non-zero dependable-income streams are also rejected because the approved retirement integration currently accepts one dependable-income indexing treatment. These restrictions are stated on-site; the implementation does not assume an adviser handoff.
 
-No personal tax answers are written to URLs, analytics, generated personal HTML, browser storage, or network APIs.
+## Live calculation and UI
 
-## UAE/Dubai research and enablement decision
+- No production rule bundle contains personalized amounts. The detailed profile is normalized from live age, retirement timing, horizon, monthly retirement spending, pension/other/rental income, portfolio withdrawals, property price/use/timing, current monthly income, invested share, return, inflation and reserve inputs, plus detailed material answers.
+- User-supplied annual property service/housing fees enter retirement spending, and supported DLD purchase fees enter acquisition capital. Sale/gift/inheritance registration fees remain separately reconciled lifecycle effects.
+- The result is hidden until calculation and uses one table comparing plain-language branch, annual tax, after-tax dependable income, annual property fees, lifecycle registration fees and capital needed today.
+- Expandable audit lines link the controlling official sources and expose formula, assumptions, exclusions, rule IDs, tax year and confidence.
+- The dedicated form uses native labels, fieldsets, radio/select/number controls, `required` validation, keyboard behavior and ARIA live status updates.
+- Unsupported destinations have no home-jurisdiction choice or refine entry point. Unsupported pair/fact combinations cannot run.
 
-UAE/Dubai was investigated as the first candidate using current primary government sources. The evidence supports several important domestic rules:
+## Official rule sources
 
-- The UAE government states that the UAE does not levy income tax on individuals. Source: [UAE Government — Taxation](https://u.ae/en/information-and-services/finance-and-investment/taxation), checked 2026-09-01; page current in 2026.
-- The Federal Tax Authority states that a natural person enters corporate-tax scope only when conducting UAE business/business activity and business turnover exceeds AED 1 million in a calendar year; wages, personal investment income, and real-estate investment income are excluded from that test. Sources: [FTA — Basis of Taxation: Natural Person](https://tax.gov.ae/en/taxes/corporate.tax/corporate.tax.topics/basis.of.taxation.natural.person.aspx), last updated 2024-05-06, checked 2026-09-01; [FTA — Taxation of natural persons guide](https://tax.gov.ae/Datafolder/Files/Guides/CT/Taxation%20of%20natural%20persons%20-%2025%2011%202023.pdf), effective for relevant corporate-tax periods, checked 2026-09-01; [FTA — Real Estate Investment guide](https://tax.gov.ae/Datafolder/Files/Pdf/2024/Real-Estate-Investment-for-natural-persons-22-10-2024.pdf), published 2024, checked 2026-09-01.
-- UAE domestic tax residence includes fact-dependent 183-day, 90-day, and centre-of-interests routes; treaty residence and tie-breakers must be evaluated under the applicable agreement. Sources: [FTA — Cabinet Decision No. 85 of 2022](https://tax.gov.ae/en/content/cabinet.decision.no.85.of.2022.on.determination.of.tax.residency.home.aspx), effective 2023-03-01, checked 2026-09-01; [FTA — Tax Resident and Tax Residency Certificate guide](https://tax.gov.ae/Datafolder/Files/Guides/VAT/VAT%20Guides/Tax-Resident-and-TRC--18-10-2024.pdf), published 2024, checked 2026-09-01.
-- Dubai Land Department describes the 4% sale-registration fee as 2% seller and 2% buyer, subject to transaction-specific additional charges; gift registration is 0.125% of valuation with an AED 2,000 minimum for the stated qualifying relationships/conditions; inheritance title transfer has stated fixed registration and document/map fees. These are registration/service fees, not relabelled as income taxes. Sources: [DLD — Property Sale Registration](https://dubailand.gov.ae/en/eservices/property-sale-registration/), checked 2026-09-01; [DLD — Property Gift Registration](https://dubailand.gov.ae/en/eservices/property-gift-registration/), checked 2026-09-01; [DLD — Inheritance Title Transfer](https://dubailand.gov.ae/en/eservices/inheritance-title-transfer/), checked 2026-09-01; [DLD — registration fee legislation](https://dubailand.gov.ae/media/zrrd4qw4/en-legislation.pdf), checked 2026-09-01.
-- Building service charges vary by property and are available through DLD's property-specific index, so no universal rate was invented. Source: [DLD — Service Charge Index](https://dubailand.gov.ae/en/eservices/service-charge-index-overview/service-charge-index), checked 2026-09-01.
+All production legal and tax rules use current primary government sources with claim-level IDs, effective dates and 2026-09-01 check dates:
 
-UAE/Dubai remains disabled. A UAE domestic bundle cannot produce the promised exact FIRE result without a complete current home-jurisdiction residence, income, foreign-tax-credit, treaty, and continuing-property overlay for the user's actual home jurisdiction. Enabling UAE would therefore present a partial destination total as exact. No partial UAE business or property rule graph was added to production data.
+- [UAE Government — taxation](https://u.ae/en/information-and-services/finance-and-investment/taxation): no UAE individual income tax.
+- [UAE Federal Tax Authority — natural persons](https://tax.gov.ae/en/taxes/corporate.tax/corporate.tax.topics/basis.of.taxation.natural.person.aspx): business/business-activity corporate-tax scope and explicit wage, personal-investment and real-estate-investment exclusions. Business/consulting is outside the enabled profile.
+- [UAE Federal Tax Authority — Cabinet Decision No. 85 of 2022](https://tax.gov.ae/en/content/cabinet.decision.no.85.of.2022.on.determination.of.tax.residency.home.aspx): supported 183-day residence route, effective 2023-03-01.
+- [Hong Kong IRD — non-resident individuals](https://www.ird.gov.hk/eng/tax/ind_nr.htm): Hong Kong territorial source exposure.
+- [Hong Kong IRD — synthesised Hong Kong–UAE agreement](https://www.ird.gov.hk/eng/pdf/Synthesised_Text_HKSAR_UAE.pdf): residence/treaty framework and double-tax relief context.
+- [Dubai Land Department — sale registration](https://dubailand.gov.ae/en/eservices/property-sale-registration/): 2% buyer and 2% seller shares, title/map/knowledge/innovation and trustee fees.
+- [Dubai Land Department — gift registration](https://dubailand.gov.ae/en/eservices/property-gift-registration/): 0.125% valuation fee, AED 2,000 minimum, qualifying relationships and service fees.
+- [Dubai Land Department — inheritance transfer](https://dubailand.gov.ae/en/eservices/inheritance-title-transfer/): current fixed transfer and service fees.
+- [Dubai Land Department — service-charge index](https://dubailand.gov.ae/en/eservices/service-charge-index-overview/service-charge-index): property-specific approved service charges; no rate is invented.
+- [Dubai Municipality — services](https://www.dm.gov.ae/dubai-municipality-services/): owned/leased-unit housing fee based on rental value; the billed amount is user supplied.
+- [UAE Government — residential property VAT](https://u.ae/participate/-/media/Information-and-services/Finance-and-Investment/VAt-guidelines/vattreatmentofproperties-Eng.ashx?la=en): supported residential rent/sale VAT treatment.
+- [Central Bank of the UAE — official exchange rates](https://www.centralbank.ae/umbraco/Surface/Exchange/GetExchangeRateAllCurrency): current AED conversion for AED-denominated fees.
 
-## Tests and verification
+Dubai was added to the ordinary retirement-cost dataset so the enabled tax destination is genuinely selectable. Its initial cost benchmark discloses current Numbeo observations, official Dubai household-expenditure context and DLD property evidence; users may replace every material cash-flow amount. UAE mortgage availability remains `research_incomplete`, and the exact tax profile separately permits cash purchases only.
 
-TDD coverage was added for:
+## Verification
 
-- strict destination-plus-home enablement and synthetic rejection;
-- native labels, fieldsets, radio/select/number controls, typed answers, and contract validation;
-- one reconciled result table, branch comparison, audit details, and official links;
-- memory-only state and privacy traps;
-- end-to-end calculation through a synthetic fully enabled pair;
-- builder stripping of all production entry points while no complete pair exists;
-- retirement UI protection against re-showing the refine control; and
-- static-verifier rejection of a forged enabled-but-non-executable destination.
+- Focused rules/UI/page/builder/cost suite: 154 tests passed.
+- Full repository suite: 1,206 tests passed in 47.121 seconds after the final DLD gift-valuation correction.
+- The non-vacuous static verifier selects the real pair, initializes a DOM, fills live inputs, routes every progressive answer, submits, renders the result, checks official links/plain branch/handoff state, rejects an unsupported pair, and traps history, storage, network and analytics calls. Result: 33 calculator destinations, one enabled profile, zero privacy calls, no detailed-tax errors.
+- Real Chrome exact flow: calculated and rendered one reconciliation table with official audit links.
+- Responsive widths 320, 375, 390, 430, 736 and 1024 CSS pixels: document width equalled viewport width and the result remained present.
+- JavaScript-disabled Chrome: refine button remains hidden/disabled; detailed section and result remain hidden.
+- `git diff --check`: clean.
 
-Fresh verification on 2026-09-01:
+The repository-wide static verifier still reports unrelated pre-existing generated-site problems: two missing Spain page markers and three missing Chamonix images. It reports no detailed-tax error.
 
-- `python3 src/build_unified_app.py` — exit 0.
-- Focused detailed/page/UI/builder suite — 108 tests, all passed.
-- `python3 -m unittest discover -s tests` — 1,197 tests, all passed in 48.754 seconds.
-- Detailed-tax static runtime verifier — 32 destinations exercised, zero privacy calls, synthetic probe unavailable, no detailed-tax errors.
-- `git diff --check` — clean.
-- Browser checks at 320, 375, 390, 430, 736, and 1024 CSS pixels — no horizontal overflow; refine control hidden/disabled; detailed section hidden.
-- JavaScript-disabled headless Chrome load — exit 0; the server-rendered refine control and detailed section remain hidden/disabled.
+## Privacy
 
-The repository-wide `scripts/verify_static_site.py` still exits 1 for unrelated pre-existing generated-site issues: two missing Spain page markers and three missing Chamonix image assets. It reports no detailed-tax runtime error.
-
-## Remaining launch condition
-
-Launch requires at least one complete, officially sourced destination-and-home pair that passes the existing rule validator and the executable full-bundle tests. Until then, the exact feature remains intentionally unavailable while the existing non-technical planning range continues to work.
+Detailed answers/results remain in memory only. The flow does not write personal values to URLs, generated personal HTML, storage, analytics or network APIs.

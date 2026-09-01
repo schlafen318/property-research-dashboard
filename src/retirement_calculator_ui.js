@@ -820,7 +820,6 @@
       el("ret-tax-wealth-band").disabled = !visibility.wealthBand;
       el("ret-tax-refine").hidden = true;
       el("ret-tax-refine").disabled = true;
-      el("ret-tax-refine-status").hidden = true;
       ["ret-tax-withdrawals", "ret-tax-gain-intensity"].forEach(function (id) {
         el(id).disabled = !visibility.estimate;
       });
@@ -1153,7 +1152,6 @@
       details.hidden = true;
       refine.hidden = true;
       refine.disabled = true;
-      el("ret-tax-refine-status").hidden = true;
       if (view.status === "unavailable") {
         unavailable.hidden = false;
         return view;
@@ -1517,9 +1515,6 @@
     el("ret-save-intent-button").addEventListener("click", function () {
       el("ret-save-intent-button").hidden = true;
       el("ret-save-intent-status").hidden = false;
-    });
-    el("ret-tax-refine").addEventListener("click", function () {
-      el("ret-tax-refine-status").hidden = false;
     });
     ["ret-current-location", "ret-current-monthly-spending"].forEach(function (id) {
       el(id).addEventListener("input", function () { renderCurrentCostComparison(); });

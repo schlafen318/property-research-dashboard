@@ -420,9 +420,17 @@ class RetirementCalculatorPageTests(unittest.TestCase):
     def test_detailed_tax_section_has_one_question_region_one_table_and_live_updates(self) -> None:
         section = self.html.split('id="ret-tax-detailed"', 1)[1].split("</section>", 1)[0]
         self.assertEqual(1, section.count('id="ret-tax-detailed-questions"'))
-        self.assertEqual(1, section.count("<table"))
+        self.assertEqual(0, section.count("<table"))
         self.assertIn('id="ret-tax-detailed-status" role="status" aria-live="polite"', section)
-        self.assertIn("Calculation details and official sources", section)
+        self.assertIn('id="ret-tax-detailed-form"', section)
+        self.assertIn('type="submit"', section)
+        self.assertIn('id="ret-tax-detailed-result" hidden', section)
+
+    def test_home_jurisdiction_control_contains_only_supported_real_pairs(self) -> None:
+        self.assertIn('<option value="dubai">Dubai</option>', self.html)
+        self.assertIn('<label for="ret-home-tax-jurisdiction">Home tax jurisdiction</label>', self.html)
+        self.assertIn('<option value="hong-kong">Hong Kong</option>', self.html)
+        self.assertNotIn('value="synthetic-example"', self.html)
 
     def test_personalized_form_uses_cash_flow_inputs(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]

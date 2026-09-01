@@ -262,6 +262,25 @@
         }
       ]
     },
+    "United Arab Emirates": {
+      "availability": "research_incomplete",
+      "maximum_ltv": null,
+      "maximum_term_years": null,
+      "maximum_age_at_maturity": null,
+      "loan_currencies": ["AED"],
+      "eligible_residency": [],
+      "eligible_income_sources": [],
+      "supported_uses": [],
+      "conditions": ["No current first-party lender terms covering the default non-resident overseas-income buyer profile were validated. The exact Hong Kong-to-Dubai tax profile is limited separately to a cash purchase."],
+      "confidence": "low",
+      "evidence_date": "2026-09-01",
+      "sources": [
+        {
+          "name": "Dubai Land Department — property sale registration",
+          "url": "https://dubailand.gov.ae/en/eservices/property-sale-registration/"
+        }
+      ]
+    },
     "United States": {
       "availability": "research_incomplete",
       "maximum_ltv": null,
