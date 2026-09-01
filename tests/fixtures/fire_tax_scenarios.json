@@ -3,6 +3,7 @@
     "tax_screen": {
       "status": "complete",
       "last_reviewed": "2026-09-01",
+      "confidence": "medium_high",
       "source_ids": ["tax-residence", "income-scope", "property-tax", "wealth-tax"],
       "planning_bands": {
         "seasonal": {

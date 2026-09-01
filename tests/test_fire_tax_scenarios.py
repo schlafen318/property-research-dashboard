@@ -48,6 +48,7 @@ class FireTaxScenarioTests(unittest.TestCase):
                     "propertyPrice": 500_000,
                     "propertyUse": "personal",
                     "wealthBand": "under_threshold",
+                    "asOf": "2026-09-01",
                 },
                 "country": fixture_country(),
             }
@@ -62,6 +63,52 @@ class FireTaxScenarioTests(unittest.TestCase):
         self.assertEqual(100_000, result["planningBase"])
         self.assertEqual(["tax-residence", "income-scope", "property-tax"], result["sourceIds"])
 
+    def test_amount_explanations_cover_each_case_amount(self) -> None:
+        result = run_scenario(
+            {
+                "input": {
+                    "taxMode": "destination_estimate",
+                    "stayMode": "full_relocation",
+                    "dependableIncome": 40_000,
+                    "portfolioWithdrawals": 60_000,
+                    "realizedGainIntensity": "moderate",
+                    "propertyUse": "personal",
+                    "wealthBand": "under_threshold",
+                    "asOf": "2026-09-01",
+                },
+                "country": fixture_country(),
+            }
+        )
+
+        self.assertEqual(["favorable", "central", "adverse"], list(result["amountExplanations"]))
+        for case_name, fields in result["amountExplanations"].items():
+            with self.subTest(case=case_name):
+                self.assertEqual(
+                    {
+                        "total",
+                        "incomeTaxReserve",
+                        "propertyTaxReserve",
+                        "wealthTaxReserve",
+                        "complianceReserve",
+                    },
+                    set(fields),
+                )
+            for field_name, explanation in fields.items():
+                with self.subTest(case=case_name, field=field_name):
+                    self.assertIsInstance(explanation["formula"], str)
+                    self.assertTrue(explanation["formula"])
+                    self.assertIsInstance(explanation["assumptions"], list)
+                    self.assertTrue(explanation["assumptions"])
+                    self.assertIsInstance(explanation["inclusions"], list)
+                    self.assertTrue(explanation["inclusions"])
+                    self.assertIsInstance(explanation["exclusions"], list)
+                    self.assertTrue(explanation["exclusions"])
+                    self.assertEqual("2026", explanation["taxYear"])
+                    self.assertEqual("medium_high", explanation["confidence"])
+                    self.assertIsInstance(explanation["sourceIds"], list)
+                    if result["cases"][case_name][field_name] > 0:
+                        self.assertTrue(explanation["sourceIds"])
+
     def test_gain_intensity_modifier_changes_only_the_income_tax_reserve(self) -> None:
         payload = {
             "input": {
@@ -72,6 +119,7 @@ class FireTaxScenarioTests(unittest.TestCase):
                 "realizedGainIntensity": "high",
                 "propertyUse": "none",
                 "wealthBand": "under_threshold",
+                "asOf": "2026-09-01",
             },
             "country": fixture_country(),
         }
@@ -95,6 +143,7 @@ class FireTaxScenarioTests(unittest.TestCase):
                     "propertyUse": "personal",
                     "wealthBand": "above_threshold",
                     "propertyTaxIncludedInRetirementCosts": True,
+                    "asOf": "2026-09-01",
                 },
                 "country": fixture_country(),
             }
@@ -123,6 +172,7 @@ class FireTaxScenarioTests(unittest.TestCase):
                     "realizedGainIntensity": "moderate",
                     "propertyUse": "personal",
                     "wealthBand": "under_threshold",
+                    "asOf": "2026-09-01",
                 },
                 "country": country,
             }
@@ -131,6 +181,51 @@ class FireTaxScenarioTests(unittest.TestCase):
         self.assertEqual("unavailable", result["status"])
         self.assertIsNone(result["cases"]["central"]["total"])
         self.assertTrue(result["conditional"])
+
+    def test_partial_missing_allowance_category_is_unavailable_not_zero(self) -> None:
+        country = fixture_country()
+        del country["tax_screen"]["annual_allowances"]["property_tax"]
+
+        result = run_scenario(
+            {
+                "input": {
+                    "taxMode": "destination_estimate",
+                    "stayMode": "seasonal",
+                    "dependableIncome": 20_000,
+                    "portfolioWithdrawals": 20_000,
+                    "realizedGainIntensity": "moderate",
+                    "propertyUse": "personal",
+                    "wealthBand": "under_threshold",
+                    "asOf": "2026-09-01",
+                },
+                "country": country,
+            }
+        )
+
+        self.assertEqual("unavailable", result["status"])
+        self.assertIsNone(result["cases"]["central"]["propertyTaxReserve"])
+        self.assertIsNone(result["cases"]["central"]["total"])
+        self.assertIn("allowance", result["explanations"][0]["reason"])
+
+    def test_destination_estimate_requires_a_freshness_anchor(self) -> None:
+        result = run_scenario(
+            {
+                "input": {
+                    "taxMode": "destination_estimate",
+                    "stayMode": "seasonal",
+                    "dependableIncome": 20_000,
+                    "portfolioWithdrawals": 20_000,
+                    "realizedGainIntensity": "moderate",
+                    "propertyUse": "personal",
+                    "wealthBand": "under_threshold",
+                },
+                "country": fixture_country(),
+            }
+        )
+
+        self.assertEqual("unavailable", result["status"])
+        self.assertIsNone(result["cases"]["central"]["total"])
+        self.assertIn("freshness", result["explanations"][0]["reason"])
 
     def test_stale_scenario_evidence_is_unavailable_not_zero(self) -> None:
         country = fixture_country()

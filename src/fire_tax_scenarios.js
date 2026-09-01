@@ -10,6 +10,7 @@
   const VALID_GAIN_INTENSITIES = new Set(["low", "moderate", "high"]);
   const VALID_PROPERTY_USES = new Set(["none", "personal", "rental", "mixed"]);
   const VALID_WEALTH_BANDS = new Set(["under_threshold", "above_threshold", "unknown"]);
+  const REQUIRED_ALLOWANCES = ["property_tax", "wealth_tax", "compliance"];
 
   function number(value, label) {
     const result = Number(value);
@@ -27,6 +28,7 @@
 
   function unavailable(reason) {
     const cases = {};
+    const amountExplanations = {};
     CASES.forEach(function (key) {
       cases[key] = {
         total: null,
@@ -35,12 +37,14 @@
         wealthTaxReserve: null,
         complianceReserve: null,
       };
+      amountExplanations[key] = {};
     });
     return {
       status: "unavailable",
       conditional: true,
       planningBase: null,
       cases: cases,
+      amountExplanations: amountExplanations,
       explanations: [{ category: "scenario_evidence", status: "unavailable", reason: reason, sourceIds: [] }],
       sourceIds: [],
     };
@@ -80,11 +84,40 @@
   }
 
   function staleEvidence(screen, asOf) {
-    if (!asOf) return false;
     const reviewed = parseIsoDate(screen.last_reviewed);
     const current = parseIsoDate(asOf);
     if (reviewed === null || current === null) return true;
     return current - reviewed > 366 * 24 * 60 * 60 * 1000;
+  }
+
+  function completeAllowance(allowance) {
+    return allowance &&
+      Array.isArray(allowance.source_ids) &&
+      allowance.source_ids.length > 0 &&
+      CASES.every(function (key) {
+        const amount = Number(allowance[key + "_usd"]);
+        return Number.isFinite(amount) && amount >= 0;
+      });
+  }
+
+  function completeAllowances(screen) {
+    const allowances = screen.annual_allowances;
+    if (!allowances) return false;
+    return REQUIRED_ALLOWANCES.every(function (key) {
+      return completeAllowance(allowances[key]);
+    });
+  }
+
+  function amountExplanation(input) {
+    return {
+      formula: input.formula,
+      assumptions: input.assumptions,
+      inclusions: input.inclusions,
+      exclusions: input.exclusions,
+      taxYear: input.taxYear,
+      confidence: input.confidence,
+      sourceIds: input.sourceIds || [],
+    };
   }
 
   function estimateTaxScenario(rawInput, countryRecord) {
@@ -120,11 +153,15 @@
     if (screen.status !== "complete") {
       return unavailable("Tax scenario evidence is not complete for this destination.");
     }
-    if (staleEvidence(screen, input.asOf)) {
+    const asOf = input.asOf || countryRecord.as_of || countryRecord.reviewed_on;
+    if (!asOf) {
+      return unavailable("A freshness anchor is required for destination tax scenarios.");
+    }
+    if (staleEvidence(screen, asOf)) {
       return unavailable("Tax scenario evidence is stale for this destination.");
     }
-    if (!screen.planning_bands || !screen.gain_intensity_modifiers || !screen.annual_allowances) {
-      return unavailable("Tax scenario assumptions are missing for this destination.");
+    if (!screen.planning_bands || !screen.gain_intensity_modifiers || !completeAllowances(screen)) {
+      return unavailable("Tax scenario allowance assumptions are missing for this destination.");
     }
 
     const stayMode = selected(input.stayMode, VALID_STAY_MODES, "part_year", "stayMode");
@@ -154,9 +191,28 @@
       reason: "Planning reserve uses the selected stay mode and realized-gain intensity.",
       sourceIds: unique([].concat(screen.planning_band_basis_source_ids || [], screen.gain_intensity_source_ids || [])),
     }];
+    const taxYear = String(asOf).slice(0, 4);
+    const confidence = screen.confidence || "low";
+    const amountExplanations = {};
     CASES.forEach(function (key) {
       const rate = number(band[key + "_rate"], key + " planning rate");
       cases[key].incomeTaxReserve = Math.round(planningBase * rate * modifier);
+      amountExplanations[key] = {
+        incomeTaxReserve: amountExplanation({
+          formula: "round((dependableIncome + portfolioWithdrawals) * " + key + "_rate * gain_intensity_modifier)",
+          assumptions: [
+            "dependableIncome=" + number(input.dependableIncome, "dependableIncome"),
+            "portfolioWithdrawals=" + number(input.portfolioWithdrawals, "portfolioWithdrawals"),
+            "stayMode=" + stayMode,
+            "realizedGainIntensity=" + realizedGainIntensity,
+          ],
+          inclusions: ["dependable income", "portfolio withdrawals"],
+          exclusions: ["statutory tax calculation", "home-country tax interaction"],
+          taxYear: taxYear,
+          confidence: confidence,
+          sourceIds: unique([].concat(screen.planning_band_basis_source_ids || [], screen.gain_intensity_source_ids || [])),
+        }),
+      };
     });
 
     const allowances = screen.annual_allowances || {};
@@ -176,6 +232,17 @@
           reason: "Annual property tax is already included in owner retirement costs.",
           sourceIds: allowance.source_ids || [],
         });
+        CASES.forEach(function (key) {
+          amountExplanations[key][field] = amountExplanation({
+            formula: "0; excluded because owner retirement costs already include annual property tax",
+            assumptions: ["propertyTaxIncludedInRetirementCosts=true"],
+            inclusions: ["evaluated annual property ownership tax allowance"],
+            exclusions: ["annual property tax already in owner retirement costs"],
+            taxYear: taxYear,
+            confidence: confidence,
+            sourceIds: allowance.source_ids || [],
+          });
+        });
         return;
       }
       if (!allowanceApplies(allowance, normalized, category)) {
@@ -184,6 +251,17 @@
           status: "not_applicable",
           reason: "The selected profile does not trigger this allowance.",
           sourceIds: allowance.source_ids || [],
+        });
+        CASES.forEach(function (key) {
+          amountExplanations[key][field] = amountExplanation({
+            formula: "0; selected profile does not trigger this allowance",
+            assumptions: ["propertyUse=" + propertyUse, "wealthBand=" + wealthBand],
+            inclusions: ["evaluated " + (allowance.label || category)],
+            exclusions: [allowance.label || category],
+            taxYear: taxYear,
+            confidence: confidence,
+            sourceIds: allowance.source_ids || [],
+          });
         });
         return;
       }
@@ -195,6 +273,15 @@
       });
       CASES.forEach(function (key) {
         cases[key][field] = allowanceAmount(allowance, key);
+        amountExplanations[key][field] = amountExplanation({
+          formula: key + "_usd from annual_allowances." + category,
+          assumptions: ["propertyUse=" + propertyUse, "wealthBand=" + wealthBand],
+          inclusions: [allowance.label || category],
+          exclusions: ["buyer-specific statutory calculation"],
+          taxYear: taxYear,
+          confidence: confidence,
+          sourceIds: allowance.source_ids || [],
+        });
       });
     });
 
@@ -203,6 +290,22 @@
         cases[key].propertyTaxReserve +
         cases[key].wealthTaxReserve +
         cases[key].complianceReserve;
+      amountExplanations[key].total = amountExplanation({
+        formula: "incomeTaxReserve + propertyTaxReserve + wealthTaxReserve + complianceReserve",
+        assumptions: ["taxMode=destination_estimate", "taxYear=" + taxYear],
+        inclusions: [
+          "income tax reserve",
+          "property tax reserve",
+          "wealth tax reserve",
+          "compliance reserve",
+        ],
+        exclusions: ["transaction taxes", "sale taxes", "succession taxes"],
+        taxYear: taxYear,
+        confidence: confidence,
+        sourceIds: unique(Object.keys(amountExplanations[key]).reduce(function (all, field) {
+          return all.concat(amountExplanations[key][field].sourceIds || []);
+        }, [])),
+      });
     });
 
     const sourceIds = unique(explanations.reduce(function (all, item) {
@@ -214,6 +317,7 @@
       conditional: false,
       planningBase: Math.round(planningBase),
       cases: cases,
+      amountExplanations: amountExplanations,
       explanations: explanations,
       sourceIds: sourceIds,
     };

@@ -202,6 +202,19 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertEqual(24620, result["liquidPortfolio"])
         self.assertEqual(2200, result["annualTaxExpenses"])
 
+    def test_omitted_tax_mode_is_not_labeled_after_tax_without_return_basis(self) -> None:
+        result = calculate(level_cash_flow_payload())
+        self.assertEqual("unspecified", result["taxMode"])
+        self.assertEqual("unspecified", result["returnBasis"])
+        self.assertEqual(0, result["annualTaxExpenses"])
+
+    def test_omitted_tax_mode_defaults_after_tax_only_with_compatible_return_basis(self) -> None:
+        payload = level_cash_flow_payload()
+        payload["returnBasis"] = "after_fees_and_tax"
+        result = calculate(payload)
+        self.assertEqual("user_after_tax", result["taxMode"])
+        self.assertEqual("after_fees_and_tax", result["returnBasis"])
+
     def test_destination_estimate_requires_scenario_expenses(self) -> None:
         payload = level_cash_flow_payload()
         payload["taxMode"] = "destination_estimate"

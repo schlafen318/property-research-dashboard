@@ -576,6 +576,8 @@
         expectedPortfolioReturn: rate("ret-expected-return"),
         monthlyIncomeBeforeRetirement: moneyNumber("ret-monthly-income"),
         incomeInvestedRate: rate("ret-income-invested-rate"),
+        taxMode: "unspecified",
+        returnBasis: "after_fees",
       };
     }
 

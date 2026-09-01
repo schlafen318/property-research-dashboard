@@ -122,3 +122,109 @@ The full suite also emitted existing dry-run SEO notification/control logs after
 - `annual_allowances` values are planning reserves suitable for stress testing; they are not user-specific estimates and should be surfaced as such by later UI work.
 - The scenario estimator only performs stale-date checks when `input.asOf` is supplied; callers should pass the FIRE payload review date or page as-of date when using live country data.
 - Full-suite output includes noisy dry-run SEO monitor logs, including simulated GitHub unavailable/issue messages, but the unittest command exited 0 with `OK`.
+
+## Fix Round 1
+
+Addressed review findings:
+
+- Added per-case amount explanations for every tax scenario amount, including formula, assumptions, inclusions, exclusions, tax year, confidence, and source IDs.
+- Required all scenario allowance categories and evidence before returning available estimates; partial missing allowance evidence now returns unavailable with null amounts.
+- Required a freshness anchor for destination-estimate tax scenarios; missing/stale evidence is unavailable rather than silently fresh.
+- Changed retirement engine omitted `taxMode` semantics to `unspecified` unless the caller explicitly supplies a compatible after-fees-and-tax return basis; updated current UI payload to state `taxMode: "unspecified"` and `returnBasis: "after_fees"`.
+
+### Fix Round 1 RED
+
+Focused command:
+
+```bash
+python3 -m unittest tests.test_fire_tax_scenarios tests.test_retirement_calculator_engine tests.test_retirement_calculator_ui -v
+```
+
+Initial output after adding failing tests:
+
+```text
+Ran 67 tests in 7.360s
+
+FAILED (failures=4, errors=2)
+```
+
+Failures/errors covered:
+
+- `KeyError: 'amountExplanations'`
+- Missing freshness anchor returned `available`
+- Partial missing allowance category returned `available`
+- Retirement result omitted `returnBasis`
+- Omitted `taxMode` returned `user_after_tax` instead of `unspecified`
+- UI caller did not make current after-fees-only semantics explicit
+
+After correcting the UI regression test to match the current UI label, the focused RED remained:
+
+```text
+Ran 67 tests in 7.330s
+
+FAILED (failures=4, errors=2)
+```
+
+One interim post-implementation run showed only the missing-allowance reason text still needed to satisfy the regression:
+
+```text
+Ran 67 tests in 7.359s
+
+FAILED (failures=1)
+```
+
+### Fix Round 1 GREEN
+
+Focused command:
+
+```bash
+python3 -m unittest tests.test_fire_tax_scenarios tests.test_retirement_calculator_engine tests.test_retirement_calculator_ui -v
+```
+
+Output:
+
+```text
+Ran 67 tests in 7.388s
+
+OK
+```
+
+Full command:
+
+```bash
+python3 -m unittest -q
+```
+
+Output:
+
+```text
+----------------------------------------------------------------------
+Ran 942 tests in 19.316s
+
+OK
+```
+
+The full suite also emitted existing dry-run SEO notification/control logs after the unittest OK summary.
+
+### Fix Round 1 files
+
+- `src/fire_tax_scenarios.js`
+- `src/retirement_calculator.js`
+- `src/retirement_calculator_ui.js`
+- `tests/fixtures/fire_tax_scenarios.json`
+- `tests/test_fire_tax_scenarios.py`
+- `tests/test_retirement_calculator_engine.py`
+- `tests/test_retirement_calculator_ui.py`
+
+### Fix Round 1 self-review
+
+- Confirmed amount explanations are present for every case/amount and use data-backed source IDs for positive reserves.
+- Confirmed property tax already included in retirement owner costs is explicitly excluded in explanation records.
+- Confirmed partial missing allowance evidence and missing freshness anchors return unavailable/null, not zero estimates.
+- Confirmed the current retirement calculator UI no longer implies user returns are after-tax when the label only says after fees.
+- Confirmed tax scenario inputs/results remain in memory-only function payloads/return objects; no analytics, URL, personalized HTML, or storage writes were added.
+- Confirmed generated artifacts remain unstaged and unrelated to this fix.
+
+### Fix Round 1 concerns
+
+- Full-suite output still includes pre-existing dry-run SEO monitor logs, including simulated GitHub unavailable/issue messages, but the unittest command exited 0 with `OK`.

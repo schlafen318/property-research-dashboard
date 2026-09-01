@@ -176,6 +176,12 @@ class RetirementCalculatorUITests(unittest.TestCase):
             source,
         )
 
+    def test_engine_input_marks_current_ui_return_basis_without_claiming_after_tax(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+
+        self.assertIn('taxMode: "unspecified"', source)
+        self.assertIn('returnBasis: "after_fees"', source)
+
     def test_converts_monthly_spending_to_annual_for_the_engine(self) -> None:
         self.assertEqual(64_596, run_ui("annualSpendingFromMonthly", 5_383))
 
