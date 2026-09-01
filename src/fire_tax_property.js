@@ -108,11 +108,31 @@
     return from === null;
   }
 
-  function validateCatalog(catalog) {
+  function propertyOperandRoots(rules) {
+    return unique(rules.flatMap(function (rule) {
+      const roots = [];
+      if (record(rule.formula) && Array.isArray(rule.formula.operands)) roots.push.apply(roots, rule.formula.operands);
+      if (Array.isArray(rule.applies_when)) {
+        roots.push.apply(roots, rule.applies_when.map(function (condition) {
+          return record(condition) ? condition.operand : null;
+        }));
+      }
+      if (record(rule.unknown_operand_range)) {
+        roots.push(rule.unknown_operand_range.operand, rule.unknown_operand_range.reference_operand);
+      }
+      roots.push(rule.rate_operand, rule.amount_operand);
+      return roots;
+    }));
+  }
+
+  function validateCatalog(catalog, rootOperandIds) {
     if (!record(catalog) || Object.keys(catalog).length === 0) {
       throw new FireTaxPropertyRuleError("rules must include a validated operand catalog");
     }
-    Object.keys(catalog).forEach(function (operandId) {
+    const visited = new Set();
+    function visit(operandId) {
+      if (visited.has(operandId)) return;
+      visited.add(operandId);
       const operand = catalog[operandId];
       if (!record(operand) || !["profile", "constant", "derived"].includes(operand.kind) || !["money", "number", "string", "boolean"].includes(operand.value_type)) {
         throw new FireTaxPropertyRuleError("operand " + operandId + " is not executable");
@@ -135,14 +155,15 @@
       if (operand.kind === "derived" && (!record(operand.derivation) || !["add", "subtract", "multiply", "minimum", "maximum"].includes(operand.derivation.operation) || !Array.isArray(operand.derivation.operands) || operand.derivation.operands.length < 2)) {
         throw new FireTaxPropertyRuleError("operand " + operandId + " has an invalid derivation");
       }
-    });
+      if (operand.kind === "derived") operand.derivation.operands.forEach(visit);
+    }
+    rootOperandIds.forEach(visit);
   }
 
   function selectBundle(payload) {
     if (!record(payload) || payload.schema_version !== 1 || !Number.isInteger(payload.tax_year) || !record(payload.jurisdictions)) {
       throw new FireTaxPropertyRuleError("rules must be a validated Task 1 rule payload");
     }
-    validateCatalog(payload.operand_catalog);
     const jurisdictionIds = Object.keys(payload.jurisdictions);
     const jurisdictionId = typeof payload.active_jurisdiction_id === "string"
       ? payload.active_jurisdiction_id
@@ -175,6 +196,7 @@
     const seen = new Set();
     const rules = jurisdiction.rules.filter(function (rule) { return record(rule) && rule.type === "property_charge"; });
     if (rules.length === 0) throw new FireTaxPropertyRuleError("active jurisdiction has no validated property charges");
+    validateCatalog(payload.operand_catalog, propertyOperandRoots(rules));
     rules.forEach(function (rule, index) {
       const path = "property rule " + index;
       if (typeof rule.id !== "string" || !rule.id.endsWith("-" + payload.tax_year) || seen.has(rule.id)) {

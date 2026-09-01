@@ -54,6 +54,61 @@ class FireTaxPropertyTests(unittest.TestCase):
         errors = validate_fire_tax_rules(fixture()["rules"], date(2026, 9, 1))
         self.assertEqual([], errors)
 
+    def test_runtime_ignores_task1_valid_unreachable_date_and_derived_operands(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        rules["operand_catalog"].update(
+            {
+                "unused_move_date": {
+                    "kind": "profile",
+                    "profile_key": "moveDate",
+                    "value_type": "date",
+                },
+                "unused_ratio_numerator": {
+                    "kind": "constant",
+                    "value_type": "number",
+                    "value": 10,
+                },
+                "unused_ratio_denominator": {
+                    "kind": "constant",
+                    "value_type": "number",
+                    "value": 2,
+                },
+                "unused_ratio": {
+                    "kind": "derived",
+                    "value_type": "number",
+                    "derivation": {
+                        "operation": "divide",
+                        "operands": ["unused_ratio_numerator", "unused_ratio_denominator"],
+                    },
+                },
+            }
+        )
+        self.assertEqual([], validate_fire_tax_rules(rules, date(2026, 9, 1)))
+        result = calculate(rules=rules)
+        self.assertEqual("calculated", result["status"])
+        self.assertEqual(64250, result["totals"]["allTax"])
+
+    def test_task1_valid_unsupported_derived_operation_fails_when_property_reachable(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        rules["operand_catalog"]["unsupported_property_base"] = {
+            "kind": "derived",
+            "value_type": "money",
+            "currency": "EUR",
+            "derivation": {
+                "operation": "divide",
+                "operands": ["owned_purchase_value", "ownership_share"],
+            },
+        }
+        purchase_rule = rules["jurisdictions"]["synthetic-destination"]["rules"][0]
+        purchase_rule["formula"]["operands"][0] = "unsupported_property_base"
+        self.assertEqual([], validate_fire_tax_rules(rules, date(2026, 9, 1)))
+        response = calculate(rules=rules, expect_error=True)
+        self.assertFalse(response["ok"])
+        self.assertEqual("FireTaxPropertyRuleError", response.get("error"))
+        self.assertIn("derivation", response.get("message", ""))
+
     def test_full_lifecycle_keeps_tax_costs_and_prepayments_separate(self):
         result = calculate()
         self.assertEqual("calculated", result["status"])
