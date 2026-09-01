@@ -265,7 +265,7 @@ def _validate_enablement_contract(
     if (
         not isinstance(required_categories, list)
         or not all(isinstance(category, str) and category for category in required_categories)
-        or not MINIMUM_ENABLEMENT_CATEGORIES.issubset(set(required_categories))
+        or set(required_categories) != set(MINIMUM_ENABLEMENT_CATEGORIES)
     ):
         errors.append(
             "enablement_contract.required_categories must contain the complete executable category set"
@@ -494,7 +494,7 @@ def _validate_derived_operand_graph(
         if operand.get("kind") == "derived"
     }
     edges: dict[str, list[tuple[str, str]]] = {}
-    for operand_id in derived_ids:
+    for operand_id in sorted(derived_ids):
         derivation = catalog[operand_id].get("derivation")
         operands = derivation.get("operands") if isinstance(derivation, dict) else None
         if not isinstance(operands, list):
@@ -522,7 +522,7 @@ def _validate_derived_operand_graph(
         visiting.remove(operand_id)
         visited.add(operand_id)
 
-    for operand_id in edges:
+    for operand_id in sorted(edges):
         if operand_id not in visited:
             visit(operand_id)
 
@@ -925,7 +925,7 @@ def _validate_branch_graph(
         visiting.remove(rule_id)
         visited.add(rule_id)
 
-    for rule_id in branch_edges:
+    for rule_id in sorted(branch_edges):
         if rule_id not in visited:
             visit(rule_id)
 
@@ -994,8 +994,6 @@ def _rule_encodes_zero_tax(rule: dict[str, Any]) -> bool:
         operation = rule.get("formula", {}).get("operation") if isinstance(rule.get("formula"), dict) else None
         if operation == "multiply":
             return rule.get("rate") == 0
-        if operation == "add":
-            return rule.get("amount") == 0
         if operation == "progressive_rate":
             bands = rule.get("bands")
             return isinstance(bands, list) and bool(bands) and all(

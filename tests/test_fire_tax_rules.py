@@ -1,5 +1,8 @@
 import copy
 import json
+import os
+import subprocess
+import sys
 import tempfile
 import unittest
 from datetime import date
@@ -77,6 +80,14 @@ class FireTaxRuleContractTests(unittest.TestCase):
         self.assert_path_error(
             errors, "enablement_contract.category_capabilities"
         )
+
+    def test_undeclared_extension_categories_are_rejected_at_the_contract(self):
+        payload = copy.deepcopy(self.payload)
+        payload["enablement_contract"]["required_categories"].append(
+            "future_extension"
+        )
+        errors = self.validate(payload)
+        self.assert_path_error(errors, "enablement_contract.required_categories")
 
     def test_synthetic_jurisdiction_cannot_be_enabled(self):
         payload = copy.deepcopy(self.payload)
@@ -178,6 +189,64 @@ class FireTaxRuleContractTests(unittest.TestCase):
             any(
                 error.startswith(
                     "jurisdictions.synthetic-example.category_coverage.private_pension.rule_ids[0]"
+                )
+                and "zero-tax" in error
+                for error in errors
+            ),
+            errors,
+        )
+
+    def test_property_value_plus_zero_is_not_proof_of_zero_tax(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"].update(
+            {
+                "property_value": {
+                    "kind": "profile",
+                    "value_type": "money",
+                    "currency": "EUR",
+                },
+                "zero_charge": {
+                    "kind": "constant",
+                    "value_type": "money",
+                    "currency": "EUR",
+                    "value": 0,
+                },
+            }
+        )
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        jurisdiction["synthetic"] = False
+        jurisdiction["detailed_enabled"] = True
+        payload["sources"][0]["source_kind"] = "official"
+        rule = jurisdiction["rules"][2]
+        rule.pop("bands")
+        rule.update(
+            {
+                "type": "property_charge",
+                "category": "property_purchase",
+                "formula": {
+                    "operation": "add",
+                    "operands": ["property_value", "zero_charge"],
+                },
+                "lifecycle_stage": "purchase",
+                "amount": 0,
+                "amount_operand": "zero_charge",
+                "no_tax": True,
+            }
+        )
+        rule_id = rule["id"]
+        jurisdiction["category_coverage"] = {
+            category: {"treatment": "supported", "rule_ids": [rule_id]}
+            for category in payload["enablement_contract"]["required_categories"]
+        }
+        jurisdiction["category_coverage"]["property_purchase"] = {
+            "treatment": "no_tax",
+            "rule_ids": [rule_id],
+        }
+        errors = self.validate(payload)
+        self.assertTrue(
+            any(
+                error.startswith(
+                    "jurisdictions.synthetic-example.category_coverage.property_purchase.rule_ids[0]"
                 )
                 and "zero-tax" in error
                 for error in errors
@@ -365,6 +434,56 @@ class FireTaxRuleContractTests(unittest.TestCase):
                 for error in errors
             ),
             errors,
+        )
+
+    def test_derived_cycle_diagnostics_are_stable_across_python_hash_seeds(self):
+        payload = copy.deepcopy(self.payload)
+        for left, right in (("derived_a", "derived_b"), ("derived_c", "derived_d")):
+            payload["operand_catalog"][left] = {
+                "kind": "derived",
+                "value_type": "number",
+                "derivation": {
+                    "operation": "add",
+                    "operands": [right, "residence_day_threshold"],
+                },
+            }
+            payload["operand_catalog"][right] = {
+                "kind": "derived",
+                "value_type": "number",
+                "derivation": {
+                    "operation": "add",
+                    "operands": [left, "residence_day_threshold"],
+                },
+            }
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / "cyclic-rules.json"
+            path.write_text(json.dumps(payload), encoding="utf-8")
+            script = (
+                "import json,sys; from datetime import date; "
+                "from src.fire_tax_rules import load_fire_tax_rules,validate_fire_tax_rules; "
+                "errors=validate_fire_tax_rules(load_fire_tax_rules(sys.argv[1]),date(2026,9,1)); "
+                "print(json.dumps([e for e in errors if 'circular derived' in e]))"
+            )
+            outputs = []
+            for seed in ("1", "7", "42"):
+                environment = dict(os.environ)
+                environment["PYTHONHASHSEED"] = seed
+                result = subprocess.run(
+                    [sys.executable, "-c", script, str(path)],
+                    cwd=ROOT,
+                    env=environment,
+                    check=True,
+                    capture_output=True,
+                    text=True,
+                )
+                outputs.append(result.stdout.strip())
+        self.assertEqual(1, len(set(outputs)), outputs)
+        self.assertEqual(
+            [
+                "operand_catalog.derived_b.derivation.operands[0] creates a circular derived dependency",
+                "operand_catalog.derived_d.derivation.operands[0] creates a circular derived dependency",
+            ],
+            json.loads(outputs[0]),
         )
 
     def test_comparison_operands_must_have_compatible_types_and_currency(self):
