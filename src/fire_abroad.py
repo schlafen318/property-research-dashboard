@@ -71,13 +71,39 @@ def _validate_source(source: Any, path: str, errors: list[str]) -> None:
     if not isinstance(source, dict):
         errors.append(f"{path} must be an object")
         return
-    for key in ("id", "publisher", "url", "metric_supported", "accessed_on"):
+    for key in (
+        "id",
+        "publisher",
+        "url",
+        "source_date",
+        "accessed_on",
+        "metric_supported",
+        "scope_limitation",
+        "recheck_trigger",
+    ):
         if not source.get(key):
             errors.append(f"{path}.{key} is required")
     if source.get("url") and not str(source["url"]).startswith("https://"):
         errors.append(f"{path}.url must use HTTPS")
     if source.get("accessed_on") and not _iso_date(source["accessed_on"]):
         errors.append(f"{path}.accessed_on must be YYYY-MM-DD")
+
+
+def _validate_claim_source_ids(
+    references: Any,
+    path: str,
+    screen_source_ids: set[str],
+    known_source_ids: set[str],
+    errors: list[str],
+) -> None:
+    if not isinstance(references, list) or not references:
+        errors.append(f"{path} must contain at least one source")
+        return
+    for source_id in references:
+        if source_id not in known_source_ids:
+            errors.append(f"{path} contains unknown source {source_id}")
+        elif source_id not in screen_source_ids:
+            errors.append(f"{path} source {source_id} must also appear in screen.source_ids")
 
 
 def _validate_complete_tax_screen(
@@ -97,10 +123,62 @@ def _validate_complete_tax_screen(
     references = screen.get("source_ids")
     if not isinstance(references, list) or not references:
         errors.append(f"{path}.source_ids must contain at least one source")
+        screen_source_ids: set[str] = set()
     else:
+        screen_source_ids = set(references)
         for source_id in references:
             if source_id not in source_ids:
                 errors.append(f"{path}.source_ids contains unknown source {source_id}")
+
+    residence = screen.get("residence")
+    if not isinstance(residence, dict):
+        errors.append(f"{path}.residence must be an object")
+    else:
+        _validate_claim_source_ids(
+            residence.get("source_ids"),
+            f"{path}.residence.source_ids",
+            screen_source_ids,
+            source_ids,
+            errors,
+        )
+
+    _validate_claim_source_ids(
+        screen.get("scope_source_ids"),
+        f"{path}.scope_source_ids",
+        screen_source_ids,
+        source_ids,
+        errors,
+    )
+
+    funding_notes = screen.get("funding_source_notes")
+    funding_references = screen.get("funding_source_source_ids")
+    if not isinstance(funding_notes, dict):
+        errors.append(f"{path}.funding_source_notes must be an object")
+        funding_notes = {}
+    if not isinstance(funding_references, dict):
+        errors.append(f"{path}.funding_source_source_ids must be an object")
+    else:
+        if set(funding_references) != set(funding_notes):
+            errors.append(
+                f"{path}.funding_source_source_ids must match funding_source_notes"
+            )
+        for funding_source, summary in funding_notes.items():
+            if summary:
+                _validate_claim_source_ids(
+                    funding_references.get(funding_source),
+                    f"{path}.funding_source_source_ids.{funding_source}",
+                    screen_source_ids,
+                    source_ids,
+                    errors,
+                )
+
+    _validate_claim_source_ids(
+        screen.get("planning_band_basis_source_ids"),
+        f"{path}.planning_band_basis_source_ids",
+        screen_source_ids,
+        source_ids,
+        errors,
+    )
 
     bands = screen.get("planning_bands")
     if not isinstance(bands, dict):
@@ -127,8 +205,20 @@ def _validate_complete_tax_screen(
         errors.append(f"{path}.property_lifecycle must be an object")
     else:
         for stage in PROPERTY_LIFECYCLE_STAGES:
-            if stage not in lifecycle:
-                errors.append(f"{path}.property_lifecycle.{stage} is required")
+            stage_path = f"{path}.property_lifecycle.{stage}"
+            claim = lifecycle.get(stage)
+            if claim is None:
+                errors.append(f"{stage_path} is required")
+            elif not isinstance(claim, dict):
+                errors.append(f"{stage_path} must be an object")
+            elif claim.get("summary"):
+                _validate_claim_source_ids(
+                    claim.get("source_ids"),
+                    f"{stage_path}.source_ids",
+                    screen_source_ids,
+                    source_ids,
+                    errors,
+                )
 
 
 def validate_fire_abroad_payload(

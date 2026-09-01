@@ -54,6 +54,7 @@ OFFICIAL_SOURCE_HOSTS = {
     "imigrasi.go.id",
     "info.portaldasfinancas.gov.pt",
     "mofa.go.jp",
+    "mps.gov.vn",
     "narodne-novine.nn.hr",
     "nta.go.jp",
     "pajak.go.id",
@@ -105,6 +106,65 @@ class FireAbroadDataTests(unittest.TestCase):
             errors,
         )
 
+    def test_source_review_metadata_is_enforced(self):
+        for key in ("source_date", "scope_limitation", "recheck_trigger"):
+            with self.subTest(key=key):
+                payload = copy.deepcopy(self.payload)
+                del payload["sources"][0][key]
+                errors = self.validate(payload)
+                self.assertTrue(
+                    any(f"sources[0].{key} is required" in error for error in errors),
+                    errors,
+                )
+
+    def test_complete_country_requires_residence_claim_sources(self):
+        payload = copy.deepcopy(self.payload)
+        del payload["countries"]["Spain"]["tax_screen"]["residence"]["source_ids"]
+        errors = self.validate(payload)
+        self.assertTrue(
+            any("countries.Spain.tax_screen.residence.source_ids" in error for error in errors),
+            errors,
+        )
+
+    def test_complete_country_requires_scope_claim_sources(self):
+        payload = copy.deepcopy(self.payload)
+        del payload["countries"]["Spain"]["tax_screen"]["scope_source_ids"]
+        errors = self.validate(payload)
+        self.assertTrue(
+            any("countries.Spain.tax_screen.scope_source_ids" in error for error in errors),
+            errors,
+        )
+
+    def test_complete_country_requires_funding_claim_sources(self):
+        payload = copy.deepcopy(self.payload)
+        del payload["countries"]["Spain"]["tax_screen"]["funding_source_source_ids"]
+        errors = self.validate(payload)
+        self.assertTrue(
+            any("countries.Spain.tax_screen.funding_source_source_ids" in error for error in errors),
+            errors,
+        )
+
+    def test_complete_country_requires_planning_band_basis_sources(self):
+        payload = copy.deepcopy(self.payload)
+        del payload["countries"]["Spain"]["tax_screen"]["planning_band_basis_source_ids"]
+        errors = self.validate(payload)
+        self.assertTrue(
+            any("countries.Spain.tax_screen.planning_band_basis_source_ids" in error for error in errors),
+            errors,
+        )
+
+    def test_complete_country_requires_property_lifecycle_claim_sources(self):
+        payload = copy.deepcopy(self.payload)
+        del payload["countries"]["Spain"]["tax_screen"]["property_lifecycle"]["purchase"]["source_ids"]
+        errors = self.validate(payload)
+        self.assertTrue(
+            any(
+                "countries.Spain.tax_screen.property_lifecycle.purchase.source_ids" in error
+                for error in errors
+            ),
+            errors,
+        )
+
     def test_unordered_tax_bands_are_rejected(self):
         payload = copy.deepcopy(self.payload)
         payload["countries"]["Spain"]["tax_screen"]["planning_bands"]["full_relocation"] = {
@@ -151,6 +211,19 @@ class FireAbroadDataTests(unittest.TestCase):
         del payload["countries"]["Spain"]["eligibility"]
         errors = self.validate(payload)
         self.assertTrue(any("countries.Spain.eligibility" in error for error in errors), errors)
+
+    def test_long_stay_evidence_does_not_use_a_source_that_disclaims_it(self):
+        unsupported = {
+            source["id"]
+            for source in self.payload["sources"]
+            if "not long-term residence evidence" in source["scope_limitation"].lower()
+        }
+        for country_name, country in self.payload["countries"].items():
+            with self.subTest(country=country_name):
+                self.assertTrue(
+                    unsupported.isdisjoint(country["eligibility"]["long_stay_source_ids"]),
+                    f"{country_name} uses short-stay-only evidence for long-stay eligibility",
+                )
 
     def test_complete_destination_scores_must_be_bounded_and_complete(self):
         payload = copy.deepcopy(self.payload)
