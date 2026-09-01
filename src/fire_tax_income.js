@@ -106,6 +106,12 @@
     if (!validateAudit(rule, bundle) || !validateBands(rule)) {
       throw new FireTaxIncomeRuleError("rate rule " + String(rule && rule.id) + " has invalid bands or audit metadata");
     }
+    if (Object.prototype.hasOwnProperty.call(rule, "no_tax") && typeof rule.no_tax !== "boolean") {
+      throw new FireTaxIncomeRuleError("rate rule " + rule.id + " has an invalid no_tax marker");
+    }
+    if (rule.no_tax === true && rule.bands.some(function (band) { return band.rate !== 0; })) {
+      throw new FireTaxIncomeRuleError("rate rule " + rule.id + " marks no_tax but calculates positive tax");
+    }
     const grossOperand = operand(bundle, rule.formula.operands[0], "profile", "money");
     if (grossOperand.currency !== rule.currency || typeof grossOperand.profile_key !== "string") {
       throw new FireTaxIncomeRuleError("rate rule " + rule.id + " has a currency or profile operand mismatch");
@@ -120,7 +126,7 @@
   }
 
   function validateAllowance(rule, rateRule, bundle) {
-    if (!validateAudit(rule, bundle) || !record(rule.formula) || !["minimum", "maximum"].includes(rule.formula.operation) || !Array.isArray(rule.formula.operands) || rule.formula.operands.length !== 2 || !money(rule.amount)) {
+    if (!validateAudit(rule, bundle) || !record(rule.formula) || rule.formula.operation !== "minimum" || !Array.isArray(rule.formula.operands) || rule.formula.operands.length !== 2 || !money(rule.amount)) {
       throw new FireTaxIncomeRuleError("allowance rule " + String(rule && rule.id) + " is invalid");
     }
     if (rule.currency !== rateRule.currency || rule.formula.operands[0] !== rateRule.formula.operands[0] || rule.formula.operands[1] !== rule.amount_operand) {
@@ -149,16 +155,24 @@
     const bundle = selectBundle(payload);
     const incomeRules = bundle.jurisdiction.rules.filter(function (rule) { return record(rule) && INCOME_TYPES.has(rule.type); });
     const rateRules = incomeRules.filter(function (rule) { return rule.type === "rate_band"; });
-    const seen = new Set();
-    const categories = rateRules.map(function (rateRule) {
-      if (seen.has(rateRule.category)) throw new FireTaxIncomeRuleError("multiple rate rules exist for category " + rateRule.category);
-      seen.add(rateRule.category);
+    const categoriesById = new Map();
+    rateRules.forEach(function (rateRule) {
       const grossOperand = validateRateRule(rateRule, bundle);
-      const allowances = incomeRules.filter(function (rule) { return rule.type === "allowance" && rule.category === rateRule.category; });
-      const withholding = incomeRules.filter(function (rule) { return rule.type === "withholding" && rule.category === rateRule.category; });
-      allowances.forEach(function (rule) { validateAllowance(rule, rateRule, bundle); });
-      withholding.forEach(function (rule) { validateWithholding(rule, rateRule, bundle); });
-      return { rateRule: rateRule, grossOperand: grossOperand, allowances: allowances, withholding: withholding };
+      let category = categoriesById.get(rateRule.category);
+      if (!category) {
+        category = { category: rateRule.category, currency: rateRule.currency, grossOperand: grossOperand, rateRules: [], allowances: [], withholding: [] };
+        categoriesById.set(rateRule.category, category);
+      } else if (category.currency !== rateRule.currency || category.grossOperand.profile_key !== grossOperand.profile_key) {
+        throw new FireTaxIncomeRuleError("scope-specific rate rules for " + rateRule.category + " must share one currency and profile amount");
+      }
+      category.rateRules.push(rateRule);
+    });
+    const categories = Array.from(categoriesById.values());
+    categories.forEach(function (category) {
+      category.allowances = incomeRules.filter(function (rule) { return rule.type === "allowance" && rule.category === category.category; });
+      category.withholding = incomeRules.filter(function (rule) { return rule.type === "withholding" && rule.category === category.category; });
+      category.allowances.forEach(function (rule) { validateAllowance(rule, category.rateRules[0], bundle); });
+      category.withholding.forEach(function (rule) { validateWithholding(rule, category.rateRules[0], bundle); });
     });
     if (categories.length === 0) throw new FireTaxIncomeRuleError("active jurisdiction has no executable income rate rules");
     return Object.assign(bundle, { categories: categories });
@@ -167,21 +181,14 @@
   function validateProfile(profile, bundle) {
     if (!record(profile)) throw new FireTaxIncomeInputError("profile must be an object");
     if (profile.taxYear !== bundle.payload.tax_year) throw new FireTaxIncomeInputError("profile taxYear must match the validated rule year");
-    const currencies = unique(bundle.categories.map(function (category) { return category.rateRule.currency; }));
+    const currencies = unique(bundle.categories.map(function (category) { return category.currency; }));
     if (currencies.length !== 1 || profile.currency !== currencies[0]) throw new FireTaxIncomeInputError("profile currency must match the active income rules");
     if (!record(profile.incomeSourceJurisdictions)) throw new FireTaxIncomeInputError("incomeSourceJurisdictions must identify each income source");
     bundle.categories.forEach(function (category) {
       const key = category.grossOperand.profile_key;
       if (!money(profile[key])) throw new FireTaxIncomeInputError(key + " must be a non-negative finite amount");
-      const source = profile.incomeSourceJurisdictions[category.rateRule.category];
-      if (typeof source !== "string" || source.length === 0) throw new FireTaxIncomeInputError("incomeSourceJurisdictions." + category.rateRule.category + " is required");
-      if (category.rateRule.category === "retirement_account_withdrawal") {
-        const classificationOperand = bundle.payload.operand_catalog[category.rateRule.account_classification_operand];
-        const classification = profile[classificationOperand.profile_key];
-        if (!category.rateRule.supported_account_classifications.includes(classification)) {
-          throw new FireTaxIncomeInputError(classificationOperand.profile_key + " is unsupported by the validated retirement-account rule");
-        }
-      }
+      const source = profile.incomeSourceJurisdictions[category.category];
+      if (typeof source !== "string" || source.length === 0) throw new FireTaxIncomeInputError("incomeSourceJurisdictions." + category.category + " is required");
     });
   }
 
@@ -212,14 +219,27 @@
     const scope = scopeFor(residence, bundle.side);
     if (scope === "conditional") throw new FireTaxIncomeInputError("conditional residence requires calculated branches");
     const taxpayerScope = scope === "worldwide_income" ? "resident" : "nonresident";
-    const rateRule = category.rateRule;
-    if (!rateRule.taxpayer_scope.includes(taxpayerScope)) {
-      throw new FireTaxIncomeRuleError("no " + taxpayerScope + " rule is validated for " + rateRule.category);
+    const applicableRates = category.rateRules.filter(function (rule) { return rule.taxpayer_scope.includes(taxpayerScope); });
+    if (applicableRates.length === 0) {
+      throw new FireTaxIncomeRuleError("no " + taxpayerScope + " rule is validated for " + category.category);
+    }
+    if (applicableRates.length > 1) {
+      throw new FireTaxIncomeRuleError("multiple " + taxpayerScope + " rate rules are applicable for " + category.category);
+    }
+    const rateRule = applicableRates[0];
+    const allowances = category.allowances.filter(function (rule) { return rule.taxpayer_scope.includes(taxpayerScope); });
+    const withholding = category.withholding.filter(function (rule) { return rule.taxpayer_scope.includes(taxpayerScope); });
+    if (rateRule.category === "retirement_account_withdrawal") {
+      const classificationOperand = bundle.payload.operand_catalog[rateRule.account_classification_operand];
+      const classification = profile[classificationOperand.profile_key];
+      if (!rateRule.supported_account_classifications.includes(classification)) {
+        throw new FireTaxIncomeInputError(classificationOperand.profile_key + " is unsupported by the validated retirement-account rule");
+      }
     }
     const gross = profile[category.grossOperand.profile_key];
     const source = profile.incomeSourceJurisdictions[rateRule.category];
     const included = scope === "worldwide_income" || source === bundle.jurisdictionId || source === bundle.side;
-    const allRules = [rateRule].concat(category.allowances, category.withholding);
+    const allRules = [rateRule].concat(allowances, withholding);
     const audit = {
       taxYear: rateRule.tax_year,
       currency: rateRule.currency,
@@ -244,13 +264,13 @@
         explanations: ["The income source is outside the active jurisdiction; this is an out-of-scope result, not a zero-tax claim."]
       }, audit);
     }
-    const deductions = round(Math.min(gross, category.allowances.reduce(function (sum, rule) { return sum + rule.amount; }, 0)));
+    const deductions = round(Math.min(gross, allowances.reduce(function (sum, rule) { return sum + rule.amount; }, 0)));
     const taxableBase = round(Math.max(0, gross - deductions));
     const domesticTax = progressiveTax(taxableBase, rateRule.bands);
-    const sourceWithholding = round(category.withholding.reduce(function (sum, rule) { return sum + gross * rule.rate; }, 0));
+    const sourceWithholding = round(withholding.reduce(function (sum, rule) { return sum + gross * rule.rate; }, 0));
     const netTax = round(domesticTax + sourceWithholding);
     const formulaParts = ["gross " + gross + " - allowance " + deductions + " = taxable base " + taxableBase, "progressive bands = domestic tax " + domesticTax];
-    if (category.withholding.length) formulaParts.push("gross × source withholding rate = " + sourceWithholding);
+    if (withholding.length) formulaParts.push("gross × source withholding rate = " + sourceWithholding);
     return Object.assign({
       category: rateRule.category,
       status: "calculated",
@@ -269,12 +289,31 @@
     return { minimum: Math.min.apply(Math, values), maximum: Math.max.apply(Math, values) };
   }
 
+  function amountEndpoints(result, field) {
+    if (result.status === "conditional" && Array.isArray(result.branches)) {
+      return result.branches.flatMap(function (branch) { return amountEndpoints(branch, field); });
+    }
+    if (field === "grossIncome" && money(result[field])) return [result[field]];
+    return result.status === "calculated" && money(result[field]) ? [result[field]] : [0];
+  }
+
+  function resultConfidence(results) {
+    return results.reduce(function (lowest, result) {
+      return CONFIDENCE.indexOf(result.confidence) < CONFIDENCE.indexOf(lowest) ? result.confidence : lowest;
+    }, "high");
+  }
+
+  function calculatedLeaves(result) {
+    if (result.status === "conditional" && Array.isArray(result.branches)) return result.branches.flatMap(calculatedLeaves);
+    return result.status === "calculated" ? [result] : [];
+  }
+
   function conditionalCategory(profile, residence, bundle, category) {
     if (!Array.isArray(residence.branches) || residence.branches.length === 0) {
       throw new FireTaxIncomeInputError("conditional residence requires calculated branches");
     }
     const branches = residence.branches.map(function (branch) {
-      const result = calculateCategory(profile, branch, bundle, category);
+      const result = calculateResidenceCategory(profile, branch, bundle, category);
       return Object.assign({}, result, {
         assumedValue: Object.prototype.hasOwnProperty.call(branch, "assumedValue") ? branch.assumedValue : null,
         residenceStatus: branch.status || null
@@ -283,23 +322,24 @@
     const amountFields = ["grossIncome", "deductions", "taxableBase", "domesticTax", "sourceWithholding", "netTax"];
     const amounts = {};
     amountFields.forEach(function (field) {
-      amounts[field] = range(branches.map(function (branch) { return money(branch[field]) ? branch[field] : 0; }));
+      amounts[field] = range(branches.flatMap(function (branch) { return amountEndpoints(branch, field); }));
     });
+    const leaves = branches.flatMap(calculatedLeaves);
     return Object.assign({
-      category: category.rateRule.category,
+      category: category.category,
       status: "conditional",
       branches: branches,
       unresolvedFacts: Array.isArray(residence.unresolvedFacts) ? unique(residence.unresolvedFacts) : [],
       formula: "Calculated each supported residence branch; displayed amounts are branch minima and maxima.",
       explanations: ["No residence branch was selected without the controlling fact."]
     }, amounts, {
-      taxYear: category.rateRule.tax_year,
-      currency: category.rateRule.currency,
+      taxYear: bundle.payload.tax_year,
+      currency: category.currency,
       taxpayerScope: "conditional",
-      confidence: confidenceFor([category.rateRule].concat(category.allowances, category.withholding)),
+      confidence: resultConfidence(branches),
       ruleIds: unique(branches.flatMap(function (branch) { return branch.ruleIds; })),
       sourceIds: unique(branches.flatMap(function (branch) { return branch.sourceIds; })),
-      exempt: category.rateRule.no_tax === true,
+      exempt: leaves.length > 0 && leaves.every(function (leaf) { return leaf.exempt === true; }),
       assumptions: ["Each displayed endpoint is calculated from a supported residence branch."]
     });
   }
@@ -318,6 +358,20 @@
     return branches.length > 1 ? branches : null;
   }
 
+  function calculateResidenceCategory(profile, residence, bundle, category) {
+    const periodBranches = splitYearAlternatives(residence, bundle.side);
+    if (!periodBranches) return calculateCategory(profile, residence, bundle, category);
+    const splitResidence = {
+      status: "conditional",
+      scopes: { destination: "conditional", home: "conditional" },
+      unresolvedFacts: ["incomeTimingAcrossResidencePeriods"],
+      branches: periodBranches
+    };
+    const result = conditionalCategory(profile, splitResidence, bundle, category);
+    result.explanations = ["Income timing across the supported residence periods is unknown, so the result spans the calculated scope endpoints without assuming a proration."];
+    return result;
+  }
+
   function calculateIncomeTax(profile, residence, rules) {
     const bundle = projection(rules);
     validateProfile(profile, bundle);
@@ -325,21 +379,7 @@
     if (scope === "conditional" || residence.status === "conditional") {
       return bundle.categories.map(function (category) { return conditionalCategory(profile, residence, bundle, category); });
     }
-    const periodBranches = splitYearAlternatives(residence, bundle.side);
-    if (periodBranches) {
-      const splitResidence = {
-        status: "conditional",
-        scopes: { destination: "conditional", home: "conditional" },
-        unresolvedFacts: ["incomeTimingAcrossResidencePeriods"],
-        branches: periodBranches
-      };
-      return bundle.categories.map(function (category) {
-        const result = conditionalCategory(profile, splitResidence, bundle, category);
-        result.explanations = ["Income timing across the supported residence periods is unknown, so the result spans the calculated scope endpoints without assuming a proration."];
-        return result;
-      });
-    }
-    return bundle.categories.map(function (category) { return calculateCategory(profile, residence, bundle, category); });
+    return bundle.categories.map(function (category) { return calculateResidenceCategory(profile, residence, bundle, category); });
   }
 
   return {

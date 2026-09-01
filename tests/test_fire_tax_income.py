@@ -12,7 +12,9 @@ from src.fire_tax_rules import validate_fire_tax_rules
 
 ROOT = Path(__file__).resolve().parents[1]
 ENGINE = ROOT / "src" / "fire_tax_income.js"
+RESIDENCE_ENGINE = ROOT / "src" / "fire_tax_residence.js"
 FIXTURE = ROOT / "tests" / "fixtures" / "fire_tax_income.json"
+RESIDENCE_FIXTURE = ROOT / "tests" / "fixtures" / "fire_tax_residence.json"
 
 
 def fixture() -> dict:
@@ -47,6 +49,62 @@ def calculate(profile=None, residence=None, rules=None, expect_error=False):
 
 def by_category(results: list[dict]) -> dict[str, dict]:
     return {result["category"]: result for result in results}
+
+
+def rule_by_id(rules: dict, rule_id: str) -> dict:
+    return next(
+        rule
+        for rule in rules["jurisdictions"]["synthetic-destination"]["rules"]
+        if rule["id"] == rule_id
+    )
+
+
+def calculate_with_task_two_unknown_split() -> list[dict]:
+    income = fixture()
+    residence_data = json.loads(RESIDENCE_FIXTURE.read_text(encoding="utf-8"))
+    destination = copy.deepcopy(residence_data["rules"])
+    home = copy.deepcopy(residence_data["rules"])
+    destination["active_jurisdiction_id"] = residence_data["destinationId"]
+    home["active_jurisdiction_id"] = residence_data["homeId"]
+    residence_profile = {
+        "taxYear": 2026,
+        "daysInDestination": 200,
+        "destinationAvailableHome": False,
+        "daysInHome": 100,
+        "homeAvailableHome": False,
+        "familyTies": "neither",
+        "economicTies": "neither",
+        "moveDate": "2026-07-01",
+    }
+    script = (
+        "const residenceApi=require(process.argv[1]);"
+        "const incomeApi=require(process.argv[2]);"
+        "const input=JSON.parse(process.argv[3]);"
+        "const residence=residenceApi.evaluateResidence(input.residenceProfile,input.destination,input.home);"
+        "process.stdout.write(JSON.stringify({residence:residence,value:incomeApi.calculateIncomeTax(input.profile,residence,input.incomeRules)}));"
+    )
+    completed = subprocess.run(
+        [
+            "node",
+            "-e",
+            script,
+            str(RESIDENCE_ENGINE),
+            str(ENGINE),
+            json.dumps(
+                {
+                    "residenceProfile": residence_profile,
+                    "destination": destination,
+                    "home": home,
+                    "profile": income["profile"],
+                    "incomeRules": income["rules"],
+                }
+            ),
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return json.loads(completed.stdout)
 
 
 class FireTaxIncomeTests(unittest.TestCase):
@@ -90,6 +148,139 @@ class FireTaxIncomeTests(unittest.TestCase):
                 self.assertEqual(min(gross, 1000), result["deductions"])
                 self.assertEqual(max(gross - 1000, 0), result["taxableBase"])
                 self.assertAlmostEqual(expected_tax, result["domesticTax"], places=8)
+
+    def test_selects_one_rate_and_accessory_set_for_the_active_taxpayer_scope(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        jurisdiction_rules = rules["jurisdictions"]["synthetic-destination"]["rules"]
+        resident_rate = rule_by_id(rules, "synthetic-private-pension-2026")
+        resident_rate["taxpayer_scope"] = ["resident"]
+        nonresident_rate = copy.deepcopy(resident_rate)
+        nonresident_rate.update(
+            {
+                "id": "synthetic-private-pension-nonresident-2026",
+                "taxpayer_scope": ["nonresident"],
+                "bands": [{"from": 0, "up_to": None, "rate": 0.5}],
+            }
+        )
+        resident_allowance = rule_by_id(
+            rules, "synthetic-private-pension-allowance-2026"
+        )
+        resident_allowance["taxpayer_scope"] = ["resident"]
+        rules["operand_catalog"]["nonresident_pension_allowance"] = {
+            "kind": "constant",
+            "value_type": "money",
+            "currency": "EUR",
+            "value": 2000,
+        }
+        nonresident_allowance = copy.deepcopy(resident_allowance)
+        nonresident_allowance.update(
+            {
+                "id": "synthetic-private-pension-nonresident-allowance-2026",
+                "taxpayer_scope": ["nonresident"],
+                "formula": {
+                    "operation": "minimum",
+                    "operands": ["private_pension", "nonresident_pension_allowance"],
+                },
+                "amount": 2000,
+                "amount_operand": "nonresident_pension_allowance",
+            }
+        )
+        jurisdiction_rules.extend([nonresident_rate, nonresident_allowance])
+
+        resident = by_category(calculate(rules=rules))["private_pension"]
+        self.assertEqual(1200, resident["domesticTax"])
+        self.assertEqual(
+            ["synthetic-private-pension-2026", "synthetic-private-pension-allowance-2026"],
+            resident["ruleIds"],
+        )
+
+        profile = copy.deepcopy(data["profile"])
+        profile["incomeSourceJurisdictions"]["private_pension"] = (
+            "synthetic-destination"
+        )
+        nonresident = by_category(
+            calculate(
+                profile=profile,
+                residence={
+                    "status": "likely_home_resident",
+                    "scopes": {
+                        "destination": "source_income",
+                        "home": "worldwide_income",
+                    },
+                },
+                rules=rules,
+            )
+        )["private_pension"]
+        self.assertEqual(2000, nonresident["deductions"])
+        self.assertEqual(5000, nonresident["domesticTax"])
+        self.assertEqual(
+            [
+                "synthetic-private-pension-nonresident-2026",
+                "synthetic-private-pension-nonresident-allowance-2026",
+            ],
+            nonresident["ruleIds"],
+        )
+
+    def test_rejects_only_true_same_scope_rate_ambiguity(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        duplicate = copy.deepcopy(rule_by_id(rules, "synthetic-private-pension-2026"))
+        duplicate["id"] = "synthetic-private-pension-duplicate-2026"
+        rules["jurisdictions"]["synthetic-destination"]["rules"].append(duplicate)
+        result = calculate(rules=rules, expect_error=True)
+        self.assertEqual("FireTaxIncomeRuleError", result["error"])
+        self.assertIn("multiple resident rate rules", result["message"])
+
+    def test_withholding_accessories_are_filtered_to_the_active_scope(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        resident = rule_by_id(rules, "synthetic-dividend-withholding-2026")
+        resident["taxpayer_scope"] = ["resident"]
+        rules["operand_catalog"]["nonresident_dividend_withholding_rate"] = {
+            "kind": "constant",
+            "value_type": "number",
+            "value": 0.4,
+        }
+        nonresident = copy.deepcopy(resident)
+        nonresident.update(
+            {
+                "id": "synthetic-dividend-nonresident-withholding-2026",
+                "taxpayer_scope": ["nonresident"],
+                "formula": {
+                    "operation": "multiply",
+                    "operands": [
+                        "dividends",
+                        "nonresident_dividend_withholding_rate",
+                    ],
+                },
+                "rate": 0.4,
+                "rate_operand": "nonresident_dividend_withholding_rate",
+            }
+        )
+        rules["jurisdictions"]["synthetic-destination"]["rules"].append(
+            nonresident
+        )
+        profile = copy.deepcopy(data["profile"])
+        profile["incomeSourceJurisdictions"]["dividends"] = "synthetic-destination"
+        result = by_category(
+            calculate(
+                profile=profile,
+                residence={
+                    "status": "likely_home_resident",
+                    "scopes": {
+                        "destination": "source_income",
+                        "home": "worldwide_income",
+                    },
+                },
+                rules=rules,
+            )
+        )["dividends"]
+        self.assertEqual(2000, result["sourceWithholding"])
+        self.assertIn(
+            "synthetic-dividend-nonresident-withholding-2026", result["ruleIds"]
+        )
+        self.assertNotIn("synthetic-dividend-withholding-2026", result["ruleIds"])
 
     def test_source_withholding_and_pre_credit_net_tax_remain_separate(self):
         results = by_category(calculate())
@@ -163,6 +354,29 @@ class FireTaxIncomeTests(unittest.TestCase):
             ["incomeTimingAcrossResidencePeriods"], result["unresolvedFacts"]
         )
         self.assertIn("timing", result["explanations"][0].lower())
+
+    def test_task_two_unknown_split_keeps_nested_period_alternative_material(self):
+        integration = calculate_with_task_two_unknown_split()
+        self.assertEqual("conditional", integration["residence"]["status"])
+        self.assertEqual("splitYear", integration["residence"]["controllingFact"])
+        dividend = by_category(integration["value"])["dividends"]
+        self.assertEqual({"minimum": 0, "maximum": 900}, dividend["domesticTax"])
+        split_branch = next(
+            branch for branch in dividend["branches"] if branch["assumedValue"] is True
+        )
+        self.assertEqual("conditional", split_branch["status"])
+        self.assertEqual(
+            ["incomeTimingAcrossResidencePeriods"], split_branch["unresolvedFacts"]
+        )
+
+    def test_no_tax_rule_cannot_report_exempt_with_positive_tax(self):
+        data = fixture()
+        rules = copy.deepcopy(data["rules"])
+        social = rule_by_id(rules, "synthetic-social-security-exemption-2026")
+        social["bands"][0]["rate"] = 0.1
+        result = calculate(rules=rules, expect_error=True)
+        self.assertEqual("FireTaxIncomeRuleError", result["error"])
+        self.assertIn("no_tax", result["message"])
 
     def test_invalid_profile_is_a_total_error_instead_of_a_partial_estimate(self):
         data = fixture()

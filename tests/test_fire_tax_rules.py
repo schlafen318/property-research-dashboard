@@ -997,6 +997,7 @@ class FireTaxRuleContractTests(unittest.TestCase):
                 "credit_basis": "source_withholding",
                 "order": 1,
                 "applies_to_categories": ["dividends"],
+                "assumptions": ["Synthetic category matching assumption."],
             }
         )
         self.assertEqual([], self.validate(payload))
@@ -1051,6 +1052,70 @@ class FireTaxRuleContractTests(unittest.TestCase):
         errors = self.validate(payload)
         self.assert_path_error(
             errors, "jurisdictions.synthetic-example.calculation_side"
+        )
+
+    def test_allowance_execution_is_deliberately_minimum_only(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"]["allowance_amount"] = {
+            "kind": "constant",
+            "value_type": "money",
+            "currency": "EUR",
+            "value": 1000,
+        }
+        rule = payload["jurisdictions"]["synthetic-example"]["rules"][2]
+        rule.pop("bands")
+        rule.update(
+            {
+                "type": "allowance",
+                "formula": {
+                    "operation": "maximum",
+                    "operands": ["ordinary_income", "allowance_amount"],
+                },
+                "amount": 1000,
+                "amount_operand": "allowance_amount",
+            }
+        )
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.rules[2].formula.operation"
+        )
+
+    def test_no_tax_rate_rule_must_encode_zero_tax_even_before_enablement(self):
+        payload = copy.deepcopy(self.payload)
+        rule = payload["jurisdictions"]["synthetic-example"]["rules"][2]
+        rule["no_tax"] = True
+        rule["bands"][0]["rate"] = 0.1
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.rules[2].no_tax"
+        )
+
+    def test_credit_limit_requires_auditable_assumptions(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"].update(
+            {
+                "foreign_tax_paid": {"kind": "profile", "profile_key": "foreignTaxPaid", "value_type": "money", "currency": "EUR"},
+                "domestic_tax_limit": {"kind": "profile", "profile_key": "domesticTaxLimit", "value_type": "money", "currency": "EUR"},
+            }
+        )
+        rule = payload["jurisdictions"]["synthetic-example"]["rules"][2]
+        rule.pop("bands")
+        rule.update(
+            {
+                "type": "credit_limit",
+                "category": "foreign_tax_credit",
+                "formula": {"operation": "minimum", "operands": ["foreign_tax_paid", "domestic_tax_limit"]},
+                "credit_operand": "foreign_tax_paid",
+                "limit_operand": "domestic_tax_limit",
+                "credit_basis": "source_withholding",
+                "order": 1,
+                "applies_to_categories": ["dividends"],
+                "assumptions": [],
+            }
+        )
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.rules[2].assumptions"
         )
 
     def test_progressive_bands_cannot_overlap(self):

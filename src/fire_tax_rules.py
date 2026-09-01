@@ -75,7 +75,7 @@ RULE_TYPE_OPERATIONS = {
         }
     ),
     "rate_band": frozenset({"progressive_rate"}),
-    "allowance": frozenset({"minimum", "maximum"}),
+    "allowance": frozenset({"minimum"}),
     "withholding": frozenset({"multiply"}),
     "credit_limit": frozenset({"minimum"}),
     "property_charge": frozenset({"add", "multiply", "progressive_rate"}),
@@ -909,6 +909,10 @@ def _validate_rule_type_fields(
             errors.append(f"{path}.resident_when must be a boolean")
     elif rule_type == "rate_band":
         _validate_rate_bands(rule.get("bands"), f"{path}.bands", errors)
+        if "no_tax" in rule and not isinstance(rule.get("no_tax"), bool):
+            errors.append(f"{path}.no_tax must be a boolean")
+        elif rule.get("no_tax") is True and not _rule_encodes_zero_tax(rule):
+            errors.append(f"{path}.no_tax must encode a zero-tax formula")
         if rule.get("category") == "retirement_account_withdrawal":
             classification_operand_id = rule.get("account_classification_operand")
             classification_operand = (
@@ -1002,6 +1006,16 @@ def _validate_rule_type_fields(
                 errors.append(
                     f"{path}.{field} must reference a formula money operand in the rule currency"
                 )
+        assumptions = rule.get("assumptions")
+        if (
+            not isinstance(assumptions, list)
+            or not assumptions
+            or not all(
+                isinstance(assumption, str) and assumption.strip()
+                for assumption in assumptions
+            )
+        ):
+            errors.append(f"{path}.assumptions must contain explanatory assumptions")
     elif rule_type == "property_charge":
         lifecycle_stage = rule.get("lifecycle_stage")
         if not isinstance(lifecycle_stage, str) or lifecycle_stage not in PROPERTY_LIFECYCLE_STAGES:
