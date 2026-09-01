@@ -70,6 +70,14 @@ class FireTaxRuleContractTests(unittest.TestCase):
         errors = self.validate(payload)
         self.assert_path_error(errors, "enablement_contract")
 
+    def test_enablement_contract_requires_category_capabilities(self):
+        payload = copy.deepcopy(self.payload)
+        payload["enablement_contract"].pop("category_capabilities", None)
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "enablement_contract.category_capabilities"
+        )
+
     def test_synthetic_jurisdiction_cannot_be_enabled(self):
         payload = copy.deepcopy(self.payload)
         payload["jurisdictions"]["synthetic-example"]["detailed_enabled"] = True
@@ -108,6 +116,114 @@ class FireTaxRuleContractTests(unittest.TestCase):
             ),
             errors,
         )
+
+    def test_unrelated_rules_cannot_satisfy_enabled_category_capabilities(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        jurisdiction["synthetic"] = False
+        jurisdiction["detailed_enabled"] = True
+        payload["sources"][0]["source_kind"] = "official"
+        branch_id = jurisdiction["rules"][1]["id"]
+        jurisdiction["category_coverage"] = {
+            category: {"treatment": "supported", "rule_ids": [branch_id]}
+            for category in payload["enablement_contract"]["required_categories"]
+        }
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.category_coverage.private_pension.rule_ids[0]",
+        )
+
+    def test_no_tax_category_coverage_requires_an_explicit_no_tax_rule(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        jurisdiction["synthetic"] = False
+        jurisdiction["detailed_enabled"] = True
+        payload["sources"][0]["source_kind"] = "official"
+        income_id = jurisdiction["rules"][2]["id"]
+        jurisdiction["category_coverage"] = {
+            category: {"treatment": "supported", "rule_ids": [income_id]}
+            for category in payload["enablement_contract"]["required_categories"]
+        }
+        jurisdiction["category_coverage"]["private_pension"] = {
+            "treatment": "no_tax",
+            "rule_ids": [income_id],
+        }
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.category_coverage.private_pension.rule_ids[0]",
+        )
+
+    def test_no_tax_category_rule_must_encode_a_zero_tax_formula(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        jurisdiction["synthetic"] = False
+        jurisdiction["detailed_enabled"] = True
+        payload["sources"][0]["source_kind"] = "official"
+        income_rule = jurisdiction["rules"][2]
+        income_rule["category"] = "private_pension"
+        income_rule["no_tax"] = True
+        income_id = income_rule["id"]
+        jurisdiction["category_coverage"] = {
+            category: {"treatment": "supported", "rule_ids": [income_id]}
+            for category in payload["enablement_contract"]["required_categories"]
+        }
+        jurisdiction["category_coverage"]["private_pension"] = {
+            "treatment": "no_tax",
+            "rule_ids": [income_id],
+        }
+        errors = self.validate(payload)
+        self.assertTrue(
+            any(
+                error.startswith(
+                    "jurisdictions.synthetic-example.category_coverage.private_pension.rule_ids[0]"
+                )
+                and "zero-tax" in error
+                for error in errors
+            ),
+            errors,
+        )
+
+    def test_malformed_nested_values_return_exact_paths_instead_of_crashing(self):
+        cases = (
+            (
+                lambda payload: payload["operand_catalog"].__setitem__(
+                    "days_in_jurisdiction", []
+                ),
+                "operand_catalog.days_in_jurisdiction",
+            ),
+            (
+                lambda payload: payload["jurisdictions"]["synthetic-example"]["rules"][
+                    0
+                ].__setitem__(
+                    "formula", {"operation": [], "operands": [["not-an-id"]]}
+                ),
+                "jurisdictions.synthetic-example.rules[0].formula.operation",
+            ),
+            (
+                lambda payload: payload["jurisdictions"]["synthetic-example"]["rules"][
+                    1
+                ]["branches"][0]["when"].__setitem__("operand", []),
+                "jurisdictions.synthetic-example.rules[1].branches[0].when.operand",
+            ),
+            (
+                lambda payload: payload["jurisdictions"]["synthetic-example"]["rules"][
+                    0
+                ].__setitem__("type", []),
+                "jurisdictions.synthetic-example.rules[0].type",
+            ),
+            (
+                lambda payload: payload["sources"][0].__setitem__("source_kind", []),
+                "sources[0].source_kind",
+            ),
+        )
+        for mutate, expected_path in cases:
+            with self.subTest(path=expected_path):
+                payload = copy.deepcopy(self.payload)
+                mutate(payload)
+                errors = self.validate(payload)
+                self.assert_path_error(errors, expected_path)
 
     def test_missing_source_reference_reports_exact_rule_path(self):
         payload = copy.deepcopy(self.payload)
@@ -219,6 +335,38 @@ class FireTaxRuleContractTests(unittest.TestCase):
         errors = self.validate(payload)
         self.assert_path_error(errors, "operand_catalog.ordinary_income.derivation")
 
+    def test_indirect_derived_operand_cycles_are_rejected_at_the_closing_edge(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"].update(
+            {
+                "derived_a": {
+                    "kind": "derived",
+                    "value_type": "number",
+                    "derivation": {
+                        "operation": "add",
+                        "operands": ["derived_b", "residence_day_threshold"],
+                    },
+                },
+                "derived_b": {
+                    "kind": "derived",
+                    "value_type": "number",
+                    "derivation": {
+                        "operation": "add",
+                        "operands": ["derived_a", "residence_day_threshold"],
+                    },
+                },
+            }
+        )
+        errors = self.validate(payload)
+        self.assertTrue(
+            any(
+                error.startswith("operand_catalog.derived_b.derivation.operands[0]")
+                and "circular" in error
+                for error in errors
+            ),
+            errors,
+        )
+
     def test_comparison_operands_must_have_compatible_types_and_currency(self):
         payload = copy.deepcopy(self.payload)
         days = payload["operand_catalog"]["days_in_jurisdiction"]
@@ -232,6 +380,92 @@ class FireTaxRuleContractTests(unittest.TestCase):
             errors,
             "jurisdictions.synthetic-example.rules[0].formula.operands[1]",
         )
+
+    def test_rule_currency_must_match_money_formula_output(self):
+        payload = copy.deepcopy(self.payload)
+        payload["jurisdictions"]["synthetic-example"]["rules"][2]["currency"] = "USD"
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.rules[2].currency"
+        )
+
+    def test_multiply_is_exactly_binary_and_rejects_boolean_operands(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"]["boolean_flag"] = {
+            "kind": "profile",
+            "value_type": "boolean",
+        }
+        formula = payload["jurisdictions"]["synthetic-example"]["rules"][2]["formula"]
+        formula["operation"] = "multiply"
+        formula["operands"] = [
+            "ordinary_income",
+            "residence_day_threshold",
+            "boolean_flag",
+        ]
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.rules[2].formula.operands"
+        )
+        formula["operands"] = ["ordinary_income", "boolean_flag"]
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.rules[2].formula.operands"
+        )
+
+    def test_allowance_amount_must_match_its_linked_formula_constant(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"]["allowance_amount"] = {
+            "kind": "constant",
+            "value_type": "money",
+            "currency": "EUR",
+            "value": 1000,
+        }
+        rule = payload["jurisdictions"]["synthetic-example"]["rules"][2]
+        rule.pop("bands")
+        rule.update(
+            {
+                "type": "allowance",
+                "formula": {
+                    "operation": "minimum",
+                    "operands": ["ordinary_income", "allowance_amount"],
+                },
+                "amount": 2000,
+                "amount_operand": "allowance_amount",
+            }
+        )
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.rules[2].amount"
+        )
+        rule["amount"] = 1000
+        self.assertEqual([], self.validate(payload))
+
+    def test_withholding_rate_must_match_its_linked_formula_constant(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"]["withholding_rate"] = {
+            "kind": "constant",
+            "value_type": "number",
+            "value": 0.1,
+        }
+        rule = payload["jurisdictions"]["synthetic-example"]["rules"][2]
+        rule.pop("bands")
+        rule.update(
+            {
+                "type": "withholding",
+                "formula": {
+                    "operation": "multiply",
+                    "operands": ["ordinary_income", "withholding_rate"],
+                },
+                "rate": 0.2,
+                "rate_operand": "withholding_rate",
+            }
+        )
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors, "jurisdictions.synthetic-example.rules[2].rate"
+        )
+        rule["rate"] = 0.1
+        self.assertEqual([], self.validate(payload))
 
     def test_branch_comparison_value_must_match_operand_type(self):
         payload = copy.deepcopy(self.payload)

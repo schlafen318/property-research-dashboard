@@ -32,7 +32,61 @@
       "property_inheritance",
       "property_gift",
       "tax_reporting"
-    ]
+    ],
+    "category_capabilities": {
+      "tax_residence": [
+        "residence_test",
+        "branch"
+      ],
+      "private_pension": [
+        "rate_band"
+      ],
+      "government_pension": [
+        "rate_band"
+      ],
+      "social_security": [
+        "rate_band"
+      ],
+      "dividends": [
+        "rate_band"
+      ],
+      "interest": [
+        "rate_band"
+      ],
+      "realized_gains": [
+        "rate_band"
+      ],
+      "retirement_account_withdrawal": [
+        "rate_band"
+      ],
+      "rental_income": [
+        "rate_band"
+      ],
+      "employment_consulting": [
+        "rate_band"
+      ],
+      "property_purchase": [
+        "property_charge"
+      ],
+      "property_annual": [
+        "property_charge"
+      ],
+      "property_rental": [
+        "property_charge"
+      ],
+      "property_sale": [
+        "property_charge"
+      ],
+      "property_inheritance": [
+        "property_charge"
+      ],
+      "property_gift": [
+        "property_charge"
+      ],
+      "tax_reporting": [
+        "reporting_flag"
+      ]
+    }
   },
   "operand_catalog": {
     "days_in_jurisdiction": {

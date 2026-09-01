@@ -46,7 +46,7 @@ FORMULA_OPERATIONS = frozenset(
 FORMULA_ARITY = {
     "add": (2, None),
     "subtract": (2, 2),
-    "multiply": (2, None),
+    "multiply": (2, 2),
     "divide": (2, 2),
     "minimum": (2, None),
     "maximum": (2, None),
@@ -108,6 +108,25 @@ MINIMUM_ENABLEMENT_CATEGORIES = frozenset(
         "tax_reporting",
     }
 )
+MINIMUM_CATEGORY_CAPABILITIES = {
+    "tax_residence": frozenset({"residence_test", "branch"}),
+    "private_pension": frozenset({"rate_band"}),
+    "government_pension": frozenset({"rate_band"}),
+    "social_security": frozenset({"rate_band"}),
+    "dividends": frozenset({"rate_band"}),
+    "interest": frozenset({"rate_band"}),
+    "realized_gains": frozenset({"rate_band"}),
+    "retirement_account_withdrawal": frozenset({"rate_band"}),
+    "rental_income": frozenset({"rate_band"}),
+    "employment_consulting": frozenset({"rate_band"}),
+    "property_purchase": frozenset({"property_charge"}),
+    "property_annual": frozenset({"property_charge"}),
+    "property_rental": frozenset({"property_charge"}),
+    "property_sale": frozenset({"property_charge"}),
+    "property_inheritance": frozenset({"property_charge"}),
+    "property_gift": frozenset({"property_charge"}),
+    "tax_reporting": frozenset({"reporting_flag"}),
+}
 
 
 def load_fire_tax_rules(path: Path = RULES_PATH) -> dict[str, Any]:
@@ -207,18 +226,27 @@ def _validate_source(source: Any, index: int, as_of: date, errors: list[str]) ->
         errors.append(f"{path}.url must be an absolute HTTPS URL")
 
     _validate_effective_dates(source, path, as_of, errors)
-    if source.get("source_kind") not in {"official", "primary", "synthetic"}:
+    source_kind = source.get("source_kind")
+    if not isinstance(source_kind, str) or source_kind not in {
+        "official",
+        "primary",
+        "synthetic",
+    }:
         errors.append(f"{path}.source_kind must be official, primary or synthetic")
     return source_id
 
 
 def _validate_enablement_contract(
     payload: dict[str, Any], errors: list[str]
-) -> tuple[set[str], set[str]]:
+) -> tuple[set[str], set[str], dict[str, set[str]]]:
     contract = payload.get("enablement_contract")
     if not isinstance(contract, dict):
         errors.append("enablement_contract must be an object")
-        return set(RULE_TYPES), set(MINIMUM_ENABLEMENT_CATEGORIES)
+        return (
+            set(RULE_TYPES),
+            set(MINIMUM_ENABLEMENT_CATEGORIES),
+            {key: set(value) for key, value in MINIMUM_CATEGORY_CAPABILITIES.items()},
+        )
 
     required_types = contract.get("required_rule_types")
     if (
@@ -245,10 +273,39 @@ def _validate_enablement_contract(
         category_set = set(MINIMUM_ENABLEMENT_CATEGORIES)
     else:
         category_set = set(required_categories)
-    return type_set, category_set
+
+    capabilities = contract.get("category_capabilities")
+    capability_set: dict[str, set[str]] = {}
+    capabilities_valid = isinstance(capabilities, dict) and set(capabilities) == set(
+        MINIMUM_CATEGORY_CAPABILITIES
+    )
+    if capabilities_valid:
+        for category, required in MINIMUM_CATEGORY_CAPABILITIES.items():
+            declared = capabilities.get(category)
+            if (
+                not isinstance(declared, list)
+                or not all(isinstance(rule_type, str) for rule_type in declared)
+                or set(declared) != set(required)
+            ):
+                errors.append(
+                    f"enablement_contract.category_capabilities.{category} must declare its executable rule types"
+                )
+                capabilities_valid = False
+            else:
+                capability_set[category] = set(declared)
+    if not capabilities_valid:
+        errors.append(
+            "enablement_contract.category_capabilities must cover every required category"
+        )
+        capability_set = {
+            key: set(value) for key, value in MINIMUM_CATEGORY_CAPABILITIES.items()
+        }
+    return type_set, category_set, capability_set
 
 
 def _value_matches_type(value: Any, value_type: Any) -> bool:
+    if not isinstance(value_type, str):
+        return False
     if value_type in {"number", "money"}:
         return _is_number(value)
     if value_type == "boolean":
@@ -275,29 +332,40 @@ def _validate_operand_catalog(
         if not isinstance(operand, dict):
             errors.append(f"{path} must be an object")
             continue
-        if operand.get("kind") not in {"profile", "constant", "derived"}:
+        kind = operand.get("kind")
+        value_type = operand.get("value_type")
+        if not isinstance(kind, str) or kind not in {"profile", "constant", "derived"}:
             errors.append(f"{path}.kind must be profile, constant or derived")
-        if operand.get("value_type") not in {"number", "money", "boolean", "string", "date"}:
+        if not isinstance(value_type, str) or value_type not in {
+            "number",
+            "money",
+            "boolean",
+            "string",
+            "date",
+        }:
             errors.append(f"{path}.value_type is unsupported")
-        if operand.get("kind") == "constant" and "value" not in operand:
+        if kind == "constant" and "value" not in operand:
             errors.append(f"{path}.value is required for a constant operand")
-        elif operand.get("kind") == "constant" and not _value_matches_type(
-            operand.get("value"), operand.get("value_type")
+        elif kind == "constant" and not _value_matches_type(
+            operand.get("value"), value_type
         ):
             errors.append(f"{path}.value must match value_type")
-        if operand.get("value_type") == "money":
+        if value_type == "money":
             currency = operand.get("currency")
             if not isinstance(currency, str) or not CURRENCY_PATTERN.fullmatch(currency):
                 errors.append(f"{path}.currency must be an ISO 4217-style code")
-    for operand_id, operand in catalog.items():
+    valid_catalog = {
+        operand_id: operand
+        for operand_id, operand in catalog.items()
+        if isinstance(operand_id, str) and isinstance(operand, dict)
+    }
+    for operand_id, operand in valid_catalog.items():
         if not isinstance(operand, dict) or operand.get("kind") != "derived":
             continue
         derivation_path = f"operand_catalog.{operand_id}.derivation"
         derivation = operand.get("derivation")
-        _validate_formula(derivation, derivation_path, catalog, errors)
-        if isinstance(derivation, dict) and operand_id in derivation.get("operands", []):
-            errors.append(f"{derivation_path}.operands cannot reference its own operand")
-        result_signature = _formula_result_signature(derivation, catalog)
+        _validate_formula(derivation, derivation_path, valid_catalog, errors)
+        result_signature = _formula_result_signature(derivation, valid_catalog)
         if result_signature is not None:
             result_type, result_currency = result_signature
             if operand.get("value_type") != result_type or (
@@ -306,7 +374,8 @@ def _validate_operand_catalog(
                 errors.append(
                     f"{derivation_path} result type and currency must match the derived operand"
                 )
-    return catalog
+    _validate_derived_operand_graph(valid_catalog, errors)
+    return valid_catalog
 
 
 def _same_currency(operands: list[dict[str, Any]]) -> bool:
@@ -325,10 +394,15 @@ def _validate_formula_operand_compatibility(
     path: str,
     errors: list[str],
 ) -> None:
-    if not operand_ids or any(operand_id not in catalog for operand_id in operand_ids):
+    if not operand_ids or any(
+        not isinstance(operand_id, str) or operand_id not in catalog
+        for operand_id in operand_ids
+    ):
         return
     operands = [catalog[operand_id] for operand_id in operand_ids]
     types = [operand.get("value_type") for operand in operands]
+    if not all(isinstance(value_type, str) for value_type in types):
+        return
     comparison_ops = {
         "greater_than",
         "greater_than_or_equal",
@@ -346,7 +420,10 @@ def _validate_formula_operand_compatibility(
         if not valid or not _same_currency(operands):
             errors.append(f"{path}.operands[1] is incompatible with the comparison operand")
     elif operation in same_type_ops:
-        valid = len(set(types)) == 1 and types[0] in {"number", "money"}
+        valid = all(value_type == types[0] for value_type in types) and types[0] in {
+            "number",
+            "money",
+        }
         if not valid or not _same_currency(operands):
             errors.append(f"{path}.operands must use compatible numeric types and currency")
     elif operation == "multiply" and len(types) == 2:
@@ -369,11 +446,16 @@ def _formula_result_signature(
     if not isinstance(formula, dict):
         return None
     operation = formula.get("operation")
+    if not isinstance(operation, str):
+        return None
     operand_ids = formula.get("operands")
     if (
         not isinstance(operand_ids, list)
         or not operand_ids
-        or any(operand_id not in catalog for operand_id in operand_ids)
+        or any(
+            not isinstance(operand_id, str) or operand_id not in catalog
+            for operand_id in operand_ids
+        )
     ):
         return None
     operands = [catalog[operand_id] for operand_id in operand_ids]
@@ -403,6 +485,48 @@ def _formula_result_signature(
     return None
 
 
+def _validate_derived_operand_graph(
+    catalog: dict[str, dict[str, Any]], errors: list[str]
+) -> None:
+    derived_ids = {
+        operand_id
+        for operand_id, operand in catalog.items()
+        if operand.get("kind") == "derived"
+    }
+    edges: dict[str, list[tuple[str, str]]] = {}
+    for operand_id in derived_ids:
+        derivation = catalog[operand_id].get("derivation")
+        operands = derivation.get("operands") if isinstance(derivation, dict) else None
+        if not isinstance(operands, list):
+            edges[operand_id] = []
+            continue
+        edges[operand_id] = [
+            (
+                dependency,
+                f"operand_catalog.{operand_id}.derivation.operands[{index}]",
+            )
+            for index, dependency in enumerate(operands)
+            if isinstance(dependency, str) and dependency in derived_ids
+        ]
+
+    visiting: set[str] = set()
+    visited: set[str] = set()
+
+    def visit(operand_id: str) -> None:
+        visiting.add(operand_id)
+        for dependency, dependency_path in edges.get(operand_id, []):
+            if dependency in visiting:
+                errors.append(f"{dependency_path} creates a circular derived dependency")
+            elif dependency not in visited:
+                visit(dependency)
+        visiting.remove(operand_id)
+        visited.add(operand_id)
+
+    for operand_id in edges:
+        if operand_id not in visited:
+            visit(operand_id)
+
+
 def _validate_formula(
     formula: Any,
     path: str,
@@ -413,13 +537,13 @@ def _validate_formula(
         errors.append(f"{path} must be an object")
         return
     operation = formula.get("operation")
-    if operation not in FORMULA_OPERATIONS:
+    if not isinstance(operation, str) or operation not in FORMULA_OPERATIONS:
         errors.append(f"{path}.operation is unsupported")
     operands = formula.get("operands")
     if not isinstance(operands, list) or not operands:
         errors.append(f"{path}.operands must contain at least one operand")
         return
-    if operation in FORMULA_ARITY:
+    if isinstance(operation, str) and operation in FORMULA_ARITY:
         minimum, maximum = FORMULA_ARITY[operation]
         if len(operands) < minimum or (maximum is not None and len(operands) > maximum):
             expected = str(minimum) if minimum == maximum else f"at least {minimum}"
@@ -505,11 +629,11 @@ def _validate_branch_rule(
             errors.append(f"{branch_path}.when must be an object")
             continue
         operand_id = condition.get("operand")
-        operand = operand_catalog.get(operand_id)
+        operand = operand_catalog.get(operand_id) if isinstance(operand_id, str) else None
         if operand is None:
             errors.append(f"{branch_path}.when.operand references unknown operand {operand_id}")
         operator = condition.get("operator")
-        if operator not in BRANCH_OPERATORS:
+        if not isinstance(operator, str) or operator not in BRANCH_OPERATORS:
             errors.append(f"{branch_path}.when.operator is unsupported")
         if "value" not in condition:
             errors.append(f"{branch_path}.when.value is required")
@@ -524,11 +648,16 @@ def _validate_branch_rule(
                 valid_value = _value_matches_type(value, value_type)
             if not valid_value:
                 errors.append(f"{branch_path}.when.value must match operand value_type")
-            if operator not in {"equals", "not_equals", "in"} and value_type not in {
-                "number",
-                "money",
-                "date",
-            }:
+            if (
+                isinstance(operator, str)
+                and isinstance(value_type, str)
+                and operator not in {
+                "equals",
+                "not_equals",
+                "in",
+                }
+                and value_type not in {"number", "money", "date"}
+            ):
                 errors.append(
                     f"{branch_path}.when.operator is incompatible with operand value_type"
                 )
@@ -565,11 +694,50 @@ def _validate_explanation(
             errors.append(f"{path}.explanation contains unknown placeholder {field_name}")
 
 
-def _validate_rule_type_fields(rule: dict[str, Any], path: str, errors: list[str]) -> None:
+def _validate_linked_constant(
+    rule: dict[str, Any],
+    path: str,
+    operand_catalog: dict[str, dict[str, Any]],
+    value_field: str,
+    operand_field: str,
+    value_type: str,
+    errors: list[str],
+) -> None:
+    operand_id = rule.get(operand_field)
+    if not isinstance(operand_id, str) or not operand_id:
+        errors.append(f"{path}.{operand_field} must identify the formula constant")
+        return
+    formula = rule.get("formula")
+    formula_operands = formula.get("operands") if isinstance(formula, dict) else None
+    if not isinstance(formula_operands, list) or operand_id not in formula_operands:
+        errors.append(f"{path}.{operand_field} must appear in formula.operands")
+        return
+    operand = operand_catalog.get(operand_id)
+    if (
+        operand is None
+        or operand.get("kind") != "constant"
+        or operand.get("value_type") != value_type
+    ):
+        errors.append(f"{path}.{operand_field} must reference a {value_type} constant")
+        return
+    if value_type == "money" and operand.get("currency") != rule.get("currency"):
+        errors.append(f"{path}.{operand_field} currency must match the rule currency")
+    if operand.get("value") != rule.get(value_field):
+        errors.append(f"{path}.{value_field} must match its linked formula constant")
+
+
+def _validate_rule_type_fields(
+    rule: dict[str, Any],
+    path: str,
+    operand_catalog: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
     rule_type = rule.get("type")
     operation = rule.get("formula", {}).get("operation") if isinstance(rule.get("formula"), dict) else None
-    allowed_operations = RULE_TYPE_OPERATIONS.get(rule_type)
-    if allowed_operations is not None and operation not in allowed_operations:
+    allowed_operations = RULE_TYPE_OPERATIONS.get(rule_type) if isinstance(rule_type, str) else None
+    if allowed_operations is not None and (
+        not isinstance(operation, str) or operation not in allowed_operations
+    ):
         errors.append(f"{path}.formula.operation is incompatible with {rule_type}")
 
     if rule_type == "residence_test":
@@ -580,10 +748,30 @@ def _validate_rule_type_fields(rule: dict[str, Any], path: str, errors: list[str
     elif rule_type == "allowance":
         if not _is_number(rule.get("amount")) or rule["amount"] < 0:
             errors.append(f"{path}.amount must be a non-negative finite number")
+        else:
+            _validate_linked_constant(
+                rule,
+                path,
+                operand_catalog,
+                "amount",
+                "amount_operand",
+                "money",
+                errors,
+            )
     elif rule_type == "withholding":
         rate = rule.get("rate")
         if not _is_number(rate) or not 0 <= rate <= 1:
             errors.append(f"{path}.rate must be between 0 and 1")
+        else:
+            _validate_linked_constant(
+                rule,
+                path,
+                operand_catalog,
+                "rate",
+                "rate_operand",
+                "number",
+                errors,
+            )
     elif rule_type == "credit_limit":
         categories = rule.get("applies_to_categories")
         if not isinstance(categories, list) or not categories or not all(
@@ -591,8 +779,39 @@ def _validate_rule_type_fields(rule: dict[str, Any], path: str, errors: list[str
         ):
             errors.append(f"{path}.applies_to_categories must contain income categories")
     elif rule_type == "property_charge":
-        if rule.get("lifecycle_stage") not in PROPERTY_LIFECYCLE_STAGES:
+        lifecycle_stage = rule.get("lifecycle_stage")
+        if not isinstance(lifecycle_stage, str) or lifecycle_stage not in PROPERTY_LIFECYCLE_STAGES:
             errors.append(f"{path}.lifecycle_stage must be a supported property stage")
+        if operation == "multiply":
+            rate = rule.get("rate")
+            if not _is_number(rate) or not 0 <= rate <= 1:
+                errors.append(f"{path}.rate must be between 0 and 1")
+            else:
+                _validate_linked_constant(
+                    rule,
+                    path,
+                    operand_catalog,
+                    "rate",
+                    "rate_operand",
+                    "number",
+                    errors,
+                )
+        elif operation == "add":
+            amount = rule.get("amount")
+            if not _is_number(amount) or amount < 0:
+                errors.append(f"{path}.amount must be a non-negative finite number")
+            else:
+                _validate_linked_constant(
+                    rule,
+                    path,
+                    operand_catalog,
+                    "amount",
+                    "amount_operand",
+                    "money",
+                    errors,
+                )
+        elif operation == "progressive_rate":
+            _validate_rate_bands(rule.get("bands"), f"{path}.bands", errors)
     elif rule_type == "reporting_flag":
         if not isinstance(rule.get("reporting_code"), str) or not rule["reporting_code"].strip():
             errors.append(f"{path}.reporting_code is required")
@@ -619,7 +838,7 @@ def _validate_rule(
         errors.append(f"{path}.id must be a stable kebab-case ID ending in a four-digit year")
         rule_id = None
     rule_type = rule.get("type")
-    if rule_type not in RULE_TYPES:
+    if not isinstance(rule_type, str) or rule_type not in RULE_TYPES:
         errors.append(f"{path}.type must be a supported rule type")
     tax_year = rule.get("tax_year")
     if not isinstance(tax_year, int) or isinstance(tax_year, bool) or tax_year < 2000:
@@ -641,7 +860,15 @@ def _validate_rule(
     if not isinstance(currency, str) or not CURRENCY_PATTERN.fullmatch(currency):
         errors.append(f"{path}.currency must be an ISO 4217-style code")
 
-    _validate_formula(rule.get("formula"), f"{path}.formula", operand_catalog, errors)
+    formula = rule.get("formula")
+    _validate_formula(formula, f"{path}.formula", operand_catalog, errors)
+    result_signature = _formula_result_signature(formula, operand_catalog)
+    if (
+        result_signature is not None
+        and result_signature[0] == "money"
+        and currency != result_signature[1]
+    ):
+        errors.append(f"{path}.currency must match formula output currency")
 
     source_ids = rule.get("source_ids")
     if not isinstance(source_ids, list) or not source_ids:
@@ -656,12 +883,13 @@ def _validate_rule(
                 )
 
     _validate_effective_dates(rule, path, as_of, errors)
-    if rule.get("confidence") not in CONFIDENCE_LEVELS:
+    confidence = rule.get("confidence")
+    if not isinstance(confidence, str) or confidence not in CONFIDENCE_LEVELS:
         errors.append(f"{path}.confidence must be a supported confidence level")
     if not isinstance(rule.get("recheck_trigger"), str) or not rule["recheck_trigger"].strip():
         errors.append(f"{path}.recheck_trigger is required")
     _validate_explanation(rule, path, operand_catalog, errors)
-    _validate_rule_type_fields(rule, path, errors)
+    _validate_rule_type_fields(rule, path, operand_catalog, errors)
     edges = (
         _validate_branch_rule(rule, path, operand_catalog, errors)
         if rule_type == "branch"
@@ -702,6 +930,80 @@ def _validate_branch_graph(
             visit(rule_id)
 
 
+def _validate_category_coverage(
+    jurisdiction: dict[str, Any],
+    jurisdiction_path: str,
+    rules_by_id: dict[str, dict[str, Any]],
+    category_capabilities: dict[str, set[str]],
+    errors: list[str],
+) -> None:
+    coverage = jurisdiction.get("category_coverage")
+    coverage_path = f"{jurisdiction_path}.category_coverage"
+    if not isinstance(coverage, dict):
+        errors.append(f"{coverage_path} must explicitly cover every calculation category")
+        return
+
+    for category, required_types in category_capabilities.items():
+        category_path = f"{coverage_path}.{category}"
+        entry = coverage.get(category)
+        if not isinstance(entry, dict):
+            errors.append(f"{category_path} must declare supported or no_tax treatment")
+            continue
+        treatment = entry.get("treatment")
+        if not isinstance(treatment, str) or treatment not in {"supported", "no_tax"}:
+            errors.append(f"{category_path}.treatment must be supported or no_tax")
+        elif treatment == "no_tax" and category in {"tax_residence", "tax_reporting"}:
+            errors.append(f"{category_path}.treatment must be supported for this category")
+        rule_ids = entry.get("rule_ids")
+        if not isinstance(rule_ids, list) or not rule_ids:
+            errors.append(f"{category_path}.rule_ids must contain executable rules")
+            continue
+
+        covered_types: set[str] = set()
+        for index, rule_id in enumerate(rule_ids):
+            rule_path = f"{category_path}.rule_ids[{index}]"
+            if not isinstance(rule_id, str) or rule_id not in rules_by_id:
+                errors.append(f"{rule_path} must reference a rule in this jurisdiction")
+                continue
+            rule = rules_by_id[rule_id]
+            if rule.get("category") != category:
+                errors.append(f"{rule_path} references a rule for another category")
+            rule_type = rule.get("type")
+            if isinstance(rule_type, str):
+                covered_types.add(rule_type)
+            if treatment == "no_tax" and rule.get("no_tax") is not True:
+                errors.append(f"{rule_path} must reference an explicit no_tax rule")
+            elif treatment == "no_tax" and not _rule_encodes_zero_tax(rule):
+                errors.append(f"{rule_path} no_tax rule must encode a zero-tax formula")
+        missing_types = sorted(required_types - covered_types)
+        if missing_types:
+            errors.append(
+                f"{category_path}.rule_ids must include executable "
+                + ", ".join(missing_types)
+            )
+
+
+def _rule_encodes_zero_tax(rule: dict[str, Any]) -> bool:
+    rule_type = rule.get("type")
+    if rule_type == "rate_band":
+        bands = rule.get("bands")
+        return isinstance(bands, list) and bool(bands) and all(
+            isinstance(band, dict) and band.get("rate") == 0 for band in bands
+        )
+    if rule_type in {"withholding", "property_charge"}:
+        operation = rule.get("formula", {}).get("operation") if isinstance(rule.get("formula"), dict) else None
+        if operation == "multiply":
+            return rule.get("rate") == 0
+        if operation == "add":
+            return rule.get("amount") == 0
+        if operation == "progressive_rate":
+            bands = rule.get("bands")
+            return isinstance(bands, list) and bool(bands) and all(
+                isinstance(band, dict) and band.get("rate") == 0 for band in bands
+            )
+    return False
+
+
 def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
     """Return path-addressed validation errors for detailed FIRE tax rules."""
 
@@ -723,7 +1025,9 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
     if payload_checked is not None and payload_checked > as_of:
         errors.append("payload.checked_on cannot be after the validation date")
 
-    required_rule_types, required_categories = _validate_enablement_contract(payload, errors)
+    required_rule_types, required_categories, category_capabilities = (
+        _validate_enablement_contract(payload, errors)
+    )
 
     operand_catalog = _validate_operand_catalog(payload, errors)
 
@@ -767,6 +1071,7 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
             continue
 
         rule_ids: set[str] = set()
+        rules_by_id: dict[str, dict[str, Any]] = {}
         branch_edges: dict[str, list[tuple[str, str]]] = {}
         jurisdiction_rule_types: set[str] = set()
         jurisdiction_categories: set[str] = set()
@@ -799,6 +1104,8 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
             if rule_id in rule_ids:
                 errors.append(f"{rule_path}.id duplicates rule ID {rule_id}")
             rule_ids.add(rule_id)
+            if isinstance(rule, dict):
+                rules_by_id.setdefault(rule_id, rule)
             if isinstance(rule, dict) and rule.get("type") == "branch":
                 branch_edges[rule_id] = edges
         _validate_branch_graph(rule_ids, branch_edges, errors)
@@ -829,5 +1136,12 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
                     f"{enablement_path} has an incomplete executable rule set; missing "
                     + "; ".join(missing)
                 )
+            _validate_category_coverage(
+                jurisdiction,
+                jurisdiction_path,
+                rules_by_id,
+                category_capabilities,
+                errors,
+            )
 
     return errors
