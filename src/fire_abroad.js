@@ -59,28 +59,61 @@
     };
   }
 
+  function unavailableTaxScreen(reason) {
+    return {
+      status: "tax_impact_unavailable",
+      conditional: true,
+      residence_outcome: "needs_evidence",
+      scope_summary: reason,
+      readiness: "highly_profile_dependent",
+      readiness_score: null,
+      favorable_reserve: null,
+      central_reserve: null,
+      adverse_reserve: null,
+      rates: null,
+      included_categories: [],
+      material_flags: [],
+      source_ids: [],
+      confidence: "low",
+    };
+  }
+
+  function parseIsoDate(value) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(String(value || ""))) return null;
+    const parts = String(value).split("-").map(Number);
+    const result = Date.UTC(parts[0], parts[1] - 1, parts[2]);
+    const check = new Date(result);
+    if (check.getUTCFullYear() !== parts[0] || check.getUTCMonth() !== parts[1] - 1 || check.getUTCDate() !== parts[2]) {
+      return null;
+    }
+    return result;
+  }
+
+  function taxFreshnessError(screen, asOf) {
+    const current = parseIsoDate(asOf);
+    const reviewed = parseIsoDate(screen.last_reviewed);
+    if (current === null || reviewed === null) {
+      return "A current freshness anchor and valid tax review date are required for this destination.";
+    }
+    if (reviewed > current) {
+      return "Tax-impact evidence is newer than the current screening anchor and needs review.";
+    }
+    if (current - reviewed > 366 * 24 * 60 * 60 * 1000) {
+      return "Tax-impact evidence is stale for this destination.";
+    }
+    return "";
+  }
+
   function screenTax(input) {
     const country = input && input.country || {};
     const profile = normalizeProfile(input && input.profile || {});
     const screen = country.tax_screen || {};
     if (screen.status !== "complete") {
-      return {
-        status: "tax_impact_unavailable",
-        conditional: true,
-        residence_outcome: "needs_evidence",
-        scope_summary: "Tax-impact research is not complete for this destination.",
-        readiness: "highly_profile_dependent",
-        readiness_score: null,
-        favorable_reserve: null,
-        central_reserve: null,
-        adverse_reserve: null,
-        rates: null,
-        included_categories: [],
-        material_flags: [],
-        source_ids: [],
-        confidence: "low",
-      };
+      return unavailableTaxScreen("Tax-impact research is not complete for this destination.");
     }
+    const bypass = profile.tax_mode === "user_after_tax";
+    const freshnessError = bypass ? "" : taxFreshnessError(screen, input && input.asOf);
+    if (freshnessError) return unavailableTaxScreen(freshnessError);
     const residence = {
       under_90: "residence_depends_on_days_and_ties",
       "90_182": "residence_depends_on_days_and_ties",
@@ -98,7 +131,6 @@
       central: Number(bands.full_relocation.central_rate),
       adverse: Number(bands.full_relocation.adverse_rate),
     };
-    const bypass = profile.tax_mode === "user_after_tax";
     function reserve(key) {
       if (bypass) return 0;
       return profile.planning_base === null ? null : Math.round(profile.planning_base * rates[key]);
@@ -224,7 +256,7 @@
       const countryName = override.country || destination.country;
       const country = countries[countryName] || { tax_screen: { status: "research_pending" } };
       const eligibility = screenEligibility({ country: country, profile: profile });
-      const tax = screenTax({ country: country, profile: profile });
+      const tax = screenTax({ country: country, profile: profile, asOf: input.asOf });
       const cost = costs[destination.id];
       const rankable = Boolean(cost && override.scores && eligibility.rankable && tax.status !== "tax_impact_unavailable");
       return {

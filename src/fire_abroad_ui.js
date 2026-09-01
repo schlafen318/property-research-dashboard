@@ -30,6 +30,17 @@
       "&household=" + household + "&housing=" + housing;
   }
 
+  function rankingInput(input) {
+    const payload = input && input.payload || {};
+    return {
+      asOf: payload.asOf,
+      destinations: payload.destinations,
+      retirementCosts: payload.retirementCosts,
+      firePayload: payload.fire,
+      profile: input && input.profile || {},
+    };
+  }
+
   function money(value) {
     return value === null || value === undefined
       ? "—"
@@ -67,7 +78,11 @@
         const pending = document.createElement("td");
         pending.colSpan = 6;
         if (row.tax.status === "tax_impact_unavailable") {
-          pending.appendChild(textElement("strong", "Research pending — tax evidence is incomplete, so this destination is not ranked."));
+          pending.appendChild(textElement(
+            "strong",
+            "Tax evidence unavailable — " + row.tax.scope_summary +
+              " This destination remains visible but is not ranked."
+          ));
         } else {
           pending.appendChild(textElement("strong", "Eligibility check needed — " + row.eligibility.summary));
         }
@@ -137,12 +152,7 @@
         wealthTaxRelevant: false,
       });
       propertyGroup.hidden = !visibility.propertyUse;
-      const rows = GHAFireAbroad.rankDestinations({
-        destinations: payload.destinations,
-        retirementCosts: payload.retirementCosts,
-        firePayload: payload.fire,
-        profile: profile,
-      });
+      const rows = GHAFireAbroad.rankDestinations(rankingInput({ payload: payload, profile: profile }));
       renderRows(rows, profile, tbody);
     }
     Object.keys(controls).forEach(function (key) {
@@ -155,6 +165,7 @@
   return {
     taxControlVisibility: taxControlVisibility,
     safeCalculatorHref: safeCalculatorHref,
+    rankingInput: rankingInput,
     initFireAbroad: initFireAbroad,
   };
 });

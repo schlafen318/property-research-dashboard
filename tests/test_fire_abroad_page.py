@@ -66,7 +66,7 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn("Reference view:", self.html)
         self.assertIn("/5", self.html)
         self.assertIn("not a statutory rate or assessment", self.html)
-        self.assertIn("Research pending", self.html)
+        self.assertIn("Tax evidence unavailable", self.html)
 
     def test_property_tax_lifecycle_and_sources_are_available_on_demand(self):
         for stage in ("Purchase", "Annual ownership", "Rental operation", "Sale", "Inheritance or gift"):

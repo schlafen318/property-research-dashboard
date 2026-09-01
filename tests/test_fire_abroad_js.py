@@ -28,6 +28,94 @@ def run_js(module: Path, function_name: str, payload: object) -> object:
 
 
 class FireAbroadJavaScriptTests(unittest.TestCase):
+    def test_destination_tax_freshness_crosses_after_366_days_but_after_tax_mode_is_exempt(self):
+        complete = json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"][0]["tax_screen"]
+        complete["last_reviewed"] = "2026-09-01"
+
+        boundary = run_js(
+            ENGINE,
+            "screenTax",
+            {"country": {"tax_screen": complete}, "profile": {"planning_base": 100000}, "asOf": "2027-09-02"},
+        )
+        crossed = run_js(
+            ENGINE,
+            "screenTax",
+            {"country": {"tax_screen": complete}, "profile": {"planning_base": 100000}, "asOf": "2027-09-03"},
+        )
+        supplied = run_js(
+            ENGINE,
+            "screenTax",
+            {
+                "country": {"tax_screen": complete},
+                "profile": {"planning_base": 100000, "tax_mode": "user_after_tax"},
+                "asOf": "2027-09-03",
+            },
+        )
+
+        self.assertEqual("planning_estimate", boundary["status"])
+        self.assertEqual(12000, boundary["central_reserve"])
+        self.assertEqual("tax_impact_unavailable", crossed["status"])
+        self.assertTrue(crossed["conditional"])
+        self.assertIsNone(crossed["central_reserve"])
+        self.assertIsNone(crossed["readiness_score"])
+        self.assertEqual("low", crossed["confidence"])
+        self.assertIn("stale", crossed["scope_summary"].lower())
+        self.assertEqual("user_after_tax", supplied["status"])
+        self.assertEqual(0, supplied["central_reserve"])
+
+    def test_stale_destination_remains_visible_but_is_unranked(self):
+        complete = json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"][0]["tax_screen"]
+        complete["last_reviewed"] = "2026-09-01"
+        result = run_js(
+            ENGINE,
+            "rankDestinations",
+            {
+                "asOf": "2027-09-03",
+                "destinations": [{"id": "alpha", "name": "Alpha", "country": "Spain"}],
+                "retirementCosts": {
+                    "alpha": {"profiles": {"single": {"categories_usd": {"living": 16000}, "annual_rent_usd": 10000, "annual_owner_costs_usd": 6000}}}
+                },
+                "firePayload": {
+                    "countries": {
+                        "Spain": {"tax_screen": complete, "eligibility": {"status": "complete", "short_stay_source_ids": ["stay"], "long_stay_source_ids": ["residence"]}}
+                    },
+                    "destination_overrides": {
+                        "alpha": {"country": "Spain", "scores": {"active_life": 4, "healthcare_bridge": 4, "stay_flexibility": 4, "global_access": 4, "community_fit": 4, "property_exit_flexibility": 4}}
+                    },
+                },
+                "profile": {"mobility_rights": "local_free_movement"},
+            },
+        )
+        supplied = run_js(
+            ENGINE,
+            "rankDestinations",
+            {
+                "asOf": "2027-09-03",
+                "destinations": [{"id": "alpha", "name": "Alpha", "country": "Spain"}],
+                "retirementCosts": {
+                    "alpha": {"profiles": {"single": {"categories_usd": {"living": 16000}, "annual_rent_usd": 10000, "annual_owner_costs_usd": 6000}}}
+                },
+                "firePayload": {
+                    "countries": {
+                        "Spain": {"tax_screen": complete, "eligibility": {"status": "complete", "short_stay_source_ids": ["stay"], "long_stay_source_ids": ["residence"]}}
+                    },
+                    "destination_overrides": {
+                        "alpha": {"country": "Spain", "scores": {"active_life": 4, "healthcare_bridge": 4, "stay_flexibility": 4, "global_access": 4, "community_fit": 4, "property_exit_flexibility": 4}}
+                    },
+                },
+                "profile": {"mobility_rights": "local_free_movement", "tax_mode": "user_after_tax"},
+            },
+        )
+
+        self.assertEqual(1, len(result))
+        self.assertEqual("alpha", result[0]["destination_id"])
+        self.assertFalse(result[0]["rankable"])
+        self.assertIsNone(result[0]["overall_score"])
+        self.assertIsNone(result[0]["budget"]["central_annual_cost"])
+        self.assertEqual("tax_impact_unavailable", result[0]["tax"]["status"])
+        self.assertTrue(supplied[0]["rankable"])
+        self.assertEqual("user_after_tax", supplied[0]["tax"]["status"])
+
     def test_profile_defaults_match_python_contract(self):
         profile = run_js(ENGINE, "normalizeProfile", {})
         self.assertEqual("part_year", profile["stay_mode"])
@@ -42,7 +130,7 @@ class FireAbroadJavaScriptTests(unittest.TestCase):
             result = run_js(
                 ENGINE,
                 "screenTax",
-                {"country": {"tax_screen": case["tax_screen"]}, "profile": case["profile"]},
+                {"country": {"tax_screen": case["tax_screen"]}, "profile": case["profile"], "asOf": "2026-09-01"},
             )
             self.assertEqual(case["expected"], {
                 "status": result["status"],
@@ -103,6 +191,7 @@ class FireAbroadJavaScriptTests(unittest.TestCase):
             ENGINE,
             "rankDestinations",
             {
+                "asOf": "2026-09-01",
                 "destinations": [
                     {"id": "alpha", "name": "Alpha", "country": "Spain"},
                     {"id": "beta", "name": "Beta", "country": "Portugal"}
@@ -130,11 +219,11 @@ class FireAbroadJavaScriptTests(unittest.TestCase):
 
     def test_all_visible_tax_inputs_change_or_gate_the_result(self):
         complete = json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"][0]["tax_screen"]
-        baseline = run_js(ENGINE, "screenTax", {"country": {"tax_screen": complete}, "profile": {"annual_day_band": "under_90"}})
+        baseline = run_js(ENGINE, "screenTax", {"country": {"tax_screen": complete}, "profile": {"annual_day_band": "under_90"}, "asOf": "2026-09-01"})
         changed = run_js(ENGINE, "screenTax", {"country": {"tax_screen": complete}, "profile": {
             "annual_day_band": "183_plus", "funding_source": "property", "housing": "buy_now",
             "property_use": "rental", "home_tax_context": "citizenship_based_worldwide"
-        }})
+        }, "asOf": "2026-09-01"})
         self.assertNotEqual(baseline["residence_outcome"], changed["residence_outcome"])
         self.assertNotEqual(baseline["scope_summary"], changed["scope_summary"])
         self.assertIn("property_rental_tax", changed["material_flags"])
@@ -176,6 +265,25 @@ class FireAbroadJavaScriptTests(unittest.TestCase):
         self.assertIn("GHAFireAbroad.rankDestinations", source)
         self.assertIn("replaceChildren", source)
         self.assertNotIn("innerHTML", source)
+
+    def test_ui_ranking_input_forwards_serialized_freshness_anchor(self):
+        result = run_js(
+            UI,
+            "rankingInput",
+            {
+                "payload": {
+                    "asOf": "2027-09-03",
+                    "destinations": [{"id": "alpha"}],
+                    "retirementCosts": {"alpha": {}},
+                    "fire": {"countries": {}},
+                },
+                "profile": {"tax_mode": "destination_estimate"},
+            },
+        )
+
+        self.assertEqual("2027-09-03", result["asOf"])
+        self.assertEqual([{"id": "alpha"}], result["destinations"])
+        self.assertEqual("destination_estimate", result["profile"]["tax_mode"])
 
 
 if __name__ == "__main__":

@@ -472,25 +472,51 @@ def screen_eligibility(country: dict[str, Any], profile: dict[str, Any]) -> dict
     }
 
 
-def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
+def _unavailable_tax_screen(reason: str) -> dict[str, Any]:
+    return {
+        "status": "tax_impact_unavailable",
+        "conditional": True,
+        "residence_outcome": "needs_evidence",
+        "scope_summary": reason,
+        "readiness": "highly_profile_dependent",
+        "readiness_score": None,
+        "favorable_reserve": None,
+        "central_reserve": None,
+        "adverse_reserve": None,
+        "rates": None,
+        "included_categories": [],
+        "material_flags": [],
+        "source_ids": [],
+        "confidence": "low",
+    }
+
+
+def _tax_freshness_error(screen: dict[str, Any], as_of: date | str | None) -> str | None:
+    try:
+        current = as_of if isinstance(as_of, date) else datetime.strptime(str(as_of), "%Y-%m-%d").date()
+        reviewed = datetime.strptime(str(screen.get("last_reviewed")), "%Y-%m-%d").date()
+    except (TypeError, ValueError):
+        return "A current freshness anchor and valid tax review date are required for this destination."
+    if reviewed > current:
+        return "Tax-impact evidence is newer than the current screening anchor and needs review."
+    if (current - reviewed).days > 366:
+        return "Tax-impact evidence is stale for this destination."
+    return None
+
+
+def screen_tax(
+    country: dict[str, Any],
+    profile: dict[str, Any],
+    *,
+    as_of: date | str | None = None,
+) -> dict[str, Any]:
     screen = country.get("tax_screen", {})
     if screen.get("status") != "complete":
-        return {
-            "status": "tax_impact_unavailable",
-            "conditional": True,
-            "residence_outcome": "needs_evidence",
-            "scope_summary": "Tax-impact research is not complete for this destination.",
-            "readiness": "highly_profile_dependent",
-            "readiness_score": None,
-            "favorable_reserve": None,
-            "central_reserve": None,
-            "adverse_reserve": None,
-            "rates": None,
-            "included_categories": [],
-            "material_flags": [],
-            "source_ids": [],
-            "confidence": "low",
-        }
+        return _unavailable_tax_screen("Tax-impact research is not complete for this destination.")
+    bypass = profile["tax_mode"] == "user_after_tax"
+    freshness_error = None if bypass else _tax_freshness_error(screen, as_of)
+    if freshness_error:
+        return _unavailable_tax_screen(freshness_error)
 
     residence_outcome = {
         "under_90": "residence_depends_on_days_and_ties",
@@ -513,8 +539,6 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
             "adverse": float(band["adverse_rate"]),
         }
     planning_base = profile.get("planning_base")
-    bypass = profile["tax_mode"] == "user_after_tax"
-
     def reserve(key: str) -> int | None:
         if bypass:
             return 0
@@ -641,6 +665,8 @@ def rank_fire_abroad_destinations(
     retirement_costs: dict[str, dict[str, Any]],
     fire_payload: dict[str, Any],
     profile: dict[str, Any] | None,
+    *,
+    as_of: date | str | None = None,
 ) -> list[dict[str, Any]]:
     normalized = normalize_fire_profile(profile)
     countries = fire_payload.get("countries", {})
@@ -652,7 +678,7 @@ def rank_fire_abroad_destinations(
         country_name = override.get("country", destination.get("country"))
         country = countries.get(country_name, {"tax_screen": {"status": "research_pending"}})
         eligibility = screen_eligibility(country, normalized)
-        tax_result = screen_tax(country, normalized)
+        tax_result = screen_tax(country, normalized, as_of=as_of)
         cost = retirement_costs.get(destination_id)
         scores = override.get("scores")
         rankable = bool(

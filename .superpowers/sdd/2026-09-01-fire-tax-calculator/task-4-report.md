@@ -226,3 +226,98 @@ At a real 390px Chrome viewport, the submitted `user_after_tax` result had docum
 - `tests/test_retirement_destination_finder_ui.py`
 
 Generated artifacts remain excluded from the commit.
+
+## Fix Round 2
+
+### Freshness regression addressed
+
+The Python and browser FIRE Abroad screeners now require the same deterministic ISO `asOf` anchor used by the finder. Complete destination-estimate evidence remains usable through day 366 after review and becomes `tax_impact_unavailable` on day 367. Stale rows remain in the comparison as conditional, visibly unranked information with null score, readiness score, and tax-adjusted annual cost; they are not silently dropped or assigned an old reserve/confidence. The `user_after_tax` path remains exempt because it uses the user's supplied after-tax assumptions and adds no destination tax estimate.
+
+`build_fire_abroad_page(..., tax_as_of=...)` uses the explicit test override or the real current build date, serializes it as `asOf`, passes it to the Python pre-render ranker, and the UI passes the same field to the JavaScript runtime ranker. The stale row copy exposes the evidence reason and says the destination remains visible but is not ranked.
+
+### TDD RED evidence
+
+Engine boundary tests were written first:
+
+```text
+$ python3 -m unittest tests.test_fire_abroad.FireAbroadModelTests.test_destination_tax_freshness_crosses_after_366_days_but_after_tax_mode_is_exempt tests.test_fire_abroad.FireAbroadModelTests.test_stale_destination_remains_visible_but_is_unranked tests.test_fire_abroad_js.FireAbroadJavaScriptTests.test_destination_tax_freshness_crosses_after_366_days_but_after_tax_mode_is_exempt tests.test_fire_abroad_js.FireAbroadJavaScriptTests.test_stale_destination_remains_visible_but_is_unranked -v
+Ran 4 tests in 0.321s
+FAILED (failures=2, errors=2)
+```
+
+Python rejected the new `as_of` argument; JavaScript left 367-day-old evidence as a rankable `planning_estimate` with numeric reserves.
+
+Build/runtime propagation tests were then written first:
+
+```text
+$ python3 -m unittest tests.test_build_unified_app_auto_links.AutoInternalLinkTests.test_fire_page_serializes_build_date_and_retains_stale_destinations_unranked tests.test_fire_abroad_js.FireAbroadJavaScriptTests.test_ui_ranking_input_forwards_serialized_freshness_anchor -v
+Ran 2 tests in 0.083s
+FAILED (errors=2)
+```
+
+The page builder did not accept `tax_as_of`, and the UI had no executable ranking-input boundary that forwarded the serialized anchor.
+
+### GREEN and verification evidence
+
+Each RED group passed after its minimal implementation. Fresh focused runs:
+
+```text
+$ python3 -m unittest tests.test_fire_abroad tests.test_fire_abroad_js tests.test_fire_abroad_page tests.test_build_unified_app_auto_links -v
+Ran 38 tests in 2.113s
+OK
+
+$ python3 -m unittest tests.test_retirement_calculator_engine tests.test_retirement_calculator_ui tests.test_retirement_destination_finder tests.test_retirement_destination_finder_ui tests.test_fire_abroad_data -v
+Ran 109 tests in 10.686s
+OK
+```
+
+The stale ranking tests also exercise `user_after_tax` through the full Python and JavaScript rankers and confirm it remains rankable with `user_after_tax` status.
+
+Build and full suite:
+
+```text
+$ python3 src/build_unified_app.py
+/Users/steph-tmp/Documents/GitHub/property-research-dashboard/artifacts/unified_destination_dashboard.html
+exit 0
+
+$ python3 -m unittest discover -s tests -q
+Ran 979 tests in 22.764s
+OK
+```
+
+`node --check` for both changed JavaScript files, Python compilation for changed Python/test modules, and `git diff --check` all exited 0.
+
+The behavioral generated-page test builds with `tax_as_of=2027-09-03`, parses the serialized payload, and confirms all 10 launch destinations remain in the table while every stale result omits `/5` scores and calculator actions and includes the stale/unranked explanation. The JavaScript boundary tests run the real screening/ranking module and the actual UI ranking-input builder, proving the browser receives the same anchor. A fresh Playwright wrapper attempt did not return CLI help within 30 seconds in this environment, so no new visual browser session was claimed; the deterministic generated DOM/runtime checks are the proportionate fallback. Round 1's completed responsive and script-disabled browser evidence remains unchanged.
+
+The static verifier still exits 1 only for the same unrelated dirty-artifact defects:
+
+```text
+Missing marker 'Buyer Next Step' in artifacts/countries/spain-property/index.html
+Missing marker 'Turn Spain research into a shortlist' in artifacts/countries/spain-property/index.html
+artifacts/destinations/chamonix/index.html -> /assets/chamonix-valley-life.webp
+artifacts/destinations/chamonix/index.html -> /assets/chamonix-winter-access.webp
+artifacts/destinations/chamonix/index.html -> /assets/chamonix-building-governance.webp
+```
+
+### Fix Round 2 files
+
+- `.superpowers/sdd/2026-09-01-fire-tax-calculator/task-4-report.md`
+- `src/build_unified_app.py`
+- `src/fire_abroad.js`
+- `src/fire_abroad.py`
+- `src/fire_abroad_page.py`
+- `src/fire_abroad_ui.js`
+- `tests/fixtures/fire_abroad_screen_contract.json`
+- `tests/test_build_unified_app_auto_links.py`
+- `tests/test_fire_abroad.py`
+- `tests/test_fire_abroad_js.py`
+- `tests/test_fire_abroad_page.py`
+
+### Fix Round 2 self-review and concerns
+
+- Python and JavaScript use the same strict ISO-date contract and 366-day threshold; missing, invalid, future-dated, and stale anchors cannot create a numeric destination tax estimate.
+- The production build passes one `build_date` to validation, the finder, FIRE pre-rendering, and the FIRE browser payload.
+- Stale destination-estimate rows preserve visibility but cannot contribute old cost, readiness, confidence, or rank values.
+- `user_after_tax` bypasses destination-evidence freshness in both engines and rankers, retaining its single zero-added-tax assumption.
+- No calculator/finder privacy, equity, owner-cost, or handoff code changed in this round.
+- Generated artifacts and unrelated dirty changes remain excluded. The only open repository-level concern remains the pre-existing Spain/Chamonix static-verifier failures above.

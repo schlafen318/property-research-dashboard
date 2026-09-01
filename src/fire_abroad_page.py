@@ -30,7 +30,10 @@ def _result_rows(rows: list[dict[str, Any]]) -> str:
         if not row["rankable"]:
             eligibility = row.get("eligibility", {})
             if row["tax"]["status"] == "tax_impact_unavailable":
-                reason = "Research pending — tax evidence is incomplete, so this destination is not ranked."
+                reason = (
+                    "Tax evidence unavailable — " + row["tax"]["scope_summary"] +
+                    " This destination remains visible but is not ranked."
+                )
             else:
                 reason = "Eligibility check needed — " + eligibility.get("summary", "verify a legal stay route before ranking.")
             rendered.append(

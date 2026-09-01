@@ -9,6 +9,27 @@ from scripts import verify_static_site
 
 
 class AutoInternalLinkTests(unittest.TestCase):
+    def test_fire_page_serializes_build_date_and_retains_stale_destinations_unranked(self) -> None:
+        destinations = build_unified_app.rank_destinations(
+            [build_unified_app.consolidate_destination(item) for item in build_unified_app.load_json("destinations.json")]
+        )
+        fire_payload = build_unified_app.load_fire_abroad()
+        html = build_unified_app.build_fire_abroad_page(
+            destinations,
+            build_unified_app.load_retirement_costs(),
+            fire_payload,
+            tax_as_of=date(2027, 9, 3),
+        )
+        payload_text = html.split('id="fire-abroad-data">', 1)[1].split("</script>", 1)[0]
+        results = html.split('<tbody id="fire-results-body"', 1)[1].split("</tbody>", 1)[0]
+
+        self.assertEqual("2027-09-03", json.loads(payload_text)["asOf"])
+        self.assertEqual(len(fire_payload["launch_destination_ids"]), results.count('<th scope="row">'))
+        self.assertIn("stale", results.lower())
+        self.assertIn("remains visible but is not ranked", results)
+        self.assertNotIn("/5", results)
+        self.assertNotIn("Build your plan", results)
+
     def test_finder_serializes_deterministic_build_date_as_tax_freshness_anchor(self) -> None:
         destinations = build_unified_app.rank_destinations(
             [build_unified_app.consolidate_destination(item) for item in build_unified_app.load_json("destinations.json")]

@@ -6112,7 +6112,10 @@ def build_fire_abroad_page(
     destinations: list[dict],
     retirement_payload: dict,
     fire_payload: dict,
+    *,
+    tax_as_of: date | None = None,
 ) -> str:
+    tax_freshness_iso = (tax_as_of or date.today()).isoformat()
     launch_ids = set(fire_payload["launch_destination_ids"])
     launch_destinations = [item for item in destinations if item["id"] in launch_ids]
     retirement_costs = {
@@ -6130,9 +6133,11 @@ def build_fire_abroad_page(
             "housing": "rent",
             "mobility_rights": "local_free_movement",
         },
+        as_of=tax_freshness_iso,
     )
     canonical = page_url(FIRE_ABROAD_SLUG)
     browser_payload = {
+        "asOf": tax_freshness_iso,
         "reviewedOn": fire_payload["reviewed_on"],
         "destinations": launch_destinations,
         "retirementCosts": retirement_costs,
@@ -11768,7 +11773,14 @@ def build(*, as_of: date | None = None) -> Path:
     fire_abroad_dir = ARTIFACTS / FIRE_ABROAD_SLUG
     fire_abroad_dir.mkdir(parents=True, exist_ok=True)
     (fire_abroad_dir / "index.html").write_text(
-        clean_generated_html(build_fire_abroad_page(destinations, retirement_costs, fire_payload)),
+        clean_generated_html(
+            build_fire_abroad_page(
+                destinations,
+                retirement_costs,
+                fire_payload,
+                tax_as_of=build_date,
+            )
+        ),
         encoding="utf-8",
     )
     retirement_article_dir = ARTIFACTS / RETIREMENT_DESTINATIONS_SLUG

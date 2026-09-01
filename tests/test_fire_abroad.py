@@ -1,5 +1,6 @@
 import json
 import unittest
+from datetime import date
 from pathlib import Path
 
 from src.fire_abroad import (
@@ -12,11 +13,13 @@ from src.fire_abroad import (
 
 
 ROOT = Path(__file__).resolve().parents[1]
+AS_OF = date(2026, 9, 1)
 
 
 def complete_tax_screen(*, central=0.12, readiness_score=3.0):
     return {
         "status": "complete",
+        "last_reviewed": "2026-09-01",
         "residence": {"summary": "Residence depends on days and non-day tests."},
         "scope_if_resident": "worldwide_income",
         "funding_source_notes": {"portfolio": "Portfolio income may be taxable."},
@@ -61,6 +64,77 @@ def cost_record(destination_id, annual_rent):
 
 
 class FireAbroadModelTests(unittest.TestCase):
+    def test_destination_tax_freshness_crosses_after_366_days_but_after_tax_mode_is_exempt(self):
+        country = {"tax_screen": complete_tax_screen()}
+        profile = normalize_fire_profile({"planning_base": 100000})
+
+        boundary = screen_tax(country, profile, as_of=date(2027, 9, 2))
+        crossed = screen_tax(country, profile, as_of=date(2027, 9, 3))
+        supplied = screen_tax(
+            country,
+            normalize_fire_profile({"planning_base": 100000, "tax_mode": "user_after_tax"}),
+            as_of=date(2027, 9, 3),
+        )
+
+        self.assertEqual("planning_estimate", boundary["status"])
+        self.assertEqual(12000, boundary["central_reserve"])
+        self.assertEqual("tax_impact_unavailable", crossed["status"])
+        self.assertTrue(crossed["conditional"])
+        self.assertIsNone(crossed["central_reserve"])
+        self.assertIsNone(crossed["readiness_score"])
+        self.assertEqual("low", crossed["confidence"])
+        self.assertIn("stale", crossed["scope_summary"].lower())
+        self.assertEqual("user_after_tax", supplied["status"])
+        self.assertEqual(0, supplied["central_reserve"])
+
+    def test_stale_destination_remains_visible_but_is_unranked(self):
+        destinations = [{"id": "alpha", "name": "Alpha", "country": "Spain"}]
+        payload = {
+            "countries": {
+                "Spain": {
+                    "tax_screen": complete_tax_screen(),
+                    "eligibility": eligibility_screen(),
+                }
+            },
+            "destination_overrides": {
+                "alpha": {
+                    "country": "Spain",
+                    "scores": {
+                        "active_life": 4.0,
+                        "healthcare_bridge": 4.0,
+                        "stay_flexibility": 4.0,
+                        "global_access": 4.0,
+                        "community_fit": 4.0,
+                        "property_exit_flexibility": 4.0,
+                    },
+                }
+            },
+        }
+
+        rows = rank_fire_abroad_destinations(
+            destinations,
+            {"alpha": cost_record("alpha", 10000)},
+            payload,
+            {"mobility_rights": "local_free_movement"},
+            as_of=date(2027, 9, 3),
+        )
+        supplied_rows = rank_fire_abroad_destinations(
+            destinations,
+            {"alpha": cost_record("alpha", 10000)},
+            payload,
+            {"mobility_rights": "local_free_movement", "tax_mode": "user_after_tax"},
+            as_of=date(2027, 9, 3),
+        )
+
+        self.assertEqual(1, len(rows))
+        self.assertEqual("alpha", rows[0]["destination_id"])
+        self.assertFalse(rows[0]["rankable"])
+        self.assertIsNone(rows[0]["overall_score"])
+        self.assertIsNone(rows[0]["budget"]["central_annual_cost"])
+        self.assertEqual("tax_impact_unavailable", rows[0]["tax"]["status"])
+        self.assertTrue(supplied_rows[0]["rankable"])
+        self.assertEqual("user_after_tax", supplied_rows[0]["tax"]["status"])
+
     def test_quick_profile_defaults_do_not_require_financial_values(self):
         profile = normalize_fire_profile({})
         self.assertEqual("part_year", profile["stay_mode"])
@@ -74,6 +148,7 @@ class FireAbroadModelTests(unittest.TestCase):
         estimated = screen_tax(
             country,
             normalize_fire_profile({"planning_base": 100000}),
+            as_of=AS_OF,
         )
         supplied = screen_tax(
             country,
@@ -92,13 +167,13 @@ class FireAbroadModelTests(unittest.TestCase):
             "housing": "buy_now",
             "property_use": "rental",
             "home_tax_context": "citizenship_based_worldwide",
-        }))
+        }), as_of=AS_OF)
         visitor = screen_tax(country, normalize_fire_profile({
             "annual_day_band": "under_90",
             "funding_source": "pension",
             "housing": "rent",
             "home_tax_context": "residence_based",
-        }))
+        }), as_of=AS_OF)
         self.assertEqual("likely_resident", resident["residence_outcome"])
         self.assertEqual("residence_depends_on_days_and_ties", visitor["residence_outcome"])
         self.assertIn("Portfolio income", resident["scope_summary"])
@@ -109,18 +184,18 @@ class FireAbroadModelTests(unittest.TestCase):
     def test_each_visible_tax_control_changes_a_relevant_output(self):
         country = {"tax_screen": complete_tax_screen()}
         base = normalize_fire_profile({"planning_base": 100000, "annual_day_band": "unsure"})
-        seasonal = screen_tax(country, {**base, "stay_mode": "seasonal"})
-        relocated = screen_tax(country, {**base, "stay_mode": "full_relocation"})
+        seasonal = screen_tax(country, {**base, "stay_mode": "seasonal"}, as_of=AS_OF)
+        relocated = screen_tax(country, {**base, "stay_mode": "full_relocation"}, as_of=AS_OF)
         self.assertNotEqual(seasonal["central_reserve"], relocated["central_reserve"])
-        under_90 = screen_tax(country, {**base, "annual_day_band": "under_90"})
-        over_183 = screen_tax(country, {**base, "annual_day_band": "183_plus"})
+        under_90 = screen_tax(country, {**base, "annual_day_band": "under_90"}, as_of=AS_OF)
+        over_183 = screen_tax(country, {**base, "annual_day_band": "183_plus"}, as_of=AS_OF)
         self.assertNotEqual(under_90["rates"], over_183["rates"])
-        pension = screen_tax(country, {**base, "funding_source": "pension"})
+        pension = screen_tax(country, {**base, "funding_source": "pension"}, as_of=AS_OF)
         self.assertNotEqual(seasonal["scope_summary"], pension["scope_summary"])
-        rental = screen_tax(country, {**base, "housing": "buy_now", "property_use": "rental"})
+        rental = screen_tax(country, {**base, "housing": "buy_now", "property_use": "rental"}, as_of=AS_OF)
         self.assertTrue(any("Rental" in warning for warning in rental["warnings"]))
-        territorial = screen_tax(country, {**base, "home_tax_context": "territorial"})
-        residence_based = screen_tax(country, {**base, "home_tax_context": "residence_based"})
+        territorial = screen_tax(country, {**base, "home_tax_context": "territorial"}, as_of=AS_OF)
+        residence_based = screen_tax(country, {**base, "home_tax_context": "residence_based"}, as_of=AS_OF)
         self.assertNotEqual(territorial["warnings"], residence_based["warnings"])
 
     def test_unresolved_residence_spans_nonresident_and_resident_tax_branches(self):
@@ -131,6 +206,7 @@ class FireAbroadModelTests(unittest.TestCase):
                 "annual_day_band": "under_90",
                 "planning_base": 100000,
             }),
+            as_of=AS_OF,
         )
         self.assertEqual("residence_depends_on_days_and_ties", result["residence_outcome"])
         self.assertEqual(0, result["favorable_reserve"])
@@ -162,7 +238,7 @@ class FireAbroadModelTests(unittest.TestCase):
     def test_resilience_budget_adds_tax_only_in_destination_estimate_mode(self):
         cost = cost_record("alpha", 10000)
         estimated_profile = normalize_fire_profile({"planning_base": 50000})
-        estimated_tax = screen_tax({"tax_screen": complete_tax_screen(central=0.10)}, estimated_profile)
+        estimated_tax = screen_tax({"tax_screen": complete_tax_screen(central=0.10)}, estimated_profile, as_of=AS_OF)
         estimated = build_resilience_budget(cost, estimated_profile, estimated_tax)
         after_tax_profile = normalize_fire_profile({"tax_mode": "user_after_tax"})
         supplied_tax = screen_tax({"tax_screen": complete_tax_screen(central=0.10)}, after_tax_profile)
@@ -211,6 +287,7 @@ class FireAbroadModelTests(unittest.TestCase):
             costs,
             payload,
             {"mobility_rights": "local_free_movement"},
+            as_of=AS_OF,
         )
         self.assertEqual("alpha", rows[0]["destination_id"])
         self.assertTrue(rows[0]["rankable"])
@@ -225,6 +302,7 @@ class FireAbroadModelTests(unittest.TestCase):
             result = screen_tax(
                 {"tax_screen": case["tax_screen"]},
                 normalize_fire_profile(case["profile"]),
+                as_of=AS_OF,
             )
             self.assertEqual(case["expected"], {
                 "status": result["status"],
