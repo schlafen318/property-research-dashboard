@@ -1,0 +1,152 @@
+{
+  "schema_version": 1,
+  "dataset_id": "fire-tax-rules-v1",
+  "tax_year": 2026,
+  "checked_on": "2026-09-01",
+  "operand_catalog": {
+    "days_in_jurisdiction": {
+      "kind": "profile",
+      "value_type": "number"
+    },
+    "residence_day_threshold": {
+      "kind": "constant",
+      "value_type": "number",
+      "value": 183
+    },
+    "ordinary_income": {
+      "kind": "profile",
+      "value_type": "money",
+      "currency": "EUR"
+    }
+  },
+  "sources": [
+    {
+      "id": "synthetic-example-authority-2026",
+      "publisher": "Synthetic test fixture — not a legal authority",
+      "url": "https://example.invalid/fire-tax-rules-2026",
+      "source_kind": "synthetic",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 365,
+      "scope": "Exercises the detailed-rule contract only; it describes no real jurisdiction.",
+      "recheck_trigger": "Replace with current official primary sources before enabling any jurisdiction."
+    }
+  ],
+  "jurisdictions": {
+    "synthetic-example": {
+      "id": "synthetic-example",
+      "label": "Synthetic example",
+      "synthetic": true,
+      "detailed_enabled": false,
+      "rules": [
+        {
+          "id": "example-residence-days-2026",
+          "type": "residence_test",
+          "tax_year": 2026,
+          "taxpayer_scope": [
+            "individual"
+          ],
+          "category": "tax_residence",
+          "currency": "EUR",
+          "formula": {
+            "operation": "greater_than_or_equal",
+            "operands": [
+              "days_in_jurisdiction",
+              "residence_day_threshold"
+            ]
+          },
+          "resident_when": true,
+          "source_ids": [
+            "synthetic-example-authority-2026"
+          ],
+          "effective_from": "2026-01-01",
+          "checked_on": "2026-09-01",
+          "review_interval_days": 365,
+          "confidence": "high",
+          "recheck_trigger": "Revalidate before changing the synthetic fixture year.",
+          "explanation": "Synthetic residence test: compare {days_in_jurisdiction} with {residence_day_threshold}."
+        },
+        {
+          "id": "example-residence-branch-2026",
+          "type": "branch",
+          "tax_year": 2026,
+          "taxpayer_scope": [
+            "individual"
+          ],
+          "category": "tax_residence",
+          "currency": "EUR",
+          "formula": {
+            "operation": "conditional",
+            "operands": [
+              "days_in_jurisdiction"
+            ]
+          },
+          "branches": [
+            {
+              "when": {
+                "operand": "days_in_jurisdiction",
+                "operator": "greater_than_or_equal",
+                "value": 183
+              },
+              "target_rule_id": "example-income-2026"
+            },
+            {
+              "when": {
+                "operand": "days_in_jurisdiction",
+                "operator": "less_than",
+                "value": 183
+              },
+              "target_rule_id": "example-income-2026"
+            }
+          ],
+          "source_ids": [
+            "synthetic-example-authority-2026"
+          ],
+          "effective_from": "2026-01-01",
+          "checked_on": "2026-09-01",
+          "review_interval_days": 365,
+          "confidence": "high",
+          "recheck_trigger": "Revalidate before changing branch routing.",
+          "explanation": "Synthetic routing chooses an income rule after the residence fact is evaluated."
+        },
+        {
+          "id": "example-income-2026",
+          "type": "rate_band",
+          "tax_year": 2026,
+          "taxpayer_scope": [
+            "resident"
+          ],
+          "category": "ordinary_income",
+          "currency": "EUR",
+          "formula": {
+            "operation": "progressive_rate",
+            "operands": [
+              "ordinary_income"
+            ]
+          },
+          "bands": [
+            {
+              "from": 0,
+              "up_to": 10000,
+              "rate": 0.1
+            },
+            {
+              "from": 10000,
+              "up_to": null,
+              "rate": 0.2
+            }
+          ],
+          "source_ids": [
+            "synthetic-example-authority-2026"
+          ],
+          "effective_from": "2026-01-01",
+          "checked_on": "2026-09-01",
+          "review_interval_days": 365,
+          "confidence": "high",
+          "recheck_trigger": "Revalidate before changing the synthetic fixture year or bands.",
+          "explanation": "Synthetic progressive resident ordinary-income estimate for {ordinary_income}."
+        }
+      ]
+    }
+  }
+}
