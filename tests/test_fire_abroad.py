@@ -6,6 +6,7 @@ from src.fire_abroad import (
     build_resilience_budget,
     normalize_fire_profile,
     rank_fire_abroad_destinations,
+    screen_eligibility,
     screen_tax,
 )
 
@@ -30,6 +31,14 @@ def complete_tax_screen(*, central=0.12, readiness_score=3.0):
         "material_flags": ["wealth_tax"],
         "source_ids": ["tax-source"],
         "confidence": "medium_high",
+    }
+
+
+def eligibility_screen():
+    return {
+        "status": "complete",
+        "short_stay_source_ids": ["stay-source"],
+        "long_stay_source_ids": ["residence-source"],
     }
 
 
@@ -75,6 +84,41 @@ class FireAbroadModelTests(unittest.TestCase):
         self.assertEqual(22000, estimated["adverse_reserve"])
         self.assertEqual(0, supplied["central_reserve"])
 
+    def test_day_band_funding_property_use_and_home_context_change_tax_screen(self):
+        country = {"tax_screen": complete_tax_screen()}
+        resident = screen_tax(country, normalize_fire_profile({
+            "annual_day_band": "183_plus",
+            "funding_source": "portfolio",
+            "housing": "buy_now",
+            "property_use": "rental",
+            "home_tax_context": "citizenship_based_worldwide",
+        }))
+        visitor = screen_tax(country, normalize_fire_profile({
+            "annual_day_band": "under_90",
+            "funding_source": "pension",
+            "housing": "rent",
+            "home_tax_context": "residence_based",
+        }))
+        self.assertEqual("likely_resident", resident["residence_outcome"])
+        self.assertEqual("likely_nonresident", visitor["residence_outcome"])
+        self.assertIn("Portfolio income", resident["scope_summary"])
+        self.assertIn("property_rental_tax", resident["material_flags"])
+        self.assertIn("continuing_home_country_tax", resident["material_flags"])
+        self.assertNotEqual(resident["scope_summary"], visitor["scope_summary"])
+
+    def test_eligibility_must_be_supported_before_ranking(self):
+        country = {"eligibility": eligibility_screen()}
+        free_movement = screen_eligibility(country, normalize_fire_profile({
+            "mobility_rights": "local_free_movement",
+            "annual_day_band": "183_plus",
+        }))
+        unknown = screen_eligibility(country, normalize_fire_profile({
+            "mobility_rights": "prefer_not_to_say",
+        }))
+        self.assertEqual("likely_eligible", free_movement["status"])
+        self.assertEqual("eligibility_depends_on_profile", unknown["status"])
+        self.assertFalse(unknown["rankable"])
+
     def test_pending_tax_research_is_conditional_not_zero_tax(self):
         result = screen_tax(
             {"tax_screen": {"status": "research_pending"}},
@@ -102,7 +146,7 @@ class FireAbroadModelTests(unittest.TestCase):
         ]
         payload = {
             "countries": {
-                "Spain": {"tax_screen": complete_tax_screen()},
+                "Spain": {"tax_screen": complete_tax_screen(), "eligibility": eligibility_screen()},
                 "Portugal": {"tax_screen": {"status": "research_pending"}},
             },
             "destination_overrides": {
@@ -131,7 +175,12 @@ class FireAbroadModelTests(unittest.TestCase):
             },
         }
         costs = {"alpha": cost_record("alpha", 10000), "beta": cost_record("beta", 8000)}
-        rows = rank_fire_abroad_destinations(destinations, costs, payload, {})
+        rows = rank_fire_abroad_destinations(
+            destinations,
+            costs,
+            payload,
+            {"mobility_rights": "local_free_movement"},
+        )
         self.assertEqual("alpha", rows[0]["destination_id"])
         self.assertTrue(rows[0]["rankable"])
         self.assertFalse(rows[1]["rankable"])

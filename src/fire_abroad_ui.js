@@ -45,6 +45,7 @@
       moderate: "Moderate",
       complex: "Complex",
       highly_profile_dependent: "Highly profile-dependent",
+      likely_eligible: "Likely eligible",
     };
     return labels[value] || String(value || "").replaceAll("_", " ");
   }
@@ -64,13 +65,19 @@
       tr.appendChild(heading);
       if (!row.rankable) {
         const pending = document.createElement("td");
-        pending.colSpan = 5;
-        pending.appendChild(textElement("strong", "Research pending"));
-        pending.appendChild(document.createTextNode(" — this destination remains unranked until its tax evidence is complete."));
+        pending.colSpan = 6;
+        if (row.tax.status === "tax_impact_unavailable") {
+          pending.appendChild(textElement("strong", "Research pending — tax evidence is incomplete, so this destination is not ranked."));
+        } else {
+          pending.appendChild(textElement("strong", "Eligibility check needed — " + row.eligibility.summary));
+        }
         tr.appendChild(pending);
         return tr;
       }
       tr.appendChild(textElement("td", row.overall_score.toFixed(2) + "/5"));
+      const eligibility = textElement("td", label(row.eligibility.status));
+      eligibility.appendChild(textElement("small", row.eligibility.summary));
+      tr.appendChild(eligibility);
       const residence = textElement("td", label(row.tax.residence_outcome));
       residence.appendChild(textElement("small", row.tax.scope_summary));
       tr.appendChild(residence);
@@ -107,6 +114,8 @@
       income: document.getElementById("fire-income"),
       housing: document.getElementById("fire-housing"),
       propertyUse: document.getElementById("fire-property-use"),
+      mobility: document.getElementById("fire-mobility"),
+      taxHome: document.getElementById("fire-tax-home"),
     };
     const propertyGroup = document.querySelector('[data-fire-group="property-use"]');
     function update() {
@@ -116,6 +125,8 @@
         funding_source: controls.income.value,
         housing: controls.housing.value,
         property_use: controls.propertyUse.value,
+        mobility_rights: controls.mobility.value,
+        home_tax_context: controls.taxHome.value,
         household: "single",
         tax_mode: "destination_estimate",
       };

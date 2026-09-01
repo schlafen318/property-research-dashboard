@@ -34,6 +34,7 @@
       "name": "full relocation with supplied after-tax figures",
       "profile": {
         "stay_mode": "full_relocation",
+        "annual_day_band": "183_plus",
         "planning_base": 100000,
         "tax_mode": "user_after_tax"
       },

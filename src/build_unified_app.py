@@ -6082,6 +6082,15 @@ def schema_for_fire_abroad(canonical: str) -> list[dict]:
             "url": canonical,
             "description": FIRE_ABROAD_DESCRIPTION,
         },
+        {
+            "@context": "https://schema.org",
+            "@type": "BreadcrumbList",
+            "itemListElement": [
+                {"@type": "ListItem", "position": 1, "name": "Home", "item": SITE_URL},
+                {"@type": "ListItem", "position": 2, "name": "Guides", "item": page_url(GUIDE_HUB_SLUG)},
+                {"@type": "ListItem", "position": 3, "name": "FIRE Abroad", "item": canonical},
+            ],
+        },
     ]
 
 
@@ -6715,6 +6724,7 @@ def build_guide_hub_page(pages: list[dict], destinations: list[dict]) -> str:
             </div>
           </section>
           {retirement_calculator_callout("guide-research-note", "guide hub")}
+          <section class="guide-research-note"><p><strong>Planning an overseas FIRE move?</strong> <a href="/{FIRE_ABROAD_SLUG}/">Screen destinations with tax residence, legal-stay eligibility, and planning tax reserves in view.</a></p></section>
           <section class="guide-feature" id="featured-research">
             <div class="guide-feature__image" role="img" aria-label="Coastal destination landscape"></div>
             <div class="guide-feature__copy">

@@ -113,7 +113,7 @@ class FireAbroadJavaScriptTests(unittest.TestCase):
                 },
                 "firePayload": {
                     "countries": {
-                        "Spain": {"tax_screen": complete},
+                        "Spain": {"tax_screen": complete, "eligibility": {"status": "complete", "short_stay_source_ids": ["stay"], "long_stay_source_ids": ["residence"]}},
                         "Portugal": {"tax_screen": {"status": "research_pending"}}
                     },
                     "destination_overrides": {
@@ -121,12 +121,24 @@ class FireAbroadJavaScriptTests(unittest.TestCase):
                         "beta": {"country": "Portugal", "scores": {"active_life": 4, "healthcare_bridge": 4, "stay_flexibility": 4, "global_access": 4, "community_fit": 4, "property_exit_flexibility": 4}}
                     }
                 },
-                "profile": {}
+                "profile": {"mobility_rights": "local_free_movement"}
             },
         )
         self.assertEqual("alpha", result[0]["destination_id"])
         self.assertTrue(result[0]["rankable"])
         self.assertFalse(result[1]["rankable"])
+
+    def test_all_visible_tax_inputs_change_or_gate_the_result(self):
+        complete = json.loads(FIXTURE.read_text(encoding="utf-8"))["cases"][0]["tax_screen"]
+        baseline = run_js(ENGINE, "screenTax", {"country": {"tax_screen": complete}, "profile": {"annual_day_band": "under_90"}})
+        changed = run_js(ENGINE, "screenTax", {"country": {"tax_screen": complete}, "profile": {
+            "annual_day_band": "183_plus", "funding_source": "property", "housing": "buy_now",
+            "property_use": "rental", "home_tax_context": "citizenship_based_worldwide"
+        }})
+        self.assertNotEqual(baseline["residence_outcome"], changed["residence_outcome"])
+        self.assertNotEqual(baseline["scope_summary"], changed["scope_summary"])
+        self.assertIn("property_rental_tax", changed["material_flags"])
+        self.assertIn("continuing_home_country_tax", changed["material_flags"])
 
     def test_calculator_link_contains_only_existing_allowlisted_values(self):
         href = run_js(

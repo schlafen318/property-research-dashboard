@@ -56,10 +56,42 @@
       "source_date": "Current guidance",
       "accessed_on": "2026-09-01",
       "notes": "Regional rules, exemptions, ownership, debt and treaty facts can change the result."
+    },
+    {
+      "id": "schengen-short-stay",
+      "publisher": "European Commission — Migration and Home Affairs",
+      "url": "https://home-affairs.ec.europa.eu/policies/schengen/border-crossing/short-stay-calculator_en",
+      "metric_supported": "General Schengen short-stay limit of 90 days in any 180-day period",
+      "source_date": "27 October 2025",
+      "accessed_on": "2026-09-01",
+      "notes": "Passport, visa, prior-stay and bilateral rules can change whether a particular traveller may use the general limit."
+    },
+    {
+      "id": "spain-eu-short-stay",
+      "publisher": "Government of Spain — General State Administration",
+      "url": "https://administracion.gob.es/pag_Home/en/Tu-espacio-europeo/derechos-obligaciones/ciudadanos/residencia/estancia.html",
+      "metric_supported": "EU and EEA citizen documentation for stays in Spain under three months",
+      "source_date": "24 March 2026",
+      "accessed_on": "2026-09-01",
+      "notes": "Longer stays can require registration and supporting conditions."
+    },
+    {
+      "id": "spain-nonworking-residence",
+      "publisher": "Ministry of Foreign Affairs, European Union and Cooperation of Spain",
+      "url": "https://www.exteriores.gob.es/Consulados/washington/en/ServiciosConsulares/Paginas/Consular/Visado-de-residencia-no-lucrativa.aspx",
+      "metric_supported": "A non-working residence route exists for applicants with sufficient guaranteed means",
+      "source_date": "Current guidance under rules effective 20 May 2025",
+      "accessed_on": "2026-09-01",
+      "notes": "This route does not authorize work, including remote work; eligibility and filing venue depend on the applicant's facts."
     }
   ],
   "countries": {
     "Spain": {
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": ["schengen-short-stay", "spain-eu-short-stay"],
+        "long_stay_source_ids": ["spain-eu-short-stay", "spain-nonworking-residence"]
+      },
       "tax_screen": {
         "status": "complete",
         "residence": {
@@ -86,7 +118,7 @@
           "part_year": {"favorable_rate": 0.03, "central_rate": 0.12, "adverse_rate": 0.22},
           "full_relocation": {"favorable_rate": 0.12, "central_rate": 0.22, "adverse_rate": 0.35}
         },
-        "planning_band_method": "Broad screening reserve applied to modeled dependable income and portfolio withdrawals; not a statutory rate or assessment.",
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are deliberately broad scenarios, not sourced statutory rates, tax estimates, or assessments.",
         "included_categories": [
           "income_tax_reserve",
           "social_tax_reserve",

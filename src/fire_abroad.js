@@ -12,6 +12,9 @@
     tax_mode: new Set(["destination_estimate", "user_after_tax"]),
     funding_source: new Set(["portfolio", "pension", "property", "work_business", "mixed"]),
     property_use: new Set(["personal", "rental", "mixed"]),
+    annual_day_band: new Set(["under_90", "90_182", "183_plus", "unsure"]),
+    mobility_rights: new Set(["local_free_movement", "general_nonlocal", "prefer_not_to_say"]),
+    home_tax_context: new Set(["citizenship_based_worldwide", "residence_based", "territorial", "prefer_not_to_say"]),
   };
   const weights = {
     active_life: 0.25,
@@ -49,8 +52,9 @@
       tax_mode: selected(raw.tax_mode, "tax_mode", "destination_estimate"),
       funding_source: selected(raw.funding_source, "funding_source", "portfolio"),
       property_use: selected(raw.property_use, "property_use", "personal"),
-      annual_day_band: String(raw.annual_day_band || "unsure"),
-      home_tax_context: String(raw.home_tax_context || "prefer_not_to_say"),
+      annual_day_band: selected(raw.annual_day_band, "annual_day_band", "unsure"),
+      mobility_rights: selected(raw.mobility_rights, "mobility_rights", "prefer_not_to_say"),
+      home_tax_context: selected(raw.home_tax_context, "home_tax_context", "prefer_not_to_say"),
       planning_base: planningBase,
     };
   }
@@ -89,17 +93,38 @@
       return profile.planning_base === null ? null : Math.round(profile.planning_base * rates[key]);
     }
     const residence = {
-      seasonal: "likely_nonresident",
-      part_year: "residence_depends_on_days_and_ties",
-      full_relocation: "likely_resident",
-    }[profile.stay_mode];
+      under_90: "likely_nonresident",
+      "90_182": "residence_depends_on_days_and_ties",
+      "183_plus": "likely_resident",
+      unsure: "residence_depends_on_days_and_ties",
+    }[profile.annual_day_band];
+    const fallbackFundingNotes = {
+      portfolio: "Portfolio income needs category-specific review.",
+      pension: "Pension income needs treaty and pension-type review.",
+      property: "Property income needs source-country and residence review.",
+      work_business: "Work or business income needs source and social-tax review.",
+      mixed: "Each income category needs separate review.",
+    };
+    const fundingNote = (screen.funding_source_notes || {})[profile.funding_source] ||
+      fallbackFundingNotes[profile.funding_source];
+    const materialFlags = (screen.material_flags || []).slice();
+    if (profile.housing !== "rent" && (profile.property_use === "rental" || profile.property_use === "mixed")) {
+      materialFlags.push("property_rental_tax");
+    }
+    if (profile.home_tax_context === "citizenship_based_worldwide") {
+      materialFlags.push("continuing_home_country_tax");
+    } else if (profile.home_tax_context === "prefer_not_to_say") {
+      materialFlags.push("home_country_tax_interaction");
+    }
     return {
       status: bypass ? "user_after_tax" : "planning_estimate",
-      conditional: residence === "residence_depends_on_days_and_ties",
+      conditional: residence === "residence_depends_on_days_and_ties" ||
+        profile.home_tax_context === "citizenship_based_worldwide" ||
+        profile.home_tax_context === "prefer_not_to_say",
       residence_outcome: residence,
-      scope_summary: screen.scope_if_resident === "worldwide_income"
+      scope_summary: fundingNote + " " + (screen.scope_if_resident === "worldwide_income"
         ? "Worldwide income may enter scope if destination tax residence applies."
-        : "Local-source income may remain taxable.",
+        : "Local-source income may remain taxable."),
       readiness: screen.tax_readiness,
       readiness_score: Number(screen.tax_readiness_score),
       favorable_reserve: reserve("favorable"),
@@ -107,10 +132,26 @@
       adverse_reserve: reserve("adverse"),
       rates: rates,
       included_categories: (screen.included_categories || []).slice(),
-      material_flags: (screen.material_flags || []).slice(),
+      material_flags: materialFlags,
       source_ids: (screen.source_ids || []).slice(),
       confidence: screen.confidence || "low",
     };
+  }
+
+  function screenEligibility(input) {
+    const country = input && input.country || {};
+    const profile = normalizeProfile(input && input.profile || {});
+    const evidence = country.eligibility || {};
+    if (evidence.status !== "complete") {
+      return { status: "needs_verification", rankable: false, summary: "Legal-stay evidence is not complete for this destination.", source_ids: [] };
+    }
+    if (profile.mobility_rights === "local_free_movement") {
+      return { status: "likely_eligible", rankable: true, summary: "Local or free-movement rights provide a credible stay path; registration rules may still apply.", source_ids: (evidence.long_stay_source_ids || []).slice() };
+    }
+    if (profile.mobility_rights === "general_nonlocal" && profile.annual_day_band === "under_90") {
+      return { status: "eligibility_depends_on_profile", rankable: false, summary: "A short stay may fit the general visitor limit, but passport and visa rules still control.", source_ids: (evidence.short_stay_source_ids || []).slice() };
+    }
+    return { status: "eligibility_depends_on_profile", rankable: false, summary: "A visa or residence route must be verified for this stay plan.", source_ids: (evidence.long_stay_source_ids || []).slice() };
   }
 
   function buildResilienceBudget(input) {
@@ -165,14 +206,16 @@
       const override = overrides[destination.id] || {};
       const countryName = override.country || destination.country;
       const country = countries[countryName] || { tax_screen: { status: "research_pending" } };
+      const eligibility = screenEligibility({ country: country, profile: profile });
       const tax = screenTax({ country: country, profile: profile });
       const cost = costs[destination.id];
-      const rankable = Boolean(cost && override.scores && tax.status !== "tax_impact_unavailable");
+      const rankable = Boolean(cost && override.scores && eligibility.rankable && tax.status !== "tax_impact_unavailable");
       return {
         destination_id: destination.id,
         name: destination.name || destination.id,
         country: countryName,
         rankable: rankable,
+        eligibility: eligibility,
         overall_score: null,
         tax: tax,
         budget: cost ? buildResilienceBudget({ cost: cost, profile: profile, taxScreen: tax }) : null,
@@ -213,6 +256,7 @@
   return {
     normalizeProfile: normalizeProfile,
     screenTax: screenTax,
+    screenEligibility: screenEligibility,
     buildResilienceBudget: buildResilienceBudget,
     rankDestinations: rankDestinations,
   };

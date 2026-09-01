@@ -88,6 +88,26 @@ class FireAbroadDataTests(unittest.TestCase):
             errors,
         )
 
+    def test_stale_review_date_is_rejected(self):
+        payload = copy.deepcopy(self.payload)
+        payload["countries"]["Spain"]["tax_screen"]["last_reviewed"] = "2024-01-01"
+        errors = self.validate(payload)
+        self.assertTrue(any("last_reviewed is stale" in error for error in errors), errors)
+
+    def test_complete_country_requires_eligibility_evidence(self):
+        payload = copy.deepcopy(self.payload)
+        del payload["countries"]["Spain"]["eligibility"]
+        errors = self.validate(payload)
+        self.assertTrue(any("countries.Spain.eligibility" in error for error in errors), errors)
+
+    def test_complete_destination_scores_must_be_bounded_and_complete(self):
+        payload = copy.deepcopy(self.payload)
+        del payload["destination_overrides"]["valencia"]["scores"]["active_life"]
+        payload["destination_overrides"]["malaga-costa-del-sol"]["scores"]["global_access"] = 9
+        errors = self.validate(payload)
+        self.assertTrue(any("valencia.scores.active_life" in error for error in errors), errors)
+        self.assertTrue(any("malaga-costa-del-sol.scores.global_access" in error for error in errors), errors)
+
 
 if __name__ == "__main__":
     unittest.main()

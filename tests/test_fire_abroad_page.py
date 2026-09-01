@@ -34,6 +34,8 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn('<body class="gha-mode-utility gha-top-level fire-abroad-page"', self.html)
         self.assertIn('<header class="gha-header">', self.html)
         self.assertIn('<footer class="gha-footer">', self.html)
+        self.assertIn('aria-label="Breadcrumb"', self.html)
+        self.assertIn('"@type":"BreadcrumbList"', self.html)
 
     def test_initial_tax_controls_are_plain_and_progressive(self):
         for label in (
@@ -42,6 +44,8 @@ class FireAbroadPageTests(unittest.TestCase):
             "Main source of spending money",
             "Housing plan",
             "How would you use the home?",
+            "Your mobility rights",
+            "Current tax-home system",
         ):
             self.assertIn(label, self.html)
         self.assertIn('data-fire-group="property-use" hidden', self.html)
@@ -52,7 +56,8 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn("Tax Readiness", self.html)
         self.assertIn("Planning tax reserve", self.html)
         self.assertIn("Likely tax residence", self.html)
-        self.assertIn("Worldwide income may enter scope", self.html)
+        self.assertIn("Stay eligibility", self.html)
+        self.assertIn("Eligibility check needed", self.html)
         self.assertIn("not a statutory rate or assessment", self.html)
         self.assertIn("Research pending", self.html)
 
@@ -61,19 +66,21 @@ class FireAbroadPageTests(unittest.TestCase):
             self.assertIn(stage, self.html)
         self.assertIn("Agencia Tributaria", self.html)
         self.assertIn("Data checked 1 September 2026", self.html)
-        self.assertIn("Refine this tax estimate", self.html)
+        self.assertNotIn("data-fire-refine", self.html)
+        self.assertIn("Spain property-tax lifecycle", self.html)
 
     def test_calculator_links_do_not_include_tax_or_financial_inputs(self):
-        self.assertIn(
-            'href="/retirement-abroad-calculator/?destination=valencia&amp;household=single&amp;housing=rent"',
-            self.html,
-        )
+        self.assertIn('href="/retirement-abroad-calculator/"', self.html)
         for forbidden in ("taxHome=", "annualDays=", "planningBase=", "wealthBand="):
             self.assertNotIn(forbidden, self.html)
 
     def test_sitemap_contains_fire_route(self):
         sitemap = (ROOT / "artifacts" / "sitemap.xml").read_text(encoding="utf-8")
         self.assertIn("https://globalhomeatlas.com/fire-abroad/", sitemap)
+
+    def test_guide_hub_links_to_fire_screen(self):
+        guides = (ROOT / "artifacts" / "guides" / "index.html").read_text(encoding="utf-8")
+        self.assertIn('href="/fire-abroad/"', guides)
 
 
 if __name__ == "__main__":

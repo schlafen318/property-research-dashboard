@@ -43,6 +43,14 @@ VALID_TAX_READINESS = frozenset(
 )
 VALID_CONFIDENCE = frozenset({"low", "medium", "medium_high", "high"})
 PROPERTY_LIFECYCLE_STAGES = ("purchase", "annual", "rental", "sale", "succession")
+DESTINATION_SCORE_KEYS = (
+    "active_life",
+    "healthcare_bridge",
+    "stay_flexibility",
+    "global_access",
+    "community_fit",
+    "property_exit_flexibility",
+)
 
 
 def load_fire_abroad(path: Path = FIRE_ABROAD_PATH) -> dict[str, Any]:
@@ -130,8 +138,13 @@ def validate_fire_abroad_payload(
     retirement_ids: set[str],
     as_of: date,
 ) -> list[str]:
-    del as_of  # Freshness intervals are enforced as complete evidence is added.
     errors: list[str] = []
+    for key, expected in (("weights", FIRE_WEIGHTS), ("active_life_weights", ACTIVE_LIFE_WEIGHTS)):
+        supplied = payload.get(key)
+        if not isinstance(supplied, dict) or set(supplied) != set(expected):
+            errors.append(f"{key} must contain the approved dimensions")
+        elif abs(sum(float(value) for value in supplied.values()) - 1.0) > 1e-9:
+            errors.append(f"{key} must sum to 1")
     if set(payload.get("launch_destination_ids", [])) != set(LAUNCH_DESTINATION_IDS):
         errors.append("launch_destination_ids must match the approved launch set")
     for destination_id in payload.get("launch_destination_ids", []):
@@ -173,6 +186,43 @@ def validate_fire_abroad_payload(
             errors.append(f"{path}.status must be complete or research_pending")
             continue
         _validate_complete_tax_screen(screen, path, seen_sources, errors)
+        reviewed = screen.get("last_reviewed")
+        if _iso_date(reviewed):
+            reviewed_date = datetime.strptime(reviewed, "%Y-%m-%d").date()
+            if reviewed_date > as_of:
+                errors.append(f"{path}.last_reviewed cannot be after the validation date")
+            elif (as_of - reviewed_date).days > 366:
+                errors.append(f"{path}.last_reviewed is stale")
+        eligibility_path = f"countries.{country_name}.eligibility"
+        eligibility = country.get("eligibility") if isinstance(country, dict) else None
+        if not isinstance(eligibility, dict) or eligibility.get("status") != "complete":
+            errors.append(f"{eligibility_path} must contain complete stay evidence")
+        else:
+            for key in ("short_stay_source_ids", "long_stay_source_ids"):
+                refs = eligibility.get(key)
+                if not isinstance(refs, list) or not refs:
+                    errors.append(f"{eligibility_path}.{key} must contain a source")
+                elif any(source_id not in seen_sources for source_id in refs):
+                    errors.append(f"{eligibility_path}.{key} contains an unknown source")
+
+    overrides = payload.get("destination_overrides", {})
+    for destination_id in payload.get("launch_destination_ids", []):
+        path = f"destination_overrides.{destination_id}"
+        override = overrides.get(destination_id)
+        if not isinstance(override, dict):
+            errors.append(f"{path} is required")
+            continue
+        country_name = override.get("country")
+        if country_name not in countries:
+            errors.append(f"{path}.country must resolve to a country record")
+            continue
+        if countries[country_name].get("tax_screen", {}).get("status") != "complete":
+            continue
+        scores = override.get("scores")
+        for key in DESTINATION_SCORE_KEYS:
+            value = scores.get(key) if isinstance(scores, dict) else None
+            if not isinstance(value, (int, float)) or not 0 <= value <= 5:
+                errors.append(f"{path}.scores.{key} must be between 0 and 5")
 
     return errors
 
@@ -184,6 +234,13 @@ VALID_FUNDING_SOURCES = frozenset(
     {"portfolio", "pension", "property", "work_business", "mixed"}
 )
 VALID_PROPERTY_USES = frozenset({"personal", "rental", "mixed"})
+VALID_DAY_BANDS = frozenset({"under_90", "90_182", "183_plus", "unsure"})
+VALID_MOBILITY_RIGHTS = frozenset(
+    {"local_free_movement", "general_nonlocal", "prefer_not_to_say"}
+)
+VALID_HOME_TAX_CONTEXTS = frozenset(
+    {"citizenship_based_worldwide", "residence_based", "territorial", "prefer_not_to_say"}
+)
 
 
 def _enum(value: Any, allowed: frozenset[str], default: str, label: str) -> str:
@@ -217,9 +274,53 @@ def normalize_fire_profile(raw: dict[str, Any] | None) -> dict[str, Any]:
         "property_use": _enum(
             raw.get("property_use"), VALID_PROPERTY_USES, "personal", "property_use"
         ),
-        "annual_day_band": str(raw.get("annual_day_band") or "unsure"),
-        "home_tax_context": str(raw.get("home_tax_context") or "prefer_not_to_say"),
+        "annual_day_band": _enum(
+            raw.get("annual_day_band"), VALID_DAY_BANDS, "unsure", "annual_day_band"
+        ),
+        "mobility_rights": _enum(
+            raw.get("mobility_rights"),
+            VALID_MOBILITY_RIGHTS,
+            "prefer_not_to_say",
+            "mobility_rights",
+        ),
+        "home_tax_context": _enum(
+            raw.get("home_tax_context"),
+            VALID_HOME_TAX_CONTEXTS,
+            "prefer_not_to_say",
+            "home_tax_context",
+        ),
         "planning_base": planning_base,
+    }
+
+
+def screen_eligibility(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, Any]:
+    evidence = country.get("eligibility", {})
+    if evidence.get("status") != "complete":
+        return {
+            "status": "needs_verification",
+            "rankable": False,
+            "summary": "Legal-stay evidence is not complete for this destination.",
+            "source_ids": [],
+        }
+    if profile["mobility_rights"] == "local_free_movement":
+        return {
+            "status": "likely_eligible",
+            "rankable": True,
+            "summary": "Local or free-movement rights provide a credible stay path; registration rules may still apply.",
+            "source_ids": list(evidence.get("long_stay_source_ids", [])),
+        }
+    if profile["mobility_rights"] == "general_nonlocal" and profile["annual_day_band"] == "under_90":
+        return {
+            "status": "eligibility_depends_on_profile",
+            "rankable": False,
+            "summary": "A short stay may fit the general visitor limit, but passport and visa rules still control.",
+            "source_ids": list(evidence.get("short_stay_source_ids", [])),
+        }
+    return {
+        "status": "eligibility_depends_on_profile",
+        "rankable": False,
+        "summary": "A visa or residence route must be verified for this stay plan.",
+        "source_ids": list(evidence.get("long_stay_source_ids", [])),
     }
 
 
@@ -260,16 +361,37 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
         return round(planning_base * rates[key])
 
     residence_outcome = {
-        "seasonal": "likely_nonresident",
-        "part_year": "residence_depends_on_days_and_ties",
-        "full_relocation": "likely_resident",
-    }[profile["stay_mode"]]
+        "under_90": "likely_nonresident",
+        "90_182": "residence_depends_on_days_and_ties",
+        "183_plus": "likely_resident",
+        "unsure": "residence_depends_on_days_and_ties",
+    }[profile["annual_day_band"]]
     scope = screen.get("scope_if_resident", "unknown")
+    fallback_funding_notes = {
+        "portfolio": "Portfolio income needs category-specific review.",
+        "pension": "Pension income needs treaty and pension-type review.",
+        "property": "Property income needs source-country and residence review.",
+        "work_business": "Work or business income needs source and social-tax review.",
+        "mixed": "Each income category needs separate review.",
+    }
+    funding_note = screen.get("funding_source_notes", {}).get(
+        profile["funding_source"], fallback_funding_notes[profile["funding_source"]]
+    )
+    material_flags = list(screen.get("material_flags", []))
+    if profile["housing"] != "rent" and profile["property_use"] in {"rental", "mixed"}:
+        material_flags.append("property_rental_tax")
+    if profile["home_tax_context"] == "citizenship_based_worldwide":
+        material_flags.append("continuing_home_country_tax")
+    elif profile["home_tax_context"] == "prefer_not_to_say":
+        material_flags.append("home_country_tax_interaction")
     return {
         "status": "user_after_tax" if bypass else "planning_estimate",
-        "conditional": residence_outcome == "residence_depends_on_days_and_ties",
+        "conditional": (
+            residence_outcome == "residence_depends_on_days_and_ties"
+            or profile["home_tax_context"] in {"citizenship_based_worldwide", "prefer_not_to_say"}
+        ),
         "residence_outcome": residence_outcome,
-        "scope_summary": (
+        "scope_summary": funding_note + " " + (
             "Worldwide income may enter scope if destination tax residence applies."
             if scope == "worldwide_income"
             else "Local-source income may remain taxable."
@@ -281,7 +403,7 @@ def screen_tax(country: dict[str, Any], profile: dict[str, Any]) -> dict[str, An
         "adverse_reserve": reserve("adverse"),
         "rates": rates,
         "included_categories": list(screen.get("included_categories", [])),
-        "material_flags": list(screen.get("material_flags", [])),
+        "material_flags": material_flags,
         "source_ids": list(screen.get("source_ids", [])),
         "confidence": screen.get("confidence", "low"),
     }
@@ -362,10 +484,16 @@ def rank_fire_abroad_destinations(
         override = overrides.get(destination_id, {})
         country_name = override.get("country", destination.get("country"))
         country = countries.get(country_name, {"tax_screen": {"status": "research_pending"}})
+        eligibility = screen_eligibility(country, normalized)
         tax_result = screen_tax(country, normalized)
         cost = retirement_costs.get(destination_id)
         scores = override.get("scores")
-        rankable = bool(cost and scores and tax_result["status"] != "tax_impact_unavailable")
+        rankable = bool(
+            cost
+            and scores
+            and eligibility["rankable"]
+            and tax_result["status"] != "tax_impact_unavailable"
+        )
         budget = (
             build_resilience_budget(cost, normalized, tax_result)
             if cost
@@ -381,6 +509,7 @@ def rank_fire_abroad_destinations(
                 "name": destination.get("name", destination_id),
                 "country": country_name,
                 "rankable": rankable,
+                "eligibility": eligibility,
                 "overall_score": None,
                 "tax": tax_result,
                 "budget": budget,
