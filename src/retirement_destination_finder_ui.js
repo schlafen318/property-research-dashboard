@@ -60,6 +60,9 @@
     const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
     const closest = recommendations[0];
     if (!closest) return "No destinations could be evaluated under these assumptions.";
+    if (closest.tier === "conditional") {
+      return "Tax-adjusted affordability is conditional because current destination tax evidence is unavailable.";
+    }
     if (Number(input.withinReachCount) > 0) {
       return Number(input.withinReachCount) + " destinations are within reach. " +
         closest.name + " is the strongest modeled match under your preferences.";
@@ -73,7 +76,48 @@
       within_reach: "Within reach",
       close: "Close",
       stretch: "Stretch",
+      conditional: "Conditional",
     }[value] || "Not classified";
+  }
+
+  function signedMoney(value) {
+    const amount = Number(value);
+    if (!Number.isFinite(amount)) return "Unavailable";
+    return (amount < 0 ? "−" : amount > 0 ? "+" : "") + money.format(Math.abs(amount));
+  }
+
+  function writeTaxResultFields(nodes, item) {
+    const range = Array.isArray(item.retirementTargetRange) ? item.retirementTargetRange : [];
+    const unavailable = item.taxStatus === "unavailable" || !Number.isFinite(Number(item.retirementTarget));
+    nodes.target.textContent = unavailable ? "Unavailable" : money.format(Number(item.retirementTarget));
+    nodes.range.textContent = unavailable
+      ? "Unavailable"
+      : money.format(Number(range[0])) + "–" + money.format(Number(range[1]));
+    nodes.centralGap.textContent = unavailable ? "Unavailable" : signedMoney(item.surplusGap);
+    nodes.favorableGap.textContent = unavailable ? "Unavailable" : signedMoney(item.favorableGap);
+    nodes.adverseGap.textContent = unavailable ? "Unavailable" : signedMoney(item.adverseGap);
+  }
+
+  function finderAnalyticsPayload(user) {
+    return {
+      housing_plan: user.housingPlan,
+      purchase_method: user.housingPlan === "buy_now" ? user.purchaseMethod : "not_applicable",
+    };
+  }
+
+  function finderEvidenceSummary(input) {
+    const excluded = Number(input.excludedCount) || 0;
+    const conditional = Number(input.conditionalCount) || 0;
+    const parts = [];
+    if (conditional) {
+      parts.push(conditional + " destination" + (conditional === 1 ? " has" : "s have") +
+        " conditional tax-adjusted results because current evidence is unavailable.");
+    }
+    if (excluded) {
+      parts.push(excluded + " destination" + (excluded === 1 ? "" : "s") +
+        " could not be recommended under these assumptions.");
+    }
+    return parts.join(" ") || "Every destination had enough information to evaluate.";
   }
 
   function chartTooltip(point) {
@@ -276,38 +320,100 @@
       element("finder-chart-tooltip").hidden = false;
     }
 
+    function textElement(tag, className, value) {
+      const node = document.createElement(tag);
+      if (className) node.className = className;
+      node.textContent = value;
+      return node;
+    }
+
+    function definition(list, label, value) {
+      const row = document.createElement("div");
+      row.appendChild(textElement("dt", "", label));
+      const amount = textElement("dd", "", value);
+      row.appendChild(amount);
+      list.appendChild(row);
+      return amount;
+    }
+
     function resultRow(item, user) {
-      const propertyBits = user.housingPlan === "buy_now"
-        ? '<div><dt>Property equity</dt><dd>' + money.format(item.propertyEquity) +
-          '</dd></div><div><dt>Mortgage remaining</dt><dd>' + money.format(item.mortgageBalance) + "</dd></div>"
-        : "";
-      const rental = user.housingPlan === "buy_now" && user.useBeforeRetirement === "rental"
-        ? '<div><dt>Annual property cash flow</dt><dd>' + money.format(item.netRentalCashFlow) + "</dd></div>"
-        : "";
-      const financing = user.housingPlan === "buy_now"
-        ? '<p class="finder-financing"><strong>' + escapeHtml(item.financingStatus) + "</strong>" +
-          (item.financingReason ? " — " + escapeHtml(item.financingReason) : "") + "</p>"
-        : "";
       const dossierHref = safeDossierHref(item.destinationId);
       const detailHref = safeDetailHref({
         destinationId: item.destinationId,
         household: user.household,
         housingPlan: user.housingPlan,
       });
-      return '<article class="finder-result"><header><div><p class="finder-tier">' +
-        escapeHtml(tierLabel(item.tier)) + '</p><h3><a href="' + escapeHtml(dossierHref) +
-        '" data-finder-dossier>' + escapeHtml(item.name) + "</a>" +
-        '</h3><p class="finder-place">' + escapeHtml(item.country) +
-        '</p></div></header><dl>' +
-        '<div><dt>Projected portfolio</dt><dd>' + money.format(item.portfolioAtRetirement) + "</dd></div>" +
-        '<div><dt>Retirement target</dt><dd>' + money.format(item.retirementTarget) + "</dd></div>" +
-        '<div><dt>Surplus or gap</dt><dd>' + money.format(item.surplusGap) + "</dd></div>" +
-        propertyBits + rental + "</dl>" + financing +
-        (item.preferenceMatches.length ? '<p class="finder-matches"><strong>Preference match:</strong> ' + escapeHtml(item.preferenceMatches.join(" · ")) + "</p>" : "") +
-        '<div class="finder-result-actions"><a href="' + escapeHtml(dossierHref) +
-        '" data-finder-dossier>View destination dossier</a><a href="' + escapeHtml(detailHref) +
-        '" data-finder-detail>Build a detailed plan</a></div>' +
-        "</article>";
+      const article = document.createElement("article");
+      article.className = "finder-result";
+      const header = document.createElement("header");
+      const heading = document.createElement("div");
+      heading.appendChild(textElement("p", "finder-tier", tierLabel(item.tier)));
+      const title = document.createElement("h3");
+      const titleLink = textElement("a", "", item.name);
+      titleLink.href = dossierHref;
+      titleLink.setAttribute("data-finder-dossier", "");
+      title.appendChild(titleLink);
+      heading.appendChild(title);
+      heading.appendChild(textElement("p", "finder-place", item.country));
+      header.appendChild(heading);
+      article.appendChild(header);
+
+      const facts = document.createElement("dl");
+      definition(facts, "Projected portfolio", money.format(item.portfolioAtRetirement));
+      const target = definition(facts, "Central tax-adjusted target", "");
+      const range = definition(facts, "Favorable–adverse target range", "");
+      const centralGap = definition(facts, "Central surplus or gap", "");
+      const favorableGap = definition(facts, "Favorable gap", "");
+      const adverseGap = definition(facts, "Adverse gap", "");
+      writeTaxResultFields({
+        target: target,
+        range: range,
+        centralGap: centralGap,
+        favorableGap: favorableGap,
+        adverseGap: adverseGap,
+      }, item);
+      if (user.housingPlan === "buy_now") {
+        definition(facts, "Property equity", money.format(item.propertyEquity));
+        definition(facts, "Mortgage remaining", money.format(item.mortgageBalance));
+        if (user.useBeforeRetirement === "rental") {
+          definition(facts, "Annual property cash flow", money.format(item.netRentalCashFlow));
+        }
+      }
+      article.appendChild(facts);
+
+      if (item.taxStatus === "unavailable") {
+        article.appendChild(textElement(
+          "p",
+          "finder-financing",
+          "Tax-adjusted result unavailable. " + (item.taxReason || "Current evidence needs review.")
+        ));
+      }
+      if (user.housingPlan === "buy_now") {
+        article.appendChild(textElement(
+          "p",
+          "finder-financing",
+          item.financingStatus + (item.financingReason ? " — " + item.financingReason : "")
+        ));
+      }
+      if (item.preferenceMatches.length) {
+        article.appendChild(textElement(
+          "p",
+          "finder-matches",
+          "Preference match: " + item.preferenceMatches.join(" · ")
+        ));
+      }
+      const actions = document.createElement("div");
+      actions.className = "finder-result-actions";
+      const dossier = textElement("a", "", "View destination dossier");
+      dossier.href = dossierHref;
+      dossier.setAttribute("data-finder-dossier", "");
+      actions.appendChild(dossier);
+      const detail = textElement("a", "", "Build a detailed plan");
+      detail.href = detailHref;
+      detail.setAttribute("data-finder-detail", "");
+      actions.appendChild(detail);
+      article.appendChild(actions);
+      return article;
     }
 
     function renderRecommendationList() {
@@ -315,9 +421,12 @@
         items: currentRecommendations,
         expanded: recommendationsExpanded,
       });
-      element("finder-recommendations").innerHTML = visible.map(function (item) {
+      element("finder-recommendations").replaceChildren.apply(
+        element("finder-recommendations"),
+        visible.map(function (item) {
         return resultRow(item, currentUser);
-      }).join("");
+        })
+      );
       const toggle = element("finder-show-all");
       toggle.hidden = currentRecommendations.length <= 5;
       toggle.textContent = recommendationsExpanded ? "Show the strongest five" : "View all destinations";
@@ -377,17 +486,15 @@
         ? currentRecommendations[0].name
         : "—";
       renderRecommendationList();
-      element("finder-excluded-summary").textContent = result.excluded.length
-        ? result.excluded.length + " destinations could not be recommended under these assumptions."
-        : "Every destination had enough information to evaluate.";
+      element("finder-excluded-summary").textContent = finderEvidenceSummary({
+        excludedCount: result.excluded.length,
+        conditionalCount: result.summary.conditionalCount,
+      });
       renderExclusions(result.excluded);
       renderEvidence(currentRecommendations);
       results.hidden = false;
       results.scrollIntoView({ behavior: "smooth", block: "start" });
-      track("retirement_destination_finder_complete", {
-        housing_plan: user.housingPlan,
-        purchase_method: user.housingPlan === "buy_now" ? user.purchaseMethod : "not_applicable",
-      });
+      track("retirement_destination_finder_complete", finderAnalyticsPayload(user));
     }
 
     form.addEventListener("submit", function (event) {
@@ -409,6 +516,7 @@
           destinations: payload.destinations,
           retirementCosts: payload.retirementCosts,
           mortgageProfiles: payload.mortgageProfiles,
+          taxPlanning: payload.taxPlanning,
         });
         render(result, user);
       } catch (error) {
@@ -456,6 +564,9 @@
     recommendationsForDisplay: recommendationsForDisplay,
     resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,
+    writeTaxResultFields: writeTaxResultFields,
+    finderAnalyticsPayload: finderAnalyticsPayload,
+    finderEvidenceSummary: finderEvidenceSummary,
     chartTooltip: chartTooltip,
     mobileChartWidth: mobileChartWidth,
     initRetirementDestinationFinder: initRetirementDestinationFinder,

@@ -6,7 +6,7 @@ import sys
 import xml.etree.ElementTree as ET
 from html.parser import HTMLParser
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import parse_qs, unquote, urlparse
 
 ROOT = Path(__file__).resolve().parents[1]
 ARTIFACTS = ROOT / "artifacts"
@@ -15,6 +15,7 @@ SITE_ORIGIN = "https://globalhomeatlas.com"
 KEY_PAGES = [
     ARTIFACTS / "guides" / "index.html",
     ARTIFACTS / "retirement-abroad-calculator" / "index.html",
+    ARTIFACTS / "retirement-destination-finder" / "index.html",
     ARTIFACTS / "best-countries-to-buy-property-as-a-foreigner" / "index.html",
     ARTIFACTS / "countries" / "spain-property" / "index.html",
 ]
@@ -24,6 +25,11 @@ REQUIRED_MARKERS = {
         "Retirement Abroad Calculator",
         "Compare monthly living expenses",
         "Portfolio dividends and interest",
+    ],
+    ARTIFACTS / "retirement-destination-finder" / "index.html": [
+        "central tax-adjusted target",
+        "Favorable–adverse target range",
+        "Your financial details stay in this browser",
     ],
     ARTIFACTS / "guides" / "index.html": [
         "Choose the question that matters most to you.",
@@ -90,6 +96,25 @@ def broken_local_links() -> list[str]:
     return broken
 
 
+def finder_handoff_privacy_errors(html: str) -> list[str]:
+    parser = LinkParser()
+    parser.feed(html)
+    allowed = {"destination", "household", "housing"}
+    errors: list[str] = []
+    for link in parser.links:
+        parsed = urlparse(link)
+        if parsed.path != "/retirement-abroad-calculator/" or not parsed.query:
+            continue
+        keys = set(parse_qs(parsed.query, keep_blank_values=True))
+        unexpected = sorted(keys - allowed)
+        if unexpected:
+            errors.append(
+                "Finder calculator handoff exposes unexpected query parameters: "
+                + ", ".join(unexpected)
+            )
+    return errors
+
+
 def verify(min_sitemap_urls: int) -> list[str]:
     errors: list[str] = []
     for page in KEY_PAGES:
@@ -105,6 +130,9 @@ def verify(min_sitemap_urls: int) -> list[str]:
         for marker in markers:
             if marker not in text:
                 errors.append(f"Missing marker {marker!r} in {page.relative_to(ROOT)}")
+    finder_page = ARTIFACTS / "retirement-destination-finder" / "index.html"
+    if finder_page.exists():
+        errors.extend(finder_handoff_privacy_errors(finder_page.read_text(encoding="utf-8")))
     errors.extend(broken_local_links())
     return errors
 

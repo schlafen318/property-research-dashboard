@@ -26,6 +26,89 @@ def run_ui(function_name: str, payload: object) -> object:
 
 
 class RetirementDestinationFinderUITests(unittest.TestCase):
+    def test_tax_result_fields_are_written_as_text_not_generated_html(self) -> None:
+        script = (
+            "const ui = require(process.argv[1]);"
+            "const values = {};"
+            "const nodes = {};"
+            "['target','range','centralGap','favorableGap','adverseGap'].forEach((key) => {"
+            "  const node = {};"
+            "  Object.defineProperty(node, 'innerHTML', {set() { throw new Error('unsafe HTML sink'); }});"
+            "  Object.defineProperty(node, 'textContent', {set(value) { values[key] = value; }});"
+            "  nodes[key] = node;"
+            "});"
+            "ui.writeTaxResultFields(nodes, {"
+            "  retirementTarget: 120000, retirementTargetRange: [110000, 130000],"
+            "  favorableGap: -10000, surplusGap: -20000, adverseGap: -30000, taxStatus: 'available'"
+            "});"
+            "process.stdout.write(JSON.stringify(values));"
+        )
+        result = subprocess.run(
+            ["node", "-e", script, str(UI)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(
+            {
+                "target": "$120,000",
+                "range": "$110,000–$130,000",
+                "centralGap": "−$20,000",
+                "favorableGap": "−$10,000",
+                "adverseGap": "−$30,000",
+            },
+            json.loads(result.stdout),
+        )
+
+    def test_conditional_tax_result_fields_never_render_null_as_zero(self) -> None:
+        script = (
+            "const ui = require(process.argv[1]);"
+            "const values = {};"
+            "const nodes = {};"
+            "['target','range','centralGap','favorableGap','adverseGap'].forEach((key) => {"
+            "  Object.defineProperty(nodes, key, {value: {set textContent(value) { values[key] = value; }}});"
+            "});"
+            "ui.writeTaxResultFields(nodes, {"
+            "  retirementTarget: null, retirementTargetRange: [null, null],"
+            "  favorableGap: null, surplusGap: null, adverseGap: null, taxStatus: 'unavailable'"
+            "});"
+            "process.stdout.write(JSON.stringify(values));"
+        )
+        result = subprocess.run(
+            ["node", "-e", script, str(UI)],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual({key: "Unavailable" for key in (
+            "target", "range", "centralGap", "favorableGap", "adverseGap"
+        )}, json.loads(result.stdout))
+
+    def test_analytics_payload_excludes_tax_inputs_and_results(self) -> None:
+        payload = run_ui(
+            "finderAnalyticsPayload",
+            {
+                "housingPlan": "buy_now",
+                "purchaseMethod": "mortgage",
+                "taxMode": "destination_estimate",
+                "taxProfile": {"dependableIncome": 90_000, "wealthBand": "above_threshold"},
+                "taxResult": {"central": 1_200_000, "adverse": 1_400_000},
+            },
+        )
+        self.assertEqual({"housing_plan": "buy_now", "purchase_method": "mortgage"}, payload)
+
+    def test_evidence_summary_exposes_conditional_tax_results_beyond_the_display_cap(self) -> None:
+        self.assertEqual(
+            "7 destinations have conditional tax-adjusted results because current evidence is unavailable.",
+            run_ui("finderEvidenceSummary", {"excludedCount": 0, "conditionalCount": 7}),
+        )
+        self.assertEqual(
+            "1 destination could not be recommended under these assumptions.",
+            run_ui("finderEvidenceSummary", {"excludedCount": 1, "conditionalCount": 0}),
+        )
+
     def test_buy_now_visibility_tracks_financing_and_use(self) -> None:
         visible = run_ui(
             "housingVisibility",
@@ -93,6 +176,7 @@ class RetirementDestinationFinderUITests(unittest.TestCase):
         self.assertEqual("Within reach", run_ui("tierLabel", "within_reach"))
         self.assertEqual("Close", run_ui("tierLabel", "close"))
         self.assertEqual("Stretch", run_ui("tierLabel", "stretch"))
+        self.assertEqual("Conditional", run_ui("tierLabel", "conditional"))
 
     def test_chart_tooltip_exposes_year_and_amount(self) -> None:
         tooltip = run_ui("chartTooltip", {"year": 7, "portfolio": 432100})

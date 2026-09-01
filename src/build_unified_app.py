@@ -115,11 +115,11 @@ RETIREMENT_FINDER_TITLE = "Retirement Destination Finder: Where Can I Afford to 
 RETIREMENT_FINDER_FAQS = [
     (
         "How does the finder choose retirement destinations?",
-        "It ranks destinations by whether projected liquid capital covers the modeled target, then uses region, setting and healthcare preferences within each financial tier.",
+        "It ranks destinations by whether projected liquid capital covers the central tax-adjusted target, then uses region, setting and healthcare preferences within each financial tier.",
     ),
     (
         "Does within reach mean I can definitely retire there?",
-        "No. It means the financial projection covers the modeled target under the assumptions entered. Immigration, tax, healthcare, currency and personal circumstances require separate review.",
+        "No. It means the financial projection covers the central tax-adjusted target under the assumptions entered. Immigration, tax, healthcare, currency and personal circumstances require separate review.",
     ),
     (
         "Should I model renting or buying?",
@@ -127,7 +127,7 @@ RETIREMENT_FINDER_FAQS = [
     ),
     (
         "Are visa and tax costs included?",
-        "No. The finder compares modeled living, reserve and housing capital. Confirm visa eligibility and obtain country-specific tax advice separately.",
+        "The finder includes broad destination tax-planning reserves where current evidence supports them. A destination remains conditional when that evidence is unavailable. Visa costs and individual tax advice remain outside the model.",
     ),
 ]
 PREMIUM_DESTINATION_PEER_OVERRIDES = {
@@ -6071,6 +6071,7 @@ def build_retirement_destination_finder_page(
         universe_count=len(eligible_destinations),
         payload_json=json.dumps(payload, separators=(",", ":")).replace("</", "<\\/"),
         retirement_engine=RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        retirement_ui=RETIREMENT_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         property_engine=PROPERTY_FINANCE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         tax_scenario_engine=FIRE_TAX_SCENARIOS_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),

@@ -149,13 +149,13 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-tax-wealth-band-field"', form)
         self.assertIn("Expected annual portfolio return after fees and tax (%)", form)
 
-    def test_finder_tax_profile_is_honest_about_preparatory_ranking_status(self) -> None:
+    def test_finder_tax_profile_explains_live_tax_adjusted_ranking(self) -> None:
         tax_section = self.html.split('id="finder-tax-planning"', 1)[1].split("</fieldset>", 1)[0]
 
-        self.assertIn("prepare your tax profile", tax_section)
-        self.assertIn("do not yet change finder rankings or retirement targets", tax_section)
+        self.assertIn("change finder rankings and retirement targets", tax_section)
+        self.assertIn("central tax-adjusted target", tax_section)
         self.assertIn('href="/retirement-abroad-calculator/"', tax_section)
-        self.assertIn("tax-adjusted result", tax_section)
+        self.assertNotIn("do not yet change", tax_section)
 
     def test_finder_tax_control_visibility_disables_inapplicable_fields(self) -> None:
         renting = run_ui(
@@ -182,8 +182,10 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="finder-recommendations"', self.html)
         self.assertIn('id="finder-exclusions"', self.html)
         self.assertIn("Projected portfolio", self.html)
-        self.assertIn("Retirement target", self.html)
-        self.assertIn("Surplus or gap", self.html)
+        self.assertIn("Central tax-adjusted target", self.html)
+        self.assertIn("Favorable–adverse target range", self.html)
+        self.assertIn("Favorable gap", self.html)
+        self.assertIn("Adverse gap", self.html)
         self.assertNotIn("Retirement score", self.html)
 
     def test_results_lead_with_a_plain_language_decision_and_progressive_list(self) -> None:
@@ -199,7 +201,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn('id="within-reach"', self.html)
         self.assertIn('id="rent-or-buy"', self.html)
         self.assertIn('id="finder-faq"', self.html)
-        self.assertIn("Projected liquid capital covers the modeled retirement target", self.html)
+        self.assertIn("Projected liquid capital covers the central tax-adjusted retirement target", self.html)
         self.assertIn("Buying requires separate property capital", self.html)
         self.assertIn('"@type":"FAQPage"', self.html)
 
