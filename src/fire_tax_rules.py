@@ -1411,6 +1411,8 @@ def _validate_residence_jurisdiction(
             used_operands.update(value for value in formula["operands"] if isinstance(value, str))
     for operand_id in sorted(used_operands):
         operand = operand_catalog.get(operand_id)
+        if isinstance(operand, dict) and operand.get("kind") == "derived":
+            errors.append(f"operand_catalog.{operand_id} derived operands are not executable for residence")
         if (
             isinstance(operand, dict)
             and operand.get("kind") == "profile"

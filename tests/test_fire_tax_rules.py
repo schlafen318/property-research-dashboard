@@ -313,6 +313,29 @@ class FireTaxRuleContractTests(unittest.TestCase):
         self.assert_path_error(errors, "jurisdictions.synthetic-example.questions[0].accepted_values")
         self.assert_path_error(errors, "jurisdictions.synthetic-example.questions[0].materiality_values")
 
+    def test_executable_residence_operands_reject_unsupported_derived_values(self):
+        payload = copy.deepcopy(self.payload)
+        payload["operand_catalog"]["base_residence_threshold"] = {
+            "kind": "constant",
+            "value_type": "number",
+            "value": 183,
+        }
+        payload["operand_catalog"]["residence_day_threshold"] = {
+            "kind": "derived",
+            "value_type": "number",
+            "derivation": {
+                "operation": "add",
+                "operands": ["base_residence_threshold"],
+            },
+        }
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(
+            errors,
+            "operand_catalog.residence_day_threshold",
+        )
+
     def test_treaty_branch_uses_validated_ordered_residence_decisions(self):
         payload = copy.deepcopy(self.payload)
         jurisdiction = payload["jurisdictions"]["synthetic-example"]
