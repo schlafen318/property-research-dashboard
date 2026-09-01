@@ -91,7 +91,12 @@
   "operand_catalog": {
     "days_in_jurisdiction": {
       "kind": "profile",
-      "value_type": "number"
+      "profile_key": "daysInJurisdiction",
+      "value_type": "number",
+      "minimum": 0,
+      "maximum": 365,
+      "integer": true,
+      "day_count": true
     },
     "residence_day_threshold": {
       "kind": "constant",
@@ -100,6 +105,7 @@
     },
     "ordinary_income": {
       "kind": "profile",
+      "profile_key": "ordinaryIncome",
       "value_type": "money",
       "currency": "EUR"
     }
@@ -123,6 +129,37 @@
       "label": "Synthetic example",
       "synthetic": true,
       "detailed_enabled": false,
+      "resident_scope": "worldwide_income",
+      "nonresident_scope": "source_income",
+      "residence_logic": {
+        "operation": "any",
+        "rule_ids": [
+          "example-residence-days-2026"
+        ]
+      },
+      "questions": [
+        {
+          "id": "example-days-in-jurisdiction",
+          "operand_id": "days_in_jurisdiction",
+          "control": "number",
+          "label": "How many days will you spend in the jurisdiction?",
+          "reason": "The validated day threshold can change the residence result.",
+          "accepted_values": {
+            "min": 0,
+            "max": 365,
+            "step": 1,
+            "integer": true
+          },
+          "materiality_values": [
+            0,
+            183,
+            365
+          ],
+          "affects_rule_ids": [
+            "example-residence-days-2026"
+          ]
+        }
+      ],
       "rules": [
         {
           "id": "example-residence-days-2026",

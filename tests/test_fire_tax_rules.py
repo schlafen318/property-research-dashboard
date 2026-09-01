@@ -97,6 +97,317 @@ class FireTaxRuleContractTests(unittest.TestCase):
             errors, "jurisdictions.synthetic-example.detailed_enabled"
         )
 
+    def test_residence_jurisdiction_requires_explicit_logic_and_scopes(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        jurisdiction.pop("resident_scope", None)
+        jurisdiction.pop("nonresident_scope", None)
+        jurisdiction.pop("residence_logic", None)
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(errors, "jurisdictions.synthetic-example.resident_scope")
+        self.assert_path_error(errors, "jurisdictions.synthetic-example.nonresident_scope")
+        self.assert_path_error(errors, "jurisdictions.synthetic-example.residence_logic")
+
+    def test_residence_questions_use_control_specific_validated_values_and_rules(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        jurisdiction["questions"] = [
+            {
+                "id": "example-days-question",
+                "operand_id": "days_in_jurisdiction",
+                "control": "number",
+                "label": "How many days will you spend there?",
+                "reason": "The validated day test can change residence.",
+                "accepted_values": {"min": 0, "max": 366, "step": 1, "integer": True},
+                "materiality_values": [0, 183, 366],
+                "affects_rule_ids": ["example-residence-days-2026"],
+            }
+        ]
+        question = jurisdiction["questions"][0]
+        question["accepted_values"] = ["not", "a", "number", "range"]
+        question["affects_rule_ids"] = ["missing-residence-rule-2026"]
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.questions[0].accepted_values",
+        )
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.questions[0].affects_rule_ids[0]",
+        )
+
+    def test_runtime_jurisdiction_selector_must_reference_validated_jurisdiction(self):
+        payload = copy.deepcopy(self.payload)
+        payload["active_jurisdiction_id"] = "missing-jurisdiction"
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(errors, "active_jurisdiction_id")
+
+    def test_question_ranges_and_materiality_values_stay_within_native_control(self):
+        payload = copy.deepcopy(self.payload)
+        question = payload["jurisdictions"]["synthetic-example"]["questions"][0]
+        question["accepted_values"] = {
+            "min": 1,
+            "max": 366,
+            "step": 0.5,
+            "integer": False,
+        }
+        question["materiality_values"] = [0, 183, 366]
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.questions[0].accepted_values",
+        )
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.questions[0].materiality_values",
+        )
+
+    def test_question_labels_are_plain_text_and_branch_conditions_are_declared(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        jurisdiction["questions"][0]["label"] = "<strong>Days?</strong>"
+        branch = jurisdiction["rules"][1]
+        branch["formula"]["operands"] = ["ordinary_income"]
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.questions[0].label",
+        )
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.rules[1].branches[0].when.operand",
+        )
+
+    def test_questions_reference_only_active_residence_graph_rules(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        dormant = copy.deepcopy(jurisdiction["rules"][0])
+        dormant["id"] = "example-dormant-days-2026"
+        jurisdiction["rules"].append(dormant)
+        jurisdiction["questions"][0]["affects_rule_ids"] = [dormant["id"]]
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.questions[0].affects_rule_ids[0]",
+        )
+
+    def test_string_residence_operands_require_validated_allowed_values(self):
+        payload = copy.deepcopy(self.payload)
+        operand = payload["operand_catalog"]["days_in_jurisdiction"]
+        operand.update(
+            {
+                "value_type": "string",
+                "allowed_values": ["home", "destination"],
+            }
+        )
+        operand.pop("minimum", None)
+        operand.pop("maximum", None)
+        operand.pop("integer", None)
+        operand.pop("day_count", None)
+        payload["operand_catalog"]["residence_day_threshold"].update(
+            {"value_type": "string", "value": "destination"}
+        )
+        payload["jurisdictions"]["synthetic-example"]["questions"][0].update(
+            {
+                "control": "select",
+                "accepted_values": ["home", "destination", "banana"],
+                "materiality_values": ["home", "destination"],
+            }
+        )
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.questions[0].accepted_values",
+        )
+
+        operand.pop("allowed_values")
+        errors = self.validate(payload)
+        self.assert_path_error(errors, "operand_catalog.days_in_jurisdiction.allowed_values")
+
+    def test_special_residence_rules_have_single_cardinality_and_definite_split_base(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        split = copy.deepcopy(jurisdiction["rules"][1])
+        split.update(
+            {
+                "id": "example-split-year-2026",
+                "branch_kind": "split_year",
+                "date_operand": "example_move_date",
+                "activation_operand": "example_split_requested",
+                "applies_to_statuses": ["conditional"],
+                "periods": [
+                    {
+                        "position": "before",
+                        "status": "likely_home_resident",
+                        "scopes": {"destination": "worldwide_income", "home": "source_income"},
+                    },
+                    {
+                        "position": "from",
+                        "status": "likely_destination_resident",
+                        "scopes": {"destination": "worldwide_income", "home": "source_income"},
+                    },
+                ],
+                "formula": {
+                    "operation": "conditional",
+                    "operands": ["example_split_requested", "example_move_date"],
+                },
+            }
+        )
+        payload["operand_catalog"].update(
+            {
+                "example_move_date": {
+                    "kind": "profile",
+                    "profile_key": "moveDate",
+                    "value_type": "date",
+                },
+                "example_split_requested": {
+                    "kind": "profile",
+                    "profile_key": "splitYear",
+                    "value_type": "boolean",
+                },
+            }
+        )
+        jurisdiction["rules"].extend([split, {**copy.deepcopy(split), "id": "example-second-split-2026"}])
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(errors, "jurisdictions.synthetic-example.rules")
+        self.assertTrue(any("applies_to_statuses" in error for error in errors))
+        self.assertTrue(any("periods[0].scopes" in error for error in errors))
+
+    def test_split_date_question_values_are_real_and_inside_tax_year(self):
+        payload = copy.deepcopy(self.payload)
+        question = payload["jurisdictions"]["synthetic-example"]["questions"][0]
+        payload["operand_catalog"]["days_in_jurisdiction"].update(
+            {"value_type": "date", "profile_key": "moveDate"}
+        )
+        for field in ("minimum", "maximum", "integer", "day_count"):
+            payload["operand_catalog"]["days_in_jurisdiction"].pop(field, None)
+        payload["operand_catalog"]["residence_day_threshold"].update(
+            {"value_type": "date", "value": "2026-07-01"}
+        )
+        question.update(
+            {
+                "control": "date",
+                "accepted_values": {"min": "2026-02-30", "max": "2027-01-01"},
+                "materiality_values": ["2026-02-30", "2027-01-01"],
+            }
+        )
+
+        errors = self.validate(payload)
+
+        self.assert_path_error(errors, "jurisdictions.synthetic-example.questions[0].accepted_values")
+        self.assert_path_error(errors, "jurisdictions.synthetic-example.questions[0].materiality_values")
+
+    def test_treaty_branch_uses_validated_ordered_residence_decisions(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        branch = copy.deepcopy(jurisdiction["rules"][1])
+        branch.update(
+            {
+                "id": "example-treaty-tie-breaker-2026",
+                "branch_kind": "treaty_tie_breaker",
+                "branches": [
+                    {
+                        "when": {
+                            "operand": "days_in_jurisdiction",
+                            "operator": "greater_than_or_equal",
+                            "value": 183,
+                        },
+                        "residence_decision": "destination",
+                    }
+                ],
+            }
+        )
+        jurisdiction["rules"].append(branch)
+
+        self.assertEqual([], self.validate(payload))
+        branch["branches"][0].pop("residence_decision")
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.rules[3].branches[0].residence_decision",
+        )
+
+    def test_split_year_branch_requires_explicit_period_status_and_scopes(self):
+        payload = copy.deepcopy(self.payload)
+        jurisdiction = payload["jurisdictions"]["synthetic-example"]
+        branch = copy.deepcopy(jurisdiction["rules"][1])
+        branch.update(
+            {
+                "id": "example-split-year-2026",
+                "branch_kind": "split_year",
+                "formula": {
+                    "operation": "conditional",
+                    "operands": ["days_in_jurisdiction"],
+                },
+                "date_operand": "days_in_jurisdiction",
+                "activation_operand": "days_in_jurisdiction",
+                "applies_to_statuses": ["likely_destination_resident"],
+                "periods": [
+                    {
+                        "position": "before",
+                        "status": "likely_home_resident",
+                        "scopes": {
+                            "destination": "source_income",
+                            "home": "worldwide_income",
+                        },
+                    },
+                    {
+                        "position": "from",
+                        "status": "likely_destination_resident",
+                        "scopes": {
+                            "destination": "worldwide_income",
+                            "home": "source_income",
+                        },
+                    },
+                ],
+            }
+        )
+        branch.pop("branches")
+        jurisdiction["rules"].append(branch)
+
+        errors = self.validate(payload)
+        self.assertTrue(
+            any(error.startswith("jurisdictions.synthetic-example.rules[3].date_operand") for error in errors),
+            errors,
+        )
+        branch["date_operand"] = "move_date"
+        payload["operand_catalog"]["move_date"] = {
+            "kind": "profile",
+            "profile_key": "moveDate",
+            "value_type": "date",
+        }
+        branch["activation_operand"] = "split_year_requested"
+        payload["operand_catalog"]["split_year_requested"] = {
+            "kind": "profile",
+            "profile_key": "splitYear",
+            "value_type": "boolean",
+        }
+        branch["formula"]["operands"] = ["split_year_requested", "move_date"]
+
+        self.assertEqual([], self.validate(payload))
+        branch["periods"][0].pop("scopes")
+        errors = self.validate(payload)
+        self.assert_path_error(
+            errors,
+            "jurisdictions.synthetic-example.rules[3].periods[0].scopes",
+        )
+
     def test_enabled_jurisdiction_rejects_non_official_referenced_sources(self):
         payload = copy.deepcopy(self.payload)
         jurisdiction = payload["jurisdictions"]["synthetic-example"]

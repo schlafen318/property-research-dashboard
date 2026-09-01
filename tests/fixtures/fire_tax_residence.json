@@ -1,316 +1,82 @@
 {
-  "schema_version": 1,
-  "taxYear": 2026,
-  "operand_catalog": {
-    "days_in_destination": {"kind": "profile", "value_type": "number"},
-    "destination_day_threshold": {"kind": "constant", "value_type": "number", "value": 183},
-    "days_in_home": {"kind": "profile", "value_type": "number"},
-    "home_day_threshold": {"kind": "constant", "value_type": "number", "value": 183},
-    "destination_available_home_flag": {"kind": "derived", "value_type": "number"},
-    "destination_family_ties_flag": {"kind": "derived", "value_type": "number"},
-    "destination_economic_ties_flag": {"kind": "derived", "value_type": "number"},
-    "home_available_home_flag": {"kind": "derived", "value_type": "number"},
-    "home_family_ties_flag": {"kind": "derived", "value_type": "number"},
-    "home_economic_ties_flag": {"kind": "derived", "value_type": "number"},
-    "true_flag": {"kind": "constant", "value_type": "number", "value": 1}
-  },
-  "sources": [
-    {
-      "id": "synthetic-destination-authority-2026",
-      "publisher": "Synthetic destination authority — test fixture only",
-      "url": "https://example.invalid/synthetic-destination-residence-2026",
-      "source_kind": "synthetic",
-      "effective_from": "2026-01-01",
-      "checked_on": "2026-09-01",
-      "review_interval_days": 365,
-      "scope": "Exercises destination residence branches; it describes no real jurisdiction.",
-      "recheck_trigger": "Replace before enabling a real jurisdiction."
+  "destinationId": "synthetic-destination",
+  "homeId": "synthetic-home",
+  "rules": {
+    "schema_version": 1,
+    "dataset_id": "synthetic-fire-tax-residence-v1",
+    "tax_year": 2026,
+    "checked_on": "2026-09-01",
+    "enablement_contract": {
+      "required_rule_types": ["residence_test", "rate_band", "allowance", "withholding", "credit_limit", "property_charge", "reporting_flag", "branch"],
+      "required_categories": ["tax_residence", "private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting", "property_purchase", "property_annual", "property_rental", "property_sale", "property_inheritance", "property_gift", "tax_reporting"],
+      "category_capabilities": {"tax_residence": ["residence_test", "branch"], "private_pension": ["rate_band"], "government_pension": ["rate_band"], "social_security": ["rate_band"], "dividends": ["rate_band"], "interest": ["rate_band"], "realized_gains": ["rate_band"], "retirement_account_withdrawal": ["rate_band"], "rental_income": ["rate_band"], "employment_consulting": ["rate_band"], "property_purchase": ["property_charge"], "property_annual": ["property_charge"], "property_rental": ["property_charge"], "property_sale": ["property_charge"], "property_inheritance": ["property_charge"], "property_gift": ["property_charge"], "tax_reporting": ["reporting_flag"]}
     },
-    {
-      "id": "synthetic-home-authority-2026",
-      "publisher": "Synthetic home authority — test fixture only",
-      "url": "https://example.invalid/synthetic-home-residence-2026",
-      "source_kind": "synthetic",
-      "effective_from": "2026-01-01",
-      "checked_on": "2026-09-01",
-      "review_interval_days": 365,
-      "scope": "Exercises continuing home-country residence branches; it describes no real jurisdiction.",
-      "recheck_trigger": "Replace before enabling a real jurisdiction."
+    "operand_catalog": {
+      "days_in_destination": {"kind": "profile", "profile_key": "daysInDestination", "value_type": "number", "minimum": 0, "maximum": 365, "integer": true, "day_count": true},
+      "days_in_home": {"kind": "profile", "profile_key": "daysInHome", "value_type": "number", "minimum": 0, "maximum": 365, "integer": true, "day_count": true},
+      "residence_day_threshold": {"kind": "constant", "value_type": "number", "value": 183},
+      "destination_available_home": {"kind": "profile", "profile_key": "destinationAvailableHome", "value_type": "boolean"},
+      "home_available_home": {"kind": "profile", "profile_key": "homeAvailableHome", "value_type": "boolean"},
+      "family_ties": {"kind": "profile", "profile_key": "familyTies", "value_type": "string", "allowed_values": ["home", "destination", "both", "neither", "unknown"]},
+      "economic_ties": {"kind": "profile", "profile_key": "economicTies", "value_type": "string", "allowed_values": ["home", "destination", "both", "neither", "unknown"]},
+      "destination_side": {"kind": "constant", "value_type": "string", "value": "destination"},
+      "home_side": {"kind": "constant", "value_type": "string", "value": "home"},
+      "both_sides": {"kind": "constant", "value_type": "string", "value": "both"},
+      "split_year_requested": {"kind": "profile", "profile_key": "splitYear", "value_type": "boolean"},
+      "move_date": {"kind": "profile", "profile_key": "moveDate", "value_type": "date"},
+      "treaty_permanent_home": {"kind": "profile", "profile_key": "treatyPermanentHome", "value_type": "string", "allowed_values": ["home", "destination", "both", "neither", "unknown"]},
+      "treaty_centre": {"kind": "profile", "profile_key": "treatyCentreOfVitalInterests", "value_type": "string", "allowed_values": ["home", "destination", "both", "neither", "unknown"]}
     },
-    {
-      "id": "synthetic-treaty-2026",
-      "publisher": "Synthetic treaty authority — test fixture only",
-      "url": "https://example.invalid/synthetic-treaty-2026",
-      "source_kind": "synthetic",
-      "effective_from": "2026-01-01",
-      "checked_on": "2026-09-01",
-      "review_interval_days": 365,
-      "scope": "Exercises treaty tie-breaker ordering; it describes no real treaty.",
-      "recheck_trigger": "Replace before enabling a real treaty."
-    }
-  ],
-  "questions": [
-    {
-      "id": "fire-tax-days-destination",
-      "fact": "daysInDestination",
-      "control": "number",
-      "label": "About how many days will you spend in the destination this tax year?",
-      "reason": "The destination day-count test can change your tax-residence result.",
-      "acceptedValues": {"min": 0, "max": 366, "step": 1},
-      "affectsRuleIds": ["synthetic-destination-days-2026"]
-    },
-    {
-      "id": "fire-tax-destination-home",
-      "fact": "destinationAvailableHome",
-      "control": "select",
-      "label": "Will you have a home continuously available in the destination?",
-      "reason": "An available home can change the destination's domestic residence result.",
-      "acceptedValues": [true, false, "unknown"],
-      "affectsRuleIds": ["synthetic-destination-home-2026"]
-    },
-    {
-      "id": "fire-tax-family-ties",
-      "fact": "familyTies",
-      "control": "select",
-      "label": "Where will your closest family ties be?",
-      "reason": "Family ties can change either country's domestic residence result.",
-      "acceptedValues": ["home", "destination", "both", "neither", "unknown"],
-      "affectsRuleIds": ["synthetic-destination-family-2026", "synthetic-home-family-2026"]
-    },
-    {
-      "id": "fire-tax-economic-ties",
-      "fact": "economicTies",
-      "control": "select",
-      "label": "Where will your main economic ties be?",
-      "reason": "Economic ties can change either country's domestic residence result.",
-      "acceptedValues": ["home", "destination", "both", "neither", "unknown"],
-      "affectsRuleIds": ["synthetic-destination-economic-2026", "synthetic-home-economic-2026"]
-    },
-    {
-      "id": "fire-tax-move-date",
-      "fact": "moveDate",
-      "control": "date",
-      "label": "On what date will your move take effect?",
-      "reason": "A move date is needed to calculate the supported split-year periods.",
-      "acceptedValues": {"format": "YYYY-MM-DD"},
-      "affectsRuleIds": ["synthetic-split-year-2026"]
-    },
-    {
-      "id": "fire-tax-treaty-home",
-      "fact": "treatyPermanentHome",
-      "control": "select",
-      "label": "Where will you have a permanent home for treaty purposes?",
-      "reason": "The treaty applies its permanent-home test before later tie-breakers.",
-      "acceptedValues": ["home", "destination", "both", "neither", "unknown"],
-      "affectsRuleIds": ["synthetic-treaty-tie-breaker-2026"]
-    },
-    {
-      "id": "fire-tax-treaty-centre",
-      "fact": "treatyCentreOfVitalInterests",
-      "control": "select",
-      "label": "Where is your centre of personal and economic interests?",
-      "reason": "This treaty tie-breaker is reached only if the permanent-home test does not decide residence.",
-      "acceptedValues": ["home", "destination", "both", "neither", "unknown"],
-      "affectsRuleIds": ["synthetic-treaty-tie-breaker-2026"]
-    },
-    {
-      "id": "fire-tax-nonmaterial-theme",
-      "fact": "themePreference",
-      "control": "select",
-      "label": "Which display theme do you prefer?",
-      "reason": "This should never be asked by the tax router.",
-      "acceptedValues": ["light", "dark"],
-      "affectsRuleIds": ["synthetic-destination-days-2026"],
-      "outcomes": {"light": "same", "dark": "same"}
-    }
-  ],
-  "destinationRules": {
-    "id": "synthetic-destination",
-    "label": "Synthetic destination",
-    "taxYear": 2026,
-    "residentScope": "worldwide_income",
-    "nonresidentScope": "source_income",
-    "rules": [
-      {
-        "id": "synthetic-destination-days-2026",
-        "type": "residence_test",
-        "tax_year": 2026,
-        "taxpayer_scope": ["individual"],
-        "category": "tax_residence",
-        "currency": "EUR",
-        "formula": {"operation": "greater_than_or_equal", "operands": ["days_in_destination", "destination_day_threshold"]},
-        "test": "day_threshold",
-        "fact": "daysInDestination",
-        "operator": "greater_than_or_equal",
-        "threshold": 183,
-        "source_ids": ["synthetic-destination-authority-2026"],
-        "effective_from": "2026-01-01",
-        "checked_on": "2026-09-01",
-        "review_interval_days": 365,
-        "confidence": "high",
-        "recheck_trigger": "Replace before enabling a real jurisdiction.",
-        "explanation": "Destination domestic residence begins at 183 days in this synthetic example."
-      },
-      {
-        "id": "synthetic-destination-home-2026",
-        "type": "residence_test",
-        "tax_year": 2026,
-        "taxpayer_scope": ["individual"],
-        "category": "tax_residence",
-        "currency": "EUR",
-        "formula": {"operation": "greater_than_or_equal", "operands": ["destination_available_home_flag", "true_flag"]},
-        "test": "boolean",
-        "fact": "destinationAvailableHome",
-        "residentValues": [true],
-        "source_ids": ["synthetic-destination-authority-2026"],
-        "effective_from": "2026-01-01",
-        "checked_on": "2026-09-01",
-        "review_interval_days": 365,
-        "confidence": "high",
-        "recheck_trigger": "Replace before enabling a real jurisdiction.",
-        "explanation": "A continuously available destination home is a separate synthetic domestic test."
-      },
-      {
-        "id": "synthetic-destination-family-2026",
-        "type": "residence_test",
-        "tax_year": 2026,
-        "taxpayer_scope": ["individual"],
-        "category": "tax_residence",
-        "currency": "EUR",
-        "formula": {"operation": "greater_than_or_equal", "operands": ["destination_family_ties_flag", "true_flag"]},
-        "test": "side",
-        "fact": "familyTies",
-        "residentValues": ["destination", "both"],
-        "source_ids": ["synthetic-destination-authority-2026"],
-        "effective_from": "2026-01-01",
-        "checked_on": "2026-09-01",
-        "review_interval_days": 365,
-        "confidence": "high",
-        "recheck_trigger": "Replace before enabling a real jurisdiction.",
-        "explanation": "Destination family ties are a synthetic domestic residence factor."
-      },
-      {
-        "id": "synthetic-destination-economic-2026",
-        "type": "residence_test",
-        "tax_year": 2026,
-        "taxpayer_scope": ["individual"],
-        "category": "tax_residence",
-        "currency": "EUR",
-        "formula": {"operation": "greater_than_or_equal", "operands": ["destination_economic_ties_flag", "true_flag"]},
-        "test": "side",
-        "fact": "economicTies",
-        "residentValues": ["destination", "both"],
-        "source_ids": ["synthetic-destination-authority-2026"],
-        "effective_from": "2026-01-01",
-        "checked_on": "2026-09-01",
-        "review_interval_days": 365,
-        "confidence": "high",
-        "recheck_trigger": "Replace before enabling a real jurisdiction.",
-        "explanation": "Destination economic ties are a synthetic domestic residence factor."
-      }
+    "sources": [
+      {"id": "synthetic-destination-authority-2026", "publisher": "Synthetic destination authority — test fixture only", "url": "https://example.invalid/synthetic-destination-residence-2026", "source_kind": "synthetic", "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "scope": "Exercises destination residence branches; it describes no real jurisdiction.", "recheck_trigger": "Replace before enabling a real jurisdiction."},
+      {"id": "synthetic-home-authority-2026", "publisher": "Synthetic home authority — test fixture only", "url": "https://example.invalid/synthetic-home-residence-2026", "source_kind": "synthetic", "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "scope": "Exercises home residence branches; it describes no real jurisdiction.", "recheck_trigger": "Replace before enabling a real jurisdiction."},
+      {"id": "synthetic-treaty-2026", "publisher": "Synthetic treaty authority — test fixture only", "url": "https://example.invalid/synthetic-treaty-2026", "source_kind": "synthetic", "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "scope": "Exercises treaty ordering; it describes no real treaty.", "recheck_trigger": "Replace before enabling a real treaty."}
     ],
-    "splitYear": {
-      "supported": true,
-      "ruleId": "synthetic-split-year-2026",
-      "dateFact": "moveDate",
-      "source_ids": ["synthetic-destination-authority-2026"],
-      "explanation": "The synthetic example supports a split year beginning on the stated move date."
-    },
-    "treatyTieBreaker": {
-      "supported": true,
-      "ruleId": "synthetic-treaty-tie-breaker-2026",
-      "source_ids": ["synthetic-treaty-2026"],
-      "tests": [
-        {"fact": "treatyPermanentHome"},
-        {"fact": "treatyCentreOfVitalInterests"}
-      ],
-      "explanation": "The synthetic treaty applies permanent home, then centre of vital interests."
-    }
-  },
-  "homeRules": {
-    "id": "synthetic-home",
-    "label": "Synthetic home country",
-    "taxYear": 2026,
-    "residentScope": "worldwide_income",
-    "nonresidentScope": "source_income",
-    "rules": [
-      {
-        "id": "synthetic-home-days-2026",
-        "type": "residence_test",
-        "tax_year": 2026,
-        "taxpayer_scope": ["individual"],
-        "category": "tax_residence",
-        "currency": "EUR",
-        "formula": {"operation": "greater_than_or_equal", "operands": ["days_in_home", "home_day_threshold"]},
-        "test": "day_threshold",
-        "fact": "daysInHome",
-        "operator": "greater_than_or_equal",
-        "threshold": 183,
-        "source_ids": ["synthetic-home-authority-2026"],
-        "effective_from": "2026-01-01",
-        "checked_on": "2026-09-01",
-        "review_interval_days": 365,
-        "confidence": "high",
-        "recheck_trigger": "Replace before enabling a real jurisdiction.",
-        "explanation": "Home-country domestic residence begins at 183 days in this synthetic example."
+    "jurisdictions": {
+      "synthetic-destination": {
+        "id": "synthetic-destination", "label": "Synthetic destination", "synthetic": true, "detailed_enabled": false,
+        "resident_scope": "worldwide_income", "nonresident_scope": "source_income",
+        "residence_logic": {"operation": "any", "rule_ids": ["synthetic-destination-days-2026", "synthetic-destination-home-2026", "synthetic-destination-family-2026", "synthetic-destination-family-both-2026", "synthetic-destination-economic-2026", "synthetic-destination-economic-both-2026"]},
+        "questions": [
+          {"id": "fire-tax-days-destination", "operand_id": "days_in_destination", "control": "number", "label": "About how many days will you spend in the destination this tax year?", "reason": "The validated destination day-count test can change tax residence.", "accepted_values": {"min": 0, "max": 365, "step": 1, "integer": true}, "materiality_values": [0, 182, 183, 365], "affects_rule_ids": ["synthetic-destination-days-2026"]},
+          {"id": "fire-tax-destination-home", "operand_id": "destination_available_home", "control": "checkbox", "label": "Will you have a home continuously available in the destination?", "reason": "The validated available-home test can change destination residence.", "accepted_values": [true, false], "materiality_values": [true, false], "affects_rule_ids": ["synthetic-destination-home-2026"]},
+          {"id": "fire-tax-family-ties", "operand_id": "family_ties", "control": "select", "label": "Where will your closest family ties be?", "reason": "The validated family-ties tests can change domestic residence.", "accepted_values": ["home", "destination", "both", "neither", "unknown"], "materiality_values": ["home", "destination", "both", "neither"], "affects_rule_ids": ["synthetic-destination-family-2026", "synthetic-destination-family-both-2026"]},
+          {"id": "fire-tax-economic-ties", "operand_id": "economic_ties", "control": "select", "label": "Where will your main economic ties be?", "reason": "The validated economic-ties tests can change domestic residence.", "accepted_values": ["home", "destination", "both", "neither", "unknown"], "materiality_values": ["home", "destination", "both", "neither"], "affects_rule_ids": ["synthetic-destination-economic-2026", "synthetic-destination-economic-both-2026"]},
+          {"id": "fire-tax-split-year", "operand_id": "split_year_requested", "control": "checkbox", "label": "Should the supported split-year rule be applied?", "reason": "The answer determines whether the move date changes the tax-year periods.", "accepted_values": [true, false], "materiality_values": [true, false], "affects_rule_ids": ["synthetic-split-year-2026"]},
+          {"id": "fire-tax-move-date", "operand_id": "move_date", "control": "date", "label": "On what date will your move take effect?", "reason": "The validated split-year rule uses this date to create explicit periods.", "accepted_values": {"min": "2026-01-01", "max": "2026-12-31"}, "materiality_values": ["2026-01-01", "2026-07-01", "2026-12-31"], "affects_rule_ids": ["synthetic-split-year-2026"]},
+          {"id": "fire-tax-treaty-home", "operand_id": "treaty_permanent_home", "control": "select", "label": "Where will you have a permanent home for treaty purposes?", "reason": "The validated treaty rule evaluates permanent home first.", "accepted_values": ["home", "destination", "both", "neither", "unknown"], "materiality_values": ["home", "destination", "both", "neither"], "affects_rule_ids": ["synthetic-treaty-tie-breaker-2026"]},
+          {"id": "fire-tax-treaty-centre", "operand_id": "treaty_centre", "control": "select", "label": "Where is your centre of personal and economic interests?", "reason": "The validated treaty rule reaches this test only if permanent home does not decide residence.", "accepted_values": ["home", "destination", "both", "neither", "unknown"], "materiality_values": ["home", "destination", "both", "neither"], "affects_rule_ids": ["synthetic-treaty-tie-breaker-2026"]}
+        ],
+        "rules": [
+          {"id": "synthetic-destination-days-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "greater_than_or_equal", "operands": ["days_in_destination", "residence_day_threshold"]}, "resident_when": true, "source_ids": ["synthetic-destination-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {days_in_destination} with {residence_day_threshold}."},
+          {"id": "synthetic-destination-home-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "flag", "operands": ["destination_available_home"]}, "resident_when": true, "source_ids": ["synthetic-destination-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Evaluate {destination_available_home} as a residence flag."},
+          {"id": "synthetic-destination-family-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "equals", "operands": ["family_ties", "destination_side"]}, "resident_when": true, "source_ids": ["synthetic-destination-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {family_ties} with {destination_side}."},
+          {"id": "synthetic-destination-family-both-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "equals", "operands": ["family_ties", "both_sides"]}, "resident_when": true, "source_ids": ["synthetic-destination-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {family_ties} with {both_sides}."},
+          {"id": "synthetic-destination-economic-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "equals", "operands": ["economic_ties", "destination_side"]}, "resident_when": true, "source_ids": ["synthetic-destination-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {economic_ties} with {destination_side}."},
+          {"id": "synthetic-destination-economic-both-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "equals", "operands": ["economic_ties", "both_sides"]}, "resident_when": true, "source_ids": ["synthetic-destination-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {economic_ties} with {both_sides}."},
+          {"id": "synthetic-treaty-tie-breaker-2026", "type": "branch", "branch_kind": "treaty_tie_breaker", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "conditional", "operands": ["treaty_permanent_home", "treaty_centre"]}, "branches": [{"when": {"operand": "treaty_permanent_home", "operator": "equals", "value": "destination"}, "residence_decision": "destination"}, {"when": {"operand": "treaty_permanent_home", "operator": "equals", "value": "home"}, "residence_decision": "home"}, {"when": {"operand": "treaty_centre", "operator": "equals", "value": "destination"}, "residence_decision": "destination"}, {"when": {"operand": "treaty_centre", "operator": "equals", "value": "home"}, "residence_decision": "home"}], "source_ids": ["synthetic-treaty-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real treaty.", "explanation": "Apply validated treaty conditions in declared order."},
+          {"id": "synthetic-split-year-2026", "type": "branch", "branch_kind": "split_year", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "conditional", "operands": ["split_year_requested", "move_date"]}, "activation_operand": "split_year_requested", "date_operand": "move_date", "applies_to_statuses": ["likely_destination_resident"], "periods": [{"position": "before", "status": "likely_home_resident", "scopes": {"destination": "source_income", "home": "worldwide_income"}}, {"position": "from", "status": "likely_destination_resident", "scopes": {"destination": "worldwide_income", "home": "source_income"}}], "source_ids": ["synthetic-destination-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real split-year rule.", "explanation": "Apply explicit before and from periods using {move_date}."}
+        ]
       },
-      {
-        "id": "synthetic-home-home-2026",
-        "type": "residence_test",
-        "tax_year": 2026,
-        "taxpayer_scope": ["individual"],
-        "category": "tax_residence",
-        "currency": "EUR",
-        "formula": {"operation": "greater_than_or_equal", "operands": ["home_available_home_flag", "true_flag"]},
-        "test": "boolean",
-        "fact": "homeAvailableHome",
-        "residentValues": [true],
-        "source_ids": ["synthetic-home-authority-2026"],
-        "effective_from": "2026-01-01",
-        "checked_on": "2026-09-01",
-        "review_interval_days": 365,
-        "confidence": "high",
-        "recheck_trigger": "Replace before enabling a real jurisdiction.",
-        "explanation": "A continuously available home-country home is a separate synthetic domestic test."
-      },
-      {
-        "id": "synthetic-home-family-2026",
-        "type": "residence_test",
-        "tax_year": 2026,
-        "taxpayer_scope": ["individual"],
-        "category": "tax_residence",
-        "currency": "EUR",
-        "formula": {"operation": "greater_than_or_equal", "operands": ["home_family_ties_flag", "true_flag"]},
-        "test": "side",
-        "fact": "familyTies",
-        "residentValues": ["home", "both"],
-        "source_ids": ["synthetic-home-authority-2026"],
-        "effective_from": "2026-01-01",
-        "checked_on": "2026-09-01",
-        "review_interval_days": 365,
-        "confidence": "high",
-        "recheck_trigger": "Replace before enabling a real jurisdiction.",
-        "explanation": "Home-country family ties are a synthetic domestic residence factor."
-      },
-      {
-        "id": "synthetic-home-economic-2026",
-        "type": "residence_test",
-        "tax_year": 2026,
-        "taxpayer_scope": ["individual"],
-        "category": "tax_residence",
-        "currency": "EUR",
-        "formula": {"operation": "greater_than_or_equal", "operands": ["home_economic_ties_flag", "true_flag"]},
-        "test": "side",
-        "fact": "economicTies",
-        "residentValues": ["home", "both"],
-        "source_ids": ["synthetic-home-authority-2026"],
-        "effective_from": "2026-01-01",
-        "checked_on": "2026-09-01",
-        "review_interval_days": 365,
-        "confidence": "high",
-        "recheck_trigger": "Replace before enabling a real jurisdiction.",
-        "explanation": "Home-country economic ties are a synthetic domestic residence factor."
+      "synthetic-home": {
+        "id": "synthetic-home", "label": "Synthetic home country", "synthetic": true, "detailed_enabled": false,
+        "resident_scope": "worldwide_income", "nonresident_scope": "source_income",
+        "residence_logic": {"operation": "any", "rule_ids": ["synthetic-home-days-2026", "synthetic-home-home-2026", "synthetic-home-family-2026", "synthetic-home-family-both-2026", "synthetic-home-economic-2026", "synthetic-home-economic-both-2026"]},
+        "questions": [
+          {"id": "fire-tax-days-home", "operand_id": "days_in_home", "control": "number", "label": "About how many days will you spend in your home country this tax year?", "reason": "The validated home-country day-count test can change tax residence.", "accepted_values": {"min": 0, "max": 365, "step": 1, "integer": true}, "materiality_values": [0, 182, 183, 365], "affects_rule_ids": ["synthetic-home-days-2026"]},
+          {"id": "fire-tax-home-home", "operand_id": "home_available_home", "control": "checkbox", "label": "Will you keep a home continuously available in your home country?", "reason": "The validated available-home test can change continuing residence.", "accepted_values": [true, false], "materiality_values": [true, false], "affects_rule_ids": ["synthetic-home-home-2026"]},
+          {"id": "fire-tax-family-ties", "operand_id": "family_ties", "control": "select", "label": "Where will your closest family ties be?", "reason": "The validated family-ties tests can change domestic residence.", "accepted_values": ["home", "destination", "both", "neither", "unknown"], "materiality_values": ["home", "destination", "both", "neither"], "affects_rule_ids": ["synthetic-home-family-2026", "synthetic-home-family-both-2026"]},
+          {"id": "fire-tax-economic-ties", "operand_id": "economic_ties", "control": "select", "label": "Where will your main economic ties be?", "reason": "The validated economic-ties tests can change domestic residence.", "accepted_values": ["home", "destination", "both", "neither", "unknown"], "materiality_values": ["home", "destination", "both", "neither"], "affects_rule_ids": ["synthetic-home-economic-2026", "synthetic-home-economic-both-2026"]}
+        ],
+        "rules": [
+          {"id": "synthetic-home-days-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "greater_than_or_equal", "operands": ["days_in_home", "residence_day_threshold"]}, "resident_when": true, "source_ids": ["synthetic-home-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {days_in_home} with {residence_day_threshold}."},
+          {"id": "synthetic-home-home-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "flag", "operands": ["home_available_home"]}, "resident_when": true, "source_ids": ["synthetic-home-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Evaluate {home_available_home} as a residence flag."},
+          {"id": "synthetic-home-family-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "equals", "operands": ["family_ties", "home_side"]}, "resident_when": true, "source_ids": ["synthetic-home-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {family_ties} with {home_side}."},
+          {"id": "synthetic-home-family-both-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "equals", "operands": ["family_ties", "both_sides"]}, "resident_when": true, "source_ids": ["synthetic-home-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {family_ties} with {both_sides}."},
+          {"id": "synthetic-home-economic-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "equals", "operands": ["economic_ties", "home_side"]}, "resident_when": true, "source_ids": ["synthetic-home-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {economic_ties} with {home_side}."},
+          {"id": "synthetic-home-economic-both-2026", "type": "residence_test", "tax_year": 2026, "taxpayer_scope": ["individual"], "category": "tax_residence", "currency": "EUR", "formula": {"operation": "equals", "operands": ["economic_ties", "both_sides"]}, "resident_when": true, "source_ids": ["synthetic-home-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Compare {economic_ties} with {both_sides}."}
+        ]
       }
-    ]
+    }
   }
 }

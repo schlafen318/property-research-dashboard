@@ -38,6 +38,8 @@ FORMULA_OPERATIONS = frozenset(
         "greater_than_or_equal",
         "less_than",
         "less_than_or_equal",
+        "equals",
+        "not_equals",
         "progressive_rate",
         "conditional",
         "flag",
@@ -54,13 +56,23 @@ FORMULA_ARITY = {
     "greater_than_or_equal": (2, 2),
     "less_than": (2, 2),
     "less_than_or_equal": (2, 2),
+    "equals": (2, 2),
+    "not_equals": (2, 2),
     "progressive_rate": (1, 1),
     "conditional": (1, None),
     "flag": (1, 1),
 }
 RULE_TYPE_OPERATIONS = {
     "residence_test": frozenset(
-        {"greater_than", "greater_than_or_equal", "less_than", "less_than_or_equal"}
+        {
+            "greater_than",
+            "greater_than_or_equal",
+            "less_than",
+            "less_than_or_equal",
+            "equals",
+            "not_equals",
+            "flag",
+        }
     ),
     "rate_band": frozenset({"progressive_rate"}),
     "allowance": frozenset({"minimum", "maximum"}),
@@ -127,6 +139,18 @@ MINIMUM_CATEGORY_CAPABILITIES = {
     "property_gift": frozenset({"property_charge"}),
     "tax_reporting": frozenset({"reporting_flag"}),
 }
+RESIDENCE_STATUSES = frozenset(
+    {
+        "likely_home_resident",
+        "likely_destination_resident",
+        "possible_dual_resident",
+        "conditional",
+    }
+)
+RESIDENCE_SCOPES = frozenset({"worldwide_income", "source_income", "conditional"})
+QUESTION_CONTROLS = frozenset({"number", "select", "radio", "date", "checkbox"})
+PROFILE_KEY_PATTERN = re.compile(r"^[A-Za-z][A-Za-z0-9]*$")
+QUESTION_ID_PATTERN = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 
 
 def load_fire_tax_rules(path: Path = RULES_PATH) -> dict[str, Any]:
@@ -350,6 +374,41 @@ def _validate_operand_catalog(
             operand.get("value"), value_type
         ):
             errors.append(f"{path}.value must match value_type")
+        if kind == "profile":
+            profile_key = operand.get("profile_key")
+            if not isinstance(profile_key, str) or not PROFILE_KEY_PATTERN.fullmatch(
+                profile_key
+            ):
+                errors.append(f"{path}.profile_key must be a stable profile field name")
+        allowed_values = operand.get("allowed_values")
+        if "allowed_values" in operand:
+            if (
+                kind != "profile"
+                or value_type != "string"
+                or not isinstance(allowed_values, list)
+                or len(allowed_values) < 2
+                or not all(isinstance(value, str) and value for value in allowed_values)
+                or len(set(allowed_values)) != len(allowed_values)
+            ):
+                errors.append(f"{path}.allowed_values must contain distinct profile string values")
+        minimum = operand.get("minimum")
+        maximum = operand.get("maximum")
+        if "minimum" in operand and (not _is_number(minimum) or value_type != "number"):
+            errors.append(f"{path}.minimum is supported only for numeric operands")
+        if "maximum" in operand and (not _is_number(maximum) or value_type != "number"):
+            errors.append(f"{path}.maximum is supported only for numeric operands")
+        if _is_number(minimum) and _is_number(maximum) and minimum > maximum:
+            errors.append(f"{path}.maximum must be at least minimum")
+        if "integer" in operand and (
+            not isinstance(operand.get("integer"), bool) or value_type != "number"
+        ):
+            errors.append(f"{path}.integer is supported only for numeric operands")
+        if "day_count" in operand and (
+            operand.get("day_count") is not True
+            or value_type != "number"
+            or kind != "profile"
+        ):
+            errors.append(f"{path}.day_count must mark a numeric profile operand")
         if value_type == "money":
             currency = operand.get("currency")
             if not isinstance(currency, str) or not CURRENCY_PATTERN.fullmatch(currency):
@@ -409,6 +468,7 @@ def _validate_formula_operand_compatibility(
         "less_than",
         "less_than_or_equal",
     }
+    equality_ops = {"equals", "not_equals"}
     same_type_ops = {"add", "subtract", "minimum", "maximum"}
 
     if operation in comparison_ops:
@@ -419,6 +479,16 @@ def _validate_formula_operand_compatibility(
         }
         if not valid or not _same_currency(operands):
             errors.append(f"{path}.operands[1] is incompatible with the comparison operand")
+    elif operation in equality_ops:
+        valid = len(types) == 2 and types[0] == types[1] and types[0] in {
+            "number",
+            "money",
+            "boolean",
+            "string",
+            "date",
+        }
+        if not valid or not _same_currency(operands):
+            errors.append(f"{path}.operands[1] is incompatible with the equality operand")
     elif operation in same_type_ops:
         valid = all(value_type == types[0] for value_type in types) and types[0] in {
             "number",
@@ -465,6 +535,8 @@ def _formula_result_signature(
         "greater_than_or_equal",
         "less_than",
         "less_than_or_equal",
+        "equals",
+        "not_equals",
         "flag",
     }:
         return ("boolean", None)
@@ -601,12 +673,93 @@ def _validate_rate_bands(bands: Any, path: str, errors: list[str]) -> None:
         errors.append(f"{path}[{len(bands) - 1}].up_to must be null for the final band")
 
 
+def _validate_residence_scopes(scopes: Any, path: str, errors: list[str]) -> None:
+    if not isinstance(scopes, dict) or set(scopes) != {"destination", "home"}:
+        errors.append(f"{path} must declare destination and home scopes")
+        return
+    for side in ("destination", "home"):
+        if scopes.get(side) not in RESIDENCE_SCOPES:
+            errors.append(f"{path}.{side} must be a supported residence scope")
+
+
+def _validate_split_year_branch(
+    rule: dict[str, Any],
+    path: str,
+    operand_catalog: dict[str, dict[str, Any]],
+    errors: list[str],
+) -> None:
+    formula = rule.get("formula")
+    formula_operands = formula.get("operands") if isinstance(formula, dict) else []
+    date_operand = rule.get("date_operand")
+    date_record = operand_catalog.get(date_operand) if isinstance(date_operand, str) else None
+    if date_record is None or date_record.get("kind") != "profile" or date_record.get("value_type") != "date":
+        errors.append(f"{path}.date_operand must reference a profile date operand")
+    elif date_operand not in formula_operands:
+        errors.append(f"{path}.date_operand must appear in formula.operands")
+    activation = rule.get("activation_operand")
+    activation_record = operand_catalog.get(activation) if isinstance(activation, str) else None
+    if (
+        activation_record is None
+        or activation_record.get("kind") != "profile"
+        or activation_record.get("value_type") != "boolean"
+    ):
+        errors.append(f"{path}.activation_operand must reference a profile boolean operand")
+    elif activation not in formula_operands:
+        errors.append(f"{path}.activation_operand must appear in formula.operands")
+
+    statuses = rule.get("applies_to_statuses")
+    if (
+        not isinstance(statuses, list)
+        or not statuses
+        or not all(status in RESIDENCE_STATUSES - {"conditional"} for status in statuses)
+    ):
+        errors.append(f"{path}.applies_to_statuses must contain definite residence statuses")
+
+    periods = rule.get("periods")
+    if not isinstance(periods, list) or len(periods) != 2:
+        errors.append(f"{path}.periods must contain explicit before and from periods")
+        return
+    positions: set[str] = set()
+    for index, period in enumerate(periods):
+        period_path = f"{path}.periods[{index}]"
+        if not isinstance(period, dict):
+            errors.append(f"{period_path} must be an object")
+            continue
+        position = period.get("position")
+        if position not in {"before", "from"}:
+            errors.append(f"{period_path}.position must be before or from")
+        elif position in positions:
+            errors.append(f"{period_path}.position must be unique")
+        else:
+            positions.add(position)
+        if period.get("status") not in RESIDENCE_STATUSES:
+            errors.append(f"{period_path}.status must be a supported residence status")
+        _validate_residence_scopes(period.get("scopes"), f"{period_path}.scopes", errors)
+        expected_scopes = {
+            "likely_destination_resident": {"destination": "worldwide_income", "home": "source_income"},
+            "likely_home_resident": {"destination": "source_income", "home": "worldwide_income"},
+            "possible_dual_resident": {"destination": "worldwide_income", "home": "worldwide_income"},
+            "conditional": {"destination": "conditional", "home": "conditional"},
+        }.get(period.get("status"))
+        if expected_scopes is not None and period.get("scopes") != expected_scopes:
+            errors.append(f"{period_path}.scopes must match the declared residence status")
+    if positions != {"before", "from"}:
+        errors.append(f"{path}.periods must contain one before and one from period")
+
+
 def _validate_branch_rule(
     rule: dict[str, Any],
     path: str,
     operand_catalog: dict[str, dict[str, Any]],
     errors: list[str],
 ) -> list[tuple[str, str]]:
+    branch_kind = rule.get("branch_kind")
+    if branch_kind == "split_year":
+        _validate_split_year_branch(rule, path, operand_catalog, errors)
+        return []
+    if branch_kind is not None and branch_kind != "treaty_tie_breaker":
+        errors.append(f"{path}.branch_kind is unsupported")
+
     branches = rule.get("branches")
     edges: list[tuple[str, str]] = []
     if not isinstance(branches, list) or not branches:
@@ -618,11 +771,17 @@ def _validate_branch_rule(
         if not isinstance(branch, dict):
             errors.append(f"{branch_path} must be an object")
             continue
-        target = branch.get("target_rule_id")
-        if not isinstance(target, str) or not target:
-            errors.append(f"{branch_path}.target_rule_id is required")
+        if branch_kind == "treaty_tie_breaker":
+            if branch.get("residence_decision") not in {"home", "destination"}:
+                errors.append(
+                    f"{branch_path}.residence_decision must be home or destination"
+                )
         else:
-            edges.append((target, f"{branch_path}.target_rule_id"))
+            target = branch.get("target_rule_id")
+            if not isinstance(target, str) or not target:
+                errors.append(f"{branch_path}.target_rule_id is required")
+            else:
+                edges.append((target, f"{branch_path}.target_rule_id"))
 
         condition = branch.get("when")
         if not isinstance(condition, dict):
@@ -632,6 +791,11 @@ def _validate_branch_rule(
         operand = operand_catalog.get(operand_id) if isinstance(operand_id, str) else None
         if operand is None:
             errors.append(f"{branch_path}.when.operand references unknown operand {operand_id}")
+        else:
+            formula = rule.get("formula")
+            formula_operands = formula.get("operands") if isinstance(formula, dict) else None
+            if not isinstance(formula_operands, list) or operand_id not in formula_operands:
+                errors.append(f"{branch_path}.when.operand must appear in formula.operands")
         operator = condition.get("operator")
         if not isinstance(operator, str) or operator not in BRANCH_OPERATORS:
             errors.append(f"{branch_path}.when.operator is unsupported")
@@ -816,7 +980,9 @@ def _validate_rule_type_fields(
         if not isinstance(rule.get("reporting_code"), str) or not rule["reporting_code"].strip():
             errors.append(f"{path}.reporting_code is required")
     elif rule_type == "branch":
-        if not isinstance(rule.get("branches"), list) or not rule["branches"]:
+        if rule.get("branch_kind") != "split_year" and (
+            not isinstance(rule.get("branches"), list) or not rule["branches"]
+        ):
             errors.append(f"{path}.branches must contain at least one branch")
 
 
@@ -1002,6 +1168,267 @@ def _rule_encodes_zero_tax(rule: dict[str, Any]) -> bool:
     return False
 
 
+def _question_value_valid(value: Any, operand: dict[str, Any]) -> bool:
+    if value == "unknown":
+        return True
+    if not _value_matches_type(value, operand.get("value_type")):
+        return False
+    if operand.get("value_type") == "number":
+        if _is_number(operand.get("minimum")) and value < operand["minimum"]:
+            return False
+        if _is_number(operand.get("maximum")) and value > operand["maximum"]:
+            return False
+        if operand.get("integer") is True and not float(value).is_integer():
+            return False
+    if operand.get("value_type") == "string" and isinstance(operand.get("allowed_values"), list):
+        return value in operand["allowed_values"]
+    return True
+
+
+def _rule_uses_operand(rule: dict[str, Any], operand_id: str) -> bool:
+    formula = rule.get("formula")
+    if isinstance(formula, dict) and operand_id in formula.get("operands", []):
+        return True
+    if rule.get("date_operand") == operand_id or rule.get("activation_operand") == operand_id:
+        return True
+    branches = rule.get("branches")
+    return isinstance(branches, list) and any(
+        isinstance(branch, dict)
+        and isinstance(branch.get("when"), dict)
+        and branch["when"].get("operand") == operand_id
+        for branch in branches
+    )
+
+
+def _question_value_accepted(value: Any, control: Any, accepted: Any) -> bool:
+    if control == "number":
+        return (
+            _is_number(value)
+            and isinstance(accepted, dict)
+            and accepted.get("min") <= value <= accepted.get("max")
+            and (accepted.get("integer") is not True or float(value).is_integer())
+        )
+    if control == "date":
+        return (
+            isinstance(value, str)
+            and isinstance(accepted, dict)
+            and accepted.get("min") <= value <= accepted.get("max")
+        )
+    return isinstance(accepted, list) and value in accepted
+
+
+def _validate_residence_questions(
+    jurisdiction: dict[str, Any],
+    path: str,
+    operand_catalog: dict[str, dict[str, Any]],
+    rules_by_id: dict[str, dict[str, Any]],
+    active_rule_ids: set[str],
+    dataset_tax_year: Any,
+    errors: list[str],
+) -> None:
+    questions = jurisdiction.get("questions")
+    if not isinstance(questions, list) or not questions:
+        errors.append(f"{path}.questions must contain validated residence questions")
+        return
+    seen_ids: set[str] = set()
+    seen_operands: set[str] = set()
+    for index, question in enumerate(questions):
+        question_path = f"{path}.questions[{index}]"
+        if not isinstance(question, dict):
+            errors.append(f"{question_path} must be an object")
+            continue
+        question_id = question.get("id")
+        if not isinstance(question_id, str) or not QUESTION_ID_PATTERN.fullmatch(question_id):
+            errors.append(f"{question_path}.id must be a stable kebab-case ID")
+        elif question_id in seen_ids:
+            errors.append(f"{question_path}.id duplicates question ID {question_id}")
+        else:
+            seen_ids.add(question_id)
+        operand_id = question.get("operand_id")
+        operand = operand_catalog.get(operand_id) if isinstance(operand_id, str) else None
+        if operand is None or operand.get("kind") != "profile":
+            errors.append(f"{question_path}.operand_id must reference a profile operand")
+        elif operand_id in seen_operands:
+            errors.append(f"{question_path}.operand_id duplicates a question operand")
+        else:
+            seen_operands.add(operand_id)
+        for field in ("label", "reason"):
+            if not isinstance(question.get(field), str) or not question[field].strip():
+                errors.append(f"{question_path}.{field} is required")
+            elif "<" in question[field] or ">" in question[field]:
+                errors.append(f"{question_path}.{field} must be plain text")
+        control = question.get("control")
+        if control not in QUESTION_CONTROLS:
+            errors.append(f"{question_path}.control must be a native control type")
+        accepted = question.get("accepted_values")
+        if control == "number":
+            valid_accepted = (
+                isinstance(accepted, dict)
+                and _is_number(accepted.get("min"))
+                and _is_number(accepted.get("max"))
+                and _is_number(accepted.get("step"))
+                and accepted["step"] > 0
+                and accepted["min"] <= accepted["max"]
+                and isinstance(accepted.get("integer"), bool)
+                and operand is not None
+                and operand.get("value_type") == "number"
+                and _question_value_valid(accepted["min"], operand)
+                and _question_value_valid(accepted["max"], operand)
+                and (operand.get("integer") is not True or accepted["integer"] is True)
+                and (accepted["integer"] is not True or float(accepted["step"]).is_integer())
+            )
+        elif control == "date":
+            accepted_min = _parse_date(accepted.get("min")) if isinstance(accepted, dict) else None
+            accepted_max = _parse_date(accepted.get("max")) if isinstance(accepted, dict) else None
+            valid_accepted = (
+                isinstance(accepted, dict)
+                and accepted_min is not None
+                and accepted_max is not None
+                and accepted["min"] <= accepted["max"]
+                and accepted_min.year == dataset_tax_year
+                and accepted_max.year == dataset_tax_year
+                and operand is not None
+                and operand.get("value_type") == "date"
+            )
+        elif control == "checkbox":
+            valid_accepted = (
+                isinstance(accepted, list)
+                and len(accepted) == 2
+                and set(accepted) == {True, False}
+                and operand is not None
+                and operand.get("value_type") == "boolean"
+            )
+        else:
+            valid_accepted = (
+                isinstance(accepted, list)
+                and len(accepted) >= 2
+                and operand is not None
+                and all(_question_value_valid(value, operand) for value in accepted)
+            )
+        if not valid_accepted:
+            errors.append(f"{question_path}.accepted_values is incompatible with control and operand")
+
+        materiality_values = question.get("materiality_values")
+        finite_expected = (
+            [value for value in accepted if value != "unknown"]
+            if control in {"select", "radio", "checkbox"} and isinstance(accepted, list)
+            else None
+        )
+        if (
+            not isinstance(materiality_values, list)
+            or len(materiality_values) < 2
+            or operand is None
+            or not all(_question_value_valid(value, operand) for value in materiality_values)
+            or not all(
+                _question_value_accepted(value, control, accepted)
+                for value in materiality_values
+            )
+            or (
+                control == "date"
+                and any(
+                    (parsed := _parse_date(value)) is None or parsed.year != dataset_tax_year
+                    for value in materiality_values
+                )
+            )
+            or len({json.dumps(value, sort_keys=True) for value in materiality_values}) < 2
+            or (
+                finite_expected is not None
+                and {json.dumps(value, sort_keys=True) for value in materiality_values}
+                != {json.dumps(value, sort_keys=True) for value in finite_expected}
+            )
+        ):
+            errors.append(f"{question_path}.materiality_values must contain valid distinct test values")
+        affects = question.get("affects_rule_ids")
+        if not isinstance(affects, list) or not affects:
+            errors.append(f"{question_path}.affects_rule_ids must contain executable rules")
+        else:
+            for rule_index, rule_id in enumerate(affects):
+                rule_path = f"{question_path}.affects_rule_ids[{rule_index}]"
+                rule = rules_by_id.get(rule_id) if isinstance(rule_id, str) else None
+                if rule is None:
+                    errors.append(f"{rule_path} must reference a rule in this jurisdiction")
+                elif rule_id not in active_rule_ids:
+                    errors.append(f"{rule_path} must reference an active residence rule")
+                elif isinstance(operand_id, str) and not _rule_uses_operand(rule, operand_id):
+                    errors.append(f"{rule_path} references a rule unaffected by the operand")
+
+
+def _validate_residence_jurisdiction(
+    jurisdiction: dict[str, Any],
+    path: str,
+    rules_by_id: dict[str, dict[str, Any]],
+    operand_catalog: dict[str, dict[str, Any]],
+    dataset_tax_year: Any,
+    errors: list[str],
+) -> None:
+    residence_rules = {
+        rule_id: rule
+        for rule_id, rule in rules_by_id.items()
+        if rule.get("type") == "residence_test"
+        and rule.get("category") == "tax_residence"
+    }
+    if not residence_rules:
+        return
+    special_rules = [
+        rule
+        for rule in rules_by_id.values()
+        if rule.get("branch_kind") in {"treaty_tie_breaker", "split_year"}
+    ]
+    for branch_kind in ("treaty_tie_breaker", "split_year"):
+        if sum(rule.get("branch_kind") == branch_kind for rule in special_rules) > 1:
+            errors.append(f"{path}.rules must contain at most one {branch_kind} rule")
+    for field in ("resident_scope", "nonresident_scope"):
+        if jurisdiction.get(field) not in RESIDENCE_SCOPES - {"conditional"}:
+            errors.append(f"{path}.{field} must be worldwide_income or source_income")
+    logic = jurisdiction.get("residence_logic")
+    if not isinstance(logic, dict):
+        errors.append(f"{path}.residence_logic must be an object")
+    else:
+        if logic.get("operation") not in {"any", "all"}:
+            errors.append(f"{path}.residence_logic.operation must be any or all")
+        rule_ids = logic.get("rule_ids")
+        if not isinstance(rule_ids, list) or not rule_ids:
+            errors.append(f"{path}.residence_logic.rule_ids must contain residence tests")
+        else:
+            for index, rule_id in enumerate(rule_ids):
+                if rule_id not in residence_rules:
+                    errors.append(
+                        f"{path}.residence_logic.rule_ids[{index}] must reference a tax-residence test"
+                    )
+    logic_ids = set(logic.get("rule_ids", [])) if isinstance(logic, dict) and isinstance(logic.get("rule_ids"), list) else set()
+    active_rule_ids = logic_ids | {
+        rule_id
+        for rule_id, rule in rules_by_id.items()
+        if rule.get("branch_kind") in {"treaty_tie_breaker", "split_year"}
+    }
+    used_operands: set[str] = set()
+    for rule_id in active_rule_ids:
+        rule = rules_by_id.get(rule_id)
+        if not isinstance(rule, dict):
+            continue
+        formula = rule.get("formula")
+        if isinstance(formula, dict) and isinstance(formula.get("operands"), list):
+            used_operands.update(value for value in formula["operands"] if isinstance(value, str))
+    for operand_id in sorted(used_operands):
+        operand = operand_catalog.get(operand_id)
+        if (
+            isinstance(operand, dict)
+            and operand.get("kind") == "profile"
+            and operand.get("value_type") == "string"
+            and not isinstance(operand.get("allowed_values"), list)
+        ):
+            errors.append(f"operand_catalog.{operand_id}.allowed_values is required for a residence string operand")
+    _validate_residence_questions(
+        jurisdiction,
+        path,
+        operand_catalog,
+        rules_by_id,
+        active_rule_ids,
+        dataset_tax_year,
+        errors,
+    )
+
+
 def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
     """Return path-addressed validation errors for detailed FIRE tax rules."""
 
@@ -1048,6 +1475,11 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
     if not isinstance(jurisdictions, dict) or not jurisdictions:
         errors.append("jurisdictions must be a non-empty object")
         return errors
+    if "active_jurisdiction_id" in payload and (
+        not isinstance(payload["active_jurisdiction_id"], str)
+        or payload["active_jurisdiction_id"] not in jurisdictions
+    ):
+        errors.append("active_jurisdiction_id must reference a jurisdiction in this payload")
 
     for jurisdiction_key, jurisdiction in jurisdictions.items():
         jurisdiction_path = f"jurisdictions.{jurisdiction_key}"
@@ -1107,6 +1539,14 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
             if isinstance(rule, dict) and rule.get("type") == "branch":
                 branch_edges[rule_id] = edges
         _validate_branch_graph(rule_ids, branch_edges, errors)
+        _validate_residence_jurisdiction(
+            jurisdiction,
+            jurisdiction_path,
+            rules_by_id,
+            operand_catalog,
+            dataset_tax_year,
+            errors,
+        )
 
         if jurisdiction.get("detailed_enabled"):
             enablement_path = f"{jurisdiction_path}.detailed_enabled"
