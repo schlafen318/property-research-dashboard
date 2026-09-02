@@ -25,6 +25,7 @@ try:
         validate_fire_abroad_payload,
     )
     from src.fire_abroad_page import build_fire_abroad_html
+    from src.fire_tax_rules import load_fire_tax_rules, validate_fire_tax_rules
     from src.foreign_buyer_country_guides import (
         build_foreign_buyer_country_guide,
         get_foreign_buyer_country_guide,
@@ -60,6 +61,7 @@ except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.p
         validate_fire_abroad_payload,
     )
     from fire_abroad_page import build_fire_abroad_html
+    from fire_tax_rules import load_fire_tax_rules, validate_fire_tax_rules
     from foreign_buyer_country_guides import (
         build_foreign_buyer_country_guide,
         get_foreign_buyer_country_guide,
@@ -199,6 +201,17 @@ RETIREMENT_ENGINE_PATH = ROOT / "src" / "retirement_calculator.js"
 RETIREMENT_UI_PATH = ROOT / "src" / "retirement_calculator_ui.js"
 FIRE_ABROAD_ENGINE_PATH = ROOT / "src" / "fire_abroad.js"
 FIRE_ABROAD_UI_PATH = ROOT / "src" / "fire_abroad_ui.js"
+FIRE_TAX_RULES_PATH = DATA / "fire_tax_rules.json"
+FIRE_TAX_PROFILE_PATH = ROOT / "src" / "fire_tax_profile.js"
+FIRE_TAX_RESIDENCE_PATH = ROOT / "src" / "fire_tax_residence.js"
+FIRE_TAX_INCOME_PATH = ROOT / "src" / "fire_tax_income.js"
+FIRE_TAX_CREDITS_PATH = ROOT / "src" / "fire_tax_credits.js"
+FIRE_TAX_PROPERTY_PATH = ROOT / "src" / "fire_tax_property.js"
+FIRE_TAX_DETAILED_PATH = ROOT / "src" / "fire_tax_detailed.js"
+FIRE_TAX_EXPLAIN_PATH = ROOT / "src" / "fire_tax_explain.js"
+FIRE_TAX_HK_UAE_PATH = ROOT / "src" / "fire_tax_hk_uae.js"
+FIRE_TAX_DETAILED_UI_PATH = ROOT / "src" / "fire_tax_detailed_ui.js"
+FIRE_TAX_SCENARIOS_PATH = ROOT / "src" / "fire_tax_scenarios.js"
 RETIREMENT_PLANNING_CURRENCIES = {
     "as_of": "2026-08-27",
     "display_date": "27 August 2026",
@@ -1429,6 +1442,52 @@ def load_fire_abroad_for_build(
     return _validated_fire_abroad_for_build(
         load_fire_abroad(path), destinations, retirement_costs
     )
+
+
+def detailed_fire_tax_page_payload(path: Path = FIRE_TAX_RULES_PATH) -> dict:
+    """Publish only validated, official, explicitly enabled exact-rule bundles."""
+    rules = load_fire_tax_rules(path)
+    errors = validate_fire_tax_rules(rules, as_of=date.today())
+    if errors:
+        raise ValueError("Invalid detailed FIRE tax rules: " + "; ".join(errors))
+    jurisdictions = {}
+    for jurisdiction_id, jurisdiction in rules.get("jurisdictions", {}).items():
+        if jurisdiction.get("detailed_enabled") is not True or jurisdiction.get("synthetic") is True:
+            continue
+        source_ids = {
+            source_id
+            for rule in jurisdiction.get("rules", [])
+            for source_id in rule.get("source_ids", [])
+        }
+        sources_by_id = {source["id"]: source for source in rules.get("sources", [])}
+        if not source_ids or any(
+            sources_by_id.get(source_id, {}).get("source_kind") != "official"
+            for source_id in source_ids
+        ):
+            continue
+        jurisdictions[jurisdiction_id] = {
+            "detailed_enabled": True,
+            "synthetic": False,
+            "label": jurisdiction["label"],
+            "supported_home_jurisdiction_ids": [],
+            "runtime_bundles": {},
+        }
+    return {
+        "tax_year": rules["tax_year"],
+        "checked_on": rules["checked_on"],
+        "jurisdictions": jurisdictions,
+        "supported_profiles": {
+            profile_id: deepcopy(profile)
+            for profile_id, profile in rules.get("supported_profiles", {}).items()
+            if profile.get("detailed_enabled") is True and profile.get("synthetic") is False
+        },
+        "planning_currencies": deepcopy(RETIREMENT_PLANNING_CURRENCIES),
+        "aed_per_usd": 3.6725,
+        "sources": [
+            source for source in rules.get("sources", [])
+            if source.get("source_kind") == "official"
+        ],
+    }
 
 
 def load_mortgage_profiles(path: Path = MORTGAGE_PROFILES_PATH) -> dict:
@@ -6351,9 +6410,12 @@ def build_fire_abroad_page(
     destinations: list[dict],
     retirement_costs: dict,
     fire_payload: dict,
+    *,
+    tax_as_of: date | None = None,
 ) -> str:
     """Build the validated default FIRE Abroad ranking and browser payload."""
 
+    tax_freshness_date = tax_as_of or date.today()
     fire_payload = _validated_fire_abroad_for_build(
         fire_payload, destinations, retirement_costs
     )
@@ -6383,7 +6445,23 @@ def build_fire_abroad_page(
         fire_payload,
         default_profile,
     )
+    launch_by_id = {item["id"]: item for item in launch_destinations}
+    for result in default_results:
+        destination = launch_by_id.get(result.get("destination_id"), {})
+        country = fire_payload.get("countries", {}).get(destination.get("country"), {})
+        reviewed = country.get("tax_screen", {}).get("last_reviewed")
+        try:
+            tax_stale = (tax_freshness_date - date.fromisoformat(reviewed)).days > 366
+        except (TypeError, ValueError):
+            tax_stale = True
+        if tax_stale:
+            result["score"] = None
+            result["status"] = "needs_verification"
+            result["status_reason"] = (
+                "Tax evidence is stale; this destination remains visible but is not ranked."
+            )
     embedded_payload = {
+        "asOf": tax_freshness_date.isoformat(),
         "destinations": launch_destinations,
         "retirement_costs": launch_retirement_costs,
         "fire_payload": fire_payload,
@@ -6452,7 +6530,12 @@ def build_retirement_destination_finder_page(
     destinations: list[dict],
     retirement_payload: dict,
     mortgage_payload: dict,
+    fire_payload: dict | None = None,
+    *,
+    tax_as_of: date | None = None,
 ) -> str:
+    fire_payload = fire_payload or load_fire_abroad()
+    tax_freshness_iso = (tax_as_of or date.today()).isoformat()
     retirement_ids = {item["destination_id"] for item in retirement_payload["destinations"]}
     eligible_destinations = [item for item in destinations if item["id"] in retirement_ids]
     mortgage_profiles = {
@@ -6482,6 +6565,12 @@ def build_retirement_destination_finder_page(
         "retirementCosts": retirement_payload["destinations"],
         "mortgageProfiles": mortgage_profiles,
         "defaultBuyerProfile": mortgage_payload["default_buyer_profile"],
+        "taxPlanning": {
+            "asOf": tax_freshness_iso,
+            "reviewedOn": fire_payload["reviewed_on"],
+            "countries": fire_payload["countries"],
+            "sources": fire_payload.get("sources", []),
+        },
     }
     region_options = "".join(
         f'<option value="{escape(region)}">{escape(region.replace("-", " ").title())}</option>'
@@ -6501,9 +6590,11 @@ def build_retirement_destination_finder_page(
         universe_count=len(eligible_destinations),
         payload_json=json.dumps(payload, separators=(",", ":")).replace("</", "<\\/"),
         retirement_engine=RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        retirement_ui=RETIREMENT_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         property_engine=PROPERTY_FINANCE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         scenario_engine=RETIREMENT_FINDER_SCENARIO_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        tax_scenario_engine=FIRE_TAX_SCENARIOS_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_ui=RETIREMENT_FINDER_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         analytics=analytics_event_script(),
         design_css=retirement_finder_design_css(),
@@ -6650,7 +6741,14 @@ def retirement_calculator_callout(css_class: str, source_label: str) -> str:
     """
 
 
-def build_retirement_calculator_page(destinations: list[dict], retirement_payload: dict) -> str:
+def build_retirement_calculator_page(
+    destinations: list[dict],
+    retirement_payload: dict,
+    fire_payload: dict | None = None,
+    *,
+    tax_as_of: date | None = None,
+) -> str:
+    tax_freshness_iso = (tax_as_of or date.today()).isoformat()
     canonical = page_url(RETIREMENT_CALCULATOR_SLUG)
     destination_by_id = {item["id"]: item for item in destinations}
     records = retirement_payload["destinations"]
@@ -6670,6 +6768,7 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         )
     if len(browser_records) < 4:
         raise ValueError("Retirement calculator quick answer requires at least four destinations")
+    fire_payload = fire_payload or load_fire_abroad()
     default_destination_id = "fukuoka-itoshima" if any(
         item["destination_id"] == "fukuoka-itoshima" for item in browser_records
     ) else browser_records[0]["destination_id"]
@@ -6707,7 +6806,8 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         slug = destination_slug(destination) if destination else item["destination_id"]
         quick_rows.append(
             f'<tr class="quick-benchmark-row"><th scope="row"><a href="/destinations/{escape(slug)}/">{escape(item["name"])}</a></th>'
-            f'<td>{money(metrics["annual_spending"])}</td><td><strong>{money(metrics["required_capital"])}</strong></td></tr>'
+            f'<td><span class="mobile-benchmark-label">Annual spending</span>{money(metrics["annual_spending"])}</td>'
+            f'<td><span class="mobile-benchmark-label">Capital needed</span><strong>{money(metrics["required_capital"])}</strong></td></tr>'
         )
     couple_low = retirement_capital_requirement(ranked_couple[0], "couple")["required_capital"]
     couple_high = retirement_capital_requirement(ranked_couple[-1], "couple")["required_capital"]
@@ -6729,18 +6829,45 @@ def build_retirement_calculator_page(destinations: list[dict], retirement_payloa
         f'<details><summary>{escape(question)}</summary><p>{escape(answer)}</p></details>'
         for question, answer in RETIREMENT_FAQS
     )
+    detailed_tax_payload = detailed_fire_tax_page_payload()
+    detailed_tax_data = json.dumps(
+        detailed_tax_payload,
+        ensure_ascii=False,
+        separators=(",", ":"),
+    ).replace("</", "<\\/")
     page_data = json.dumps(
         {
             "as_of": retirement_payload["as_of"],
             "currency": retirement_payload["currency"],
             "planning_currencies": RETIREMENT_PLANNING_CURRENCIES,
             "destinations": browser_records,
+            "tax_planning": {
+                "as_of": tax_freshness_iso,
+                "reviewed_on": fire_payload["reviewed_on"],
+                "countries": fire_payload["countries"],
+                "sources": fire_payload.get("sources", []),
+            },
         },
         ensure_ascii=False,
         separators=(",", ":"),
     ).replace("</", "<\\/")
     engine_js = RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
+    tax_scenario_js = FIRE_TAX_SCENARIOS_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
     ui_js = RETIREMENT_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>") if RETIREMENT_UI_PATH.exists() else ""
+    detailed_engine_scripts = "\n".join(
+        path.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
+        for path in (
+            FIRE_TAX_RESIDENCE_PATH,
+            FIRE_TAX_PROFILE_PATH,
+            FIRE_TAX_INCOME_PATH,
+            FIRE_TAX_CREDITS_PATH,
+            FIRE_TAX_PROPERTY_PATH,
+            FIRE_TAX_DETAILED_PATH,
+            FIRE_TAX_EXPLAIN_PATH,
+            FIRE_TAX_HK_UAE_PATH,
+            FIRE_TAX_DETAILED_UI_PATH,
+        )
+    )
     html = """<!doctype html>
 <html lang="en">
 <head>
@@ -6748,19 +6875,20 @@ __HEAD__
   <style>
     :root { color: #24312d; background: #f5f1e9; font-family: Inter, ui-sans-serif, system-ui, sans-serif; --ink:#24312d; --muted:#66736c; --line:#d8d1c4; --paper:#fffdf7; --green:#315e50; }
     * { box-sizing: border-box; } body { margin:0; line-height:1.55; } a { color:#245c4b; } h1,h2 { font-family:Georgia,serif; line-height:1.08; } h1 { font-size:clamp(38px,7vw,68px); margin:.4rem 0 1rem; } h2 { font-size:clamp(27px,4vw,38px); }
-    .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; }
+    .calc-shell { width:min(1120px, calc(100% - 32px)); margin:0 auto; } [hidden] { display:none!important; }
     .calc-hero { color:#fff; background:#243f37; padding-bottom:46px; } .eyebrow { text-transform:uppercase; letter-spacing:.08em; font-size:12px; font-weight:800; color:#d8c28d; margin-top:42px; } .lede { max-width:760px; font-size:18px; color:#e2e8e4; } .calc-modes { display:flex; flex-wrap:wrap; gap:18px; margin-top:22px; font-weight:750; } .calc-modes a { color:#fff; } .calc-modes a[aria-current] { color:#d8c28d; text-decoration:none; border-bottom:2px solid #d8c28d; }
-    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } .planning-currency { grid-column:1 / -1; } .planning-currency select { max-width:280px; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:400; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
+    main { padding:32px 0 70px; } .calculator-layout { display:grid; grid-template-columns:minmax(0,1fr) minmax(300px,.76fr); gap:24px; align-items:start; } .calc-panel { min-width:0; background:var(--paper); border:1px solid var(--line); border-radius:10px; padding:clamp(18px,3vw,30px); } .detailed-projection { margin-top:24px; } .detailed-projection > h2 { margin-top:0; } .projection-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:0 28px; align-items:start; } .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:15px; } .field { min-width:0; } .planning-currency { grid-column:1 / -1; } .planning-currency select { max-width:280px; } label,.field-label { display:block; font-weight:750; margin:0 0 6px; } input,select,button { width:100%; min-height:46px; border:1px solid #a9a398; border-radius:6px; background:#fff; color:var(--ink); padding:10px 12px; font:inherit; } input:focus,select:focus,button:focus { outline:3px solid #d6b96f; outline-offset:2px; } .check { display:flex; gap:8px; align-items:center; font-weight:600; margin-top:8px; } .check input { width:20px; min-height:20px; } fieldset { min-width:0; border:0; padding:0; margin:24px 0 0; } legend { font-family:Georgia,serif; font-size:23px; font-weight:700; margin-bottom:12px; } #retirement-calculator { counter-reset:calculator-step; } #retirement-calculator > fieldset { counter-increment:calculator-step; } #retirement-calculator > fieldset > legend::before { content:"Step " counter(calculator-step); display:block; margin-bottom:2px; color:var(--muted); font-family:Inter,ui-sans-serif,system-ui,sans-serif; font-size:11px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; } .hint { color:var(--muted); font-size:13px; margin:6px 0 0; } details.assumptions { margin:24px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); padding:13px 0; } summary { cursor:pointer; font-weight:400; } .primary { background:var(--green); color:#fff; border-color:var(--green); font-weight:850; cursor:pointer; }
     .result-panel { position:sticky; top:18px; } .result-panel h2 { margin-top:0; } .result-decision { margin:14px 0 20px; padding:15px 0; border-top:1px solid var(--line); border-bottom:1px solid var(--line); font-family:Georgia,serif; font-size:22px; line-height:1.3; } .key-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .key-figures div { border-top:1px solid var(--line); padding-top:10px; } .key-figures span { display:block; color:var(--muted); font-size:12px; } .key-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:27px; line-height:1.1; } .save-intent { padding-top:2px; } .save-intent .text-button { font-weight:750; } .result-period { padding:18px 0; border-top:1px solid var(--line); } .result-period h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .result-total { font-family:Georgia,serif; font-size:clamp(34px,5vw,48px); line-height:1; margin:8px 0; } .result-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:10px; margin:16px 0 0; } .result-grid div { border-top:1px solid var(--line); padding-top:10px; } .result-grid span { display:block; color:var(--muted); font-size:12px; } .result-grid strong { display:block; font-size:20px; } .result-grid strong.is-negative { color:#9b2c20; } .result-grid small { display:block; color:var(--muted); font-size:12px; line-height:1.4; margin-top:4px; } #ret-errors { color:#8a2b20; font-weight:700; } .is-hidden { display:none; }
     .accumulation-figure { position:relative; margin:0; padding:18px 0; border-top:1px solid var(--line); } .accumulation-figure h3 { font-family:Georgia,serif; font-size:21px; margin:0 0 10px; } .chart-legend { display:flex; gap:18px; color:var(--muted); font-size:12px; margin-bottom:8px; } .chart-key::before { content:""; display:inline-block; width:10px; height:10px; margin-right:6px; background:#315e50; } .chart-key.contribution::before { background:#c29b45; } .accumulation-chart { display:block; width:100%; height:auto; overflow:visible; } .chart-axis { stroke:var(--line); stroke-width:1; } .chart-target { stroke:#9b6a33; stroke-width:1.5; stroke-dasharray:5 4; } .chart-target-label { fill:#7a5227; font-size:11px; font-weight:700; } .chart-axis-label { fill:var(--muted); font-size:10px; } .chart-lump { fill:#315e50; } .chart-contribution { fill:#c29b45; } .chart-year { opacity:0; transform:translateY(8px); animation:ret-year-in .35s ease forwards; animation-delay:var(--year-delay); cursor:pointer; outline:none; } .chart-year.is-active rect,.chart-year:focus-visible rect { stroke:#24312d; stroke-width:2px; } .chart-tooltip { position:absolute; z-index:2; top:60px; right:0; width:min(245px,calc(100% - 20px)); padding:11px 13px; border-radius:6px; background:#24312d; color:#fff; box-shadow:0 8px 24px rgba(36,49,45,.2); font-size:12px; } .chart-tooltip strong { display:block; font-size:14px; margin-bottom:5px; } .chart-tooltip div { display:flex; justify-content:space-between; gap:12px; } .chart-tooltip span { color:#dfe7e3; } .result-comparison { padding:16px 0; border-top:1px solid var(--line); } .result-comparison h3,.result-comparison summary { font-family:Georgia,serif; font-size:21px; } .result-table { min-width:0; font-size:13px; background:transparent; } .result-table th,.result-table td { padding:8px 5px; white-space:normal; } .result-table td { text-align:right; } .result-table .is-selected { background:#f1eee4; } @keyframes ret-year-in { to { opacity:1; transform:translateY(0); } }
     .text-button { width:auto; min-height:0; padding:0; border:0; border-radius:0; background:none; color:#245c4b; text-decoration:underline; cursor:pointer; font-size:13px; }
+    .tax-mode-choices { display:grid; gap:10px; margin-bottom:16px; } .tax-mode-choice { display:grid; grid-template-columns:20px 1fr; gap:9px; align-items:start; margin:0; font-weight:650; } .tax-mode-choice input { width:20px; min-height:20px; margin-top:2px; } .tax-mode-choice small { display:block; color:var(--muted); font-weight:400; } .tax-range span { display:block; color:var(--muted); font-size:12px; } .tax-range { margin:0 0 12px; } .tax-range strong { display:block; font-size:18px; } .tax-details .result-table { margin-top:12px; } .tax-details .result-table th,.tax-details .result-table td { white-space:normal; } .tax-explanations { margin-top:16px; font-size:13px; } .tax-explanations article { padding:12px 0; border-top:1px solid var(--line); } .tax-explanations h3 { margin:0 0 6px; font-size:18px; } .detailed-tax { margin-top:24px; } .detailed-tax table { min-width:0; } .detailed-tax-question-list { display:grid; gap:15px; max-width:700px; }
     .current-cost-comparison { margin-top:24px; } .current-cost-comparison h2 { margin:0 0 8px; } .current-cost-layout { display:grid; grid-template-columns:minmax(230px,.72fr) minmax(0,1.28fr); gap:28px; align-items:start; margin-top:20px; } .optional-label { color:var(--muted); font-weight:400; } .current-cost-result { border-left:1px solid var(--line); padding-left:28px; } .current-cost-summary { margin:0; font-family:Georgia,serif; font-size:23px; line-height:1.28; } .current-cost-annual { margin:7px 0 20px; color:var(--muted); } .current-cost-bars { display:grid; gap:14px; } .current-cost-bar-heading { display:flex; justify-content:space-between; gap:16px; margin-bottom:5px; } .current-cost-bar-heading span { color:var(--muted); white-space:nowrap; } .current-cost-track { height:10px; background:#e7e1d6; } .current-cost-fill { display:block; height:100%; background:#7d968b; transition:width .35s ease; } .current-cost-row.destination .current-cost-fill { background:var(--green); } .target-comparison { margin-top:22px; padding-top:18px; border-top:1px solid var(--line); } .target-comparison h3 { margin:0 0 12px; font-family:Georgia,serif; font-size:21px; } .target-figures { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; } .target-figures div { border-top:1px solid var(--line); padding-top:9px; } .target-figures span { display:block; color:var(--muted); font-size:12px; } .target-figures strong { display:block; margin-top:3px; font-family:Georgia,serif; font-size:24px; } .target-difference { margin:12px 0 0; font-weight:750; }
     .cost-sidecar { width:min(560px,100%); max-width:none; height:100dvh; max-height:none; margin:0 0 0 auto; padding:0; border:0; background:transparent; overflow:hidden; } .cost-sidecar[open] { animation:cost-sidecar-in .25s ease-out; } .cost-sidecar::backdrop { background:rgba(24,34,30,.42); } .cost-sidecar-panel { height:100%; padding:24px; overflow:auto; background:var(--paper); box-shadow:-12px 0 32px rgba(36,49,45,.18); } .cost-sidecar-header { position:sticky; top:-24px; z-index:1; display:flex; align-items:flex-start; justify-content:space-between; gap:20px; margin:-24px -24px 14px; padding:24px; border-bottom:1px solid var(--line); background:var(--paper); } .cost-sidecar-header h2 { margin:0; font-size:30px; } .cost-sidecar-close { width:auto; min-height:40px; padding:7px 10px; background:transparent; cursor:pointer; } .cost-sidecar-chart { display:grid; gap:5px; } .cost-row { min-height:0; padding:9px 10px; border:1px solid transparent; border-radius:3px; background:transparent; text-align:left; cursor:pointer; } .cost-row:hover,.cost-row:focus-visible { border-color:var(--line); background:#f5f1e9; } .cost-row.is-current { border-color:var(--green); } .cost-row-heading { display:flex; justify-content:space-between; gap:16px; } .cost-row-heading > span { color:var(--muted); white-space:nowrap; } .cost-bar-track { display:block; height:8px; margin-top:6px; background:#e7e1d6; } .cost-bar-fill { display:block; height:100%; background:#56806f; } @keyframes cost-sidecar-in { from { transform:translateX(100%); } to { transform:translateX(0); } }
-    .quick-answer { padding:4px 0 36px; } .quick-answer h2 { max-width:760px; margin:.2rem 0 1rem; } .quick-answer > p { max-width:850px; } .quick-answer .table-wrap { margin-top:20px; } .quick-benchmark { min-width:560px; } .quick-benchmark td:last-child { font-family:Georgia,serif; font-size:18px; }
+    .quick-answer { padding:34px 0; border-top:1px solid var(--line); } .quick-answer h2 { max-width:760px; margin:.2rem 0 1rem; } .quick-answer > p { max-width:850px; } .quick-answer .table-wrap { margin-top:20px; } .quick-benchmark { min-width:560px; } .quick-benchmark td:last-child { font-family:Georgia,serif; font-size:18px; } .mobile-benchmark-label { display:none; }
     .content-section { padding:34px 0; border-top:1px solid var(--line); } .table-wrap { overflow-x:auto; } table { width:100%; min-width:1080px; border-collapse:collapse; background:var(--paper); } caption { padding:12px; text-align:left; color:var(--muted); font-weight:750; } th,td { text-align:left; padding:12px; border-bottom:1px solid var(--line); white-space:nowrap; } th { white-space:normal; } .quick-benchmark { min-width:560px; } .trust-meta { font-family:Georgia,serif; font-size:19px; } .source-list { columns:2; padding-left:20px; } .source-list li { break-inside:avoid; margin:0 0 8px; } .faq details { padding:14px 0; border-bottom:1px solid var(--line); } .related { display:flex; flex-wrap:wrap; gap:16px; } footer { padding:30px 0; background:#243f37; color:#e2e8e4; } footer a { color:#fff; }
     .plan-change-summary { margin:20px 0 6px; padding:18px 0; border-top:1px solid var(--accent); border-bottom:1px solid var(--line); } .plan-change-summary h3 { margin:0; font-family:Georgia,serif; font-size:22px; font-weight:400; } .plan-change-outcome { margin:7px 0 16px; color:var(--muted); } .plan-change-list { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:14px; margin:0; } .plan-change-list div { border-top:1px solid var(--line); padding-top:9px; } .plan-change-list dt { color:var(--muted); font-size:12px; } .plan-change-list dd { margin:3px 0 0; font-family:Georgia,serif; font-size:22px; line-height:1.2; } .plan-change-list small { display:block; margin-top:3px; color:var(--muted); font-family:Arial,sans-serif; font-size:12px; } .result-adjust { margin-top:20px; } .ret-back-row { margin:0 0 20px; }
     @media(max-width:780px) { .calculator-page.ret-mobile-results #retirement-calculator { display:none; } .calculator-page.ret-mobile-editing #ret-results,.calculator-page.ret-mobile-editing #ret-detailed-projection,.calculator-page.ret-mobile-editing #ret-current-cost-comparison { display:none!important; } .calculator-page.ret-mobile-editing #ret-calculate { position:sticky; z-index:4; bottom:12px; box-shadow:0 8px 24px rgba(36,49,45,.18); } .calculator-layout,.projection-grid,.current-cost-layout { grid-template-columns:1fr; } .result-panel { position:static; } .plan-change-list { grid-template-columns:1fr; gap:10px; } .key-figures { grid-template-columns:1fr; } .current-cost-result { border-left:0; border-top:1px solid var(--line); padding:20px 0 0; } .source-list { columns:1; } }
-    @media(max-width:520px) { .field-grid,.result-grid { grid-template-columns:1fr; } .calc-modes { display:grid; gap:10px; } .calc-modes a { width:max-content; max-width:100%; } h1 { overflow-wrap:anywhere; } th,td { padding:10px 8px; font-size:13px; } }
+    @media(max-width:520px) { .field-grid,.result-grid { grid-template-columns:1fr; } .calc-modes { display:grid; gap:10px; } .calc-modes a { width:max-content; max-width:100%; } h1 { overflow-wrap:anywhere; } th,td { padding:10px 8px; font-size:13px; } .quick-benchmark { min-width:0; } .quick-benchmark thead { display:none; } .quick-benchmark tbody { display:grid; } .quick-benchmark tr { display:grid; grid-template-columns:minmax(0,1fr) auto; gap:2px 16px; padding:12px 0; border-bottom:1px solid var(--line); } .quick-benchmark th,.quick-benchmark td { padding:0; border:0; white-space:normal; } .quick-benchmark th[scope=row] { grid-column:1; } .quick-benchmark td:nth-child(2) { grid-column:1; color:var(--muted); } .quick-benchmark td:nth-child(3) { grid-column:2; grid-row:1 / span 2; align-self:center; text-align:right; } .mobile-benchmark-label { display:block; font-size:11px; color:var(--muted); } }
     @media(prefers-reduced-motion:reduce) { .chart-year,.cost-sidecar[open] { animation:none; opacity:1; transform:none; } }
   </style>
   <style id="gha-top-level-design">
@@ -6774,7 +6902,6 @@ __UTILITY_CSS__
     <p class="lede">Estimate comfortable destination spending, project it to retirement, and separate the portfolio, property capital, and reserve you may need.</p><p class="hint">Choose your planning currency below. Destination data is normalized in today's USD before conversion.</p><nav class="calc-modes" aria-label="Retirement calculator mode"><a href="/retirement-abroad-calculator/" aria-current="page">Plan for a destination</a><a href="/retirement-destination-finder/">Find destinations I can afford</a></nav>
   </div></header>
   <main><div class="calc-shell">
-    __QUICK_ANSWER__
     <section class="calculator-layout" aria-label="Retirement calculator">
       <form class="calc-panel" id="retirement-calculator" tabindex="-1" novalidate>
         <p class="ret-back-row"><button class="text-button" id="ret-back-results" type="button" hidden>Back to results</button></p>
@@ -6787,6 +6914,7 @@ __UTILITY_CSS__
         </div></fieldset>
         <fieldset><legend>Destination and housing</legend><div class="field-grid">
           <div class="field"><label for="ret-destination">Destination</label><select id="ret-destination">__OPTIONS__</select><p class="hint"><button class="text-button" id="ret-cost-compare-open" type="button">Compare destination retirement costs</button></p></div>
+          <div class="field" id="ret-home-tax-jurisdiction-field" hidden><label for="ret-home-tax-jurisdiction">Home tax jurisdiction</label><select id="ret-home-tax-jurisdiction"><option value="">Choose one</option><option value="hong-kong">Hong Kong</option></select><p class="hint">Shown only where a complete destination-and-home calculation is supported.</p></div>
           <div class="field"><label for="ret-housing-plan">Housing plan</label><select id="ret-housing-plan"><option value="rent" selected>Rent</option><option value="own">Already own</option><option value="buy_now">Buy now</option><option value="buy_retirement">Buy at retirement</option></select></div>
           <div class="field"><label id="ret-monthly-spending-label" for="ret-monthly-spending">Monthly retirement living expenses including rent</label><input id="ret-monthly-spending" type="text" inputmode="numeric" data-money min="0" step="1" value="0"><p class="hint" id="ret-housing-guidance">Monthly retirement living expenses, including rent.</p></div>
           <div class="field" id="ret-property-field"><label for="ret-property-budget">Home purchase budget today</label><input id="ret-property-budget" type="text" inputmode="numeric" data-money min="0" step="1" value="0"><p class="hint">Prefilled with today's representative destination price. Edit it to match the home you expect to buy.</p><p class="hint" id="ret-acquisition-cost-guidance">The selected destination’s modeled acquisition-cost allowance—or explicit exclusion—is shown here.</p></div>
@@ -6795,13 +6923,26 @@ __UTILITY_CSS__
           <div class="field"><label for="ret-monthly-income">After-tax monthly income</label><input id="ret-monthly-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"></div>
           <div class="field"><label for="ret-income-invested-rate">Share invested from income (%)</label><input id="ret-income-invested-rate" type="number" min="0" max="100" step="1" value="20"><p class="hint" id="ret-monthly-investment-preview">Monthly contribution: $0</p></div>
         </div></fieldset>
-        <fieldset><legend>Income continuing after retirement (annual)</legend><p class="hint">Use after-tax amounts expected to continue in retirement. Do not include dividends from the portfolio being calculated.</p><div class="field-grid">
+        <fieldset><legend>Income continuing after retirement (annual)</legend><p class="hint" id="ret-retirement-income-note">Enter dependable amounts before destination tax. Do not include dividends from the portfolio being calculated.</p><div class="field-grid">
           <div class="field"><label for="ret-pension">Pension</label><input id="ret-pension" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><label class="check"><input id="ret-pension-indexed" type="checkbox" checked> Inflation-linked</label></div>
           <div class="field"><label for="ret-other-income">Other non-portfolio income</label><input id="ret-other-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><label class="check"><input id="ret-other-indexed" type="checkbox" checked> Inflation-linked</label></div>
           <div class="field"><label for="ret-rental-income">Net rental income</label><input id="ret-rental-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at zero when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox" checked> Inflation-linked</label></div>
         </div></fieldset>
+        <fieldset id="ret-tax-planning"><legend>Tax planning</legend><p class="hint">Choose a broad planning range or use figures you already know are after tax. Initial screen assumes a full-year relocation; you can refine this later for seasonal or part-year plans.</p>
+          <div class="tax-mode-choices">
+            <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="destination_estimate" checked><span>Use destination planning estimate<small>Add a broad, source-backed tax reserve to the retirement plan.</small></span></label>
+            <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="user_after_tax"><span>I know my after-tax figures<small>No destination income-tax reserve is added.</small></span></label>
+          </div>
+          <div id="ret-tax-estimate-fields"><p class="hint">Dependable annual income is taken from the retirement-income amounts above.</p><div class="field-grid">
+            <div class="field"><label for="ret-tax-withdrawals">Expected annual portfolio withdrawals</label><input id="ret-tax-withdrawals" type="text" inputmode="numeric" data-money min="0" step="100" value="0"></div>
+            <div class="field"><label for="ret-tax-gain-intensity">How much of those withdrawals may be realized gains?</label><select id="ret-tax-gain-intensity"><option value="low">Little or none</option><option value="moderate" selected>A moderate share</option><option value="high">A large share</option></select></div>
+            <div class="field" id="ret-tax-property-use-field" hidden><label for="ret-tax-property-use">How will you use the destination home?</label><select id="ret-tax-property-use" disabled><option value="personal" selected>Personal use</option><option value="rental">Rental</option><option value="mixed">Personal and rental use</option></select></div>
+            <div class="field" id="ret-tax-wealth-band-field" hidden><label for="ret-tax-wealth-band">Broad household wealth band</label><select id="ret-tax-wealth-band" disabled><option value="under_threshold">Below the destination threshold</option><option value="above_threshold">Above the destination threshold</option><option value="unknown" selected>Not sure</option></select><p class="hint">Shown only where the destination evidence identifies a material wealth-tax exposure.</p></div>
+          </div></div>
+          <p class="hint" id="ret-tax-after-tax-note" hidden>Your dependable income and portfolio return must already reflect tax.</p>
+        </fieldset>
         <fieldset><legend>Portfolio assumption</legend>
-          <label for="ret-expected-return">Expected annual portfolio return after fees (%)</label>
+          <label for="ret-expected-return">Expected annual portfolio return after fees and tax (%)</label>
           <input id="ret-expected-return" type="number" min="-5" max="15" step="0.1" required>
           <p class="hint">Required. Enter your own straight-line return assumption; this is not a guaranteed return or probability-of-success estimate.</p>
           <p class="hint"><button class="text-button" id="ret-example-return" type="button">Use an illustrative 4% example</button> to explore the model; it is not a forecast or recommendation.</p>
@@ -6812,14 +6953,19 @@ __UTILITY_CSS__
           <div class="field"><label for="ret-property-inflation">Property inflation (%)</label><input id="ret-property-inflation" type="number" min="0" max="15" step="0.1"></div>
           <div class="field"><label for="ret-reserve-months">Emergency reserve (months)</label><input id="ret-reserve-months" type="number" min="0" max="36" step="1" value="12"></div>
         </div></details>
-        <div id="ret-errors" role="alert" tabindex="-1"></div><button class="primary" id="ret-calculate" type="submit">Update estimate</button>
+        <div id="ret-errors" role="alert" tabindex="-1"></div><button class="primary" id="ret-calculate" type="submit">Calculate estimate</button>
       </form>
       <section class="calc-panel result-panel" id="ret-results" tabindex="-1" aria-live="polite" aria-atomic="true">
-        <h2>Your planning estimate</h2><p class="hint" id="ret-result-status">Complete the inputs and calculate.</p>
-        <p class="result-decision" id="ret-plan-summary">Enter your assumptions to see what to invest today and each month.</p>
+        <h2>Your planning estimate</h2><p class="hint" id="ret-result-status">Add a return assumption, then calculate.</p>
+        <p class="result-decision" id="ret-plan-summary">Your estimate will appear here after you add a return assumption.</p>
         <section class="plan-change-summary" id="ret-plan-change-summary" hidden aria-labelledby="ret-plan-change-heading"><h3 id="ret-plan-change-heading">What changed</h3><p class="plan-change-outcome" id="ret-plan-change-outcome"></p><dl class="plan-change-list" id="ret-plan-change-list"></dl></section>
+        <p class="tax-range" id="ret-tax-range" hidden><span>Favorable to adverse range</span><strong id="ret-tax-range-capital">—</strong></p>
+        <p class="hint" id="ret-tax-unavailable" hidden>This destination tax estimate is conditional because current evidence is unavailable.</p>
+        <p class="hint" id="ret-tax-no-tax-comparison" hidden>No added destination tax comparison: <strong id="ret-tax-no-tax-capital">—</strong>.</p>
+        <details class="tax-details" id="ret-tax-details" hidden><summary>Assumptions and sources</summary><div class="table-wrap"><table class="result-table"><thead><tr><th>Scenario</th><th>Tax reserve</th><th>Total annual requirement</th><th>Capital requirement</th></tr></thead><tbody><tr id="ret-tax-favorable-row"><th scope="row">Favorable</th><td></td><td></td><td></td></tr><tr id="ret-tax-central-row"><th scope="row">Central</th><td></td><td></td><td></td></tr><tr id="ret-tax-adverse-row"><th scope="row">Adverse</th><td></td><td></td><td></td></tr></tbody></table></div><div class="tax-explanations" id="ret-tax-explanations"></div></details>
+        <p><button class="text-button" id="ret-tax-refine" type="button" hidden disabled>Refine with detailed tax rules</button></p><p class="hint" id="ret-tax-detailed-availability" role="status">Detailed tax refinement appears only for supported destination and home-country combinations.</p>
         <section class="result-period" id="ret-today-section" aria-label="Key planning figures"><div class="key-figures">
-          <div><span>Needed today</span><strong id="ret-total-today">—</strong></div><div><span>Needed at retirement</span><strong id="ret-total-retirement-summary">—</strong></div><div><span>Monthly contribution</span><strong id="ret-monthly-contribution">—</strong></div><div id="ret-home-summary" hidden><span id="ret-home-today-label">Home purchase today</span><strong id="ret-home-today">—</strong></div>
+          <div><span>Monthly contribution</span><strong id="ret-monthly-contribution">—</strong></div><div><span>Retirement capital</span><strong id="ret-total-retirement-summary">—</strong></div><div><span>Property capital</span><strong id="ret-property-summary">—</strong></div>
         </div>
         </section>
         <button class="primary result-adjust" id="ret-adjust-plan" type="button" hidden>Adjust plan</button>
@@ -6845,6 +6991,13 @@ __UTILITY_CSS__
         </div>
         <p class="hint" id="ret-result-assumptions">Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.</p>
       </section>
+    <section class="calc-panel detailed-tax" id="ret-tax-detailed" hidden aria-labelledby="ret-tax-detailed-heading">
+      <h2 id="ret-tax-detailed-heading">Refine your tax estimate</h2>
+      <p class="hint">Answer only facts that can change a validated rule. Your answers and results remain in this browser's memory and are not added to links or analytics.</p>
+      <p id="ret-tax-detailed-status" role="status" aria-live="polite"></p>
+      <form id="ret-tax-detailed-form"><div class="detailed-tax-question-list" id="ret-tax-detailed-questions"></div><button type="submit">Calculate refined estimate</button></form>
+      <div id="ret-tax-detailed-result" hidden></div>
+    </section>
     <section class="calc-panel current-cost-comparison" id="ret-current-cost-comparison" hidden aria-labelledby="ret-current-cost-heading">
       <h2 id="ret-current-cost-heading">Compare with where you live now</h2>
       <p class="hint">Use your household's current monthly spending, including housing, in your selected planning currency. This comparison does not change your retirement estimate.</p>
@@ -6874,16 +7027,21 @@ __UTILITY_CSS__
       <div class="cost-sidecar-panel"><header class="cost-sidecar-header"><div><h2 id="ret-cost-sidecar-title">Compare monthly living expenses</h2><p class="hint" id="ret-cost-sidecar-context"></p></div><button class="cost-sidecar-close" id="ret-cost-sidecar-close" type="button" aria-label="Close destination comparison">Close</button></header><div class="cost-sidecar-chart" id="ret-cost-sidecar-chart"></div></div>
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
-    <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Tax, visa eligibility, currency shocks, individualized healthcare and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a>__FIRE_ABROAD_LINK__</p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
+    __QUICK_ANSWER__
+    <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. It also adds a broad destination tax allowance. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Individual tax or treaty advice, visa eligibility, currency shocks, individualized healthcare, and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a>__FIRE_ABROAD_LINK__</p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
     <section class="content-section"><h2>Retirement plans by capital</h2><p class="related"><a href="/retire-abroad-with-500k/">$500,000</a><a href="/retire-abroad-with-750k/">$750,000</a><a href="/retire-abroad-with-1-million/">$1 million</a><a href="/retire-abroad-with-1-5-million/">$1.5 million</a><a href="/retire-abroad-with-2-million/">$2 million</a></p></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
   __SITE_FOOTER__
   <script id="retirement-destination-data" type="application/json">__DATA__</script>
+  <script id="fire-tax-detailed-data" type="application/json">__DETAILED_TAX_DATA__</script>
   <script>__ENGINE__</script>
+  <script>__TAX_SCENARIO_ENGINE__</script>
   <script>__UI__</script>
+  <script>__DETAILED_ENGINES__</script>
 __ANALYTICS__
   <script>if(window.GHARetirementCalculatorUI){window.GHARetirementCalculatorUI.initRetirementCalculator("retirement-calculator",JSON.parse(document.getElementById("retirement-destination-data").textContent));}</script>
+  <script>if(window.GHAFireTaxDetailedUI){window.GHAFireTaxDetailedUI.initDetailedTaxUI("retirement-calculator",JSON.parse(document.getElementById("fire-tax-detailed-data").textContent));}</script>
 </body></html>"""
     replacements = {
         "__HEAD__": head_html(RETIREMENT_CALCULATOR_TITLE, RETIREMENT_CALCULATOR_DESCRIPTION, canonical, schema_for_retirement_calculator(canonical)),
@@ -6900,8 +7058,11 @@ __ANALYTICS__
             'data-track-label="retirement calculator">Compare active FIRE Abroad destinations</a>'
         ),
         "__DATA__": page_data,
+        "__DETAILED_TAX_DATA__": detailed_tax_data,
         "__ENGINE__": engine_js,
+        "__TAX_SCENARIO_ENGINE__": tax_scenario_js,
         "__UI__": ui_js,
+        "__DETAILED_ENGINES__": detailed_engine_scripts,
         "__ANALYTICS__": analytics_event_script(),
     }
     for key, value in replacements.items():
@@ -10836,7 +10997,8 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
     ]
 
 
-def build() -> Path:
+def build(*, as_of: date | None = None) -> Path:
+    build_date = as_of or date.today()
     content_overrides = load_content_overrides()
     destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
     destinations = rank_destinations(destinations)
@@ -12221,14 +12383,24 @@ def build() -> Path:
     retirement_calculator_dir = ARTIFACTS / RETIREMENT_CALCULATOR_SLUG
     retirement_calculator_dir.mkdir(parents=True, exist_ok=True)
     (retirement_calculator_dir / "index.html").write_text(
-        clean_generated_html(build_retirement_calculator_page(destinations, retirement_costs)),
+        clean_generated_html(
+            build_retirement_calculator_page(
+                destinations, retirement_costs, fire_payload, tax_as_of=build_date
+            )
+        ),
         encoding="utf-8",
     )
     retirement_finder_dir = ARTIFACTS / RETIREMENT_FINDER_SLUG
     retirement_finder_dir.mkdir(parents=True, exist_ok=True)
     (retirement_finder_dir / "index.html").write_text(
         clean_generated_html(
-            build_retirement_destination_finder_page(destinations, retirement_costs, mortgage_profiles)
+            build_retirement_destination_finder_page(
+                destinations,
+                retirement_costs,
+                mortgage_profiles,
+                fire_payload,
+                tax_as_of=build_date,
+            )
         ),
         encoding="utf-8",
     )
@@ -12236,7 +12408,9 @@ def build() -> Path:
     fire_abroad_dir.mkdir(parents=True, exist_ok=True)
     (fire_abroad_dir / "index.html").write_text(
         clean_generated_html(
-            build_fire_abroad_page(destinations, retirement_costs, fire_payload)
+            build_fire_abroad_page(
+                destinations, retirement_costs, fire_payload, tax_as_of=build_date
+            )
         ),
         encoding="utf-8",
     )

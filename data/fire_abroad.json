@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "reviewed_on": "2026-08-29",
+  "reviewed_on": "2026-09-01",
   "review_policy": {
     "immigration_days": 90,
     "tax_days": 90,
@@ -416,7 +416,186 @@
           "jurisdiction_level": "European Union",
           "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
         }
-      ]
+      ],
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": [
+          "schengen-short-stay"
+        ],
+        "long_stay_source_ids": [
+          "eu-inactive-residence",
+          "portugal-own-income-visa"
+        ]
+      },
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "183_plus",
+          "summary": "More than 183 days or a home showing habitual-residence intent can create Portuguese residence.",
+          "non_day_tests": [
+            "Home available in circumstances indicating habitual-residence intent"
+          ],
+          "source_ids": [
+            "portugal-residence-scope"
+          ]
+        },
+        "scope_if_resident": "worldwide_income",
+        "scope_source_ids": [
+          "portugal-residence-scope"
+        ],
+        "funding_source_notes": {
+          "portfolio": "Residents typically bring worldwide investment income and gains into Portuguese scope.",
+          "pension": "Pension source, treaty and any special status require separate review.",
+          "property": "Portuguese property creates acquisition, annual, rental and disposal tax touchpoints.",
+          "work_business": "Employment or business income requires category, social-security and treaty analysis.",
+          "mixed": "Mixed income should be mapped category by category."
+        },
+        "funding_source_source_ids": {
+          "portfolio": [
+            "portugal-residence-scope",
+            "portugal-tax-system"
+          ],
+          "pension": [
+            "portugal-tax-system"
+          ],
+          "property": [
+            "portugal-transfer",
+            "portugal-annual-property",
+            "portugal-rental",
+            "portugal-tax-system"
+          ],
+          "work_business": [
+            "portugal-tax-system"
+          ],
+          "mixed": [
+            "portugal-residence-scope",
+            "portugal-tax-system"
+          ]
+        },
+        "tax_readiness": "complex",
+        "tax_readiness_score": 2.7,
+        "planning_bands": {
+          "seasonal": {
+            "favorable_rate": 0.0,
+            "central_rate": 0.04,
+            "adverse_rate": 0.1
+          },
+          "part_year": {
+            "favorable_rate": 0.04,
+            "central_rate": 0.14,
+            "adverse_rate": 0.25
+          },
+          "full_relocation": {
+            "favorable_rate": 0.12,
+            "central_rate": 0.24,
+            "adverse_rate": 0.38
+          }
+        },
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are broad scenarios, not statutory tax rates, sourced tax estimates, or assessments.",
+        "planning_band_basis_source_ids": [
+          "portugal-residence-scope",
+          "portugal-tax-system"
+        ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "portugal-residence-scope",
+          "portugal-tax-system"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 500,
+            "central_usd": 1500,
+            "adverse_usd": 4000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "portugal-annual-property"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 1000,
+            "adverse_usd": 5000,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "portugal-annual-property"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 800,
+            "central_usd": 2000,
+            "adverse_usd": 4500,
+            "source_ids": [
+              "portugal-tax-system"
+            ]
+          }
+        },
+        "included_categories": [
+          "income_tax_reserve",
+          "social_tax_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": [
+          "inheritance_stamp_duty",
+          "additional_property_tax",
+          "treaty_dependence"
+        ],
+        "property_lifecycle": {
+          "purchase": {
+            "summary": "Acquisition can trigger IMT and other transaction charges.",
+            "source_ids": [
+              "portugal-transfer",
+              "portugal-tax-system"
+            ]
+          },
+          "annual": {
+            "summary": "IMI and sometimes additional IMI require assessed-value and ownership review.",
+            "source_ids": [
+              "portugal-annual-property"
+            ]
+          },
+          "rental": {
+            "summary": "Portuguese rents are reportable property income with documented expense rules.",
+            "source_ids": [
+              "portugal-rental"
+            ]
+          },
+          "sale": {
+            "summary": "A sale can generate taxable capital gains; residence and reinvestment facts matter.",
+            "source_ids": [
+              "portugal-tax-system"
+            ]
+          },
+          "succession": {
+            "summary": "Stamp-duty and exemption outcomes depend on asset, relationship and estate structure.",
+            "source_ids": [
+              "portugal-tax-system"
+            ]
+          }
+        },
+        "source_ids": [
+          "portugal-residence-scope",
+          "portugal-tax-system",
+          "portugal-transfer",
+          "portugal-annual-property",
+          "portugal-rental"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium_high"
+      }
     },
     "Spain": {
       "stay_routes": {
@@ -767,7 +946,187 @@
           "jurisdiction_level": "European Union",
           "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
         }
-      ]
+      ],
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": [
+          "schengen-short-stay",
+          "spain-eu-stay"
+        ],
+        "long_stay_source_ids": [
+          "eu-inactive-residence",
+          "spain-nonworking-visa"
+        ]
+      },
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "183_plus",
+          "summary": "A full relocation or extended part-year stay can create Spanish tax residence.",
+          "non_day_tests": [
+            "Main centre or base of economic activities or interests",
+            "Rebuttable spouse and dependent-minor family presumption"
+          ],
+          "source_ids": [
+            "spain-tax-residence"
+          ]
+        },
+        "scope_if_resident": "worldwide_income",
+        "scope_source_ids": [
+          "spain-income-scope"
+        ],
+        "funding_source_notes": {
+          "portfolio": "Resident taxation can reach worldwide dividends, interest and realized gains.",
+          "pension": "Pension treatment depends on type, source country and treaty.",
+          "property": "Spanish property can create income, wealth and disposal exposure even while nonresident.",
+          "work_business": "Work and business income require residence, source and social-tax review.",
+          "mixed": "Mixed-income plans require category-by-category treatment."
+        },
+        "funding_source_source_ids": {
+          "portfolio": [
+            "spain-income-scope"
+          ],
+          "pension": [
+            "spain-income-scope"
+          ],
+          "property": [
+            "spain-real-estate",
+            "spain-wealth-tax"
+          ],
+          "work_business": [
+            "spain-income-scope"
+          ],
+          "mixed": [
+            "spain-income-scope",
+            "spain-real-estate"
+          ]
+        },
+        "tax_readiness": "complex",
+        "tax_readiness_score": 2.5,
+        "planning_bands": {
+          "seasonal": {
+            "favorable_rate": 0.0,
+            "central_rate": 0.03,
+            "adverse_rate": 0.08
+          },
+          "part_year": {
+            "favorable_rate": 0.03,
+            "central_rate": 0.12,
+            "adverse_rate": 0.22
+          },
+          "full_relocation": {
+            "favorable_rate": 0.12,
+            "central_rate": 0.22,
+            "adverse_rate": 0.35
+          }
+        },
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are broad scenarios, not statutory tax rates, sourced tax estimates, or assessments.",
+        "planning_band_basis_source_ids": [
+          "spain-tax-residence",
+          "spain-income-scope",
+          "spain-real-estate"
+        ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "spain-income-scope",
+          "spain-real-estate"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 500,
+            "central_usd": 2000,
+            "adverse_usd": 5000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "spain-real-estate"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 2000,
+            "adverse_usd": 8000,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "spain-wealth-tax"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 1000,
+            "central_usd": 2500,
+            "adverse_usd": 5000,
+            "source_ids": [
+              "spain-income-scope"
+            ]
+          }
+        },
+        "included_categories": [
+          "income_tax_reserve",
+          "social_tax_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": [
+          "wealth_tax",
+          "inheritance_tax",
+          "regional_variation"
+        ],
+        "property_lifecycle": {
+          "purchase": {
+            "summary": "New and used home purchases can fall under VAT or regional transfer tax depending on the transaction.",
+            "source_ids": [
+              "spain-property-purchase"
+            ]
+          },
+          "annual": {
+            "summary": "Possible wealth-tax and imputed-income exposure requires property and residence facts.",
+            "source_ids": [
+              "spain-real-estate",
+              "spain-wealth-tax"
+            ]
+          },
+          "rental": {
+            "summary": "Rental income remains taxable and deductions depend on residence and treaty context.",
+            "source_ids": [
+              "spain-real-estate"
+            ]
+          },
+          "sale": {
+            "summary": "Capital-gains tax and nonresident sale withholding can apply.",
+            "source_ids": [
+              "spain-real-estate"
+            ]
+          },
+          "succession": {
+            "summary": "Inheritance exposure depends on residence, location, relationship and regional rules.",
+            "source_ids": [
+              "spain-inheritance"
+            ]
+          }
+        },
+        "source_ids": [
+          "spain-tax-residence",
+          "spain-income-scope",
+          "spain-real-estate",
+          "spain-property-purchase",
+          "spain-wealth-tax",
+          "spain-inheritance"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium_high"
+      }
     },
     "Greece": {
       "stay_routes": {
@@ -1131,7 +1490,192 @@
           "jurisdiction_level": "European Union",
           "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
         }
-      ]
+      ],
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": [
+          "schengen-short-stay"
+        ],
+        "long_stay_source_ids": [
+          "eu-inactive-residence"
+        ]
+      },
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "183_plus",
+          "summary": "Residence can arise through home, habitual abode, vital interests or more than 183 days.",
+          "non_day_tests": [
+            "Permanent or principal residence",
+            "Habitual abode",
+            "Centre of vital interests"
+          ],
+          "source_ids": [
+            "greece-residence"
+          ]
+        },
+        "scope_if_resident": "worldwide_income",
+        "scope_source_ids": [
+          "greece-residence",
+          "greece-nonresident"
+        ],
+        "funding_source_notes": {
+          "portfolio": "Resident scope can reach dividends, interest and capital gains.",
+          "pension": "Pensions require source, treaty and special-regime review.",
+          "property": "Greek property creates E9, ENFIA, rental, transfer and disposal exposure.",
+          "work_business": "Employment and business follow source, residence and activity rules.",
+          "mixed": "Mixed income requires category and treaty analysis."
+        },
+        "funding_source_source_ids": {
+          "portfolio": [
+            "greece-income",
+            "greece-residence"
+          ],
+          "pension": [
+            "greece-income",
+            "greece-nonresident"
+          ],
+          "property": [
+            "greece-property",
+            "greece-income",
+            "greece-transfer-inheritance"
+          ],
+          "work_business": [
+            "greece-income",
+            "greece-nonresident"
+          ],
+          "mixed": [
+            "greece-income",
+            "greece-nonresident"
+          ]
+        },
+        "tax_readiness": "complex",
+        "tax_readiness_score": 2.6,
+        "planning_bands": {
+          "seasonal": {
+            "favorable_rate": 0.0,
+            "central_rate": 0.05,
+            "adverse_rate": 0.12
+          },
+          "part_year": {
+            "favorable_rate": 0.05,
+            "central_rate": 0.15,
+            "adverse_rate": 0.25
+          },
+          "full_relocation": {
+            "favorable_rate": 0.12,
+            "central_rate": 0.23,
+            "adverse_rate": 0.35
+          }
+        },
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are broad scenarios, not statutory tax rates, sourced tax estimates, or assessments.",
+        "planning_band_basis_source_ids": [
+          "greece-residence",
+          "greece-income",
+          "greece-nonresident"
+        ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "greece-income",
+          "greece-nonresident"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 500,
+            "central_usd": 1500,
+            "adverse_usd": 4000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "greece-property"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 1000,
+            "adverse_usd": 4000,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "greece-property"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 1000,
+            "central_usd": 2500,
+            "adverse_usd": 5000,
+            "source_ids": [
+              "greece-income"
+            ]
+          }
+        },
+        "included_categories": [
+          "income_tax_reserve",
+          "social_tax_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": [
+          "presumptive_income",
+          "annual_property_tax",
+          "inheritance_tax"
+        ],
+        "property_lifecycle": {
+          "purchase": {
+            "summary": "Acquisition requires a transfer declaration and can affect presumptive-income analysis.",
+            "source_ids": [
+              "greece-transfer-inheritance",
+              "greece-nonresident"
+            ]
+          },
+          "annual": {
+            "summary": "E9 reporting and annual ENFIA apply to Greek holdings.",
+            "source_ids": [
+              "greece-property"
+            ]
+          },
+          "rental": {
+            "summary": "Greek immovable-property income is taxable under category rules.",
+            "source_ids": [
+              "greece-income",
+              "greece-nonresident"
+            ]
+          },
+          "sale": {
+            "summary": "Disposal treatment and temporary suspensions must be checked at sale date.",
+            "source_ids": [
+              "greece-income",
+              "greece-nonresident"
+            ]
+          },
+          "succession": {
+            "summary": "Inheritance depends on asset situs, residence, nationality and relationship.",
+            "source_ids": [
+              "greece-transfer-inheritance"
+            ]
+          }
+        },
+        "source_ids": [
+          "greece-residence",
+          "greece-income",
+          "greece-nonresident",
+          "greece-property",
+          "greece-transfer-inheritance"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium_high"
+      }
     },
     "Croatia": {
       "stay_routes": {
@@ -1496,7 +2040,185 @@
           "jurisdiction_level": "European Union",
           "notes": "Official live guidance. The broad profile does not establish that the user is an EU citizen; the result is conditional on actually holding the selected right and meeting applicable registration or residence conditions."
         }
-      ]
+      ],
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": [
+          "schengen-short-stay"
+        ],
+        "long_stay_source_ids": [
+          "eu-inactive-residence"
+        ]
+      },
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "183_plus",
+          "summary": "A Croatian home or habitual abode can establish residence; there is no simple visitor-day safe harbour.",
+          "non_day_tests": [
+            "Dwelling held continuously for at least 183 days even without occupation",
+            "Family home or predominant place of stay or work"
+          ],
+          "source_ids": [
+            "croatia-residence",
+            "croatia-income-law"
+          ]
+        },
+        "scope_if_resident": "worldwide_income",
+        "scope_source_ids": [
+          "croatia-income-law"
+        ],
+        "funding_source_notes": {
+          "portfolio": "Residents are within worldwide scope for capital income.",
+          "pension": "Pensions require source, treaty and residence review.",
+          "property": "Property can create transfer, annual, rental and disposal taxes.",
+          "work_business": "Employment and self-employment fall within Croatian income categories.",
+          "mixed": "Mixed income requires worldwide/source mapping and category classification."
+        },
+        "funding_source_source_ids": {
+          "portfolio": [
+            "croatia-income-law"
+          ],
+          "pension": [
+            "croatia-income-law"
+          ],
+          "property": [
+            "croatia-income-law",
+            "croatia-transfer",
+            "croatia-annual-property",
+            "croatia-sale"
+          ],
+          "work_business": [
+            "croatia-income-law"
+          ],
+          "mixed": [
+            "croatia-income-law"
+          ]
+        },
+        "tax_readiness": "moderate",
+        "tax_readiness_score": 3.1,
+        "planning_bands": {
+          "seasonal": {
+            "favorable_rate": 0.0,
+            "central_rate": 0.04,
+            "adverse_rate": 0.1
+          },
+          "part_year": {
+            "favorable_rate": 0.04,
+            "central_rate": 0.13,
+            "adverse_rate": 0.22
+          },
+          "full_relocation": {
+            "favorable_rate": 0.1,
+            "central_rate": 0.2,
+            "adverse_rate": 0.32
+          }
+        },
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are broad scenarios, not statutory tax rates, sourced tax estimates, or assessments.",
+        "planning_band_basis_source_ids": [
+          "croatia-residence",
+          "croatia-income-law"
+        ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "croatia-income-law"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 300,
+            "central_usd": 1000,
+            "adverse_usd": 2500,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "croatia-annual-property"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "croatia-income-law"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 800,
+            "central_usd": 2000,
+            "adverse_usd": 4000,
+            "source_ids": [
+              "croatia-income-law"
+            ]
+          }
+        },
+        "included_categories": [
+          "income_tax_reserve",
+          "social_tax_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": [
+          "dwelling_based_residence",
+          "local_property_tax",
+          "treaty_dependence"
+        ],
+        "property_lifecycle": {
+          "purchase": {
+            "summary": "Acquisition can attract transfer tax when VAT is not charged.",
+            "source_ids": [
+              "croatia-transfer"
+            ]
+          },
+          "annual": {
+            "summary": "Annual local property tax depends on municipality, use and exemptions.",
+            "source_ids": [
+              "croatia-annual-property"
+            ]
+          },
+          "rental": {
+            "summary": "Rental and short-stay accommodation fall within property-income rules.",
+            "source_ids": [
+              "croatia-income-law"
+            ]
+          },
+          "sale": {
+            "summary": "Disposal tax depends on holding, use, relationship and acquisition method.",
+            "source_ids": [
+              "croatia-sale"
+            ]
+          },
+          "succession": {
+            "summary": "Inheritance outcomes depend on relationship, asset type and transfer rules.",
+            "source_ids": [
+              "croatia-inheritance",
+              "croatia-transfer"
+            ]
+          }
+        },
+        "source_ids": [
+          "croatia-income-law",
+          "croatia-residence",
+          "croatia-transfer",
+          "croatia-annual-property",
+          "croatia-sale",
+          "croatia-inheritance"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium"
+      }
     },
     "Indonesia": {
       "stay_routes": {
@@ -1821,7 +2543,190 @@
           "jurisdiction_level": "Bali",
           "notes": "Official destination page used for documented activity locations, not qualitative marketing claims."
         }
-      ]
+      ],
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": [
+          "indonesia-short-stay"
+        ],
+        "long_stay_source_ids": [
+          "indonesia-second-home"
+        ]
+      },
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "183_plus",
+          "summary": "Residence, more than 183 days in 12 months, or presence with intention to reside can create domestic status.",
+          "non_day_tests": [
+            "Residence in Indonesia",
+            "Presence during a tax year with intention to reside"
+          ],
+          "source_ids": [
+            "indonesia-residence"
+          ]
+        },
+        "scope_if_resident": "worldwide_income",
+        "scope_source_ids": [
+          "indonesia-scope"
+        ],
+        "funding_source_notes": {
+          "portfolio": "Worldwide investment income can enter scope for a domestic taxpayer.",
+          "pension": "Pensions require residence, source, withholding and treaty analysis.",
+          "property": "Property involves local land tax plus rental, transfer and title constraints.",
+          "work_business": "Work and business can create source-tax and immigration consequences.",
+          "mixed": "Mixed income needs domestic, foreign-source and withholding classification."
+        },
+        "funding_source_source_ids": {
+          "portfolio": [
+            "indonesia-scope",
+            "indonesia-nonresident-income"
+          ],
+          "pension": [
+            "indonesia-nonresident-income"
+          ],
+          "property": [
+            "indonesia-property-rights",
+            "indonesia-land-tax",
+            "indonesia-transfer"
+          ],
+          "work_business": [
+            "indonesia-scope",
+            "indonesia-nonresident-income"
+          ],
+          "mixed": [
+            "indonesia-scope",
+            "indonesia-nonresident-income"
+          ]
+        },
+        "tax_readiness": "highly_profile_dependent",
+        "tax_readiness_score": 2.2,
+        "planning_bands": {
+          "seasonal": {
+            "favorable_rate": 0.01,
+            "central_rate": 0.06,
+            "adverse_rate": 0.12
+          },
+          "part_year": {
+            "favorable_rate": 0.05,
+            "central_rate": 0.15,
+            "adverse_rate": 0.25
+          },
+          "full_relocation": {
+            "favorable_rate": 0.1,
+            "central_rate": 0.22,
+            "adverse_rate": 0.32
+          }
+        },
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are broad scenarios, not statutory tax rates, sourced tax estimates, or assessments.",
+        "planning_band_basis_source_ids": [
+          "indonesia-residence",
+          "indonesia-scope",
+          "indonesia-nonresident-income"
+        ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "indonesia-scope",
+          "indonesia-nonresident-income"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 300,
+            "central_usd": 1000,
+            "adverse_usd": 3000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "indonesia-land-tax"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "indonesia-scope"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 1000,
+            "central_usd": 2500,
+            "adverse_usd": 5000,
+            "source_ids": [
+              "indonesia-scope"
+            ]
+          }
+        },
+        "included_categories": [
+          "income_tax_reserve",
+          "withholding_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": [
+          "foreign_expert_rule",
+          "title_restrictions",
+          "local_property_tax"
+        ],
+        "property_lifecycle": {
+          "purchase": {
+            "summary": "Foreign buyers must verify the permitted land-right form and transaction tax for the specific property.",
+            "source_ids": [
+              "indonesia-property-rights",
+              "indonesia-transfer"
+            ]
+          },
+          "annual": {
+            "summary": "Urban land and building tax is locally administered.",
+            "source_ids": [
+              "indonesia-land-tax"
+            ]
+          },
+          "rental": {
+            "summary": "Rent from Indonesian property can remain Indonesian-source income.",
+            "source_ids": [
+              "indonesia-nonresident-income"
+            ]
+          },
+          "sale": {
+            "summary": "Transfer of land or building rights can trigger transaction-based income tax.",
+            "source_ids": [
+              "indonesia-transfer"
+            ]
+          },
+          "succession": {
+            "summary": "Foreign succession requires both income-tax clearance and continued eligibility for the land right.",
+            "source_ids": [
+              "indonesia-inheritance",
+              "indonesia-property-rights"
+            ]
+          }
+        },
+        "source_ids": [
+          "indonesia-residence",
+          "indonesia-scope",
+          "indonesia-nonresident-income",
+          "indonesia-property-rights",
+          "indonesia-land-tax",
+          "indonesia-transfer",
+          "indonesia-inheritance"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium"
+      }
     },
     "Thailand": {
       "stay_routes": {
@@ -2171,7 +3076,185 @@
           "jurisdiction_level": "Phuket",
           "notes": "Undated official destination page; source_date records the reviewed live-page snapshot and supports activity availability only."
         }
-      ]
+      ],
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": [
+          "thailand-evisa"
+        ],
+        "long_stay_source_ids": [
+          "thailand-evisa"
+        ]
+      },
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "183_plus",
+          "summary": "An aggregate stay of 180 days or more in a calendar year creates Thai residence.",
+          "non_day_tests": [],
+          "source_ids": [
+            "thailand-pit"
+          ]
+        },
+        "scope_if_resident": "thai_source_and_remitted_foreign_income",
+        "scope_source_ids": [
+          "thailand-pit"
+        ],
+        "funding_source_notes": {
+          "portfolio": "Foreign investment income can enter scope when residence and remittance conditions are met.",
+          "pension": "Foreign pensions require residence, remittance, treaty and exemption review.",
+          "property": "Property involves ownership limits, rental income, transfer tax and succession.",
+          "work_business": "Thai work and business income is taxable; work authorization is separate.",
+          "mixed": "Mixed income requires source, year-earned, remittance and treaty tracing."
+        },
+        "funding_source_source_ids": {
+          "portfolio": [
+            "thailand-pit",
+            "thailand-property-income"
+          ],
+          "pension": [
+            "thailand-pit",
+            "thailand-property-income"
+          ],
+          "property": [
+            "thailand-property-income",
+            "thailand-property-registration",
+            "thailand-inheritance"
+          ],
+          "work_business": [
+            "thailand-pit",
+            "thailand-property-income"
+          ],
+          "mixed": [
+            "thailand-pit",
+            "thailand-property-income"
+          ]
+        },
+        "tax_readiness": "highly_profile_dependent",
+        "tax_readiness_score": 2.3,
+        "planning_bands": {
+          "seasonal": {
+            "favorable_rate": 0.0,
+            "central_rate": 0.04,
+            "adverse_rate": 0.1
+          },
+          "part_year": {
+            "favorable_rate": 0.04,
+            "central_rate": 0.13,
+            "adverse_rate": 0.23
+          },
+          "full_relocation": {
+            "favorable_rate": 0.08,
+            "central_rate": 0.2,
+            "adverse_rate": 0.32
+          }
+        },
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are broad scenarios, not statutory tax rates, sourced tax estimates, or assessments.",
+        "planning_band_basis_source_ids": [
+          "thailand-pit",
+          "thailand-property-income"
+        ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "thailand-pit",
+          "thailand-property-income"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 300,
+            "central_usd": 1000,
+            "adverse_usd": 3000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "thailand-annual-property-tax"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "thailand-pit"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 800,
+            "central_usd": 2000,
+            "adverse_usd": 4500,
+            "source_ids": [
+              "thailand-pit"
+            ]
+          }
+        },
+        "included_categories": [
+          "income_tax_reserve",
+          "withholding_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": [
+          "foreign_income_remittance",
+          "foreign_ownership_restrictions",
+          "inheritance_tax"
+        ],
+        "property_lifecycle": {
+          "purchase": {
+            "summary": "Foreign ownership, quota, funds evidence, title and transfer charges require land-office review.",
+            "source_ids": [
+              "thailand-property-registration"
+            ]
+          },
+          "annual": {
+            "summary": "Annual land and building tax is locally collected and depends on property, use, value and exemptions.",
+            "source_ids": [
+              "thailand-annual-property-tax"
+            ]
+          },
+          "rental": {
+            "summary": "Rental income is assessable and leases can carry stamp duty.",
+            "source_ids": [
+              "thailand-pit",
+              "thailand-property-income"
+            ]
+          },
+          "sale": {
+            "summary": "Transfer can trigger withholding and transaction taxes based on acquisition and holding facts.",
+            "source_ids": [
+              "thailand-property-income",
+              "thailand-property-registration"
+            ]
+          },
+          "succession": {
+            "summary": "Inheritance depends on situs, value, relationship and domicile.",
+            "source_ids": [
+              "thailand-inheritance"
+            ]
+          }
+        },
+        "source_ids": [
+          "thailand-pit",
+          "thailand-property-income",
+          "thailand-property-registration",
+          "thailand-annual-property-tax",
+          "thailand-inheritance"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium"
+      }
     },
     "Japan": {
       "stay_routes": {
@@ -2524,7 +3607,188 @@
           "jurisdiction_level": "Fukuoka City / Itoshima",
           "notes": "Official destination page used for route and infrastructure facts, not promotional rankings."
         }
-      ]
+      ],
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": [
+          "japan-short-stay"
+        ],
+        "long_stay_source_ids": [
+          "japan-long-stay"
+        ]
+      },
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "unsure",
+          "summary": "Japan uses domicile and continuous residence rather than a simple 183-day rule; one year is a key period.",
+          "non_day_tests": [
+            "Base of living amounting to domicile",
+            "Residence continuously for one year or more",
+            "Occupation, family and assets that presume domicile"
+          ],
+          "source_ids": [
+            "japan-residence-scope",
+            "japan-nonresident"
+          ]
+        },
+        "scope_if_resident": "worldwide_income_with_non_permanent_resident_limits",
+        "scope_source_ids": [
+          "japan-residence-scope",
+          "japan-nonresident"
+        ],
+        "funding_source_notes": {
+          "portfolio": "Scope depends on resident class, foreign-source characterization and remittances.",
+          "pension": "Pension treatment depends on residence, source, treaty and type.",
+          "property": "Property creates acquisition, annual, rental, disposal and succession touchpoints.",
+          "work_business": "Work can support domicile and Japanese-source treatment.",
+          "mixed": "Mixed income needs resident-class, source and remittance tracing."
+        },
+        "funding_source_source_ids": {
+          "portfolio": [
+            "japan-residence-scope",
+            "japan-nonresident"
+          ],
+          "pension": [
+            "japan-nonresident"
+          ],
+          "property": [
+            "japan-rental",
+            "japan-property-tax",
+            "japan-inheritance"
+          ],
+          "work_business": [
+            "japan-residence-scope",
+            "japan-nonresident"
+          ],
+          "mixed": [
+            "japan-residence-scope",
+            "japan-nonresident"
+          ]
+        },
+        "tax_readiness": "complex",
+        "tax_readiness_score": 2.4,
+        "planning_bands": {
+          "seasonal": {
+            "favorable_rate": 0.0,
+            "central_rate": 0.05,
+            "adverse_rate": 0.12
+          },
+          "part_year": {
+            "favorable_rate": 0.05,
+            "central_rate": 0.16,
+            "adverse_rate": 0.28
+          },
+          "full_relocation": {
+            "favorable_rate": 0.12,
+            "central_rate": 0.25,
+            "adverse_rate": 0.4
+          }
+        },
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are broad scenarios, not statutory tax rates, sourced tax estimates, or assessments.",
+        "planning_band_basis_source_ids": [
+          "japan-residence-scope",
+          "japan-nonresident"
+        ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "japan-residence-scope",
+          "japan-nonresident"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 1000,
+            "central_usd": 3000,
+            "adverse_usd": 7000,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "japan-property-tax"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "japan-residence-scope"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 1200,
+            "central_usd": 3000,
+            "adverse_usd": 6000,
+            "source_ids": [
+              "japan-nonresident"
+            ]
+          }
+        },
+        "included_categories": [
+          "income_tax_reserve",
+          "local_tax_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": [
+          "non_permanent_resident_remittance",
+          "inheritance_nexus",
+          "domicile_test"
+        ],
+        "property_lifecycle": {
+          "purchase": {
+            "summary": "Acquisition and registration taxes require assessed-value, property and exemption facts.",
+            "source_ids": [
+              "japan-property-tax"
+            ]
+          },
+          "annual": {
+            "summary": "Fixed-asset and city-planning taxes depend on value and location.",
+            "source_ids": [
+              "japan-property-tax"
+            ]
+          },
+          "rental": {
+            "summary": "Japanese rent is domestic-source income and can require withholding and a tax representative.",
+            "source_ids": [
+              "japan-rental"
+            ]
+          },
+          "sale": {
+            "summary": "Disposal can create Japanese-source taxable gain for a nonresident.",
+            "source_ids": [
+              "japan-nonresident"
+            ]
+          },
+          "succession": {
+            "summary": "Inheritance scope depends on addresses, citizenship, visa and residence history.",
+            "source_ids": [
+              "japan-inheritance"
+            ]
+          }
+        },
+        "source_ids": [
+          "japan-residence-scope",
+          "japan-nonresident",
+          "japan-rental",
+          "japan-property-tax",
+          "japan-inheritance"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium_high"
+      }
     },
     "Vietnam": {
       "stay_routes": {
@@ -2849,7 +4113,187 @@
           "jurisdiction_level": "Da Nang / Hoi An",
           "notes": "Official city tourism page used for documented activity availability, not qualitative marketing claims."
         }
-      ]
+      ],
+      "eligibility": {
+        "status": "complete",
+        "short_stay_source_ids": [
+          "vietnam-evisa"
+        ],
+        "long_stay_source_ids": [
+          "vietnam-temporary-residence"
+        ]
+      },
+      "tax_screen": {
+        "status": "complete",
+        "residence": {
+          "day_band": "183_plus",
+          "summary": "At least 183 days or qualifying permanent accommodation can create Vietnamese residence.",
+          "non_day_tests": [
+            "Registered permanent residence",
+            "Qualifying leased accommodation under applicable rules"
+          ],
+          "source_ids": [
+            "vietnam-residence"
+          ]
+        },
+        "scope_if_resident": "worldwide_income",
+        "scope_source_ids": [
+          "vietnam-scope"
+        ],
+        "funding_source_notes": {
+          "portfolio": "Residents are generally within worldwide scope for investment and transfer income.",
+          "pension": "Pension characterization, exemption and treaty treatment require review.",
+          "property": "Ownership restrictions and land, rental, transfer and inheritance rules matter.",
+          "work_business": "Employment and business require residence, source and 2026 implementation review.",
+          "mixed": "Mixed income must be reconciled with the 2025 PIT law and implementing rules."
+        },
+        "funding_source_source_ids": {
+          "portfolio": [
+            "vietnam-scope",
+            "vietnam-pit-law"
+          ],
+          "pension": [
+            "vietnam-scope"
+          ],
+          "property": [
+            "vietnam-home-ownership",
+            "vietnam-land-tax",
+            "vietnam-pit-law"
+          ],
+          "work_business": [
+            "vietnam-scope",
+            "vietnam-pit-law"
+          ],
+          "mixed": [
+            "vietnam-scope",
+            "vietnam-pit-law"
+          ]
+        },
+        "tax_readiness": "highly_profile_dependent",
+        "tax_readiness_score": 2.0,
+        "planning_bands": {
+          "seasonal": {
+            "favorable_rate": 0.0,
+            "central_rate": 0.04,
+            "adverse_rate": 0.1
+          },
+          "part_year": {
+            "favorable_rate": 0.04,
+            "central_rate": 0.12,
+            "adverse_rate": 0.22
+          },
+          "full_relocation": {
+            "favorable_rate": 0.08,
+            "central_rate": 0.18,
+            "adverse_rate": 0.3
+          }
+        },
+        "planning_band_method": "Product-defined stress-test allowances applied to modeled dependable income and portfolio withdrawals. They are broad scenarios, not statutory tax rates, sourced tax estimates, or assessments.",
+        "planning_band_basis_source_ids": [
+          "vietnam-residence",
+          "vietnam-scope",
+          "vietnam-pit-law"
+        ],
+        "gain_intensity_modifiers": {
+          "low": 0.75,
+          "moderate": 1.0,
+          "high": 1.25
+        },
+        "gain_intensity_source_ids": [
+          "vietnam-scope",
+          "vietnam-pit-law"
+        ],
+        "annual_allowances": {
+          "property_tax": {
+            "label": "Annual property ownership tax allowance",
+            "favorable_usd": 200,
+            "central_usd": 800,
+            "adverse_usd": 2500,
+            "applies_to_property_uses": [
+              "personal",
+              "rental",
+              "mixed"
+            ],
+            "source_ids": [
+              "vietnam-land-tax"
+            ]
+          },
+          "wealth_tax": {
+            "label": "Annual wealth-tax planning allowance",
+            "favorable_usd": 0,
+            "central_usd": 0,
+            "adverse_usd": 0,
+            "applies_to_wealth_bands": [
+              "above_threshold",
+              "unknown"
+            ],
+            "source_ids": [
+              "vietnam-scope"
+            ]
+          },
+          "compliance": {
+            "label": "Annual filing and advice allowance",
+            "favorable_usd": 800,
+            "central_usd": 2000,
+            "adverse_usd": 4500,
+            "source_ids": [
+              "vietnam-pit-law"
+            ]
+          }
+        },
+        "included_categories": [
+          "income_tax_reserve",
+          "withholding_reserve",
+          "compliance_reserve"
+        ],
+        "material_flags": [
+          "2026_law_transition",
+          "foreign_ownership_restrictions",
+          "no_general_retirement_route_evidenced"
+        ],
+        "property_lifecycle": {
+          "purchase": {
+            "summary": "Foreign buyers must verify current eligibility, quota, tenure and land-use restrictions.",
+            "source_ids": [
+              "vietnam-home-ownership"
+            ]
+          },
+          "annual": {
+            "summary": "Non-agricultural land-use tax can apply based on rights and local values.",
+            "source_ids": [
+              "vietnam-land-tax"
+            ]
+          },
+          "rental": {
+            "summary": "Rental income is within the property or business framework and current rules apply.",
+            "source_ids": [
+              "vietnam-scope",
+              "vietnam-pit-law"
+            ]
+          },
+          "sale": {
+            "summary": "Real-estate transfer income is taxable under current PIT rules.",
+            "source_ids": [
+              "vietnam-pit-law"
+            ]
+          },
+          "succession": {
+            "summary": "Inherited or gifted real estate can enter PIT scope subject to exemptions.",
+            "source_ids": [
+              "vietnam-pit-law"
+            ]
+          }
+        },
+        "source_ids": [
+          "vietnam-residence",
+          "vietnam-scope",
+          "vietnam-pit-law",
+          "vietnam-land-tax",
+          "vietnam-home-ownership"
+        ],
+        "last_reviewed": "2026-09-01",
+        "confidence": "medium"
+      }
     }
   },
   "destination_overrides": {
@@ -3425,5 +4869,567 @@
       "confidence": "medium_high",
       "last_reviewed": "2026-08-29"
     }
-  }
+  },
+  "sources": [
+    {
+      "id": "schengen-short-stay",
+      "publisher": "European Commission — Migration and Home Affairs",
+      "url": "https://home-affairs.ec.europa.eu/policies/schengen/border-crossing/short-stay-calculator_en",
+      "source_date": "27 October 2025",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "General Schengen limit of 90 days in any 180-day period",
+      "scope_limitation": "Passport, visa, prior-stay and bilateral rules can change the result.",
+      "recheck_trigger": "Recheck when border rules or traveller facts change."
+    },
+    {
+      "id": "eu-inactive-residence",
+      "publisher": "European Commission — Your Europe",
+      "url": "https://europa.eu/youreurope/citizens/residence/residence-rights/inactive-citizens/index_en.htm",
+      "source_date": "Last checked 16 June 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Residence conditions after three months for economically inactive EU citizens",
+      "scope_limitation": "Applies to eligible EU citizens and qualifying family, not all third-country nationals.",
+      "recheck_trigger": "Recheck when citizenship, insurance, resources or EU law changes."
+    },
+    {
+      "id": "spain-tax-residence",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/residencia-personas-fisicas-juridicas/persona-fisica-residente-espana.html",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Spanish day, economic-interest and family residence tests",
+      "scope_limitation": "Treaty residence and detailed facts can change the domestic result.",
+      "recheck_trigger": "Recheck after day, family, economic-centre, treaty or law changes."
+    },
+    {
+      "id": "spain-income-scope",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/no-residentes/residencia-personas-fisicas-juridicas/clases-contribuyentes-imposicion-sobre-renta.html",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Worldwide scope for residents and Spanish-source scope for nonresidents",
+      "scope_limitation": "Treaties, exemptions and income-category rules can modify treatment.",
+      "recheck_trigger": "Recheck when residence, income mix, treaty or legislation changes."
+    },
+    {
+      "id": "spain-real-estate",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/vivienda-otros-inmuebles/no-residentes-tributacion-inmuebles.html",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Rental, imputed-income and disposal exposure for Spanish real estate",
+      "scope_limitation": "Regional transfer taxes, local charges and deductions need separate review.",
+      "recheck_trigger": "Recheck before acquisition, rental, change of use or disposal."
+    },
+    {
+      "id": "spain-property-purchase",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/iva/iva-operaciones-inmobiliarias/compro-vivienda-tengo-que-pagar-itp.html",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "VAT or regional transfer-tax treatment for new and used home purchases",
+      "scope_limitation": "Property classification, seller, region, transaction date and exemptions determine the actual charge.",
+      "recheck_trigger": "Recheck the current national and regional rules immediately before purchase."
+    },
+    {
+      "id": "spain-wealth-tax",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/impuesto-sobre-patrimonio/exigibilidad-impuesto-sobre-patrimonio-no-residentes.html",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Spanish wealth-tax exposure for nonresidents",
+      "scope_limitation": "Regional rules, exemptions, ownership, debt and treaties alter exposure.",
+      "recheck_trigger": "Recheck annually and after asset, debt, ownership or residence changes."
+    },
+    {
+      "id": "spain-inheritance",
+      "publisher": "Agencia Tributaria",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/en_gb/no-residentes/impuesto-sobre-sucesiones-donaciones.html",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Inheritance and gift tax procedures involving nonresidents",
+      "scope_limitation": "State or regional rules depend on residence, beneficiary and asset location.",
+      "recheck_trigger": "Recheck before estate planning and after family or residence changes."
+    },
+    {
+      "id": "spain-eu-stay",
+      "publisher": "Government of Spain — General State Administration",
+      "url": "https://administracion.gob.es/pag_Home/en/Tu-espacio-europeo/derechos-obligaciones/ciudadanos/residencia/estancia.html",
+      "source_date": "24 March 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "EU and EEA citizen documentation for short Spanish stays",
+      "scope_limitation": "Longer stays require registration and supporting conditions.",
+      "recheck_trigger": "Recheck when citizenship, stay length or registration rules change."
+    },
+    {
+      "id": "spain-nonworking-visa",
+      "publisher": "Ministry of Foreign Affairs of Spain",
+      "url": "https://www.exteriores.gob.es/Consulados/washington/en/ServiciosConsulares/Paginas/Consular/Visado-de-residencia-no-lucrativa.aspx",
+      "source_date": "Rules effective 20 May 2025",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Non-working residence route with sufficient means",
+      "scope_limitation": "Does not authorize work; eligibility and venue depend on applicant facts.",
+      "recheck_trigger": "Recheck before applying and after work, means, insurance or consular changes."
+    },
+    {
+      "id": "portugal-residence-scope",
+      "publisher": "Portuguese Tax and Customs Authority",
+      "url": "https://info.portaldasfinancas.gov.pt/en/tax-information/getting-started-in-portugal/tax-residency/tax-residency-rules/Pages/default.aspx",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Portuguese residence tests and worldwide/source income scope",
+      "scope_limitation": "Tax-treaty residence coordination and habitual-home facts can change the result.",
+      "recheck_trigger": "Recheck after day, home, treaty or address-registration changes."
+    },
+    {
+      "id": "portugal-tax-system",
+      "publisher": "Portuguese Tax and Customs Authority",
+      "url": "https://info.portaldasfinancas.gov.pt/pt/docs/Portug_tax_system/Documents/Portuguese_Tax_System.pdf",
+      "source_date": "2025 edition",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Official overview of Portuguese income categories, gains and property taxes",
+      "scope_limitation": "Overview only; current codes, treaties and taxpayer facts control.",
+      "recheck_trigger": "Recheck annually and after a budget or tax-code amendment."
+    },
+    {
+      "id": "portugal-transfer",
+      "publisher": "Portuguese Tax and Customs Authority",
+      "url": "https://info.portaldasfinancas.gov.pt/pt/informacao_fiscal/codigos_tributarios/cimt/Pages/cimt2.aspx",
+      "source_date": "Consolidated code current 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Municipal property-transfer tax scope",
+      "scope_limitation": "Tax base, rate, exemptions and VAT interaction depend on the transaction.",
+      "recheck_trigger": "Recheck immediately before any acquisition."
+    },
+    {
+      "id": "portugal-annual-property",
+      "publisher": "Portuguese Tax and Customs Authority",
+      "url": "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Casa_e_propriedades/Imposto_anual/Paginas/default.aspx",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Annual IMI and additional IMI ownership taxes",
+      "scope_limitation": "Municipal rate, assessed value, exemptions and ownership determine amount.",
+      "recheck_trigger": "Recheck annually and after valuation, use or ownership changes."
+    },
+    {
+      "id": "portugal-rental",
+      "publisher": "Portuguese Tax and Customs Authority",
+      "url": "https://info.portaldasfinancas.gov.pt/pt/apoio_ao_contribuinte/Cidadaos/Rendimentos/Prediais/Paginas/default.aspx",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Rental-income reporting and deductible property expenses",
+      "scope_limitation": "Election, residence, documentation and expense rules affect calculation.",
+      "recheck_trigger": "Recheck before first rental and each filing year."
+    },
+    {
+      "id": "portugal-own-income-visa",
+      "publisher": "Portuguese Government — gov.pt",
+      "url": "https://www2.gov.pt/en/servicos/pedir-um-visto-de-residencia-para-fixacao-de-residencia-de-reformados-religiosos-e-pessoas-que-vivem-de-rendimentos-proprios/-/asset_publisher/01mjqjlm1jP0/content/1842-srv-ces-fds_lead",
+      "source_date": "3 December 2024",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Residence visa for retirees and people living from own income",
+      "scope_limitation": "Approval, documents and consular venue are applicant-specific.",
+      "recheck_trigger": "Recheck before application or renewal."
+    },
+    {
+      "id": "indonesia-residence",
+      "publisher": "Directorate General of Taxes, Indonesia",
+      "url": "https://www.pajak.go.id/id/peraturan/penentuan-subjek-pajak-dalam-negeri-dan-subjek-pajak-luar-negeri-0",
+      "source_date": "PER-23/PJ/2025",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Residence, more-than-183-day and intention-to-reside tests",
+      "scope_limitation": "Treaties and domicile, presence or intention evidence can change classification.",
+      "recheck_trigger": "Recheck when days, visa, home, family, work or treaty changes."
+    },
+    {
+      "id": "indonesia-scope",
+      "publisher": "Directorate General of Taxes, Indonesia",
+      "url": "https://www.pajak.go.id/index.php/en/node/34274",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Residence-based worldwide and source-based income principles",
+      "scope_limitation": "Foreign-expert concessions, treaties and category rules need separate review.",
+      "recheck_trigger": "Recheck after residence, treaty, investment or income-law changes."
+    },
+    {
+      "id": "indonesia-nonresident-income",
+      "publisher": "Directorate General of Taxes, Indonesia",
+      "url": "https://www.pajak.go.id/en/income-tax-article-26-income-tax-foreign-taxpayers",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Indonesian-source investment, rent, service and pension income for foreign taxpayers",
+      "scope_limitation": "Treaty, payer and beneficial-ownership facts alter withholding.",
+      "recheck_trigger": "Recheck for each payment type and treaty change."
+    },
+    {
+      "id": "indonesia-land-tax",
+      "publisher": "Directorate General of Taxes, Indonesia",
+      "url": "https://www.pajak.go.id/en/artikel/role-government-managing-land-and-building-tax",
+      "source_date": "7 February 2024",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Central and local land and building tax administration",
+      "scope_limitation": "Urban property tax is locally administered under local rules.",
+      "recheck_trigger": "Recheck with the local authority before acquisition and annually."
+    },
+    {
+      "id": "indonesia-transfer",
+      "publisher": "Directorate General of Taxes, Indonesia",
+      "url": "https://pajak.go.id/en/node/63052",
+      "source_date": "Government Regulation 34 of 2016",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Income tax on transfers of land and building rights",
+      "scope_limitation": "Local acquisition levies, title eligibility and exemptions need separate review.",
+      "recheck_trigger": "Recheck before acquisition, gift or disposal."
+    },
+    {
+      "id": "indonesia-property-rights",
+      "publisher": "Ministry of Agrarian Affairs and Spatial Planning / National Land Agency, Indonesia",
+      "url": "https://jdih.atrbpn.go.id/peraturan/download/946/Terjemahan%20PP%20No%2018%20Tahun%202021.pdf",
+      "source_date": "Government Regulation 18 of 2021, effective 2 February 2021",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Residential property and land-right categories available to foreign holders",
+      "scope_limitation": "Immigration documents, property type, land-right form, minimum thresholds and implementing rules control eligibility.",
+      "recheck_trigger": "Recheck current land and immigration rules before reservation, transfer or succession."
+    },
+    {
+      "id": "indonesia-inheritance",
+      "publisher": "Directorate General of Taxes, Indonesia",
+      "url": "https://www.pajak.go.id/en/node/117926",
+      "source_date": "Minister of Finance Regulation 81 of 2024",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Income-tax exemption and clearance for inherited land and buildings",
+      "scope_limitation": "Title, local levies and later disposal require separate review.",
+      "recheck_trigger": "Recheck before succession planning or title transfer."
+    },
+    {
+      "id": "indonesia-short-stay",
+      "publisher": "Directorate General of Immigration, Indonesia",
+      "url": "https://imigrasi.go.id/wna/permohonan-visa-republik-indonesia/visa-kunjungan-satu-kali-perjalanan-indeks-c9a?all=1&golden_visa=0",
+      "source_date": "Current catalogue reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Visitor and arrival-visa stay periods and extensions",
+      "scope_limitation": "Visa class, sponsorship and activities depend on nationality and facts.",
+      "recheck_trigger": "Recheck immediately before travel or extension."
+    },
+    {
+      "id": "indonesia-second-home",
+      "publisher": "Directorate General of Immigration, Indonesia",
+      "url": "https://imigrasi.go.id/wna/permohonan-visa-republik-indonesia/klasifikasi-visa-tinggal-terbatas-indeks-e33f",
+      "source_date": "Current catalogue reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Second-home limited-stay visa controls",
+      "scope_limitation": "Funds, activities, family and approval are application-specific.",
+      "recheck_trigger": "Recheck before application, renewal or activity change."
+    },
+    {
+      "id": "croatia-income-law",
+      "publisher": "Official Gazette of the Republic of Croatia",
+      "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/2016_12_115_2525.html",
+      "source_date": "Income Tax Act NN 115/2016 as amended",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Resident definitions, worldwide/source scope and income categories",
+      "scope_limitation": "Later amendments, treaties and regulations must be applied.",
+      "recheck_trigger": "Recheck after legislation, residence or income changes."
+    },
+    {
+      "id": "croatia-residence",
+      "publisher": "Official Gazette of the Republic of Croatia",
+      "url": "https://narodne-novine.nn.hr/clanci/sluzbeni/full/2016_12_115_2519.html",
+      "source_date": "General Tax Act NN 115/2016 as amended",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Dwelling and habitual-abode residence tests",
+      "scope_limitation": "Treaties and home, family and abode facts can change the result.",
+      "recheck_trigger": "Recheck after home, family, day-count or treaty changes."
+    },
+    {
+      "id": "croatia-transfer",
+      "publisher": "Government of the Republic of Croatia",
+      "url": "https://www.gov.hr/en/real-estate-transfer-tax/1464",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Real-estate transfer tax for purchase, gift and inheritance",
+      "scope_limitation": "VAT, exemptions, value and filing facts determine actual charge.",
+      "recheck_trigger": "Recheck before acquisition, gift or inheritance."
+    },
+    {
+      "id": "croatia-annual-property",
+      "publisher": "Ministry of Finance of Croatia",
+      "url": "https://mfin.gov.hr/vijesti/porez-na-nekretnine/3873?big=0",
+      "source_date": "13 March 2025",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Annual local property tax from 1 January 2025",
+      "scope_limitation": "Municipal decisions, use and exemptions determine liability.",
+      "recheck_trigger": "Recheck annually with the municipality."
+    },
+    {
+      "id": "croatia-sale",
+      "publisher": "Government of the Republic of Croatia",
+      "url": "https://www.gov.hr/en/sale-of-real-property/1288",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Property-sale registration and potential income tax",
+      "scope_limitation": "Holding, use, relationship and acquisition method affect treatment.",
+      "recheck_trigger": "Recheck immediately before sale, gift or exchange."
+    },
+    {
+      "id": "croatia-inheritance",
+      "publisher": "Ministry of Justice and Public Administration of Croatia",
+      "url": "https://mpudt.gov.hr/citizens/single-digital-gateway-remit-of-the-ministry-of-justice-and-public-administration/rights-and-obligations-with-regard-to-inheritance-in-another-member-state-including-tax-rules/25485?big=0",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Inheritance and gift taxes including real-estate interaction",
+      "scope_limitation": "Relationship, asset type, location and succession facts control.",
+      "recheck_trigger": "Recheck before estate planning and after family changes."
+    },
+    {
+      "id": "greece-residence",
+      "publisher": "Independent Authority for Public Revenue, Greece",
+      "url": "https://aade.gr/en/greeks-abroad-non-residents/income-taxation/tax-residence-natural-persons-itc",
+      "source_date": "Law 4172/2013, guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Home, vital-interests and 183-day residence tests and worldwide principle",
+      "scope_limitation": "Treaties and private-purpose exception need fact review.",
+      "recheck_trigger": "Recheck after days, home, family, treaty or law changes."
+    },
+    {
+      "id": "greece-income",
+      "publisher": "Independent Authority for Public Revenue, Greece",
+      "url": "https://www.aade.gr/en/greeks-abroad-non-residents/income-taxation/income-categories-and-income-taxation-greece",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Employment, pension, business, capital, rental and gains categories",
+      "scope_limitation": "Rates and temporary rules change; treaties and exemptions matter.",
+      "recheck_trigger": "Recheck each filing year and when income mix changes."
+    },
+    {
+      "id": "greece-nonresident",
+      "publisher": "Independent Authority for Public Revenue, Greece",
+      "url": "https://www.aade.gr/en/greeks-abroad-non-residents/income-taxation/taxation-greek-sourced-income-obtained-non-residents-pit",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Greek-source income categories and treaty controls",
+      "scope_limitation": "Tax residence certificate and treaty-specific rules may be required.",
+      "recheck_trigger": "Recheck when residence, source, treaty or property changes."
+    },
+    {
+      "id": "greece-property",
+      "publisher": "Independent Authority for Public Revenue, Greece",
+      "url": "https://www.aade.gr/en/greeks-abroad-non-residents/property-taxation/unified-tax-ownership-real-estate-e9-enfia",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "E9 reporting and annual ENFIA ownership tax",
+      "scope_limitation": "Property facts, values, ownership and exemptions determine assessment.",
+      "recheck_trigger": "Recheck after any property change and annually."
+    },
+    {
+      "id": "greece-transfer-inheritance",
+      "publisher": "Independent Authority for Public Revenue, Greece",
+      "url": "https://www.aade.gr/en/tax-return-real-estate-transfer-gifts-parental-provision-and-inheritance",
+      "source_date": "Instructions updated through 16 February 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Property transfer, gift and inheritance declarations",
+      "scope_limitation": "Procedure does not determine personal rate, exemption or valuation.",
+      "recheck_trigger": "Recheck before purchase, gift or inheritance."
+    },
+    {
+      "id": "vietnam-residence",
+      "publisher": "Government of Vietnam — Legal Documents Portal",
+      "url": "https://vanban.chinhphu.vn/?docid=75957&pageid=27160",
+      "source_date": "Decree 100/2008/ND-CP as amended",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "183-day and permanent-accommodation residence tests",
+      "scope_limitation": "Later laws, decrees, circulars and treaties must be applied.",
+      "recheck_trigger": "Recheck after day, accommodation, treaty or law changes."
+    },
+    {
+      "id": "vietnam-scope",
+      "publisher": "Foreign Investment Agency, Ministry of Finance of Vietnam",
+      "url": "https://fia.mof.gov.vn/en/Single/MenuID/793a43ff-0059-4504-b747-934193322015",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Worldwide resident and Vietnamese-source nonresident scope and PIT categories",
+      "scope_limitation": "Overview only; 2025 law, decrees and treaties control.",
+      "recheck_trigger": "Recheck when implementation, residence or income changes."
+    },
+    {
+      "id": "vietnam-pit-law",
+      "publisher": "Government of Vietnam — Legal Documents Portal",
+      "url": "https://vanban.chinhphu.vn/?classid=1&docid=51258&pageid=27160&typegroupid=3",
+      "source_date": "Law 04/2007/QH12 transitioning to Law 109/2025/QH15",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Investment, real-estate transfer, inheritance and gift income",
+      "scope_limitation": "New law and 2026 decree change thresholds and mechanics.",
+      "recheck_trigger": "Recheck on each commencement date and before filing or transfer."
+    },
+    {
+      "id": "vietnam-land-tax",
+      "publisher": "Government of Vietnam — Legal Documents Portal",
+      "url": "https://vanban.chinhphu.vn/default.aspx?docid=96038&pageid=27160",
+      "source_date": "Law 48/2010/QH12 current 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Non-agricultural land-use tax objects and taxpayers",
+      "scope_limitation": "Rights, allocation, local prices and exemptions determine assessment.",
+      "recheck_trigger": "Recheck annually and after land-use or valuation changes."
+    },
+    {
+      "id": "vietnam-home-ownership",
+      "publisher": "Government of Vietnam — Legal Documents Portal",
+      "url": "https://vanban.chinhphu.vn/?classid=1&docid=209627&pageid=27160",
+      "source_date": "Housing Law 27/2023/QH15, effective 1 January 2025",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Current eligibility and controls for foreign organizations and individuals owning housing",
+      "scope_limitation": "Entry status, project, security area, quota, tenure and implementing rules determine the permitted interest.",
+      "recheck_trigger": "Recheck current housing, land and implementing rules before purchase, transfer or succession."
+    },
+    {
+      "id": "vietnam-evisa",
+      "publisher": "Vietnam Immigration Department",
+      "url": "https://evisa.xuatnhapcanh.gov.vn/trang-chu-ttdt",
+      "source_date": "Portal notice effective 11 November 2024",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "E-visa for up to 90 days, single or multiple entry",
+      "scope_limitation": "Nationality, purpose and approval control; not long-term residence evidence.",
+      "recheck_trigger": "Recheck before travel or any stay beyond 90 days."
+    },
+    {
+      "id": "vietnam-temporary-residence",
+      "publisher": "Ministry of Public Security of Vietnam",
+      "url": "https://mps.gov.vn/chinh-sach-phap-luat/bai-viet/nhung-diem-moi-theo-thong-tu-so-70-2026-tt-bca-1786525709",
+      "source_date": "Circular 70/2026/TT-BCA effective 1 July 2026; guidance published 13 August 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Current temporary-residence-card framework for eligible foreign investors and other qualifying categories",
+      "scope_limitation": "Requires a qualifying category, sponsor and documents; it is not a general retirement or self-funded residence route.",
+      "recheck_trigger": "Recheck the current category, sponsor, visa and application rules before a stay beyond 90 days."
+    },
+    {
+      "id": "japan-residence-scope",
+      "publisher": "National Tax Agency Japan",
+      "url": "https://www.nta.go.jp/english/taxes/individual/pdf/incometax_2025/04.pdf",
+      "source_date": "2025 income tax guide published 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Domicile, residence and non-permanent-resident classification",
+      "scope_limitation": "Nationality, domicile, years and remittances determine taxable scope.",
+      "recheck_trigger": "Recheck after domicile, work, family, remittance or five-year changes."
+    },
+    {
+      "id": "japan-nonresident",
+      "publisher": "National Tax Agency Japan",
+      "url": "https://www.nta.go.jp/english/taxes/individual/12006.htm",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Nonresident definition and Japanese-source income scope",
+      "scope_limitation": "Treaties, PE, payer and income-category facts modify treatment.",
+      "recheck_trigger": "Recheck after residence, work, property, payer or treaty changes."
+    },
+    {
+      "id": "japan-rental",
+      "publisher": "National Tax Agency Japan",
+      "url": "https://www.nta.go.jp/english/taxes/individual/12014.htm",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Japanese-source rental income and nonresident filing",
+      "scope_limitation": "Tenant, deductions, treaty and tax-agent facts affect treatment.",
+      "recheck_trigger": "Recheck before leasing and each filing year."
+    },
+    {
+      "id": "japan-property-tax",
+      "publisher": "Tokyo Metropolitan Government Bureau of Taxation",
+      "url": "https://www.tax.metro.tokyo.lg.jp/book/guidebookgaigo/guidebook2023e.pdf",
+      "source_date": "2023 guide; framework checked 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Acquisition, registration, fixed-asset and city-planning taxes",
+      "scope_limitation": "Tokyo examples do not set Fukuoka local rates; local confirmation is required.",
+      "recheck_trigger": "Recheck with Fukuoka authorities before acquisition and annually."
+    },
+    {
+      "id": "japan-inheritance",
+      "publisher": "National Tax Agency Japan",
+      "url": "https://www.nta.go.jp/english/taxes/others/02/15001.htm",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Inheritance-tax nexus and taxable-property scope",
+      "scope_limitation": "Citizenship, visa, addresses and history of decedent and heir matter.",
+      "recheck_trigger": "Recheck before succession planning and after status changes."
+    },
+    {
+      "id": "japan-short-stay",
+      "publisher": "Ministry of Foreign Affairs of Japan",
+      "url": "https://www.mofa.go.jp/j_info/visit/visa/faq.html",
+      "source_date": "31 March 2023; current links reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Up-to-90-day exemption for eligible nationals without income activity",
+      "scope_limitation": "Nationality, purpose and bilateral rules determine permission.",
+      "recheck_trigger": "Recheck immediately before travel or income activity."
+    },
+    {
+      "id": "japan-long-stay",
+      "publisher": "Ministry of Foreign Affairs of Japan",
+      "url": "https://www.mofa.go.jp/ca/fna/page22e_000738.html",
+      "source_date": "17 March 2023; route reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Designated-activities sightseeing and recreation long stay",
+      "scope_limitation": "Limited by nationality, savings, insurance, activities and approval.",
+      "recheck_trigger": "Recheck before application, extension, work or family changes."
+    },
+    {
+      "id": "thailand-pit",
+      "publisher": "Revenue Department of Thailand",
+      "url": "https://www.rd.go.th/english/6045.html",
+      "source_date": "Current guidance reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "180-day residence, Thai-source and remitted foreign-income scope",
+      "scope_limitation": "Remittance timing, treaties, exemptions and category rules need analysis.",
+      "recheck_trigger": "Recheck annually and after day, remittance or guidance changes."
+    },
+    {
+      "id": "thailand-property-income",
+      "publisher": "Revenue Department of Thailand",
+      "url": "https://www.rd.go.th/english/37749.html",
+      "source_date": "Revenue Code sections 38–64 reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Rental, pension, investment and immovable-transfer income",
+      "scope_limitation": "Deductions, history, gifts and transaction purpose alter calculation.",
+      "recheck_trigger": "Recheck before rental, gift, sale or filing."
+    },
+    {
+      "id": "thailand-property-registration",
+      "publisher": "Department of Lands, Thailand",
+      "url": "https://www.dol.go.th/train/Documents/ENG_E_BOOK.pdf",
+      "source_date": "Official English guide available 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Foreign condominium ownership and transfer registration",
+      "scope_limitation": "Title, quota, funds, fees and land-office practice need specific review.",
+      "recheck_trigger": "Recheck with the land office before reservation or transfer."
+    },
+    {
+      "id": "thailand-annual-property-tax",
+      "publisher": "Department of Local Administration, Thailand",
+      "url": "https://ltaxsvt.dla.go.th/public/index.do",
+      "source_date": "Current portal reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Annual land and building tax, local collection and value-based assessment",
+      "scope_limitation": "Liability and amount depend on ownership, use, assessed value, exemptions and local administration.",
+      "recheck_trigger": "Recheck the local assessment and current rules for each tax year."
+    },
+    {
+      "id": "thailand-inheritance",
+      "publisher": "Revenue Department of Thailand",
+      "url": "https://www.rd.go.th/english/27739.html",
+      "source_date": "Inheritance Tax Act B.E. 2558 and rules",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Inheritance tax legislation and implementing instruments",
+      "scope_limitation": "Situs, threshold, relationship, exemptions and domicile matter.",
+      "recheck_trigger": "Recheck before estate planning and after family or asset changes."
+    },
+    {
+      "id": "thailand-evisa",
+      "publisher": "Ministry of Foreign Affairs of Thailand",
+      "url": "https://thaievisa.go.th/home",
+      "source_date": "Current portal reviewed 1 September 2026",
+      "accessed_on": "2026-09-01",
+      "metric_supported": "Tourism, retirement, long-term and Destination Thailand visa categories",
+      "scope_limitation": "Nationality, location, purpose, evidence and discretion determine approval.",
+      "recheck_trigger": "Recheck before application, renewal, work or retirement changes."
+    }
+  ]
 }

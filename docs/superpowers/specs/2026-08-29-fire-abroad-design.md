@@ -1,13 +1,23 @@
 # FIRE Abroad Design
 
-**Date:** 2026-08-29
-**Status:** Approved for implementation planning
+**Date:** 2026-08-29; revised 2026-09-01
+**Status:** Revised design ready for written-spec review
 
 ## Purpose
 
 Create a canonical FIRE Abroad destination-discovery page for financially independent people who want an active life outside their current country. The page should help readers screen destinations for a seasonal stay, part-year base, or full relocation without assuming that every user is conventionally retired, over 50, buying property, or seeking permanent residence.
 
-The product combines Global Home Atlas's existing destination, retirement-cost, property, and calculator infrastructure with a compact FIRE-specific evidence layer. It is a screening and planning tool, not individualized financial, tax, immigration, healthcare, or investment advice.
+The product combines Global Home Atlas's existing destination, retirement-cost, property, and calculator infrastructure with a FIRE-specific evidence and tax-planning layer. It begins with a concise screening experience, includes a tax-aware planning estimate in the normal calculators, and lets serious users progressively refine that estimate without forcing technical tax questions on everyone. It is an educational planning tool, not a guaranteed tax assessment or a recommendation to use a particular legal or ownership structure.
+
+## Product Principle: Progressive Tax Disclosure
+
+Tax must be visible early enough to prevent a misleading affordability conclusion, but the initial experience must remain approachable. The product therefore has three layers:
+
+1. **Quick tax screen:** a small set of plain-language questions produces residence, income-scope, property-tax, wealth/inheritance, reporting-complexity, and evidence-confidence signals.
+2. **Tax-aware planning estimate:** the standard FIRE and property calculators show a destination tax-reserve range and its effect on annual spending and required capital. Users who already know their after-tax figures may bypass the estimate.
+3. **Detailed tax calculation:** an optional drill-down asks only the additional facts needed for the selected country, income, property use, and tax issues, then replaces planning ranges with a more specific calculation and an auditable breakdown.
+
+The interface must not ask for a fact until it can materially change the result. Missing information produces a stated range or conditional branch, not an automatic dead end or a generic adviser handoff.
 
 ## Audience and Positioning
 
@@ -20,6 +30,8 @@ The public category and page name are **FIRE Abroad**. Supporting language may u
 - Rank destinations for a financially sustainable, active life abroad.
 - Distinguish seasonal stays, part-year bases, and full relocation.
 - Make legal-stay, tax-residence, healthcare-access, and work-permission constraints visible before users treat a destination as viable.
+- Show how estimated tax changes annual spending and the FIRE capital range without pretending that an early screen is an exact assessment.
+- Provide an optional route from screening assumptions to a detailed, source-backed tax calculation.
 - Treat daily activity and year-round active living as a first-class decision factor.
 - Connect discovery results to the existing retirement calculator and destination research without exposing sensitive data in URLs or analytics.
 - Publish transparent evidence, review dates, confidence, and limitations.
@@ -27,10 +39,10 @@ The public category and page name are **FIRE Abroad**. Supporting language may u
 
 ## Non-goals
 
-- Calculate an individual's tax liability or recommend a tax structure.
+- Guarantee an exact tax assessment or recommend an ownership, entity, trust, residency, or investment structure.
 - Guarantee visa, residence, insurance, banking, or work eligibility.
 - Provide portfolio allocation, withdrawal-rate, or investment advice beyond the existing calculator's documented planning assumptions.
-- Collect or persist citizenship, financial balances, income amounts, account types, or health information.
+- Persist citizenship, financial balances, income amounts, account types, tax-residence facts, or health information. Detailed tax inputs remain browser-local and are excluded from URLs and analytics.
 - Create thin country pages or a new application framework in the first release.
 - Treat property purchase or permanent residence as necessary for FIRE Abroad.
 
@@ -59,15 +71,22 @@ After mode eligibility, calculate a FIRE Abroad score on a 0–5 scale using the
 | Dimension | Weight | What it measures |
 | --- | ---: | --- |
 | Active Life | 25% | Whether meaningful daily activity is convenient and sustainable through a normal year |
-| Sustainable annual cost | 20% | Comfortable recurring cost plus realistic resilience allowances |
+| Sustainable annual cost | 20% | Comfortable recurring cost plus realistic resilience and tax-reserve allowances |
 | Healthcare Bridge | 15% | Practical access from arrival through later life, not healthcare reputation alone |
 | Stay Flexibility | 10% | Credible options for the selected duration and ability to change modes later |
-| Tax Compatibility | 10% | Clarity, administrative complexity, and scenario-specific exposure flags, not a personal tax rate |
+| Tax Readiness | 10% | Whether material tax exposures are identifiable and manageable for the selected broad profile; kept separate from the estimated economic burden |
 | Global Access | 8% | Practical access to airports, family, and international connections |
 | Community Fit | 7% | Ease of building a social life and functioning as a foreign resident or repeat visitor |
 | Property and Exit Flexibility | 5% | Ability to rent or buy appropriately, avoid lock-in, sell, and move capital |
 
 The weights total 100%. Scores must be generated by a FIRE-specific wrapper around the existing ranking conventions rather than adding a second general destination engine. The wrapper may reuse existing normalized destination dimensions where their meaning matches; it must not relabel an unrelated score as FIRE evidence.
+
+Tax has two distinct effects and they must never be collapsed into one number:
+
+- **Economic tax impact** changes the sustainable annual-cost estimate and tax-adjusted capital range.
+- **Tax Readiness** describes rule clarity, reporting and filing burden, unresolved profile dependencies, and evidence confidence.
+
+A material unresolved tax-residence conflict, unavailable tax estimate, or high-impact wealth/estate exposure is a visible conditional state and can prevent a destination from being labelled financially within reach. Lifestyle dimensions cannot offset that state.
 
 ### Active Life Score
 
@@ -93,10 +112,11 @@ Reuse `data/retirement_costs.json` for destination costs. The FIRE Abroad presen
 - recurring immigration and administration costs;
 - realistic travel home;
 - an explicit contingency allowance;
+- an estimated annual tax reserve when the user has not supplied after-tax figures;
 - a clearly labeled currency and inflation buffer; and
 - one-time relocation costs shown separately rather than disguised as recurring spending.
 
-The first release may use documented scenario allowances rather than forecast exchange rates or local inflation. It must explain that currency and inflation can materially change affordability. It must not add the same healthcare, travel, visa, or contingency cost twice when the shared dataset already includes it.
+The first release may use documented scenario allowances rather than forecast exchange rates or local inflation. It must explain that currency and inflation can materially change affordability. It must not add the same healthcare, travel, visa, contingency, property-tax, or income-tax cost twice when the shared dataset or user-supplied after-tax figures already include it.
 
 ### Healthcare Bridge
 
@@ -118,30 +138,74 @@ Stay Flexibility evaluates routes for the selected mode, duration limits, renewa
 - passive income only;
 - remote work permitted;
 - local work permitted; or
-- unclear / professional review required.
+- unclear / needs verification.
 
 Work permission modifies Stay Flexibility and does not receive a separate weight. The page must not imply that passive-income residence automatically authorizes consulting, remote work, or local employment.
 
-### Tax Compatibility
+### Tax Screening, Planning, and Detailed Calculation
 
-Tax Compatibility measures the clarity and administrative burden of the likely scenario. It must not claim that a destination is universally low-tax or estimate personal liability.
+#### Quick tax screen
 
-For each country and mode, record and display:
+The initial FIRE screen asks only:
 
-- the standard tax-residence trigger and important non-day-count tests;
-- whether residents are generally taxed on worldwide or local-source income;
-- broad flags for pensions, dividends, capital gains, property, wealth, and inheritance;
-- relevant treaty and reporting complexity;
-- source-country or property-income exposure that can exist while nonresident; and
-- a warning when the intended stay is likely to create local tax residence.
+- current tax-home country or broad home-tax context;
+- intended stay mode and approximate annual-day band;
+- main funding source: portfolio, pension, property income, work/business, or mixed;
+- rent or buy; and
+- for buyers, personal, rental, or mixed use.
 
-The user may optionally select a broad home-tax context, including a US-person warning state, intended stay mode, approximate days, and broad income categories. Precise income, balances, gains, accounts, or health data are not collected. These selections remain in the browser and are excluded from URLs and analytics.
+It may ask one additional broad wealth band only when the selected jurisdiction has a material wealth-tax exposure that cannot otherwise be described responsibly. It must not request cost basis, exact gains, account classifications, treaty pension details, financing deductions, or estate facts in the initial screen.
 
-Tax residence and immigration residence must be presented as separate concepts. For example, a seasonal visitor may still owe tax on local-source income, while a full resident may enter local worldwide-income scope. US citizens and resident aliens receive a persistent reminder that US worldwide-income filing commonly continues abroad, without attempting a treaty or foreign-tax-credit calculation.
+For each country and mode, the quick result records and displays:
+
+- likely tax-residence outcome and the important non-day-count tests;
+- whether worldwide income may enter scope;
+- the main tax treatment affecting the selected funding source;
+- a purchase-cost range and recurring property-tax range;
+- material wealth, inheritance, departure-country, or reporting warnings;
+- Tax Readiness: straightforward, moderate, complex, or highly profile-dependent; and
+- confidence, checked date, and the facts most likely to change the result.
+
+The result uses plain language and ranges. It must not label a jurisdiction universally low-tax or present a screening range as an assessment.
+
+#### Tax-aware planning estimate
+
+The standard FIRE and property calculators add a tax section with two mutually exclusive modes:
+
+1. **Use destination planning estimate.** Ask for annual dependable income, expected portfolio withdrawals, realized-gain intensity (`none`, `low`, `moderate`, or `high`), property price and use, and a broad household-wealth band only when relevant.
+2. **I know my after-tax figures.** Preserve the current after-tax income workflow and require the portfolio-return assumption to be explicitly after fees and tax.
+
+The destination estimate produces a favorable, central, and adverse-but-plausible range for:
+
+- income and social-tax reserve;
+- annual property, wealth, imputed-income, vacancy, and compliance costs where applicable;
+- after-tax dependable income;
+- after-tax portfolio-return assumption or tax-drag adjustment;
+- tax-inclusive annual spending requirement; and
+- tax-adjusted FIRE capital requirement.
+
+The main calculator result shows the central planning estimate and range. Each line expands to explain the included tax categories, the controlling assumptions, what is excluded, confidence, tax year, and primary sources. The existing no-tax calculation remains available only as a clearly labelled comparison.
+
+#### Detailed tax calculation
+
+The action **Refine this tax estimate** opens the optional detailed layer. Questions are dynamically routed: only facts capable of changing a displayed calculation are requested. Depending on the selected scenario, these may include precise days and move date, available homes and family/economic ties, citizenship or continuing-tax status, income by type and source, pension or account classification, dividends, interest, gains and cost basis, withholding and foreign taxes, property financing and deductions, ownership shares, rental use, other taxable wealth, intended sale date, and succession facts.
+
+The detailed result calculates and explains, where supported by the launch-country rules:
+
+- domestic and possible dual tax residence, including split-year treatment and treaty branches;
+- tax by income category;
+- source-country withholding and foreign-tax-credit interaction;
+- purchase, annual ownership, rental operation, disposal, inheritance, and gift taxes;
+- continuing home-country, exit-tax, reporting, and account-wrapper flags; and
+- the resulting tax-adjusted FIRE cash flow and capital estimate.
+
+When an unresolved fact controls the answer, the product asks for it. If the user does not know, it calculates and displays each supported branch. A generic professional-advice message must not replace calculations that the available evidence can support.
+
+Tax residence and immigration residence must remain separate concepts. A seasonal visitor may owe tax on local-source income, while a full resident may enter local worldwide-income scope. US citizens and resident aliens receive a continuing worldwide-income and filing overlay; other home-country overlays follow the same data contract rather than being treated as a US-only exception.
 
 ### Financial Infrastructure
 
-The Tax Compatibility detail also displays non-scored supporting flags for:
+The Tax Readiness detail also displays non-scored supporting flags for:
 
 - bank-account opening requirements;
 - tax-identification or residence dependencies;
@@ -154,6 +218,16 @@ These are screening warnings, not guarantees about a particular financial instit
 ### Property and Long-Term Exit Resilience
 
 Property is optional. A destination can score well when renting provides a flexible and credible route. This dimension evaluates rental availability, foreign-buyer access where relevant, transaction costs, market liquidity, and the ability to sell and move proceeds.
+
+Property tax must be presented across its lifecycle rather than compressed into one acquisition percentage or annual owner-cost number:
+
+- **Purchase:** transfer or registration tax, VAT or sales tax, stamp duty, foreign-buyer surcharge, and mandatory government/notarial/registry charges.
+- **Annual ownership:** property tax, wealth tax, imputed income, vacancy or underuse tax, and recurring filing or tax-representative cost.
+- **Rental operation:** income tax, withholding, deductible-cost treatment, depreciation where supported, VAT or lodging tax, and licensing-related fiscal obligations.
+- **Sale:** capital-gains tax, depreciation recapture, nonresident withholding, municipal or land-value tax, and tax clearance where applicable.
+- **Transfer at death or by gift:** situs, domicile or residence exposure, inheritance or estate tax, gift tax, principal allowances, and treaty flags.
+
+The quick screen shows ranges and major flags. The standard calculator includes purchase and annual tax reserves. The detailed layer calculates the supported lifecycle components from the user's property facts. Non-tax insurance, maintenance, association, legal, finance, inspection, and management costs remain separate so users can see what is tax and what is not.
 
 The result also explains longer-term resilience: whether a user can transition from seasonal use to residence, maintain healthcare access as needs change, avoid being forced to buy, reach family, and exit if regulation, climate, disaster exposure, or personal circumstances change. Broad political, regulatory, climate, and disaster risks appear as evidence-backed warnings rather than an over-precise predictive score.
 
@@ -195,12 +269,13 @@ Keep the first interaction compact:
 - household: single or couple;
 - housing: rent, already own, buy now, or buy at retirement;
 - broad mobility-rights context, optional: local/free-movement rights, general nonlocal passport, or prefer not to say;
-- broad home-tax context, optional;
-- approximate annual days, used only for warnings;
+- current tax-home country or broad home-tax context, optional;
+- approximate annual-day band, used for residence screening and tax-range selection;
 - broad income type, optional: portfolio, pension, property, business/consulting, or mixed; and
+- destination-home use when buying: personal, rental, or mixed; and
 - activity priorities as optional filters after the general Active Life ranking.
 
-Do not request net worth, account values, detailed nationality, passport number, health history, or exact income on this page.
+The initial controls do not request net worth, account values, detailed nationality, passport number, health history, or exact income. Those facts appear only in the optional detailed calculation when they can change an active result.
 
 ### Results
 
@@ -212,7 +287,7 @@ Use a concise ranked table or list rather than dense repeated cards. Each result
 - Active Life score and strongest activity reason;
 - healthcare-bridge status;
 - stay route and work-permission flag;
-- tax-residence warning or compatibility status;
+- tax-residence outcome, Tax Readiness, and planning-impact range;
 - strongest risk or verification requirement;
 - evidence confidence and last review date;
 - links to the relevant destination/country guide; and
@@ -220,7 +295,7 @@ Use a concise ranked table or list rather than dense repeated cards. Each result
 
 The detailed methodology section explains weights, evidence, limitations, and why immigration and tax residence differ. Country-specific evidence opens progressively rather than duplicating every source in each summary row.
 
-The calculator handoff includes only values already accepted by `retirementPrefill()`: validated destination, household, and housing. Age, tax context, days, income categories, scores, and financial values must not enter the URL. Expanding the calculator's allowlist is outside this release.
+The calculator handoff includes only values already accepted by `retirementPrefill()`: validated destination, household, and housing. Age, tax context, days, income categories, scores, and financial values must not enter the URL. Browser-local session state may preserve the user's tax-screen selections for an in-page calculator transition, but those values must not enter query strings, analytics, generated HTML, or persistent storage.
 
 ### Internal linking
 
@@ -241,7 +316,7 @@ Do not add another primary-navigation item. The FIRE Abroad page links back to t
 
 - `data/destinations.json` remains the source for destination identity, existing decision dimensions, links, and property context.
 - `data/retirement_costs.json` remains the source for household costs, housing scenarios, travel, visa/admin, healthcare allowances, contingency, inflation assumptions, and representative property figures.
-- The existing pure retirement calculator remains unchanged and continues to model user-entered after-tax income. FIRE Abroad does not inject a guessed tax rate into that engine.
+- The existing pure retirement calculator remains the base cash-flow engine. Its contract is extended to distinguish user-supplied after-tax inputs from destination-estimated tax reserves and to require that investment returns used in an after-tax calculation are explicitly after fees and tax.
 
 ### FIRE overlay
 
@@ -250,7 +325,10 @@ Add `data/fire_abroad.json` as a compact evidence overlay keyed by country with 
 - supported destination IDs and optional destination override;
 - legal-stay routes by mode, duration, age/income/dependant conditions, and renewal burden;
 - work-permission classification;
-- tax-residence trigger, taxation scope, category flags, treaty/reporting note, and tax complexity;
+- quick-screen tax-residence triggers, taxation scope, category flags, tax-impact bands, Tax Readiness, and treaty/reporting notes;
+- tax rules and thresholds for supported detailed calculations, keyed by tax year, taxpayer scope, income or property category, jurisdiction level, source, effective date, checked date, confidence, and recheck trigger;
+- property lifecycle rules for purchase, annual ownership, rental operation, sale, inheritance, and gift;
+- home-country overlays for continuing residence, worldwide-income filing, exit tax, foreign-tax credits, reporting, and account-wrapper recognition;
 - healthcare eligibility, waiting period, age/pre-existing-condition flags, access and evacuation dependency;
 - Active Life subcomponent scores with supporting evidence;
 - banking/capital-mobility flags;
@@ -258,7 +336,19 @@ Add `data/fire_abroad.json` as a compact evidence overlay keyed by country with 
 - source records with metric supported, URL, publisher, source date, accessed date, jurisdiction level, and notes; and
 - confidence and last-reviewed date for each volatile section.
 
-Country-level records may be inherited, but destination-specific Active Life evidence and any local override must be explicit. Immigration, tax, healthcare, and financial-infrastructure facts should use official or primary sources wherever available. Editorial summaries must not replace the underlying evidence records.
+Country-level records may be inherited, but destination-specific Active Life evidence, subnational tax rules, and local property-tax overrides must be explicit. Immigration, tax, healthcare, and financial-infrastructure facts should use official or primary sources wherever available. Editorial summaries must not replace the underlying evidence records.
+
+Tax calculation is separated into focused modules:
+
+- `tax_profile`: normalize the quick, planning, and detailed inputs and determine which follow-up questions are material;
+- `tax_residence`: evaluate domestic residence, continuing residence, split-year, dual-residence, and supported treaty branches;
+- `tax_income`: calculate supported income categories, withholding, and credits;
+- `tax_property`: calculate property purchase, annual, rental, sale, inheritance, and gift components;
+- `tax_scenarios`: produce favorable, central, and adverse planning ranges when exact facts are intentionally omitted;
+- `tax_explain`: return formulas, assumptions, exclusions, confidence, and source references for every displayed amount; and
+- the existing retirement engine: consume the chosen after-tax income, tax-inclusive spending, and after-tax return assumptions.
+
+Python build-time implementations provide validated default and no-JavaScript content. Equivalent dependency-free JavaScript implementations provide browser-local personalization. Shared fixtures prevent material calculation drift between runtimes.
 
 ### Ranking boundary
 
@@ -267,9 +357,9 @@ Add a focused pure function, conceptually `rank_fire_abroad_destinations(destina
 1. validates and normalizes the profile;
 2. joins the three datasets by stable IDs;
 3. applies mode and age eligibility;
-4. composes non-duplicative resilience costs;
+4. runs the quick tax screen and composes non-duplicative resilience and tax-reserve costs;
 5. calculates Active Life and the weighted FIRE score;
-6. attaches tax, work, healthcare, banking, and risk warnings;
+6. attaches tax-residence, tax-impact, Tax Readiness, work, healthcare, banking, and risk results;
 7. excludes results that fail the explicit launch-critical validation rules; and
 8. returns deterministic ranked view models for rendering.
 
@@ -281,13 +371,14 @@ Sort eligible results by FIRE Abroad score descending, then complete-evidence co
 
 - Every immigration, tax, healthcare, cost, banking, and risk claim requires a source and checked date.
 - A launch-critical legal, tax-residence, or healthcare field without a supported source fails build-time validation for that destination and mode.
+- Every displayed tax amount or range must resolve to a versioned rule, formula, source, applicable taxpayer scope, effective date, and stated assumption set.
 - Conflicting evidence produces **Needs verification**, preserves the conflict in source notes, and prevents an unsupported definitive claim.
 - Volatile facts have a review interval and become visibly stale when overdue; staleness cannot silently retain a high-confidence label.
 - Missing Active Life subcomponents make the destination unranked rather than treating missing values as zero.
 - Unknown profile-dependent eligibility is displayed as conditional, not eligible or ineligible.
 - Invalid query values and browser inputs fall back to documented defaults.
 - If JavaScript fails, the default server-rendered ranking, methodology, caveats, and internal links remain available.
-- Analytics may record control categories and result clicks, but never age, tax home, days, income categories, or financial inputs.
+- Analytics may record generic feature use and result clicks, but never age, citizenship, tax home, days, income categories, property values, wealth bands, account types, financial inputs, tax results, or calculation branches.
 
 ## Structured Data and Accessibility
 
@@ -309,7 +400,12 @@ Controls require native labels, keyboard operation, visible focus, and announced
 - country inheritance and destination overrides resolve correctly;
 - resilience costs do not double-count shared healthcare, travel, visa/admin, or contingency categories;
 - work permissions modify Stay Flexibility only;
-- tax warnings vary by mode, days, and broad home-tax context without calculating liability;
+- quick tax results vary by mode, day band, funding source, housing, use, and broad home-tax context;
+- favorable, central, and adverse tax-reserve ranges are ordered, source-backed, and never double-count user-supplied after-tax amounts;
+- the return assumption is explicitly after fees and tax whenever it feeds a tax-adjusted capital result;
+- detailed routing asks only questions that can change the active calculation;
+- residence branches, income-category calculations, foreign-tax-credit limits, and property lifecycle calculations match shared fixtures;
+- every tax result exposes formula, assumptions, exclusions, tax year, confidence, and source IDs;
 - missing score inputs never become an implicit zero; and
 - tie-breaking is stable and documented.
 
@@ -319,6 +415,8 @@ Controls require native labels, keyboard operation, visible focus, and announced
 - title, meta description, canonical, H1, breadcrumb, and structured data are valid;
 - useful default rankings and methodology are present without JavaScript;
 - the page is included in the sitemap and required internal-link surfaces;
+- the initial result remains concise and usable without opening detailed tax controls;
+- `Refine this tax estimate` progressively reveals only applicable detailed questions;
 - every rendered destination and calculator link resolves;
 - calculator links contain only destination, household, and housing allowlisted values;
 - no sensitive fields enter analytics payloads, URLs, or generated HTML; and
@@ -326,11 +424,17 @@ Controls require native labels, keyboard operation, visible focus, and announced
 
 ### Interaction and visual verification
 
-Exercise all three stay modes, age boundaries, households, housing states, incomplete-profile states, and at least one US-person warning scenario. Check 320, 375, 390, 430, 736, and 1024 pixel widths for legibility, focus treatment, table/list reflow, and no horizontal overflow. Confirm that the page remains understandable when scripts are disabled.
+Exercise all three stay modes, age boundaries, households, housing states, property-use states, income-source categories, incomplete-profile states, planning-estimate versus user-supplied-after-tax modes, detailed-question routing, and at least one continuing-home-country overlay. Check 320, 375, 390, 430, 736, and 1024 pixel widths for legibility, focus treatment, progressive disclosure, table/list reflow, and no horizontal overflow. Confirm that the initial page remains understandable and appropriately caveated when scripts are disabled.
 
 ## Rollout and Success Measures
 
-Deploy the single canonical page after data validation, unit tests, static build checks, and responsive verification pass. Do not launch destination-specific FIRE pages in this release.
+The work is delivered as three independently testable increments because the evidence overlay, tax-aware calculator integration, and detailed rules engine have different correctness boundaries:
+
+1. **Quick screen and tax-aware ranking:** publish the canonical FIRE page, progressive initial controls, Tax Readiness, tax-impact bands, property-lifecycle summaries, and source-backed default results for the ten launch destinations.
+2. **Tax-aware calculator integration:** add destination planning ranges, user-supplied-after-tax mode, explicit after-fees-and-tax return handling, tax-adjusted annual spending and capital results, expandable explanations, and cross-runtime fixtures.
+3. **Detailed calculation:** add dynamic question routing and versioned residence, income, credit, property-lifecycle, and continuing-home-country calculations. A jurisdiction is enabled for detailed calculation only when every applicable launch-critical rule and explanation passes validation; other jurisdictions retain the complete quick and planning layers rather than showing a false exact result.
+
+Deploy each increment after its data validation, unit tests, static build checks, and responsive verification pass. Do not launch destination-specific FIRE pages in these increments.
 
 Track non-sensitive events for page view, stay-mode change, activity-filter use, destination-guide click, and calculator handoff. Evaluate the first release using:
 

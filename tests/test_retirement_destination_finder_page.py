@@ -438,7 +438,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             self.html,
         )
 
-    def test_desktop_keeps_the_original_four_step_labels_and_combined_opening_section(self) -> None:
+    def test_desktop_labels_include_tax_as_the_fourth_of_five_steps(self) -> None:
         form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split(
             "</form>", 1
         )[0]
@@ -449,7 +449,9 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             "@media (max-width: 620px)", 1
         )[0]
 
-        self.assertIn('class="finder-step finder-step-desktop">Step 1 of 4', form)
+        self.assertIn('class="finder-step finder-step-desktop">Step 1 of 5', form)
+        self.assertIn('class="finder-step finder-step-desktop">Step 4 of 5', form)
+        self.assertNotIn("Step 5 of 6", form)
         self.assertIn('class="finder-desktop-only">What you have today', form)
         self.assertIn('class="finder-section finder-section-split"', form)
         self.assertIn(".finder-step.finder-step-mobile, .retirement-finder-page .finder-mobile-only { display: none; }", design_css)
@@ -457,6 +459,9 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
         self.assertIn(".finder-section-split", design_css)
         self.assertIn(".finder-step-desktop", mobile_css)
         self.assertIn(".finder-step-mobile", mobile_css)
+
+    def test_tax_choice_radios_do_not_inherit_full_width_input_styles(self) -> None:
+        self.assertIn(".tax-mode-choice input{width:20px;min-height:20px", self.html)
 
     def test_projection_uses_editorial_svg_styles_instead_of_flex_bars(self) -> None:
         self.assertNotIn(".finder-projection-bars{height:180px;display:flex", self.html)
@@ -499,7 +504,7 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
 
     def test_finder_embeds_the_shared_planning_currency_reference_data(self) -> None:
         payload = json.loads(
-            self.html.split('<script id="retirement-finder-data" type="application/json">', 1)[1]
+            self.html.split('<script type="application/json" id="retirement-finder-data">', 1)[1]
             .split("</script>", 1)[0]
         )
 

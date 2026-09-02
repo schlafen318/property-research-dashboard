@@ -38,6 +38,13 @@ VALID_CONFIDENCE = frozenset({"low", "medium", "medium_high", "high"})
 VALID_ACTIVITY_TAGS = frozenset(
     {"walking", "cycling", "hiking", "water", "winter_sports", "fitness_social"}
 )
+VALID_TAX_READINESS = frozenset(
+    {"straightforward", "moderate", "complex", "highly_profile_dependent"}
+)
+VALID_GAIN_INTENSITIES = frozenset({"low", "moderate", "high"})
+VALID_WEALTH_BANDS = frozenset({"under_threshold", "above_threshold", "unknown"})
+VALID_PROPERTY_USES = frozenset({"personal", "rental", "mixed"})
+SCENARIO_ALLOWANCE_KEYS = frozenset({"property_tax", "wealth_tax", "compliance"})
 CANONICAL_LAUNCH_IDS = frozenset(
     {
         "algarve-cascais",
@@ -822,6 +829,87 @@ def validate_fire_abroad_payload(
 
     errors: list[str] = []
 
+    scenario_sources = payload.get("sources", []) if isinstance(payload, dict) else []
+    scenario_source_ids = {
+        item.get("id")
+        for item in scenario_sources
+        if isinstance(item, dict) and isinstance(item.get("id"), str) and item.get("id")
+    }
+
+    def validate_scenario_refs(value: object, owner: str) -> None:
+        if not isinstance(value, list) or not value:
+            errors.append(f"{owner} must contain at least one source")
+            return
+        for source_id in value:
+            if source_id not in scenario_source_ids:
+                errors.append(f"{owner} contains unknown source {source_id}")
+
+    def validate_tax_screen(country_name: str, country: object) -> None:
+        owner = f"countries.{country_name}.tax_screen"
+        screen = country.get("tax_screen") if isinstance(country, dict) else None
+        if not isinstance(screen, dict):
+            errors.append(f"{owner} must be an object")
+            return
+        if screen.get("status") == "research_pending":
+            if "planning_bands" in screen:
+                errors.append(f"{owner}.planning_bands cannot be claimed while research is pending")
+            return
+        if screen.get("status") != "complete":
+            errors.append(f"{owner}.status must be complete or research_pending")
+            return
+        if screen.get("tax_readiness") not in VALID_TAX_READINESS:
+            errors.append(f"{owner}.tax_readiness must be a supported value")
+        readiness_score = screen.get("tax_readiness_score")
+        if isinstance(readiness_score, bool) or not isinstance(readiness_score, (int, float)) or not 0 <= readiness_score <= 5:
+            errors.append(f"{owner}.tax_readiness_score must be between 0 and 5")
+        validate_scenario_refs(screen.get("source_ids"), f"{owner}.source_ids")
+        bands = screen.get("planning_bands")
+        if not isinstance(bands, dict):
+            errors.append(f"{owner}.planning_bands must be an object")
+        else:
+            for mode in VALID_STAY_MODES:
+                band = bands.get(mode)
+                path = f"{owner}.planning_bands.{mode}"
+                if not isinstance(band, dict):
+                    errors.append(f"{path} is required")
+                    continue
+                values = [band.get(key) for key in ("favorable_rate", "central_rate", "adverse_rate")]
+                if not all(isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value <= 1 for value in values):
+                    errors.append(f"{path} rates must be between 0 and 1")
+                elif not values[0] <= values[1] <= values[2]:
+                    errors.append(f"{path} rates must be ordered favorable, central, adverse")
+        modifiers = screen.get("gain_intensity_modifiers")
+        if not isinstance(modifiers, dict) or set(modifiers) != VALID_GAIN_INTENSITIES:
+            errors.append(f"{owner}.gain_intensity_modifiers must contain low, moderate and high")
+        else:
+            values = [modifiers[key] for key in ("low", "moderate", "high")]
+            if not all(isinstance(value, (int, float)) and not isinstance(value, bool) and 0 <= value <= 2 for value in values):
+                errors.append(f"{owner}.gain_intensity_modifiers values must be between 0 and 2")
+            elif not values[0] <= values[1] <= values[2]:
+                errors.append(f"{owner}.gain_intensity_modifiers must be ordered low, moderate, high")
+        allowances = screen.get("annual_allowances")
+        if not isinstance(allowances, dict) or set(allowances) != SCENARIO_ALLOWANCE_KEYS:
+            errors.append(f"{owner}.annual_allowances must contain property_tax, wealth_tax and compliance")
+        else:
+            for key in SCENARIO_ALLOWANCE_KEYS:
+                allowance = allowances[key]
+                path = f"{owner}.annual_allowances.{key}"
+                if not isinstance(allowance, dict):
+                    errors.append(f"{path} must be an object")
+                    continue
+                values = [allowance.get(name) for name in ("favorable_usd", "central_usd", "adverse_usd")]
+                if not all(isinstance(value, (int, float)) and not isinstance(value, bool) and value >= 0 for value in values):
+                    errors.append(f"{path} amounts must be non-negative numbers")
+                elif not values[0] <= values[1] <= values[2]:
+                    errors.append(f"{path} amounts must be ordered favorable, central, adverse")
+                validate_scenario_refs(allowance.get("source_ids"), f"{path}.source_ids")
+                if key == "property_tax" and not set(allowance.get("applies_to_property_uses", [])).issubset(VALID_PROPERTY_USES):
+                    errors.append(f"{path}.applies_to_property_uses contains an unsupported use")
+                if key == "wealth_tax" and not set(allowance.get("applies_to_wealth_bands", [])).issubset(VALID_WEALTH_BANDS):
+                    errors.append(f"{path}.applies_to_wealth_bands contains an unsupported band")
+        validate_scenario_refs(screen.get("planning_band_basis_source_ids"), f"{owner}.planning_band_basis_source_ids")
+        validate_scenario_refs(screen.get("gain_intensity_source_ids"), f"{owner}.gain_intensity_source_ids")
+
     def add(owner: str, path: str, message: str) -> None:
         errors.append(f"{owner} {path}: {message}")
 
@@ -988,6 +1076,7 @@ def validate_fire_abroad_payload(
     country_source_ids: dict[str, set[str]] = {}
     for country_id, country_value in countries.items():
         country = mapping(country_value, country_id, "record")
+        validate_tax_screen(country_id, country)
         sources = country.get("sources")
         if not isinstance(sources, list) or not sources:
             add(country_id, "sources", "must contain source records")

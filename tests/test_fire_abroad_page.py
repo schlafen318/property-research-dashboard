@@ -158,8 +158,9 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn("Pre-existing conditions", self.html)
         self.assertIn("Brokerage", self.html)
         self.assertIn("USD ", self.html)
-        self.assertNotIn("$", self.html.split('<script id="fire-abroad-data"', 1)[0])
-        self.assertEqual(10, self.html.count(">Build your plan</a>"))
+        self.assertNotIn("$", self.html.split('<script type="application/json" id="fire-abroad-data"', 1)[0])
+        self.assertEqual(0, self.html.count(">Build your plan</a>"))
+        self.assertEqual(10, self.html.count(">Read destination guide</a>"))
         self.assertEqual(10, self.html.count('<tr data-fire-result="'))
         self.assertLess(self.html.index("Algarve / Cascais"), self.html.index("Da Nang / Hoi An"))
 
@@ -251,14 +252,14 @@ class FireAbroadPageTests(unittest.TestCase):
 
     def test_embedded_payload_is_minimal_complete_and_script_safe(self) -> None:
         script_text = re.search(
-            r'<script id="fire-abroad-data" type="application/json">(.*?)</script>',
+            r'<script type="application/json" id="fire-abroad-data">(.*?)</script>',
             self.html,
             re.DOTALL,
         ).group(1)
         self.assertNotRegex(script_text, r"[<>&]")
         payload = json.loads(script_text)
         self.assertEqual(
-            {"destinations", "retirement_costs", "fire_payload", "profile"},
+            {"asOf", "destinations", "retirement_costs", "fire_payload", "profile"},
             set(payload),
         )
         launch_ids = {
@@ -303,7 +304,7 @@ class FireAbroadPageTests(unittest.TestCase):
         target["name"] = "Valencia <coast> & city"
         rendered = build_fire_abroad_page(destinations, self.retirement_costs, self.fire_payload)
         script_text = re.search(
-            r'<script id="fire-abroad-data" type="application/json">(.*?)</script>',
+            r'<script type="application/json" id="fire-abroad-data">(.*?)</script>',
             rendered,
             re.DOTALL,
         ).group(1)
@@ -321,7 +322,7 @@ class FireAbroadPageTests(unittest.TestCase):
         hrefs = re.findall(
             r'href="([^"]*retirement-abroad-calculator/\?[^"]+)"', self.html
         )
-        self.assertEqual(10, len(hrefs))
+        self.assertEqual(0, len(hrefs))
         for href in hrefs:
             with self.subTest(href=href):
                 query = parse_qs(urlsplit(html_module.unescape(href)).query)
@@ -332,7 +333,7 @@ class FireAbroadPageTests(unittest.TestCase):
 
     def test_server_result_links_declare_sanitized_semantic_tracking(self) -> None:
         self.assertEqual(
-            10,
+            0,
             self.html.count(
                 'data-fire-track="calculator_handoff" data-fire-destination-id="'
             ),
@@ -346,7 +347,7 @@ class FireAbroadPageTests(unittest.TestCase):
         for destination_id in CANONICAL_LAUNCH_IDS:
             with self.subTest(destination_id=destination_id):
                 self.assertEqual(
-                    3,
+                    2,
                     self.html.count(f'data-fire-destination-id="{destination_id}"'),
                 )
 
@@ -407,7 +408,7 @@ class FireAbroadPageTests(unittest.TestCase):
         self.assertIn("25% Active Life", self.html)
         self.assertIn("20% sustainable annual cost", self.html)
         self.assertIn("currency and inflation buffer", self.html.lower())
-        self.assertIn("Evidence reviewed 2026-08-29", self.html)
+        self.assertIn("Evidence reviewed 2026-09-01", self.html)
         self.assertIn('<details class="fire-evidence">', self.html)
         self.assertIn("Source evidence and review dates", self.html)
         self.assertIn("<noscript>", self.html)

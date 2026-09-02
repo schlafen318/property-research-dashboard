@@ -1,0 +1,542 @@
+{
+  "schema_version": 1,
+  "dataset_id": "fire-tax-rules-v1",
+  "tax_year": 2026,
+  "checked_on": "2026-09-01",
+  "enablement_contract": {
+    "required_rule_types": [
+      "residence_test",
+      "rate_band",
+      "allowance",
+      "withholding",
+      "credit_limit",
+      "property_charge",
+      "reporting_flag",
+      "branch"
+    ],
+    "required_categories": [
+      "tax_residence",
+      "private_pension",
+      "government_pension",
+      "social_security",
+      "dividends",
+      "interest",
+      "realized_gains",
+      "retirement_account_withdrawal",
+      "rental_income",
+      "employment_consulting",
+      "property_purchase",
+      "property_annual",
+      "property_rental",
+      "property_sale",
+      "property_inheritance",
+      "property_gift",
+      "tax_reporting"
+    ],
+    "category_capabilities": {
+      "tax_residence": [
+        "residence_test",
+        "branch"
+      ],
+      "private_pension": [
+        "rate_band"
+      ],
+      "government_pension": [
+        "rate_band"
+      ],
+      "social_security": [
+        "rate_band"
+      ],
+      "dividends": [
+        "rate_band"
+      ],
+      "interest": [
+        "rate_band"
+      ],
+      "realized_gains": [
+        "rate_band"
+      ],
+      "retirement_account_withdrawal": [
+        "rate_band"
+      ],
+      "rental_income": [
+        "rate_band"
+      ],
+      "employment_consulting": [
+        "rate_band"
+      ],
+      "property_purchase": [
+        "property_charge"
+      ],
+      "property_annual": [
+        "property_charge"
+      ],
+      "property_rental": [
+        "property_charge"
+      ],
+      "property_sale": [
+        "property_charge"
+      ],
+      "property_inheritance": [
+        "property_charge"
+      ],
+      "property_gift": [
+        "property_charge"
+      ],
+      "tax_reporting": [
+        "reporting_flag"
+      ]
+    }
+  },
+  "operand_catalog": {
+    "days_in_jurisdiction": {
+      "kind": "profile",
+      "profile_key": "daysInJurisdiction",
+      "value_type": "number",
+      "minimum": 0,
+      "maximum": 365,
+      "integer": true,
+      "day_count": true
+    },
+    "residence_day_threshold": {
+      "kind": "constant",
+      "value_type": "number",
+      "value": 183
+    },
+    "ordinary_income": {
+      "kind": "profile",
+      "profile_key": "ordinaryIncome",
+      "value_type": "money",
+      "currency": "EUR"
+    }
+  },
+  "sources": [
+    {
+      "id": "uae-individual-tax-2026",
+      "publisher": "Official Platform of the UAE Government",
+      "url": "https://u.ae/en/information-and-services/finance-and-investment/taxation",
+      "source_kind": "official",
+      "effective_from": "2023-06-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "The UAE does not levy income tax on individuals.",
+      "recheck_trigger": "Recheck before each tax-year release or any announced personal-income-tax change."
+    },
+    {
+      "id": "uae-natural-person-business-2026",
+      "publisher": "UAE Federal Tax Authority",
+      "url": "https://tax.gov.ae/en/taxes/corporate.tax/corporate.tax.topics/basis.of.taxation.natural.person.aspx",
+      "source_kind": "official",
+      "effective_from": "2024-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Natural-person corporate-tax scope and the exclusions for wages, personal investment income and real-estate investment income.",
+      "recheck_trigger": "Recheck any natural-person threshold, excluded-income or corporate-tax amendment."
+    },
+    {
+      "id": "uae-tax-residence-2026",
+      "publisher": "UAE Federal Tax Authority",
+      "url": "https://tax.gov.ae/en/content/cabinet.decision.no.85.of.2022.on.determination.of.tax.residency.home.aspx",
+      "source_kind": "official",
+      "effective_from": "2023-03-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Cabinet Decision No. 85 of 2022, including the natural-person 183-day residence route.",
+      "recheck_trigger": "Recheck any UAE tax-residence decision or implementing guidance change."
+    },
+    {
+      "id": "hk-territorial-individual-tax-2026",
+      "publisher": "Hong Kong Inland Revenue Department",
+      "url": "https://www.ird.gov.hk/eng/tax/ind_nr.htm",
+      "source_kind": "official",
+      "effective_from": "2026-04-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Non-resident individuals remain liable for Hong Kong services and business on a territorial source basis.",
+      "recheck_trigger": "Recheck the individual source rules and 2026/27 assessment guidance."
+    },
+    {
+      "id": "hk-ordinary-residence-facts-2026",
+      "publisher": "Hong Kong Inland Revenue Department",
+      "url": "https://www.ird.gov.hk/eng/faq/pa.htm",
+      "source_kind": "official",
+      "effective_from": "2026-04-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "IRD factual guidance for ordinary residence: normal settled daily life and objective home, work or business, family, social and economic connections. The calculator asks these facts and does not ask the user for a legal conclusion.",
+      "recheck_trigger": "Recheck IRD ordinary-residence guidance and objective factors before each tax-year release."
+    },
+    {
+      "id": "hk-uae-treaty-2026",
+      "publisher": "Hong Kong Inland Revenue Department",
+      "url": "https://www.ird.gov.hk/eng/pdf/Synthesised_Text_HKSAR_UAE.pdf",
+      "source_kind": "official",
+      "effective_from": "2016-04-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Article 4 residence tests: more than 180 days in the relevant assessment year or more than 300 days in either pair of consecutive assessment years containing it, followed where dual resident by permanent home, centre of vital interests, habitual abode, then Hong Kong right of abode or UAE nationality; unresolved cases require competent-authority agreement.",
+      "recheck_trigger": "Recheck treaty, MLI reservations and competent-authority updates."
+    },
+    {
+      "id": "dld-sale-registration-2026",
+      "publisher": "Dubai Land Department",
+      "url": "https://dubailand.gov.ae/en/eservices/property-sale-registration/",
+      "source_kind": "official",
+      "effective_from": "2013-10-02",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Sale registration shares and current title, map and trustee service fees.",
+      "recheck_trigger": "Recheck DLD sale-registration and trustee fee schedules."
+    },
+    {
+      "id": "dld-gift-registration-2026",
+      "publisher": "Dubai Land Department",
+      "url": "https://dubailand.gov.ae/en/eservices/property-gift-registration/",
+      "source_kind": "official",
+      "effective_from": "2013-10-02",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Qualifying gift relationships and current gift registration and service fees.",
+      "recheck_trigger": "Recheck DLD gift eligibility, valuation and service fees."
+    },
+    {
+      "id": "dld-inheritance-registration-2026",
+      "publisher": "Dubai Land Department",
+      "url": "https://dubailand.gov.ae/en/eservices/inheritance-title-transfer/",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Current inheritance title-transfer, document, map and service-partner fees.",
+      "recheck_trigger": "Recheck DLD inheritance transfer requirements and fees."
+    },
+    {
+      "id": "dld-service-charge-index-2026",
+      "publisher": "Dubai Land Department",
+      "url": "https://dubailand.gov.ae/en/eservices/service-charge-index-overview/service-charge-index",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Property-specific approved service charges; the calculator requires the user's property-specific amount.",
+      "recheck_trigger": "Recheck the property-specific service-charge index."
+    },
+    {
+      "id": "uae-residential-property-vat-2026",
+      "publisher": "Official Platform of the UAE Government",
+      "url": "https://u.ae/participate/-/media/Information-and-services/Finance-and-Investment/VAt-guidelines/vattreatmentofproperties-Eng.ashx?la=en",
+      "source_kind": "official",
+      "effective_from": "2018-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 120,
+      "scope": "Residential-property owner does not charge VAT on residential rent or sale; commercial-property treatment is excluded from this profile.",
+      "recheck_trigger": "Recheck UAE VAT legislation and FTA residential-property guidance."
+    },
+    {
+      "id": "cbuae-aed-usd-rate-2026",
+      "publisher": "Central Bank of the UAE",
+      "url": "https://www.centralbank.ae/umbraco/Surface/Exchange/GetExchangeRateAllCurrency",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 30,
+      "scope": "Official VAT exchange table; the calculator uses the published USD rate of AED 3.6725 to translate AED-denominated registration fees.",
+      "recheck_trigger": "Recheck the CBUAE official exchange-rate publication before release."
+    },
+    {
+      "id": "dubai-municipality-housing-fee-2026",
+      "publisher": "Dubai Municipality",
+      "url": "https://www.dm.gov.ae/dubai-municipality-services/",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Housing fees on leased or owned units are property-specific and based on rental value; the calculator requires the user's current billed amount.",
+      "recheck_trigger": "Recheck Dubai Municipality housing-fee services and the property bill before release."
+    },
+    {
+      "id": "synthetic-example-authority-2026",
+      "publisher": "Synthetic test fixture — not a legal authority",
+      "url": "https://example.invalid/fire-tax-rules-2026",
+      "source_kind": "synthetic",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 365,
+      "scope": "Exercises the detailed-rule contract only; it describes no real jurisdiction.",
+      "recheck_trigger": "Replace with current official primary sources before enabling any jurisdiction."
+    }
+  ],
+  "supported_profiles": {
+    "hong-kong-to-dubai": {
+      "id": "hong-kong-to-dubai",
+      "label": "Hong Kong to Dubai",
+      "synthetic": false,
+      "detailed_enabled": true,
+      "home_jurisdiction_id": "hong-kong",
+      "home_label": "Hong Kong",
+      "destination_id": "dubai",
+      "destination_label": "Dubai",
+      "tax_year": 2026,
+      "source_ids": [
+        "uae-individual-tax-2026",
+        "uae-natural-person-business-2026",
+        "uae-tax-residence-2026",
+        "hk-territorial-individual-tax-2026",
+        "hk-ordinary-residence-facts-2026",
+        "hk-uae-treaty-2026"
+      ],
+      "income_categories": [
+        "private_pension",
+        "government_pension",
+        "social_security",
+        "dividends",
+        "interest",
+        "realized_gains",
+        "retirement_account_withdrawal",
+        "rental_income",
+        "employment_consulting"
+      ],
+      "property_lifecycle": [],
+      "runtime_definition": {
+        "factory": "hong-kong-to-dubai-v1",
+        "supported_activity_types": ["retired_nonworking"],
+        "supported_retirement_accounts": ["personal_investment"],
+        "supported_housing_plans": ["rent"]
+      },
+      "runtime_rule_graph": {
+        "schema_version": 1,
+        "currency_binding": "planning_currency",
+        "tax_year": 2026,
+        "effective_from": "2026-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "confidence": "high",
+        "recheck_trigger": "Revalidate every linked official source and the serialized graph before the next tax-year release.",
+        "residence": {
+          "destination": {
+            "jurisdiction_id": "dubai",
+            "label": "Dubai",
+            "calculation_side": "destination",
+            "source_ids": ["uae-tax-residence-2026"],
+            "operands": {
+              "days_in_destination": {"kind": "profile", "profile_key": "daysInDestination", "value_type": "number", "minimum": 0, "maximum": 365, "integer": true, "day_count": true},
+              "threshold": {"kind": "constant", "value_type": "number", "value": 183}
+            },
+            "rules": [{
+              "id": "uae-domestic-183-day-residence-2026",
+              "type": "residence_test",
+              "category": "tax_residence",
+              "taxpayer_scope": ["individual"],
+              "source_ids": ["uae-tax-residence-2026"],
+              "formula": {"operation": "greater_than_or_equal", "operands": ["days_in_destination", "threshold"]},
+              "resident_when": true,
+              "explanation": "UAE domestic tax residence under the supported 183-day route; this is not a treaty-residence determination."
+            }]
+          },
+          "home": {
+            "jurisdiction_id": "hong-kong",
+            "label": "Hong Kong",
+            "calculation_side": "home",
+            "source_ids": ["hk-uae-treaty-2026", "hk-ordinary-residence-facts-2026"],
+            "operands": {"home_resident": {"kind": "profile", "profile_key": "homeTreatyResident", "value_type": "boolean"}},
+            "rules": [{
+              "id": "hong-kong-supported-domestic-residence-2026",
+              "type": "residence_test",
+              "category": "tax_residence",
+              "taxpayer_scope": ["individual"],
+              "source_ids": ["hk-uae-treaty-2026", "hk-ordinary-residence-facts-2026"],
+              "formula": {"operation": "flag", "operands": ["home_resident"]},
+              "resident_when": true,
+              "explanation": "The enabled profile proceeds only when supported Hong Kong day-count and settled-life facts establish that the user is not a Hong Kong resident; possible dual residence is unavailable."
+            }]
+          }
+        },
+        "income": {
+          "destination": {
+            "jurisdiction_id": "dubai",
+            "label": "Dubai",
+            "calculation_side": "destination",
+            "rule_type": "rate_band",
+            "taxpayer_scope": ["resident", "nonresident"],
+            "source_ids": ["uae-individual-tax-2026", "uae-natural-person-business-2026"],
+            "categories": ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting"],
+            "profile_keys": {"private_pension": "privatePension", "government_pension": "governmentPension", "social_security": "socialSecurity", "dividends": "dividends", "interest": "interest", "realized_gains": "realizedGains", "retirement_account_withdrawal": "retirementAccountWithdrawal", "rental_income": "rentalIncome", "employment_consulting": "employmentConsulting"},
+            "rule_ids": {"private_pension": "dubai-private-pension-2026", "government_pension": "dubai-government-pension-2026", "social_security": "dubai-social-security-2026", "dividends": "dubai-dividends-2026", "interest": "dubai-interest-2026", "realized_gains": "dubai-realized-gains-2026", "retirement_account_withdrawal": "dubai-retirement-account-withdrawal-2026", "rental_income": "dubai-rental-income-2026", "employment_consulting": "dubai-employment-consulting-2026"},
+            "formula": {"operation": "progressive_rate", "operand_prefix": "income_"},
+            "bands": [{"from": 0, "up_to": null, "rate": 0}],
+            "no_tax": true,
+            "explanation": "The UAE individual no-tax rule applies only to this nonworking renter profile; business, consulting and employment are excluded."
+          },
+          "continuing_home": {
+            "jurisdiction_id": "hong-kong",
+            "label": "Hong Kong",
+            "calculation_side": "home",
+            "rule_type": "rate_band",
+            "taxpayer_scope": ["resident", "nonresident"],
+            "source_ids": ["hk-territorial-individual-tax-2026", "hk-uae-treaty-2026"],
+            "categories": ["private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting"],
+            "profile_keys": {"private_pension": "privatePension", "government_pension": "governmentPension", "social_security": "socialSecurity", "dividends": "dividends", "interest": "interest", "realized_gains": "realizedGains", "retirement_account_withdrawal": "retirementAccountWithdrawal", "rental_income": "rentalIncome", "employment_consulting": "employmentConsulting"},
+            "rule_ids": {"private_pension": "hong-kong-private-pension-2026", "government_pension": "hong-kong-government-pension-2026", "social_security": "hong-kong-social-security-2026", "dividends": "hong-kong-dividends-2026", "interest": "hong-kong-interest-2026", "realized_gains": "hong-kong-realized-gains-2026", "retirement_account_withdrawal": "hong-kong-retirement-account-withdrawal-2026", "rental_income": "hong-kong-rental-income-2026", "employment_consulting": "hong-kong-employment-consulting-2026"},
+            "formula": {"operation": "progressive_rate", "operand_prefix": "income_"},
+            "bands": [{"from": 0, "up_to": null, "rate": 0}],
+            "no_tax": true,
+            "explanation": "Only non-Hong Kong-source personal-investment withdrawals reach this territorial overlay; all other income categories must be zero."
+          }
+        },
+        "credits": {"destination": [], "continuing_home": []},
+        "property": {
+          "destination": {"jurisdiction_id": "dubai", "label": "Dubai", "calculation_side": "destination", "taxpayer_scope": "not_applicable", "source_ids": [], "rules": []},
+          "continuing_home": {"jurisdiction_id": "hong-kong", "label": "Hong Kong", "calculation_side": "home", "taxpayer_scope": "not_applicable", "source_ids": [], "rules": []}
+        }
+      }
+    }
+  },
+  "jurisdictions": {
+    "synthetic-example": {
+      "id": "synthetic-example",
+      "label": "Synthetic example",
+      "synthetic": true,
+      "detailed_enabled": false,
+      "resident_scope": "worldwide_income",
+      "nonresident_scope": "source_income",
+      "residence_logic": {
+        "operation": "any",
+        "rule_ids": [
+          "example-residence-days-2026"
+        ]
+      },
+      "questions": [
+        {
+          "id": "example-days-in-jurisdiction",
+          "operand_id": "days_in_jurisdiction",
+          "control": "number",
+          "label": "How many days will you spend in the jurisdiction?",
+          "reason": "The validated day threshold can change the residence result.",
+          "accepted_values": {
+            "min": 0,
+            "max": 365,
+            "step": 1,
+            "integer": true
+          },
+          "materiality_values": [
+            0,
+            183,
+            365
+          ],
+          "affects_rule_ids": [
+            "example-residence-days-2026"
+          ]
+        }
+      ],
+      "rules": [
+        {
+          "id": "example-residence-days-2026",
+          "type": "residence_test",
+          "tax_year": 2026,
+          "taxpayer_scope": [
+            "individual"
+          ],
+          "category": "tax_residence",
+          "currency": "EUR",
+          "formula": {
+            "operation": "greater_than_or_equal",
+            "operands": [
+              "days_in_jurisdiction",
+              "residence_day_threshold"
+            ]
+          },
+          "resident_when": true,
+          "source_ids": [
+            "synthetic-example-authority-2026"
+          ],
+          "effective_from": "2026-01-01",
+          "checked_on": "2026-09-01",
+          "review_interval_days": 365,
+          "confidence": "high",
+          "recheck_trigger": "Revalidate before changing the synthetic fixture year.",
+          "explanation": "Synthetic residence test: compare {days_in_jurisdiction} with {residence_day_threshold}."
+        },
+        {
+          "id": "example-residence-branch-2026",
+          "type": "branch",
+          "tax_year": 2026,
+          "taxpayer_scope": [
+            "individual"
+          ],
+          "category": "tax_residence",
+          "currency": "EUR",
+          "formula": {
+            "operation": "conditional",
+            "operands": [
+              "days_in_jurisdiction"
+            ]
+          },
+          "branches": [
+            {
+              "when": {
+                "operand": "days_in_jurisdiction",
+                "operator": "greater_than_or_equal",
+                "value": 183
+              },
+              "target_rule_id": "example-income-2026"
+            },
+            {
+              "when": {
+                "operand": "days_in_jurisdiction",
+                "operator": "less_than",
+                "value": 183
+              },
+              "target_rule_id": "example-income-2026"
+            }
+          ],
+          "source_ids": [
+            "synthetic-example-authority-2026"
+          ],
+          "effective_from": "2026-01-01",
+          "checked_on": "2026-09-01",
+          "review_interval_days": 365,
+          "confidence": "high",
+          "recheck_trigger": "Revalidate before changing branch routing.",
+          "explanation": "Synthetic routing chooses an income rule after the residence fact is evaluated."
+        },
+        {
+          "id": "example-income-2026",
+          "type": "rate_band",
+          "tax_year": 2026,
+          "taxpayer_scope": [
+            "resident"
+          ],
+          "category": "ordinary_income",
+          "currency": "EUR",
+          "formula": {
+            "operation": "progressive_rate",
+            "operands": [
+              "ordinary_income"
+            ]
+          },
+          "bands": [
+            {
+              "from": 0,
+              "up_to": 10000,
+              "rate": 0.1
+            },
+            {
+              "from": 10000,
+              "up_to": null,
+              "rate": 0.2
+            }
+          ],
+          "source_ids": [
+            "synthetic-example-authority-2026"
+          ],
+          "effective_from": "2026-01-01",
+          "checked_on": "2026-09-01",
+          "review_interval_days": 365,
+          "confidence": "high",
+          "recheck_trigger": "Revalidate before changing the synthetic fixture year or bands.",
+          "explanation": "Synthetic progressive resident ordinary-income estimate for {ordinary_income}."
+        }
+      ]
+    }
+  }
+}

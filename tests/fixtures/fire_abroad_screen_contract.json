@@ -1,0 +1,83 @@
+{
+  "cases": [
+    {
+      "name": "part-year destination estimate",
+      "profile": {
+        "stay_mode": "part_year",
+        "planning_base": 100000,
+        "tax_mode": "destination_estimate"
+      },
+      "tax_screen": {
+        "status": "complete",
+        "last_reviewed": "2026-09-01",
+        "scope_if_resident": "worldwide_income",
+        "tax_readiness": "complex",
+        "tax_readiness_score": 2.5,
+        "planning_bands": {
+          "seasonal": {"favorable_rate": 0.0, "central_rate": 0.03, "adverse_rate": 0.08},
+          "part_year": {"favorable_rate": 0.03, "central_rate": 0.12, "adverse_rate": 0.22},
+          "full_relocation": {"favorable_rate": 0.12, "central_rate": 0.22, "adverse_rate": 0.35}
+        },
+        "included_categories": ["income_tax_reserve", "compliance_reserve"],
+        "material_flags": ["wealth_tax"],
+        "source_ids": ["tax-source"],
+        "confidence": "medium_high"
+      },
+      "expected": {
+        "status": "planning_estimate",
+        "residence_outcome": "residence_depends_on_days_and_ties",
+        "favorable_reserve": 0,
+        "central_reserve": 12000,
+        "adverse_reserve": 35000
+      }
+    },
+    {
+      "name": "full relocation with supplied after-tax figures",
+      "profile": {
+        "stay_mode": "full_relocation",
+        "annual_day_band": "183_plus",
+        "planning_base": 100000,
+        "tax_mode": "user_after_tax"
+      },
+      "tax_screen": {
+        "status": "complete",
+        "last_reviewed": "2026-09-01",
+        "scope_if_resident": "worldwide_income",
+        "tax_readiness": "complex",
+        "tax_readiness_score": 2.5,
+        "planning_bands": {
+          "seasonal": {"favorable_rate": 0.0, "central_rate": 0.03, "adverse_rate": 0.08},
+          "part_year": {"favorable_rate": 0.03, "central_rate": 0.12, "adverse_rate": 0.22},
+          "full_relocation": {"favorable_rate": 0.12, "central_rate": 0.22, "adverse_rate": 0.35}
+        },
+        "included_categories": ["income_tax_reserve", "compliance_reserve"],
+        "material_flags": ["wealth_tax"],
+        "source_ids": ["tax-source"],
+        "confidence": "medium_high"
+      },
+      "expected": {
+        "status": "user_after_tax",
+        "residence_outcome": "likely_resident",
+        "favorable_reserve": 0,
+        "central_reserve": 0,
+        "adverse_reserve": 0
+      }
+    },
+    {
+      "name": "pending research remains unavailable",
+      "profile": {
+        "stay_mode": "seasonal",
+        "planning_base": 100000,
+        "tax_mode": "destination_estimate"
+      },
+      "tax_screen": {"status": "research_pending"},
+      "expected": {
+        "status": "tax_impact_unavailable",
+        "residence_outcome": "needs_evidence",
+        "favorable_reserve": null,
+        "central_reserve": null,
+        "adverse_reserve": null
+      }
+    }
+  ]
+}

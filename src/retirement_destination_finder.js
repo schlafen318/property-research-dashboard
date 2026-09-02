@@ -5,10 +5,16 @@
   const propertyFinance = typeof module === "object" && module.exports
     ? require("./property_finance.js")
     : root.GHAPropertyFinance;
-  const api = factory(retirement, propertyFinance);
+  const taxScenarios = typeof module === "object" && module.exports
+    ? require("./fire_tax_scenarios.js")
+    : root.GHAFireTaxScenarios;
+  const calculatorUI = typeof module === "object" && module.exports
+    ? require("./retirement_calculator_ui.js")
+    : root.GHARetirementCalculatorUI;
+  const api = factory(retirement, propertyFinance, taxScenarios, calculatorUI);
   if (typeof module === "object" && module.exports) module.exports = api;
   if (root) root.GHARetirementDestinationFinder = api;
-})(typeof window !== "undefined" ? window : null, function (retirement, propertyFinance) {
+})(typeof window !== "undefined" ? window : null, function (retirement, propertyFinance, taxScenarios, calculatorUI) {
   "use strict";
 
   function number(value, label) {
@@ -184,7 +190,58 @@
   }
 
   function tierOrder(tier) {
-    return { within_reach: 0, close: 1, stretch: 2 }[tier];
+    return { within_reach: 0, close: 1, stretch: 2, conditional: 3 }[tier];
+  }
+
+  function unavailableTaxScenario(reason) {
+    return {
+      status: "unavailable",
+      conditional: true,
+      explanations: [{ reason: reason }],
+    };
+  }
+
+  function destinationTaxScenario(input, destination, cost) {
+    const user = input.user || {};
+    const profile = user.taxProfile || {};
+    const planning = input.taxPlanning || {};
+    const country = planning.countries && planning.countries[destination.country];
+    try {
+      return taxScenarios.estimateTaxScenario({
+        taxMode: user.taxMode || "user_after_tax",
+        stayMode: profile.stayMode || "full_relocation",
+        dependableIncome: profile.dependableIncome || 0,
+        portfolioWithdrawals: profile.portfolioWithdrawals || 0,
+        realizedGainIntensity: profile.realizedGainIntensity,
+        propertyUse: profile.propertyUse,
+        wealthBand: profile.wealthBand,
+        propertyTaxIncludedInRetirementCosts: user.housingPlan !== "rent",
+        propertyPrice: Number(cost.property.representative_price_usd),
+        asOf: planning.asOf,
+      }, country);
+    } catch (error) {
+      return unavailableTaxScenario(error && error.message ? error.message : "Tax scenario inputs are invalid.");
+    }
+  }
+
+  function targetCases(baseInput, taxScenario) {
+    if (taxScenario.status === "unavailable") return null;
+    const results = calculatorUI.calculateTaxAdjustedScenarios(baseInput, taxScenario);
+    if (taxScenario.status === "user_after_tax") {
+      const row = results.user_after_tax;
+      return {
+        central: Number(row.result.totalCapitalAtRetirement),
+        annualTaxReserve: Number(row.annualTaxReserve),
+        returnBasis: row.result.returnBasis,
+      };
+    }
+    return {
+      favorable: Number(results.favorable.result.totalCapitalAtRetirement),
+      central: Number(results.central.result.totalCapitalAtRetirement),
+      adverse: Number(results.adverse.result.totalCapitalAtRetirement),
+      annualTaxReserve: Number(results.central.annualTaxReserve),
+      returnBasis: results.central.result.returnBasis,
+    };
   }
 
   function mortgageLiabilityAtRetirement(propertyResult, expectedReturn) {
@@ -260,8 +317,10 @@
         return;
       }
       const retirementProfile = cost.profiles[user.household];
-      const targetResult = retirement.calculateRetirementTarget(retirementTargetInput(user, cost));
-      let retirementTarget = Number(targetResult.totalCapitalAtRetirement);
+      const baseTargetInput = retirementTargetInput(user, cost);
+      const taxScenario = destinationTaxScenario(input, destination, cost);
+      const targets = targetCases(baseTargetInput, taxScenario);
+      let retirementTarget = targets ? targets.central : null;
       let portfolioAtRetirement = sharedProjection ? sharedProjection.portfolioAtRetirement : 0;
       let annualProjection = sharedProjection ? sharedProjection.annualProjection : null;
       let propertyEquity = 0;
@@ -332,14 +391,22 @@
         propertyEquity = propertyResult.propertyEquityAtRetirement;
         mortgageBalance = propertyResult.mortgageBalanceAtRetirement;
         netRentalCashFlow = propertyResult.netRentalCashFlowAtRetirement;
-        retirementTarget += mortgageLiabilityAtRetirement(propertyResult, Number(user.expectedPortfolioReturn));
+        const mortgageLiability = mortgageLiabilityAtRetirement(propertyResult, Number(user.expectedPortfolioReturn));
+        if (targets) {
+          targets.central += mortgageLiability;
+          if (Number.isFinite(targets.favorable)) targets.favorable += mortgageLiability;
+          if (Number.isFinite(targets.adverse)) targets.adverse += mortgageLiability;
+          retirementTarget = targets.central;
+        }
         financingReason = propertyResult.reasons[0] || (mortgageProfile.conditions || [])[0] || "";
       }
 
-      const fundingRatio = retirementTarget > 0 ? portfolioAtRetirement / retirementTarget : Infinity;
-      const tier = fundingTier(fundingRatio);
+      const fundingRatio = retirementTarget === null
+        ? null
+        : (retirementTarget > 0 ? portfolioAtRetirement / retirementTarget : Infinity);
+      const tier = fundingRatio === null ? "conditional" : fundingTier(fundingRatio);
       const matches = preferenceMatches(destination, user.preferences || {});
-      recommendations.push({
+      const recommendation = {
         destinationId: destination.id,
         name: destination.name,
         country: destination.country,
@@ -356,7 +423,14 @@
             : retirementProfile.annual_owner_costs_usd)
         ) / 12,
         countryGuideHref: destination.countryGuideHref || "",
-        surplusGap: portfolioAtRetirement - retirementTarget,
+        surplusGap: retirementTarget === null ? null : portfolioAtRetirement - retirementTarget,
+        taxStatus: taxScenario.status,
+        taxReason: taxScenario.explanations && taxScenario.explanations[0]
+          ? taxScenario.explanations[0].reason
+          : "",
+        conditional: taxScenario.status === "unavailable" || taxScenario.conditional === true,
+        annualTaxReserve: targets ? targets.annualTaxReserve : null,
+        returnBasis: targets ? targets.returnBasis : null,
         propertyEquity: propertyEquity,
         mortgageBalance: mortgageBalance,
         netRentalCashFlow: netRentalCashFlow,
@@ -367,7 +441,15 @@
           "&household=" + encodeURIComponent(user.household) +
           "&housing=" + encodeURIComponent(user.housingPlan),
         evidenceConfidence: mortgageProfile.confidence || "low",
-      });
+      };
+      if (taxScenario.status !== "user_after_tax") {
+        recommendation.retirementTargetRange = targets
+          ? [targets.favorable, targets.adverse]
+          : [null, null];
+        recommendation.favorableGap = targets ? portfolioAtRetirement - targets.favorable : null;
+        recommendation.adverseGap = targets ? portfolioAtRetirement - targets.adverse : null;
+      }
+      recommendations.push(recommendation);
     });
 
     recommendations.sort(function (left, right) {
@@ -382,6 +464,7 @@
         withinReachCount: recommendations.filter(function (item) { return item.tier === "within_reach"; }).length,
         closeCount: recommendations.filter(function (item) { return item.tier === "close"; }).length,
         stretchCount: recommendations.filter(function (item) { return item.tier === "stretch"; }).length,
+        conditionalCount: recommendations.filter(function (item) { return item.tier === "conditional"; }).length,
       },
       sharedProjection: sharedProjection,
       recommendations: recommendations,

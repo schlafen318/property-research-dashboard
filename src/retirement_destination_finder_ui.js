@@ -115,6 +115,25 @@
     };
   }
 
+  function taxControlVisibility(input) {
+    const estimate = String(input && input.taxMode || "destination_estimate") === "destination_estimate";
+    const housingPlan = String(input && input.housingPlan || "rent");
+    return {
+      estimate: estimate,
+      propertyUse: estimate && housingPlan !== "rent",
+      wealthBand: estimate && Boolean(input && input.wealthTaxRelevant),
+      afterTax: !estimate,
+    };
+  }
+
+  function taxResultPresentation(item) {
+    if (item.taxStatus !== "user_after_tax") return null;
+    return {
+      targetLabel: "After-tax target",
+      note: "Uses your after-tax income and return; no destination tax estimate was added.",
+    };
+  }
+
   function activeMoneyControlIds(input) {
     const active = MONEY_CONTROL_IDS.filter(function (id) {
       return id !== "finder-property-allocation";
@@ -142,6 +161,18 @@
       "&housing=" + encodeURIComponent(housingPlan);
   }
 
+  function calculatorHrefsForResults(input) {
+    const recommendations = Array.isArray(input && input.recommendations) ? input.recommendations : [];
+    const user = input && input.user || {};
+    return recommendations.map(function (item) {
+      return safeDetailHref({
+        destinationId: item.destinationId,
+        household: user.household,
+        housingPlan: user.housingPlan,
+      });
+    });
+  }
+
   function safeDossierHref(destinationId) {
     const slug = /^[a-z0-9-]+$/.test(String(destinationId || "")) ? String(destinationId) : "";
     return "/destinations/" + (slug ? encodeURIComponent(slug) + "/" : "");
@@ -151,6 +182,9 @@
     const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
     const closest = recommendations[0];
     if (!closest) return "No destinations match this plan yet.";
+    if (closest.tier === "conditional") {
+      return "Affordability is conditional where current destination tax evidence is unavailable.";
+    }
     if (Number(input.withinReachCount) > 0) {
       return "Your plan puts " + Number(input.withinReachCount) + " destinations within reach. " +
         closest.name + " is your strongest overall match.";
@@ -168,6 +202,7 @@
       within_reach: "Within reach",
       close: "Close",
       stretch: "Stretch",
+      conditional: "Conditional",
     }[value] || "Not classified";
   }
 
@@ -244,6 +279,7 @@
     const currency = input.currency || "USD";
     const ratesToUsd = input.ratesToUsd || { USD: 1 };
     function money(value) {
+      if (value === null || value === undefined || !Number.isFinite(Number(value))) return "Unavailable";
       return resultMoney({ amountUsd: Number(value) || 0, currency: currency, ratesToUsd: ratesToUsd });
     }
     function options(position, selectedId) {
@@ -301,7 +337,9 @@
     const strongest = new Map(recommendations.slice(0, 3).map(function (item, index) {
       return [item.destinationId, index + 1];
     }));
-    const rows = recommendations.map(function (item) {
+    const rows = recommendations.filter(function (item) {
+      return item.retirementTarget !== null && Number.isFinite(Number(item.retirementTarget));
+    }).map(function (item) {
       const target = Math.max(0, Number(item.retirementTarget) || 0);
       return {
         destinationId: item.destinationId,
@@ -461,7 +499,9 @@
 
   function finderProjectionView(input) {
     const recommendations = Array.isArray(input.recommendations) ? input.recommendations : [];
-    const closest = recommendations[0];
+    const closest = recommendations.find(function (item) {
+      return item.retirementTarget !== null && Number.isFinite(Number(item.retirementTarget));
+    });
     if (!closest) return null;
     const shared = input.sharedProjection && Array.isArray(input.sharedProjection.annualProjection)
       ? input.sharedProjection.annualProjection
@@ -509,6 +549,7 @@
       "finder-financing",
       "finder-before-retirement",
       "finder-retirement-income",
+      "finder-tax-planning",
       "finder-preferences",
     ];
     const wizardMedia = typeof root.matchMedia === "function"
@@ -519,6 +560,41 @@
     function numeric(id) { return Number(element(id).value); }
     function checked(id) { return element(id).checked; }
     function selected(id) { return element(id).value; }
+    function selectedTaxMode() {
+      const control = Array.from(form.querySelectorAll('input[name="finder-tax-mode"]')).find(function (item) {
+        return item.checked;
+      });
+      return control ? control.value : "destination_estimate";
+    }
+    function finderHasWealthTaxEvidence() {
+      const countries = payload.taxPlanning && payload.taxPlanning.countries || {};
+      return Object.values(countries).some(function (country) {
+        const allowance = country && country.tax_screen && country.tax_screen.annual_allowances &&
+          country.tax_screen.annual_allowances.wealth_tax;
+        return allowance && ["favorable_usd", "central_usd", "adverse_usd"].some(function (key) {
+          return Number(allowance[key]) > 0;
+        });
+      });
+    }
+    function syncTaxControls() {
+      const visibility = taxControlVisibility({
+        taxMode: selectedTaxMode(),
+        housingPlan: selected("finder-housing-plan"),
+        wealthTaxRelevant: finderHasWealthTaxEvidence(),
+      });
+      element("finder-tax-estimate-fields").hidden = !visibility.estimate;
+      element("finder-tax-after-tax-note").hidden = !visibility.afterTax;
+      element("finder-tax-property-use-field").hidden = !visibility.propertyUse;
+      element("finder-tax-property-use").disabled = !visibility.propertyUse;
+      element("finder-tax-wealth-band-field").hidden = !visibility.wealthBand;
+      element("finder-tax-wealth-band").disabled = !visibility.wealthBand;
+      ["finder-tax-withdrawals", "finder-tax-gain-intensity"].forEach(function (id) {
+        element(id).disabled = !visibility.estimate;
+      });
+      if (element("finder-tax-withdrawals").value === "") {
+        element("finder-tax-withdrawals").value = "0";
+      }
+    }
     function activeWizardSectionIds() {
       const sectionIds = ["finder-profile", "finder-current-resources", "finder-housing"];
       if (selected("finder-housing-plan") === "buy_now") {
@@ -624,7 +700,9 @@
         : stepId === "finder-housing" && selected("finder-housing-plan") === "buy_now"
           ? ["finder-property-allocation"]
           : stepId === "finder-retirement-income"
-            ? ["finder-pension", "finder-other-income"]
+            ? ["finder-pension", "finder-other-income"].concat(
+              selectedTaxMode() === "destination_estimate" ? ["finder-tax-withdrawals"] : []
+            )
             : [];
       if (invalidMoneyIds.some(function (id) { return validateMoneyControl(element(id)); })) {
         errors.push("Enter a valid amount in the highlighted field.");
@@ -776,6 +854,7 @@
         const conditional = sectionId === "finder-financing" || sectionId === "finder-before-retirement";
         section.hidden = active ? sectionId !== activeId : conditional && sectionIds.indexOf(sectionId) === -1;
       });
+      element("finder-tax-planning").hidden = active ? activeId !== "finder-retirement-income" : false;
       if (!active) return;
       const stepNumber = wizardStepIndex + 1;
       element("finder-wizard-step").textContent = "Step " + stepNumber + " of " + sections.length;
@@ -870,10 +949,12 @@
           portfolioAtRetirement: Number(item.portfolioAtRetirement != null
             ? item.portfolioAtRetirement
             : projectedCapital),
-          retirementTarget: Number(item.retirementTarget != null
-            ? item.retirementTarget
-            : item.retirementTargetUsd),
-          surplusGap: Number(item.surplusGap != null ? item.surplusGap : item.surplusGapUsd),
+          retirementTarget: item.retirementTarget == null && item.retirementTargetUsd == null
+            ? null
+            : Number(item.retirementTarget != null ? item.retirementTarget : item.retirementTargetUsd),
+          surplusGap: item.surplusGap == null && item.surplusGapUsd == null
+            ? null
+            : Number(item.surplusGap != null ? item.surplusGap : item.surplusGapUsd),
           annualProjection: Array.isArray(item.annualProjection) ? item.annualProjection : [],
         });
       });
@@ -895,6 +976,7 @@
       });
       element("finder-own-guidance").hidden = selected("finder-housing-plan") !== "own";
       element("finder-submit").disabled = selected("finder-housing-plan") === "own";
+      syncTaxControls();
       updateWizardStep();
     }
 
@@ -925,6 +1007,22 @@
         monthlyPortfolioContribution: moneyNumber("finder-monthly-contribution"),
         contributionInflationLinked: checked("finder-contribution-indexed"),
         expectedPortfolioReturn: numeric("finder-return") / 100,
+        returnBasis: "after_fees_and_tax",
+        taxMode: selectedTaxMode(),
+        taxProfile: {
+          stayMode: "full_relocation",
+          dependableIncome: incomeStreams().reduce(function (total, stream) {
+            return total + Number(stream.amount || 0);
+          }, 0),
+          portfolioWithdrawals: moneyNumber("finder-tax-withdrawals"),
+          realizedGainIntensity: selected("finder-tax-gain-intensity"),
+          propertyUse: housingPlan === "rent" || element("finder-tax-property-use").disabled
+            ? "none"
+            : selected("finder-tax-property-use"),
+          wealthBand: element("finder-tax-wealth-band").disabled
+            ? "unknown"
+            : selected("finder-tax-wealth-band"),
+        },
         generalInflation: 0.026,
         emergencyReserveMonths: 12,
         incomeStreams: incomeStreams(),
@@ -1121,17 +1219,35 @@
       const trackingAttributes = ' data-finder-destination data-destination-id="' +
         escapeHtml(item.destinationId) + '" data-surface="recommended_match" data-match-rank="' +
         matchRank + '" data-tier="' + escapeHtml(item.tier) + '"';
-      const hasRemainingCapital = Number(item.surplusGap) >= 0;
+      const unavailableTax = item.taxStatus === "unavailable" || !Number.isFinite(Number(item.retirementTarget));
+      const afterTax = taxResultPresentation(item);
+      const hasRemainingCapital = !unavailableTax && Number(item.surplusGap) >= 0;
       const gapLabel = hasRemainingCapital ? "Capital remaining" : "Capital gap";
       const gapAmount = Math.abs(Number(item.surplusGap) || 0);
+      const range = Array.isArray(item.retirementTargetRange) ? item.retirementTargetRange : [];
+      const targetMarkup = unavailableTax
+        ? "Unavailable"
+        : displayResultMoney(item.retirementTarget);
+      const gapMarkup = unavailableTax ? "Unavailable" : displayResultMoney(gapAmount);
+      const rangeMarkup = !unavailableTax && Number.isFinite(Number(range[0])) && Number.isFinite(Number(range[1]))
+        ? '<div><dt>Favorable–adverse range</dt><dd>' + displayResultMoney(range[0]) + "–" +
+          displayResultMoney(range[1]) + "</dd></div>"
+        : "";
+      const taxNote = unavailableTax
+        ? '<p class="finder-financing">Tax-adjusted result unavailable. ' +
+          escapeHtml(item.taxReason || "Current evidence needs review.") + "</p>"
+        : afterTax
+          ? '<p class="finder-financing">' + escapeHtml(afterTax.note) + "</p>"
+          : "";
       return '<article class="finder-result"><header><div><p class="finder-tier">' +
         escapeHtml(tierLabel(item.tier)) + '</p><h3><a href="' + escapeHtml(dossierHref) +
         '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
         '</p></div></header><dl>' +
-        '<div><dt>Required capital</dt><dd>' + displayResultMoney(item.retirementTarget) + "</dd></div>" +
-        '<div><dt>' + gapLabel + '</dt><dd>' + displayResultMoney(gapAmount) + "</dd></div>" +
-        propertyBits + rental + "</dl>" + financing +
+        '<div><dt>' + escapeHtml(afterTax ? afterTax.targetLabel : "Central tax-adjusted target") +
+        '</dt><dd>' + targetMarkup + "</dd></div>" +
+        '<div><dt>' + gapLabel + '</dt><dd>' + gapMarkup + "</dd></div>" + rangeMarkup +
+        propertyBits + rental + "</dl>" + financing + taxNote +
         '<p class="finder-rationale">' + escapeHtml(finderMatchExplanation({
           item: item,
           matchRank: matchRank,
@@ -1505,6 +1621,7 @@
           destinations: payload.destinations,
           retirementCosts: payload.retirementCosts,
           mortgageProfiles: payload.mortgageProfiles,
+          taxPlanning: payload.taxPlanning,
         });
         render(result, user);
       } catch (error) {
@@ -1522,6 +1639,9 @@
           track("retirement_destination_finder_mortgage_open", { purchase_method: "mortgage" });
         }
       });
+    });
+    form.querySelectorAll('input[name="finder-tax-mode"]').forEach(function (control) {
+      control.addEventListener("change", syncTaxControls);
     });
     element("finder-currency").value = selectedCurrency;
     element("finder-currency").addEventListener("change", function () {
@@ -1622,8 +1742,11 @@
     resultMoney: resultMoney,
     compactResultMoney: compactResultMoney,
     housingVisibility: housingVisibility,
+    taxControlVisibility: taxControlVisibility,
+    taxResultPresentation: taxResultPresentation,
     activeMoneyControlIds: activeMoneyControlIds,
     safeDetailHref: safeDetailHref,
+    calculatorHrefsForResults: calculatorHrefsForResults,
     safeDossierHref: safeDossierHref,
     resultSummaryRead: resultSummaryRead,
     tierLabel: tierLabel,

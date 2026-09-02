@@ -191,6 +191,50 @@ class RetirementCalculatorEngineTests(unittest.TestCase):
         self.assertEqual([13200, 14520], result["annualFundingGaps"])
         self.assertEqual(27720, result["liquidPortfolio"])
 
+    def test_annual_tax_expenses_are_inflated_with_general_expenses(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update(
+            {
+                "horizonYears": 2,
+                "expenseCategories": [{"amount": 10_000, "inflationRate": 0}],
+                "incomeStreams": [],
+                "annualTaxExpenses": 2_000,
+                "taxMode": "destination_estimate",
+                "returnBasis": "after_fees_and_tax",
+                "generalInflation": 0.10,
+            }
+        )
+        result = calculate(payload)
+        self.assertEqual([12200, 12420], result["annualFundingGaps"])
+        self.assertEqual(24620, result["liquidPortfolio"])
+        self.assertEqual(2200, result["annualTaxExpenses"])
+
+    def test_omitted_tax_mode_is_not_labeled_after_tax_without_return_basis(self) -> None:
+        result = calculate(level_cash_flow_payload())
+        self.assertEqual("unspecified", result["taxMode"])
+        self.assertEqual("unspecified", result["returnBasis"])
+        self.assertEqual(0, result["annualTaxExpenses"])
+
+    def test_omitted_tax_mode_defaults_after_tax_only_with_compatible_return_basis(self) -> None:
+        payload = level_cash_flow_payload()
+        payload["returnBasis"] = "after_fees_and_tax"
+        result = calculate(payload)
+        self.assertEqual("user_after_tax", result["taxMode"])
+        self.assertEqual("after_fees_and_tax", result["returnBasis"])
+
+    def test_destination_estimate_requires_scenario_expenses(self) -> None:
+        payload = level_cash_flow_payload()
+        payload["taxMode"] = "destination_estimate"
+        payload["returnBasis"] = "after_fees_and_tax"
+        with self.assertRaises(subprocess.CalledProcessError):
+            calculate(payload)
+
+    def test_tax_adjusted_expenses_require_after_tax_return_basis(self) -> None:
+        payload = level_cash_flow_payload()
+        payload.update({"annualTaxExpenses": 1_000, "returnBasis": "gross"})
+        with self.assertRaises(subprocess.CalledProcessError):
+            calculate(payload)
+
     def test_fixed_and_indexed_income_follow_different_paths(self) -> None:
         payload = level_cash_flow_payload()
         payload.update(

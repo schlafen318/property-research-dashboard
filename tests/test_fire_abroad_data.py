@@ -57,7 +57,7 @@ class FireAbroadDataTests(unittest.TestCase):
             payload,
             destination_ids=self.destination_ids,
             retirement_ids=self.retirement_ids,
-            as_of=date(2026, 8, 29),
+            as_of=date(2026, 9, 1),
         )
 
     def test_launch_contract_is_complete_and_valid(self) -> None:
@@ -341,9 +341,9 @@ class FireAbroadDataTests(unittest.TestCase):
     def test_source_dates_cannot_be_future_or_after_access(self) -> None:
         payload = copy.deepcopy(load_fire_abroad())
         future_source = payload["countries"]["Portugal"]["sources"][0]
-        future_source["source_date"] = "2026-08-30"
+        future_source["source_date"] = "2026-09-02"
         future_access = payload["countries"]["Spain"]["sources"][0]
-        future_access["accessed_date"] = "2026-08-30"
+        future_access["accessed_date"] = "2026-09-02"
         reversed_dates = payload["countries"]["Greece"]["sources"][0]
         reversed_dates["source_date"] = "2026-08-29"
         reversed_dates["accessed_date"] = "2026-08-28"

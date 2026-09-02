@@ -41,6 +41,52 @@
     return rate;
   }
 
+  function normalizedReturnBasis(input) {
+    const basis = input.returnBasis === undefined || input.returnBasis === null || input.returnBasis === ""
+      ? "unspecified"
+      : String(input.returnBasis);
+    if (!new Set(["unspecified", "after_fees", "after_fees_and_tax", "gross"]).has(basis)) {
+      throw new Error("Return basis is invalid");
+    }
+    return basis;
+  }
+
+  function normalizedTaxMode(input, returnBasis) {
+    const mode = input.taxMode === undefined || input.taxMode === null || input.taxMode === ""
+      ? (returnBasis === "after_fees_and_tax" ? "user_after_tax" : "unspecified")
+      : String(input.taxMode);
+    if (!new Set(["unspecified", "user_after_tax", "destination_estimate"]).has(mode)) {
+      throw new Error("Tax mode must be unspecified, user_after_tax or destination_estimate");
+    }
+    return mode;
+  }
+
+  function annualTaxExpenses(input) {
+    const returnBasis = normalizedReturnBasis(input);
+    const mode = normalizedTaxMode(input, returnBasis);
+    const supplied = input.annualTaxExpenses;
+    if (mode === "destination_estimate" && (supplied === undefined || supplied === null || supplied === "")) {
+      throw new Error("Destination tax estimate requires annualTaxExpenses from a TaxScenario");
+    }
+    const amount = supplied === undefined || supplied === null || supplied === ""
+      ? 0
+      : finiteNonNegative(supplied, "Annual tax expenses");
+    if (amount > 0 && returnBasis !== "after_fees_and_tax") {
+      throw new Error("Tax-adjusted results require returnBasis after_fees_and_tax");
+    }
+    if (mode === "destination_estimate" && returnBasis !== "after_fees_and_tax") {
+      throw new Error("Destination tax estimate requires returnBasis after_fees_and_tax");
+    }
+    if (mode === "user_after_tax" && returnBasis !== "after_fees_and_tax") {
+      throw new Error("User after-tax mode requires returnBasis after_fees_and_tax");
+    }
+    return {
+      mode: mode,
+      amount: amount,
+      returnBasis: returnBasis,
+    };
+  }
+
   function projectedExpenseTotal(categories, years) {
     return categories.reduce(function (total, category) {
       const amount = finiteNonNegative(category.amount, "Expense amount");
@@ -79,6 +125,7 @@
       "Monthly income before retirement"
     );
     const incomeInvestedRate = boundedRate(input.incomeInvestedRate, "Income invested rate", 1);
+    const tax = annualTaxExpenses(input);
 
     if (!HOUSING_PLANS.has(input.housingPlan)) {
       throw new Error("Housing plan must be rent, own, buy_now, or buy_retirement");
@@ -93,7 +140,8 @@
     let outsideIncome = 0;
     for (let year = 0; year < horizonYears; year += 1) {
       const projectionYears = yearsToRetirement + year;
-      const expenses = projectedExpenseTotal(input.expenseCategories, projectionYears);
+      const taxExpenses = project(tax.amount, generalInflation, projectionYears);
+      const expenses = projectedExpenseTotal(input.expenseCategories, projectionYears) + taxExpenses;
       const income = projectedIncomeTotal(input.incomeStreams, projectionYears);
       if (year === 0) {
         firstYearExpenses = expenses;
@@ -172,6 +220,9 @@
     return {
       yearsToRetirement: yearsToRetirement,
       firstYearExpenses: firstYearExpenses,
+      annualTaxExpenses: project(tax.amount, generalInflation, yearsToRetirement),
+      taxMode: tax.mode,
+      returnBasis: tax.returnBasis,
       outsideIncome: outsideIncome,
       fundingGap: fundingGap,
       annualFundingGaps: annualFundingGaps,

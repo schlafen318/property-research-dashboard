@@ -1,0 +1,80 @@
+{
+  "rules": {
+    "schema_version": 1,
+    "dataset_id": "synthetic-fire-tax-income-v1",
+    "tax_year": 2026,
+    "checked_on": "2026-09-01",
+    "active_jurisdiction_id": "synthetic-destination",
+    "enablement_contract": {
+      "required_rule_types": ["residence_test", "rate_band", "allowance", "withholding", "credit_limit", "property_charge", "reporting_flag", "branch"],
+      "required_categories": ["tax_residence", "private_pension", "government_pension", "social_security", "dividends", "interest", "realized_gains", "retirement_account_withdrawal", "rental_income", "employment_consulting", "property_purchase", "property_annual", "property_rental", "property_sale", "property_inheritance", "property_gift", "tax_reporting"],
+      "category_capabilities": {"tax_residence": ["residence_test", "branch"], "private_pension": ["rate_band"], "government_pension": ["rate_band"], "social_security": ["rate_band"], "dividends": ["rate_band"], "interest": ["rate_band"], "realized_gains": ["rate_band"], "retirement_account_withdrawal": ["rate_band"], "rental_income": ["rate_band"], "employment_consulting": ["rate_band"], "property_purchase": ["property_charge"], "property_annual": ["property_charge"], "property_rental": ["property_charge"], "property_sale": ["property_charge"], "property_inheritance": ["property_charge"], "property_gift": ["property_charge"], "tax_reporting": ["reporting_flag"]}
+    },
+    "operand_catalog": {
+      "private_pension": {"kind": "profile", "profile_key": "privatePension", "value_type": "money", "currency": "EUR"},
+      "government_pension": {"kind": "profile", "profile_key": "governmentPension", "value_type": "money", "currency": "EUR"},
+      "social_security": {"kind": "profile", "profile_key": "socialSecurity", "value_type": "money", "currency": "EUR"},
+      "dividends": {"kind": "profile", "profile_key": "dividends", "value_type": "money", "currency": "EUR"},
+      "interest": {"kind": "profile", "profile_key": "interest", "value_type": "money", "currency": "EUR"},
+      "realized_gains": {"kind": "profile", "profile_key": "realizedGains", "value_type": "money", "currency": "EUR"},
+      "retirement_withdrawal": {"kind": "profile", "profile_key": "retirementAccountWithdrawal", "value_type": "money", "currency": "EUR"},
+      "retirement_classification": {"kind": "profile", "profile_key": "retirementAccountClassification", "value_type": "string", "allowed_values": ["traditional_tax_deferred", "tax_free", "unsupported_offshore"]},
+      "rental_income": {"kind": "profile", "profile_key": "rentalIncome", "value_type": "money", "currency": "EUR"},
+      "employment_consulting": {"kind": "profile", "profile_key": "employmentConsulting", "value_type": "money", "currency": "EUR"},
+      "private_pension_allowance": {"kind": "constant", "value_type": "money", "currency": "EUR", "value": 1000},
+      "dividend_allowance": {"kind": "constant", "value_type": "money", "currency": "EUR", "value": 500},
+      "interest_allowance": {"kind": "constant", "value_type": "money", "currency": "EUR", "value": 500},
+      "dividend_withholding_rate": {"kind": "constant", "value_type": "number", "value": 0.15},
+      "rental_withholding_rate": {"kind": "constant", "value_type": "number", "value": 0.1},
+      "foreign_tax_paid": {"kind": "profile", "profile_key": "foreignTaxPaid", "value_type": "money", "currency": "EUR"},
+      "domestic_tax_limit": {"kind": "profile", "profile_key": "domesticTaxLimit", "value_type": "money", "currency": "EUR"}
+    },
+    "sources": [
+      {"id": "synthetic-income-authority-2026", "publisher": "Synthetic income authority — test fixture only", "url": "https://example.invalid/synthetic-income-2026", "source_kind": "synthetic", "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "scope": "Exercises income, withholding and credit calculations; it describes no real jurisdiction.", "recheck_trigger": "Replace before enabling a real jurisdiction."}
+    ],
+    "jurisdictions": {
+      "synthetic-destination": {
+        "id": "synthetic-destination",
+        "label": "Synthetic destination",
+        "synthetic": true,
+        "detailed_enabled": false,
+        "calculation_side": "destination",
+        "resident_scope": "worldwide_income",
+        "nonresident_scope": "source_income",
+        "rules": [
+          {"id": "synthetic-private-pension-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "private_pension", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["private_pension"]}, "bands": [{"from": 0, "up_to": 10000, "rate": 0.1}, {"from": 10000, "up_to": null, "rate": 0.2}], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply synthetic progressive pension bands to {private_pension}."},
+          {"id": "synthetic-private-pension-allowance-2026", "type": "allowance", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "private_pension", "currency": "EUR", "formula": {"operation": "minimum", "operands": ["private_pension", "private_pension_allowance"]}, "amount": 1000, "amount_operand": "private_pension_allowance", "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Deduct up to {private_pension_allowance} from synthetic private pension income."},
+          {"id": "synthetic-government-pension-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "government_pension", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["government_pension"]}, "bands": [{"from": 0, "up_to": null, "rate": 0.15}], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply a synthetic pension rate to {government_pension}."},
+          {"id": "synthetic-social-security-exemption-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "social_security", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["social_security"]}, "bands": [{"from": 0, "up_to": null, "rate": 0}], "no_tax": true, "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Treat synthetic social security of {social_security} as exempt."},
+          {"id": "synthetic-dividends-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "dividends", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["dividends"]}, "bands": [{"from": 0, "up_to": null, "rate": 0.2}], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply a synthetic dividend rate to {dividends}."},
+          {"id": "synthetic-dividend-allowance-2026", "type": "allowance", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "dividends", "currency": "EUR", "formula": {"operation": "minimum", "operands": ["dividends", "dividend_allowance"]}, "amount": 500, "amount_operand": "dividend_allowance", "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Deduct up to {dividend_allowance} from synthetic dividends."},
+          {"id": "synthetic-dividend-withholding-2026", "type": "withholding", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "dividends", "currency": "EUR", "formula": {"operation": "multiply", "operands": ["dividends", "dividend_withholding_rate"]}, "rate": 0.15, "rate_operand": "dividend_withholding_rate", "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply synthetic source withholding at {rate} to {dividends}."},
+          {"id": "synthetic-interest-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "interest", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["interest"]}, "bands": [{"from": 0, "up_to": null, "rate": 0.1}], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply a synthetic interest rate to {interest}."},
+          {"id": "synthetic-interest-allowance-2026", "type": "allowance", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "interest", "currency": "EUR", "formula": {"operation": "minimum", "operands": ["interest", "interest_allowance"]}, "amount": 500, "amount_operand": "interest_allowance", "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Deduct up to {interest_allowance} from synthetic interest."},
+          {"id": "synthetic-realized-gains-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "realized_gains", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["realized_gains"]}, "bands": [{"from": 0, "up_to": null, "rate": 0.18}], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply a synthetic gains rate to {realized_gains}."},
+          {"id": "synthetic-retirement-withdrawal-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "retirement_account_withdrawal", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["retirement_withdrawal"]}, "bands": [{"from": 0, "up_to": 10000, "rate": 0.1}, {"from": 10000, "up_to": null, "rate": 0.2}], "account_classification_operand": "retirement_classification", "supported_account_classifications": ["traditional_tax_deferred"], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply synthetic bands to a supported retirement withdrawal of {retirement_withdrawal}."},
+          {"id": "synthetic-rental-income-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "rental_income", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["rental_income"]}, "bands": [{"from": 0, "up_to": null, "rate": 0.2}], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply a synthetic rental-income rate to {rental_income}."},
+          {"id": "synthetic-rental-withholding-2026", "type": "withholding", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "rental_income", "currency": "EUR", "formula": {"operation": "multiply", "operands": ["rental_income", "rental_withholding_rate"]}, "rate": 0.1, "rate_operand": "rental_withholding_rate", "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply synthetic rental source withholding at {rate} to {rental_income}."},
+          {"id": "synthetic-employment-consulting-2026", "type": "rate_band", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "employment_consulting", "currency": "EUR", "formula": {"operation": "progressive_rate", "operands": ["employment_consulting"]}, "bands": [{"from": 0, "up_to": null, "rate": 0.25}], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Apply a synthetic employment and consulting rate to {employment_consulting}."},
+          {"id": "synthetic-category-credit-2026", "type": "credit_limit", "tax_year": 2026, "taxpayer_scope": ["resident", "nonresident"], "category": "foreign_tax_credit", "currency": "EUR", "formula": {"operation": "minimum", "operands": ["foreign_tax_paid", "domestic_tax_limit"]}, "credit_operand": "foreign_tax_paid", "limit_operand": "domestic_tax_limit", "credit_basis": "source_withholding", "order": 1, "applies_to_categories": ["dividends", "rental_income"], "assumptions": ["Source withholding is creditable only against the matching domestic income category."], "source_ids": ["synthetic-income-authority-2026"], "effective_from": "2026-01-01", "checked_on": "2026-09-01", "review_interval_days": 365, "confidence": "high", "recheck_trigger": "Replace before enabling a real jurisdiction.", "explanation": "Limit synthetic category credit to foreign tax paid and domestic tax."}
+        ]
+      }
+    }
+  },
+  "profile": {
+    "taxYear": 2026,
+    "currency": "EUR",
+    "privatePension": 12000,
+    "governmentPension": 4000,
+    "socialSecurity": 3000,
+    "dividends": 5000,
+    "interest": 2000,
+    "realizedGains": 10000,
+    "retirementAccountWithdrawal": 15000,
+    "retirementAccountClassification": "traditional_tax_deferred",
+    "rentalIncome": 6000,
+    "employmentConsulting": 8000,
+    "incomeSourceJurisdictions": {"private_pension": "home", "government_pension": "home", "social_security": "home", "dividends": "home", "interest": "home", "realized_gains": "home", "retirement_account_withdrawal": "home", "rental_income": "home", "employment_consulting": "synthetic-destination"}
+  },
+  "residence": {"status": "likely_destination_resident", "scopes": {"destination": "worldwide_income", "home": "source_income"}, "unresolvedFacts": [], "ruleIds": ["synthetic-residence-2026"], "sourceIds": ["synthetic-income-authority-2026"]}
+}

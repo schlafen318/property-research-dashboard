@@ -54,46 +54,22 @@
     const hasResult = Boolean(input && input.hasResult);
     const hasEditSnapshot = Boolean(input && input.hasEditSnapshot);
     const requestedMode = input && input.requestedMode === "results" ? "results" : "editing";
-    if (!mobile) {
-      return {
-        mode: "split",
-        formHidden: false,
-        resultsHidden: false,
-        backHidden: true,
-      };
-    }
+    if (!mobile) return { mode: "split", formHidden: false, resultsHidden: false, backHidden: true };
     if (hasResult && requestedMode === "results") {
-      return {
-        mode: "results",
-        formHidden: true,
-        resultsHidden: false,
-        backHidden: true,
-      };
+      return { mode: "results", formHidden: true, resultsHidden: false, backHidden: true };
     }
-    return {
-      mode: "editing",
-      formHidden: false,
-      resultsHidden: true,
-      backHidden: !hasEditSnapshot,
-    };
+    return { mode: "editing", formHidden: false, resultsHidden: true, backHidden: !hasEditSnapshot };
   }
 
   function retirementCalculatorViewportAction(input) {
     const leavingMobile = Boolean(input && input.wasMobile) && !Boolean(input && input.isMobile);
     const hasPendingMobileEdit = input && input.requestedMode === "editing" && Boolean(input.hasEditSnapshot);
     const recalculate = Boolean(leavingMobile && hasPendingMobileEdit);
-    return {
-      recalculate: recalculate,
-      clearEditSnapshot: recalculate,
-    };
+    return { recalculate: recalculate, clearEditSnapshot: recalculate };
   }
 
   function retirementCalculatorViewportResolution(input) {
-    return {
-      clearEditSnapshot: true,
-      restoreSnapshot: !Boolean(input && input.recalculated),
-      submitResult: false,
-    };
+    return { clearEditSnapshot: true, restoreSnapshot: !Boolean(input && input.recalculated), submitResult: false };
   }
 
   function parseMoneyInput(value) {
@@ -137,6 +113,12 @@
 
   function illustrativeReturnExample() {
     return 4;
+  }
+
+  function applyIllustrativeReturn(control) {
+    control.value = String(illustrativeReturnExample());
+    control.dispatchEvent(new Event("input", { bubbles: true }));
+    control.dispatchEvent(new Event("change", { bubbles: true }));
   }
 
   function currentCostComparison(input) {
@@ -252,6 +234,393 @@
     ];
   }
 
+  function taxControlVisibility(input) {
+    const estimate = String(input && input.taxMode || "destination_estimate") === "destination_estimate";
+    const housingPlan = String(input && input.housingPlan || "rent");
+    return {
+      estimate: estimate,
+      propertyUse: estimate && housingPlan !== "rent",
+      wealthBand: estimate && Boolean(input && input.wealthTaxRelevant),
+      afterTax: !estimate,
+    };
+  }
+
+  function taxEvidenceContext(taxPlanning) {
+    const planning = taxPlanning || {};
+    return {
+      asOf: planning.as_of,
+      taxYear: String(planning.reviewed_on || "").slice(0, 4),
+    };
+  }
+
+  function wealthTaxRelevant(countryRecord) {
+    const screen = countryRecord && countryRecord.tax_screen || {};
+    const allowance = screen.annual_allowances && screen.annual_allowances.wealth_tax;
+    if (!allowance || !Array.isArray(allowance.applies_to_wealth_bands)) return false;
+    return allowance.applies_to_wealth_bands.length > 0 &&
+      ["favorable_usd", "central_usd", "adverse_usd"].some(function (key) {
+        return Number(allowance[key]) > 0;
+      });
+  }
+
+  function taxResultPresentation(input) {
+    const taxScenario = input && input.taxScenario || {};
+    const scenarioResults = input && input.scenarioResults || {};
+    if (taxScenario.status === "unavailable") {
+      return {
+        status: "unavailable",
+        conditional: taxScenario.conditional !== false,
+        headlineKey: null,
+        rows: [],
+        capitalRange: [],
+        noTaxComparison: null,
+        refineAvailable: false,
+      };
+    }
+    if (taxScenario.status === "user_after_tax") {
+      return {
+        status: "user_after_tax",
+        conditional: false,
+        headlineKey: "user_after_tax",
+        rows: [],
+        capitalRange: [],
+        noTaxComparison: null,
+        refineAvailable: false,
+      };
+    }
+    const keys = ["favorable", "central", "adverse"];
+    const rows = keys.map(function (key) {
+      const row = scenarioResults[key];
+      if (!row) throw new Error("Tax-adjusted result " + key + " is required");
+      return {
+        key: key,
+        label: row.label || key.charAt(0).toUpperCase() + key.slice(1),
+        annualTaxReserve: Number(row.annualTaxReserve),
+        totalAnnualRequirement: Number(row.firstYearExpenses),
+        requiredCapital: Number(row.requiredCapital),
+        amountExplanations: row.amountExplanations || {},
+      };
+    });
+    return {
+      status: "available",
+      conditional: false,
+      headlineKey: "central",
+      rows: rows,
+      capitalRange: [rows[0].requiredCapital, rows[2].requiredCapital],
+      noTaxComparison: scenarioResults.central.noTaxComparison,
+      refineAvailable: true,
+    };
+  }
+
+  function detailedRefineAvailable(input) {
+    return Boolean(input && input.enabledMarker === "true");
+  }
+
+  function detailedPlanningCases(scenarioResults, fallbackResult) {
+    const keys = ["favorable", "central", "adverse"];
+    const fallbackCapital = Number(fallbackResult && fallbackResult.totalNeededToday);
+    return {
+      status: scenarioResults && scenarioResults.central ? "broad_tax_adjusted" : "current_plan_baseline",
+      currency: "USD",
+      cases: Object.fromEntries(keys.map(function (key) {
+        const row = scenarioResults && scenarioResults[key];
+        const capital = row ? Number(row.requiredCapital) : fallbackCapital;
+        const tax = row ? Number(row.annualTaxReserve) : 0;
+        if (!Number.isFinite(capital) || !Number.isFinite(tax)) throw new Error("Current planning cases require finite live calculator amounts");
+        return [key, { label: key.charAt(0).toUpperCase() + key.slice(1), annualTaxReserve: tax, requiredCapital: capital }];
+      })),
+    };
+  }
+
+  function taxAuditEntries(input) {
+    const labels = {
+      taxReserve: "Tax reserve",
+      annualRequirement: "Total annual requirement",
+      capitalRequirement: "Capital requirement",
+    };
+    const fields = ["taxReserve", "annualRequirement", "capitalRequirement"];
+    return (input && input.rows || []).reduce(function (entries, row) {
+      fields.forEach(function (field) {
+        const explanation = row.amountExplanations && row.amountExplanations[field];
+        if (!explanation) return;
+        entries.push({
+          scenarioKey: row.key,
+          amountKey: field,
+          heading: row.label + " — " + labels[field],
+          explanation: explanation,
+        });
+      });
+      return entries;
+    }, []);
+  }
+
+  function calculatorEngine() {
+    if (root && root.GHARetirementCalculator) return root.GHARetirementCalculator;
+    if (typeof require === "function") return require("./retirement_calculator.js");
+    throw new Error("Retirement calculator engine is required");
+  }
+
+  function clonedInput(input) {
+    return JSON.parse(JSON.stringify(input || {}));
+  }
+
+  function taxAdjustedEngineInput(baseInput, taxAmount, taxMode) {
+    const input = clonedInput(baseInput);
+    input.annualTaxExpenses = Number(taxAmount);
+    input.taxMode = taxMode;
+    input.returnBasis = "after_fees_and_tax";
+    return input;
+  }
+
+  function auditMetadata(input) {
+    const explanation = input || {};
+    const audit = {
+      status: explanation.status || "included",
+      label: explanation.label || "tax reserve",
+      formula: explanation.formula || "0; user supplied after-tax assumptions",
+      assumptions: (explanation.assumptions || ["taxMode=user_after_tax", "returnBasis=after_fees_and_tax"]).slice(),
+      inclusions: (explanation.inclusions || ["user-supplied after-tax assumptions"]).slice(),
+      exclusions: (explanation.exclusions || ["destination tax scenario"]).slice(),
+      taxYear: explanation.taxYear || "not_applicable",
+      confidence: explanation.confidence || "user_supplied",
+      sourceIds: (explanation.sourceIds || []).slice(),
+    };
+    if (explanation.confidenceScope) audit.confidenceScope = explanation.confidenceScope;
+    if (explanation.sourceScope) audit.sourceScope = explanation.sourceScope;
+    if (explanation.inputEvidence) {
+      audit.inputEvidence = explanation.inputEvidence.map(function (item) {
+        return {
+          component: item.component,
+          status: item.status,
+          confidence: item.confidence,
+          sourceIds: (item.sourceIds || []).slice(),
+        };
+      });
+    }
+    return audit;
+  }
+
+  function scenarioAmountExplanations(baseInput, result, taxExplanation) {
+    const taxReserve = auditMetadata(taxExplanation || (result.taxMode === "user_after_tax" ? {
+      status: "excluded",
+    } : {}));
+    const shared = {
+      taxYear: taxReserve.taxYear,
+      confidence: taxReserve.confidence,
+      sourceIds: taxReserve.sourceIds,
+    };
+    const combinedInputEvidence = [
+      {
+        component: "tax component",
+        status: taxReserve.status === "included"
+          ? "source-backed planning estimate"
+          : "excluded; user supplied after-tax assumptions",
+        confidence: taxReserve.confidence,
+        sourceIds: taxReserve.sourceIds,
+      },
+      {
+        component: "destination costs",
+        status: "destination estimate used; no separate source metadata attached to this audit",
+        confidence: "not_assessed",
+        sourceIds: [],
+      },
+      {
+        component: "household and housing",
+        status: "user-supplied inputs",
+        confidence: "not_applicable",
+        sourceIds: [],
+      },
+      {
+        component: "return and timing",
+        status: "user-supplied assumptions",
+        confidence: "not_applicable",
+        sourceIds: [],
+      },
+    ];
+    const annualRequirement = auditMetadata({
+      status: "included",
+      label: "total annual requirement",
+      formula: "firstYearExpenses = projected retirement expenses + annualTaxExpenses",
+      assumptions: [
+        "yearsToRetirement=" + result.yearsToRetirement,
+        "generalInflation=" + Number(baseInput.generalInflation),
+        "taxMode=" + result.taxMode,
+      ],
+      inclusions: ["projected retirement expense categories"].concat(taxReserve.inclusions),
+      exclusions: ["reliable outside income (shown separately)"].concat(taxReserve.exclusions),
+      taxYear: shared.taxYear,
+      confidence: shared.confidence,
+      sourceIds: shared.sourceIds,
+      confidenceScope: "tax_component_only",
+      sourceScope: "tax_component_only",
+      inputEvidence: combinedInputEvidence,
+    });
+    const capitalInclusions = ["tax-adjusted annual funding gaps", "emergency reserve"];
+    if (result.propertyCapital > 0) capitalInclusions.push("applicable home purchase capital");
+    const capitalRequirement = auditMetadata({
+      status: "included",
+      label: "capital requirement",
+      formula: "totalNeededToday = max(0, totalCapitalAtRetirement - contributionValueAtRetirement) / (1 + expectedPortfolioReturn)^yearsToRetirement + homePurchaseNeededToday",
+      assumptions: [
+        "currentAge=" + Number(baseInput.currentAge),
+        "retirementAge=" + Number(baseInput.retirementAge),
+        "horizonYears=" + Number(baseInput.horizonYears),
+        "expectedPortfolioReturn=" + Number(baseInput.expectedPortfolioReturn),
+        "monthlyIncomeBeforeRetirement=" + Number(baseInput.monthlyIncomeBeforeRetirement),
+        "incomeInvestedRate=" + Number(baseInput.incomeInvestedRate),
+      ],
+      inclusions: capitalInclusions,
+      exclusions: ["property equity as liquid retirement funding"].concat(taxReserve.exclusions),
+      taxYear: shared.taxYear,
+      confidence: shared.confidence,
+      sourceIds: shared.sourceIds,
+      confidenceScope: "tax_component_only",
+      sourceScope: "tax_component_only",
+      inputEvidence: combinedInputEvidence,
+    });
+    return {
+      taxReserve: taxReserve,
+      annualRequirement: annualRequirement,
+      capitalRequirement: capitalRequirement,
+    };
+  }
+
+  function auditEvidencePresentation(explanation) {
+    const audit = explanation || {};
+    const taxComponentOnly = audit.sourceScope === "tax_component_only" ||
+      audit.confidenceScope === "tax_component_only";
+    return {
+      confidenceLabel: taxComponentOnly ? "Tax component confidence" : "Confidence",
+      sourcesLabel: taxComponentOnly ? "Tax-component sources" : "Sources",
+      inputEvidenceText: (audit.inputEvidence || []).map(function (item) {
+        const component = String(item.component || "Input");
+        return component.charAt(0).toUpperCase() + component.slice(1) + ": " +
+          String(item.status || "status unavailable");
+      }).join("; "),
+    };
+  }
+
+  function scenarioResult(key, label, baseInput, taxCase, noTaxResult, taxMode, taxExplanation) {
+    const annualTaxReserve = Number(taxCase && taxCase.total);
+    if (!Number.isFinite(annualTaxReserve) || annualTaxReserve < 0) {
+      throw new Error("Tax scenario case " + key + " requires a finite non-negative total");
+    }
+    const result = calculatorEngine().calculateRetirement(
+      taxAdjustedEngineInput(baseInput, annualTaxReserve, taxMode)
+    );
+    return {
+      key: key,
+      label: label,
+      annualTaxReserve: annualTaxReserve,
+      annualTaxExpenses: result.annualTaxExpenses,
+      firstYearExpenses: result.firstYearExpenses,
+      fundingGap: result.fundingGap,
+      requiredCapital: result.totalNeededToday,
+      requiredCapitalDifference: result.totalNeededToday - noTaxResult.totalNeededToday,
+      noTaxComparisonLabel: "No added destination tax",
+      noTaxRequiredCapital: noTaxResult.totalNeededToday,
+      noTaxComparison: {
+        label: "No added destination tax",
+        requiredCapital: noTaxResult.totalNeededToday,
+      },
+      amountExplanations: scenarioAmountExplanations(baseInput, result, taxExplanation),
+      result: result,
+    };
+  }
+
+  function calculateTaxAdjustedScenarios(baseInput, taxScenario) {
+    if (!taxScenario || typeof taxScenario !== "object") throw new Error("Tax scenario is required");
+    const noTaxResult = calculatorEngine().calculateRetirement(
+      taxAdjustedEngineInput(baseInput, 0, "user_after_tax")
+    );
+    if (taxScenario.status === "user_after_tax") {
+      return {
+        user_after_tax: scenarioResult(
+          "user_after_tax",
+          "User after-tax",
+          baseInput,
+          { total: 0 },
+          noTaxResult,
+          "user_after_tax",
+          taxScenario.amountExplanations && taxScenario.amountExplanations.user_after_tax &&
+            taxScenario.amountExplanations.user_after_tax.total
+        ),
+      };
+    }
+    const cases = taxScenario.cases || {};
+    return {
+      favorable: scenarioResult("favorable", "Favorable", baseInput, cases.favorable, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.favorable && taxScenario.amountExplanations.favorable.total),
+      central: scenarioResult("central", "Central", baseInput, cases.central, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.central && taxScenario.amountExplanations.central.total),
+      adverse: scenarioResult("adverse", "Adverse", baseInput, cases.adverse, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.adverse && taxScenario.amountExplanations.adverse.total),
+    };
+  }
+
+  function detailedAmountRange(value, label) {
+    if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+      return { minimum: value, maximum: value };
+    }
+    if (value && typeof value === "object" && Number.isFinite(value.minimum) &&
+        Number.isFinite(value.maximum) && value.minimum >= 0 && value.minimum <= value.maximum) {
+      return { minimum: Number(value.minimum), maximum: Number(value.maximum) };
+    }
+    throw new Error(label + " must be a non-negative amount or calculated range");
+  }
+
+  function detailedRetirementInput(baseInput, integration, annualTaxExpenses, afterTaxIncome) {
+    const input = clonedInput(baseInput);
+    input.annualTaxExpenses = annualTaxExpenses;
+    input.taxMode = "destination_estimate";
+    input.returnBasis = "after_fees_and_tax";
+    input.expectedPortfolioReturn = Number(integration.selectedAfterTaxReturn);
+    input.incomeStreams = [{
+      amount: afterTaxIncome,
+      indexed: integration.dependableIncomeIndexed === true,
+      inflationRate: Number(integration.dependableIncomeInflationRate || 0),
+    }];
+    return input;
+  }
+
+  function calculateDetailedRetirement(baseInput, integration) {
+    if (!integration || integration.returnBasis !== "after_fees_and_tax") {
+      throw new Error("Detailed retirement integration requires returnBasis after_fees_and_tax");
+    }
+    const selectedReturn = Number(integration.selectedAfterTaxReturn);
+    if (!Number.isFinite(selectedReturn)) throw new Error("Detailed retirement integration requires an explicit after-tax return");
+    const tax = detailedAmountRange(integration.annualTaxExpenses, "annualTaxExpenses");
+    const income = detailedAmountRange(integration.afterTaxDependableIncome, "afterTaxDependableIncome");
+    const exact = tax.minimum === tax.maximum && income.minimum === income.maximum;
+    if (exact) {
+      const input = detailedRetirementInput(baseInput, integration, tax.minimum, income.minimum);
+      return {
+        status: "calculated",
+        input: input,
+        refined: calculatorEngine().calculateRetirement(input),
+        planningRange: integration.planningRange || null,
+      };
+    }
+    const favorableInput = detailedRetirementInput(baseInput, integration, tax.minimum, income.maximum);
+    const adverseInput = detailedRetirementInput(baseInput, integration, tax.maximum, income.minimum);
+    const favorable = calculatorEngine().calculateRetirement(favorableInput);
+    const adverse = calculatorEngine().calculateRetirement(adverseInput);
+    return {
+      status: "conditional",
+      input: {
+        status: "conditional",
+        returnBasis: "after_fees_and_tax",
+        expectedPortfolioReturn: selectedReturn,
+        annualTaxExpenses: { minimum: tax.minimum, maximum: tax.maximum },
+        afterTaxDependableIncome: { minimum: income.minimum, maximum: income.maximum },
+        cases: { favorable: favorableInput, adverse: adverseInput },
+      },
+      cases: { favorable: favorable, adverse: adverse },
+      capitalRange: {
+        minimum: Math.min(favorable.totalNeededToday, adverse.totalNeededToday),
+        maximum: Math.max(favorable.totalNeededToday, adverse.totalNeededToday),
+      },
+      planningRange: integration.planningRange || null,
+    };
+  }
+
   function planningSummary(input) {
     const result = input && input.result ? input.result : input;
     const currency = input && input.currency ? input.currency : "USD";
@@ -277,31 +646,18 @@
     const currency = input.currency || "USD";
     const ratesToUsd = input.ratesToUsd || { USD: 1 };
     const displayAmount = function (amountUsd) {
-      const converted = convertPlanningAmount({
-        amount: Number(amountUsd),
-        fromCurrency: "USD",
-        toCurrency: currency,
-        ratesToUsd: ratesToUsd,
-      });
+      const converted = convertPlanningAmount({ amount: Number(amountUsd), fromCurrency: "USD", toCurrency: currency, ratesToUsd: ratesToUsd });
       return Math.round(converted === null ? 0 : converted);
     };
     const formatAmount = function (amount) {
-      return new Intl.NumberFormat("en-US", {
-        style: "currency",
-        currency: currency,
-        maximumFractionDigits: 0,
-      }).format(amount);
+      return new Intl.NumberFormat("en-US", { style: "currency", currency: currency, maximumFractionDigits: 0 }).format(amount);
     };
     const items = [];
     const moneyMetric = function (label, key) {
       const before = displayAmount(previous[key]);
       const after = displayAmount(current[key]);
       if (before === after) return;
-      items.push({
-        label: label,
-        value: formatAmount(after),
-        change: formatAmount(Math.abs(after - before)) + (after < before ? " lower" : " higher"),
-      });
+      items.push({ label: label, value: formatAmount(after), change: formatAmount(Math.abs(after - before)) + (after < before ? " lower" : " higher") });
     };
     moneyMetric("Needed today", "totalNeededToday");
     moneyMetric("Monthly contribution", "monthlyContributionToday");
@@ -312,61 +668,35 @@
       items.push({
         label: "Retirement timing",
         value: currentYears + (currentYears === 1 ? " year" : " years") + " to retirement",
-        change: difference + (difference === 1 ? " year " : " years ") +
-          (currentYears < previousYears ? "sooner" : "later"),
+        change: difference + (difference === 1 ? " year " : " years ") + (currentYears < previousYears ? "sooner" : "later"),
       });
     }
     moneyMetric("Needed at retirement", "totalCapitalAtRetirement");
-
-    const todayBefore = displayAmount(previous.totalNeededToday);
-    const todayAfter = displayAmount(current.totalNeededToday);
-    const monthlyBefore = displayAmount(previous.monthlyContributionToday);
-    const monthlyAfter = displayAmount(current.monthlyContributionToday);
-    const todayDirection = Math.sign(todayAfter - todayBefore);
-    const monthlyDirection = Math.sign(monthlyAfter - monthlyBefore);
+    const todayDirection = Math.sign(displayAmount(current.totalNeededToday) - displayAmount(previous.totalNeededToday));
+    const monthlyDirection = Math.sign(displayAmount(current.monthlyContributionToday) - displayAmount(previous.monthlyContributionToday));
     let outcome = "";
-    if (todayDirection < 0 && monthlyDirection < 0) {
-      outcome = "Your updated plan needs less today and each month.";
-    } else if (todayDirection > 0 && monthlyDirection > 0) {
-      outcome = "Your updated plan needs more today and each month.";
-    } else if (todayDirection < 0 && monthlyDirection > 0) {
-      outcome = "Your updated plan trades a lower upfront amount for higher monthly investing.";
-    } else if (todayDirection > 0 && monthlyDirection < 0) {
-      outcome = "Your updated plan trades a higher upfront amount for lower monthly investing.";
-    } else if (todayDirection !== 0) {
-      outcome = "Your updated plan " + (todayDirection < 0 ? "reduces" : "increases") +
-        " the amount needed today.";
-    } else if (monthlyDirection !== 0) {
-      outcome = "Your updated plan " + (monthlyDirection < 0 ? "reduces" : "increases") +
-        " the monthly contribution.";
-    } else if (previousYears !== currentYears) {
-      outcome = "Your updated retirement timing changes how long your investments can grow.";
-    } else if (items.length) {
-      outcome = "Your updated assumptions change the capital needed at retirement.";
-    }
+    if (todayDirection < 0 && monthlyDirection < 0) outcome = "Your updated plan needs less today and each month.";
+    else if (todayDirection > 0 && monthlyDirection > 0) outcome = "Your updated plan needs more today and each month.";
+    else if (todayDirection < 0 && monthlyDirection > 0) outcome = "Your updated plan trades a lower upfront amount for higher monthly investing.";
+    else if (todayDirection > 0 && monthlyDirection < 0) outcome = "Your updated plan trades a higher upfront amount for lower monthly investing.";
+    else if (todayDirection !== 0) outcome = "Your updated plan " + (todayDirection < 0 ? "reduces" : "increases") + " the amount needed today.";
+    else if (monthlyDirection !== 0) outcome = "Your updated plan " + (monthlyDirection < 0 ? "reduces" : "increases") + " the monthly contribution.";
+    else if (previousYears !== currentYears) outcome = "Your updated retirement timing changes how long your investments can grow.";
+    else if (items.length) outcome = "Your updated assumptions change the capital needed at retirement.";
     return { items: items.slice(0, 3), outcome: outcome };
   }
 
   function retirementPlanSubmissionState(input) {
     const previous = input && input.lastSubmitted ? input.lastSubmitted : null;
     const current = input && input.current ? input.current : null;
-    if (!input || !input.submitted || !current) {
-      return { comparison: null, lastSubmitted: previous };
-    }
-    return {
-      comparison: previous ? { previous: previous, current: current } : null,
-      lastSubmitted: current,
-    };
+    if (!input || !input.submitted || !current) return { comparison: null, lastSubmitted: previous };
+    return { comparison: previous ? { previous: previous, current: current } : null, lastSubmitted: current };
   }
 
   function retirementAutoCalculationAction(input) {
     const isCurrencyChange = input && input.controlId === "ret-currency";
-    const isPendingMobileEdit = Boolean(input && input.mobile) &&
-      input.requestedMode === "editing" && Boolean(input.hasEditSnapshot);
-    return {
-      schedule: !isCurrencyChange && !isPendingMobileEdit,
-      clearComparison: !Boolean(input && input.mobile) && !isCurrencyChange,
-    };
+    const isPendingMobileEdit = Boolean(input && input.mobile) && input.requestedMode === "editing" && Boolean(input.hasEditSnapshot);
+    return { schedule: !isCurrencyChange && !isPendingMobileEdit, clearComparison: !Boolean(input && input.mobile) && !isCurrencyChange };
   }
 
   function accumulationTooltipContent(input) {
@@ -519,6 +849,7 @@
       "ret-pension",
       "ret-other-income",
       "ret-rental-income",
+      "ret-tax-withdrawals",
       "ret-current-monthly-spending",
     ];
     const formatMoneyControl = function (control) {
@@ -548,14 +879,8 @@
     let hasTrackedResult = false;
     let hasTrackedCurrentCostComparison = false;
     let latestResult = null;
-    let lastSubmittedResult = null;
-    let lastPlanComparison = null;
-    let requestedViewMode = "editing";
-    let editSnapshot = null;
-    const mobileQuery = typeof root.matchMedia === "function"
-      ? root.matchMedia("(max-width: 780px)")
-      : { matches: false };
-    let wasMobile = mobileQuery.matches;
+    let latestTaxScenario = null;
+    let latestScenarioResults = null;
 
     const prefill = retirementPrefill(root.location && root.location.search);
     [
@@ -576,17 +901,49 @@
       return byId[el("ret-destination").value];
     }
 
-    function syncDestinationDefaults(resetPropertyBudget, preserveValues) {
+    function selectedTaxMode() {
+      const selected = form.querySelector('input[name="ret-tax-mode"]:checked');
+      return selected ? selected.value : "destination_estimate";
+    }
+
+    function selectedCountryRecord() {
+      const planning = payload.tax_planning || {};
+      const countries = planning.countries || {};
+      const record = selectedRecord();
+      return record && countries[record.country] || null;
+    }
+
+    function syncTaxControls() {
+      const visibility = taxControlVisibility({
+        taxMode: selectedTaxMode(),
+        housingPlan: el("ret-housing-plan").value,
+        wealthTaxRelevant: wealthTaxRelevant(selectedCountryRecord()),
+      });
+      el("ret-tax-estimate-fields").hidden = !visibility.estimate;
+      el("ret-tax-after-tax-note").hidden = !visibility.afterTax;
+      el("ret-retirement-income-note").textContent = visibility.afterTax
+        ? "Enter amounts that already reflect tax. Do not include dividends from the portfolio being calculated."
+        : "Enter dependable amounts before destination tax. Do not include dividends from the portfolio being calculated.";
+      el("ret-tax-property-use-field").hidden = !visibility.propertyUse;
+      el("ret-tax-property-use").disabled = !visibility.propertyUse;
+      el("ret-tax-wealth-band-field").hidden = !visibility.wealthBand;
+      el("ret-tax-wealth-band").disabled = !visibility.wealthBand;
+      el("ret-tax-refine").hidden = true;
+      el("ret-tax-refine").disabled = true;
+      ["ret-tax-withdrawals", "ret-tax-gain-intensity"].forEach(function (id) {
+        el(id).disabled = !visibility.estimate;
+      });
+    }
+
+    function syncDestinationDefaults(resetPropertyBudget) {
       const record = selectedRecord();
       if (!record) return;
       const profile = record.profiles[el("ret-household").value];
       const plan = el("ret-housing-plan").value;
       const expenseLabels = housingExpenseLabels(plan);
       benchmarkValue = annualBenchmark({ profile: profile, plan: plan });
-      if (!preserveValues) {
-        monthlySpendingIsAutomatic = true;
-        el("ret-monthly-spending").value = formatMoneyInputValue(roundToNearestHundred(fromUsd(benchmarkValue / 12)));
-      }
+      monthlySpendingIsAutomatic = true;
+      el("ret-monthly-spending").value = formatMoneyInputValue(roundToNearestHundred(fromUsd(benchmarkValue / 12)));
       el("ret-monthly-spending-label").textContent = expenseLabels.input;
       el("ret-first-expenses-label").textContent = expenseLabels.result;
       el("ret-housing-guidance").textContent = housingGuidance(plan);
@@ -604,115 +961,10 @@
           Math.round(fromUsd(Number(record.property.representative_price_usd)))
         );
       }
-      if (!preserveValues) {
-        el("ret-general-inflation").value = String(record.inflation.general * 100);
-        el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
-        el("ret-property-inflation").value = String(record.inflation.property * 100);
-      }
-    }
-
-    function captureFormState() {
-      return {
-        monthlySpendingIsAutomatic: monthlySpendingIsAutomatic,
-        controls: Array.from(form.elements).filter(function (control) {
-          return control.id && !["button", "submit"].includes(control.type);
-        }).map(function (control) {
-          return {
-            id: control.id,
-            value: control.value,
-            checked: Boolean(control.checked),
-          };
-        }),
-      };
-    }
-
-    function restoreFormState(snapshot) {
-      if (!snapshot) return;
-      snapshot.controls.forEach(function (saved) {
-        const control = el(saved.id);
-        if (!control) return;
-        control.value = saved.value;
-        if (control.type === "checkbox" || control.type === "radio") control.checked = saved.checked;
-      });
-      monthlySpendingIsAutomatic = snapshot.monthlySpendingIsAutomatic;
-      selectedCurrency = el("ret-currency").value;
-      syncDestinationDefaults(false, true);
-      updateMonthlyInvestmentPreview();
-    }
-
-    function focusSection(section) {
-      if (!section) return;
-      section.scrollIntoView({ behavior: "smooth", block: "start" });
-      section.focus({ preventScroll: true });
-    }
-
-    function applyCalculatorView() {
-      const state = retirementCalculatorViewState({
-        mobile: mobileQuery.matches,
-        hasResult: Boolean(latestResult),
-        requestedMode: requestedViewMode,
-        hasEditSnapshot: Boolean(editSnapshot),
-      });
-      form.hidden = state.formHidden;
-      el("ret-results").hidden = state.resultsHidden;
-      el("ret-back-results").hidden = state.backHidden;
-      el("ret-adjust-plan").hidden = !latestResult;
-      document.body.classList.toggle("ret-mobile-results", state.mode === "results");
-      document.body.classList.toggle("ret-mobile-editing", state.mode === "editing" && mobileQuery.matches);
-      return state;
-    }
-
-    function showResults() {
-      requestedViewMode = "results";
-      editSnapshot = null;
-      const state = applyCalculatorView();
-      if (state.mode === "results") focusSection(el("ret-results"));
-    }
-
-    function editPlan() {
-      if (mobileQuery.matches) {
-        editSnapshot = captureFormState();
-        requestedViewMode = "editing";
-        applyCalculatorView();
-      }
-      focusSection(form);
-      track("retirement_calculator_adjust_plan");
-    }
-
-    function returnToResults() {
-      root.clearTimeout(autoCalculationTimer);
-      restoreFormState(editSnapshot);
-      if (latestResult) {
-        render(latestResult);
-        renderPlanChangeComparison(lastPlanComparison);
-      }
-      showResults();
-    }
-
-    function handleViewportChange() {
-      const isMobile = mobileQuery.matches;
-      const action = retirementCalculatorViewportAction({
-        wasMobile: wasMobile,
-        isMobile: isMobile,
-        requestedMode: requestedViewMode,
-        hasEditSnapshot: Boolean(editSnapshot),
-      });
-      wasMobile = isMobile;
-      if (action.recalculate) {
-        const recalculated = calculate(null);
-        const resolution = retirementCalculatorViewportResolution({ recalculated: recalculated });
-        if (recalculated && !resolution.submitResult) renderPlanChangeComparison(null);
-        if (resolution.restoreSnapshot) {
-          restoreFormState(editSnapshot);
-          if (latestResult) {
-            render(latestResult);
-            renderPlanChangeComparison(lastPlanComparison);
-          }
-          el("ret-errors").textContent = "";
-        }
-        if (resolution.clearEditSnapshot) editSnapshot = null;
-      }
-      applyCalculatorView();
+      el("ret-general-inflation").value = String(record.inflation.general * 100);
+      el("ret-healthcare-inflation").value = String(record.inflation.healthcare * 100);
+      el("ret-property-inflation").value = String(record.inflation.property * 100);
+      syncTaxControls();
     }
 
     function renderDestinationCosts() {
@@ -838,7 +1090,38 @@
         expectedPortfolioReturn: rate("ret-expected-return"),
         monthlyIncomeBeforeRetirement: moneyNumber("ret-monthly-income"),
         incomeInvestedRate: rate("ret-income-invested-rate"),
+        taxMode: "user_after_tax",
+        returnBasis: "after_fees_and_tax",
       };
+    }
+
+    function taxScenarioInput(planOverride) {
+      const plan = planOverride || el("ret-housing-plan").value;
+      const propertyUseVisible = !el("ret-tax-property-use").disabled;
+      const evidence = taxEvidenceContext(payload.tax_planning);
+      return {
+        taxMode: selectedTaxMode(),
+        stayMode: "full_relocation",
+        dependableIncome: moneyNumber("ret-pension") + moneyNumber("ret-other-income") + moneyNumber("ret-rental-income"),
+        portfolioWithdrawals: moneyNumber("ret-tax-withdrawals"),
+        realizedGainIntensity: el("ret-tax-gain-intensity").value,
+        propertyPrice: usesPropertyBudget(plan) ? moneyNumber("ret-property-budget") : 0,
+        propertyUse: plan === "rent" || !propertyUseVisible ? "none" : el("ret-tax-property-use").value,
+        wealthBand: el("ret-tax-wealth-band").disabled ? "unknown" : el("ret-tax-wealth-band").value,
+        propertyTaxIncludedInRetirementCosts: plan !== "rent",
+        asOf: evidence.asOf,
+        taxYear: evidence.taxYear,
+      };
+    }
+
+    function estimateTaxScenario(planOverride) {
+      if (!root.GHAFireTaxScenarios || typeof root.GHAFireTaxScenarios.estimateTaxScenario !== "function") {
+        throw new Error("Destination tax scenario engine is required");
+      }
+      return root.GHAFireTaxScenarios.estimateTaxScenario(
+        taxScenarioInput(planOverride),
+        selectedCountryRecord()
+      );
     }
 
     function setMoney(id, value) {
@@ -926,22 +1209,115 @@
       }
     }
 
-    function render(result) {
+    function appendTaxExplanation(container, headingText, explanation, sourceById) {
+      if (!explanation) return;
+      const evidence = auditEvidencePresentation(explanation);
+      const article = document.createElement("article");
+      const heading = document.createElement("h3");
+      const formula = document.createElement("p");
+      const context = document.createElement("p");
+      const sources = document.createElement("p");
+      heading.textContent = headingText;
+      formula.textContent = "Formula: " + explanation.formula;
+      context.textContent = "Status: " + String(explanation.status || "included").replaceAll("_", " ") +
+        ". Assumptions: " + (explanation.assumptions || []).join("; ") +
+        ". Included: " + (explanation.inclusions || []).join(", ") +
+        ". Excluded: " + (explanation.exclusions || []).join(", ") +
+        ". Tax year: " + explanation.taxYear + ". " + evidence.confidenceLabel + ": " + explanation.confidence + "." +
+        (evidence.inputEvidenceText ? " Input evidence: " + evidence.inputEvidenceText + "." : "");
+      sources.appendChild(document.createTextNode(evidence.sourcesLabel + ": "));
+      if (!(explanation.sourceIds || []).length) {
+        sources.appendChild(document.createTextNode("None"));
+      }
+      (explanation.sourceIds || []).forEach(function (sourceId, index) {
+        const source = sourceById[sourceId];
+        if (index) sources.appendChild(document.createTextNode(", "));
+        if (!source) {
+          sources.appendChild(document.createTextNode(sourceId));
+          return;
+        }
+        const link = document.createElement("a");
+        link.href = source.url;
+        link.rel = "noopener noreferrer";
+        link.textContent = source.publisher;
+        sources.appendChild(link);
+      });
+      article.append(heading, formula, context, sources);
+      container.appendChild(article);
+    }
+
+    function renderTaxResults(taxScenario, scenarioResults) {
+      const view = taxResultPresentation({
+        taxScenario: taxScenario,
+        scenarioResults: scenarioResults,
+      });
+      const range = el("ret-tax-range");
+      const unavailable = el("ret-tax-unavailable");
+      const comparison = el("ret-tax-no-tax-comparison");
+      const details = el("ret-tax-details");
+      const refine = el("ret-tax-refine");
+      range.hidden = true;
+      unavailable.hidden = true;
+      comparison.hidden = true;
+      details.hidden = true;
+      refine.hidden = true;
+      refine.disabled = true;
+      if (view.status === "unavailable") {
+        unavailable.hidden = false;
+        const canRefineUnavailable = detailedRefineAvailable({ planningAvailable: false, enabledMarker: refine.dataset.detailedAvailable });
+        refine.hidden = !canRefineUnavailable;
+        refine.disabled = !canRefineUnavailable;
+        return view;
+      }
+      if (view.status !== "available") return view;
+      range.hidden = false;
+      el("ret-tax-range-capital").textContent = displayMoney(view.capitalRange[0]) + "–" + displayMoney(view.capitalRange[1]);
+      if (view.noTaxComparison) {
+        comparison.hidden = false;
+        setMoney("ret-tax-no-tax-capital", view.noTaxComparison.requiredCapital);
+      }
+      view.rows.forEach(function (row) {
+        const cells = el("ret-tax-" + row.key + "-row").children;
+        cells[1].textContent = displayMoney(row.annualTaxReserve);
+        cells[2].textContent = displayMoney(row.totalAnnualRequirement);
+        cells[3].textContent = displayMoney(row.requiredCapital);
+      });
+      const explanationContainer = el("ret-tax-explanations");
+      const sourceById = Object.fromEntries(((payload.tax_planning || {}).sources || []).map(function (source) {
+        return [source.id, source];
+      }));
+      explanationContainer.replaceChildren();
+      taxAuditEntries({ rows: view.rows }).forEach(function (entry) {
+        appendTaxExplanation(explanationContainer, entry.heading, entry.explanation, sourceById);
+      });
+      details.hidden = false;
+      const canRefine = detailedRefineAvailable({
+        planningAvailable: view.refineAvailable,
+        enabledMarker: refine.dataset.detailedAvailable,
+      });
+      refine.hidden = !canRefine;
+      refine.disabled = !canRefine;
+      return view;
+    }
+
+    function render(result, taxScenario, scenarioResults) {
       const record = selectedRecord();
       latestResult = result;
+      latestTaxScenario = taxScenario;
+      latestScenarioResults = scenarioResults;
       el("ret-detailed-projection").hidden = false;
       el("ret-plan-summary").textContent = planningSummary({
         result: result,
+        taxScenario: taxScenario,
         currency: selectedCurrency,
         ratesToUsd: ratesToUsd,
       });
-      setMoney("ret-total-today", result.totalNeededToday);
       setMoney("ret-invest-today", result.investmentNeededToday);
-      setMoney("ret-home-today", result.homePurchaseNeededToday);
       setMoney("ret-monthly-contribution", result.monthlyContributionToday);
       setMoney("ret-contribution-retirement", result.contributionValueAtRetirement);
       setMoney("ret-total-retirement", result.totalCapitalAtRetirement);
       setMoney("ret-total-retirement-summary", result.totalCapitalAtRetirement);
+      setMoney("ret-property-summary", result.propertyCapital);
       setMoney("ret-liquid-portfolio", result.liquidPortfolio);
       setMoney("ret-property-retirement", result.propertyTiming === "retirement" ? result.propertyCapital : 0);
       setMoney("ret-emergency-reserve", result.emergencyReserve);
@@ -961,14 +1337,11 @@
       el("ret-net-return-explanation").textContent = netReturnIsNegative
         ? "Expected return minus first-year portfolio withdrawal. Withdrawals exceed the assumed return."
         : "Expected return minus first-year portfolio withdrawal.";
-      el("ret-home-today-label").textContent = result.propertyTiming === "today"
-        ? "Home purchase needed now"
-        : "Home purchase today";
-      el("ret-home-summary").hidden = result.propertyTiming !== "today";
       el("ret-property-retirement-label").textContent = result.propertyTiming === "retirement"
         ? "Home purchase at retirement"
         : "No home purchase at retirement";
       el("ret-result-status").textContent = record.name + " · " + el("ret-household").selectedOptions[0].textContent + " · " + result.yearsToRetirement + " years to retirement";
+      renderTaxResults(taxScenario, scenarioResults);
       renderSensitivity();
       renderHousingComparison();
       renderAccumulationChart(result.annualAccumulation, result.totalCapitalAtRetirement);
@@ -978,49 +1351,10 @@
         "uses the same expected return every year. Actual return order and market losses can materially change the outcome. " +
         "Planning estimate only; not financial, tax, legal, immigration, healthcare, or investment advice.";
       el("ret-save-action").hidden = false;
-      applyCalculatorView();
       if (!hasTrackedResult) {
         track("retirement_calculator_result_view");
         hasTrackedResult = true;
       }
-    }
-
-    function renderPlanChangeComparison(comparison) {
-      const section = el("ret-plan-change-summary");
-      const list = el("ret-plan-change-list");
-      lastPlanComparison = comparison || null;
-      list.replaceChildren();
-      const summary = retirementPlanChanges({
-        previous: comparison && comparison.previous,
-        current: comparison && comparison.current,
-        currency: selectedCurrency,
-        ratesToUsd: ratesToUsd,
-      });
-      el("ret-plan-change-outcome").textContent = summary.outcome;
-      summary.items.forEach(function (item) {
-        const group = document.createElement("div");
-        const label = document.createElement("dt");
-        const value = document.createElement("dd");
-        const change = document.createElement("small");
-        label.textContent = item.label;
-        value.textContent = item.value;
-        change.textContent = item.change;
-        value.appendChild(change);
-        group.appendChild(label);
-        group.appendChild(value);
-        list.appendChild(group);
-      });
-      section.hidden = summary.items.length === 0;
-    }
-
-    function acceptSubmittedResult(result) {
-      const state = retirementPlanSubmissionState({
-        lastSubmitted: lastSubmittedResult,
-        current: result,
-        submitted: true,
-      });
-      lastSubmittedResult = state.lastSubmitted;
-      renderPlanChangeComparison(state.comparison);
     }
 
     function appendComparisonRow(container, label, rateLabel, value, isSelected) {
@@ -1037,14 +1371,21 @@
       container.appendChild(row);
     }
 
+    function resultForTaxScenario(baseInput, taxScenario) {
+      const scenarios = calculateTaxAdjustedScenarios(baseInput, taxScenario);
+      return taxScenario.status === "user_after_tax"
+        ? scenarios.user_after_tax.result
+        : scenarios.central.result;
+    }
+
     function renderSensitivity() {
       const container = el("ret-sensitivity-rows");
       const baseInput = calculatorInput();
       container.replaceChildren();
       sensitivityRates(baseInput.expectedPortfolioReturn).forEach(function (scenario) {
-        const result = engine.calculateRetirement(Object.assign({}, baseInput, {
+        const result = resultForTaxScenario(Object.assign({}, baseInput, {
           expectedPortfolioReturn: scenario.rate,
-        }));
+        }), latestTaxScenario);
         appendComparisonRow(
           container,
           scenario.label,
@@ -1067,7 +1408,8 @@
       ];
       container.replaceChildren();
       plans.forEach(function (plan) {
-        const result = engine.calculateRetirement(calculatorInput(plan.value));
+        const scenario = estimateTaxScenario(plan.value);
+        const result = resultForTaxScenario(calculatorInput(plan.value), scenario);
         const row = document.createElement("tr");
         const name = document.createElement("th");
         const today = document.createElement("td");
@@ -1179,20 +1521,38 @@
           errors.textContent = "Check the highlighted numeric input and try again.";
           invalid.focus();
         }
-        return false;
+        return;
       }
       try {
-        render(engine.calculateRetirement(calculatorInput()));
-        if (event) {
-          acceptSubmittedResult(latestResult);
-          track("retirement_calculator_calculate");
-          showResults();
+        const taxScenario = estimateTaxScenario();
+        if (taxScenario.status === "unavailable") {
+          const baseResult = calculatorEngine().calculateRetirement(calculatorInput());
+          el("ret-tax-refine").dataset.planningCases = JSON.stringify(detailedPlanningCases({}, baseResult));
+          latestResult = null;
+          latestTaxScenario = taxScenario;
+          latestScenarioResults = {};
+          renderTaxResults(taxScenario, {});
+          el("ret-plan-summary").textContent = "A tax-adjusted estimate is unavailable for this destination. Choose another destination or use after-tax figures you already know.";
+          el("ret-result-status").textContent = selectedRecord().name + " · Conditional tax evidence";
+          el("ret-today-section").hidden = true;
+          el("ret-detailed-projection").hidden = true;
+          el("ret-current-cost-comparison").hidden = true;
+          el("ret-save-action").hidden = true;
+          el("ret-calculate").textContent = "Update estimate";
+          return;
         }
-        return true;
+        const scenarioResults = calculateTaxAdjustedScenarios(calculatorInput(), taxScenario);
+        const result = taxScenario.status === "user_after_tax"
+          ? scenarioResults.user_after_tax.result
+          : scenarioResults.central.result;
+        el("ret-today-section").hidden = false;
+        el("ret-tax-refine").dataset.planningCases = JSON.stringify(detailedPlanningCases(scenarioResults, result));
+        render(result, taxScenario, scenarioResults);
+        el("ret-calculate").textContent = "Update estimate";
+        if (event) track("retirement_calculator_calculate");
       } catch (error) {
         errors.textContent = error instanceof Error ? error.message : "Unable to calculate this scenario.";
         errors.focus();
-        return false;
       }
     }
 
@@ -1227,26 +1587,13 @@
       });
       selectedCurrency = nextCurrency;
       updateMonthlyInvestmentPreview();
-      if (latestResult) {
-        render(latestResult);
-        renderPlanChangeComparison(lastPlanComparison);
-      }
+      if (latestResult) render(latestResult, latestTaxScenario, latestScenarioResults);
       if (shouldTrack !== false) track("retirement_calculator_currency_change");
     }
 
-    function scheduleCalculation(event) {
+    function scheduleCalculation() {
       updateMonthlyInvestmentPreview();
       root.clearTimeout(autoCalculationTimer);
-      const action = retirementAutoCalculationAction({
-        controlId: event && event.target ? event.target.id : "",
-        mobile: mobileQuery.matches,
-        requestedMode: requestedViewMode,
-        hasEditSnapshot: Boolean(editSnapshot),
-      });
-      if (action.clearComparison) {
-        renderPlanChangeComparison(null);
-      }
-      if (!action.schedule) return;
       if (el("ret-expected-return").value === "" || firstInvalidField()) return;
       autoCalculationTimer = root.setTimeout(function () { calculate(null); }, 250);
     }
@@ -1263,6 +1610,9 @@
     form.addEventListener("submit", calculate);
     form.addEventListener("input", scheduleCalculation);
     form.addEventListener("change", scheduleCalculation);
+    form.querySelectorAll('input[name="ret-tax-mode"]').forEach(function (control) {
+      control.addEventListener("change", syncTaxControls);
+    });
     moneyControlIds.forEach(function (id) {
       const control = el(id);
       if (!control) return;
@@ -1276,19 +1626,13 @@
       });
     });
     el("ret-example-return").addEventListener("click", function () {
-      el("ret-expected-return").value = String(illustrativeReturnExample());
-      scheduleCalculation();
+      applyIllustrativeReturn(el("ret-expected-return"));
       track("retirement_calculator_example_return");
     });
     el("ret-save-intent-button").addEventListener("click", function () {
       el("ret-save-intent-button").hidden = true;
       el("ret-save-intent-status").hidden = false;
     });
-    el("ret-adjust-plan").addEventListener("click", editPlan);
-    el("ret-back-results").addEventListener("click", returnToResults);
-    if (typeof mobileQuery.addEventListener === "function") {
-      mobileQuery.addEventListener("change", handleViewportChange);
-    }
     ["ret-current-location", "ret-current-monthly-spending"].forEach(function (id) {
       el(id).addEventListener("input", function () { renderCurrentCostComparison(); });
     });
@@ -1299,7 +1643,6 @@
     }
     updateMonthlyInvestmentPreview();
     initDestinationCostSidecar();
-    applyCalculatorView();
     track("retirement_calculator_open");
   }
 
@@ -1330,6 +1673,7 @@
     annualSpendingFromMonthly: annualSpendingFromMonthly,
     roundToNearestHundred: roundToNearestHundred,
     illustrativeReturnExample: illustrativeReturnExample,
+    applyIllustrativeReturn: applyIllustrativeReturn,
     currentCostComparison: currentCostComparison,
     retirementTargetComparison: retirementTargetComparison,
     annualBenchmark: annualBenchmark,
@@ -1339,6 +1683,16 @@
     housingExpenseLabels: housingExpenseLabels,
     accumulationChartModel: accumulationChartModel,
     sensitivityRates: sensitivityRates,
+    taxControlVisibility: taxControlVisibility,
+    taxEvidenceContext: taxEvidenceContext,
+    wealthTaxRelevant: wealthTaxRelevant,
+    taxResultPresentation: taxResultPresentation,
+    detailedRefineAvailable: detailedRefineAvailable,
+    detailedPlanningCases: detailedPlanningCases,
+    taxAuditEntries: taxAuditEntries,
+    auditEvidencePresentation: auditEvidencePresentation,
+    calculateTaxAdjustedScenarios: calculateTaxAdjustedScenarios,
+    calculateDetailedRetirement: calculateDetailedRetirement,
     planningSummary: planningSummary,
     retirementPlanChanges: retirementPlanChanges,
     retirementPlanSubmissionState: retirementPlanSubmissionState,

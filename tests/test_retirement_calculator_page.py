@@ -13,6 +13,23 @@ PAGE = ROOT / "artifacts" / "retirement-abroad-calculator" / "index.html"
 UI_MODULE = ROOT / "src" / "retirement_calculator_ui.js"
 
 
+def run_ui(function_name: str, payload: object) -> object:
+    script = (
+        "const ui = require(process.argv[1]);"
+        "const input = JSON.parse(process.argv[2]);"
+        "process.stdout.write(JSON.stringify(ui[process.argv[3]](input)));"
+    )
+    result = subprocess.run(
+        ["node", "-e", script, str(UI_MODULE), json.dumps(payload), function_name],
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        raise AssertionError(result.stderr)
+    return json.loads(result.stdout)
+
+
 class CalculatorMarkupParser(HTMLParser):
     def __init__(self) -> None:
         super().__init__()
@@ -108,12 +125,28 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("3.5% withdrawal rate", quick_answer)
         self.assertIn('/retirement-destinations-ranked-by-cost/', quick_answer)
 
+    def test_calculator_precedes_supporting_benchmarks_in_the_reading_order(self) -> None:
+        calculator = self.html.index('<section class="calculator-layout"')
+        benchmark = self.html.index('id="ret-quick-answer"')
+
+        self.assertLess(calculator, benchmark)
+
+    def test_mobile_benchmarks_reflow_into_labeled_rows_instead_of_clipping(self) -> None:
+        quick_answer = self.html.split('id="ret-quick-answer"', 1)[1].split("</section>", 1)[0]
+        head = self.html.split("</head>", 1)[0]
+
+        self.assertEqual(8, quick_answer.count('class="mobile-benchmark-label"'))
+        self.assertIn("Annual spending", quick_answer)
+        self.assertIn("Capital needed", quick_answer)
+        self.assertIn(".quick-benchmark tr { display:grid;", head)
+        self.assertIn(".quick-benchmark { min-width:0; }", head)
+
     def test_page_exposes_authorship_review_methodology_sources_and_exclusions(self) -> None:
         self.assertIn('id="ret-trust"', self.html)
         trust = self.html.split('id="ret-trust"', 1)[1].split("</section>", 1)[0]
         self.assertIn("Global Home Atlas Research Team", trust)
         self.assertIn("Data reviewed", trust)
-        self.assertIn("Tax, visa eligibility, currency shocks", trust)
+        self.assertIn("Individual tax or treaty advice, visa eligibility, currency shocks", trust)
         self.assertIn('href="/methodology/"', trust)
         self.assertIn("Destination cost sources", trust)
         self.assertIn('rel="nofollow noopener"', trust)
@@ -129,6 +162,140 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-example-return" type="button"', form)
         self.assertIn("Use an illustrative 4% example", form)
         self.assertIn("not a forecast or recommendation", form)
+
+    def test_primary_form_has_progress_cues_and_initial_action_language(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+
+        self.assertIn("counter-reset:calculator-step", self.html)
+        self.assertIn('class="primary" id="ret-calculate" type="submit">Calculate estimate</button>', form)
+        self.assertIn("Your estimate will appear here after you add a return assumption.", self.html)
+
+    def test_tax_controls_use_two_plain_language_progressive_modes(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+        self.assertIn('<fieldset id="ret-tax-planning">', form)
+        self.assertIn('value="destination_estimate" checked', form)
+        self.assertIn('value="user_after_tax"', form)
+        self.assertIn("Use destination planning estimate", form)
+        self.assertIn("I know my after-tax figures", form)
+        self.assertIn("Dependable annual income", form)
+        self.assertIn('id="ret-retirement-income-note"', form)
+        self.assertIn("Expected annual portfolio withdrawals", form)
+        self.assertIn("How much of those withdrawals may be realized gains?", form)
+        self.assertIn('id="ret-tax-property-use-field" hidden', form)
+        self.assertIn('id="ret-tax-wealth-band-field" hidden', form)
+        self.assertIn("Expected annual portfolio return after fees and tax (%)", form)
+
+    def test_tax_control_visibility_is_mode_housing_and_jurisdiction_dependent(self) -> None:
+        renting = run_ui(
+            "taxControlVisibility",
+            {"taxMode": "destination_estimate", "housingPlan": "rent", "wealthTaxRelevant": False},
+        )
+        self.assertEqual(
+            {"estimate": True, "propertyUse": False, "wealthBand": False, "afterTax": False},
+            renting,
+        )
+        buying_in_wealth_tax_jurisdiction = run_ui(
+            "taxControlVisibility",
+            {"taxMode": "destination_estimate", "housingPlan": "buy_now", "wealthTaxRelevant": True},
+        )
+        self.assertEqual(
+            {"estimate": True, "propertyUse": True, "wealthBand": True, "afterTax": False},
+            buying_in_wealth_tax_jurisdiction,
+        )
+        bypass = run_ui(
+            "taxControlVisibility",
+            {"taxMode": "user_after_tax", "housingPlan": "buy_now", "wealthTaxRelevant": True},
+        )
+        self.assertEqual(
+            {"estimate": False, "propertyUse": False, "wealthBand": False, "afterTax": True},
+            bypass,
+        )
+
+    def test_tax_result_targets_put_central_first_and_details_in_one_disclosure(self) -> None:
+        results = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
+        self.assertIn('id="ret-plan-summary"', results)
+        self.assertNotIn('id="ret-tax-central"', results)
+        self.assertNotIn('id="ret-tax-central-capital"', results)
+        self.assertIn('id="ret-tax-range"', results)
+        self.assertLess(results.index('id="ret-plan-summary"'), results.index('id="ret-tax-range"'))
+        self.assertIn('id="ret-tax-no-tax-comparison"', results)
+        self.assertIn("No added destination tax comparison", results)
+        self.assertIn('id="ret-tax-details"', results)
+        self.assertIn("Assumptions and sources", results)
+        disclosure = results.split('id="ret-tax-details"', 1)[1].split("</details>", 1)[0]
+        for label in ("Tax reserve", "Total annual requirement", "Capital requirement"):
+            self.assertIn(label, disclosure)
+        for scenario in ("favorable", "central", "adverse"):
+            self.assertIn(f'id="ret-tax-{scenario}-row"', disclosure)
+        self.assertIn('id="ret-tax-explanations"', disclosure)
+        self.assertIn('id="ret-tax-refine" type="button" hidden disabled', results)
+
+    def test_initial_tax_screen_states_the_shared_full_relocation_assumption(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+
+        self.assertIn("Initial screen assumes a full-year relocation", form)
+        self.assertIn("refine this later", form)
+
+    def test_result_panel_has_one_needed_today_headline_and_distinct_key_figures(self) -> None:
+        panel = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
+
+        self.assertEqual(1, panel.count('id="ret-plan-summary"'))
+        self.assertNotIn('id="ret-total-today"', panel)
+        self.assertNotIn('id="ret-tax-central-capital"', panel)
+        self.assertIn('<span>Monthly contribution</span><strong id="ret-monthly-contribution">', panel)
+        self.assertIn('<span>Retirement capital</span><strong id="ret-total-retirement-summary">', panel)
+        self.assertIn('<span>Property capital</span><strong id="ret-property-summary">', panel)
+
+    def test_tax_result_presentation_preserves_order_and_unavailable_state(self) -> None:
+        available = run_ui(
+            "taxResultPresentation",
+            {
+                "taxScenario": {"status": "available"},
+                "scenarioResults": {
+                    "favorable": {"requiredCapital": 700000, "firstYearExpenses": 50000, "annualTaxReserve": 5000},
+                    "central": {
+                        "requiredCapital": 800000,
+                        "firstYearExpenses": 60000,
+                        "annualTaxReserve": 10000,
+                        "noTaxComparison": {"label": "No added destination tax", "requiredCapital": 650000},
+                    },
+                    "adverse": {"requiredCapital": 900000, "firstYearExpenses": 70000, "annualTaxReserve": 15000},
+                },
+            },
+        )
+        self.assertEqual("central", available["headlineKey"])
+        self.assertEqual(["favorable", "central", "adverse"], [row["key"] for row in available["rows"]])
+        self.assertEqual([700000, 900000], available["capitalRange"])
+        self.assertEqual("No added destination tax", available["noTaxComparison"]["label"])
+        self.assertTrue(available.get("refineAvailable", False))
+        unavailable = run_ui(
+            "taxResultPresentation",
+            {"taxScenario": {"status": "unavailable", "conditional": True}, "scenarioResults": {}},
+        )
+        self.assertEqual("unavailable", unavailable["status"])
+        self.assertTrue(unavailable["conditional"])
+        self.assertEqual([], unavailable["rows"])
+        self.assertFalse(unavailable.get("refineAvailable", False))
+        bypass = run_ui(
+            "taxResultPresentation",
+            {"taxScenario": {"status": "user_after_tax"}, "scenarioResults": {}},
+        )
+        self.assertFalse(bypass.get("refineAvailable", False))
+
+    def test_tax_values_are_not_added_to_calculator_handoff_query(self) -> None:
+        prefill = run_ui(
+            "retirementPrefill",
+            "?destination=valencia&household=couple&housing=rent&taxMode=user_after_tax&dependableIncome=90000&wealthBand=above_threshold",
+        )
+        self.assertEqual(
+            {"destination": "valencia", "household": "couple", "housing": "rent"},
+            prefill,
+        )
+
+    def test_calculator_panels_allow_320_px_intrinsic_shrink(self) -> None:
+        head = self.html.split("</head>", 1)[0]
+        self.assertIn(".calc-panel { min-width:0;", head)
+        self.assertIn("fieldset { min-width:0;", head)
 
     def test_form_controls_are_labeled_and_results_are_accessible(self) -> None:
         parser = CalculatorMarkupParser()
@@ -155,7 +322,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         }
         self.assertTrue(expected_controls.issubset(parser.control_ids))
         self.assertTrue(expected_controls - {"ret-calculate"} <= parser.label_targets)
-        self.assertEqual(2, parser.live_regions)
+        self.assertEqual(3, parser.live_regions)
         self.assertGreaterEqual(parser.noscript_sections, 1)
 
     def test_form_defaults_to_age_45_and_retirement_at_60(self) -> None:
@@ -273,13 +440,42 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("summary { cursor:pointer; font-weight:400; }", self.html)
         self.assertNotIn("details.assumptions summary { font-weight:400; }", self.html)
 
+    def test_detailed_tax_refinement_is_embedded_but_unavailable_jurisdictions_have_no_entry_point(self) -> None:
+        self.assertIn("GHAFireTaxDetailedUI", self.html)
+        self.assertIn('id="ret-tax-detailed" hidden', self.html)
+        self.assertIn('id="ret-tax-refine" type="button" hidden disabled', self.html)
+        self.assertIn('id="ret-tax-detailed-availability" role="status"', self.html)
+        self.assertIn("Detailed tax refinement appears only for supported destination and home-country combinations.", self.html)
+        payload_text = self.html.split(
+            '<script id="fire-tax-detailed-data" type="application/json">', 1
+        )[1].split("</script>", 1)[0]
+        payload = json.loads(payload_text)
+        self.assertEqual({}, payload["jurisdictions"])
+        self.assertNotIn("synthetic-example", payload_text)
+
+    def test_detailed_tax_section_has_one_question_region_one_table_and_live_updates(self) -> None:
+        section = self.html.split('id="ret-tax-detailed"', 1)[1].split("</section>", 1)[0]
+        self.assertEqual(1, section.count('id="ret-tax-detailed-questions"'))
+        self.assertEqual(0, section.count("<table"))
+        self.assertIn('id="ret-tax-detailed-status" role="status" aria-live="polite"', section)
+        self.assertIn('id="ret-tax-detailed-form"', section)
+        self.assertIn('type="submit"', section)
+        self.assertIn("Calculate refined estimate", section)
+        self.assertIn('id="ret-tax-detailed-result" hidden', section)
+
+    def test_home_jurisdiction_control_contains_only_supported_real_pairs(self) -> None:
+        self.assertIn('<option value="dubai">Dubai</option>', self.html)
+        self.assertIn('<label for="ret-home-tax-jurisdiction">Home tax jurisdiction</label>', self.html)
+        self.assertIn('<option value="hong-kong">Hong Kong</option>', self.html)
+        self.assertNotIn('value="synthetic-example"', self.html)
+
     def test_personalized_form_uses_cash_flow_inputs(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
         self.assertIn("Monthly retirement living expenses including rent", form)
         self.assertIn('<option value="buy_now">Buy now</option>', form)
         self.assertIn('<option value="buy_retirement">Buy at retirement</option>', form)
         self.assertNotIn('<option value="buy_retirement" selected>', form)
-        self.assertIn("Expected annual portfolio return after fees (%)", form)
+        self.assertIn("Expected annual portfolio return after fees and tax (%)", form)
         self.assertIn('id="ret-expected-return" type="number" min="-5" max="15" step="0.1" required', form)
         for removed in ("ret-withdrawal-rate", "ret-income-preset", "ret-cash-yield"):
             self.assertNotIn(f'id="{removed}"', form)
@@ -322,10 +518,9 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         result_panel = top_layout.split('id="ret-results"', 1)[1]
         self.assertIn('id="ret-plan-summary"', result_panel)
         self.assertIn('id="ret-today-section"', result_panel)
-        self.assertIn('id="ret-total-today"', result_panel)
         self.assertIn('id="ret-total-retirement-summary"', result_panel)
         self.assertIn('id="ret-monthly-contribution"', result_panel)
-        self.assertIn('id="ret-home-summary" hidden', result_panel)
+        self.assertIn('id="ret-property-summary"', result_panel)
         for detail_id in (
             "ret-accumulation-figure",
             "ret-sensitivity",
@@ -456,9 +651,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         results = self.html.split('id="ret-results"', 1)[1].split("<noscript>", 1)[0]
         for element_id in (
             "ret-today-section",
-            "ret-total-today",
+            "ret-property-summary",
             "ret-invest-today",
-            "ret-home-today",
             "ret-retirement-section",
             "ret-total-retirement",
             "ret-property-retirement",
@@ -472,7 +666,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-contribution-retirement",
         ):
             self.assertIn(f'id="{element_id}"', results)
-        self.assertIn("Needed today", results)
+        self.assertIn("Your estimate will appear here after you add a return assumption.", results)
         self.assertIn("What you need at retirement", results)
         self.assertIn("First retirement year", results)
         self.assertIn('id="ret-first-expenses-label">Annual spending incl. rent</span>', results)
@@ -518,9 +712,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-expected-return",
             "ret-reserve-months",
             "ret-errors",
-            "ret-total-today",
+            "ret-property-summary",
             "ret-invest-today",
-            "ret-home-today",
             "ret-total-retirement",
             "ret-liquid-portfolio",
             "ret-property-retirement",
