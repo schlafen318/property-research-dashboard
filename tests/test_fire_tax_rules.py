@@ -79,6 +79,24 @@ class FireTaxRuleContractTests(unittest.TestCase):
         self.assert_path_error(errors, "statutory_screening.jurisdictions.example.source_ids")
         self.assert_path_error(errors, "statutory_screening.jurisdictions.example.capital_gains.rate")
 
+    def test_packaged_statutory_screening_rules_cover_all_completed_fire_countries(self):
+        screening = self.payload["statutory_screening"]
+        self.assertEqual([0, 0.5, 1], screening["gain_shares"])
+        self.assertEqual(
+            {
+                "Croatia",
+                "Greece",
+                "Indonesia",
+                "Japan",
+                "Portugal",
+                "Spain",
+                "Thailand",
+                "Vietnam",
+            },
+            {record["country"] for record in screening["jurisdictions"].values()},
+        )
+        self.assertEqual([], self.validate(self.payload))
+
     def test_packaged_synthetic_rules_are_complete_but_not_site_enabled(self):
         self.assertEqual([], self.validate(self.payload))
         jurisdiction = self.payload["jurisdictions"]["synthetic-example"]

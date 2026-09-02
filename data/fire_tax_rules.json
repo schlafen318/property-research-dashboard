@@ -264,8 +264,237 @@
       "review_interval_days": 365,
       "scope": "Exercises the detailed-rule contract only; it describes no real jurisdiction.",
       "recheck_trigger": "Replace with current official primary sources before enabling any jurisdiction."
+    },
+    {
+      "id": "portugal-securities-gains-2026",
+      "publisher": "Portuguese Tax and Customs Authority",
+      "url": "https://info.portaldasfinancas.gov.pt/pt/apoio_contribuinte/Folhetos_informativos/Documents/SFP-Taxas-2025.pdf",
+      "source_kind": "official",
+      "effective_from": "2025-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "The published special-rate table applies 28% to the positive balance of securities gains and losses, subject to statutory aggregation conditions.",
+      "recheck_trigger": "Recheck the current CIRS article 72 rate and mandatory aggregation conditions before each tax-year release."
+    },
+    {
+      "id": "spain-savings-gains-2026",
+      "publisher": "Spanish Tax Agency",
+      "url": "https://sede.agenciatributaria.gob.es/Sede/ayuda/manuales-videos-folletos/manuales-practicos/irpf-2025/c15-calculo-impuesto-determinacion-cuotas-integras/gravamen-aplicable-contribuyentes-irpf-residentes-extranjero/gravamen-base-liquidable-ahorro.html",
+      "source_kind": "official",
+      "effective_from": "2025-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Resident savings-base rates are 19%, 21%, 23%, 27%, and 30% at the published EUR thresholds for 2025 and following years.",
+      "recheck_trigger": "Recheck the resident savings-base schedule before each tax-year release."
+    },
+    {
+      "id": "greece-capital-gains-2026",
+      "publisher": "Independent Authority for Public Revenue (AADE)",
+      "url": "https://www.aade.gr/en/greeks-abroad-non-residents/income-taxation/income-categories-and-income-taxation-greece",
+      "source_kind": "official",
+      "effective_from": "2025-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "AADE's income-category table states a 15% rate for income from capital gains including stocks, bonds, and derivatives.",
+      "recheck_trigger": "Recheck article 42 participation and listing conditions before each release."
+    },
+    {
+      "id": "croatia-capital-gains-2026",
+      "publisher": "Republic of Croatia official gazette and investment portal",
+      "url": "https://investcroatia.gov.hr/en/tax-system/",
+      "source_kind": "official",
+      "effective_from": "2025-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Capital gains are taxed at 12%; the Income Tax Act exempts financial assets disposed of after two years.",
+      "recheck_trigger": "Recheck the current Income Tax Act rate and holding-period exemption before each release."
+    },
+    {
+      "id": "japan-listed-share-gains-2026",
+      "publisher": "Japan National Tax Agency",
+      "url": "https://www.nta.go.jp/publication/pamph/gensen/shikata_r08/pdf/15.pdf",
+      "source_kind": "official",
+      "effective_from": "2026-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "The 2026 withholding guide gives the 15.315% national component for listed-share gains; the supported resident calculation includes the 5% inhabitant-tax component, totaling 20.315%.",
+      "recheck_trigger": "Recheck NTA listed-securities taxation and reconstruction surtax before each release."
+    },
+    {
+      "id": "indonesia-resident-worldwide-income-2026",
+      "publisher": "Indonesia Directorate General of Taxes",
+      "url": "https://pajak.go.id/en/income-tax-calculation-mechanism-individual",
+      "source_kind": "official",
+      "effective_from": "2022-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "Resident individual income includes economic gains from Indonesia or abroad and is subject to the current article 17 progressive rates.",
+      "recheck_trigger": "Recheck article 17 thresholds, foreign-expert scope restrictions, and foreign securities treatment before each release."
+    },
+    {
+      "id": "thailand-remitted-foreign-income-2026",
+      "publisher": "Thailand Revenue Department",
+      "url": "https://www.rd.go.th/fileadmin/user_upload/porphor/GuideTaxFromAbroad_EN.pdf",
+      "source_kind": "official",
+      "effective_from": "2024-01-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "A Thai resident includes foreign-source income earned from 2024 onward when it is remitted to Thailand, subject to the applicable PIT computation and foreign-tax-credit rules.",
+      "recheck_trigger": "Recheck foreign-source remittance guidance and PIT bands before each release."
+    },
+    {
+      "id": "vietnam-securities-transfer-2026",
+      "publisher": "Vietnam Ministry of Finance",
+      "url": "https://mof.gov.vn/bo-tai-chinh/dong-gop-y-kien-du-thao-van-ban/du-thao-thong-tu-quy-dinh-chi-tiet-mot-so-dieu-cua-luat-thue-thu-nhap-ca-nhan-va-nghi-dinh-so-2026nd-cp-ngay-thang-nam-2026-cua-chinh-phu-quy-dinh-chi-tiet-mot-so-dieu-cua-luat-thue-thu-nhap-ca-nhan",
+      "source_kind": "official",
+      "effective_from": "2026-07-01",
+      "checked_on": "2026-09-01",
+      "review_interval_days": 90,
+      "scope": "The 2026 implementation material calculates individual tax on securities transfers as transfer price multiplied by 0.1% for each transfer.",
+      "recheck_trigger": "Recheck the enacted 2026 PIT law and implementing decree before each release."
     }
   ],
+  "statutory_screening": {
+    "gain_shares": [0, 0.5, 1],
+    "jurisdictions": {
+      "croatia": {
+        "country": "Croatia",
+        "tax_year": 2026,
+        "effective_from": "2025-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "currency": "EUR",
+        "residence_assumption": "full_year_resident",
+        "portfolio_scope": "personal_taxable_listed_securities",
+        "capital_gains": {
+          "base": "gain",
+          "calculation": "holding_period_exemption",
+          "rate": 0.12,
+          "exemption_after_years": 2,
+          "holding_period_assumption_years": 0
+        },
+        "source_ids": ["croatia-capital-gains-2026"]
+      },
+      "greece": {
+        "country": "Greece",
+        "tax_year": 2026,
+        "effective_from": "2025-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "currency": "EUR",
+        "residence_assumption": "full_year_resident",
+        "portfolio_scope": "personal_taxable_listed_securities",
+        "capital_gains": {"base": "gain", "calculation": "flat_rate", "rate": 0.15},
+        "source_ids": ["greece-capital-gains-2026"]
+      },
+      "indonesia": {
+        "country": "Indonesia",
+        "tax_year": 2026,
+        "effective_from": "2022-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "currency": "IDR",
+        "residence_assumption": "full_year_resident",
+        "portfolio_scope": "personal_taxable_listed_securities",
+        "capital_gains": {
+          "base": "combined_assessable_income",
+          "calculation": "progressive_rate",
+          "bands": [
+            {"up_to": 60000000, "rate": 0.05},
+            {"up_to": 250000000, "rate": 0.15},
+            {"up_to": 500000000, "rate": 0.25},
+            {"up_to": 5000000000, "rate": 0.3},
+            {"up_to": null, "rate": 0.35}
+          ]
+        },
+        "source_ids": ["indonesia-resident-worldwide-income-2026"]
+      },
+      "japan": {
+        "country": "Japan",
+        "tax_year": 2026,
+        "effective_from": "2026-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "currency": "JPY",
+        "residence_assumption": "full_year_resident",
+        "portfolio_scope": "personal_taxable_listed_securities",
+        "capital_gains": {"base": "gain", "calculation": "flat_rate", "rate": 0.20315},
+        "source_ids": ["japan-listed-share-gains-2026"]
+      },
+      "portugal": {
+        "country": "Portugal",
+        "tax_year": 2026,
+        "effective_from": "2025-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "currency": "EUR",
+        "residence_assumption": "full_year_resident",
+        "portfolio_scope": "personal_taxable_listed_securities",
+        "capital_gains": {"base": "gain", "calculation": "flat_rate", "rate": 0.28},
+        "source_ids": ["portugal-securities-gains-2026"]
+      },
+      "spain": {
+        "country": "Spain",
+        "tax_year": 2026,
+        "effective_from": "2025-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "currency": "EUR",
+        "residence_assumption": "full_year_resident",
+        "portfolio_scope": "personal_taxable_listed_securities",
+        "capital_gains": {
+          "base": "gain",
+          "calculation": "progressive_rate",
+          "bands": [
+            {"up_to": 6000, "rate": 0.19},
+            {"up_to": 50000, "rate": 0.21},
+            {"up_to": 200000, "rate": 0.23},
+            {"up_to": 300000, "rate": 0.27},
+            {"up_to": null, "rate": 0.3}
+          ]
+        },
+        "source_ids": ["spain-savings-gains-2026"]
+      },
+      "thailand": {
+        "country": "Thailand",
+        "tax_year": 2026,
+        "effective_from": "2024-01-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "currency": "THB",
+        "residence_assumption": "full_year_resident",
+        "portfolio_scope": "personal_taxable_listed_securities",
+        "capital_gains": {
+          "base": "remitted_gain",
+          "calculation": "remittance_progressive_rate",
+          "remittance_assumption": "fully_remitted",
+          "bands": [
+            {"up_to": 150000, "rate": 0},
+            {"up_to": 300000, "rate": 0.05},
+            {"up_to": 500000, "rate": 0.1},
+            {"up_to": 750000, "rate": 0.15},
+            {"up_to": 1000000, "rate": 0.2},
+            {"up_to": 2000000, "rate": 0.25},
+            {"up_to": 4000000, "rate": 0.3},
+            {"up_to": null, "rate": 0.35}
+          ]
+        },
+        "source_ids": ["thailand-remitted-foreign-income-2026"]
+      },
+      "vietnam": {
+        "country": "Vietnam",
+        "tax_year": 2026,
+        "effective_from": "2026-07-01",
+        "checked_on": "2026-09-01",
+        "review_interval_days": 90,
+        "currency": "VND",
+        "residence_assumption": "full_year_resident",
+        "portfolio_scope": "personal_taxable_listed_securities",
+        "capital_gains": {"base": "proceeds", "calculation": "proceeds_rate", "rate": 0.001},
+        "source_ids": ["vietnam-securities-transfer-2026"]
+      }
+    }
+  },
   "supported_profiles": {
     "hong-kong-to-dubai": {
       "id": "hong-kong-to-dubai",
