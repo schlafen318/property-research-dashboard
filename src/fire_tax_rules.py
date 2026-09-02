@@ -2131,6 +2131,138 @@ def _validate_residence_jurisdiction(
     )
 
 
+STATUTORY_SCREENING_CALCULATIONS = frozenset(
+    {
+        "flat_rate",
+        "progressive_rate",
+        "proceeds_rate",
+        "holding_period_exemption",
+        "remittance_progressive_rate",
+        "conditional_exemption",
+    }
+)
+STATUTORY_SCREENING_BASES = frozenset(
+    {"gain", "proceeds", "combined_assessable_income", "remitted_gain"}
+)
+
+
+def _validate_screening_rate(value: Any, path: str, errors: list[str]) -> None:
+    if (
+        not isinstance(value, (int, float))
+        or isinstance(value, bool)
+        or not math.isfinite(value)
+        or not 0 <= value <= 1
+    ):
+        errors.append(f"{path} must be a finite rate from 0 to 1")
+
+
+def _validate_screening_bands(value: Any, path: str, errors: list[str]) -> None:
+    if not isinstance(value, list) or not value:
+        errors.append(f"{path} must contain at least one rate band")
+        return
+    previous = 0.0
+    saw_open_end = False
+    for index, band in enumerate(value):
+        band_path = f"{path}[{index}]"
+        if not isinstance(band, dict):
+            errors.append(f"{band_path} must be an object")
+            continue
+        up_to = band.get("up_to")
+        if up_to is None:
+            if index != len(value) - 1:
+                errors.append(f"{band_path}.up_to may be null only for the final band")
+            saw_open_end = True
+        elif (
+            not isinstance(up_to, (int, float))
+            or isinstance(up_to, bool)
+            or not math.isfinite(up_to)
+            or up_to <= previous
+        ):
+            errors.append(f"{band_path}.up_to must increase across bands")
+        else:
+            previous = float(up_to)
+        _validate_screening_rate(band.get("rate"), f"{band_path}.rate", errors)
+    if not saw_open_end:
+        errors.append(f"{path} must end with an open-ended band")
+
+
+def validate_statutory_screening_rules(
+    payload: Any,
+    *,
+    source_ids: set[str],
+    as_of: date,
+) -> list[str]:
+    """Validate the compact statutory rules used by initial screening."""
+
+    root_path = "statutory_screening"
+    errors: list[str] = []
+    if not isinstance(payload, dict):
+        return [f"{root_path} must be an object"]
+    if payload.get("gain_shares") != [0, 0.5, 1]:
+        errors.append(f"{root_path}.gain_shares must equal [0, 0.5, 1]")
+    jurisdictions = payload.get("jurisdictions")
+    if not isinstance(jurisdictions, dict) or not jurisdictions:
+        errors.append(f"{root_path}.jurisdictions must be a non-empty object")
+        return errors
+    for key, record in jurisdictions.items():
+        path = f"{root_path}.jurisdictions.{key}"
+        if not isinstance(record, dict):
+            errors.append(f"{path} must be an object")
+            continue
+        for field in ("country", "residence_assumption", "portfolio_scope"):
+            if not isinstance(record.get(field), str) or not record[field].strip():
+                errors.append(f"{path}.{field} is required")
+        if record.get("residence_assumption") != "full_year_resident":
+            errors.append(f"{path}.residence_assumption must equal full_year_resident")
+        if record.get("portfolio_scope") != "personal_taxable_listed_securities":
+            errors.append(
+                f"{path}.portfolio_scope must equal personal_taxable_listed_securities"
+            )
+        tax_year = record.get("tax_year")
+        if not isinstance(tax_year, int) or isinstance(tax_year, bool) or not 2000 <= tax_year <= 9999:
+            errors.append(f"{path}.tax_year must be a four-digit year")
+        currency = record.get("currency")
+        if not isinstance(currency, str) or CURRENCY_PATTERN.fullmatch(currency) is None:
+            errors.append(f"{path}.currency must be a three-letter currency code")
+        _validate_effective_dates(record, path, as_of, errors)
+        linked_sources = record.get("source_ids")
+        if not isinstance(linked_sources, list) or not linked_sources:
+            errors.append(f"{path}.source_ids must contain at least one source")
+        else:
+            for source_id in linked_sources:
+                if source_id not in source_ids:
+                    errors.append(f"{path}.source_ids references unknown source {source_id}")
+        capital_gains = record.get("capital_gains")
+        gain_path = f"{path}.capital_gains"
+        if not isinstance(capital_gains, dict):
+            errors.append(f"{gain_path} must be an object")
+            continue
+        base = capital_gains.get("base")
+        calculation = capital_gains.get("calculation")
+        if base not in STATUTORY_SCREENING_BASES:
+            errors.append(f"{gain_path}.base is unsupported")
+        if calculation not in STATUTORY_SCREENING_CALCULATIONS:
+            errors.append(f"{gain_path}.calculation is unsupported")
+            continue
+        if calculation in {"flat_rate", "proceeds_rate", "holding_period_exemption", "conditional_exemption"}:
+            _validate_screening_rate(capital_gains.get("rate"), f"{gain_path}.rate", errors)
+        if calculation in {"progressive_rate", "remittance_progressive_rate"}:
+            _validate_screening_bands(capital_gains.get("bands"), f"{gain_path}.bands", errors)
+        if calculation == "holding_period_exemption":
+            years = capital_gains.get("exemption_after_years")
+            if not isinstance(years, (int, float)) or isinstance(years, bool) or years <= 0:
+                errors.append(f"{gain_path}.exemption_after_years must be positive")
+        if calculation == "remittance_progressive_rate" and capital_gains.get("remittance_assumption") not in {"fully_remitted", "not_remitted"}:
+            errors.append(
+                f"{gain_path}.remittance_assumption must be fully_remitted or not_remitted"
+            )
+        if calculation == "conditional_exemption":
+            condition = capital_gains.get("condition")
+            if not isinstance(condition, dict) or not isinstance(condition.get("field"), str):
+                errors.append(f"{gain_path}.condition must identify a screening field")
+    return errors
+
+
 def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
     """Return path-addressed validation errors for detailed FIRE tax rules."""
 
@@ -2174,6 +2306,15 @@ def validate_fire_tax_rules(payload: dict[str, Any], as_of: date) -> list[str]:
                     source_kinds[source_id] = source.get("source_kind")
 
     _validate_supported_profiles(payload, known_source_ids, source_kinds, as_of, errors)
+
+    if "statutory_screening" in payload:
+        errors.extend(
+            validate_statutory_screening_rules(
+                payload["statutory_screening"],
+                source_ids=known_source_ids,
+                as_of=as_of,
+            )
+        )
 
     jurisdictions = payload.get("jurisdictions")
     if not isinstance(jurisdictions, dict) or not jurisdictions:

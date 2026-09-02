@@ -8,7 +8,11 @@ import unittest
 from datetime import date
 from pathlib import Path
 
-from src.fire_tax_rules import load_fire_tax_rules, validate_fire_tax_rules
+from src.fire_tax_rules import (
+    load_fire_tax_rules,
+    validate_fire_tax_rules,
+    validate_statutory_screening_rules,
+)
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -26,6 +30,54 @@ class FireTaxRuleContractTests(unittest.TestCase):
             any(error.startswith(path) for error in errors),
             f"Expected an error at {path!r}; got {errors!r}",
         )
+
+    def statutory_payload(self):
+        return {
+            "gain_shares": [0, 0.5, 1],
+            "jurisdictions": {
+                "example": {
+                    "country": "Example",
+                    "tax_year": 2026,
+                    "effective_from": "2026-01-01",
+                    "checked_on": "2026-09-01",
+                    "review_interval_days": 90,
+                    "currency": "EUR",
+                    "residence_assumption": "full_year_resident",
+                    "portfolio_scope": "personal_taxable_listed_securities",
+                    "capital_gains": {
+                        "base": "gain",
+                        "calculation": "flat_rate",
+                        "rate": 0.12,
+                    },
+                    "source_ids": ["uae-individual-tax-2026"],
+                }
+            },
+        }
+
+    def test_statutory_screening_contract_accepts_complete_flat_gain_rule(self):
+        errors = validate_statutory_screening_rules(
+            self.statutory_payload(),
+            source_ids={source["id"] for source in self.payload["sources"]},
+            as_of=date(2026, 9, 1),
+        )
+        self.assertEqual([], errors)
+
+    def test_statutory_screening_contract_rejects_stale_missing_source_and_bad_rate(self):
+        payload = self.statutory_payload()
+        rule = payload["jurisdictions"]["example"]
+        rule["checked_on"] = "2025-01-01"
+        rule["source_ids"] = ["missing-official-source"]
+        rule["capital_gains"]["rate"] = -0.1
+
+        errors = validate_statutory_screening_rules(
+            payload,
+            source_ids={source["id"] for source in self.payload["sources"]},
+            as_of=date(2026, 9, 1),
+        )
+
+        self.assert_path_error(errors, "statutory_screening.jurisdictions.example.checked_on")
+        self.assert_path_error(errors, "statutory_screening.jurisdictions.example.source_ids")
+        self.assert_path_error(errors, "statutory_screening.jurisdictions.example.capital_gains.rate")
 
     def test_packaged_synthetic_rules_are_complete_but_not_site_enabled(self):
         self.assertEqual([], self.validate(self.payload))
