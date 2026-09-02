@@ -566,34 +566,10 @@
       });
       return control ? control.value : "destination_estimate";
     }
-    function finderHasWealthTaxEvidence() {
-      const countries = payload.taxPlanning && payload.taxPlanning.countries || {};
-      return Object.values(countries).some(function (country) {
-        const allowance = country && country.tax_screen && country.tax_screen.annual_allowances &&
-          country.tax_screen.annual_allowances.wealth_tax;
-        return allowance && ["favorable_usd", "central_usd", "adverse_usd"].some(function (key) {
-          return Number(allowance[key]) > 0;
-        });
-      });
-    }
     function syncTaxControls() {
-      const visibility = taxControlVisibility({
-        taxMode: selectedTaxMode(),
-        housingPlan: selected("finder-housing-plan"),
-        wealthTaxRelevant: finderHasWealthTaxEvidence(),
-      });
+      const visibility = taxControlVisibility({ taxMode: selectedTaxMode() });
       element("finder-tax-estimate-fields").hidden = !visibility.estimate;
       element("finder-tax-after-tax-note").hidden = !visibility.afterTax;
-      element("finder-tax-property-use-field").hidden = !visibility.propertyUse;
-      element("finder-tax-property-use").disabled = !visibility.propertyUse;
-      element("finder-tax-wealth-band-field").hidden = !visibility.wealthBand;
-      element("finder-tax-wealth-band").disabled = !visibility.wealthBand;
-      ["finder-tax-withdrawals", "finder-tax-gain-intensity"].forEach(function (id) {
-        element(id).disabled = !visibility.estimate;
-      });
-      if (element("finder-tax-withdrawals").value === "") {
-        element("finder-tax-withdrawals").value = "0";
-      }
     }
     function activeWizardSectionIds() {
       const sectionIds = ["finder-profile", "finder-current-resources", "finder-housing"];
@@ -700,9 +676,7 @@
         : stepId === "finder-housing" && selected("finder-housing-plan") === "buy_now"
           ? ["finder-property-allocation"]
           : stepId === "finder-retirement-income"
-            ? ["finder-pension", "finder-other-income"].concat(
-              selectedTaxMode() === "destination_estimate" ? ["finder-tax-withdrawals"] : []
-            )
+            ? ["finder-pension", "finder-other-income"]
             : [];
       if (invalidMoneyIds.some(function (id) { return validateMoneyControl(element(id)); })) {
         errors.push("Enter a valid amount in the highlighted field.");
@@ -1014,14 +988,6 @@
           dependableIncome: incomeStreams().reduce(function (total, stream) {
             return total + Number(stream.amount || 0);
           }, 0),
-          portfolioWithdrawals: moneyNumber("finder-tax-withdrawals"),
-          realizedGainIntensity: selected("finder-tax-gain-intensity"),
-          propertyUse: housingPlan === "rent" || element("finder-tax-property-use").disabled
-            ? "none"
-            : selected("finder-tax-property-use"),
-          wealthBand: element("finder-tax-wealth-band").disabled
-            ? "unknown"
-            : selected("finder-tax-wealth-band"),
         },
         generalInflation: 0.026,
         emergencyReserveMonths: 12,
@@ -1230,7 +1196,7 @@
         : displayResultMoney(item.retirementTarget);
       const gapMarkup = unavailableTax ? "Unavailable" : displayResultMoney(gapAmount);
       const rangeMarkup = !unavailableTax && Number.isFinite(Number(range[0])) && Number.isFinite(Number(range[1]))
-        ? '<div><dt>Favorable–adverse range</dt><dd>' + displayResultMoney(range[0]) + "–" +
+        ? '<div><dt>0%–100% realized-gain range</dt><dd>' + displayResultMoney(range[0]) + "–" +
           displayResultMoney(range[1]) + "</dd></div>"
         : "";
       const taxNote = unavailableTax
@@ -1244,7 +1210,7 @@
         '" data-finder-dossier' + trackingAttributes + ' data-action="dossier">' + escapeHtml(item.name) + "</a>" +
         '</h3><p class="finder-place">' + escapeHtml(item.country) +
         '</p></div></header><dl>' +
-        '<div><dt>' + escapeHtml(afterTax ? afterTax.targetLabel : "Central tax-adjusted target") +
+        '<div><dt>' + escapeHtml(afterTax ? afterTax.targetLabel : "Estimate (50% realized gains)") +
         '</dt><dd>' + targetMarkup + "</dd></div>" +
         '<div><dt>' + gapLabel + '</dt><dd>' + gapMarkup + "</dd></div>" + rangeMarkup +
         propertyBits + rental + "</dl>" + financing + taxNote +

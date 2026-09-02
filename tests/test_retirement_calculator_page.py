@@ -146,7 +146,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         trust = self.html.split('id="ret-trust"', 1)[1].split("</section>", 1)[0]
         self.assertIn("Global Home Atlas Research Team", trust)
         self.assertIn("Data reviewed", trust)
-        self.assertIn("Individual tax or treaty advice, visa eligibility, currency shocks", trust)
+        self.assertIn("Home-country tax, treaty interaction", trust)
+        self.assertIn("visa eligibility, currency shocks", trust)
         self.assertIn('href="/methodology/"', trust)
         self.assertIn("Destination cost sources", trust)
         self.assertIn('rel="nofollow noopener"', trust)
@@ -177,12 +178,13 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('value="user_after_tax"', form)
         self.assertIn("Use destination planning estimate", form)
         self.assertIn("I know my after-tax figures", form)
-        self.assertIn("Dependable annual income", form)
+        self.assertIn("calculated from annual retirement spending minus dependable income", form)
         self.assertIn('id="ret-retirement-income-note"', form)
-        self.assertIn("Expected annual portfolio withdrawals", form)
-        self.assertIn("How much of those withdrawals may be realized gains?", form)
-        self.assertIn('id="ret-tax-property-use-field" hidden', form)
-        self.assertIn('id="ret-tax-wealth-band-field" hidden', form)
+        self.assertNotIn('id="ret-tax-withdrawals"', form)
+        self.assertNotIn('id="ret-tax-gain-intensity"', form)
+        self.assertNotIn('id="ret-tax-property-use"', form)
+        self.assertNotIn('id="ret-tax-wealth-band"', form)
+        self.assertIn("0%, 50%, and 100%", form)
         self.assertIn("Expected annual portfolio return after fees and tax (%)", form)
 
     def test_portfolio_withdrawal_is_derived_from_expenses_less_dependable_income(self) -> None:
@@ -245,20 +247,25 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-tax-no-tax-comparison"', results)
         self.assertIn("No added destination tax comparison", results)
         self.assertIn('id="ret-tax-details"', results)
-        self.assertIn("Assumptions and sources", results)
+        self.assertIn("How the tax range is calculated", results)
         disclosure = results.split('id="ret-tax-details"', 1)[1].split("</details>", 1)[0]
-        for label in ("Tax reserve", "Total annual requirement", "Capital requirement"):
+        for label in ("Capital-gains tax", "Capital needed"):
             self.assertIn(label, disclosure)
         for scenario in ("favorable", "central", "adverse"):
             self.assertIn(f'id="ret-tax-{scenario}-row"', disclosure)
+        for label in ("0% gains", "50% gains (estimate)", "100% gains"):
+            self.assertIn(label, disclosure)
+        self.assertNotIn(">Favorable<", disclosure)
+        self.assertNotIn(">Central<", disclosure)
+        self.assertNotIn(">Adverse<", disclosure)
         self.assertIn('id="ret-tax-explanations"', disclosure)
         self.assertIn('id="ret-tax-refine" type="button" hidden disabled', results)
 
     def test_initial_tax_screen_states_the_shared_full_relocation_assumption(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
 
-        self.assertIn("Initial screen assumes a full-year relocation", form)
-        self.assertIn("refine this later", form)
+        self.assertIn("initial screen assumes a full-year relocation", form)
+        self.assertIn("current destination capital-gains rules", form)
 
     def test_result_panel_has_one_needed_today_headline_and_distinct_key_figures(self) -> None:
         panel = self.html.split('id="ret-results"', 1)[1].split('</section>\n    </section>', 1)[0]
@@ -378,6 +385,24 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         )
         self.assertEqual("2026-08-27", payload["planning_currencies"]["as_of"])
         self.assertAlmostEqual(0.7866117265603891, payload["planning_currencies"]["rates_to_usd"]["SGD"])
+
+    def test_page_embeds_statutory_tax_rules_and_loads_engine_before_adapter(self) -> None:
+        payload = json.loads(
+            self.html.split('<script id="retirement-destination-data" type="application/json">', 1)[1]
+            .split("</script>", 1)[0]
+        )
+        statutory = payload["tax_planning"]["statutory"]
+
+        self.assertEqual([0, 0.5, 1], statutory["gain_shares"])
+        self.assertIn("portugal", statutory["jurisdictions"])
+        self.assertEqual(0.28, statutory["jurisdictions"]["portugal"]["capital_gains"]["rate"])
+        self.assertIn("EUR", statutory["rates_to_usd"])
+        for currency in ("IDR", "THB", "VND"):
+            self.assertIn(currency, statutory["rates_to_usd"])
+        self.assertLess(
+            self.html.index("root.GHAFireTaxStatutory = factory"),
+            self.html.index("root.GHAFireTaxScenarios = api"),
+        )
 
     def test_housing_inputs_match_how_retirees_plan(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]

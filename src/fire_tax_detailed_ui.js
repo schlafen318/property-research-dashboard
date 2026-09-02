@@ -474,6 +474,8 @@
         { amount: number("ret-rental-income"), indexed: field("ret-rental-indexed") && field("ret-rental-indexed").checked },
       ].filter(function (item) { return item.amount > 0; });
       const indexChoices = Array.from(new Set(dependable.map(function (item) { return item.indexed === true; })));
+      const dependableTotal = dependable.reduce(function (total, item) { return total + item.amount; }, 0);
+      const annualSpending = number("ret-monthly-spending") * 12;
       let planningRange = null;
       let planningRangeCurrencyValid = true;
       try {
@@ -486,10 +488,10 @@
       return {
         currency: currency,
         currentAge: number("ret-current-age"), retirementAge: number("ret-retirement-age"), horizonYears: number("ret-horizon"),
-        annualSpending: number("ret-monthly-spending") * 12,
+        annualSpending: annualSpending,
         annualPension: number("ret-pension"), annualOtherIncome: number("ret-other-income"), annualRentalIncome: number("ret-rental-income"),
-        annualWithdrawals: number("ret-tax-withdrawals"), propertyPrice: propertyPrice, housingPlan: housingPlan,
-        propertyUse: field("ret-tax-property-use") ? field("ret-tax-property-use").value : "personal",
+        annualWithdrawals: Math.max(0, annualSpending - dependableTotal), propertyPrice: propertyPrice, housingPlan: housingPlan,
+        propertyUse: housingPlan === "rent" ? "none" : "personal",
         selectedAfterTaxReturn: number("ret-expected-return") / 100,
         explicitReturnProvided: !!(field("ret-expected-return") && String(field("ret-expected-return").value).trim()),
         monthlyIncomeBeforeRetirement: number("ret-monthly-income"), incomeInvestedRate: number("ret-income-invested-rate") / 100,

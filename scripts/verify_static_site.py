@@ -32,8 +32,8 @@ REQUIRED_MARKERS = {
         "Portfolio dividends and interest",
     ],
     ARTIFACTS / "retirement-destination-finder" / "index.html": [
-        "central tax-adjusted target",
-        "Favorable–adverse target range",
+        "Estimate (50% realized gains)",
+        "0%–100% realized-gain range",
         "Your financial details stay in this browser",
     ],
     ARTIFACTS / "guides" / "index.html": [

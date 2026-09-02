@@ -514,6 +514,34 @@ class RetirementDestinationFinderPageTests(unittest.TestCase):
             list(payload["planning_currencies"]["rates_to_usd"]),
         )
 
+    def test_finder_embeds_statutory_tax_rules_and_loads_engine_before_adapter(self) -> None:
+        payload = json.loads(
+            self.html.split('<script type="application/json" id="retirement-finder-data">', 1)[1]
+            .split("</script>", 1)[0]
+        )
+        statutory = payload["taxPlanning"]["statutory"]
+
+        self.assertEqual([0, 0.5, 1], statutory["gain_shares"])
+        self.assertIn("spain", statutory["jurisdictions"])
+        self.assertIn("EUR", statutory["rates_to_usd"])
+        for currency in ("IDR", "THB", "VND"):
+            self.assertIn(currency, statutory["rates_to_usd"])
+        self.assertLess(
+            self.html.index("root.GHAFireTaxStatutory = factory"),
+            self.html.index("root.GHAFireTaxScenarios = api"),
+        )
+
+    def test_finder_infers_withdrawals_and_realized_gain_range_without_extra_inputs(self) -> None:
+        form = self.html.split('id="retirement-destination-finder-form"', 1)[1].split("</form>", 1)[0]
+
+        self.assertNotIn('id="finder-tax-withdrawals"', form)
+        self.assertNotIn('id="finder-tax-gain-intensity"', form)
+        self.assertNotIn('id="finder-tax-property-use"', form)
+        self.assertNotIn('id="finder-tax-wealth-band"', form)
+        self.assertIn("calculated from retirement spending minus dependable income", form)
+        self.assertIn("0%, 50%, and 100%", form)
+        self.assertNotIn("Favorable–adverse", self.html)
+
     def test_finder_money_controls_follow_the_selected_planning_currency(self) -> None:
         self.assertIn(
             '<select id="finder-currency"><option value="USD" selected>USD — US dollar</option>',

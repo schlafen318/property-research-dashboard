@@ -70,6 +70,10 @@
     } else if (gain.calculation === "progressive_rate" ||
                gain.calculation === "remittance_progressive_rate") {
       taxLocal = progressiveTax(baseLocal, gain.bands);
+      if (gain.base === "combined_assessable_income") {
+        taxLocal -= progressiveTax(dependableIncomeUsd / fxToUsd, gain.bands);
+        reason = "Incremental tax from the modeled gain after stacking it above dependable income.";
+      }
     } else {
       throw new Error("Unsupported statutory calculation");
     }

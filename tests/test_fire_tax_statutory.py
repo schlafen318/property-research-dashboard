@@ -42,6 +42,28 @@ def base_rule(capital_gains: dict) -> dict:
 
 
 class FireTaxStatutoryTests(unittest.TestCase):
+    def test_every_published_country_rule_calculates_with_its_currency(self):
+        rules = json.loads((ROOT / "data" / "fire_tax_rules.json").read_text())["statutory_screening"]
+        rates = json.loads((ROOT / "data" / "fx_rates.json").read_text())["rates_to_usd"]
+        rates.update({"EUR": 1.1645, "JPY": 0.006273907655837509})
+
+        for country_id, rule in rules["jurisdictions"].items():
+            with self.subTest(country=country_id):
+                result = run_engine(
+                    "estimateStatutoryTaxRange",
+                    {
+                        "input": {
+                            "portfolioWithdrawals": 40_000,
+                            "dependableIncome": 20_000,
+                            "gainShares": rules["gain_shares"],
+                            "fxToUsd": rates[rule["currency"]],
+                            "asOf": "2026-09-02",
+                        },
+                        "rule": rule,
+                    },
+                )
+                self.assertEqual("available", result["status"])
+
     def test_flat_gain_rule_returns_disclosed_zero_half_and_full_gain_cases(self):
         result = run_engine(
             "estimateStatutoryTaxRange",
@@ -91,6 +113,32 @@ class FireTaxStatutoryTests(unittest.TestCase):
         )
 
         self.assertEqual([0, 2_000, 5_000], [case["capitalGainsTax"] for case in result["cases"]])
+
+    def test_combined_income_rule_reports_only_incremental_tax_from_realized_gain(self):
+        result = run_engine(
+            "estimateStatutoryTaxRange",
+            {
+                "input": {
+                    "portfolioWithdrawals": 20_000,
+                    "dependableIncome": 10_000,
+                    "gainShares": [0, 0.5, 1],
+                    "fxToUsd": 1,
+                    "asOf": "2026-09-01",
+                },
+                "rule": base_rule(
+                    {
+                        "base": "combined_assessable_income",
+                        "calculation": "progressive_rate",
+                        "bands": [
+                            {"up_to": 10_000, "rate": 0.1},
+                            {"up_to": None, "rate": 0.2},
+                        ],
+                    }
+                ),
+            },
+        )
+
+        self.assertEqual([0, 2_000, 4_000], [case["capitalGainsTax"] for case in result["cases"]])
 
     def test_proceeds_rule_taxes_withdrawal_not_assumed_gain(self):
         result = run_engine(

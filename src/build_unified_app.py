@@ -211,6 +211,7 @@ FIRE_TAX_DETAILED_PATH = ROOT / "src" / "fire_tax_detailed.js"
 FIRE_TAX_EXPLAIN_PATH = ROOT / "src" / "fire_tax_explain.js"
 FIRE_TAX_HK_UAE_PATH = ROOT / "src" / "fire_tax_hk_uae.js"
 FIRE_TAX_DETAILED_UI_PATH = ROOT / "src" / "fire_tax_detailed_ui.js"
+FIRE_TAX_STATUTORY_PATH = ROOT / "src" / "fire_tax_statutory.js"
 FIRE_TAX_SCENARIOS_PATH = ROOT / "src" / "fire_tax_scenarios.js"
 RETIREMENT_PLANNING_CURRENCIES = {
     "as_of": "2026-08-27",
@@ -1486,6 +1487,42 @@ def detailed_fire_tax_page_payload(path: Path = FIRE_TAX_RULES_PATH) -> dict:
         "sources": [
             source for source in rules.get("sources", [])
             if source.get("source_kind") == "official"
+        ],
+    }
+
+
+def statutory_fire_tax_screen_payload(
+    path: Path = FIRE_TAX_RULES_PATH,
+    *,
+    as_of: date | None = None,
+) -> dict:
+    """Publish validated destination-side capital-gains screening rules."""
+    rules = load_fire_tax_rules(path)
+    errors = validate_fire_tax_rules(rules, as_of=date.fromisoformat(rules["checked_on"]))
+    if errors:
+        raise ValueError("Invalid statutory FIRE tax screening rules: " + "; ".join(errors))
+    screening = rules["statutory_screening"]
+    statutory_fx = load_json("fx_rates.json")
+    rates_to_usd = {
+        **statutory_fx["rates_to_usd"],
+        **RETIREMENT_PLANNING_CURRENCIES["rates_to_usd"],
+    }
+    source_ids = {
+        source_id
+        for jurisdiction in screening["jurisdictions"].values()
+        for source_id in jurisdiction["source_ids"]
+    }
+    return {
+        "gain_shares": screening["gain_shares"],
+        "jurisdictions": screening["jurisdictions"],
+        "rates_to_usd": rates_to_usd,
+        "fx_as_of": {
+            "planning_currencies": RETIREMENT_PLANNING_CURRENCIES["as_of"],
+            "additional_statutory_currencies": statutory_fx["as_of"],
+        },
+        "sources": [
+            source for source in rules.get("sources", [])
+            if source.get("id") in source_ids
         ],
     }
 
@@ -6570,6 +6607,7 @@ def build_retirement_destination_finder_page(
             "reviewedOn": fire_payload["reviewed_on"],
             "countries": fire_payload["countries"],
             "sources": fire_payload.get("sources", []),
+            "statutory": statutory_fire_tax_screen_payload(as_of=tax_as_of),
         },
     }
     region_options = "".join(
@@ -6595,6 +6633,7 @@ def build_retirement_destination_finder_page(
         finder_engine=RETIREMENT_FINDER_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         scenario_engine=RETIREMENT_FINDER_SCENARIO_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         tax_scenario_engine=FIRE_TAX_SCENARIOS_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
+        tax_statutory_engine=FIRE_TAX_STATUTORY_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         finder_ui=RETIREMENT_FINDER_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>"),
         analytics=analytics_event_script(),
         design_css=retirement_finder_design_css(),
@@ -6846,6 +6885,7 @@ def build_retirement_calculator_page(
                 "reviewed_on": fire_payload["reviewed_on"],
                 "countries": fire_payload["countries"],
                 "sources": fire_payload.get("sources", []),
+                "statutory": statutory_fire_tax_screen_payload(as_of=tax_as_of),
             },
         },
         ensure_ascii=False,
@@ -6853,6 +6893,7 @@ def build_retirement_calculator_page(
     ).replace("</", "<\\/")
     engine_js = RETIREMENT_ENGINE_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
     tax_scenario_js = FIRE_TAX_SCENARIOS_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
+    tax_statutory_js = FIRE_TAX_STATUTORY_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
     ui_js = RETIREMENT_UI_PATH.read_text(encoding="utf-8").replace("</script>", "<\\/script>") if RETIREMENT_UI_PATH.exists() else ""
     detailed_engine_scripts = "\n".join(
         path.read_text(encoding="utf-8").replace("</script>", "<\\/script>")
@@ -6928,17 +6969,12 @@ __UTILITY_CSS__
           <div class="field"><label for="ret-other-income">Other non-portfolio income</label><input id="ret-other-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><label class="check"><input id="ret-other-indexed" type="checkbox" checked> Inflation-linked</label></div>
           <div class="field"><label for="ret-rental-income">Net rental income</label><input id="ret-rental-income" type="text" inputmode="numeric" data-money min="0" step="100" value="0"><p class="hint">Only include income from a separate rental property. Leave at zero when your destination home is for your own use.</p><label class="check"><input id="ret-rental-indexed" type="checkbox" checked> Inflation-linked</label></div>
         </div></fieldset>
-        <fieldset id="ret-tax-planning"><legend>Tax planning</legend><p class="hint">Choose a broad planning range or use figures you already know are after tax. Initial screen assumes a full-year relocation; you can refine this later for seasonal or part-year plans.</p>
+        <fieldset id="ret-tax-planning"><legend>Tax planning</legend><p class="hint">Use a destination capital-gains tax estimate or figures you already know are after tax. The initial screen assumes a full-year relocation.</p>
           <div class="tax-mode-choices">
-            <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="destination_estimate" checked><span>Use destination planning estimate<small>Add a broad, source-backed tax reserve to the retirement plan.</small></span></label>
-            <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="user_after_tax"><span>I know my after-tax figures<small>No destination income-tax reserve is added.</small></span></label>
+            <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="destination_estimate" checked><span>Use destination planning estimate<small>Apply current destination capital-gains rules to the portfolio withdrawal calculated by this plan.</small></span></label>
+            <label class="tax-mode-choice"><input type="radio" name="ret-tax-mode" value="user_after_tax"><span>I know my after-tax figures<small>No destination capital-gains tax estimate is added.</small></span></label>
           </div>
-          <div id="ret-tax-estimate-fields"><p class="hint">Dependable annual income is taken from the retirement-income amounts above.</p><div class="field-grid">
-            <div class="field"><label for="ret-tax-withdrawals">Expected annual portfolio withdrawals</label><input id="ret-tax-withdrawals" type="text" inputmode="numeric" data-money min="0" step="100" value="0"></div>
-            <div class="field"><label for="ret-tax-gain-intensity">How much of those withdrawals may be realized gains?</label><select id="ret-tax-gain-intensity"><option value="low">Little or none</option><option value="moderate" selected>A moderate share</option><option value="high">A large share</option></select></div>
-            <div class="field" id="ret-tax-property-use-field" hidden><label for="ret-tax-property-use">How will you use the destination home?</label><select id="ret-tax-property-use" disabled><option value="personal" selected>Personal use</option><option value="rental">Rental</option><option value="mixed">Personal and rental use</option></select></div>
-            <div class="field" id="ret-tax-wealth-band-field" hidden><label for="ret-tax-wealth-band">Broad household wealth band</label><select id="ret-tax-wealth-band" disabled><option value="under_threshold">Below the destination threshold</option><option value="above_threshold">Above the destination threshold</option><option value="unknown" selected>Not sure</option></select><p class="hint">Shown only where the destination evidence identifies a material wealth-tax exposure.</p></div>
-          </div></div>
+          <div id="ret-tax-estimate-fields"><p class="hint">Annual portfolio withdrawals are calculated from annual retirement spending minus dependable income. Because the cost basis is unknown, the range applies current destination rules assuming 0%, 50%, and 100% of each withdrawal is a realized gain; 50% is the estimate.</p></div>
           <p class="hint" id="ret-tax-after-tax-note" hidden>Your dependable income and portfolio return must already reflect tax.</p>
         </fieldset>
         <fieldset><legend>Portfolio assumption</legend>
@@ -6959,10 +6995,10 @@ __UTILITY_CSS__
         <h2>Your planning estimate</h2><p class="hint" id="ret-result-status">Add a return assumption, then calculate.</p>
         <p class="result-decision" id="ret-plan-summary">Your estimate will appear here after you add a return assumption.</p>
         <section class="plan-change-summary" id="ret-plan-change-summary" hidden aria-labelledby="ret-plan-change-heading"><h3 id="ret-plan-change-heading">What changed</h3><p class="plan-change-outcome" id="ret-plan-change-outcome"></p><dl class="plan-change-list" id="ret-plan-change-list"></dl></section>
-        <p class="tax-range" id="ret-tax-range" hidden><span>Favorable to adverse range</span><strong id="ret-tax-range-capital">—</strong></p>
+        <p class="tax-range" id="ret-tax-range" hidden><span>Capital needed across the realized-gain range</span><strong id="ret-tax-range-capital">—</strong></p>
         <p class="hint" id="ret-tax-unavailable" hidden>This destination tax estimate is conditional because current evidence is unavailable.</p>
         <p class="hint" id="ret-tax-no-tax-comparison" hidden>No added destination tax comparison: <strong id="ret-tax-no-tax-capital">—</strong>.</p>
-        <details class="tax-details" id="ret-tax-details" hidden><summary>Assumptions and sources</summary><div class="table-wrap"><table class="result-table"><thead><tr><th>Scenario</th><th>Tax reserve</th><th>Total annual requirement</th><th>Capital requirement</th></tr></thead><tbody><tr id="ret-tax-favorable-row"><th scope="row">Favorable</th><td></td><td></td><td></td></tr><tr id="ret-tax-central-row"><th scope="row">Central</th><td></td><td></td><td></td></tr><tr id="ret-tax-adverse-row"><th scope="row">Adverse</th><td></td><td></td><td></td></tr></tbody></table></div><div class="tax-explanations" id="ret-tax-explanations"></div></details>
+        <details class="tax-details" id="ret-tax-details" hidden><summary>How the tax range is calculated</summary><p class="hint">Current destination capital-gains rules are applied to the calculated portfolio withdrawal. This screen excludes home-country tax, treaties, account-specific reliefs, losses, other income taxes, and filing costs.</p><div class="table-wrap"><table class="result-table"><thead><tr><th>Realized gain assumption</th><th>Capital-gains tax</th><th>Capital needed</th></tr></thead><tbody><tr id="ret-tax-favorable-row"><th scope="row">0% gains</th><td></td><td></td></tr><tr id="ret-tax-central-row"><th scope="row">50% gains (estimate)</th><td></td><td></td></tr><tr id="ret-tax-adverse-row"><th scope="row">100% gains</th><td></td><td></td></tr></tbody></table></div><div class="tax-explanations" id="ret-tax-explanations"></div></details>
         <p><button class="text-button" id="ret-tax-refine" type="button" hidden disabled>Refine with detailed tax rules</button></p><p class="hint" id="ret-tax-detailed-availability" role="status">Detailed tax refinement appears only for supported destination and home-country combinations.</p>
         <section class="result-period" id="ret-today-section" aria-label="Key planning figures"><div class="key-figures">
           <div><span>Monthly contribution</span><strong id="ret-monthly-contribution">—</strong></div><div><span>Retirement capital</span><strong id="ret-total-retirement-summary">—</strong></div><div><span>Property capital</span><strong id="ret-property-summary">—</strong></div>
@@ -7028,7 +7064,7 @@ __UTILITY_CSS__
     </dialog>
     <noscript><p class="calc-panel"><strong>The interactive calculator requires JavaScript.</strong> You can still review the destination cost ranking and methodology using the links below.</p></noscript>
     __QUICK_ANSWER__
-    <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. It also adds a broad destination tax allowance. Portfolio dividends and interest remain inside that return rather than being counted twice.</p><p><strong>Not included:</strong> Individual tax or treaty advice, visa eligibility, currency shocks, individualized healthcare, and investment advice. Verify these separately before acting.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a>__FIRE_ABROAD_LINK__</p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
+    <section class="content-section" id="ret-trust"><h2>How to read this estimate</h2><p class="trust-meta">By Global Home Atlas Research Team · Data reviewed __AS_OF__</p><p>The model projects destination expenses and reliable retirement income, then separates the portfolio, reserve, and property capital needed under the return you enter. For supported countries, it applies current destination capital-gains rules to a clearly disclosed range of realized gains. Portfolio dividends and interest remain inside the return rather than being counted twice.</p><p><strong>Not included:</strong> Home-country tax, treaty interaction, account-specific reliefs, losses, other income taxes, filing costs, visa eligibility, currency shocks, individualized healthcare, or investment advice.</p><p class="related"><a href="/methodology/">Read the methodology</a><a href="/retirement-destination-finder/">Find destinations your plan can support</a><a href="/buying-property-abroad-for-retirement/" data-track="retirement_calculator_guide_click">Plan a retirement property purchase</a>__FIRE_ABROAD_LINK__</p><details><summary>Destination cost sources</summary><ul class="source-list">__SOURCES__</ul></details></section>
     <section class="content-section"><h2>Retirement plans by capital</h2><p class="related"><a href="/retire-abroad-with-500k/">$500,000</a><a href="/retire-abroad-with-750k/">$750,000</a><a href="/retire-abroad-with-1-million/">$1 million</a><a href="/retire-abroad-with-1-5-million/">$1.5 million</a><a href="/retire-abroad-with-2-million/">$2 million</a></p></section>
     <section class="content-section faq"><h2>Frequently asked questions</h2>__FAQ__</section>
   </div></main>
@@ -7036,6 +7072,7 @@ __UTILITY_CSS__
   <script id="retirement-destination-data" type="application/json">__DATA__</script>
   <script id="fire-tax-detailed-data" type="application/json">__DETAILED_TAX_DATA__</script>
   <script>__ENGINE__</script>
+  <script>__TAX_STATUTORY_ENGINE__</script>
   <script>__TAX_SCENARIO_ENGINE__</script>
   <script>__UI__</script>
   <script>__DETAILED_ENGINES__</script>
@@ -7061,6 +7098,7 @@ __ANALYTICS__
         "__DETAILED_TAX_DATA__": detailed_tax_data,
         "__ENGINE__": engine_js,
         "__TAX_SCENARIO_ENGINE__": tax_scenario_js,
+        "__TAX_STATUTORY_ENGINE__": tax_statutory_js,
         "__UI__": ui_js,
         "__DETAILED_ENGINES__": detailed_engine_scripts,
         "__ANALYTICS__": analytics_event_script(),

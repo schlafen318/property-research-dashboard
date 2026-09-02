@@ -269,16 +269,6 @@
     };
   }
 
-  function wealthTaxRelevant(countryRecord) {
-    const screen = countryRecord && countryRecord.tax_screen || {};
-    const allowance = screen.annual_allowances && screen.annual_allowances.wealth_tax;
-    if (!allowance || !Array.isArray(allowance.applies_to_wealth_bands)) return false;
-    return allowance.applies_to_wealth_bands.length > 0 &&
-      ["favorable_usd", "central_usd", "adverse_usd"].some(function (key) {
-        return Number(allowance[key]) > 0;
-      });
-  }
-
   function taxResultPresentation(input) {
     const taxScenario = input && input.taxScenario || {};
     const scenarioResults = input && input.scenarioResults || {};
@@ -349,25 +339,15 @@
   }
 
   function taxAuditEntries(input) {
-    const labels = {
-      taxReserve: "Tax reserve",
-      annualRequirement: "Total annual requirement",
-      capitalRequirement: "Capital requirement",
-    };
-    const fields = ["taxReserve", "annualRequirement", "capitalRequirement"];
-    return (input && input.rows || []).reduce(function (entries, row) {
-      fields.forEach(function (field) {
-        const explanation = row.amountExplanations && row.amountExplanations[field];
-        if (!explanation) return;
-        entries.push({
-          scenarioKey: row.key,
-          amountKey: field,
-          heading: row.label + " — " + labels[field],
-          explanation: explanation,
-        });
-      });
-      return entries;
-    }, []);
+    const estimate = (input && input.rows || []).find(function (row) { return row.key === "central"; });
+    const explanation = estimate && estimate.amountExplanations && estimate.amountExplanations.taxReserve;
+    if (!explanation) return [];
+    return [{
+      scenarioKey: "central",
+      amountKey: "taxReserve",
+      heading: "Estimate calculation and sources",
+      explanation: explanation,
+    }];
   }
 
   function calculatorEngine() {
@@ -565,9 +545,9 @@
     }
     const cases = taxScenario.cases || {};
     return {
-      favorable: scenarioResult("favorable", "Favorable", baseInput, cases.favorable, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.favorable && taxScenario.amountExplanations.favorable.total),
-      central: scenarioResult("central", "Central", baseInput, cases.central, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.central && taxScenario.amountExplanations.central.total),
-      adverse: scenarioResult("adverse", "Adverse", baseInput, cases.adverse, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.adverse && taxScenario.amountExplanations.adverse.total),
+      favorable: scenarioResult("favorable", "0% gains", baseInput, cases.favorable, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.favorable && taxScenario.amountExplanations.favorable.total),
+      central: scenarioResult("central", "50% gains (estimate)", baseInput, cases.central, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.central && taxScenario.amountExplanations.central.total),
+      adverse: scenarioResult("adverse", "100% gains", baseInput, cases.adverse, noTaxResult, "destination_estimate", taxScenario.amountExplanations && taxScenario.amountExplanations.adverse && taxScenario.amountExplanations.adverse.total),
     };
   }
 
@@ -865,7 +845,6 @@
       "ret-pension",
       "ret-other-income",
       "ret-rental-income",
-      "ret-tax-withdrawals",
       "ret-current-monthly-spending",
     ];
     const formatMoneyControl = function (control) {
@@ -926,29 +905,24 @@
       const planning = payload.tax_planning || {};
       const countries = planning.countries || {};
       const record = selectedRecord();
-      return record && countries[record.country] || null;
+      if (!record) return null;
+      const country = countries[record.country] || {};
+      const statutory = planning.statutory || {};
+      const rules = statutory.jurisdictions || {};
+      return Object.assign({}, country, {
+        statutory_screening: rules[String(record.country || "").toLowerCase()] || null,
+      });
     }
 
     function syncTaxControls() {
-      const visibility = taxControlVisibility({
-        taxMode: selectedTaxMode(),
-        housingPlan: el("ret-housing-plan").value,
-        wealthTaxRelevant: wealthTaxRelevant(selectedCountryRecord()),
-      });
+      const visibility = taxControlVisibility({ taxMode: selectedTaxMode() });
       el("ret-tax-estimate-fields").hidden = !visibility.estimate;
       el("ret-tax-after-tax-note").hidden = !visibility.afterTax;
       el("ret-retirement-income-note").textContent = visibility.afterTax
         ? "Enter amounts that already reflect tax. Do not include dividends from the portfolio being calculated."
         : "Enter dependable amounts before destination tax. Do not include dividends from the portfolio being calculated.";
-      el("ret-tax-property-use-field").hidden = !visibility.propertyUse;
-      el("ret-tax-property-use").disabled = !visibility.propertyUse;
-      el("ret-tax-wealth-band-field").hidden = !visibility.wealthBand;
-      el("ret-tax-wealth-band").disabled = !visibility.wealthBand;
       el("ret-tax-refine").hidden = true;
       el("ret-tax-refine").disabled = true;
-      ["ret-tax-withdrawals", "ret-tax-gain-intensity"].forEach(function (id) {
-        el(id).disabled = !visibility.estimate;
-      });
     }
 
     function syncDestinationDefaults(resetPropertyBudget) {
@@ -1114,18 +1088,16 @@
     function taxScenarioInput(planOverride) {
       const plan = planOverride || el("ret-housing-plan").value;
       const baseInput = calculatorInput(plan);
-      const propertyUseVisible = !el("ret-tax-property-use").disabled;
       const evidence = taxEvidenceContext(payload.tax_planning);
+      const statutory = (payload.tax_planning || {}).statutory || {};
+      const rule = selectedCountryRecord() && selectedCountryRecord().statutory_screening;
       return {
         taxMode: selectedTaxMode(),
         stayMode: "full_relocation",
         dependableIncome: moneyNumber("ret-pension") + moneyNumber("ret-other-income") + moneyNumber("ret-rental-income"),
         portfolioWithdrawals: deriveAnnualPortfolioWithdrawal(baseInput),
-        realizedGainIntensity: el("ret-tax-gain-intensity").value,
-        propertyPrice: usesPropertyBudget(plan) ? moneyNumber("ret-property-budget") : 0,
-        propertyUse: plan === "rent" || !propertyUseVisible ? "none" : el("ret-tax-property-use").value,
-        wealthBand: el("ret-tax-wealth-band").disabled ? "unknown" : el("ret-tax-wealth-band").value,
-        propertyTaxIncludedInRetirementCosts: plan !== "rent",
+        gainShares: statutory.gain_shares || [0, 0.5, 1],
+        fxToUsd: rule && (statutory.rates_to_usd || {})[rule.currency],
         asOf: evidence.asOf,
         taxYear: evidence.taxYear,
       };
@@ -1296,11 +1268,14 @@
       view.rows.forEach(function (row) {
         const cells = el("ret-tax-" + row.key + "-row").children;
         cells[1].textContent = displayMoney(row.annualTaxReserve);
-        cells[2].textContent = displayMoney(row.totalAnnualRequirement);
-        cells[3].textContent = displayMoney(row.requiredCapital);
+        cells[2].textContent = displayMoney(row.requiredCapital);
       });
       const explanationContainer = el("ret-tax-explanations");
-      const sourceById = Object.fromEntries(((payload.tax_planning || {}).sources || []).map(function (source) {
+      const planning = payload.tax_planning || {};
+      const sourceById = Object.fromEntries([].concat(
+        planning.sources || [],
+        planning.statutory && planning.statutory.sources || []
+      ).map(function (source) {
         return [source.id, source];
       }));
       explanationContainer.replaceChildren();
@@ -1703,7 +1678,6 @@
     sensitivityRates: sensitivityRates,
     taxControlVisibility: taxControlVisibility,
     taxEvidenceContext: taxEvidenceContext,
-    wealthTaxRelevant: wealthTaxRelevant,
     taxResultPresentation: taxResultPresentation,
     detailedRefineAvailable: detailedRefineAvailable,
     detailedPlanningCases: detailedPlanningCases,

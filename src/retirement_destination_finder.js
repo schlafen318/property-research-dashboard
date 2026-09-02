@@ -205,14 +205,18 @@
     const user = input.user || {};
     const profile = user.taxProfile || {};
     const planning = input.taxPlanning || {};
-    const country = planning.countries && planning.countries[destination.country];
+    const baseCountry = planning.countries && planning.countries[destination.country] || {};
+    const statutory = planning.statutory || {};
+    const rule = (statutory.jurisdictions || {})[String(destination.country || "").toLowerCase()];
+    const country = Object.assign({}, baseCountry, { statutory_screening: rule || null });
     try {
       return taxScenarios.estimateTaxScenario({
         taxMode: user.taxMode || "user_after_tax",
         stayMode: profile.stayMode || "full_relocation",
         dependableIncome: profile.dependableIncome || 0,
         portfolioWithdrawals: calculatorUI.deriveAnnualPortfolioWithdrawal(baseTargetInput),
-        realizedGainIntensity: profile.realizedGainIntensity,
+        gainShares: statutory.gain_shares || [0, 0.5, 1],
+        fxToUsd: rule && (statutory.rates_to_usd || {})[rule.currency],
         propertyUse: profile.propertyUse,
         wealthBand: profile.wealthBand,
         propertyTaxIncludedInRetirementCosts: user.housingPlan !== "rent",
