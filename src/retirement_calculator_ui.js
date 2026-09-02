@@ -107,6 +107,22 @@
     return Number(monthlySpending) * 12;
   }
 
+  function deriveAnnualPortfolioWithdrawal(input) {
+    const expenseCategories = Array.isArray(input && input.expenseCategories)
+      ? input.expenseCategories
+      : [];
+    const incomeStreams = Array.isArray(input && input.incomeStreams)
+      ? input.incomeStreams
+      : [];
+    const annualExpenses = expenseCategories.reduce(function (total, category) {
+      return total + Number(category && category.amount || 0);
+    }, 0);
+    const dependableIncome = incomeStreams.reduce(function (total, stream) {
+      return total + Number(stream && stream.amount || 0);
+    }, 0);
+    return Math.max(0, annualExpenses - dependableIncome);
+  }
+
   function roundToNearestHundred(amount) {
     return Math.round(Number(amount) / 100) * 100;
   }
@@ -1097,13 +1113,14 @@
 
     function taxScenarioInput(planOverride) {
       const plan = planOverride || el("ret-housing-plan").value;
+      const baseInput = calculatorInput(plan);
       const propertyUseVisible = !el("ret-tax-property-use").disabled;
       const evidence = taxEvidenceContext(payload.tax_planning);
       return {
         taxMode: selectedTaxMode(),
         stayMode: "full_relocation",
         dependableIncome: moneyNumber("ret-pension") + moneyNumber("ret-other-income") + moneyNumber("ret-rental-income"),
-        portfolioWithdrawals: moneyNumber("ret-tax-withdrawals"),
+        portfolioWithdrawals: deriveAnnualPortfolioWithdrawal(baseInput),
         realizedGainIntensity: el("ret-tax-gain-intensity").value,
         propertyPrice: usesPropertyBudget(plan) ? moneyNumber("ret-property-budget") : 0,
         propertyUse: plan === "rent" || !propertyUseVisible ? "none" : el("ret-tax-property-use").value,
@@ -1671,6 +1688,7 @@
     isInvalidMoneyInput: isInvalidMoneyInput,
     formatPlanningMoney: formatPlanningMoney,
     annualSpendingFromMonthly: annualSpendingFromMonthly,
+    deriveAnnualPortfolioWithdrawal: deriveAnnualPortfolioWithdrawal,
     roundToNearestHundred: roundToNearestHundred,
     illustrativeReturnExample: illustrativeReturnExample,
     applyIllustrativeReturn: applyIllustrativeReturn,

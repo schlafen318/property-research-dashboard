@@ -185,6 +185,30 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-tax-wealth-band-field" hidden', form)
         self.assertIn("Expected annual portfolio return after fees and tax (%)", form)
 
+    def test_portfolio_withdrawal_is_derived_from_expenses_less_dependable_income(self) -> None:
+        self.assertEqual(
+            24_000,
+            run_ui(
+                "deriveAnnualPortfolioWithdrawal",
+                {
+                    "expenseCategories": [{"amount": 30_000}, {"amount": 12_000}],
+                    "incomeStreams": [{"amount": 18_000}],
+                },
+            ),
+        )
+
+    def test_derived_portfolio_withdrawal_cannot_be_negative(self) -> None:
+        self.assertEqual(
+            0,
+            run_ui(
+                "deriveAnnualPortfolioWithdrawal",
+                {
+                    "expenseCategories": [{"amount": 30_000}],
+                    "incomeStreams": [{"amount": 36_000}],
+                },
+            ),
+        )
+
     def test_tax_control_visibility_is_mode_housing_and_jurisdiction_dependent(self) -> None:
         renting = run_ui(
             "taxControlVisibility",

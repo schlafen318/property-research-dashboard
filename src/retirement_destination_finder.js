@@ -201,7 +201,7 @@
     };
   }
 
-  function destinationTaxScenario(input, destination, cost) {
+  function destinationTaxScenario(input, destination, cost, baseTargetInput) {
     const user = input.user || {};
     const profile = user.taxProfile || {};
     const planning = input.taxPlanning || {};
@@ -211,7 +211,7 @@
         taxMode: user.taxMode || "user_after_tax",
         stayMode: profile.stayMode || "full_relocation",
         dependableIncome: profile.dependableIncome || 0,
-        portfolioWithdrawals: profile.portfolioWithdrawals || 0,
+        portfolioWithdrawals: calculatorUI.deriveAnnualPortfolioWithdrawal(baseTargetInput),
         realizedGainIntensity: profile.realizedGainIntensity,
         propertyUse: profile.propertyUse,
         wealthBand: profile.wealthBand,
@@ -318,7 +318,7 @@
       }
       const retirementProfile = cost.profiles[user.household];
       const baseTargetInput = retirementTargetInput(user, cost);
-      const taxScenario = destinationTaxScenario(input, destination, cost);
+      const taxScenario = destinationTaxScenario(input, destination, cost, baseTargetInput);
       const targets = targetCases(baseTargetInput, taxScenario);
       let retirementTarget = targets ? targets.central : null;
       let portfolioAtRetirement = sharedProjection ? sharedProjection.portfolioAtRetirement : 0;
