@@ -75,7 +75,7 @@
 
   function profileAccess(destinationId, payload, profile, facts) {
     const homeId = record(profile) && typeof profile.homeJurisdictionId === "string" ? profile.homeJurisdictionId : "";
-    if (!homeId) return { available: false, reason: "Choose your home tax jurisdiction before using exact refinement." };
+    if (!homeId) return { available: false, reason: "Choose your home tax jurisdiction to see whether detailed tax refinement is available." };
     const definition = supportedProfile(destinationId, payload, homeId);
     if (!record(definition) || definition.detailed_enabled !== true) return { available: false, reason: "Complete current rules do not yet cover this destination together with your home tax jurisdiction." };
     if (definition.synthetic === true) return { available: false, reason: "Synthetic rules cannot be used for a personal estimate." };
@@ -126,7 +126,7 @@
     if (!record(entry) || entry.detailed_enabled !== true) return { available: false, reason: "No complete current exact-rule set is enabled for this destination." };
     if (entry.synthetic === true) return { available: false, reason: "Synthetic rules cannot be used for a personal estimate." };
     const homeId = record(profile) && typeof profile.homeJurisdictionId === "string" ? profile.homeJurisdictionId : "";
-    if (!homeId) return { available: false, reason: "Choose your home tax jurisdiction before using exact refinement." };
+    if (!homeId) return { available: false, reason: "Choose your home tax jurisdiction to see whether detailed tax refinement is available." };
     if (!Array.isArray(entry.supported_home_jurisdiction_ids) || !entry.supported_home_jurisdiction_ids.includes(homeId)) {
       return { available: false, reason: "Complete current rules do not yet cover this destination together with your home tax jurisdiction." };
     }
@@ -535,13 +535,13 @@
         status.textContent = current.reason;
         if (submit) submit.disabled = true;
       } else {
-        status.textContent = currentQuestions.length ? "Answer the remaining facts that can change this estimate." : "All material facts are ready. Calculate the exact profile.";
+        status.textContent = currentQuestions.length ? "Answer the remaining facts that can change this estimate." : "All required details are ready. Calculate the refined estimate.";
         if (submit) submit.disabled = currentQuestions.length > 0;
         if (!currentQuestions.length) {
           try {
             runRefinement({ destinationId: destination.value, homeJurisdictionId: home.value, uiPayload: payload, planningFacts: planningFacts(), answers: answers });
           } catch (error) {
-            status.textContent = error instanceof Error ? error.message : "The complete profile could not be executed.";
+            status.textContent = error instanceof Error ? error.message : "The refined estimate could not be calculated.";
             if (submit) submit.disabled = true;
           }
         }
@@ -561,7 +561,7 @@
       button.dataset.detailedAvailable = current.available ? "true" : "false";
       button.hidden = !current.available;
       button.disabled = !current.available;
-      availability.textContent = current.available ? "Exact destination-and-home refinement is available for this profile." : current.reason;
+      availability.textContent = current.available ? "Detailed tax refinement is available for this destination and home-country combination." : current.reason;
       if (!current.available) { section.hidden = true; active = false; }
       if (active && current.available) { resetResult(); renderQuestions(); }
     }
@@ -601,10 +601,10 @@
         const output = runRefinement({ destinationId: destination.value, homeJurisdictionId: home.value, uiPayload: payload, planningFacts: planningFacts(), answers: answers });
         resultContainer.innerHTML = output.markup;
         resultContainer.hidden = false;
-        status.textContent = "Exact destination-and-home calculation updated from the current plan.";
+        status.textContent = "Detailed tax estimate updated from the current plan.";
       } catch (error) {
         resetResult();
-        status.textContent = error instanceof Error ? error.message : "This exact calculation is unavailable for the current facts.";
+        status.textContent = error instanceof Error ? error.message : "A refined estimate is unavailable for the current facts.";
       }
     });
     form.addEventListener("input", function (event) { if (!shouldHandlePlanningEvent(detailedForm, event.target)) return; if (resetIfCurrencyChanged()) { sync(); return; } if (active) { resetResult(); renderQuestions(); } else sync(); });

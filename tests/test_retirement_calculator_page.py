@@ -125,6 +125,22 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("3.5% withdrawal rate", quick_answer)
         self.assertIn('/retirement-destinations-ranked-by-cost/', quick_answer)
 
+    def test_calculator_precedes_supporting_benchmarks_in_the_reading_order(self) -> None:
+        calculator = self.html.index('<section class="calculator-layout"')
+        benchmark = self.html.index('id="ret-quick-answer"')
+
+        self.assertLess(calculator, benchmark)
+
+    def test_mobile_benchmarks_reflow_into_labeled_rows_instead_of_clipping(self) -> None:
+        quick_answer = self.html.split('id="ret-quick-answer"', 1)[1].split("</section>", 1)[0]
+        head = self.html.split("</head>", 1)[0]
+
+        self.assertEqual(8, quick_answer.count('class="mobile-benchmark-label"'))
+        self.assertIn("Annual spending", quick_answer)
+        self.assertIn("Capital needed", quick_answer)
+        self.assertIn(".quick-benchmark tr { display:grid;", head)
+        self.assertIn(".quick-benchmark { min-width:0; }", head)
+
     def test_page_exposes_authorship_review_methodology_sources_and_exclusions(self) -> None:
         self.assertIn('id="ret-trust"', self.html)
         trust = self.html.split('id="ret-trust"', 1)[1].split("</section>", 1)[0]
@@ -146,6 +162,13 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-example-return" type="button"', form)
         self.assertIn("Use an illustrative 4% example", form)
         self.assertIn("not a forecast or recommendation", form)
+
+    def test_primary_form_has_progress_cues_and_initial_action_language(self) -> None:
+        form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
+
+        self.assertIn("counter-reset:calculator-step", self.html)
+        self.assertIn('class="primary" id="ret-calculate" type="submit">Calculate estimate</button>', form)
+        self.assertIn("Your estimate will appear here after you add a return assumption.", self.html)
 
     def test_tax_controls_use_two_plain_language_progressive_modes(self) -> None:
         form = self.html.split('id="retirement-calculator"', 1)[1].split("</form>", 1)[0]
@@ -409,7 +432,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-tax-detailed" hidden', self.html)
         self.assertIn('id="ret-tax-refine" type="button" hidden disabled', self.html)
         self.assertIn('id="ret-tax-detailed-availability" role="status"', self.html)
-        self.assertIn("Exact refinement is unavailable until complete current rules cover both this destination and your home tax jurisdiction.", self.html)
+        self.assertIn("Detailed tax refinement appears only for supported destination and home-country combinations.", self.html)
         payload_text = self.html.split(
             '<script id="fire-tax-detailed-data" type="application/json">', 1
         )[1].split("</script>", 1)[0]
@@ -424,6 +447,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn('id="ret-tax-detailed-status" role="status" aria-live="polite"', section)
         self.assertIn('id="ret-tax-detailed-form"', section)
         self.assertIn('type="submit"', section)
+        self.assertIn("Calculate refined estimate", section)
         self.assertIn('id="ret-tax-detailed-result" hidden', section)
 
     def test_home_jurisdiction_control_contains_only_supported_real_pairs(self) -> None:
@@ -592,7 +616,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
             "ret-contribution-retirement",
         ):
             self.assertIn(f'id="{element_id}"', results)
-        self.assertIn("Central estimate needed today", results)
+        self.assertIn("Your estimate will appear here after you add a return assumption.", results)
         self.assertIn("What you need at retirement", results)
         self.assertIn("First retirement year", results)
         self.assertIn('id="ret-first-expenses-label">Annual spending incl. rent</span>', results)

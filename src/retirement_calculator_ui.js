@@ -92,6 +92,12 @@
     return 4;
   }
 
+  function applyIllustrativeReturn(control) {
+    control.value = String(illustrativeReturnExample());
+    control.dispatchEvent(new Event("input", { bubbles: true }));
+    control.dispatchEvent(new Event("change", { bubbles: true }));
+  }
+
   function currentCostComparison(input) {
     const currentMonthly = Number(input.currentMonthly);
     const destinationMonthly = Number(input.destinationMonthly);
@@ -1444,6 +1450,7 @@
           el("ret-detailed-projection").hidden = true;
           el("ret-current-cost-comparison").hidden = true;
           el("ret-save-action").hidden = true;
+          el("ret-calculate").textContent = "Update estimate";
           return;
         }
         const scenarioResults = calculateTaxAdjustedScenarios(calculatorInput(), taxScenario);
@@ -1453,6 +1460,7 @@
         el("ret-today-section").hidden = false;
         el("ret-tax-refine").dataset.planningCases = JSON.stringify(detailedPlanningCases(scenarioResults, result));
         render(result, taxScenario, scenarioResults);
+        el("ret-calculate").textContent = "Update estimate";
         if (event) track("retirement_calculator_calculate");
       } catch (error) {
         errors.textContent = error instanceof Error ? error.message : "Unable to calculate this scenario.";
@@ -1530,8 +1538,7 @@
       });
     });
     el("ret-example-return").addEventListener("click", function () {
-      el("ret-expected-return").value = String(illustrativeReturnExample());
-      scheduleCalculation();
+      applyIllustrativeReturn(el("ret-expected-return"));
       track("retirement_calculator_example_return");
     });
     el("ret-save-intent-button").addEventListener("click", function () {
@@ -1575,6 +1582,7 @@
     annualSpendingFromMonthly: annualSpendingFromMonthly,
     roundToNearestHundred: roundToNearestHundred,
     illustrativeReturnExample: illustrativeReturnExample,
+    applyIllustrativeReturn: applyIllustrativeReturn,
     currentCostComparison: currentCostComparison,
     retirementTargetComparison: retirementTargetComparison,
     annualBenchmark: annualBenchmark,

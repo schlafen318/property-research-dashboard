@@ -440,6 +440,31 @@ class RetirementCalculatorUITests(unittest.TestCase):
         self.assertIn('el("ret-example-return").addEventListener("click"', source)
         self.assertIn('track("retirement_calculator_example_return")', source)
 
+    def test_illustrative_return_refreshes_every_live_consumer(self) -> None:
+        script = (
+            "const ui = require(process.argv[1]);"
+            "const events = [];"
+            "const control = {value:'',dispatchEvent:(event)=>events.push(event.type)};"
+            "ui.applyIllustrativeReturn(control);"
+            "process.stdout.write(JSON.stringify({value:control.value,events}));"
+        )
+        result = subprocess.run(
+            ["node", "-e", script, str(UI_MODULE)],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            check=True,
+        )
+
+        self.assertEqual(
+            {"value": "4", "events": ["input", "change"]},
+            json.loads(result.stdout),
+        )
+
+    def test_primary_action_changes_to_update_after_a_result(self) -> None:
+        source = UI_MODULE.read_text(encoding="utf-8")
+        self.assertIn('el("ret-calculate").textContent = "Update estimate";', source)
+
     def test_detail_handoff_accepts_only_allowlisted_categories(self) -> None:
         self.assertEqual(
             {"destination": "valencia", "household": "couple", "housing": "buy_now"},
