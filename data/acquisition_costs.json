@@ -1,5 +1,5 @@
 {
-  "as_of": "2026-08-19",
+  "as_of": "2026-09-04",
   "reporting_currency": "USD",
   "buyer_profile": {
     "residency": "nonresident",
@@ -560,7 +560,7 @@
           "url": "https://khonsulegal.com/insights/thai-condo-foreign-quota/",
           "source_type": "law_firm",
           "metric_supported": "Current quota test, foreign-currency evidence, 30-year lease limit, 1.1% lease charges, buyer transfer-fee allocation and seller-tax treatment",
-          "source_date": "2026-05-31",
+          "source_date": "2026-05-12",
           "accessed_on": "2026-08-19",
           "notes": "Published by the firm's Head of Legal and updated for June 2026."
         }
@@ -718,7 +718,7 @@
     {
       "destination_id": "da-nang-hoi-an",
       "local_currency": "VND",
-      "jurisdiction_basis": "The post-1 July 2025 Da Nang municipality is the jurisdiction for both Da Nang and the former Quang Nam/Hoi An area. The legacy Da Nang city registration-service tariff is used as the representative local proxy and may not yet be uniform in the former Hoi An wards. The benchmark converts to about VND4.47 billion.",
+      "jurisdiction_basis": "The post-1 July 2025 Da Nang municipality is the jurisdiction for both Da Nang and the former Quang Nam/Hoi An area. The legacy Da Nang city registration-service tariff is used as the representative local proxy and may not yet be uniform in the former Hoi An wards. The current benchmark converts to about VND7.47 billion.",
       "purchase_route": {
         "status": "conditional",
         "label": "Eligible commercial-project apartment resale",
@@ -744,10 +744,10 @@
           "label": "Notarization fee",
           "category": "legal",
           "inclusion": "base",
-          "calculation": {"type": "fixed_plus_rate", "tax_base": "purchase_price", "fixed_amount": 700000, "rate": 0.0005, "valid_price_local": {"minimum": 3000000000, "minimum_inclusive": false, "maximum": 5000000000, "maximum_inclusive": true}},
+          "calculation": {"type": "fixed_plus_rate", "tax_base": "purchase_price", "fixed_amount": 1200000, "rate": 0.0004, "valid_price_local": {"minimum": 5000000000, "minimum_inclusive": false, "maximum": 10000000000, "maximum_inclusive": true}},
           "estimate_strategy": "statutory",
           "source_ids": ["vn-circular-257", "vn-chambers-2026"],
-          "notes": "The benchmark falls in the VND3-VND5 billion bracket: VND2.2 million plus 0.05% of the amount over VND3 billion. Algebraically within that bracket this equals VND700,000 plus 0.05% of total price."
+          "notes": "The current benchmark falls in the VND5-VND10 billion bracket: VND3.2 million plus 0.04% of the amount over VND5 billion. Algebraically within that bracket this equals VND1.2 million plus 0.04% of total price."
         },
         {
           "id": "local-title-registration-service",
@@ -833,8 +833,8 @@
         }
       ],
       "confidence": "medium",
-      "reviewed_on": "2026-08-19",
-      "review_notes": "Eligibility is asset-, project-, seller- and quota-specific. A foreign-to-foreign resale carries only the seller's remaining ownership term; it does not restart at 50 years. The local registration range is a representative legacy Da Nang tariff after the 2025 merger, so former Hoi An ward pricing must be checked. Seller tax, new-build VAT, financing and recurring charges are excluded."
+      "reviewed_on": "2026-09-04",
+      "review_notes": "Eligibility is asset-, project-, seller- and quota-specific. A foreign-to-foreign resale carries only the seller's remaining ownership term; it does not restart at 50 years. The notarization formula was re-benchmarked to the current VND5-VND10 billion band. The local registration range remains a representative legacy Da Nang tariff after the 2025 merger, so former Hoi An ward pricing must be checked. Seller tax, new-build VAT, financing and recurring charges are excluded."
     },
     {
       "destination_id": "valencia",
@@ -2029,7 +2029,7 @@
     {
       "destination_id": "mallorca",
       "local_currency": "EUR",
-      "jurisdiction_basis": "Palma de Mallorca in the Balearic Islands is the representative municipality. The benchmark converts to about EUR531,433 and falls in the second general TPO band. Balearic law computes a progressive quota and then applies the resulting average rate rounded to two decimals; at this benchmark the rounded average rate is 8.25%, valid only for the explicit local-price interval encoded below.",
+      "jurisdiction_basis": "Palma de Mallorca in the Balearic Islands is the representative municipality. The current benchmark converts to about EUR418,177 and falls in the second general TPO band. Balearic law computes a progressive quota and then applies the resulting average rate rounded to two decimals; at this benchmark the rounded average rate is 8.04%, valid only for the explicit local-price interval encoded below.",
       "purchase_route": {
         "status": "conditional",
         "label": "Direct individual resale purchase subject to nationality, rural classification and restricted-zone authorization",
@@ -2045,10 +2045,10 @@
           "label": "Balearic resale transfer tax (TPO)",
           "category": "tax",
           "inclusion": "base",
-          "calculation": {"type": "fixed_plus_rate", "tax_base": "purchase_price", "fixed_amount": 0, "rate": 0.0825, "valid_price_local": {"minimum": 530503.9787798409, "minimum_inclusive": true, "maximum": 537634.4086021505, "maximum_inclusive": false}},
+          "calculation": {"type": "fixed_plus_rate", "tax_base": "purchase_price", "fixed_amount": 0, "rate": 0.0804, "valid_price_local": {"minimum": 414507.7720207254, "minimum_inclusive": true, "maximum": 418848.167539267, "maximum_inclusive": false}},
           "estimate_strategy": "statutory",
           "source_ids": ["es-balearic-tpo"],
-          "notes": "The statutory schedule is 8% through EUR400,000, 9% to EUR600,000, 10% to EUR1 million, 12% to EUR2 million and 13% above. The authority requires the schedule-derived average rate to be rounded to two decimals; the benchmark's 8.25% rounded rate is bounded to the interval where it remains valid."
+          "notes": "The statutory schedule is 8% through EUR400,000, 9% to EUR600,000, 10% to EUR1 million, 12% to EUR2 million and 13% above. The authority requires the schedule-derived average rate to be rounded to two decimals; the current benchmark's 8.04% rounded rate is bounded to the interval where it remains valid."
         },
         {
           "id": "reference-value-uplift",
@@ -2179,8 +2179,8 @@
         }
       ],
       "confidence": "medium-high",
-      "reviewed_on": "2026-08-19",
-      "review_notes": "The base is the official schedule-derived 8.25% rounded average TPO rate, explicitly bounded to the current benchmark interval. The full underlying Balearic schedule is documented. Registry, buyer copies and any non-EU authorization remain unquantified. Buyer counsel and brokerage are not universal; seller plusvalia, financing, recurring costs and new-build VAT/AJD are excluded."
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The base is the official schedule-derived 8.04% rounded average TPO rate, explicitly bounded to the current benchmark interval. The full underlying Balearic schedule was rechecked on 2026-09-04. Registry, buyer copies and any non-EU authorization remain unquantified. Buyer counsel and brokerage are not universal; seller plusvalia, financing, recurring costs and new-build VAT/AJD are excluded."
     },
     {
       "destination_id": "croatia-istria-dalmatia",
@@ -3280,7 +3280,7 @@
     {
       "destination_id": "swiss-valais-vaud-alps",
       "local_currency": "CHF",
-      "jurisdiction_basis": "A two-jurisdiction benchmark range is used: Verbier in Val de Bagnes, Canton Valais, is the lower government-charge representative; Villars-sur-Ollon in Ollon, Canton Vaud, is the upper representative. At the CHF2,349,382 benchmark, Valais applies 1.5% canton transfer duty plus Val de Bagnes's 50% municipal supplement and a 2 per mille registry fee; Vaud/Ollon applies 2.2% canton plus 1.1% municipal duty and a 1.5 per mille registry fee.",
+      "jurisdiction_basis": "A two-jurisdiction benchmark range is used: Verbier in Val de Bagnes, Canton Valais, is the lower government-charge representative; Villars-sur-Ollon in Ollon, Canton Vaud, is the upper representative. At the current CHF2,373,300 benchmark, Valais applies 1.5% canton transfer duty plus Val de Bagnes's 50% municipal supplement and a 2 per mille registry fee; Vaud/Ollon applies 2.2% canton plus 1.1% municipal duty and a 1.5 per mille registry fee.",
       "purchase_route": {
         "status": "conditional",
         "label": "Direct natural-person holiday-home purchase subject to canton permit, quota and asset eligibility",
@@ -3298,11 +3298,11 @@
           "inclusion": "base",
           "calculation": {
             "type": "manual",
-            "low_amount": 57561.5,
-            "estimate_amount": 69307.59088568488,
-            "high_amount": 81053.68177136974,
+            "low_amount": 58147.25,
+            "estimate_amount": 70013.05,
+            "high_amount": 81878.85,
             "valid_price_local": {
-              "exact": 2349382.0803295574,
+              "exact": 2373300,
               "tolerance": 0.000001
             }
           },
@@ -3315,7 +3315,7 @@
             "ollon-2026-tax-order",
             "vaud-registry-law"
           ],
-          "notes": "Benchmark-only manual range. Low: Valais taxable value rounded to CHF2,349,400 for 1.5% canton duty plus 50% municipal supplement (CHF52,861.50), and registry base rounded to CHF2,350,000 at 2 per mille (CHF4,700). High: Vaud/Ollon 3.3% duty plus 0.15% registry on the benchmark (CHF81,053.68). The CHF0.000001 exact-guard tolerance covers floating-point FX conversion only and is not a price interval."
+          "notes": "Benchmark-only manual range. Low: Valais taxable value CHF2,373,300 for 1.5% canton duty plus 50% municipal supplement (CHF53,399.25), and registry base rounded up to CHF2,374,000 at 2 per mille (CHF4,748). High: Vaud/Ollon 3.3% duty plus 0.15% registry on the benchmark (CHF81,878.85). The CHF0.000001 exact-guard tolerance covers floating-point FX conversion only and is not a price interval."
         },
         {
           "id": "notarial-deed",
@@ -3450,8 +3450,8 @@
         }
       ],
       "confidence": "medium",
-      "reviewed_on": "2026-08-19",
-      "review_notes": "The benchmark-only government-charge range is CHF57,561.50-CHF81,053.68, midpoint CHF69,307.59. An exact CHF2,349,382.0803295574 guard with CHF0.000001 floating-point tolerance prevents reuse at any substantively changed price. Notary, permit/quota and second-home clearance remain conditional-null."
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The benchmark-only government-charge range is CHF58,147.25-CHF81,878.85, midpoint CHF70,013.05. An exact CHF2,373,300 guard with CHF0.000001 floating-point tolerance prevents reuse at any substantively changed price. Vaud's current 3.3% purchaser duty was rechecked on 2026-09-04. Notary, permit/quota and second-home clearance remain conditional-null."
     },
     {
       "destination_id": "vancouver-island-victoria",
@@ -4006,7 +4006,7 @@
     {
       "destination_id": "lake-tahoe",
       "local_currency": "USD",
-      "jurisdiction_basis": "A two-shore statutory benchmark range is used. Tahoe City in unincorporated Placer County, California, is the low representative: USD0.55 documentary transfer tax per USD500 or fraction plus a USD14 first-page recording fee. Incline Village in Washoe County, Nevada, is the high representative: USD2.05 real-property transfer tax per USD500 or fraction plus a USD43 general-document recording fee. At the USD1,240,000 benchmark, the exact totals are USD1,378 and USD5,127 respectively.",
+      "jurisdiction_basis": "A two-shore statutory benchmark range is used. Tahoe City in unincorporated Placer County, California, is the low representative: USD0.55 documentary transfer tax per USD500 or fraction plus a USD14 first-page recording fee. Incline Village in Washoe County, Nevada, is the high representative: USD2.05 real-property transfer tax per USD500 or fraction plus a USD43 general-document recording fee. At the current USD1,060,000 benchmark, the exact totals are USD1,180 and USD4,389 respectively.",
       "purchase_route": {
         "status": "available",
         "label": "Direct foreign natural-person purchase on either representative shore",
@@ -4024,11 +4024,11 @@
           "inclusion": "base",
           "calculation": {
             "type": "manual",
-            "low_amount": 1378,
-            "estimate_amount": 3252.5,
-            "high_amount": 5127,
+            "low_amount": 1180,
+            "estimate_amount": 2784.5,
+            "high_amount": 4389,
             "valid_price_local": {
-              "exact": 1240000,
+              "exact": 1060000,
               "tolerance": 0.000001
             }
           },
@@ -4041,7 +4041,7 @@
             "washoe-recorder-fees",
             "nevada-nrs-375"
           ],
-          "notes": "Benchmark-only geographic range. California low: 2,480 USD500 units x USD0.55 = USD1,364, plus USD14 first-page recording; the USD75 Building Homes and Jobs fee is exempt because the deed is subject to documentary transfer tax. Nevada high: 2,480 USD500 units x USD2.05 = USD5,084, plus USD43 recording. California law exposes a beneficiary of the deed to the tax; Nevada makes buyer and seller jointly and severally liable, while allowing contractual reallocation. The USD0.000001 exact-guard tolerance covers floating-point arithmetic only; any substantive price change, including one that changes a fractional USD500 unit, is rejected."
+          "notes": "Benchmark-only geographic range. California low: 2,120 USD500 units x USD0.55 = USD1,166, plus USD14 first-page recording; the USD75 Building Homes and Jobs fee is exempt because the deed is subject to documentary transfer tax. Nevada high: 2,120 USD500 units x USD2.05 = USD4,346, plus USD43 recording. California law exposes a beneficiary of the deed to the tax; Nevada makes buyer and seller jointly and severally liable, while allowing contractual reallocation. The USD0.000001 exact-guard tolerance covers floating-point arithmetic only; any substantive price change, including one that changes a fractional USD500 unit, is rejected."
         },
         {
           "id": "additional-document-charges",
@@ -4213,8 +4213,8 @@
         }
       ],
       "confidence": "medium-high",
-      "reviewed_on": "2026-08-19",
-      "review_notes": "The benchmark-only base range reconciles exactly to USD1,378 in Tahoe City/Placer County and USD5,127 in Incline Village/Washoe County, with midpoint USD3,252.50. An exact USD1,240,000 guard with USD0.000001 floating-point tolerance prevents reuse across the next fractional-USD500 unit. The main concern is negotiated economic allocation, especially in Nevada; no seller payment is assumed."
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The benchmark-only base range reconciles exactly to USD1,180 in Tahoe City/Placer County and USD4,389 in Incline Village/Washoe County, with midpoint USD2,784.50. The two county schedules were rechecked on 2026-09-04. An exact USD1,060,000 guard with USD0.000001 floating-point tolerance prevents reuse across the next fractional-USD500 unit. The main concern is negotiated economic allocation, especially in Nevada; no seller payment is assumed."
     },
     {
       "destination_id": "jackson-hole",
@@ -4367,7 +4367,7 @@
     {
       "destination_id": "aspen-snowmass",
       "local_currency": "USD",
-      "jurisdiction_basis": "Aspen and Snowmass Village, both in Pitkin County, Colorado, define the representative range. Snowmass Village is the lower municipal case at 1% of purchase price; Aspen is the upper case at 0.5% of the full price plus 1% after excluding the first USD100,000. Colorado's documentary fee is USD0.01 for each USD100 or major fraction of consideration, and Pitkin County charges a flat USD43 deed-recording fee. At the USD5,170,000 benchmark, the municipal taxes are USD51,700 and USD76,550 and the rounded documentary fee is USD517.",
+      "jurisdiction_basis": "Aspen and Snowmass Village, both in Pitkin County, Colorado, define the representative range. Snowmass Village is the lower municipal case at 1% of purchase price; Aspen is the upper case at 0.5% of the full price plus 1% after excluding the first USD100,000. Colorado's documentary fee is USD0.01 for each USD100 or major fraction of consideration, and Pitkin County charges a flat USD43 deed-recording fee. At the current USD2,200,000 benchmark, the municipal taxes are USD22,000 and USD32,000 and the documentary fee is USD220.",
       "purchase_route": {
         "status": "available",
         "label": "Direct foreign natural-person purchase",
@@ -4385,11 +4385,11 @@
           "inclusion": "base",
           "calculation": {
             "type": "manual",
-            "low_amount": 51700,
-            "estimate_amount": 64125,
-            "high_amount": 76550,
+            "low_amount": 22000,
+            "estimate_amount": 27000,
+            "high_amount": 32000,
             "valid_price_local": {
-              "exact": 5170000,
+              "exact": 2200000,
               "tolerance": 0.000001
             }
           },
@@ -4398,7 +4398,7 @@
             "snowmass-rett",
             "aspen-rett"
           ],
-          "notes": "Benchmark-only geographic range. Low: Snowmass Village 1% x USD5,170,000 = USD51,700. High: Aspen 0.5% x USD5,170,000 plus 1% x USD5,070,000 = USD76,550. Both municipalities state that the purchaser is responsible. The USD0.000001 exact-guard tolerance covers floating-point arithmetic only."
+          "notes": "Benchmark-only geographic range. Low: Snowmass Village 1% x USD2,200,000 = USD22,000. High: Aspen 0.5% x USD2,200,000 plus 1% x USD2,100,000 = USD32,000. Both municipalities state that the purchaser is responsible. The USD0.000001 exact-guard tolerance covers floating-point arithmetic only."
         },
         {
           "id": "colorado-documentary-fee",
@@ -4407,11 +4407,11 @@
           "inclusion": "base",
           "calculation": {
             "type": "manual",
-            "low_amount": 517,
-            "estimate_amount": 517,
-            "high_amount": 517,
+            "low_amount": 220,
+            "estimate_amount": 220,
+            "high_amount": 220,
             "valid_price_local": {
-              "exact": 5170000,
+              "exact": 2200000,
               "tolerance": 0.000001
             }
           },
@@ -4420,7 +4420,7 @@
             "pitkin-recording-guide",
             "colorado-crs-39-13-102"
           ],
-          "notes": "Benchmark-only amount: 51,700 USD100 units x USD0.01 = USD517. Section 39-13-102 applies USD0.01 to each USD100 or major fraction, so a rate formula is not used for arbitrary prices. The USD0.000001 guard tolerance covers floating-point arithmetic only."
+          "notes": "Benchmark-only amount: 22,000 USD100 units x USD0.01 = USD220. Section 39-13-102 applies USD0.01 to each USD100 or major fraction, so a rate formula is not used for arbitrary prices. The USD0.000001 guard tolerance covers floating-point arithmetic only."
         },
         {
           "id": "pitkin-county-deed-recording",
@@ -4562,8 +4562,8 @@
         }
       ],
       "confidence": "medium-high",
-      "reviewed_on": "2026-08-19",
-      "review_notes": "Base low/estimate/high reconcile to USD52,260 / USD64,685 / USD77,110: municipal RETT USD51,700 / USD64,125 / USD76,550, plus the statutorily rounded USD517 documentary fee and USD43 recording. Both quantified benchmark-only components use an exact USD5,170,000 guard with USD0.000001 floating-point tolerance. Title/closing, buyer brokerage and property-specific restrictions remain conditional-null."
+      "reviewed_on": "2026-09-04",
+      "review_notes": "Base low/estimate/high reconcile to USD22,263 / USD27,263 / USD32,263: municipal RETT USD22,000 / USD27,000 / USD32,000, plus the USD220 documentary fee and USD43 recording. Aspen and Snowmass municipal rates were rechecked on 2026-09-04. Both quantified benchmark-only components use an exact USD2,200,000 guard with USD0.000001 floating-point tolerance. Title/closing, buyer brokerage and property-specific restrictions remain conditional-null."
     },
     {
       "destination_id": "dubai",
@@ -4752,7 +4752,7 @@
         }
       ],
       "sources": [
-        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029 with limited supply-supporting exceptions", "source_date": "2026-05-31", "accessed_on": "2026-09-04", "notes": "Current Australian Government announcement controlling the baseline route."},
+        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029 with limited supply-supporting exceptions", "source_date": "2026-05-12", "accessed_on": "2026-09-04", "notes": "Current Australian Government announcement controlling the baseline route."},
         {"id": "ato-residential-application", "name": "Australian Taxation Office - residential property applications for foreign investors", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/residential-property-application-for-foreign-investors", "source_type": "official", "metric_supported": "Approval requirement, established-dwelling restrictions, and eligible new-dwelling route", "source_date": "2025-03-30", "accessed_on": "2026-09-04", "notes": "Official application guidance; the later Treasury announcement extends the ban end date."},
         {"id": "qld-transfer-duty", "name": "Queensland Revenue Office - calculate transfer duty", "url": "https://qro.qld.gov.au/duties/transfer-duty/calculate/how-to-calculate/", "source_type": "official", "metric_supported": "Transfer duty applies to dutiable value and foreign residential acquisitions attract additional duty", "source_date": "2026-08-01", "accessed_on": "2026-09-04", "notes": "Live state revenue guidance."},
         {"id": "qld-afad", "name": "Queensland Revenue Office - additional foreign acquirer duty", "url": "https://qro.qld.gov.au/duties/investors/afad/", "source_type": "official", "metric_supported": "8% additional foreign acquirer duty", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Undated live guidance; access date used."}
@@ -4777,7 +4777,7 @@
         {"id": "western-australia-foreign-duty", "label": "Western Australia foreign buyers duty", "category": "tax", "inclusion": "conditional", "applicability": "For a legally eligible residential acquisition by a foreign person unless an exemption applies.", "calculation": {"type": "rate", "tax_base": "purchase_price", "rate": 0.07}, "estimate_strategy": "statutory", "source_ids": ["wa-foreign-buyers-duty"], "notes": "The 7% surcharge is decision context for an eligible alternative, not a total for the prohibited baseline."}
       ],
       "sources": [
-        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029", "source_date": "2026-05-31", "accessed_on": "2026-09-04", "notes": "Current national policy announcement."},
+        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029", "source_date": "2026-05-12", "accessed_on": "2026-09-04", "notes": "Current national policy announcement."},
         {"id": "ato-residential-application", "name": "Australian Taxation Office - residential property applications for foreign investors", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/residential-property-application-for-foreign-investors", "source_type": "official", "metric_supported": "Approval requirement and eligible alternative property routes", "source_date": "2025-03-30", "accessed_on": "2026-09-04", "notes": "Official application guidance."},
         {"id": "wa-transfer-duty-overview", "name": "RevenueWA - Transfer Duty Overview", "url": "https://www.wa.gov.au/system/files/2025-07/duties-transfer-duty-overview-fact-sheet.pdf", "source_type": "official", "metric_supported": "Western Australia transfer duty and foreign-duty framework", "source_date": "2025-07-01", "accessed_on": "2026-09-04", "notes": "Official state fact sheet."},
         {"id": "wa-foreign-buyers-duty", "name": "Western Australian Government - foreign buyers duty", "url": "https://www.wa.gov.au/service/financial-management/taxation-and-duty/about-foreign-buyers-duty", "source_type": "official", "metric_supported": "7% foreign buyers duty on relevant residential acquisitions", "source_date": "2026-08-13", "accessed_on": "2026-09-04", "notes": "Current state guidance."}
@@ -4803,7 +4803,7 @@
         }
       ],
       "sources": [
-        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029", "source_date": "2026-05-31", "accessed_on": "2026-09-04", "notes": "Current national policy announcement."},
+        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029", "source_date": "2026-05-12", "accessed_on": "2026-09-04", "notes": "Current national policy announcement."},
         {"id": "ato-residential-application", "name": "Australian Taxation Office - residential property applications for foreign investors", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/residential-property-application-for-foreign-investors", "source_type": "official", "metric_supported": "Approval requirement and eligible new-dwelling route", "source_date": "2025-03-30", "accessed_on": "2026-09-04", "notes": "Official application guidance."},
         {"id": "nsw-transfer-duty", "name": "Revenue NSW - calculate transfer duty", "url": "https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty/understanding-transfer-duty/calculate-transfer-duty", "source_type": "official", "metric_supported": "2026-27 progressive transfer-duty schedule", "source_date": "2026-08-19", "accessed_on": "2026-09-04", "notes": "Current NSW revenue guidance."},
         {"id": "nsw-foreign-surcharge", "name": "Revenue NSW - surcharge purchaser duty", "url": "https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty/surcharge-purchaser-duty/what-is-surcharge-purchaser-duty", "source_type": "official", "metric_supported": "9% foreign purchaser surcharge", "source_date": "2026-08-20", "accessed_on": "2026-09-04", "notes": "Current NSW revenue guidance."},

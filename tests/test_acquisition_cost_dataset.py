@@ -394,6 +394,35 @@ class AcquisitionCostDatasetContractTests(unittest.TestCase):
                         fx_rates_to_usd=self.fx_rates_to_usd,
                     )
 
+    def test_revalidated_changed_benchmarks_match_current_source_formulas(self) -> None:
+        expected_local_totals = {
+            "da-nang-hoi-an": (41_963_975.489628606, 42_060_475.489628606, 42_156_975.489628606),
+            "mallorca": (33_621.410649567886,) * 3,
+            "swiss-valais-vaud-alps": (58_147.25, 70_013.05, 81_878.85),
+            "lake-tahoe": (1_180.0, 2_784.5, 4_389.0),
+            "aspen-snowmass": (22_263.0, 27_263.0, 32_263.0),
+        }
+        records_by_id = {
+            record["destination_id"]: record
+            for record in self.dataset["destinations"]
+        }
+
+        for destination_id, expected in expected_local_totals.items():
+            with self.subTest(destination_id=destination_id):
+                record = records_by_id[destination_id]
+                destination = self.destinations_by_id[destination_id]
+                result = calculate_acquisition_costs(
+                    record,
+                    property_price_usd=destination["usd_per_m2"] * 100,
+                    fx_rates_to_usd=self.fx_rates_to_usd,
+                )
+                actual = tuple(
+                    sum(component[key] for component in result["components"])
+                    for key in ("low_local", "estimate_local", "high_local")
+                )
+                for actual_value, expected_value in zip(actual, expected):
+                    self.assertAlmostEqual(actual_value, expected_value)
+
     def test_final_destination_parity(self) -> None:
         records = self.dataset["destinations"]
         destinations = self.destinations
