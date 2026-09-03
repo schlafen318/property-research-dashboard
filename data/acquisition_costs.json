@@ -4814,6 +4814,123 @@
       "confidence": "high",
       "reviewed_on": "2026-09-04",
       "review_notes": "The grouped benchmark is suppressed because both ordinary established-resale routes are unavailable. NSW and Victorian duty information remains conditional context only."
+    },
+    {
+      "destination_id": "los-angeles-orange-county",
+      "local_currency": "USD",
+      "jurisdiction_basis": "The City of Los Angeles in Los Angeles County and a representative Orange County location define the range. At the exact USD915,487 comparison-home benchmark, both cases carry California county documentary transfer tax; the Los Angeles case also carries the city's 0.45% base tax. The benchmark is below the current Measure ULA threshold.",
+      "purchase_route": {
+        "status": "available",
+        "label": "Direct foreign natural-person purchase",
+        "notes": "California permits property ownership without regard to citizenship. Federal sanctions, tax reporting, title, insurance and property-specific use restrictions still require buyer and asset review."
+      },
+      "benchmark_calculability": {"status": "calculable", "reason": ""},
+      "components": [
+        {
+          "id": "county-and-city-transfer-tax-range",
+          "label": "Orange County-to-City of Los Angeles transfer-tax range",
+          "category": "tax",
+          "inclusion": "base",
+          "calculation": {"type": "manual", "low_amount": 1007.05, "estimate_amount": 3066.925, "high_amount": 5126.8, "valid_price_local": {"exact": 915487, "tolerance": 0.000001}},
+          "estimate_strategy": "manual",
+          "source_ids": ["ca-rtc-11911", "oc-recorder-fees", "la-city-transfer-tax"],
+          "notes": "Benchmark-only geographic range using 1,831 USD500 units. Orange County low: 1,831 x USD0.55 = USD1,007.05. City of Los Angeles high adds 1,831 x USD2.25 = USD4,119.75. No ULA tax applies below USD5.4 million."
+        },
+        {"id": "recording-and-indexing", "label": "Deed recording and indexing charges", "category": "registration", "inclusion": "conditional", "applicability": "Depends on county, page count, document type, exemptions and indexing details.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["oc-recorder-fees"], "notes": "No universal one-document buyer amount is inferred for the grouped destination."},
+        {"id": "title-escrow-and-inspection", "label": "Title, escrow, inspection and legal services", "category": "closing", "inclusion": "conditional", "applicability": "Provider, scope and buyer/seller allocation are transaction-specific.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["ca-dre-homebuyer"], "notes": "California regulator guidance describes these transaction roles but does not set a universal buyer amount."},
+        {"id": "buyer-brokerage", "label": "Buyer-broker compensation", "category": "brokerage", "inclusion": "conditional", "applicability": "Only when owed under the buyer agreement and not covered by another negotiated source.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["ca-dre-buyer-compensation"], "notes": "Compensation is negotiable and is not encoded as a standard percentage."}
+      ],
+      "sources": [
+        {"id": "ca-civil-671", "name": "California Civil Code section 671", "url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=CIV&sectionNum=671.", "source_type": "statute", "metric_supported": "California property ownership regardless of citizenship", "source_date": "2022-01-01", "accessed_on": "2026-09-04", "notes": "Current official code page."},
+        {"id": "ca-rtc-11911", "name": "California Revenue and Taxation Code section 11911", "url": "https://leginfo.legislature.ca.gov/faces/codes_displaySection.xhtml?lawCode=RTC&sectionNum=11911.", "source_type": "statute", "metric_supported": "County documentary transfer tax of USD0.55 per USD500 or fraction", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Undated live official code page; access date used."},
+        {"id": "oc-recorder-fees", "name": "Orange County Clerk-Recorder fee schedule", "url": "https://ocrecorder.com/sites/ocrecorder/files/2020-09/Fee_Schedule_2020_with_Fee_Increase_Notice.pdf", "source_type": "registry", "metric_supported": "USD0.55 documentary transfer tax per USD500 and recording add-ons", "source_date": "2020-01-01", "accessed_on": "2026-09-04", "notes": "Official county schedule corroborating the statutory county rate; current recording details must be confirmed at closing."},
+        {"id": "la-city-transfer-tax", "name": "Los Angeles Office of Finance - real property transfer tax and Measure ULA", "url": "https://finance.lacity.gov/faq/measure-ula", "source_type": "official", "metric_supported": "0.45% city base transfer tax and 2026 ULA thresholds", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Live city FAQ; access date used."},
+        {"id": "ca-dre-homebuyer", "name": "California Department of Real Estate - homebuyer guidance", "url": "https://www.dre.ca.gov/Consumers/FirstHomeCalifornia.html", "source_type": "official", "metric_supported": "Escrow, title and closing roles", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Undated live regulator guidance; access date used."},
+        {"id": "ca-dre-buyer-compensation", "name": "California Department of Real Estate - buyer representation and compensation", "url": "https://www.dre.ca.gov/Licensees/Advisories/Advisory_2024_11_14_Changes_to_Buyer_Representation.html", "source_type": "official", "metric_supported": "Written buyer agreement and negotiable compensation", "source_date": "2024-12-12", "accessed_on": "2026-09-04", "notes": "Official amended advisory."}
+      ],
+      "confidence": "medium-high",
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The exact-price guard preserves statutory USD500 rounding. The range reflects Orange County versus the City of Los Angeles; transaction-specific recording, title, escrow, inspections and brokerage stay conditional."
+    },
+    {
+      "destination_id": "miami-fort-lauderdale",
+      "local_currency": "USD",
+      "jurisdiction_basis": "Miami-Dade and Broward Counties represent Miami and Fort Lauderdale. At the exact USD880,000 100 m2 benchmark, the deed-tax range runs from Miami-Dade single-family treatment to Miami-Dade non-single-family treatment; Broward's statewide USD0.70-per-USD100 rate falls within that range.",
+      "purchase_route": {
+        "status": "conditional",
+        "label": "Direct purchase subject to nationality, domicile, parcel and proximity screening",
+        "notes": "Many foreign individuals may acquire Florida residential property, but Chapter 692 restricts defined foreign principals and certain property near military installations or critical infrastructure, with additional rules for persons connected to China. The generic nonresident profile lacks the nationality, domicile and parcel facts needed to declare the route unconditional."
+      },
+      "benchmark_calculability": {"status": "calculable", "reason": "The statutory deed-tax range is calculable even though buyer eligibility needs screening."},
+      "components": [
+        {
+          "id": "florida-deed-tax-range",
+          "label": "Miami-Dade/Broward documentary stamp tax range",
+          "category": "tax",
+          "inclusion": "base",
+          "calculation": {"type": "manual", "low_amount": 5280, "estimate_amount": 7260, "high_amount": 9240, "valid_price_local": {"exact": 880000, "tolerance": 0.000001}},
+          "estimate_strategy": "manual",
+          "source_ids": ["fl-dor-documentary-stamp"],
+          "notes": "At 8,800 USD100 units: Miami-Dade single-family low is USD5,280 at USD0.60; Broward is USD6,160 at USD0.70; Miami-Dade non-single-family high is USD9,240 at USD1.05 including surtax. The midpoint summarizes the destination range, not a statutory middle case."
+        },
+        {"id": "recording-fees", "label": "County recording fees", "category": "registration", "inclusion": "conditional", "applicability": "Depends on county, document length and instruments recorded.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["miami-recording"], "notes": "Miami-Dade lists USD10 for the first page, but a grouped destination and unknown document set do not support one universal amount."},
+        {"id": "eligibility-clearance", "label": "Foreign-principal and parcel eligibility clearance", "category": "regulatory", "inclusion": "conditional", "applicability": "Required diligence when nationality, domicile, ownership structure or parcel proximity could engage Chapter 692.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["fl-foreign-principal-definitions", "fl-proximity-restriction"], "notes": "No generic legal-fee amount is invented."},
+        {"id": "title-escrow-inspection-and-brokerage", "label": "Title, settlement, inspection and buyer representation", "category": "closing", "inclusion": "conditional", "applicability": "Quotes and contractual allocation vary by property and service provider.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["miami-recording"], "notes": "Not included without an authoritative universal buyer amount."}
+      ],
+      "sources": [
+        {"id": "fl-dor-documentary-stamp", "name": "Florida Department of Revenue - Documentary Stamp Tax", "url": "https://floridarevenue.com/taxes/taxesfees/Pages/doc_stamp.aspx", "source_type": "official", "metric_supported": "USD0.70 statewide deed rate; Miami-Dade USD0.60 rate plus USD0.45 non-single-family surtax", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Live state tax guidance; access date used."},
+        {"id": "miami-recording", "name": "Miami-Dade Clerk of the Court - Official Records", "url": "https://www.miamidade.gov/sites/clerk/official-records.page", "source_type": "registry", "metric_supported": "Official-recording process and USD10 first-page recording fee", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Undated live county page; access date used."},
+        {"id": "fl-foreign-principal-definitions", "name": "Florida Statutes section 692.201", "url": "https://leg.state.fl.us/STATUTES/index.cfm?App_mode=Display_Statute&Search_String=&URL=0600-0699%2F0692%2FSections%2F0692.201.html", "source_type": "statute", "metric_supported": "Definitions of foreign country of concern and foreign principal", "source_date": "2025-01-01", "accessed_on": "2026-09-04", "notes": "Official current statute page."},
+        {"id": "fl-proximity-restriction", "name": "Florida Statutes section 692.203", "url": "https://www.leg.state.fl.us/statutes/index.cfm?App_mode=Display_Statute&Search_String=&URL=0600-0699%2F0692%2FSections%2F0692.203.html", "source_type": "statute", "metric_supported": "Restrictions for defined foreign principals near military installations and critical infrastructure", "source_date": "2025-01-01", "accessed_on": "2026-09-04", "notes": "Official current statute page; buyer and parcel facts determine application."}
+      ],
+      "confidence": "medium-high",
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The base range is limited to deed taxes with exact statutory rounding at the benchmark. Route status is conditional because the buyer profile does not identify nationality/domicile and the destination does not identify a parcel."
+    },
+    {
+      "destination_id": "vancouver",
+      "local_currency": "CAD",
+      "jurisdiction_basis": "Vancouver in the Metro Vancouver Regional District, British Columbia. The federal prohibition covers residential property in census metropolitan areas through 1 January 2027, and the baseline non-Canadian second-home buyer is not assigned an exception.",
+      "purchase_route": {
+        "status": "unavailable",
+        "label": "Covered residential purchase prohibited for the baseline non-Canadian",
+        "notes": "The federal prohibition remains in force until 1 January 2027. Statutory exceptions are buyer- and circumstance-specific and are not assumed."
+      },
+      "benchmark_calculability": {"status": "not_calculable", "reason": "A normal all-in acquisition total would imply an available route during the federal prohibition, so totals are suppressed."},
+      "components": [
+        {
+          "id": "bc-general-property-transfer-tax",
+          "label": "B.C. general property transfer tax",
+          "category": "tax",
+          "inclusion": "conditional",
+          "applicability": "Only if the buyer qualifies for a federal exception and completes a taxable transfer.",
+          "calculation": {"type": "progressive", "tax_base": "purchase_price", "brackets": [{"up_to": 200000, "rate": 0.01}, {"up_to": 2000000, "rate": 0.02}, {"up_to": 3000000, "rate": 0.03}, {"up_to": null, "rate": 0.05}]},
+          "estimate_strategy": "statutory",
+          "source_ids": ["bc-property-transfer-tax"],
+          "notes": "Calculated on fair market value for an eligible transfer; no amount enters the unavailable baseline total."
+        },
+        {
+          "id": "bc-additional-foreign-tax",
+          "label": "B.C. additional property transfer tax for foreign entities",
+          "category": "tax",
+          "inclusion": "conditional",
+          "applicability": "If an eligible foreign national acquires residential property in Metro Vancouver without a provincial exemption.",
+          "calculation": {"type": "rate", "tax_base": "purchase_price", "rate": 0.20},
+          "estimate_strategy": "statutory",
+          "source_ids": ["bc-additional-foreign-tax"],
+          "notes": "The 20% tax is retained as exception-route context and does not imply federal eligibility."
+        },
+        {"id": "legal-title-and-registration", "label": "Legal conveyancing, title and registration charges", "category": "closing", "inclusion": "conditional", "applicability": "Only for an eligible purchase; amounts depend on provider, title and filings.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["bc-property-transfer-tax"], "notes": "No universal buyer amount is encoded."}
+      ],
+      "sources": [
+        {"id": "ca-foreign-buyer-extension", "name": "Government of Canada - extension of foreign ownership prohibition", "url": "https://www.canada.ca/en/department-finance/news/2024/02/government-announces-two-year-extension-to-ban-on-foreign-ownership-of-canadian-housing.html", "source_type": "official", "metric_supported": "Federal purchase prohibition extended to 1 January 2027", "source_date": "2024-02-04", "accessed_on": "2026-09-04", "notes": "Official federal announcement enacted through the 2024 budget legislation."},
+        {"id": "ca-prohibition-regulations", "name": "Canada - Prohibition on the Purchase of Residential Property by Non-Canadians Regulations", "url": "https://laws-lois.justice.gc.ca/eng/regulations/SOR-2022-250/index.html", "source_type": "statute", "metric_supported": "Covered property, prescribed metropolitan geography and exceptions", "source_date": "2026-06-14", "accessed_on": "2026-09-04", "notes": "Official consolidated regulations."},
+        {"id": "bc-property-transfer-tax", "name": "Province of British Columbia - property transfer tax", "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax", "source_type": "official", "metric_supported": "General 1%, 2% and 3% brackets plus further residential tax over CAD3 million", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Undated live provincial guidance; access date used."},
+        {"id": "bc-additional-foreign-tax", "name": "Province of British Columbia - additional property transfer tax", "url": "https://www2.gov.bc.ca/gov/content/taxes/property-taxes/property-transfer-tax/additional-property-transfer-tax", "source_type": "official", "metric_supported": "20% additional tax for foreign entities acquiring residential property in Metro Vancouver", "source_date": "2025-06-20", "accessed_on": "2026-09-04", "notes": "Current provincial guidance."}
+      ],
+      "confidence": "high",
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The federal ban makes the baseline route unavailable. B.C. general and foreign-buyer transfer taxes are preserved only as conditional context for a buyer who proves an applicable federal exception."
     }
   ]
 }
