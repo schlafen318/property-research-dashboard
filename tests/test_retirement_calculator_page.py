@@ -244,8 +244,8 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertNotIn('id="ret-tax-central-capital"', results)
         self.assertIn('id="ret-tax-range"', results)
         self.assertLess(results.index('id="ret-plan-summary"'), results.index('id="ret-tax-range"'))
-        self.assertIn('id="ret-tax-no-tax-comparison"', results)
-        self.assertIn("No added destination tax comparison", results)
+        self.assertNotIn('id="ret-tax-no-tax-comparison"', results)
+        self.assertNotIn("No added destination tax comparison", results)
         self.assertIn('id="ret-tax-details"', results)
         self.assertIn("How the tax range is calculated", results)
         disclosure = results.split('id="ret-tax-details"', 1)[1].split("</details>", 1)[0]
@@ -493,7 +493,7 @@ class RetirementCalculatorPageTests(unittest.TestCase):
         self.assertIn("GHAFireTaxDetailedUI", self.html)
         self.assertIn('id="ret-tax-detailed" hidden', self.html)
         self.assertIn('id="ret-tax-refine" type="button" hidden disabled', self.html)
-        self.assertIn('id="ret-tax-detailed-availability" role="status"', self.html)
+        self.assertIn('id="ret-tax-detailed-availability" role="status" hidden', self.html)
         self.assertIn("Detailed tax refinement appears only for supported destination and home-country combinations.", self.html)
         payload_text = self.html.split(
             '<script id="fire-tax-detailed-data" type="application/json">', 1

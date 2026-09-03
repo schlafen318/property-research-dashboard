@@ -1242,12 +1242,10 @@
       });
       const range = el("ret-tax-range");
       const unavailable = el("ret-tax-unavailable");
-      const comparison = el("ret-tax-no-tax-comparison");
       const details = el("ret-tax-details");
       const refine = el("ret-tax-refine");
       range.hidden = true;
       unavailable.hidden = true;
-      comparison.hidden = true;
       details.hidden = true;
       refine.hidden = true;
       refine.disabled = true;
@@ -1261,10 +1259,6 @@
       if (view.status !== "available") return view;
       range.hidden = false;
       el("ret-tax-range-capital").textContent = displayMoney(view.capitalRange[0]) + "–" + displayMoney(view.capitalRange[1]);
-      if (view.noTaxComparison) {
-        comparison.hidden = false;
-        setMoney("ret-tax-no-tax-capital", view.noTaxComparison.requiredCapital);
-      }
       view.rows.forEach(function (row) {
         const cells = el("ret-tax-" + row.key + "-row").children;
         cells[1].textContent = displayMoney(row.annualTaxReserve);

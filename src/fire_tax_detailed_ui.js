@@ -553,6 +553,7 @@
     function sync() {
       const pairs = supportedHomes();
       homeField.hidden = pairs.length === 0;
+      availability.hidden = pairs.length === 0;
       Array.from(home.options).forEach(function (option) {
         if (!option.value) return;
         option.hidden = !pairs.some(function (pair) { return pair.home_jurisdiction_id === option.value; });
