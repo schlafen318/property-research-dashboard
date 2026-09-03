@@ -43,7 +43,14 @@
     "jackson-hole": {"status": "proxy", "reason": "Prime built-property benchmark reflects opaque and mixed resort stock rather than the target residence."},
     "ticino-lake-lugano": {"status": "proxy", "reason": "Average property benchmark does not isolate apartments or confirm foreign-purchasable inventory."},
     "aspen-snowmass": {"status": "proxy", "reason": "Prime single-family benchmark is materially above and different from the managed-residence archetype."},
-    "swiss-valais-vaud-alps": {"status": "proxy", "reason": "Premium alpine benchmark spans resorts and does not isolate eligible upper-middle managed residences."}
+    "swiss-valais-vaud-alps": {"status": "proxy", "reason": "Premium alpine benchmark spans resorts and does not isolate eligible upper-middle managed residences."},
+    "dubai": {"status": "proxy", "reason": "Broad apartment market data and current asking observations mix ready and off-plan submarkets rather than isolating the target completed residence."},
+    "gold-coast-sunshine-coast": {"status": "proxy", "reason": "A single new-apartment asking observation is not a completed-sale valuation or a regional upper-middle resale benchmark."},
+    "los-angeles-orange-county": {"status": "proxy", "reason": "A Santa Monica asking observation and wider regional comparables do not isolate a representative two-bedroom resale benchmark across both counties."},
+    "miami-fort-lauderdale": {"status": "proxy", "reason": "Three asking listings across distinct submarkets are not a completed-sale valuation or a representative regional benchmark."},
+    "perth-margaret-river": {"status": "proxy", "reason": "A small new-build asking sample across urban and regional submarkets is not a resale market median or valuation."},
+    "sydney-melbourne": {"status": "proxy", "reason": "Three new-development asking observations across two cities do not represent a completed-resale upper-middle benchmark."},
+    "vancouver": {"status": "proxy", "reason": "A Yaletown asking observation and mixed property-type comparables do not isolate the target residence across the Vancouver market."}
   },
   "included_costs": [
     "indicative property price"

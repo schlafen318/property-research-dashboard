@@ -12,10 +12,13 @@ import unicodedata
 from copy import deepcopy
 from datetime import date
 from html import escape
+from math import isfinite
+from numbers import Real
 from pathlib import Path
 from urllib.parse import urlparse
 
 try:
+    from src.acquisition_costs import calculate_acquisition_costs, validate_acquisition_dataset
     from src.country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from src.fire_abroad import (
         CANONICAL_LAUNCH_IDS,
@@ -52,6 +55,7 @@ try:
         validate_premium_dossier,
     )
 except ModuleNotFoundError:  # Direct execution: python3 src/build_unified_app.py
+    from acquisition_costs import calculate_acquisition_costs, validate_acquisition_dataset
     from country_retirement_guides import COUNTRY_RETIREMENT_GUIDES
     from fire_abroad import (
         CANONICAL_LAUNCH_IDS,
@@ -1126,6 +1130,10 @@ TRUST_PAGES = [
 ]
 
 
+def _is_finite_number(value: object) -> bool:
+    return not isinstance(value, bool) and isinstance(value, Real) and isfinite(value)
+
+
 def money(value: float | int | None) -> str:
     if value is None:
         return "n/a"
@@ -1138,6 +1146,162 @@ def number(value: float | int | None) -> str:
     if isinstance(value, float) and not value.is_integer():
         return f"{value:,.1f}"
     return f"{value:,.0f}"
+
+
+def acquisition_percentage(value: float | int | None) -> str:
+    if not _is_finite_number(value):
+        return "n/a"
+    return f"{float(value):.1%}"
+
+
+def acquisition_range(
+    low: float | int | None,
+    estimate: float | int | None,
+    high: float | int | None,
+) -> str:
+    if not all(_is_finite_number(value) for value in (low, estimate, high)):
+        return "Not quantified"
+    if low == high:
+        return money(estimate)
+    return f"{money(estimate)} ({money(low)}–{money(high)})"
+
+
+def acquisition_route_status(dest: dict) -> str:
+    route = dest.get("purchase_route")
+    if not isinstance(route, dict):
+        return "unavailable"
+    status = route.get("status")
+    if status not in {"available", "conditional", "unavailable"}:
+        return "unavailable"
+    return str(status)
+
+
+def acquisition_route_text(dest: dict) -> str:
+    route = dest.get("purchase_route")
+    route = route if isinstance(route, dict) else {}
+    return f"{acquisition_route_status(dest).capitalize()}: {route.get('label') or 'Route not documented'}"
+
+
+def acquisition_benchmark_status(dest: dict) -> str:
+    status = dest.get("acquisition_benchmark_status")
+    return str(status) if status in {"calculable", "not_calculable"} else "not_calculable"
+
+
+def acquisition_benchmark_reason(dest: dict) -> str:
+    if acquisition_benchmark_status(dest) == "calculable":
+        return ""
+    reason = dest.get("acquisition_benchmark_reason")
+    if isinstance(reason, str) and reason.strip():
+        return reason.strip()
+    return "No eligible route-aligned benchmark is documented."
+
+
+def acquisition_benchmark_text(dest: dict) -> str:
+    if acquisition_benchmark_status(dest) == "calculable":
+        return "Calculable"
+    return f"Not calculable: {acquisition_benchmark_reason(dest)}"
+
+
+def acquisition_status_text(dest: dict) -> str:
+    confidence = str(dest.get("acquisition_cost_confidence") or "n/a")
+    status = f"{acquisition_route_text(dest)} · {confidence} confidence"
+    if acquisition_benchmark_status(dest) != "calculable":
+        benchmark = acquisition_benchmark_text(dest)
+        status += f" · Benchmark {benchmark[0].lower()}{benchmark[1:]}"
+    return status
+
+
+def acquisition_cost_is_complete(dest: dict) -> bool:
+    component_fields_present = any(
+        field in dest for field in ("acquisition_components", "conditional_acquisition_components")
+    )
+    if component_fields_present:
+        components = [
+            *(dest.get("acquisition_components") or []),
+            *(dest.get("conditional_acquisition_components") or []),
+        ]
+        return all(
+            isinstance(component, dict)
+            and all(_is_finite_number(component.get(field)) for field in ("low_usd", "estimate_usd", "high_usd"))
+            for component in components
+        )
+    return dest.get("acquisition_cost_complete") is True
+
+
+def acquisition_completeness_text(dest: dict) -> str:
+    return "complete" if acquisition_cost_is_complete(dest) else "known-base/incomplete"
+
+
+def conditional_acquisition_disclosure(dest: dict) -> str:
+    components = dest.get("conditional_acquisition_components") or []
+    if not components:
+        return "No conditional acquisition items identified."
+    unknown = sum(1 for component in components if component.get("estimate_usd") is None)
+    if unknown:
+        return f"Known-base/incomplete; {unknown} unquantified conditional items remain outside comparable totals."
+    item_label = "item" if len(components) == 1 else "items"
+    return f"Conditional costs: {len(components)} {item_label} outside the base total."
+
+
+def acquisition_cost_text(dest: dict) -> str:
+    if acquisition_benchmark_status(dest) != "calculable":
+        return "Not quantified"
+    amount = acquisition_range(
+        dest.get("acquisition_cost_low_usd"),
+        dest.get("acquisition_cost_estimate_usd"),
+        dest.get("acquisition_cost_high_usd"),
+    )
+    return amount if acquisition_cost_is_complete(dest) else f"{amount}; known-base/incomplete"
+
+
+def all_in_acquisition_text(dest: dict) -> str:
+    status = acquisition_route_status(dest)
+    if status == "unavailable" or acquisition_benchmark_status(dest) != "calculable":
+        return "Not presented"
+    amount = acquisition_range(
+        dest.get("all_in_acquisition_low_usd"),
+        dest.get("all_in_acquisition_estimate_usd"),
+        dest.get("all_in_acquisition_high_usd"),
+    )
+    if not acquisition_cost_is_complete(dest):
+        return f"{amount}; known-base/incomplete"
+    return f"{amount}; conditional route" if status == "conditional" else amount
+
+
+def acquisition_rate_text(dest: dict) -> str:
+    if acquisition_benchmark_status(dest) != "calculable":
+        return "Not quantified"
+    rate = acquisition_percentage(dest.get("acquisition_cost_rate"))
+    return rate if acquisition_cost_is_complete(dest) else f"{rate}; known-base/incomplete"
+
+
+def acquisition_buyer_scenario(dest: dict) -> str:
+    profile = dest.get("acquisition_buyer_profile") or {}
+    if not profile:
+        return "Not documented"
+    values = [
+        f"{profile.get('residency') or 'nonresident'} {profile.get('buyer_type') or 'individual'}",
+        str(profile.get("use") or "second home"),
+        str(profile.get("financing") or "cash"),
+        str(profile.get("property_market") or "resale"),
+        "no reliefs" if profile.get("reliefs") in {None, "none"} else str(profile["reliefs"]),
+    ]
+    return " · ".join(value.replace("_", " ") for value in values).capitalize()
+
+
+def comparison_price_disclosure(destination: dict | None = None) -> str:
+    base = (
+        "Modeled base acquisition costs are shown separately from the property-price figure. "
+        "Unquantified and conditional items remain outside comparable totals."
+    )
+    if destination is None:
+        return (
+            "All prices model the same indicative 100 m² retirement home. "
+            "Each destination is labelled as an aligned benchmark or proxy. " + base
+        )
+    status = destination.get("comparison_home_evidence") or "proxy"
+    reason = destination.get("comparison_home_evidence_reason") or "Confirm the benchmark against matching local properties."
+    return f"{status.capitalize()}: {reason} {base}"
 
 
 def percentish(value: str | None) -> float:
@@ -1395,6 +1559,88 @@ def confidence_tone(value: str | None) -> str:
 
 def load_json(name: str):
     return json.loads((DATA / name).read_text(encoding="utf-8"))
+
+
+def load_comparison_methodology() -> dict:
+    return load_json("property_comparison_methodology.json")
+
+
+def load_acquisition_costs() -> dict:
+    return load_json("acquisition_costs.json")
+
+
+def add_comparison_home_estimate(destination: dict, methodology: dict) -> dict:
+    enriched = dict(destination)
+    area_m2 = float(methodology["internal_area_m2"])
+    benchmark = float(destination.get("usd_per_m2", 0) or 0)
+    if benchmark <= 0:
+        raise ValueError(f"{destination.get('id', 'destination')} must have a positive usd_per_m2 benchmark")
+    review = methodology.get("evidence_by_destination", {}).get(destination.get("id"), {})
+    evidence = review.get("status", "proxy")
+    evidence_reason = review.get(
+        "reason",
+        "Evidence alignment not reviewed for this destination; treat the estimate as a proxy.",
+    )
+    enriched.update(
+        {
+            "comparison_home_usd": benchmark * area_m2,
+            "comparison_home_area_m2": area_m2,
+            "comparison_home_archetype_id": methodology["id"],
+            "comparison_home_evidence": evidence,
+            "comparison_home_evidence_reason": evidence_reason,
+            "comparison_home_disclosure": (
+                "Standardized estimate; not a direct quote for this exact home archetype."
+                if evidence == "proxy"
+                else "Area-standardized estimate using the destination's residential market benchmark."
+            ),
+        }
+    )
+    return enriched
+
+
+def add_acquisition_cost_estimate(
+    destination: dict,
+    acquisition_record: dict,
+    fx_rates_to_usd: dict[str, float],
+    buyer_profile: dict | None = None,
+) -> dict:
+    destination_id = destination.get("id", "destination")
+    area_m2 = float(destination.get("comparison_home_area_m2", 0) or 0)
+    if area_m2 <= 0 or area_m2 != 100:
+        raise ValueError(
+            f"{destination_id} comparison_home_area_m2 must be positive and equal to the fixed 100 m² archetype"
+        )
+    result = calculate_acquisition_costs(
+        acquisition_record,
+        float(destination["comparison_home_usd"]),
+        fx_rates_to_usd,
+    )
+    enriched = dict(destination)
+    enriched.update(
+        {
+            "acquisition_cost_low_usd": result["base_cost_low_usd"],
+            "acquisition_cost_estimate_usd": result["base_cost_estimate_usd"],
+            "acquisition_cost_high_usd": result["base_cost_high_usd"],
+            "acquisition_cost_rate": result["base_cost_rate"],
+            "all_in_acquisition_low_usd": result["all_in_low_usd"],
+            "all_in_acquisition_estimate_usd": result["all_in_estimate_usd"],
+            "all_in_acquisition_high_usd": result["all_in_high_usd"],
+            "all_in_acquisition_usd_per_m2": result["all_in_usd_per_m2"],
+            "acquisition_components": result["components"],
+            "conditional_acquisition_components": result["conditional_components"],
+            "purchase_route": result["purchase_route"],
+            "acquisition_benchmark_status": result["benchmark_calculability"]["status"],
+            "acquisition_benchmark_reason": result["benchmark_calculability"]["reason"],
+            "acquisition_cost_confidence": result["acquisition_cost_confidence"],
+            "acquisition_jurisdiction_basis": result["jurisdiction_basis"],
+            "acquisition_cost_reviewed_on": result["reviewed_on"],
+            "acquisition_buyer_profile": dict(buyer_profile or {}),
+            "acquisition_sources": [dict(source) for source in acquisition_record.get("sources", [])],
+        }
+    )
+    enriched["acquisition_cost_complete"] = acquisition_cost_is_complete(enriched)
+    enriched["acquisition_cost_completeness"] = acquisition_completeness_text(enriched)
+    return enriched
 
 
 def load_retirement_costs(path: Path = RETIREMENT_COSTS_PATH) -> dict:
@@ -3796,15 +4042,111 @@ def build_country_guides_hub_page(destinations: list[dict]) -> str:
 def country_summary_metrics(hub: dict, destinations: list[dict]) -> dict:
     selected = destinations_for_ids(hub.get("destination_ids", []), destinations)
     if not selected:
-        return {"count": 0, "score": 0, "entry": 0, "ownership": 0, "retirement": 0, "liquidity": 0, "top": ""}
+        return {
+            "count": 0,
+            "score": 0,
+            "entry": 0,
+            "evidence": "n/a",
+            "ownership": 0,
+            "retirement": 0,
+            "liquidity": 0,
+            "top": "",
+            "all_in_entry": None,
+            "acquisition_cost": None,
+            "acquisition_rate": None,
+            "acquisition_evidence": "n/a",
+            "acquisition_cost_complete": False,
+            "acquisition_cost_completeness": "not available",
+            "acquisition_contributors": 0,
+            "acquisition_excluded": 0,
+            "acquisition_unavailable_excluded": 0,
+            "acquisition_uncalculable_excluded": 0,
+        }
+    evidence = (
+        "aligned benchmark"
+        if all(dest.get("comparison_home_evidence") == "aligned benchmark" for dest in selected)
+        else "mixed/proxy"
+    )
+    acquisition_contributors = [
+        dest
+        for dest in selected
+        if acquisition_route_status(dest) in {"available", "conditional"}
+        and acquisition_benchmark_status(dest) == "calculable"
+        and all(
+            _is_finite_number(dest.get(field))
+            for field in (
+                "comparison_home_usd",
+                "acquisition_cost_estimate_usd",
+                "all_in_acquisition_estimate_usd",
+            )
+        )
+    ]
+    contributor_count = len(acquisition_contributors)
+    acquisition_cost_complete = bool(acquisition_contributors) and all(
+        acquisition_cost_is_complete(dest) for dest in acquisition_contributors
+    )
+    acquisition_cost = (
+        sum(float(dest["acquisition_cost_estimate_usd"]) for dest in acquisition_contributors)
+        / contributor_count
+        if contributor_count
+        else None
+    )
+    acquisition_property_price = (
+        sum(float(dest["comparison_home_usd"]) for dest in acquisition_contributors)
+        / contributor_count
+        if contributor_count
+        else None
+    )
+    acquisition_evidence = (
+        "aligned"
+        if acquisition_contributors
+        and acquisition_cost_complete
+        and all(
+            acquisition_route_status(dest) == "available"
+            and dest.get("acquisition_cost_confidence") in {"high", "medium-high"}
+            for dest in acquisition_contributors
+        )
+        else "mixed/proxy"
+    )
+    comparison_prices = [
+        float(dest["comparison_home_usd"])
+        for dest in selected
+        if _is_finite_number(dest.get("comparison_home_usd"))
+    ]
     return {
         "count": len(selected),
         "score": sum(float(dest.get("decision_score", 0) or 0) for dest in selected) / len(selected),
-        "entry": sum(float(dest.get("usd_per_m2", 0) or 0) for dest in selected) / len(selected),
+        "entry": sum(comparison_prices) / len(comparison_prices) if comparison_prices else 0,
+        "evidence": evidence,
         "ownership": sum(metric_value(dest, "ownership_clarity") for dest in selected) / len(selected),
         "retirement": sum(metric_value(dest, "retirement_fit") for dest in selected) / len(selected),
         "liquidity": sum(metric_value(dest, "exit_liquidity") for dest in selected) / len(selected),
         "top": selected[0]["name"],
+        "all_in_entry": (
+            sum(float(dest["all_in_acquisition_estimate_usd"]) for dest in acquisition_contributors)
+            / contributor_count
+            if contributor_count
+            else None
+        ),
+        "acquisition_cost": acquisition_cost,
+        "acquisition_rate": (
+            acquisition_cost / acquisition_property_price
+            if acquisition_cost is not None and acquisition_property_price
+            else None
+        ),
+        "acquisition_evidence": acquisition_evidence,
+        "acquisition_cost_complete": acquisition_cost_complete,
+        "acquisition_cost_completeness": (
+            "complete" if acquisition_cost_complete else "known-base/incomplete" if acquisition_contributors else "not available"
+        ),
+        "acquisition_contributors": contributor_count,
+        "acquisition_excluded": len(selected) - contributor_count,
+        "acquisition_unavailable_excluded": sum(
+            1 for dest in selected if acquisition_route_status(dest) == "unavailable"
+        ),
+        "acquisition_uncalculable_excluded": sum(
+            1 for dest in selected if acquisition_benchmark_status(dest) != "calculable"
+        ),
     }
 
 
@@ -11037,14 +11379,34 @@ def sitemap_url_entries(destinations: list[dict]) -> list[tuple[str, str]]:
 def build(*, as_of: date | None = None) -> Path:
     build_date = as_of or date.today()
     content_overrides = load_content_overrides()
-    destinations = [consolidate_destination(item) for item in load_json("destinations.json")]
+    raw_destinations = load_json("destinations.json")
+    comparison_methodology = load_comparison_methodology()
+    fx = load_json("fx_rates.json")
+    fx_rates_to_usd = fx["rates_to_usd"]
+    acquisition_dataset = load_acquisition_costs()
+    validate_acquisition_dataset(
+        acquisition_dataset,
+        {item["id"] for item in raw_destinations},
+        fx_rates_to_usd,
+    )
+    acquisition_records = {
+        item["destination_id"]: item for item in acquisition_dataset["destinations"]
+    }
+    destinations = [
+        add_acquisition_cost_estimate(
+            add_comparison_home_estimate(consolidate_destination(item), comparison_methodology),
+            acquisition_records[item["id"]],
+            fx_rates_to_usd,
+            acquisition_dataset.get("buyer_profile"),
+        )
+        for item in raw_destinations
+    ]
     destinations = rank_destinations(destinations)
     retirement_costs = load_retirement_costs()
     fire_payload = load_fire_abroad_for_build(destinations, retirement_costs)
     mortgage_profiles = load_mortgage_profiles()
     guide_pages = [RETIREMENT_DESTINATIONS_PAGE, *SEO_PAGES]
     listings = load_json("listings.json")
-    fx = load_json("fx_rates.json")
     listings_by_dest: dict[str, list[dict]] = {}
     for listing in listings:
         listings_by_dest.setdefault(listing["destination_id"], []).append(listing)
@@ -11055,7 +11417,7 @@ def build(*, as_of: date | None = None) -> Path:
     )
 
     avg_score = sum(float(item.get("decision_score", 0) or 0) for item in destinations) / len(destinations)
-    min_price = min(float(item.get("usd_per_m2", 0) or 0) for item in destinations)
+    min_price = min(float(item.get("comparison_home_usd", 0) or 0) for item in destinations)
     countries = len({item.get("country") for item in destinations if item.get("country")})
     auto_internal_links = load_auto_internal_links()
     for entry in content_overrides:
@@ -11113,7 +11475,9 @@ def build(*, as_of: date | None = None) -> Path:
             "destinations": destinations,
             "listings": listings,
             "fx": fx,
-            "generated": date.today().isoformat(),
+            "property_comparison_methodology": comparison_methodology,
+            "acquisition_cost_methodology": acquisition_dataset,
+            "generated": build_date.isoformat(),
         },
         ensure_ascii=False,
     )

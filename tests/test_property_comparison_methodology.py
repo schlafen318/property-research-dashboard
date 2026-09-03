@@ -93,7 +93,7 @@ class PropertyComparisonMethodologyTests(unittest.TestCase):
             for item in destinations
         ]
 
-        self.assertEqual(len(enriched), 30)
+        self.assertEqual(len(enriched), 37)
         self.assertEqual(set(reviews), {item["id"] for item in destinations})
         self.assertTrue(all(review["status"] in {"aligned benchmark", "proxy"} for review in reviews.values()))
         self.assertTrue(all(review["reason"].strip() for review in reviews.values()))
