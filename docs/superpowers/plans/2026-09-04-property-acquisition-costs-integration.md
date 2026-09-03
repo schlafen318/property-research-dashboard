@@ -100,18 +100,18 @@ Change only the destination identifier from `m-laga-costa-del-sol` to `malaga-co
 - [ ] **Step 3: Verify the pure engine GREEN**
 
 ```bash
-python3 -m unittest tests.test_acquisition_costs tests.test_property_comparison_methodology -v
+python3 -m unittest tests.test_acquisition_costs -v
 ```
 
-Expected: all engine and methodology tests pass.
+Expected: all pure engine tests pass. The comparison-methodology suite remains red until the current builder receives its loader and enrichment hooks in Task 5.
 
-- [ ] **Step 4: Verify dataset RED is limited to the seven added IDs**
+- [ ] **Step 4: Verify the dataset RED boundary**
 
 ```bash
 python3 -m unittest tests.test_acquisition_cost_dataset -v
 ```
 
-Expected: the dataset parity failure names exactly the seven added destination IDs; no calculation, schema, date, HTTPS, source-reference, or duplicate-ID failure.
+Expected: the dataset parity failure names the seven added destination IDs. Exact-price guards may also identify historical records whose current `usd_per_m2` benchmark changed after the legacy research; preserve those failures for source revalidation in Task 4 rather than weakening the guards.
 
 - [ ] **Step 5: Commit**
 
