@@ -4705,6 +4705,115 @@
       "confidence": "high",
       "reviewed_on": "2026-09-04",
       "review_notes": "The base includes only the buyer's default 2% registration share and published DLD certificate, map, knowledge, innovation and pre-VAT trustee charges. VAT, negotiated fee reallocation, developer NOC cost and professional fees remain conditional."
+    },
+    {
+      "destination_id": "gold-coast-sunshine-coast",
+      "local_currency": "AUD",
+      "jurisdiction_basis": "Queensland, representing the Gold Coast and Sunshine Coast. The agreed baseline is a completed established resale second home, which a foreign nonresident is generally prohibited from acquiring while Australia's established-dwelling ban remains in force through mid-2029.",
+      "purchase_route": {
+        "status": "unavailable",
+        "label": "Established-resale route unavailable to the baseline foreign buyer",
+        "notes": "Limited exceptions support material housing-supply additions and do not fit a personal completed-resale second home. A qualifying new dwelling is a separate asset route and is not substituted into this benchmark."
+      },
+      "benchmark_calculability": {"status": "not_calculable", "reason": "The current comparison-home benchmark represents an established resale that the baseline buyer may not acquire; no ordinary all-in acquisition total is presented."},
+      "components": [
+        {
+          "id": "foreign-investment-approval",
+          "label": "Foreign-investment approval and application fee",
+          "category": "regulatory",
+          "inclusion": "conditional",
+          "applicability": "Only for a different transaction that is eligible for foreign-investment approval, such as a qualifying new dwelling or an exception.",
+          "calculation": null,
+          "estimate_strategy": "statutory",
+          "source_ids": ["au-established-dwelling-ban", "ato-residential-application"],
+          "notes": "The fee depends on the eligible property value and application type; none is applied to the unavailable baseline route."
+        },
+        {
+          "id": "queensland-transfer-duty",
+          "label": "Queensland transfer duty",
+          "category": "tax",
+          "inclusion": "conditional",
+          "applicability": "Only if the buyer selects a legally eligible Queensland residential acquisition.",
+          "calculation": null,
+          "estimate_strategy": "statutory",
+          "source_ids": ["qld-transfer-duty"],
+          "notes": "Queensland applies progressive duty to dutiable value; no amount is calculated for the unavailable resale benchmark."
+        },
+        {
+          "id": "queensland-afad",
+          "label": "Queensland additional foreign acquirer duty",
+          "category": "tax",
+          "inclusion": "conditional",
+          "applicability": "For a legally eligible acquisition of Queensland residential land by a foreign person unless relief applies.",
+          "calculation": {"type": "rate", "tax_base": "purchase_price", "rate": 0.08},
+          "estimate_strategy": "statutory",
+          "source_ids": ["qld-transfer-duty", "qld-afad"],
+          "notes": "The 8% surcharge is retained as decision context but does not create an all-in total for the prohibited baseline route."
+        }
+      ],
+      "sources": [
+        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029 with limited supply-supporting exceptions", "source_date": "2026-05-31", "accessed_on": "2026-09-04", "notes": "Current Australian Government announcement controlling the baseline route."},
+        {"id": "ato-residential-application", "name": "Australian Taxation Office - residential property applications for foreign investors", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/residential-property-application-for-foreign-investors", "source_type": "official", "metric_supported": "Approval requirement, established-dwelling restrictions, and eligible new-dwelling route", "source_date": "2025-03-30", "accessed_on": "2026-09-04", "notes": "Official application guidance; the later Treasury announcement extends the ban end date."},
+        {"id": "qld-transfer-duty", "name": "Queensland Revenue Office - calculate transfer duty", "url": "https://qro.qld.gov.au/duties/transfer-duty/calculate/how-to-calculate/", "source_type": "official", "metric_supported": "Transfer duty applies to dutiable value and foreign residential acquisitions attract additional duty", "source_date": "2026-08-01", "accessed_on": "2026-09-04", "notes": "Live state revenue guidance."},
+        {"id": "qld-afad", "name": "Queensland Revenue Office - additional foreign acquirer duty", "url": "https://qro.qld.gov.au/duties/investors/afad/", "source_type": "official", "metric_supported": "8% additional foreign acquirer duty", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Undated live guidance; access date used."}
+      ],
+      "confidence": "high",
+      "reviewed_on": "2026-09-04",
+      "review_notes": "No numeric total is shown because the baseline established-resale route is unavailable. Queensland duties remain conditional context for a separately eligible asset."
+    },
+    {
+      "destination_id": "perth-margaret-river",
+      "local_currency": "AUD",
+      "jurisdiction_basis": "Western Australia, representing Perth and Margaret River. The completed established-resale second-home baseline is generally unavailable to a foreign nonresident through mid-2029.",
+      "purchase_route": {
+        "status": "unavailable",
+        "label": "Established-resale route unavailable to the baseline foreign buyer",
+        "notes": "A qualifying new dwelling or material housing-supply exception is a different asset route and requires approval; it is not assumed for this comparison."
+      },
+      "benchmark_calculability": {"status": "not_calculable", "reason": "The benchmark is an established resale outside the ordinary foreign-buyer route, so acquisition totals are suppressed."},
+      "components": [
+        {"id": "foreign-investment-approval", "label": "Foreign-investment approval and application fee", "category": "regulatory", "inclusion": "conditional", "applicability": "Only for an eligible alternative transaction requiring approval.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["au-established-dwelling-ban", "ato-residential-application"], "notes": "No fee is applied to the unavailable baseline route."},
+        {"id": "western-australia-transfer-duty", "label": "Western Australia transfer duty", "category": "tax", "inclusion": "conditional", "applicability": "Only for a legally eligible Western Australia acquisition.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["wa-transfer-duty-overview"], "notes": "Ordinary transfer duty is progressive and is not calculated for the unavailable resale benchmark."},
+        {"id": "western-australia-foreign-duty", "label": "Western Australia foreign buyers duty", "category": "tax", "inclusion": "conditional", "applicability": "For a legally eligible residential acquisition by a foreign person unless an exemption applies.", "calculation": {"type": "rate", "tax_base": "purchase_price", "rate": 0.07}, "estimate_strategy": "statutory", "source_ids": ["wa-foreign-buyers-duty"], "notes": "The 7% surcharge is decision context for an eligible alternative, not a total for the prohibited baseline."}
+      ],
+      "sources": [
+        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029", "source_date": "2026-05-31", "accessed_on": "2026-09-04", "notes": "Current national policy announcement."},
+        {"id": "ato-residential-application", "name": "Australian Taxation Office - residential property applications for foreign investors", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/residential-property-application-for-foreign-investors", "source_type": "official", "metric_supported": "Approval requirement and eligible alternative property routes", "source_date": "2025-03-30", "accessed_on": "2026-09-04", "notes": "Official application guidance."},
+        {"id": "wa-transfer-duty-overview", "name": "RevenueWA - Transfer Duty Overview", "url": "https://www.wa.gov.au/system/files/2025-07/duties-transfer-duty-overview-fact-sheet.pdf", "source_type": "official", "metric_supported": "Western Australia transfer duty and foreign-duty framework", "source_date": "2025-07-01", "accessed_on": "2026-09-04", "notes": "Official state fact sheet."},
+        {"id": "wa-foreign-buyers-duty", "name": "Western Australian Government - foreign buyers duty", "url": "https://www.wa.gov.au/service/financial-management/taxation-and-duty/about-foreign-buyers-duty", "source_type": "official", "metric_supported": "7% foreign buyers duty on relevant residential acquisitions", "source_date": "2026-08-13", "accessed_on": "2026-09-04", "notes": "Current state guidance."}
+      ],
+      "confidence": "high",
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The unavailable baseline produces no numeric acquisition result. State duty information is retained only for a separately eligible transaction."
+    },
+    {
+      "destination_id": "sydney-melbourne",
+      "local_currency": "AUD",
+      "jurisdiction_basis": "New South Wales and Victoria, representing Sydney and Melbourne. The comparison assumes a completed established resale, which the baseline foreign nonresident is generally prohibited from acquiring through mid-2029.",
+      "purchase_route": {
+        "status": "unavailable",
+        "label": "Established-resale route unavailable to the baseline foreign buyer",
+        "notes": "Limited exceptions and qualifying new dwellings are different routes requiring property-specific approval and are not substituted into the completed-resale benchmark."
+      },
+      "benchmark_calculability": {"status": "not_calculable", "reason": "Because neither grouped city offers the ordinary established-resale route to this buyer profile, a numeric all-in range would be misleading."},
+      "components": [
+        {"id": "foreign-investment-approval", "label": "Foreign-investment approval and application fee", "category": "regulatory", "inclusion": "conditional", "applicability": "Only for a qualifying alternative transaction.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["au-established-dwelling-ban", "ato-residential-application"], "notes": "No application fee is applied to the unavailable baseline route."},
+        {"id": "state-transfer-duty", "label": "NSW or Victorian ordinary transfer duty", "category": "tax", "inclusion": "conditional", "applicability": "Only after selecting a legally eligible property and state.", "calculation": null, "estimate_strategy": "statutory", "source_ids": ["nsw-transfer-duty", "vic-transfer-duty"], "notes": "The two progressive state schedules differ and are not evaluated for the prohibited baseline."},
+        {"id": "foreign-purchaser-surcharge-range", "label": "NSW-to-Victoria foreign-purchaser surcharge range", "category": "tax", "inclusion": "conditional", "applicability": "For a legally eligible residential acquisition by a foreign person, subject to state definitions and exemptions.", "calculation": {"type": "range_rate", "tax_base": "purchase_price", "minimum_rate": 0.08, "maximum_rate": 0.09}, "estimate_strategy": "midpoint", "source_ids": ["nsw-foreign-surcharge", "vic-foreign-surcharge"], "notes": "Victoria is 8% and NSW is 9%; this is route context, not an all-in amount for an established resale."
+        }
+      ],
+      "sources": [
+        {"id": "au-established-dwelling-ban", "name": "Australian Treasury - More homes and a fair go for first home buyers", "url": "https://ministers.treasury.gov.au/ministers/clare-oneil-2025/media-releases/more-homes-and-fair-go-first-home-buyers", "source_type": "official", "metric_supported": "Extension of the foreign-investor established-home ban to mid-2029", "source_date": "2026-05-31", "accessed_on": "2026-09-04", "notes": "Current national policy announcement."},
+        {"id": "ato-residential-application", "name": "Australian Taxation Office - residential property applications for foreign investors", "url": "https://www.ato.gov.au/individuals-and-families/investments-and-assets/foreign-resident-investments/foreign-investment-in-australia/residential-property-application-for-foreign-investors", "source_type": "official", "metric_supported": "Approval requirement and eligible new-dwelling route", "source_date": "2025-03-30", "accessed_on": "2026-09-04", "notes": "Official application guidance."},
+        {"id": "nsw-transfer-duty", "name": "Revenue NSW - calculate transfer duty", "url": "https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty/understanding-transfer-duty/calculate-transfer-duty", "source_type": "official", "metric_supported": "2026-27 progressive transfer-duty schedule", "source_date": "2026-08-19", "accessed_on": "2026-09-04", "notes": "Current NSW revenue guidance."},
+        {"id": "nsw-foreign-surcharge", "name": "Revenue NSW - surcharge purchaser duty", "url": "https://www.revenue.nsw.gov.au/taxes-duties-levies-royalties/transfer-duty/surcharge-purchaser-duty/what-is-surcharge-purchaser-duty", "source_type": "official", "metric_supported": "9% foreign purchaser surcharge", "source_date": "2026-08-20", "accessed_on": "2026-09-04", "notes": "Current NSW revenue guidance."},
+        {"id": "vic-transfer-duty", "name": "Victoria State Revenue Office - land transfer duty", "url": "https://www.sro.vic.gov.au/buying-property/land-transfer-stamp-duty", "source_type": "official", "metric_supported": "Victorian land-transfer duty framework", "source_date": "2026-09-04", "accessed_on": "2026-09-04", "notes": "Undated live state guidance; access date used."},
+        {"id": "vic-foreign-surcharge", "name": "Victoria State Revenue Office - foreign purchaser additional duty", "url": "https://www.sro.vic.gov.au/buying-property/foreign-purchasers-property/understanding-foreign-purchaser-additional-duty", "source_type": "official", "metric_supported": "8% foreign purchaser additional duty", "source_date": "2026-06-01", "accessed_on": "2026-09-04", "notes": "Current state guidance."
+        }
+      ],
+      "confidence": "high",
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The grouped benchmark is suppressed because both ordinary established-resale routes are unavailable. NSW and Victorian duty information remains conditional context only."
     }
   ]
 }
