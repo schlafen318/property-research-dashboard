@@ -4564,6 +4564,147 @@
       "confidence": "medium-high",
       "reviewed_on": "2026-08-19",
       "review_notes": "Base low/estimate/high reconcile to USD52,260 / USD64,685 / USD77,110: municipal RETT USD51,700 / USD64,125 / USD76,550, plus the statutorily rounded USD517 documentary fee and USD43 recording. Both quantified benchmark-only components use an exact USD5,170,000 guard with USD0.000001 floating-point tolerance. Title/closing, buyer brokerage and property-specific restrictions remain conditional-null."
+    },
+    {
+      "destination_id": "dubai",
+      "local_currency": "AED",
+      "jurisdiction_basis": "Dubai Emirate, limited to a completed resale apartment in an area designated for non-UAE national freehold ownership. The USD520,000 comparison-home benchmark converts at the Central Bank of the UAE fixed reference rate of USD1 = AED3.6725.",
+      "purchase_route": {
+        "status": "available",
+        "label": "Direct foreign individual freehold purchase in a designated area",
+        "notes": "Nonresident foreigners may acquire freehold property in Dubai's designated areas. The title, project, developer no-objection certificate and designated-area status still require transaction-specific verification."
+      },
+      "benchmark_calculability": {"status": "calculable", "reason": ""},
+      "components": [
+        {
+          "id": "buyer-sale-registration-share",
+          "label": "Buyer share of DLD sale-registration fee",
+          "category": "registration",
+          "inclusion": "base",
+          "calculation": {"type": "rate", "tax_base": "purchase_price", "rate": 0.02},
+          "estimate_strategy": "statutory",
+          "source_ids": ["dld-sale-registration", "dld-fee-resolution"],
+          "notes": "The statutory 4% sale-registration fee is shared equally by buyer and seller unless the contract provides otherwise, so the baseline buyer share is 2%."
+        },
+        {
+          "id": "title-deed",
+          "label": "Title deed certificate",
+          "category": "registration",
+          "inclusion": "base",
+          "calculation": {"type": "fixed", "amount": 250},
+          "estimate_strategy": "statutory",
+          "source_ids": ["dld-sale-registration"],
+          "notes": "Current DLD service fee for issuance of the electronic title deed."
+        },
+        {
+          "id": "apartment-map",
+          "label": "Apartment or villa map",
+          "category": "registration",
+          "inclusion": "base",
+          "calculation": {"type": "fixed", "amount": 250},
+          "estimate_strategy": "statutory",
+          "source_ids": ["dld-sale-registration"],
+          "notes": "The apartment/villa map fee is used for the standardized residential unit."
+        },
+        {
+          "id": "knowledge-and-innovation-fees",
+          "label": "Knowledge and innovation fees",
+          "category": "registration",
+          "inclusion": "base",
+          "calculation": {"type": "fixed", "amount": 20},
+          "estimate_strategy": "statutory",
+          "source_ids": ["dld-sale-registration"],
+          "notes": "AED10 knowledge fee plus AED10 innovation fee."
+        },
+        {
+          "id": "registration-trustee-service",
+          "label": "Registration trustee service fee before VAT",
+          "category": "closing",
+          "inclusion": "base",
+          "calculation": {"type": "fixed", "amount": 4000, "valid_price_local": {"minimum": 500000, "minimum_inclusive": true, "maximum": 1000000000, "maximum_inclusive": true}},
+          "estimate_strategy": "statutory",
+          "source_ids": ["dld-sale-registration"],
+          "notes": "The benchmark exceeds AED500,000. DLD quotes AED4,000 plus VAT; the separately charged VAT remains conditional because this record does not introduce an unsourced tax rate."
+        },
+        {
+          "id": "trustee-vat",
+          "label": "VAT on registration trustee service",
+          "category": "tax",
+          "inclusion": "conditional",
+          "applicability": "Charged on the registration-trustee service at the applicable VAT treatment and rate.",
+          "calculation": null,
+          "estimate_strategy": "statutory",
+          "source_ids": ["dld-sale-registration"],
+          "notes": "DLD expressly states that VAT is additional; no amount is invented in the absence of a separately modeled VAT source."
+        },
+        {
+          "id": "contractual-seller-fee-reallocation",
+          "label": "Contractual reallocation of seller registration share",
+          "category": "registration",
+          "inclusion": "conditional",
+          "applicability": "Only if the sale contract requires the buyer to bear some or all of the seller's default 2% share.",
+          "calculation": null,
+          "estimate_strategy": "statutory",
+          "source_ids": ["dld-fee-resolution"],
+          "notes": "The fee resolution permits the parties to agree a different allocation."
+        },
+        {
+          "id": "developer-noc-and-conveyancing",
+          "label": "Developer NOC, conveyancing and property-specific charges",
+          "category": "closing",
+          "inclusion": "conditional",
+          "applicability": "Quote depends on the developer, title, service-charge clearance and professional services selected.",
+          "calculation": null,
+          "estimate_strategy": "statutory",
+          "source_ids": ["dld-sale-registration"],
+          "notes": "DLD requires an e-NOC in freehold areas but does not publish one universal buyer amount on the sale-registration service page."
+        }
+      ],
+      "sources": [
+        {
+          "id": "uae-foreign-ownership",
+          "name": "UAE Government - expatriates buying property",
+          "url": "https://u.ae/en/information-and-services/moving-to-the-uae/expatriates-buying-a-property-in-the-uae",
+          "source_type": "official",
+          "metric_supported": "Nonresident foreign freehold ownership in Dubai-designated areas",
+          "source_date": "2024-12-30",
+          "accessed_on": "2026-09-04",
+          "notes": "Official federal portal summary of Dubai foreign-ownership rules."
+        },
+        {
+          "id": "dld-sale-registration",
+          "name": "Dubai Land Department - Property Sale Registration",
+          "url": "https://backoffice.dubailand.gov.ae/en/eservices/property-sale-registration/",
+          "source_type": "registry",
+          "metric_supported": "Buyer 2% registration share, title/map/add-on fees, trustee fee and freehold-area e-NOC requirement",
+          "source_date": "2026-09-03",
+          "accessed_on": "2026-09-04",
+          "notes": "Live DLD service page updated 3 September 2026."
+        },
+        {
+          "id": "dld-fee-resolution",
+          "name": "Dubai Executive Council Resolution No. 30 of 2013 - Land Department fees",
+          "url": "https://dubailand.gov.ae/media/zrrd4qw4/en-legislation.pdf",
+          "source_type": "statute",
+          "metric_supported": "4% sale-registration fee and equal buyer/seller allocation unless agreed otherwise",
+          "source_date": "2013-09-18",
+          "accessed_on": "2026-09-04",
+          "notes": "Official English legislation compilation, articles 3-4 and fee table."
+        },
+        {
+          "id": "cbuae-aed-peg",
+          "name": "Central Bank of the UAE - Domestic Market Operations",
+          "url": "https://centralbank.ae/en/our-operations/monetary-policy-and-domestic-markets/domestic-market-operations/",
+          "source_type": "official",
+          "metric_supported": "Fixed USD/AED intervention rates around 3.6725",
+          "source_date": "2026-09-01",
+          "accessed_on": "2026-09-04",
+          "notes": "Supports the fixed AED conversion added to the repository FX table."
+        }
+      ],
+      "confidence": "high",
+      "reviewed_on": "2026-09-04",
+      "review_notes": "The base includes only the buyer's default 2% registration share and published DLD certificate, map, knowledge, innovation and pre-VAT trustee charges. VAT, negotiated fee reallocation, developer NOC cost and professional fees remain conditional."
     }
   ]
 }

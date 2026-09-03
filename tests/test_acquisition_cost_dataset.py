@@ -98,6 +98,30 @@ class AcquisitionCostDatasetContractTests(unittest.TestCase):
         )
         date.fromisoformat(self.dataset["as_of"])
 
+    def test_added_destination_records_are_present_and_complete(self) -> None:
+        records_by_id = {
+            record["destination_id"]: record
+            for record in self.dataset["destinations"]
+        }
+
+        for destination_id in sorted(ADDED_DESTINATION_IDS):
+            with self.subTest(destination_id=destination_id):
+                record = records_by_id.get(destination_id)
+                self.assertIsNotNone(
+                    record,
+                    f"missing acquisition-cost record for {destination_id}",
+                )
+                if record is None:
+                    continue
+                dataset = deepcopy(self.dataset)
+                dataset["destinations"] = [record]
+                validate_acquisition_dataset(
+                    dataset,
+                    expected_destination_ids={destination_id},
+                    fx_rates_to_usd=self.fx_rates_to_usd,
+                )
+
+
     def test_present_records_are_complete_and_validate(self) -> None:
         records = self.dataset["destinations"]
         validate_acquisition_dataset(
