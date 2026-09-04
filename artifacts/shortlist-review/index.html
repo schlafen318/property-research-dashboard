@@ -16,7 +16,9 @@
   <meta property="og:title" content="Shortlist Review | Global Home Atlas">
   <meta property="og:description" content="Request a Global Home Atlas shortlist review before speaking to agents, with a research-led route across buyer intent, budget, citizenship, risk, and holding period.">
   <meta property="og:url" content="https://globalhomeatlas.com/shortlist-review/">
+
   <meta name="twitter:card" content="summary_large_image">
+
 
   <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"Service","name":"Global Home Atlas Shortlist Review","url":"https://globalhomeatlas.com/shortlist-review/","description":"Request a Global Home Atlas shortlist review before speaking to agents, with a research-led route across buyer intent, budget, citizenship, risk, and holding period.","provider":{"@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"},"serviceType":"Property destination research","areaServed":"Global"},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Shortlist Review","item":"https://globalhomeatlas.com/shortlist-review/"}]}]</script>
 
@@ -789,20 +791,18 @@
       <nav class="page-nav" aria-label="Primary">
         <a class="page-brand" href="/" aria-label="Global Home Atlas home"><img class="primary-brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="page-nav-links">
-          <a href="/find-your-fit/">Find your fit</a>
-<a href="/dashboard/">Destinations</a>
-<a href="/guides/#country-selection">Countries</a>
-<a href="/guides/">Guides</a>
-<a href="/methodology/">Methodology</a>
+          <a href="/dashboard/">Destination Rankings</a>
+<a href="/retirement-abroad-calculator/">Retirement Calculator</a>
+<a href="/countries/">Country Guides</a>
+<a href="/guides/">Buying Guides</a>
         </div>
         <details class="mobile-menu">
           <summary>Menu</summary>
           <nav aria-label="Mobile primary">
-            <a href="/find-your-fit/">Find your fit</a>
-<a href="/dashboard/">Destinations</a>
-<a href="/guides/#country-selection">Countries</a>
-<a href="/guides/">Guides</a>
-<a href="/methodology/">Methodology</a>
+            <a href="/dashboard/">Destination Rankings</a>
+<a href="/retirement-abroad-calculator/">Retirement Calculator</a>
+<a href="/countries/">Country Guides</a>
+<a href="/guides/">Buying Guides</a>
           </nav>
         </details>
       </nav>
@@ -1034,9 +1034,18 @@
       document.addEventListener("click", function (event) {
         const target = event.target.closest("a, button");
         if (!target) return;
+        if (target.hasAttribute("data-finder-destination")) return;
         const explicit = target.getAttribute("data-track");
         const href = target.getAttribute("href") || "";
         if (explicit) {
+          if (explicit.indexOf("retirement_capital_scenario_") === 0) {
+            track(explicit, {
+              scenario_slug: document.body && document.body.dataset ? document.body.dataset.scenarioSlug || "" : "",
+              destination_id: target.getAttribute("data-destination-id") || "",
+              link_type: target.getAttribute("data-link-type") || ""
+            });
+            return;
+          }
           track(explicit, {
             label: target.getAttribute("data-track-label") || target.textContent.trim(),
             href: href

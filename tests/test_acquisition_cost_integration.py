@@ -710,7 +710,7 @@ class AcquisitionCostRenderingIntegrationTests(unittest.TestCase):
     def test_dashboard_card_renders_its_own_acquisition_decision_fields(self) -> None:
         cards = capture_elements(
             self.dashboard,
-            "details",
+            "div",
             **{"class": "destination-card", "data-id": "algarve-cascais"},
         )
         self.assertEqual(len(cards), 1)
@@ -736,7 +736,7 @@ class AcquisitionCostRenderingIntegrationTests(unittest.TestCase):
             with self.subTest(destination_id=destination_id):
                 cards = capture_elements(
                     self.dashboard,
-                    "details",
+                    "div",
                     **{"class": "destination-card", "data-id": destination_id},
                 )
                 self.assertEqual(len(cards), 1)
@@ -853,15 +853,30 @@ class AcquisitionCostRenderingIntegrationTests(unittest.TestCase):
         self.assertNotIn("No conditional items identified.", section)
 
     def test_peer_card_renders_its_own_all_in_and_route_status(self) -> None:
-        cards = capture_elements(self.algarve, "article", **{"class": "comparison-card"})
-        fukuoka = next(card["text"] for card in cards if "Fukuoka / Itoshima" in card["text"])
+        app_data = json.loads(capture_elements(self.dashboard, "script", id="app-data")[0]["text"])
+        algarve_destination = next(
+            item for item in app_data["destinations"]
+            if item["id"] == "algarve-cascais"
+        )
+        fukuoka_destination = next(
+            item for item in app_data["destinations"]
+            if item["id"] == "fukuoka-itoshima"
+        )
+        peer_html = build_unified_app.destination_compare_html(
+            algarve_destination,
+            [fukuoka_destination],
+        )
+        fukuoka = capture_elements(
+            peer_html,
+            "article",
+            **{"class": "comparison-card"},
+        )[0]["text"]
         self.assertIn(
             "All-in capital $271,737 ($271,427–$272,047); known-base/incomplete",
             fukuoka,
         )
         self.assertIn("Available: Direct individual freehold or condominium ownership", fukuoka)
 
-        app_data = json.loads(capture_elements(self.dashboard, "script", id="app-data")[0]["text"])
         phuket = next(
             item for item in app_data["destinations"]
             if item["id"] == "phuket-koh-samui"

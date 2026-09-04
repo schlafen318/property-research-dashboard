@@ -1981,14 +1981,13 @@ def build_destination_card(
         <div class="market-row__metric"><span>Expected net yield</span><strong>{escape(yield_range_label(dest.get("net_yield_estimate")))}</strong></div>
         <div class="market-row__metric"><span>Ownership clarity</span><strong>{ownership_score:.1f}/5</strong></div>
         {access_warning}
-        <details class="destination-card" data-id="{escape(dest['id'])}">
-          <summary>Acquisition estimate</summary>
+        <div class="destination-card" data-id="{escape(dest['id'])}" aria-label="Acquisition estimate">
           <p><strong>Acquisition costs</strong> {escape(acquisition_cost_text(dest))} {escape(acquisition_rate_text(dest))} effective · {escape(str(dest.get('acquisition_cost_confidence') or 'n/a'))} confidence</p>
           <p><strong>All-in acquisition capital</strong> {escape(all_in_acquisition_text(dest))}</p>
           <p>{escape(acquisition_route_text(dest))} · {escape(str(dest.get('comparison_home_evidence') or 'proxy'))} property price evidence</p>
           <p>{escape(conditional_acquisition_disclosure(dest))}</p>
           {f'<p>Benchmark not calculable: {escape(acquisition_benchmark_reason(dest))}</p>' if acquisition_benchmark_status(dest) != 'calculable' else ''}
-        </details>
+        </div>
       </article>
     """
 
@@ -3731,7 +3730,7 @@ def destination_acquisition_cost_html(dest: dict) -> str:
         ("All-in acquisition capital", all_in),
         ("Purchase route", acquisition_route_text(dest)),
         ("Acquisition benchmark", acquisition_benchmark_text(dest)),
-        ("Acquisition evidence", f"{dest.get('acquisition_cost_confidence') or 'n/a'} confidence"),
+        ("Acquisition evidence", str(dest.get("acquisition_cost_confidence") or "n/a")),
     ]
     summary_html = "".join(
         f'<tr><th scope="row">{escape(label)}</th><td>{escape(value)}</td></tr>'
@@ -10554,14 +10553,16 @@ def build_premium_destination_page(
         for item in destinations
         if item.get("category") == dest.get("category")
         and item.get("id") != dest.get("id")
+        and get_premium_dossier(item.get("id")) is not None
     ]
     destination_by_id = {item.get("id"): item for item in destinations}
     override_peers = [
         destination_by_id[destination_id]
         for destination_id in PREMIUM_DESTINATION_PEER_OVERRIDES.get(dest.get("id"), [])
         if destination_id in destination_by_id
+        and get_premium_dossier(destination_id) is not None
     ]
-    candidates = [*override_peers, *country_peers, *category_peers]
+    candidates = override_peers or country_peers or category_peers
     for candidate in candidates:
         candidate_id = candidate.get("id")
         if candidate_id == dest.get("id") or candidate_id in peer_ids:
@@ -10668,7 +10669,6 @@ def build_premium_destination_page(
           <p class="premium-handoff">For the national residence, tax and ownership framework, read about {national_guide_sentence}. To size the plan, use the <a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="destination page">retirement abroad calculator</a>. {comparison_handoff}</p>
         </section>
         {fire_abroad_context_link({dest["id"]}, set(CANONICAL_LAUNCH_IDS))}
-        {destination_compare_html(dest, peer_destinations)}
         {premium_dossier_references_html(spec)}
       </article>
       <aside class="premium-rail" aria-label="In this dossier">
@@ -10779,7 +10779,6 @@ def build_destination_page(
     peer_links = destination_links(peer_destinations, limit=6) or destination_links(destinations, slug, limit=6)
     destination_guide_links = guide_links_for_destination(dest, pages)
     market_summary = destination_market_summary_html(dest)
-    quick_decision = destination_quick_decision_html(dest)
     acquisition_section = destination_acquisition_cost_html(dest)
     query_match_section = destination_query_match_html(dest, pages)
     location_map = destination_location_map_html(dest)
@@ -10816,7 +10815,7 @@ def build_destination_page(
         <aside class="page-hero-card">
           <span>Global rank</span><strong>#{dest["rank"]}</strong>
           <span>Overall rating</span><strong>{dest.get("decision_score", 0):.1f}/5</strong>
-          <span>Property price</span><strong>{money(dest.get("comparison_home_usd"))}</strong>
+          <span>Price guide</span><strong>{money(dest.get("comparison_home_usd"))}</strong>
           <span>Property price evidence</span><strong>{escape(str(dest.get("comparison_home_evidence") or "proxy"))}</strong>
           {f'<span>All-in acquisition capital</span><strong>{escape(all_in_acquisition_text(dest))}</strong>' if acquisition_route_status(dest) != 'unavailable' else ''}
           <span>Purchase route</span><strong>{escape(acquisition_route_text(dest))}</strong>
@@ -10829,7 +10828,6 @@ def build_destination_page(
   <main>
     <div class="page-shell">
       {access_notice}
-      {quick_decision}
       {market_summary}
       {query_match_section}
       {location_map}
@@ -12398,7 +12396,6 @@ def build(*, as_of: date | None = None) -> Path:
     .market-row__metric strong { font-size: 13px; }
     .market-row__warning { grid-column: 1 / -1; margin: -2px 0 2px 48px; color: #7a3e2b; font-size: 12px; }
     .market-row > .destination-card { grid-column: 1 / -1; width: 100%; padding-top: 8px; border-top: 1px solid var(--line); }
-    .market-row > .destination-card summary { cursor: pointer; color: var(--teal); font-size: 12px; font-weight: 850; }
     .market-row > .destination-card p { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
     .market-row__select { display: none; }
     body.compare-mode .market-row { grid-template-columns: 34px minmax(250px, 1.7fr) 92px 120px 140px 120px; }
