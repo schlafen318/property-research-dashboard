@@ -1,0 +1,64 @@
+{
+  "destination_id": "fixture-destination",
+  "local_currency": "USD",
+  "jurisdiction_basis": "Synthetic example jurisdiction for schema testing only; not a real jurisdictional rule.",
+  "purchase_route": {
+    "status": "available",
+    "label": "Synthetic direct individual ownership",
+    "notes": "Example-only route used to exercise the dataset contract."
+  },
+  "benchmark_calculability": {
+    "status": "calculable",
+    "reason": ""
+  },
+  "components": [
+    {
+      "id": "example-transfer-tax",
+      "label": "Synthetic transfer tax",
+      "category": "tax",
+      "inclusion": "base",
+      "calculation": {
+        "type": "rate",
+        "tax_base": "purchase_price",
+        "rate": 0.05
+      },
+      "estimate_strategy": "statutory",
+      "source_ids": [
+        "example-statute"
+      ],
+      "notes": "Synthetic five-percent example for contract coverage."
+    },
+    {
+      "id": "example-optional-counsel",
+      "label": "Synthetic optional counsel fee",
+      "category": "legal",
+      "inclusion": "conditional",
+      "applicability": "Optional example service; not included in base costs.",
+      "calculation": {
+        "type": "range_fixed",
+        "minimum_amount": 500,
+        "maximum_amount": 1000
+      },
+      "estimate_strategy": "midpoint",
+      "source_ids": [
+        "example-statute"
+      ],
+      "notes": "Synthetic conditional component for schema coverage."
+    }
+  ],
+  "sources": [
+    {
+      "id": "example-statute",
+      "name": "Example Government Property Rules",
+      "url": "https://property.example.gov/acquisition-rules",
+      "source_type": "official",
+      "metric_supported": "Synthetic acquisition-cost schedule",
+      "source_date": "2026-01-01",
+      "accessed_on": "2026-08-19",
+      "notes": "Synthetic example.gov source; it does not support a real jurisdictional rule."
+    }
+  ],
+  "confidence": "high",
+  "reviewed_on": "2026-08-19",
+  "review_notes": "Synthetic record maintained only to test the dataset contract."
+}

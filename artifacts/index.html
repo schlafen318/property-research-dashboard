@@ -520,9 +520,18 @@
       document.addEventListener("click", function (event) {
         const target = event.target.closest("a, button");
         if (!target) return;
+        if (target.hasAttribute("data-finder-destination")) return;
         const explicit = target.getAttribute("data-track");
         const href = target.getAttribute("href") || "";
         if (explicit) {
+          if (explicit.indexOf("retirement_capital_scenario_") === 0) {
+            track(explicit, {
+              scenario_slug: document.body && document.body.dataset ? document.body.dataset.scenarioSlug || "" : "",
+              destination_id: target.getAttribute("data-destination-id") || "",
+              link_type: target.getAttribute("data-link-type") || ""
+            });
+            return;
+          }
           track(explicit, {
             label: target.getAttribute("data-track-label") || target.textContent.trim(),
             href: href

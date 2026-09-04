@@ -2,7 +2,7 @@
 
 ## Purpose
 
-Global Home Atlas currently compares an indicative 100 m² retirement-home property price across 30 destinations. That estimate excludes the taxes, statutory charges, professional fees, and foreign-buyer costs required to complete a purchase. This design adds a comparable acquisition-cost layer without implying that one generic buyer profile captures every legal or tax outcome.
+Global Home Atlas currently compares an indicative 100 m² retirement-home property price across 37 destinations. That estimate excludes the taxes, statutory charges, professional fees, and foreign-buyer costs required to complete a purchase. This design adds a comparable acquisition-cost layer without implying that one generic buyer profile captures every legal or tax outcome.
 
 The feature must answer two separate questions:
 
@@ -30,6 +30,21 @@ The baseline is deliberately generic. Nationality- or residency-dependent items 
 Use a comparable base-cost estimate with conditional overlays.
 
 The base total includes costs that are mandatory or normally unavoidable for the baseline transaction. Conditional items are shown separately and do not enter the comparable total unless their applicability is certain. This is preferable to a worst-case model, which would overstate many destinations, and to a full citizenship/residency calculator, which would require a substantially larger legal-rule engine and user-profile surface.
+
+## Current-Main Integration Scope
+
+The original implementation branch predates substantial calculator, finder, FIRE-tax, country-guide, and destination-dossier work. Integration must start from current `main`; it must not replay or overwrite the historical generated pages or replace newer builder behavior with the older branch version.
+
+Port the pure calculation module, schema fixtures, auditable dataset, and acquisition-specific tests first. Then adapt the acquisition hooks to the current builder through focused changes guarded by the existing repository suite and acquisition integration tests. Regenerate the complete artifact tree only after source integration is green.
+
+The historical dataset contains 30 records. Current `data/destinations.json` contains 37 destinations and uses `malaga-costa-del-sol` instead of the historical `m-laga-costa-del-sol`. The migration must:
+
+- rename the Málaga acquisition record to `malaga-costa-del-sol` without changing its disclosed jurisdiction or silently changing its sourced calculation;
+- add complete records for `dubai`, `gold-coast-sunshine-coast`, `los-angeles-orange-county`, `miami-fort-lauderdale`, `perth-margaret-river`, `sydney-melbourne`, and `vancouver`;
+- recheck the historical 30 records against their cited sources and current purchase-route assumptions before publication;
+- require exact 37-ID parity with current `data/destinations.json` before the builder may write artifacts.
+
+No partial production state is permitted. Until all 37 records validate, the integration branch may run unit tests against fixtures and explicit subsets, but it must not publish incomplete acquisition comparisons.
 
 ## Cost Boundaries
 
@@ -162,7 +177,7 @@ Every source record must contain:
 
 ## Research Standard
 
-Research all 30 destinations. Use this source hierarchy:
+Research all 37 destinations. Use this source hierarchy:
 
 1. National, regional, cantonal, state, provincial, or municipal tax authorities.
 2. Official land registries, government buyer guides, legislation, or statutory fee schedules.
@@ -229,6 +244,7 @@ The build must fail with a destination-specific error when:
 - A conditional component is accidentally included in the base total.
 - A purchase route is conditional or unavailable but has no explanatory note.
 - The property price or archetype area is zero or negative.
+- The acquisition dataset does not have exact ID parity with current `data/destinations.json`.
 
 Unknown or genuinely unquantifiable costs are not converted to zero. They remain conditional with an explicit explanation. An unavailable purchase route may still show statutory transaction-cost research for context, but the UI must not present an ordinary all-in purchasable total.
 
@@ -309,7 +325,7 @@ Unit fixtures must cover:
 
 Dataset tests must assert:
 
-- Exactly 30 unique destination records.
+- Exactly 37 unique destination records.
 - Exact ID parity with `data/destinations.json`.
 - Every base component is sourced.
 - All sources are HTTPS and dated.
@@ -323,12 +339,13 @@ Run the complete repository test suite and static-site verifier before completio
 ## Delivery Sequence
 
 1. Add schema fixtures, validation, and failing dataset tests.
-2. Research and populate all 30 destination records with traceable sources.
-3. Implement the pure calculation engine and unit tests.
-4. Integrate calculated results into the builder's enriched destination data.
-5. Update dashboard and destination surfaces.
-6. Update country, guide, export, memo, methodology, and research-standard surfaces.
-7. Regenerate artifacts and run calculation reconciliation, full tests, static verification, and code review.
+2. Import and revalidate the historical 30 records, including the Málaga ID migration.
+3. Research and populate the seven added destination records with traceable sources.
+4. Implement the pure calculation engine and unit tests.
+5. Integrate calculated results into the current builder's enriched destination data without regressing newer features.
+6. Update dashboard and destination surfaces.
+7. Update country, guide, export, memo, methodology, and research-standard surfaces.
+8. Regenerate artifacts and run 37-record calculation reconciliation, the full repository suite, static verification, and code review.
 
 ## Non-Goals
 

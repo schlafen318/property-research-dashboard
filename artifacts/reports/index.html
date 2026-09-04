@@ -16,9 +16,11 @@
   <meta property="og:title" content="Premium Property Research Reports | Global Home Atlas">
   <meta property="og:description" content="Browse premium Global Home Atlas research brief formats for retirement markets, second-home shortlists, overseas property risk, and polished buyer memos.">
   <meta property="og:url" content="https://globalhomeatlas.com/reports/">
+
   <meta name="twitter:card" content="summary_large_image">
 
-  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"CollectionPage","name":"Premium Property Research Reports","url":"https://globalhomeatlas.com/reports/","description":"Browse premium Global Home Atlas research brief formats for retirement markets, second-home shortlists, overseas property risk, and polished buyer memos.","dateModified":"2026-08-24","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Reports","item":"https://globalhomeatlas.com/reports/"}]}]</script>
+
+  <script type="application/ld+json">[{"@context":"https://schema.org","@type":"Organization","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence.","contactPoint":{"@type":"ContactPoint","email":"hello@globalhomeatlas.com","contactType":"research inquiries"}},{"@context":"https://schema.org","@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/","description":"Compare global home and property investment destinations with decision scores, ownership clarity, lifestyle fit, yields, and representative market evidence."},{"@context":"https://schema.org","@type":"CollectionPage","name":"Premium Property Research Reports","url":"https://globalhomeatlas.com/reports/","description":"Browse premium Global Home Atlas research brief formats for retirement markets, second-home shortlists, overseas property risk, and polished buyer memos.","dateModified":"2026-09-04","isPartOf":{"@type":"WebSite","name":"Global Home Atlas","url":"https://globalhomeatlas.com/"}},{"@context":"https://schema.org","@type":"BreadcrumbList","itemListElement":[{"@type":"ListItem","position":1,"name":"Home","item":"https://globalhomeatlas.com/"},{"@type":"ListItem","position":2,"name":"Reports","item":"https://globalhomeatlas.com/reports/"}]}]</script>
 
   <style>
     :root {
@@ -776,27 +778,25 @@
       <nav class="page-nav" aria-label="Primary">
         <a class="page-brand" href="/" aria-label="Global Home Atlas home"><img class="primary-brand-logo" src="/assets/global-home-atlas-logo-compact-light.svg" alt="Global Home Atlas"></a>
         <div class="page-nav-links">
-          <a href="/find-your-fit/">Find your fit</a>
-<a href="/dashboard/">Destinations</a>
-<a href="/guides/#country-selection">Countries</a>
-<a href="/guides/">Guides</a>
-<a href="/methodology/">Methodology</a>
+          <a href="/dashboard/">Destination Rankings</a>
+<a href="/retirement-abroad-calculator/">Retirement Calculator</a>
+<a href="/countries/">Country Guides</a>
+<a href="/guides/">Buying Guides</a>
         </div>
         <details class="mobile-menu">
           <summary>Menu</summary>
           <nav aria-label="Mobile primary">
-            <a href="/find-your-fit/">Find your fit</a>
-<a href="/dashboard/">Destinations</a>
-<a href="/guides/#country-selection">Countries</a>
-<a href="/guides/">Guides</a>
-<a href="/methodology/">Methodology</a>
+            <a href="/dashboard/">Destination Rankings</a>
+<a href="/retirement-abroad-calculator/">Retirement Calculator</a>
+<a href="/countries/">Country Guides</a>
+<a href="/guides/">Buying Guides</a>
           </nav>
         </details>
       </nav>
 
       <div class="page-hero-grid">
         <div>
-          <p class="page-eyebrow">Premium brief library · updated 2026-08-24</p>
+          <p class="page-eyebrow">Premium brief library · updated 2026-09-04</p>
           <h1>Premium Property Research Reports</h1>
           <p class="page-lede">Use the public Atlas to compare destinations. Use a premium brief when the decision needs buyer-specific ranking, exclusions, risk sequencing, and adviser questions.</p>
         </div>
@@ -989,9 +989,18 @@
       document.addEventListener("click", function (event) {
         const target = event.target.closest("a, button");
         if (!target) return;
+        if (target.hasAttribute("data-finder-destination")) return;
         const explicit = target.getAttribute("data-track");
         const href = target.getAttribute("href") || "";
         if (explicit) {
+          if (explicit.indexOf("retirement_capital_scenario_") === 0) {
+            track(explicit, {
+              scenario_slug: document.body && document.body.dataset ? document.body.dataset.scenarioSlug || "" : "",
+              destination_id: target.getAttribute("data-destination-id") || "",
+              link_type: target.getAttribute("data-link-type") || ""
+            });
+            return;
+          }
           track(explicit, {
             label: target.getAttribute("data-track-label") || target.textContent.trim(),
             href: href

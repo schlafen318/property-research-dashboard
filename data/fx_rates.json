@@ -10,7 +10,8 @@
     "THB": 0.0303905,
     "IDR": 0.000056243,
     "VND": 0.0000380084,
-    "AUD": 0.6997
+    "AUD": 0.6997,
+    "AED": 0.2722940776038121
   },
-  "source_note": "CHF/USD uses the Swiss National Bank July 2026 monthly average of USD 1 = CHF 0.8100, inverted to CHF 1 = USD 1.2345679012. AUD/USD uses the Reserve Bank of Australia daily rate published for 2026-07-22. Other existing rates retain their prior research basis. Re-check all rates before investment decisions."
+  "source_note": "CHF/USD uses the Swiss National Bank July 2026 monthly average of USD 1 = CHF 0.8100, inverted to CHF 1 = USD 1.2345679012. AUD/USD uses the Reserve Bank of Australia daily rate published for 2026-07-22. AED/USD uses the Central Bank of the UAE fixed reference rate of USD 1 = AED 3.6725, inverted to AED 1 = USD 0.2722940776. Other existing rates retain their prior research basis. Re-check all rates before investment decisions."
 }
