@@ -165,7 +165,7 @@ class PropertyComparisonMethodologyTests(unittest.TestCase):
         self.assertIn('"comparison_home_area_m2": 100.0', html)
         self.assertIn('"comparison_home_usd": 262000.0', html)
         self.assertNotRegex(country_html, re.compile(r"\$[\d,]+/m2"))
-        self.assertRegex(country_html, re.compile(r"\$503,500<br><small>mixed/proxy"))
+        self.assertRegex(country_html, re.compile(r"\$471,000<br><small>mixed/proxy"))
         for rendered in (country_html, destination_html, guide_html):
             self.assertIn("all-in", rendered.lower())
             self.assertNotIn("acquisition costs excluded", rendered.lower())

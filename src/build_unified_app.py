@@ -1981,6 +1981,14 @@ def build_destination_card(
         <div class="market-row__metric"><span>Expected net yield</span><strong>{escape(yield_range_label(dest.get("net_yield_estimate")))}</strong></div>
         <div class="market-row__metric"><span>Ownership clarity</span><strong>{ownership_score:.1f}/5</strong></div>
         {access_warning}
+        <details class="destination-card" data-id="{escape(dest['id'])}">
+          <summary>Acquisition estimate</summary>
+          <p><strong>Acquisition costs</strong> {escape(acquisition_cost_text(dest))} {escape(acquisition_rate_text(dest))} effective · {escape(str(dest.get('acquisition_cost_confidence') or 'n/a'))} confidence</p>
+          <p><strong>All-in acquisition capital</strong> {escape(all_in_acquisition_text(dest))}</p>
+          <p>{escape(acquisition_route_text(dest))} · {escape(str(dest.get('comparison_home_evidence') or 'proxy'))} property price evidence</p>
+          <p>{escape(conditional_acquisition_disclosure(dest))}</p>
+          {f'<p>Benchmark not calculable: {escape(acquisition_benchmark_reason(dest))}</p>' if acquisition_benchmark_status(dest) != 'calculable' else ''}
+        </details>
       </article>
     """
 
@@ -2060,6 +2068,17 @@ def destination_url(dest: dict) -> str:
 
 def json_ld(data: dict | list[dict]) -> str:
     return json.dumps(data, ensure_ascii=False, separators=(",", ":"))
+
+
+def json_for_html(data: object) -> str:
+    return (
+        json.dumps(data, ensure_ascii=False)
+        .replace("&", "\\u0026")
+        .replace("<", "\\u003c")
+        .replace(">", "\\u003e")
+        .replace("\u2028", "\\u2028")
+        .replace("\u2029", "\\u2029")
+    )
 
 
 def clean_generated_html(html: str) -> str:
@@ -2462,7 +2481,7 @@ def vacation_home_quick_answer_html(page: dict, destinations: list[dict]) -> str
               <p>{escape(dest.get("panel_verdict") or dest.get("panel_summary") or "")}</p>
               <dl>
                 <div><dt>Country</dt><dd>{escape(dest.get("country") or "n/a")}</dd></div>
-                <div><dt>Entry benchmark</dt><dd>{money(dest.get("usd_per_m2"))}/m2</dd></div>
+                <div><dt>All-in</dt><dd>{escape(all_in_acquisition_text(dest))}<br><small>{escape(acquisition_route_text(dest))}</small>{f'<br><small>Benchmark not calculable: {escape(acquisition_benchmark_reason(dest))}</small>' if acquisition_benchmark_status(dest) != 'calculable' else ''}</dd></div>
                 <div><dt>Ownership</dt><dd>{metric_value(dest, "ownership_clarity"):.1f}/5</dd></div>
                 <div><dt>Exit</dt><dd>{metric_value(dest, "exit_liquidity"):.1f}/5</dd></div>
               </dl>
@@ -3145,11 +3164,22 @@ def destination_executive_summary_cards(dest: dict) -> str:
 def destination_quick_decision_html(dest: dict) -> str:
     pros = dest.get("pros") or []
     cons = dest.get("cons") or []
+    route_status = acquisition_route_status(dest)
+    if acquisition_benchmark_status(dest) != "calculable":
+        benchmark_reason = re.sub(r"\$[\d,]+(?:\.\d+)?\s+", "", acquisition_benchmark_reason(dest), count=1)
+        budget_signal = (
+            f"Not presented all-in acquisition capital; {acquisition_route_text(dest)}; "
+            f"Benchmark not calculable: {benchmark_reason}"
+        )
+    elif route_status in {"available", "conditional"}:
+        budget_signal = f"{all_in_acquisition_text(dest)} all-in acquisition capital; {acquisition_route_text(dest)}"
+    else:
+        budget_signal = f"{acquisition_route_text(dest)}; no ordinary all-in total"
     fields = [
         ("Best buyer", pros[0] if pros else "Lifestyle-led global buyer"),
         ("Best use case", dest.get("profit_driver") or "Personal use with investment discipline."),
         ("Ownership", dest.get("ownership_notes") or "Confirm title and foreign-buyer pathway locally."),
-        ("Budget signal", f"{money(dest.get('usd_per_m2'))}/m2 benchmark"),
+        ("Budget signal", budget_signal),
         ("Rental realism", dest.get("net_yield_estimate") or "Underwrite net yield by asset type."),
         ("Main risk", cons[0] if cons else dest.get("red_flags") or "Verify local legal, rental, and resale risk."),
     ]
@@ -3683,6 +3713,70 @@ def destination_risk_checklist_html(dest: dict) -> str:
     """
 
 
+def destination_acquisition_cost_html(dest: dict) -> str:
+    route = dest.get("purchase_route")
+    route = route if isinstance(route, dict) else {}
+    route_status = acquisition_route_status(dest)
+    if acquisition_benchmark_status(dest) != "calculable":
+        all_in = all_in_acquisition_text(dest)
+    elif route_status == "unavailable":
+        all_in = "No ordinary all-in total is presented because this purchase route is unavailable."
+    else:
+        all_in = all_in_acquisition_text(dest)
+    summary_rows = [
+        ("Property price", money(dest.get("comparison_home_usd"))),
+        ("Property price evidence", str(dest.get("comparison_home_evidence") or "proxy")),
+        ("Acquisition costs", acquisition_cost_text(dest)),
+        ("Effective rate", acquisition_rate_text(dest)),
+        ("All-in acquisition capital", all_in),
+        ("Purchase route", acquisition_route_text(dest)),
+        ("Acquisition benchmark", acquisition_benchmark_text(dest)),
+        ("Acquisition evidence", f"{dest.get('acquisition_cost_confidence') or 'n/a'} confidence"),
+    ]
+    summary_html = "".join(
+        f'<tr><th scope="row">{escape(label)}</th><td>{escape(value)}</td></tr>'
+        for label, value in summary_rows
+    )
+    base_components = dest.get("acquisition_components") or []
+    base_rows = "".join(
+        f"<tr><td>{escape(str(component.get('label') or 'Acquisition component'))}</td>"
+        f"<td>{escape(str(component.get('category') or 'n/a'))}</td>"
+        f"<td>{escape(acquisition_range(component.get('low_usd'), component.get('estimate_usd'), component.get('high_usd')))}</td></tr>"
+        for component in base_components
+    ) or '<tr><td colspan="3">No base components are quantified for this route.</td></tr>'
+    conditional_items = "".join(
+        f"<li><strong>{escape(str(component.get('label') or 'Conditional component'))}</strong> — "
+        f"{escape(str(component.get('applicability') or 'Transaction-specific'))} "
+        f"Amount: {escape(acquisition_range(component.get('low_usd'), component.get('estimate_usd'), component.get('high_usd')))}.</li>"
+        for component in dest.get("conditional_acquisition_components") or []
+    )
+    conditional_html = (
+        f"<h3>Conditional items outside the base total</h3><ul>{conditional_items}</ul>"
+        if conditional_items else ""
+    )
+    source_items = "".join(
+        f'<li><a href="{escape(str(source.get("url") or ""), quote=True)}" target="_blank" rel="noreferrer">{escape(str(source.get("name") or "Source"))}</a></li>'
+        for source in dest.get("acquisition_sources") or []
+    )
+    return f"""
+      <details class="page-section" id="acquisition-costs" data-mobile-open="true" open>
+        <summary><h2>Acquisition Costs</h2></summary>
+        <div class="acquisition-table-wrap"><table class="acquisition-table"><tbody>{summary_html}</tbody></table></div>
+        <p>{escape(conditional_acquisition_disclosure(dest))}</p>
+        <h3>Base cost breakdown</h3>
+        <div class="acquisition-table-wrap"><table class="acquisition-table">
+          <thead><tr><th>Component</th><th>Category</th><th>Amount</th></tr></thead><tbody>{base_rows}</tbody>
+        </table></div>
+        {conditional_html}
+        <p><strong>Route basis:</strong> {escape(str(route.get('notes') or 'Confirm the purchase route with local counsel.'))}</p>
+        <p><strong>Jurisdiction basis:</strong> {escape(str(dest.get('acquisition_jurisdiction_basis') or 'Not documented'))}</p>
+        <p><strong>Buyer scenario:</strong> {escape(acquisition_buyer_scenario(dest))}</p>
+        <p><strong>Reviewed:</strong> {escape(str(dest.get('acquisition_cost_reviewed_on') or 'n/a'))}</p>
+        <h3>Sources</h3><ul>{source_items or '<li>No source list available.</li>'}</ul>
+      </details>
+    """
+
+
 def destination_compare_html(dest: dict, peers: list[dict]) -> str:
     if not peers:
         return ""
@@ -3696,7 +3790,7 @@ def destination_compare_html(dest: dict, peers: list[dict]) -> str:
                 <span>{peer.get("decision_score", 0):.1f}/5</span>
               </div>
               <dl>
-                <div><dt>Price</dt><dd>{money(peer.get("usd_per_m2"))}/m2</dd></div>
+                <div><dt>All-in capital</dt><dd>{escape(all_in_acquisition_text(peer))}<br><small>{escape(acquisition_status_text(peer))}</small></dd></div>
                 <div><dt>Yield</dt><dd>{escape(peer.get("net_yield_estimate") or "n/a")}</dd></div>
               </dl>
               <p>{escape(peer.get("panel_verdict") or peer.get("panel_summary") or "Compare buyer fit, ownership, yield, and exit liquidity.")}</p>
@@ -3707,6 +3801,7 @@ def destination_compare_html(dest: dict, peers: list[dict]) -> str:
       <details class="page-section" id="compare" open>
         <summary><h2>Compare Before You Commit</h2></summary>
         <p>The destination decision gets clearer when {escape(dest["name"])} is compared against a few plausible alternatives rather than judged in isolation.</p>
+        <p><strong>Price method:</strong> {escape(comparison_price_disclosure())}</p>
         <div class="page-grid">{"".join(rows)}</div>
       </details>
     """
@@ -4177,13 +4272,22 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
     for hub in COUNTRY_HUBS:
         metrics = country_summary_metrics(hub, destinations)
         destination_label = "destination" if metrics["count"] == 1 else "destinations"
+        all_in_label = (
+            f"{'Avg' if metrics['acquisition_cost_complete'] else 'Known-base avg'} all-in {money(metrics['all_in_entry'])}"
+            if metrics["all_in_entry"] is not None
+            else "Avg all-in Not quantified"
+        )
+        contributor_label = "contributor" if metrics["acquisition_contributors"] == 1 else "contributors"
+        unavailable_label = "unavailable exclusion" if metrics["acquisition_unavailable_excluded"] == 1 else "unavailable exclusions"
+        uncalculable_label = "uncalculable benchmark exclusion" if metrics["acquisition_uncalculable_excluded"] == 1 else "uncalculable benchmark exclusions"
         rows.append(
             f"""
             <tr>
               <td><strong><a href="/countries/{escape(hub["slug"])}/">{escape(hub["country"])}</a></strong><br><span>{escape(hub["description"])}</span></td>
               <td>{metrics["count"]}</td>
               <td>{metrics["score"]:.1f}/5</td>
-              <td>{money(metrics["entry"])}/m2</td>
+              <td>{money(metrics["entry"])}<br><small>{escape(metrics["evidence"])}</small></td>
+              <td>{escape(all_in_label)}<br><small>{escape(metrics["acquisition_cost_completeness"])} · {metrics["acquisition_contributors"]} {contributor_label} · {metrics["acquisition_unavailable_excluded"]} {unavailable_label} · {metrics["acquisition_uncalculable_excluded"]} {uncalculable_label} · {escape(metrics["acquisition_evidence"])}</small></td>
               <td>{metrics["ownership"]:.1f}/5</td>
               <td>{metrics["retirement"]:.1f}/5</td>
               <td>{metrics["liquidity"]:.1f}/5</td>
@@ -4247,6 +4351,7 @@ def build_country_comparison_page(destinations: list[dict], pages: list[dict]) -
                     <th>Destinations</th>
                     <th>Avg score</th>
                     <th>Avg entry</th>
+                    <th>Acquisition capital</th>
                     <th>Ownership</th>
                     <th>Retirement</th>
                     <th>Exit</th>
@@ -5372,7 +5477,8 @@ def build_seo_destination_table(destinations: list[dict]) -> str:
             <tr>
               <td><strong>{escape(dest["name"])}</strong><br><span>{escape(dest.get("country") or "")}</span></td>
               <td>{dest.get("decision_score", 0):.1f}</td>
-              <td>{money(dest.get("usd_per_m2"))}/m2</td>
+              <td>{money(dest.get("comparison_home_usd"))}<br><small>{escape(str(dest.get("comparison_home_evidence") or "proxy"))}</small></td>
+              <td>All-in {escape(all_in_acquisition_text(dest))}<br><small>{escape(acquisition_status_text(dest))}</small>{f'<br><small>Benchmark not calculable: {escape(acquisition_benchmark_reason(dest))}</small>' if acquisition_benchmark_status(dest) != 'calculable' else ''}</td>
               <td>{escape(dest.get("net_yield_estimate") or "n/a")}</td>
               <td>{metric_value(dest, "ownership_clarity"):.1f}/5</td>
               <td>{metric_value(dest, "retirement_fit"):.1f}/5</td>
@@ -5388,6 +5494,7 @@ def build_seo_destination_table(destinations: list[dict]) -> str:
               <th>Destination</th>
               <th>Score</th>
               <th>Entry</th>
+              <th>Acquisition capital</th>
               <th>Yield</th>
               <th>Ownership</th>
               <th>Retirement</th>
@@ -5413,7 +5520,8 @@ def build_seo_destination_cards(destinations: list[dict]) -> str:
               </div>
               <dl>
                 <div><dt>Decision score</dt><dd>{dest.get("decision_score", 0):.1f}/5</dd></div>
-                <div><dt>Entry benchmark</dt><dd>{money(dest.get("usd_per_m2"))}/m2</dd></div>
+                <div><dt>Property price</dt><dd>{money(dest.get("comparison_home_usd"))}<br><small>{escape(str(dest.get("comparison_home_evidence") or "proxy"))}</small></dd></div>
+                <div><dt>All-in</dt><dd>{escape(all_in_acquisition_text(dest))}<br><small>{escape(acquisition_status_text(dest))}</small>{f'<br><small>Benchmark not calculable: {escape(acquisition_benchmark_reason(dest))}</small>' if acquisition_benchmark_status(dest) != 'calculable' else ''}</dd></div>
                 <div><dt>Ownership</dt><dd>{metric_value(dest, "ownership_clarity"):.1f}/5</dd></div>
                 <div><dt>Exit liquidity</dt><dd>{metric_value(dest, "exit_liquidity"):.1f}/5</dd></div>
               </dl>
@@ -8109,17 +8217,21 @@ def foreign_buyer_destination_comparison_html(
         rows.append(
             f'<tr><th scope="row"><a href="{href}">{name}</a></th>'
             f'<td>{escape(read["asking_price_context"])}</td>'
+            f'<td>All-in {escape(all_in_acquisition_text(destination))}<br><small>{escape(acquisition_status_text(destination))}</small>'
+            f'{f"<br><small>Benchmark not calculable: {escape(acquisition_benchmark_reason(destination))}</small>" if acquisition_benchmark_status(destination) != "calculable" else ""}</td>'
             f'<td>{escape(read["best_for"])}</td><td>{escape(read["verify_first"])}</td></tr>'
         )
         cards.append(
-            f'<article><h3><a href="{href}">{name}</a></h3>'
+            f'<article class="comparison-card"><h3><a href="{href}">{name}</a></h3>'
             f'<p><strong>Asking-price context:</strong> {escape(read["asking_price_context"])}</p>'
+            f'<p><strong>All-in</strong> {escape(all_in_acquisition_text(destination))}<br><small>{escape(acquisition_status_text(destination))}</small>'
+            f'{f"<br><small>Benchmark not calculable: {escape(acquisition_benchmark_reason(destination))}</small>" if acquisition_benchmark_status(destination) != "calculable" else ""}</p>'
             f'<p><strong>Best for:</strong> {escape(read["best_for"])}</p>'
             f'<p><strong>Verify first:</strong> {escape(read["verify_first"])}</p></article>'
         )
     table = (
         '<table class="foreign-buyer-destination-table"><thead><tr>'
-        '<th scope="col">Destination</th><th scope="col">Asking-price context</th><th scope="col">Best for</th>'
+        '<th scope="col">Destination</th><th scope="col">Asking-price context</th><th scope="col">Acquisition capital</th><th scope="col">Best for</th>'
         f'<th scope="col">Verify first</th></tr></thead><tbody>{"".join(rows)}</tbody></table>'
     )
     return table, f'<div class="foreign-buyer-destination-cards">{"".join(cards)}</div>'
@@ -8723,7 +8835,7 @@ def build_seo_page(
     if is_editorial_article:
         overview_html = f"{overview_html}{editorial_content}"
     hero_actions = "" if is_editorial_article else f'''<div class="seo-actions"><a class="seo-button" href="/dashboard/#destinations" data-track="dashboard_open" data-track-label="{escape(page["h1"])} hero">Open the full dashboard</a><a class="seo-button secondary" href="#comparison" data-track="guide_compare_jump" data-track-label="{escape(page["h1"])}">Compare destinations</a></div>'''
-    hero_aside = "" if is_editorial_article else f'''<aside class="seo-hero-card"><span>Top current match</span><strong>{escape(top["name"])}</strong><span>Alternative to test</span><strong>{escape(runner_up["name"])}</strong><span>Destinations compared</span><strong>{len(selected)}</strong></aside>'''
+    hero_aside = "" if is_editorial_article else f'''<aside class="seo-hero-card"><span>Top current match</span><strong>{escape(top["name"])}</strong><span>Top all-in</span><strong>{escape(all_in_acquisition_text(top))}</strong><small>{escape(acquisition_status_text(top))}</small><span>Alternative to test</span><strong>{escape(runner_up["name"])}</strong><span>Destinations compared</span><strong>{len(selected)}</strong></aside>'''
     guide_summary = "" if is_editorial_article else f'''<section class="seo-panel" aria-label="Guide summary"><div class="seo-stats"><div><span>Primary keyword</span><strong>{escape(page["keyword"])}</strong></div><div><span>Destinations</span><strong>{len(selected)}</strong></div><div><span>Decision model</span><strong>{len(DIMENSIONS)} dimensions</strong></div><div><span>Research status</span><strong>Updated {updated}</strong></div></div></section>'''
     decision_path = "" if is_editorial_article else guide_decision_path_html(page, destinations, pages)
     destination_notes_title = "Four places to test in person" if is_japan_article else "Destination Notes for Serious Buyers"
@@ -10442,16 +10554,14 @@ def build_premium_destination_page(
         for item in destinations
         if item.get("category") == dest.get("category")
         and item.get("id") != dest.get("id")
-        and get_premium_dossier(item.get("id")) is not None
     ]
     destination_by_id = {item.get("id"): item for item in destinations}
     override_peers = [
         destination_by_id[destination_id]
         for destination_id in PREMIUM_DESTINATION_PEER_OVERRIDES.get(dest.get("id"), [])
         if destination_id in destination_by_id
-        and get_premium_dossier(destination_id) is not None
     ]
-    candidates = override_peers or country_peers or category_peers
+    candidates = [*override_peers, *country_peers, *category_peers]
     for candidate in candidates:
         candidate_id = candidate.get("id")
         if candidate_id == dest.get("id") or candidate_id in peer_ids:
@@ -10515,7 +10625,7 @@ def build_premium_destination_page(
   <style>{premium_dossier_css()}</style>
 </head>
 <body class="premium-dossier">
-  <header class="premium-hero">
+  <header class="premium-hero page-hero">
     <div class="premium-shell">
       {primary_nav_html()}
       <div class="premium-hero-grid">
@@ -10523,6 +10633,11 @@ def build_premium_destination_page(
           <h1>{escape(spec.h1)}</h1>
           <p class="premium-lede">{escape(spec.lede)}</p>
           <p class="premium-byline">By {escape(spec.author)} · Published {escape(spec.date_published)} · Reviewed {escape(spec.date_reviewed)}</p>
+          <p><strong>Property price evidence</strong> {escape(str(dest.get("comparison_home_evidence") or "proxy"))}</p>
+          {f'<p><strong>All-in acquisition capital</strong> {escape(all_in_acquisition_text(dest))}</p>' if acquisition_route_status(dest) != 'unavailable' else ''}
+          <p><strong>{escape(acquisition_route_text(dest))}</strong></p>
+          {f'<p><strong>Acquisition benchmark</strong> {escape(acquisition_benchmark_text(dest))}</p>' if acquisition_benchmark_status(dest) != 'calculable' else ''}
+          <p><a href="#acquisition-costs">View acquisition costs</a></p>
           {access_notice}
         </div>
         {premium_dossier_figure(spec.images[0], hero=True)}
@@ -10532,6 +10647,7 @@ def build_premium_destination_page(
   <main>
     <div class="premium-shell premium-content">
       <article class="premium-article">
+        {destination_quick_decision_html(dest)}
         {search_intent_section}
         <section class="premium-section" id="verdict"><h2>The verdict</h2>{verdict}</section>
         {premium_dossier_lenses_html(spec)}
@@ -10544,6 +10660,7 @@ def build_premium_destination_page(
         <section class="premium-section" id="listings">
           {property_evidence}
         </section>
+        {destination_acquisition_cost_html(dest)}
         {premium_dossier_micro_locations_html(spec)}
         <section class="premium-section" id="checklist">
           <h2>Buyer checklist—in decision order</h2>
@@ -10551,6 +10668,7 @@ def build_premium_destination_page(
           <p class="premium-handoff">For the national residence, tax and ownership framework, read about {national_guide_sentence}. To size the plan, use the <a href="/{RETIREMENT_CALCULATOR_SLUG}/" data-track="retirement_calculator_open" data-track-label="destination page">retirement abroad calculator</a>. {comparison_handoff}</p>
         </section>
         {fire_abroad_context_link({dest["id"]}, set(CANONICAL_LAUNCH_IDS))}
+        {destination_compare_html(dest, peer_destinations)}
         {premium_dossier_references_html(spec)}
       </article>
       <aside class="premium-rail" aria-label="In this dossier">
@@ -10661,6 +10779,8 @@ def build_destination_page(
     peer_links = destination_links(peer_destinations, limit=6) or destination_links(destinations, slug, limit=6)
     destination_guide_links = guide_links_for_destination(dest, pages)
     market_summary = destination_market_summary_html(dest)
+    quick_decision = destination_quick_decision_html(dest)
+    acquisition_section = destination_acquisition_cost_html(dest)
     query_match_section = destination_query_match_html(dest, pages)
     location_map = destination_location_map_html(dest)
     lifestyle_section = destination_lifestyle_html(dest)
@@ -10696,7 +10816,12 @@ def build_destination_page(
         <aside class="page-hero-card">
           <span>Global rank</span><strong>#{dest["rank"]}</strong>
           <span>Overall rating</span><strong>{dest.get("decision_score", 0):.1f}/5</strong>
-          <span>Price guide</span><strong>{money(dest.get("usd_per_m2"))}/m2</strong>
+          <span>Property price</span><strong>{money(dest.get("comparison_home_usd"))}</strong>
+          <span>Property price evidence</span><strong>{escape(str(dest.get("comparison_home_evidence") or "proxy"))}</strong>
+          {f'<span>All-in acquisition capital</span><strong>{escape(all_in_acquisition_text(dest))}</strong>' if acquisition_route_status(dest) != 'unavailable' else ''}
+          <span>Purchase route</span><strong>{escape(acquisition_route_text(dest))}</strong>
+          {f'<span>Acquisition benchmark</span><strong>{escape(acquisition_benchmark_text(dest))}</strong>' if acquisition_benchmark_status(dest) != 'calculable' else ''}
+          <a href="#acquisition-costs">View acquisition costs</a>
         </aside>
       </div>
     </div>
@@ -10704,6 +10829,7 @@ def build_destination_page(
   <main>
     <div class="page-shell">
       {access_notice}
+      {quick_decision}
       {market_summary}
       {query_match_section}
       {location_map}
@@ -10721,6 +10847,7 @@ def build_destination_page(
           {buyer_fit_section}
           {where_to_look_section}
           {budget_section}
+          {acquisition_section}
           <details class="page-section" id="ownership" open>
             <summary><h2>Ownership and Governance</h2></summary>
             <p>{escape(dest.get("ownership_notes") or "Confirm title structure, foreign-buyer rules, taxes, transfer process, and local counsel requirements before relying on any market-level conclusion.")}</p>
@@ -10797,6 +10924,33 @@ def schema_for_trust_page(page: dict, canonical: str) -> list[dict]:
     ]
 
 
+def acquisition_comparison_standard_html() -> str:
+    methodology = load_comparison_methodology()
+    acquisition = load_acquisition_costs()
+    fx = load_json("fx_rates.json")
+    profile = acquisition.get("buyer_profile", {})
+    residency = str(profile.get("residency") or "nonresident").replace("_", " ")
+    financing = str(profile.get("financing") or "cash").replace("_", " ")
+    use = str(profile.get("use") or "second home").replace("_", " ")
+    market = str(profile.get("property_market") or "resale").replace("_", " ")
+    reliefs = "no reliefs" if profile.get("reliefs") in {None, "none"} else str(profile["reliefs"]).replace("_", " ")
+    return f"""
+      <section class="page-section" id="acquisition-standard">
+        <h2>Acquisition-cost comparison standard</h2>
+        <p>The baseline models a {escape(residency)} foreign individual: {escape(financing)} · {escape(use)} · completed {escape(market)} · {escape(reliefs)}. It assumes direct personal ownership where the purchase route is legally plausible.</p>
+        <p>Every destination uses the fixed 100 m² retirement-home archetype ({escape(str(methodology.get('label') or 'indicative retirement home'))}). The base total includes only buyer-side costs marked base. Conditional overlays sit outside the base total and unknown amounts are not treated as zero.</p>
+        <p>Excluded items include seller taxes, financing, furnishing, renovation, insurance, and recurring ownership costs. Midpoints are used for bounded fee ranges, with no intermediate rounding.</p>
+        <p>Calculations use the fixed FX snapshot dated {escape(str(fx.get('as_of') or 'n/a'))}, not live exchange rates. Each record discloses a representative jurisdiction or grouped destination range.</p>
+        <p>No ordinary all-in total is presented when the route is unavailable. Completeness is independent from purchase-route status. Benchmark calculability is independent from both purchase-route status and cost completeness. No acquisition-cost or all-in figure is calculated when the standardized price benchmark does not represent an eligible asset for the modeled route.</p>
+        <p>Incomplete records are labelled known-base/incomplete; a country average is labelled as a known-base average when any contributor is incomplete.</p>
+        <h3>Source hierarchy</h3>
+        <p>Official tax and land authorities come first, followed by legislation and government guidance, major professional firms, and established research providers only when primary sources do not publish a usable range.</p>
+        <p>Acquisition data as of {escape(str(acquisition.get('as_of') or 'n/a'))}; every destination also carries its own review date. Property-price evidence and acquisition-cost confidence are separate.</p>
+        <p>This is comparative research, not individualized tax or legal advice. Outcomes depend on nationality, residence, ownership structure, asset type, municipality, and current law; verify the transaction with local counsel.</p>
+      </section>
+    """
+
+
 def trust_page_body(page: dict) -> str:
     slug = page["slug"]
     if slug == "methodology":
@@ -10815,7 +10969,7 @@ def trust_page_body(page: dict) -> str:
             <p>The score is a shortlist tool, not a purchase instruction. It helps compare destinations on a consistent basis, then forces the buyer to investigate the local legal, tax, financing, building, and neighborhood questions that decide the actual transaction.</p>
             <p>Weights are visible because different buyers should be able to challenge the model. A retirement buyer may raise healthcare and convenience. A pure investor may raise yield and exit liquidity. A lifestyle buyer may raise access and year-round activity.</p>
           </section>
-        """
+        """ + acquisition_comparison_standard_html()
     if slug == "research-standards":
         return """
           <section class="page-section">
@@ -10828,7 +10982,7 @@ def trust_page_body(page: dict) -> str:
             <p>The site prioritizes decision usefulness over destination promotion. Destinations can score well while still carrying material risks. Risks are surfaced directly because affluent global buyers need to understand what can break before they spend time on lawyers, agents, flights, or offers.</p>
             <p>Global Home Atlas is research content. It is not financial, legal, tax, immigration, or investment advice.</p>
           </section>
-        """
+        """ + acquisition_comparison_standard_html()
     if slug == "about":
         return """
           <section class="page-section">
@@ -11470,7 +11624,7 @@ def build(*, as_of: date | None = None) -> Path:
       <option value="mountain">Mountain</option>
       <option value="lake">Lake</option>
     """
-    app_data = json.dumps(
+    app_data = json_for_html(
         {
             "destinations": destinations,
             "listings": listings,
@@ -11479,7 +11633,6 @@ def build(*, as_of: date | None = None) -> Path:
             "acquisition_cost_methodology": acquisition_dataset,
             "generated": build_date.isoformat(),
         },
-        ensure_ascii=False,
     )
 
     html = """<!doctype html>
@@ -12244,6 +12397,9 @@ def build(*, as_of: date | None = None) -> Path:
     .market-row__metric { text-align: right; }
     .market-row__metric strong { font-size: 13px; }
     .market-row__warning { grid-column: 1 / -1; margin: -2px 0 2px 48px; color: #7a3e2b; font-size: 12px; }
+    .market-row > .destination-card { grid-column: 1 / -1; width: 100%; padding-top: 8px; border-top: 1px solid var(--line); }
+    .market-row > .destination-card summary { cursor: pointer; color: var(--teal); font-size: 12px; font-weight: 850; }
+    .market-row > .destination-card p { margin: 6px 0 0; color: var(--muted); font-size: 12px; }
     .market-row__select { display: none; }
     body.compare-mode .market-row { grid-template-columns: 34px minmax(250px, 1.7fr) 92px 120px 140px 120px; }
     body.compare-mode .market-row__select { display: grid; justify-items: center; gap: 3px; color: var(--muted); font-size: 9px; text-transform: uppercase; }
@@ -12368,7 +12524,7 @@ def build(*, as_of: date | None = None) -> Path:
           <button type="button" class="market-sort market-sort--numeric" data-column-sort="ownership" data-sort-label="ownership clarity">Ownership clarity <span class="sort-indicator" aria-hidden="true"></span></button>
         </div>
         <div class="cards" id="cards">__CARDS__</div>
-        <p class="research-note">FX as of __FX_AS_OF__. Verify current prices, availability, taxes, permits, title, and local advice before acting.</p>
+        <p class="research-note">__COMPARISON_DISCLOSURE__ FX as of __FX_AS_OF__. Verify current prices, availability, taxes, permits, title, and local advice before acting.</p>
       </section>
 
       <details class="advanced-controls">
@@ -12496,15 +12652,89 @@ def build(*, as_of: date | None = None) -> Path:
       return destination.decision_dimensions.find((item) => item.key === key)?.score || 0;
     }
 
+    function escapeHtml(value) {
+      return String(value ?? "").replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;"
+      })[character]);
+    }
+
+    function usd(value) {
+      if (value === null || value === undefined) return "Not quantified";
+      const numericValue = Number(value);
+      return Number.isFinite(numericValue) ? "$" + numericValue.toLocaleString(undefined, { maximumFractionDigits: 0 }) : "Not quantified";
+    }
+
+    function usdRange(low, estimate, high) {
+      const values = [low, estimate, high].map((value) => Number(value));
+      const complete = [low, estimate, high].every((value, index) => value !== null && value !== undefined && Number.isFinite(values[index]));
+      if (!complete) return usd(estimate);
+      if (values[0] === values[2]) return usd(estimate);
+      return usd(estimate) + " (" + usd(low) + "–" + usd(high) + ")";
+    }
+
+    function acquisitionCompleteness(destination) {
+      return destination.acquisition_cost_complete === true ? "complete" : "known-base/incomplete";
+    }
+
+    function benchmarkCell(destination) {
+      if (destination.acquisition_benchmark_status === "calculable") return "Calculable";
+      const reason = String(destination.acquisition_benchmark_reason || "No eligible route-aligned benchmark is documented.").trim();
+      return "Not calculable: " + reason;
+    }
+
+    function acquisitionCostCell(destination) {
+      if (destination.acquisition_benchmark_status !== "calculable") return "Not quantified";
+      const amount = usdRange(destination.acquisition_cost_low_usd, destination.acquisition_cost_estimate_usd, destination.acquisition_cost_high_usd);
+      return acquisitionCompleteness(destination) === "complete" ? amount : amount + "; known-base/incomplete";
+    }
+
+    function allInCell(destination) {
+      const status = destination.purchase_route?.status || "unavailable";
+      if (status === "unavailable" || destination.acquisition_benchmark_status !== "calculable") return "Not presented";
+      const amount = usdRange(destination.all_in_acquisition_low_usd, destination.all_in_acquisition_estimate_usd, destination.all_in_acquisition_high_usd);
+      if (acquisitionCompleteness(destination) !== "complete") return amount + "; known-base/incomplete";
+      return status === "conditional" ? amount + "; conditional route" : amount;
+    }
+
+    function routeCell(destination) {
+      const route = destination.purchase_route || {};
+      const status = ["available", "conditional", "unavailable"].includes(route.status) ? route.status : "unavailable";
+      return status.charAt(0).toUpperCase() + status.slice(1) + ": " + (route.label || "Route not documented");
+    }
+
+    function acquisitionRateCell(destination) {
+      if (destination.acquisition_benchmark_status !== "calculable") return "Not quantified";
+      const value = destination.acquisition_cost_rate;
+      if (value === null || value === undefined || !Number.isFinite(Number(value))) {
+        return acquisitionCompleteness(destination) === "complete" ? "Not quantified" : "Not quantified; known-base/incomplete";
+      }
+      const amount = (Number(value) * 100).toFixed(1) + "%";
+      return acquisitionCompleteness(destination) === "complete" ? amount : amount + "; known-base/incomplete";
+    }
+
+    function baseComponentSummary(destination) {
+      const components = destination.acquisition_components || [];
+      if (!components.length) return "<p>No quantified base components.</p>";
+      return `<ul>${components.map((component) => `<li>${escapeHtml(component.label || "Unlabelled component")} — ${escapeHtml(usd(component.estimate_usd))}</li>`).join("")}</ul>`;
+    }
+
+    function conditionalAcquisitionWarning(destination) {
+      const components = destination.conditional_acquisition_components || [];
+      if (!components.length) return "No conditional acquisition items identified.";
+      const unknown = components.filter((component) => component.estimate_usd === null || component.estimate_usd === undefined).length;
+      if (unknown) return "Known-base/incomplete; " + unknown + " unquantified conditional items remain outside comparable totals.";
+      return "Conditional costs: " + components.length + " " + (components.length === 1 ? "item" : "items") + " outside the base total.";
+    }
+
     function selectedCompareDestinations() {
       return [...compareSelected].map((id) => destinationsById.get(id)).filter(Boolean);
     }
 
     function renderCompare() {
       const selected = selectedCompareDestinations();
-      compareSelectionCount.textContent = selected.length + (selected.length === 1 ? " destination selected" : " destinations selected");
-      compareSelectionBar.classList.toggle("hidden", selected.length === 0 && !document.body.classList.contains("compare-mode"));
-      comparePanel.classList.toggle("hidden", selected.length < 2);
+      if (typeof compareSelectionCount !== "undefined") compareSelectionCount.textContent = selected.length + (selected.length === 1 ? " destination selected" : " destinations selected");
+      if (typeof compareSelectionBar !== "undefined") compareSelectionBar.classList.toggle("hidden", selected.length === 0 && !document.body.classList.contains("compare-mode"));
+      if (typeof comparePanel !== "undefined") comparePanel.classList.toggle("hidden", selected.length < 2);
       if (selected.length < 2) {
         compareOutput.className = "compare-empty";
         compareOutput.textContent = selected.length === 1
@@ -12515,7 +12745,14 @@ def build(*, as_of: date | None = None) -> Path:
       compareOutput.className = "compare-table-wrap";
       const rows = [
         ["Decision score", ...selected.map((d) => d.custom_score.toFixed(1))],
-        ["USD/m2", ...selected.map((d) => "$" + Number(d.usd_per_m2 || 0).toLocaleString())],
+        ["Indicative 100 m² retirement home", ...selected.map((d) => usd(d.comparison_home_usd))],
+        ["Property price evidence", ...selected.map((d) => d.comparison_home_evidence || "proxy")],
+        ["Acquisition costs", ...selected.map(acquisitionCostCell)],
+        ["All-in acquisition capital", ...selected.map(allInCell)],
+        ["Effective acquisition rate", ...selected.map(acquisitionRateCell)],
+        ["Purchase route", ...selected.map(routeCell)],
+        ["Acquisition benchmark", ...selected.map(benchmarkCell)],
+        ["Acquisition evidence", ...selected.map((d) => (d.acquisition_cost_confidence || "n/a") + " confidence")],
         ["Net yield", ...selected.map((d) => d.net_yield_estimate || "n/a")],
         ["Ownership", ...selected.map((d) => destinationMetric(d, "ownership_clarity").toFixed(1) + "/5")],
         ["Rental profit", ...selected.map((d) => destinationMetric(d, "rental_profit").toFixed(1) + "/5")],
@@ -12525,8 +12762,8 @@ def build(*, as_of: date | None = None) -> Path:
       ];
       compareOutput.innerHTML = `
         <table class="compare-table">
-          <thead><tr><th>Metric</th>${selected.map((d) => `<th>${d.name}<br><small>${d.country || ""}</small></th>`).join("")}</tr></thead>
-          <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${String(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
+          <thead><tr><th>Metric</th>${selected.map((d) => `<th>${escapeHtml(d.name)}<br><small>${escapeHtml(d.country || "")}</small></th>`).join("")}</tr></thead>
+          <tbody>${rows.map((row) => `<tr>${row.map((cell) => `<td>${escapeHtml(cell)}</td>`).join("")}</tr>`).join("")}</tbody>
         </table>
       `;
     }
@@ -12604,15 +12841,24 @@ def build(*, as_of: date | None = None) -> Path:
       URL.revokeObjectURL(url);
     }
 
+    function buildJsonExport() {
+      return JSON.stringify(data, null, 2);
+    }
+
     document.getElementById("export").addEventListener("click", () => {
       if (window.GHA) window.GHA.track("data_export_json", { destination_count: data.destinations.length });
-      downloadFile("destination-property-dashboard-data.json", "application/json", JSON.stringify(data, null, 2));
+      downloadFile("destination-property-dashboard-data.json", "application/json", buildJsonExport());
     });
 
-    document.getElementById("exportCsv").addEventListener("click", () => {
-      if (window.GHA) window.GHA.track("data_export_csv", { destination_count: data.destinations.length });
+    function csvValue(value) {
+      if (value === null || value === undefined) return "";
+      if (typeof value === "number" && !Number.isFinite(value)) return "";
+      return value;
+    }
+
+    function buildCsv() {
       const rows = [
-        ["rank", "destination", "country", "category", "decision_score", "custom_score", "usd_per_m2", "net_yield", "ownership_score", "retirement_score"],
+        ["rank", "destination", "country", "category", "decision_score", "custom_score", "comparison_home_usd", "comparison_home_area_m2", "comparison_home_evidence", "acquisition_cost_low_usd", "acquisition_cost_estimate_usd", "acquisition_cost_high_usd", "acquisition_cost_rate", "all_in_acquisition_low_usd", "all_in_acquisition_estimate_usd", "all_in_acquisition_high_usd", "purchase_route_status", "acquisition_cost_confidence", "acquisition_jurisdiction_basis", "acquisition_cost_reviewed_on", "acquisition_benchmark_status", "acquisition_benchmark_reason", "acquisition_cost_complete", "acquisition_cost_completeness", "underlying_usd_per_m2", "net_yield", "ownership_score", "retirement_score"],
         ...data.destinations.map((d) => [
           d.rank,
           d.name,
@@ -12620,17 +12866,44 @@ def build(*, as_of: date | None = None) -> Path:
           d.category || "",
           d.decision_score,
           d.custom_score,
+          d.comparison_home_usd,
+          d.comparison_home_area_m2,
+          d.comparison_home_evidence,
+          d.acquisition_cost_low_usd,
+          d.acquisition_cost_estimate_usd,
+          d.acquisition_cost_high_usd,
+          d.acquisition_cost_rate,
+          d.all_in_acquisition_low_usd,
+          d.all_in_acquisition_estimate_usd,
+          d.all_in_acquisition_high_usd,
+          d.purchase_route?.status,
+          d.acquisition_cost_confidence,
+          d.acquisition_jurisdiction_basis,
+          d.acquisition_cost_reviewed_on,
+          d.acquisition_benchmark_status,
+          d.acquisition_benchmark_reason,
+          d.acquisition_cost_complete,
+          d.acquisition_cost_completeness,
           d.usd_per_m2,
           d.net_yield_estimate || "",
           destinationMetric(d, "ownership_clarity"),
           destinationMetric(d, "retirement_fit")
         ])
       ];
-      const csv = rows.map((row) => row.map((cell) => '"' + String(cell).replaceAll('"', '""') + '"').join(",")).join("\\n");
-      downloadFile("destination-property-summary.csv", "text/csv", csv);
+      return rows.map((row) => row.map((cell) => '"' + String(csvValue(cell)).replaceAll('"', '""') + '"').join(",")).join("\\n");
+    }
+
+    document.getElementById("exportCsv").addEventListener("click", () => {
+      if (window.GHA) window.GHA.track("data_export_csv", { destination_count: data.destinations.length });
+      downloadFile("destination-property-summary.csv", "text/csv", buildCsv());
     });
 
     function previewDestinations() {
+      if (compareSelected.size >= 2) return selectedCompareDestinations();
+      return [...data.destinations].sort((a, b) => b.custom_score - a.custom_score).slice(0, 4);
+    }
+
+    function memoDestinations() {
       if (compareSelected.size >= 2) return selectedCompareDestinations();
       return [...data.destinations].sort((a, b) => b.custom_score - a.custom_score).slice(0, 4);
     }
@@ -12645,18 +12918,29 @@ def build(*, as_of: date | None = None) -> Path:
       })[char]);
     }
 
-    function buildPreviewHtml() {
-      const selected = previewDestinations();
+    function buildMemoHtml() {
+      const selected = memoDestinations();
       const generated = new Date().toISOString().slice(0, 10);
       const rows = selected.map((d) => `
         <section>
           <h2>${escapeHtml(d.name)} <span>${escapeHtml(d.country || "")}</span></h2>
           <dl>
             <div><dt>Decision score</dt><dd>${d.custom_score.toFixed(1)} / 5</dd></div>
-            <div><dt>USD/m2</dt><dd>$${Number(d.usd_per_m2 || 0).toLocaleString()}</dd></div>
+            <div><dt>Property price</dt><dd>${escapeHtml(usd(d.comparison_home_usd))}</dd></div>
+            <div><dt>Acquisition costs</dt><dd>${escapeHtml(acquisitionCostCell(d))}</dd></div>
+            <div><dt>All-in capital</dt><dd>${escapeHtml(allInCell(d))}</dd></div>
+            <div><dt>Effective rate</dt><dd>${escapeHtml(acquisitionRateCell(d))}</dd></div>
+            <div><dt>Cost completeness</dt><dd>${escapeHtml(acquisitionCompleteness(d))}</dd></div>
+            <div><dt>Purchase route</dt><dd>${escapeHtml(routeCell(d))}</dd></div>
+            <div><dt>Acquisition confidence</dt><dd>${escapeHtml(d.acquisition_cost_confidence || "n/a")}</dd></div>
+            <div><dt>Acquisition benchmark</dt><dd>${escapeHtml(benchmarkCell(d))}</dd></div>
             <div><dt>Net yield</dt><dd>${escapeHtml(d.net_yield_estimate || "n/a")}</dd></div>
             <div><dt>Ownership</dt><dd>${destinationMetric(d, "ownership_clarity").toFixed(1)} / 5</dd></div>
           </dl>
+          <p><strong>${escapeHtml(d.comparison_home_evidence || "proxy")} property price evidence.</strong></p>
+          <h3>Base acquisition components</h3>
+          ${baseComponentSummary(d)}
+          <p><strong>Conditional warning:</strong> ${escapeHtml(conditionalAcquisitionWarning(d))}</p>
           <h3>Investment thesis</h3>
           <p>${escapeHtml(d.profit_driver || d.panel_summary || "")}</p>
           <h3>Risk check</h3>
@@ -12707,7 +12991,7 @@ def build(*, as_of: date | None = None) -> Path:
         window.GHA.track("memo_export", { selected_count: previewDestinations().length });
         window.GHA.track("memo_preview_export", { selected_count: previewDestinations().length });
       }
-      downloadFile("atlas-comparison-preview.html", "text/html", buildPreviewHtml());
+      downloadFile("atlas-comparison-preview.html", "text/html", buildMemoHtml());
     });
 
     updateSortIndicators();
@@ -12723,6 +13007,7 @@ def build(*, as_of: date | None = None) -> Path:
         "__COUNTRY_COUNT__": str(countries),
         "__LISTING_COUNT__": str(len(listings)),
         "__FX_AS_OF__": escape(fx.get("as_of", "n/a")),
+        "__COMPARISON_DISCLOSURE__": escape(comparison_price_disclosure()),
         "__TOP_SCORE__": f"{destinations[0]['decision_score']:.1f}",
         "__AVG_SCORE__": f"{avg_score:.1f}",
         "__LOW_PRICE__": money(min_price),

@@ -636,7 +636,7 @@ class AcquisitionCostRenderingIntegrationTests(unittest.TestCase):
             "seller taxes, financing, furnishing, renovation, insurance, and recurring ownership costs",
             "Midpoints are used for bounded fee ranges",
             "no intermediate rounding",
-            "fixed FX snapshot dated 2026-06-21",
+            "fixed FX snapshot dated 2026-07",
             "not live exchange rates",
             "representative jurisdiction",
             "grouped destination range",
@@ -647,7 +647,7 @@ class AcquisitionCostRenderingIntegrationTests(unittest.TestCase):
             "known-base/incomplete",
             "country average is labelled as a known-base average",
             "Source hierarchy",
-            "Acquisition data as of 2026-08-19",
+            "Acquisition data as of 2026-09-04",
             "its own review date",
             "Property-price evidence and acquisition-cost confidence are separate",
             "comparative research, not individualized tax or legal advice",
@@ -1115,10 +1115,10 @@ process.stdout.write(JSON.stringify({{
         self.assertIn("2 contributors", portugal)
         self.assertIn("0 unavailable exclusions", portugal)
         self.assertIn("mixed/proxy", portugal)
-        self.assertIn("Known-base avg all-in $1,045,167", canada)
+        self.assertIn("Known-base avg all-in $1,345,047", canada)
         self.assertIn("known-base/incomplete", canada)
         self.assertIn("1 contributor", canada)
-        self.assertIn("1 unavailable exclusion", canada)
+        self.assertIn("2 unavailable exclusions", canada)
         self.assertIn("mixed/proxy", canada)
         self.assertIn("Avg all-in Not quantified", thailand)
         self.assertIn("0 contributors", thailand)
