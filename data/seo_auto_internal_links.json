@@ -1,5 +1,15 @@
 [
   {
+    "anchor": "Queenstown property market and foreign-buyer guide",
+    "description": "Assess current Queenstown pricing, foreign-buyer eligibility, local areas, visitor rules, hazards and resale.",
+    "fingerprint": "gha-seo-priority-queenstown-20260829",
+    "reason": "Support the Queenstown page's current property-market intent from an established second-home guide.",
+    "source_slug": "best-places-to-buy-a-second-home-abroad",
+    "target_path": "/destinations/queenstown/",
+    "theme": "New Zealand market guide",
+    "type": "internal-link"
+  },
+  {
     "anchor": "best countries for expats to buy property",
     "fingerprint": "gha-near-ranking-opportunity-511f2bd9c4ce",
     "reason": "Page is ranking around position 22.1 with 57 impressions. Add internal links, sharpen title/meta, or improve page intent match.",
@@ -32,29 +42,19 @@
     "type": "internal-link"
   },
   {
+    "anchor": "canada retirement property foreign buyers",
+    "fingerprint": "gha-near-ranking-opportunity-256de216a0ad",
+    "reason": "Page is ranking around position 10.1 with 21 impressions. Add internal links, sharpen title/meta, or improve page intent match.",
+    "source_slug": "buy-property-abroad",
+    "target_slug": "canada-retirement-property-foreign-buyers",
+    "type": "internal-link"
+  },
+  {
     "anchor": "where can foreigners buy property",
     "fingerprint": "gha-near-ranking-opportunity-500bdb15c59c",
     "reason": "Page is ranking around position 16.5 with 32 impressions. Add internal links, sharpen title/meta, or improve page intent match.",
     "source_slug": "buy-property-abroad",
     "target_slug": "where-can-foreigners-buy-property",
-    "type": "internal-link"
-  },
-  {
-    "anchor": "Queenstown property market and foreign-buyer guide",
-    "description": "Assess current Queenstown pricing, foreign-buyer eligibility, local areas, visitor rules, hazards and resale.",
-    "fingerprint": "gha-seo-priority-queenstown-20260829",
-    "reason": "Support the Queenstown page's current property-market intent from an established second-home guide.",
-    "source_slug": "best-places-to-buy-a-second-home-abroad",
-    "target_path": "/destinations/queenstown/",
-    "theme": "New Zealand market guide",
-    "type": "internal-link"
-  },
-  {
-    "anchor": "foreign buyer guide to Thailand villas",
-    "fingerprint": "gha-seo-priority-thailand-villas-20260829",
-    "reason": "Connect the broad foreign-buyer ownership guide to the detailed Thailand villa cluster.",
-    "source_slug": "where-can-foreigners-buy-property",
-    "target_slug": "thailand-villa-ownership-foreigners",
     "type": "internal-link"
   },
   {
@@ -73,6 +73,14 @@
     "source_slug": "greece-retirement-property-foreign-buyers",
     "target_path": "/destinations/crete/",
     "theme": "Greece retirement destination",
+    "type": "internal-link"
+  },
+  {
+    "anchor": "foreign buyer guide to Thailand villas",
+    "fingerprint": "gha-seo-priority-thailand-villas-20260829",
+    "reason": "Connect the broad foreign-buyer ownership guide to the detailed Thailand villa cluster.",
+    "source_slug": "where-can-foreigners-buy-property",
+    "target_slug": "thailand-villa-ownership-foreigners",
     "type": "internal-link"
   }
 ]
